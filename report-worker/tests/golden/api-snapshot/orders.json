@@ -3,6 +3,240 @@
   "orders": [
    {
     "businessImpactScore": null,
+    "createdAt": "2026-09-23T19:11:29.075Z",
+    "currentHost": null,
+    "currentTool": null,
+    "domain": "bergersysteme.com",
+    "email": "redacted@example.invalid",
+    "error": null,
+    "finishedAt": "2026-09-23T20:19:37.339Z",
+    "hasReport": true,
+    "hostsCompleted": 7,
+    "hostsTotal": 7,
+    "id": "68d59573-7a93-4efa-89cc-e7b10cc4d140",
+    "isRescan": false,
+    "overallRisk": "MITTEL",
+    "package": "perimeter",
+    "severityCounts": {
+     "CRITICAL": 0,
+     "HIGH": 3,
+     "INFO": 0,
+     "LOW": 6,
+     "MEDIUM": 3
+    },
+    "startedAt": "2026-09-23T19:51:44.224Z",
+    "status": "pending_review",
+    "subscriptionId": null,
+    "targetCount": 1,
+    "targets": [
+     {
+      "canonical": "bergersysteme.com"
+     }
+    ]
+   },
+   {
+    "businessImpactScore": null,
+    "createdAt": "2026-09-23T19:11:25.888Z",
+    "currentHost": null,
+    "currentTool": null,
+    "domain": "heuel.com",
+    "email": "redacted@example.invalid",
+    "error": null,
+    "finishedAt": "2026-09-23T20:39:35.735Z",
+    "hasReport": true,
+    "hostsCompleted": 6,
+    "hostsTotal": 6,
+    "id": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8",
+    "isRescan": false,
+    "overallRisk": "MITTEL",
+    "package": "perimeter",
+    "severityCounts": {
+     "CRITICAL": 0,
+     "HIGH": 1,
+     "INFO": 0,
+     "LOW": 7,
+     "MEDIUM": 3
+    },
+    "startedAt": "2026-09-23T19:48:08.260Z",
+    "status": "pending_review",
+    "subscriptionId": null,
+    "targetCount": 1,
+    "targets": [
+     {
+      "canonical": "heuel.com"
+     }
+    ]
+   },
+   {
+    "businessImpactScore": null,
+    "createdAt": "2026-09-23T19:11:22.680Z",
+    "currentHost": null,
+    "currentTool": null,
+    "domain": "castenow.de",
+    "email": "redacted@example.invalid",
+    "error": null,
+    "finishedAt": "2026-09-23T20:41:32.000Z",
+    "hasReport": true,
+    "hostsCompleted": 6,
+    "hostsTotal": 6,
+    "id": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+    "isRescan": false,
+    "overallRisk": "MITTEL",
+    "package": "perimeter",
+    "severityCounts": {
+     "CRITICAL": 0,
+     "HIGH": 4,
+     "INFO": 0,
+     "LOW": 10,
+     "MEDIUM": 6
+    },
+    "startedAt": "2026-09-23T19:38:57.035Z",
+    "status": "pending_review",
+    "subscriptionId": null,
+    "targetCount": 1,
+    "targets": [
+     {
+      "canonical": "castenow.de"
+     }
+    ]
+   },
+   {
+    "businessImpactScore": null,
+    "createdAt": "2026-09-23T19:11:19.519Z",
+    "currentHost": null,
+    "currentTool": null,
+    "domain": "huendgen-entsorgung.de",
+    "email": "redacted@example.invalid",
+    "error": null,
+    "finishedAt": "2026-09-23T19:51:42.983Z",
+    "hasReport": true,
+    "hostsCompleted": 2,
+    "hostsTotal": 2,
+    "id": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7",
+    "isRescan": false,
+    "overallRisk": "MITTEL",
+    "package": "perimeter",
+    "severityCounts": {
+     "CRITICAL": 0,
+     "HIGH": 1,
+     "INFO": 0,
+     "LOW": 7,
+     "MEDIUM": 2
+    },
+    "startedAt": "2026-09-23T19:29:03.665Z",
+    "status": "pending_review",
+    "subscriptionId": null,
+    "targetCount": 1,
+    "targets": [
+     {
+      "canonical": "huendgen-entsorgung.de"
+     }
+    ]
+   },
+   {
+    "businessImpactScore": null,
+    "createdAt": "2026-09-23T19:11:16.328Z",
+    "currentHost": null,
+    "currentTool": null,
+    "domain": "multi-target (2)",
+    "email": "redacted@example.invalid",
+    "error": null,
+    "finishedAt": "2026-09-23T19:48:07.017Z",
+    "hasReport": true,
+    "hostsCompleted": 4,
+    "hostsTotal": 4,
+    "id": "31d67a02-b485-4d05-b228-dbdde092cc68",
+    "isRescan": false,
+    "overallRisk": "HOCH",
+    "package": "perimeter",
+    "severityCounts": {
+     "CRITICAL": 1,
+     "HIGH": 4,
+     "INFO": 0,
+     "LOW": 7,
+     "MEDIUM": 3
+    },
+    "startedAt": "2026-09-23T19:13:40.689Z",
+    "status": "pending_review",
+    "subscriptionId": null,
+    "targetCount": 2,
+    "targets": [
+     {
+      "canonical": "junkerwerk.de"
+     },
+     {
+      "canonical": "junkerwerk.hu"
+     }
+    ]
+   },
+   {
+    "businessImpactScore": null,
+    "createdAt": "2026-09-23T19:11:13.167Z",
+    "currentHost": null,
+    "currentTool": null,
+    "domain": "lumbeck-wolter.de",
+    "email": "redacted@example.invalid",
+    "error": null,
+    "finishedAt": "2026-09-23T19:29:02.441Z",
+    "hasReport": true,
+    "hostsCompleted": 1,
+    "hostsTotal": 1,
+    "id": "c3d5724c-bdbf-4da8-982f-4f1a52210e28",
+    "isRescan": false,
+    "overallRisk": "HOCH",
+    "package": "perimeter",
+    "severityCounts": {
+     "CRITICAL": 1,
+     "HIGH": 1,
+     "INFO": 0,
+     "LOW": 4,
+     "MEDIUM": 0
+    },
+    "startedAt": "2026-09-23T19:13:39.559Z",
+    "status": "pending_review",
+    "subscriptionId": null,
+    "targetCount": 1,
+    "targets": [
+     {
+      "canonical": "lumbeck-wolter.de"
+     }
+    ]
+   },
+   {
+    "businessImpactScore": null,
+    "createdAt": "2026-09-23T19:07:32.581Z",
+    "currentHost": null,
+    "currentTool": null,
+    "domain": "dortmund-beach.com",
+    "email": "redacted@example.invalid",
+    "error": null,
+    "finishedAt": "2026-09-23T19:38:55.743Z",
+    "hasReport": true,
+    "hostsCompleted": 1,
+    "hostsTotal": 1,
+    "id": "1fbc92b9-34ab-414e-8843-a1f1e9f15431",
+    "isRescan": false,
+    "overallRisk": "MITTEL",
+    "package": "perimeter",
+    "severityCounts": {
+     "CRITICAL": 0,
+     "HIGH": 4,
+     "INFO": 0,
+     "LOW": 7,
+     "MEDIUM": 2
+    },
+    "startedAt": "2026-09-23T19:10:20.903Z",
+    "status": "pending_review",
+    "subscriptionId": null,
+    "targetCount": 1,
+    "targets": [
+     {
+      "canonical": "dortmund-beach.com"
+     }
+    ]
+   },
+   {
+    "businessImpactScore": null,
     "createdAt": "2026-09-20T10:43:46.203Z",
     "currentHost": null,
     "currentTool": "uploading",

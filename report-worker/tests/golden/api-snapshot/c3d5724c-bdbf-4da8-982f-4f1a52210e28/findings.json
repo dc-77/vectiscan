@@ -1,0 +1,770 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 1,
+   "high": 1,
+   "info": 0,
+   "low": 4,
+   "medium": 0
+  },
+  "business_impact_score": "0.0",
+  "catalog_version": "2026-09-23.2",
+  "engine": "catalog",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "facts_schema_version": "1.0.4",
+  "findings": [
+   {
+    "affected": "116.202.77.64:3306 (MariaDB), 116.202.77.64:5432 (PostgreSQL)",
+    "category": "A",
+    "description": "Der Host 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) beantwortet Verbindungen auf Datenbankports aus dem gesamten Internet: 116.202.77.64:3306 (MariaDB), 116.202.77.64:5432 (PostgreSQL). Ein Datenbankdienst gehört nicht an das öffentliche Interface.",
+    "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:3306/tcp Dienst=mysql Produkt=MySQL Version=5.5.5-10.11.18-MariaDB-0+deb12u1 Zustand=open Verfahren=mysql_native_password\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 1208244 Capabilities flags: 65534 Some Capabilities: FoundRows, Support41Auth, LongColumnFlag, Speaks41ProtocolOld, SupportsTransactions, SupportsCompression,...\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:5432/tcp Dienst=postgresql Produkt=PostgreSQL DB Version=9.6.0 or later Zustand=open",
+    "id": "VS-2026-001",
+    "impact": "Ein von außen erreichbarer Datenbankdienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar. Betroffen wären die gespeicherten Inhalte, typischerweise Seiteninhalte, Formulareingaben und Kontaktdaten.",
+    "level": "kritisch",
+    "policy_id": "db_exposed",
+    "recommendation": "Unverzüglich: Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken.\nIn Kürze: Datenbank-Zugangsdaten rotieren und die Zugriffsprotokolle der letzten Monate auf fremde Anmeldeversuche prüfen.\nMittelfristig: Administrativen Datenbankzugriff ausschließlich über einen SSH-Tunnel oder ein VPN zulassen.",
+    "scale": "exposure",
+    "severity": "CRITICAL",
+    "source": "aktiv (nmap)",
+    "title": "Datenbankdienst aus dem Internet erreichbar",
+    "urgency": "Unverzüglich",
+    "verification": "Portscan der betroffenen Datenbankports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen."
+   },
+   {
+    "affected": "lumbeck-wolter.de, lumbeck-wolter.de (~all)",
+    "category": "C",
+    "description": "Für lumbeck-wolter.de sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: lumbeck-wolter.de, lumbeck-wolter.de (~all).",
+    "evidence": "dns_records · phase0/dns_records.json\nlumbeck-wolter.de: SPF=v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.horn...",
+    "id": "VS-2026-002",
+    "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
+    "level": "hoch",
+    "policy_id": "dmarc_missing, spf_softfail",
+    "recommendation": "In Kürze: Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.\nMittelfristig: Die Richtlinie stufenweise auf Zurückweisung stellen, sobald alle Versandquellen erfasst sind, und den Abgleich der Absender scharf schalten.",
+    "scale": "hygiene",
+    "severity": "HIGH",
+    "source": "aktiv (dns_records)",
+    "title": "Richtlinie zur Absender-Authentizität für lumbeck-wolter.de nicht durchsetzend",
+    "urgency": "In Kürze",
+    "verification": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
+   },
+   {
+    "affected": "116.202.77.64:110 (POP3), 116.202.77.64:143 (IMAP), 116.202.77.64:21 (FTP)",
+    "category": "A",
+    "description": "Der Host 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 116.202.77.64:110 (POP3), 116.202.77.64:143 (IMAP), 116.202.77.64:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
+    "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open TLS erzwungen=ja\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n21/tcp open ftp ProFTPD (requires SSL)\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:110/tcp Dienst=pop3 Produkt=Courier pop3d Zustand=open STARTTLS=ja Capabilities=STLS, TOP, PIPELINING, SASL\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\npop3-capabilities: STLS TOP PIPELINING SASL CAPA RESP-CODES AUTH-RESP-CODE UIDL\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:143/tcp Dienst=imap Produkt=Dovecot imapd Zustand=open TLS erzwungen=ja STARTTLS=ja Anmeldung gesperrt=ja Capabilities=more, have, STARTTLS, OK\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\nimap-capabilities: more have STARTTLS OK listed IDLE ID SASL-IR capabilities IMAP4rev1 ENABLE post-login LOGIN-REFERRALS LITERAL+ LOGINDISABLEDA0001 Pre-login",
+    "id": "VS-2026-003",
+    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
+    "level": "niedrig",
+    "policy_id": "legacy_protocols_present",
+    "recommendation": "In Kürze: Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.\nMittelfristig: Falls der Dienst benötigt wird, den Zugriff auf feste Quelladressen beschränken und eine erzwungene Verschlüsselung sicherstellen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (nmap)",
+    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+    "urgency": "Mittelfristig",
+    "verification": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
+   },
+   {
+    "affected": "lumbeck-wolter.de",
+    "category": "C",
+    "description": "Für lumbeck-wolter.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: lumbeck-wolter.de.",
+    "evidence": "dns_records · phase0/dns_records.json\nlumbeck-wolter.de: SPF=v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.horn...",
+    "id": "VS-2026-004",
+    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
+    "level": "niedrig",
+    "policy_id": "dane_missing, mta_sts_missing, tls_rpt_missing",
+    "recommendation": "Strategisch: Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (dns_records)",
+    "title": "Transportverschlüsselung im Mailversand für lumbeck-wolter.de nicht erzwungen",
+    "urgency": "Strategisch",
+    "verification": "DNS-Abfrage der genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
+   },
+   {
+    "affected": "116.202.77.64:222 (OpenSSH 9.2p1), 116.202.77.64:3306 (MariaDB 10.11.18), 116.202.77.64:5432 (PostgreSQL unbekannt)",
+    "category": "E",
+    "description": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 116.202.77.64:222 (OpenSSH 9.2p1), 116.202.77.64:3306 (MariaDB 10.11.18), 116.202.77.64:5432 (PostgreSQL unbekannt).",
+    "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:222/tcp Dienst=ssh Produkt=OpenSSH Version=9.2p1 Zustand=open\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n222/tcp open ssh OpenSSH 9.2p1 (protocol 2.0)\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:3306/tcp Dienst=mysql Produkt=MySQL Version=5.5.5-10.11.18-MariaDB-0+deb12u1 Zustand=open Verfahren=mysql_native_password\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 1208244 Capabilities flags: 65534 Some Capabilities: FoundRows, Support41Auth, LongColumnFlag, Speaks41ProtocolOld, SupportsTransactions, SupportsCompression,...\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:5432/tcp Dienst=postgresql Produkt=PostgreSQL DB Version=9.6.0 or later Zustand=open",
+    "id": "VS-2026-005",
+    "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
+    "level": "niedrig",
+    "policy_id": "service_banner_version",
+    "recommendation": "Mittelfristig: Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.\nStrategisch: Die Vorgabe für Antwort-Header und erlaubte Methoden an einer Stelle pflegen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (nmap)",
+    "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+    "urgency": "Mittelfristig",
+    "verification": "Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue Versionsangabe und ohne die zusätzlichen Methoden."
+   },
+   {
+    "affected": "lumbeck-wolter.de",
+    "category": "E",
+    "description": "Für lumbeck-wolter.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: lumbeck-wolter.de.",
+    "evidence": "dns_records · phase0/dns_records.json\nlumbeck-wolter.de: SPF=v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.horn...",
+    "id": "VS-2026-006",
+    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
+    "level": "niedrig",
+    "policy_id": "caa_missing, dnssec_missing",
+    "recommendation": "Strategisch: Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (dns_records)",
+    "title": "DNS-Absicherung für lumbeck-wolter.de nicht eingerichtet",
+    "urgency": "Strategisch",
+    "verification": "DNS-Abfrage der Signatur und der Ausstellungseingrenzung wiederholen; erwartet wird je ein gültiger Eintrag."
+   }
+  ],
+  "overall_description": "Die Prüfung vom 23.09.2026 umfasst einen Host und zwei Hostnamen unter der Domain lumbeck-wolter.de und führt zu sechs Befunden sowie fünf positiven Feststellungen. Im Vordergrund steht, dass auf 116.202.77.64 die Datenbankdienste MariaDB auf Port 3306 und PostgreSQL auf Port 5432 aus dem gesamten Internet erreichbar sind; dieser Zugriff ist unverzüglich in der Verwaltung des Hosters oder in der Firewall zu deaktivieren oder auf feste Quelladressen zu beschränken. In Kürze folgt die Veröffentlichung einer durchsetzenden Richtlinie zur Absender-Authentizität mit Meldeadresse und der Auswertung der eingehenden Berichte. Mittelfristig sind die Altprotokolle auf Notwendigkeit zu prüfen und Versionsangaben sowie nicht benötigte Methoden aus den Antworten der Dienste zu entfernen, strategisch stehen erzwungene Transportverschlüsselung im Mailversand sowie die DNS-Absicherung an.",
+  "overall_risk": "HOCH",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "caa_missing",
+   "dane_missing",
+   "db_exposed",
+   "dmarc_missing",
+   "dnssec_missing",
+   "legacy_protocols_present",
+   "mta_sts_missing",
+   "service_banner_version",
+   "spf_softfail",
+   "tls_rpt_missing"
+  ],
+  "policy_version": "Katalog 2026-09-23.2 / Fakten 1.0.4",
+  "positive_findings": [
+   {
+    "category": "A",
+    "description": "Der Host 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) bietet seinen Webdienst über HTTPS an.",
+    "id": "VS-P01",
+    "title": "Webdienst mit Transportverschlüsselung"
+   },
+   {
+    "category": "A",
+    "description": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) lehnen die Datei- und Mailzugänge eine Anmeldung ohne aufgebaute Transportverschlüsselung ab.",
+    "id": "VS-P02",
+    "title": "Datei- und Mailzugänge erzwingen TLS vor der Anmeldung"
+   },
+   {
+    "category": "C",
+    "description": "Für lumbeck-wolter.de lehnen die Nameserver den Abruf der gesamten Zone ab, und kein Eintrag zeigt auf ein aufgegebenes Ziel.",
+    "id": "VS-P03",
+    "title": "Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge"
+   },
+   {
+    "category": "C",
+    "description": "Für lumbeck-wolter.de sind die grundlegenden Einträge zur Absender-Authentizität vorhanden.",
+    "id": "VS-P04",
+    "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
+   },
+   {
+    "category": "E",
+    "description": "Zu den geprüften Adressen und zur Domain liegt in den abgefragten Reputationsquellen kein Eintrag vor.",
+    "id": "VS-P05",
+    "title": "Keine Einträge in Reputationsquellen"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken.",
+    "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
+    "findings": [
+     "VS-2026-001"
+    ],
+    "priority": "Unverzüglich"
+   },
+   {
+    "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
+    "effect": "Schützt die Authentizität der eigenen E-Mail",
+    "findings": [
+     "VS-2026-002"
+    ],
+    "priority": "In Kürze"
+   },
+   {
+    "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
+    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+    "findings": [
+     "VS-2026-003",
+     "VS-2026-005"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain. Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
+    "effect": "Schützt die Authentizität der eigenen E-Mail",
+    "findings": [
+     "VS-2026-004",
+     "VS-2026-006"
+    ],
+    "priority": "Strategisch"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 1,
+   "HIGH": 1,
+   "INFO": 0,
+   "LOW": 4,
+   "MEDIUM": 0
+  },
+  "tech_profiles": [
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "443",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "3306",
+      "service": "MariaDB 10.11.18-MariaDB-0+deb12u1"
+     },
+     {
+      "port": "5432",
+      "service": "PostgreSQL 9.6.0 or later"
+     },
+     {
+      "port": "993",
+      "service": ""
+     },
+     {
+      "port": "995",
+      "service": ""
+     },
+     {
+      "port": "587",
+      "service": ""
+     },
+     {
+      "port": "110",
+      "service": ""
+     },
+     {
+      "port": "143",
+      "service": ""
+     },
+     {
+      "port": "465",
+      "service": ""
+     },
+     {
+      "port": "21",
+      "service": ""
+     },
+     {
+      "port": "22",
+      "service": ""
+     },
+     {
+      "port": "25",
+      "service": ""
+     },
+     {
+      "port": "4190",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "www.lumbeck-wolter.de",
+     "lumbeck-wolter.de"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "116.202.77.64",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     22,
+     80,
+     110,
+     143,
+     222,
+     443,
+     465,
+     587,
+     993,
+     995,
+     3306,
+     5432
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      993,
+      995,
+      3306,
+      587,
+      110,
+      143,
+      80,
+      465,
+      21,
+      22,
+      5432,
+      25,
+      443,
+      4190
+     ],
+     "shodan_services": {
+      "3306": "MariaDB 10.11.18-MariaDB-0+deb12u1",
+      "443": "Apache httpd",
+      "5432": "PostgreSQL 9.6.0 or later",
+      "80": "Apache httpd"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "www.lumbeck-wolter.de",
+    "redirect_data": {
+     "www.lumbeck-wolter.de": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://www.lumbeck-wolter.de/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "www.lumbeck-wolter.de",
+      "final_url": "https://www.lumbeck-wolter.de/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": "Apache httpd",
+    "tech_rows": [
+     {
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "2018-12-31",
+      "is_mega_cve": false,
+      "latest_patch": "5.5.63",
+      "name": "MySQL",
+      "patch_status": "eol",
+      "source": "tech_detect",
+      "status": "eol",
+      "top_cve": null,
+      "version": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "2021-11-11",
+      "is_mega_cve": false,
+      "latest_patch": "9.6.24",
+      "name": "PostgreSQL DB",
+      "patch_status": "eol",
+      "source": "tech_detect",
+      "status": "eol",
+      "top_cve": null,
+      "version": "9.6.0 or later",
+      "vuln_name": ""
+     },
+     {
+      "category": "Remote-Access",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "9.2p1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 110)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 110",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 143)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 143",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 21)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 21",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 22)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 22",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 25",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 3306)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "MariaDB",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "10.11.18-MariaDB-0+deb12u1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 4190)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 4190",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 465)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 465",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 5432)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PostgreSQL 9.6.0 or later",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 587)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 587",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 993)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 993",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 995)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 995",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Courier pop3d",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ProFTPD",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ProFTPD mod_sftp",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "ProFTPD",
+      "version": ""
+     },
+     {
+      "name": "ProFTPD mod_sftp",
+      "version": ""
+     },
+     {
+      "name": "Apache httpd",
+      "version": ""
+     },
+     {
+      "name": "Courier pop3d",
+      "version": ""
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "9.2p1"
+     },
+     {
+      "name": "MySQL",
+      "version": "5.5.5-10.11.18-MariaDB-0+deb12u1"
+     },
+     {
+      "name": "PostgreSQL DB",
+      "version": "9.6.0 or later"
+     }
+    ],
+    "vhost_results": {
+     "www.lumbeck-wolter.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "www.lumbeck-wolter.de"
+   }
+  ]
+ },
+ "success": true
+}

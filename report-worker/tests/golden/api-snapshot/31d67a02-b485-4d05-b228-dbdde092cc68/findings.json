@@ -1,0 +1,1690 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 1,
+   "high": 4,
+   "info": 0,
+   "low": 7,
+   "medium": 3
+  },
+  "business_impact_score": "5.0",
+  "catalog_version": "2026-09-23.2",
+  "engine": "catalog",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "facts_schema_version": "1.0.4",
+  "findings": [
+   {
+    "affected": "188.40.3.130:3306 (MariaDB), 188.40.3.130:5432 (PostgreSQL)",
+    "category": "A",
+    "description": "Der Host 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de) beantwortet Verbindungen auf Datenbankports aus dem gesamten Internet: 188.40.3.130:3306 (MariaDB), 188.40.3.130:5432 (PostgreSQL). Ein Datenbankdienst gehört nicht an das öffentliche Interface.",
+    "evidence": "nmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:3306/tcp Dienst=mysql Produkt=MySQL Version=5.5.5-10.11.18-MariaDB-0+deb12u1 Zustand=open Verfahren=mysql_native_password\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 2050949 Capabilities flags: 65534 Some Capabilities: Support41Auth, DontAllowDatabaseTableColumn, Speaks41ProtocolNew, SupportsTransactions, ODBCClient, Ignore...\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:5432/tcp Dienst=postgresql Produkt=PostgreSQL DB Version=9.6.0 or later Zustand=open",
+    "id": "VS-2026-001",
+    "impact": "Ein von außen erreichbarer Datenbankdienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar. Betroffen wären die gespeicherten Inhalte, typischerweise Seiteninhalte, Formulareingaben und Kontaktdaten.",
+    "level": "kritisch",
+    "policy_id": "db_exposed",
+    "recommendation": "Unverzüglich: Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken.\nIn Kürze: Datenbank-Zugangsdaten rotieren und die Zugriffsprotokolle der letzten Monate auf fremde Anmeldeversuche prüfen.\nMittelfristig: Administrativen Datenbankzugriff ausschließlich über einen SSH-Tunnel oder ein VPN zulassen.",
+    "scale": "exposure",
+    "severity": "CRITICAL",
+    "source": "aktiv (nmap)",
+    "title": "Datenbankdienst aus dem Internet erreichbar",
+    "urgency": "Unverzüglich",
+    "verification": "Portscan der betroffenen Datenbankports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen."
+   },
+   {
+    "affected": "217.243.248.28:4433 (SonicWall, laut Passivquelle)",
+    "category": "A",
+    "description": "Eine Passivquelle meldet für 217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 217.243.248.28:4433 (SonicWall, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
+    "evidence": "shodan · phase0a/shodan_hosts.json\nQuelle=shodan 217.243.248.28:4433 Produkt=SonicWall gesehen am=2026-09-19T17:59:34Z Banner=HTTP/1.1 200 OK Server: Web Server Cache-Control: no-store, max-age=0 Content-type: text/html; charset=UTF-8; X-Content-Type-Options: nosniff X-XS...\n\nshodan · phase0a/shodan_hosts.json\n217.243.248.28:4433 SonicWall banner=HTTP/1.1 200 OK Server: Web Server Cache-Control: no-store, max-age=0 Content-type: text/html; charset=UTF-8; X-Content-Type-Options: nosniff X-XSS-Protection:...",
+    "id": "VS-2026-002",
+    "impact": "Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel, denn eine Übernahme betrifft den gesamten Anschluss einschließlich der dahinter liegenden Systeme. Ob es sich um ein Anmeldeportal oder um die Administrationsoberfläche handelt, ist von außen nicht erkennbar.",
+    "level": "hoch",
+    "policy_id": "admin_service_exposed_passive",
+    "recommendation": "In Kürze: Firmware gegen die Sicherheitshinweise des Herstellers abgleichen; lokale Benutzerkonten und Standardkonten prüfen.\nIn Kürze: Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand.\nMittelfristig: Zugriff auf benötigte Quellnetze beschränken und Anmeldeversuche überwachen.",
+    "scale": "hygiene",
+    "severity": "HIGH",
+    "source": "passiv (shodan)",
+    "title": "Verwaltungsoberfläche laut Passivquelle erreichbar",
+    "urgency": "In Kürze",
+    "verification": "Verbindungsversuch auf den gemeldeten Port von einer externen Adresse; erwartet wird keine Verwaltungsanmeldung ohne Zugriffsbeschränkung."
+   },
+   {
+    "affected": "junkerwerk.de, junkerwerk.de (~all)",
+    "category": "C",
+    "description": "Für junkerwerk.de sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: junkerwerk.de, junkerwerk.de (~all).",
+    "evidence": "dns_records · phase0/dns_records.json\njunkerwerk.de: SPF=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all DMARC=nicht vorhanden DKIM-Selektoren=hse1, hse2 MX=mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsec...",
+    "id": "VS-2026-003",
+    "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
+    "level": "hoch",
+    "policy_id": "dmarc_missing, spf_softfail",
+    "recommendation": "In Kürze: Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.\nMittelfristig: Die Richtlinie stufenweise auf Zurückweisung stellen, sobald alle Versandquellen erfasst sind, und den Abgleich der Absender scharf schalten.",
+    "scale": "hygiene",
+    "severity": "HIGH",
+    "source": "aktiv (dns_records)",
+    "title": "Richtlinie zur Absender-Authentizität für junkerwerk.de nicht durchsetzend",
+    "urgency": "In Kürze",
+    "verification": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
+   },
+   {
+    "affected": "junkerwerk.hu, junkerwerk.hu (~all)",
+    "category": "C",
+    "description": "Für junkerwerk.hu sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: junkerwerk.hu, junkerwerk.hu (~all).",
+    "evidence": "dns_records · phase0/dns_records_junkerwerk.hu.json\njunkerwerk.hu: SPF=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all DMARC=nicht vorhanden DKIM-Selektoren=hse1, hse2 MX=mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsec...",
+    "id": "VS-2026-004",
+    "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
+    "level": "hoch",
+    "policy_id": "dmarc_missing, spf_softfail",
+    "recommendation": "In Kürze: Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.\nMittelfristig: Die Richtlinie stufenweise auf Zurückweisung stellen, sobald alle Versandquellen erfasst sind, und den Abgleich der Absender scharf schalten.",
+    "scale": "hygiene",
+    "severity": "HIGH",
+    "source": "aktiv (dns_records)",
+    "title": "Richtlinie zur Absender-Authentizität für junkerwerk.hu nicht durchsetzend",
+    "urgency": "In Kürze",
+    "verification": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
+   },
+   {
+    "affected": "cloud.junkerwerk.de:443 (TLS 1.0, TLS 1.1), cloud.junkerwerk.de:443, cloud.junkerwerk.de:443 (BEAST)",
+    "category": "D",
+    "description": "Die Transportverschlüsselung auf 217.243.248.29 lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: cloud.junkerwerk.de:443 (TLS 1.0, TLS 1.1), cloud.junkerwerk.de:443, cloud.junkerwerk.de:443 (BEAST).",
+    "evidence": "httpx · hosts/217.243.248.29/phase2/httpx.json\ncloud.junkerwerk.de:443 CN=*.junkerwerk.de SAN=*.junkerwerk.de, junkerwerk.de Aussteller=Sectigo Public Server Authentication CA DV R36 gueltig_bis=2026-12-11T23:59:59Z abgelaufen=nein Resttage=79 Namensabweichung=nein Kette vollstaendig...\n\nhttpx · hosts/217.243.248.29/phase2/httpx.json\ncloud.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de gueltig_bis=2026-12-11T23:59:59Z\n\ntestssl · scan_results:testssl:217.243.248.29\nangeboten=TLS1.0, TLS1.1, TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3\n\ntestssl · hosts/217.243.248.29/phase2/testssl.json\nservice=HTTP; pre_128cipher=No 128 cipher limit bug; SSLv2=not offered; SSLv3=not offered; TLS1=offered (deprecated); TLS1_1=offered (deprecated)\n\ntestssl\ncloud.junkerwerk.de:443 Pruefung=BEAST Urteil=vulnerable CVE=CVE-2011-3389 Ausgabe=VULNERABLE -- but also supports higher protocols TLSv1.1 TLSv1.2 (likely mitigated)",
+    "id": "VS-2026-005",
+    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
+    "level": "hoch",
+    "policy_id": "tls_legacy_protocols, tls_no_fallback_scsv, tls_weakness",
+    "recommendation": "In Kürze: Veraltete Protokolle und schwache Verfahren am Dienst abschalten.\nMittelfristig: Das aktuelle Protokoll aktivieren, den Schutz gegen eine erzwungene Rückstufung einschalten und die Gültigkeitsdauer der Transportsicherheits-Vorgabe auf mindestens ein Jahr setzen.\nStrategisch: Die Konfiguration aller verschlüsselten Dienste an einer gemeinsamen Vorgabe ausrichten und regelmäßig prüfen.",
+    "scale": "hygiene",
+    "severity": "HIGH",
+    "source": "aktiv (httpx, testssl)",
+    "threat": {
+     "cves": [
+      "CVE-2011-3389 (von testssl genannt, keine Fremdbewertung vorhanden)",
+      "CVE-2013-0169 (von testssl genannt, keine Fremdbewertung vorhanden)"
+     ],
+     "kev": "",
+     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+    },
+    "title": "Transportverschlüsselung auf 217.243.248.29 mit veralteten Verfahren",
+    "urgency": "In Kürze",
+    "verification": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
+   },
+   {
+    "affected": "autodiscover.junkerwerk.de (Outlook), outlook.junkerwerk.de (Outlook)",
+    "category": "A",
+    "description": "Aus dem Internet sind Portale erreichbar, die eine Anmeldung anbieten: autodiscover.junkerwerk.de (Outlook), outlook.junkerwerk.de (Outlook).",
+    "evidence": "web_probe · argument:host_inventory\nautodiscover.junkerwerk.de Status=200 Titel=Outlook Zieladresse=https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2f&reason=0 erreichbar=ja\n\nweb_probe · argument:host_inventory\noutlook.junkerwerk.de Status=200 Titel=Outlook Zieladresse=https://outlook.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2f&reason=0 erreichbar=ja",
+    "id": "VS-2026-006",
+    "impact": "Ein öffentlich erreichbares Anmeldeportal ist ein gewollter Zugangsweg und zugleich das erste Ziel für Rateangriffe auf Zugangsdaten. Wird ein solches Portal übernommen, steht der Weg in die dahinterliegenden Systeme offen.",
+    "level": "mittel",
+    "policy_id": "login_portal_exposed",
+    "recommendation": "In Kürze: Für jedes Portal eine zweite Anmeldestufe verlangen und den Versionsstand der Portal-Software gegen die Hinweise des Herstellers abgleichen.\nMittelfristig: Den Zugriff auf die Quellnetze beschränken, aus denen eine Anmeldung fachlich nötig ist, und fehlgeschlagene Anmeldeversuche überwachen.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (web_probe)",
+    "title": "Anmelde- und Verwaltungsportale aus dem Internet erreichbar",
+    "urgency": "Mittelfristig",
+    "verification": "Die genannten Portale von außen aufrufen; erwartet wird eine Anmeldung mit zweiter Stufe oder eine Beschränkung auf bekannte Quellnetze."
+   },
+   {
+    "affected": "autodiscover.junkerwerk.de, outlook.junkerwerk.de, autodiscover.junkerwerk.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), outlook.junkerwerk.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
+    "category": "D",
+    "description": "Die Webdienste auf 217.243.248.28 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: autodiscover.junkerwerk.de, outlook.junkerwerk.de, autodiscover.junkerwerk.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), outlook.junkerwerk.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
+    "evidence": "header_check · hosts/217.243.248.28/phase2/headers_autodiscover.junkerwerk.de.json\nautodiscover.junkerwerk.de: URL=https://autodiscover.junkerwerk.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=...\n\nheader_check · hosts/217.243.248.28/phase2/headers_outlook.junkerwerk.de.json\noutlook.junkerwerk.de: URL=https://outlook.junkerwerk.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=Microsoft-...",
+    "id": "VS-2026-007",
+    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen, und ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
+    "level": "mittel",
+    "policy_id": "csp_missing, hsts_missing, security_headers_incomplete",
+    "recommendation": "Mittelfristig: Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.\nStrategisch: Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (header_check)",
+    "title": "Sicherheits-Header und Formularschutz auf 217.243.248.28 unvollständig",
+    "urgency": "Mittelfristig",
+    "verification": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+   },
+   {
+    "affected": "cloud.junkerwerk.de, cloud.junkerwerk.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
+    "category": "D",
+    "description": "Die Webdienste auf 217.243.248.29 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: cloud.junkerwerk.de, cloud.junkerwerk.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
+    "evidence": "header_check · hosts/217.243.248.29/phase2/headers_cloud.junkerwerk.de.json\ncloud.junkerwerk.de: URL=https://cloud.junkerwerk.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=Microsoft-IIS/...",
+    "id": "VS-2026-008",
+    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen, und ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
+    "level": "mittel",
+    "policy_id": "csp_missing, hsts_missing, security_headers_incomplete",
+    "recommendation": "Mittelfristig: Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.\nStrategisch: Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (header_check)",
+    "title": "Sicherheits-Header und Formularschutz auf 217.243.248.29 unvollständig",
+    "urgency": "Mittelfristig",
+    "verification": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+   },
+   {
+    "affected": "188.40.3.130:110 (POP3), 188.40.3.130:143 (IMAP), 188.40.3.130:21 (FTP)",
+    "category": "A",
+    "description": "Der Host 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 188.40.3.130:110 (POP3), 188.40.3.130:143 (IMAP), 188.40.3.130:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
+    "evidence": "nmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open TLS erzwungen=ja\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n21/tcp open ftp ProFTPD (requires SSL)\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:110/tcp Dienst=pop3 Produkt=Courier pop3d Zustand=open STARTTLS=ja Capabilities=SASL, RESP-CODES, PIPELINING, STLS\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\npop3-capabilities: SASL RESP-CODES PIPELINING STLS UIDL AUTH-RESP-CODE TOP CAPA\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:143/tcp Dienst=imap Produkt=Dovecot imapd Zustand=open TLS erzwungen=ja STARTTLS=ja Anmeldung gesperrt=ja Capabilities=IDLE, IMAP4rev1, listed, have\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\nimap-capabilities: IDLE IMAP4rev1 listed have SASL-IR STARTTLS ID LOGIN-REFERRALS LITERAL+ Pre-login more capabilities OK LOGINDISABLEDA0001 post-login ENABLE",
+    "id": "VS-2026-009",
+    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
+    "level": "niedrig",
+    "policy_id": "legacy_protocols_present",
+    "recommendation": "In Kürze: Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.\nMittelfristig: Falls der Dienst benötigt wird, den Zugriff auf feste Quelladressen beschränken und eine erzwungene Verschlüsselung sicherstellen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (nmap)",
+    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+    "urgency": "Mittelfristig",
+    "verification": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
+   },
+   {
+    "affected": "cloud.junkerwerk.de (IIS Windows Server), 217.243.248.29:8443 (Microsoft IIS)",
+    "category": "A",
+    "description": "Auf 217.243.248.29 beantwortet ein Webdienst Anfragen mit der unveränderten Auslieferungsseite des Herstellers, teils auf einem zusätzlichen Port: cloud.junkerwerk.de (IIS Windows Server), 217.243.248.29:8443 (Microsoft IIS).",
+    "evidence": "web_probe · argument:host_inventory\ncloud.junkerwerk.de Status=200 Titel=IIS Windows Server Zieladresse=https://cloud.junkerwerk.de erreichbar=ja\n\nnmap · hosts/217.243.248.29/phase1/nmap.xml\n217.243.248.29:8443/tcp Dienst=http Produkt=Microsoft IIS httpd Version=10.0 Zustand=open TLS erzwungen=ja Capabilities=METHOD:TRACE\n\nnmap · hosts/217.243.248.29/phase1/nmap.xml\n8443/tcp open http Microsoft IIS httpd 10.0 tunnel=ssl\n\nnmap · hosts/217.243.248.29/phase1/nmap.xml\nhttp-methods: Potentially risky methods: TRACE",
+    "id": "VS-2026-010",
+    "impact": "Eine unveränderte Auslieferungsseite verrät, dass hier ein Webserver ohne eigene Anwendung antwortet, und lädt zum Ausprobieren bekannter Pfade ein. Ein zusätzlicher Webport vergrößert die Angriffsfläche, ohne dass sein Zweck von außen erkennbar ist.",
+    "level": "niedrig",
+    "policy_id": "default_page_exposed, http_alt_port",
+    "recommendation": "In Kürze: Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen.\nMittelfristig: Die Auslieferungsseite durch eine leere Antwort oder eine gezielte Weiterleitung ersetzen, damit der Dienst keinen Rückschluss auf das eingesetzte Produkt zulässt.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (nmap, web_probe)",
+    "title": "Unveränderte Auslieferungsseite und zusätzlicher Webport auf 217.243.248.29",
+    "urgency": "Mittelfristig",
+    "verification": "Die genannten Adressen von außen erneut aufrufen; erwartet wird keine Auslieferungsseite des Herstellers und kein zusätzlicher Webport."
+   },
+   {
+    "affected": "junkerwerk.de",
+    "category": "C",
+    "description": "Für junkerwerk.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: junkerwerk.de.",
+    "evidence": "dns_records · phase0/dns_records.json\njunkerwerk.de: SPF=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all DMARC=nicht vorhanden DKIM-Selektoren=hse1, hse2 MX=mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsec...",
+    "id": "VS-2026-011",
+    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
+    "level": "niedrig",
+    "policy_id": "dane_missing, mta_sts_missing, tls_rpt_missing",
+    "recommendation": "Strategisch: Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (dns_records)",
+    "title": "Transportverschlüsselung im Mailversand für junkerwerk.de nicht erzwungen",
+    "urgency": "Strategisch",
+    "verification": "DNS-Abfrage der genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
+   },
+   {
+    "affected": "junkerwerk.hu",
+    "category": "C",
+    "description": "Für junkerwerk.hu fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: junkerwerk.hu.",
+    "evidence": "dns_records · phase0/dns_records_junkerwerk.hu.json\njunkerwerk.hu: SPF=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all DMARC=nicht vorhanden DKIM-Selektoren=hse1, hse2 MX=mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsec...",
+    "id": "VS-2026-012",
+    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
+    "level": "niedrig",
+    "policy_id": "dane_missing, mta_sts_missing, tls_rpt_missing",
+    "recommendation": "Strategisch: Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (dns_records)",
+    "title": "Transportverschlüsselung im Mailversand für junkerwerk.hu nicht erzwungen",
+    "urgency": "Strategisch",
+    "verification": "DNS-Abfrage der genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
+   },
+   {
+    "affected": "autodiscover.junkerwerk.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-SE), cloud.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET), outlook.junkerwerk.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-SE), 217.243.248.29:443 (TRACE aktiv), 217.243.248.29:8443 (TRACE aktiv), 188.40.3.130:222 (OpenSSH 9.2p1), 188.40.3.130:3306 (MariaDB 10.11.18), 188.40.3.130:5432 (PostgreSQL unbekannt), 217.243.248.29:8443 (Microsoft IIS 10.0)",
+    "category": "E",
+    "description": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: autodiscover.junkerwerk.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-SE), cloud.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET), outlook.junkerwerk.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-SE), 217.243.248.29:443 (TRACE aktiv), 217.243.248.29:8443 (TRACE aktiv), 188.40.3.130:222 (OpenSSH 9.2p1), 188.40.3.130:3306 (MariaDB 10.11.18), 188.40.3.130:5432 (PostgreSQL unbekannt), 217.243.248.29:8443 (Microsoft IIS 10.0).",
+    "evidence": "header_check · hosts/217.243.248.28/phase2/headers_autodiscover.junkerwerk.de.json\nautodiscover.junkerwerk.de: URL=https://autodiscover.junkerwerk.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=...\n\nheader_check · hosts/217.243.248.29/phase2/headers_cloud.junkerwerk.de.json\ncloud.junkerwerk.de: URL=https://cloud.junkerwerk.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=Microsoft-IIS/...\n\nheader_check · hosts/217.243.248.28/phase2/headers_outlook.junkerwerk.de.json\noutlook.junkerwerk.de: URL=https://outlook.junkerwerk.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=Microsoft-...\n\nnmap · hosts/217.243.248.29/phase1/nmap.xml\n217.243.248.29:443/tcp Dienst=http Produkt=Microsoft IIS httpd Version=10.0 Zustand=open TLS erzwungen=ja Capabilities=METHOD:TRACE\n\nnmap · hosts/217.243.248.29/phase1/nmap.xml\n443/tcp open http Microsoft IIS httpd 10.0 tunnel=ssl\n\nnmap · hosts/217.243.248.29/phase1/nmap.xml\nhttp-methods: Potentially risky methods: TRACE\n\nund 7 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
+    "id": "VS-2026-013",
+    "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
+    "level": "niedrig",
+    "policy_id": "http_header_disclosure, http_trace_enabled, service_banner_version",
+    "recommendation": "Mittelfristig: Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.\nStrategisch: Die Vorgabe für Antwort-Header und erlaubte Methoden an einer Stelle pflegen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (header_check, nmap)",
+    "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+    "urgency": "Mittelfristig",
+    "verification": "Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue Versionsangabe und ohne die zusätzlichen Methoden."
+   },
+   {
+    "affected": "junkerwerk.de",
+    "category": "E",
+    "description": "Für junkerwerk.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: junkerwerk.de.",
+    "evidence": "dns_records · phase0/dns_records.json\njunkerwerk.de: SPF=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all DMARC=nicht vorhanden DKIM-Selektoren=hse1, hse2 MX=mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsec...",
+    "id": "VS-2026-014",
+    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
+    "level": "niedrig",
+    "policy_id": "caa_missing, dnssec_missing",
+    "recommendation": "Strategisch: Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (dns_records)",
+    "title": "DNS-Absicherung für junkerwerk.de nicht eingerichtet",
+    "urgency": "Strategisch",
+    "verification": "DNS-Abfrage der Signatur und der Ausstellungseingrenzung wiederholen; erwartet wird je ein gültiger Eintrag."
+   },
+   {
+    "affected": "junkerwerk.hu",
+    "category": "E",
+    "description": "Für junkerwerk.hu fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: junkerwerk.hu.",
+    "evidence": "dns_records · phase0/dns_records_junkerwerk.hu.json\njunkerwerk.hu: SPF=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all DMARC=nicht vorhanden DKIM-Selektoren=hse1, hse2 MX=mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsec...",
+    "id": "VS-2026-015",
+    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
+    "level": "niedrig",
+    "policy_id": "caa_missing, dnssec_missing",
+    "recommendation": "Strategisch: Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (dns_records)",
+    "title": "DNS-Absicherung für junkerwerk.hu nicht eingerichtet",
+    "urgency": "Strategisch",
+    "verification": "DNS-Abfrage der Signatur und der Ausstellungseingrenzung wiederholen; erwartet wird je ein gültiger Eintrag."
+   }
+  ],
+  "overall_description": "Die Prüfung vom 23.09.2026 im Paket Perimeter umfasst 4 Hosts, 8 Hostnamen und die Domains junkerwerk.de und junkerwerk.hu und führt zu 15 Befunden sowie 4 positiven Feststellungen. Im Vordergrund steht die Perimeter-Exposition: Auf 188.40.3.130 sind die Datenbankdienste MariaDB auf Port 3306 und PostgreSQL auf Port 5432 aus dem Internet erreichbar, und eine Passivquelle meldet für 217.243.248.28 eine Verwaltungs- oder Firewall-Oberfläche auf Port 4433. Zuerst ist daher der externe Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall zu deaktivieren und, falls eine externe Anwendung ihn benötigt, auf feste Quelladressen zu beschränken. Anschließend folgen die Klärung des gemeldeten Ports 4433, die durchsetzende Richtlinie zur Absender-Authentizität für beide Domains sowie die Abschaltung veralteter Protokolle auf cloud.junkerwerk.de.",
+  "overall_risk": "HOCH",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "admin_service_exposed_passive",
+   "caa_missing",
+   "csp_missing",
+   "dane_missing",
+   "db_exposed",
+   "default_page_exposed",
+   "dmarc_missing",
+   "dnssec_missing",
+   "hsts_missing",
+   "http_alt_port",
+   "http_header_disclosure",
+   "http_trace_enabled",
+   "legacy_protocols_present",
+   "login_portal_exposed",
+   "mta_sts_missing",
+   "security_headers_incomplete",
+   "service_banner_version",
+   "spf_softfail",
+   "tls_legacy_protocols",
+   "tls_no_fallback_scsv",
+   "tls_rpt_missing",
+   "tls_weakness"
+  ],
+  "policy_version": "Katalog 2026-09-23.2 / Fakten 1.0.4",
+  "positive_findings": [
+   {
+    "category": "A",
+    "description": "Der Host 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de), 217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de), 217.243.248.29 (cloud.junkerwerk.de, team.junkerwerk.de) bietet seinen Webdienst über HTTPS an.",
+    "id": "VS-P01",
+    "title": "Webdienst mit Transportverschlüsselung"
+   },
+   {
+    "category": "A",
+    "description": "Auf 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de) lehnen die Datei- und Mailzugänge eine Anmeldung ohne aufgebaute Transportverschlüsselung ab.",
+    "id": "VS-P02",
+    "title": "Datei- und Mailzugänge erzwingen TLS vor der Anmeldung"
+   },
+   {
+    "category": "C",
+    "description": "Für junkerwerk.de, junkerwerk.hu sind die grundlegenden Einträge zur Absender-Authentizität vorhanden.",
+    "id": "VS-P03",
+    "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
+   },
+   {
+    "category": "E",
+    "description": "Zu den geprüften Adressen und zur Domain liegt in den abgefragten Reputationsquellen kein Eintrag vor.",
+    "id": "VS-P04",
+    "title": "Keine Einträge in Reputationsquellen"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken.",
+    "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
+    "findings": [
+     "VS-2026-001"
+    ],
+    "priority": "Unverzüglich"
+   },
+   {
+    "action": "Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand.",
+    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+    "findings": [
+     "VS-2026-002"
+    ],
+    "priority": "In Kürze"
+   },
+   {
+    "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
+    "effect": "Schützt die Authentizität der eigenen E-Mail",
+    "findings": [
+     "VS-2026-003",
+     "VS-2026-004"
+    ],
+    "priority": "In Kürze"
+   },
+   {
+    "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
+    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+    "findings": [
+     "VS-2026-005"
+    ],
+    "priority": "In Kürze"
+   },
+   {
+    "action": "Für jedes Portal eine zweite Anmeldestufe verlangen und den Versionsstand der Portal-Software gegen die Hinweise des Herstellers abgleichen. Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
+    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+    "findings": [
+     "VS-2026-006",
+     "VS-2026-009",
+     "VS-2026-013"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+    "findings": [
+     "VS-2026-007"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren. Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen.",
+    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+    "findings": [
+     "VS-2026-008",
+     "VS-2026-010"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain. Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
+    "effect": "Schützt die Authentizität der eigenen E-Mail",
+    "findings": [
+     "VS-2026-011",
+     "VS-2026-014",
+     "VS-2026-012",
+     "VS-2026-015"
+    ],
+    "priority": "Strategisch"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 1,
+   "HIGH": 4,
+   "INFO": 0,
+   "LOW": 7,
+   "MEDIUM": 3
+  },
+  "tech_profiles": [
+   {
+    "cms": "Microsoft Exchange",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "enriched_from": "zap_spider"
+    },
+    "cms_version": "15.2.2562",
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "222",
+      "service": "OpenSSH 9.2p1"
+     },
+     {
+      "port": "443",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "3306",
+      "service": "MariaDB 10.11.18-MariaDB-0+deb12u1"
+     },
+     {
+      "port": "5432",
+      "service": "PostgreSQL 9.6.0 or later"
+     },
+     {
+      "port": "993",
+      "service": ""
+     },
+     {
+      "port": "995",
+      "service": ""
+     },
+     {
+      "port": "587",
+      "service": ""
+     },
+     {
+      "port": "110",
+      "service": ""
+     },
+     {
+      "port": "143",
+      "service": ""
+     },
+     {
+      "port": "465",
+      "service": ""
+     },
+     {
+      "port": "21",
+      "service": ""
+     },
+     {
+      "port": "25",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "www.junkerwerk.de",
+     "junkerwerk.de",
+     "nachhaltigkeit.junkerwerk.de"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "188.40.3.130",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     22,
+     80,
+     110,
+     143,
+     222,
+     443,
+     465,
+     587,
+     993,
+     995,
+     3306,
+     5432
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      993,
+      995,
+      3306,
+      587,
+      110,
+      143,
+      80,
+      465,
+      21,
+      5432,
+      25,
+      443,
+      222
+     ],
+     "shodan_services": {
+      "222": "OpenSSH 9.2p1",
+      "3306": "MariaDB 10.11.18-MariaDB-0+deb12u1",
+      "443": "Apache httpd",
+      "5432": "PostgreSQL 9.6.0 or later",
+      "80": "Apache httpd"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "www.junkerwerk.de",
+    "redirect_data": {
+     "nachhaltigkeit.junkerwerk.de": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://nachhaltigkeit.junkerwerk.de/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "nachhaltigkeit.junkerwerk.de",
+      "final_url": "https://nachhaltigkeit.junkerwerk.de/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     },
+     "www.junkerwerk.de": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://www.junkerwerk.de/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "www.junkerwerk.de",
+      "final_url": "https://www.junkerwerk.de/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": "Apache httpd",
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "2018-12-31",
+      "is_mega_cve": false,
+      "latest_patch": "5.5.63",
+      "name": "MySQL",
+      "patch_status": "eol",
+      "source": "tech_detect",
+      "status": "eol",
+      "top_cve": null,
+      "version": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "2021-11-11",
+      "is_mega_cve": false,
+      "latest_patch": "9.6.24",
+      "name": "PostgreSQL DB",
+      "patch_status": "eol",
+      "source": "tech_detect",
+      "status": "eol",
+      "top_cve": null,
+      "version": "9.6.0 or later",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Mail",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft Exchange",
+      "patch_status": "aktuell",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "15.2.2562",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Remote-Access",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "9.2p1",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 110)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 110",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 143)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 143",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 21)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 21",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 222)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "9.2p1",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 25",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 3306)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "MariaDB",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "10.11.18-MariaDB-0+deb12u1",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 465)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 465",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 5432)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PostgreSQL 9.6.0 or later",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 587)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 587",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 993)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 993",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 995)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 995",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Courier pop3d",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ProFTPD",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ProFTPD mod_sftp",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "ProFTPD",
+      "version": ""
+     },
+     {
+      "name": "ProFTPD mod_sftp",
+      "version": ""
+     },
+     {
+      "name": "Apache httpd",
+      "version": ""
+     },
+     {
+      "name": "Courier pop3d",
+      "version": ""
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "9.2p1"
+     },
+     {
+      "name": "MySQL",
+      "version": "5.5.5-10.11.18-MariaDB-0+deb12u1"
+     },
+     {
+      "name": "PostgreSQL DB",
+      "version": "9.6.0 or later"
+     },
+     {
+      "name": "Microsoft Exchange",
+      "version": "15.2.2562"
+     }
+    ],
+    "vhost_results": {
+     "nachhaltigkeit.junkerwerk.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "www.junkerwerk.de": {
+      "cms": "Microsoft Exchange",
+      "cms_confidence": 0.95,
+      "cms_version": "15.2.2562",
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "www.junkerwerk.de"
+   },
+   {
+    "cms": "Microsoft Exchange",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "enriched_from": "header_check"
+    },
+    "cms_version": "15.2.2562",
+    "exposed_services": [
+     {
+      "port": "443",
+      "service": "Outlook Web App"
+     },
+     {
+      "port": "4433",
+      "service": "SonicWall"
+     },
+     {
+      "port": "25",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "outlook.junkerwerk.de",
+     "autodiscover.junkerwerk.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "217.243.248.28",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      25,
+      443,
+      4433
+     ],
+     "shodan_services": {
+      "443": "Outlook Web App",
+      "4433": "SonicWall"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "outlook.junkerwerk.de",
+    "redirect_data": {
+     "autodiscover.junkerwerk.de": {
+      "error": null,
+      "final_domain": "autodiscover.junkerwerk.de",
+      "final_url": "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2f&reason=0",
+      "is_cross_domain": false,
+      "page_title": "Outlook",
+      "redirect_chain": [
+       "https://autodiscover.junkerwerk.de/",
+       "https://autodiscover.junkerwerk.de/owa/",
+       "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2f&reason=0",
+       "https://autodiscover.junkerwerk.de/owa/auth/15.2.2562/themes/resources/segoeui-regular.ttf"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache",
+       "content-length": "0",
+       "date": "Wed, 23 Sep 2026 19:18:42 GMT",
+       "location": "https://autodiscover.junkerwerk.de/owa/",
+       "pragma": "no-cache",
+       "server": "Microsoft-IIS/10.0",
+       "x-feserver": "EXCHANGE-SE",
+       "x-requestid": "6608bfd6-0949-49ec-b14e-59573203908c"
+      },
+      "screenshot_path": "/tmp/scan-31d67a02-b485-4d05-b228-dbdde092cc68/hosts/217.243.248.28/phase2/screenshot_autodiscover.junkerwerk.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "signInBg",
+       "cookies": "cookieTest=1",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "IE=10",
+         "name": "X-UA-Compatible"
+        },
+        {
+         "content": "text/html; CHARSET=utf-8",
+         "name": "Content-Type"
+        },
+        {
+         "content": "NOINDEX, NOFOLLOW",
+         "name": "Robots"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Outlook"
+      }
+     },
+     "outlook.junkerwerk.de": {
+      "error": null,
+      "final_domain": "outlook.junkerwerk.de",
+      "final_url": "https://outlook.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2f&reason=0",
+      "is_cross_domain": false,
+      "page_title": "Outlook",
+      "redirect_chain": [
+       "https://outlook.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2f&reason=0",
+       "https://outlook.junkerwerk.de/owa/auth/15.2.2562/themes/resources/segoeui-regular.ttf"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache, no-store",
+       "content-length": "58728",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Wed, 23 Sep 2026 19:18:36 GMT",
+       "expires": "-1",
+       "pragma": "no-cache",
+       "request-id": "b54044d3-51e2-466a-8d9e-d8191a9ba656",
+       "server": "Microsoft-IIS/10.0",
+       "x-aspnet-version": "4.0.30319",
+       "x-frame-options": "SAMEORIGIN",
+       "x-powered-by": "ASP.NET"
+      },
+      "screenshot_path": "/tmp/scan-31d67a02-b485-4d05-b228-dbdde092cc68/hosts/217.243.248.28/phase2/screenshot_outlook.junkerwerk.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "signInBg",
+       "cookies": "cookieTest=1",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "IE=10",
+         "name": "X-UA-Compatible"
+        },
+        {
+         "content": "text/html; CHARSET=utf-8",
+         "name": "Content-Type"
+        },
+        {
+         "content": "NOINDEX, NOFOLLOW",
+         "name": "Robots"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Outlook"
+      }
+     }
+    },
+    "server": null,
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Mail",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft Exchange",
+      "patch_status": "aktuell",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "15.2.2562",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft ASP.NET",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "4.0.30319",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Outlook Web App",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "15.2.2562",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft-IIS",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "10.0",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 25",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Outlook Web App",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 4433)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "SonicWall",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "OS",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Windows Server",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ASP.NET",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Microsoft-IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "ASP.NET",
+      "version": ""
+     },
+     {
+      "name": "Microsoft Exchange",
+      "version": "EXCHANGE-SE"
+     },
+     {
+      "name": "IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "Microsoft ASP.NET",
+      "version": "4.0.30319"
+     },
+     {
+      "name": "Outlook Web App",
+      "version": "15.2.2562"
+     },
+     {
+      "name": "Windows Server",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "autodiscover.junkerwerk.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "outlook.junkerwerk.de": {
+      "cms": "Microsoft Exchange",
+      "cms_confidence": 0.95,
+      "cms_version": "15.2.2562",
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "outlook.junkerwerk.de"
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "443",
+      "service": "Microsoft IIS httpd 10.0"
+     }
+    ],
+    "fqdns": [
+     "cloud.junkerwerk.de",
+     "team.junkerwerk.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "217.243.248.29",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     443,
+     8443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      443
+     ],
+     "shodan_services": {
+      "443": "Microsoft IIS httpd 10.0"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "cloud.junkerwerk.de",
+    "redirect_data": {
+     "cloud.junkerwerk.de": {
+      "error": null,
+      "final_domain": "cloud.junkerwerk.de",
+      "final_url": "https://cloud.junkerwerk.de/",
+      "is_cross_domain": false,
+      "page_title": "IIS Windows Server",
+      "redirect_chain": [
+       "https://cloud.junkerwerk.de/",
+       "https://cloud.junkerwerk.de/iisstart.png"
+      ],
+      "response_headers": {
+       "accept-ranges": "bytes",
+       "content-length": "703",
+       "content-type": "text/html",
+       "date": "Wed, 23 Sep 2026 19:18:40 GMT",
+       "etag": "\"42ffd9228a2cdc1:0\"",
+       "last-modified": "Tue, 23 Sep 2025 13:01:11 GMT",
+       "server": "Microsoft-IIS/10.0",
+       "x-powered-by": "ASP.NET"
+      },
+      "screenshot_path": "/tmp/scan-31d67a02-b485-4d05-b228-dbdde092cc68/hosts/217.243.248.29/phase2/screenshot_cloud.junkerwerk.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "text/html; charset=iso-8859-1",
+         "name": "Content-Type"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "IIS Windows Server"
+      }
+     }
+    },
+    "server": "Microsoft IIS httpd/10.0",
+    "tech_rows": [
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft IIS",
+      "patch_status": "aktuell",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "10.0",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft IIS httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "10.0",
+      "vuln_name": ""
+     },
+     {
+      "category": "OS",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Windows Server",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ASP.NET",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft ASP.NET",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Microsoft IIS httpd",
+      "version": "10.0"
+     },
+     {
+      "name": "Microsoft-IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "ASP.NET",
+      "version": ""
+     },
+     {
+      "name": "IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "Microsoft ASP.NET",
+      "version": ""
+     },
+     {
+      "name": "Windows Server",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "cloud.junkerwerk.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "cloud.junkerwerk.de"
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "443",
+      "service": "Apache httpd"
+     }
+    ],
+    "fqdns": [
+     "nachhaltigkeit.junkerwerk.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": false,
+    "has_web": true,
+    "ip": "2a01:4f8:d0a:3124::2",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      80,
+      443
+     ],
+     "shodan_services": {
+      "443": "Apache httpd",
+      "80": "Apache httpd"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "nachhaltigkeit.junkerwerk.de",
+    "redirect_data": {
+     "nachhaltigkeit.junkerwerk.de": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://nachhaltigkeit.junkerwerk.de/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "nachhaltigkeit.junkerwerk.de",
+      "final_url": "https://nachhaltigkeit.junkerwerk.de/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": null,
+    "tech_rows": [
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [],
+    "vhost_results": {
+     "nachhaltigkeit.junkerwerk.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "nachhaltigkeit.junkerwerk.de"
+   }
+  ]
+ },
+ "success": true
+}

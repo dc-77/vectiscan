@@ -1,0 +1,1026 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 1,
+   "info": 0,
+   "low": 7,
+   "medium": 2
+  },
+  "business_impact_score": "4.8",
+  "catalog_version": "2026-09-23.2",
+  "engine": "catalog",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "facts_schema_version": "1.0.4",
+  "findings": [
+   {
+    "affected": "huendgen-entsorgung.de:443 (17 Tage), www.huendgen-entsorgung.de:443 (17 Tage)",
+    "category": "D",
+    "description": "Die Zertifikate auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de) sind abgelaufen, laufen in Kürze ab, werden unvollständig ausgeliefert oder passen nicht zum aufgerufenen Namen: huendgen-entsorgung.de:443 (17 Tage), www.huendgen-entsorgung.de:443 (17 Tage).",
+    "evidence": "testssl · scan_results:testssl:18.197.248.23\nhuendgen-entsorgung.de:443 CN=www.huendgen-entsorgung.de SAN=huendgen-entsorgung.de, www.huendgen-entsorgung.de Aussteller=YR2 (Let's Encrypt from US) gueltig_bis=2026-10-11T03:14:00Z abgelaufen=nein Resttage=17 Namensabweichung=nein Ket...\n\ntestssl · scan_results:testssl:18.197.248.23\nangeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1\n\ntestssl · hosts/18.197.248.23/phase2/testssl.json\nservice=HTTP; pre_128cipher=No 128 cipher limit bug; SSLv2=not offered; SSLv3=not offered; TLS1=not offered; TLS1_1=not offered\n\nhttpx · hosts/18.197.248.23/phase2/httpx.json\nwww.huendgen-entsorgung.de:443 CN=www.huendgen-entsorgung.de SAN=huendgen-entsorgung.de, www.huendgen-entsorgung.de Aussteller=YR2 gueltig_bis=2026-10-11T03:14:37Z abgelaufen=nein Resttage=17 Protokolle=TLS1.3\n\nhttpx · hosts/18.197.248.23/phase2/httpx.json\nwww.huendgen-entsorgung.de:443 tls=tls13 cn=www.huendgen-entsorgung.de gueltig_bis=2026-10-11T03:14:37Z",
+    "id": "VS-2026-001",
+    "impact": "Ein Zertifikat mit Beanstandung führt im Browser zu einer Vertrauenswarnung. Nutzer gewöhnen sich daran, solche Warnungen wegzuklicken, und übersehen dann auch eine echte Täuschung. Betroffen sind huendgen-entsorgung.de:443 und www.huendgen-entsorgung.de:443 mit jeweils 17 Tagen.",
+    "level": "hoch",
+    "policy_id": "cert_expiring",
+    "recommendation": "Unverzüglich: Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen.\nMittelfristig: Alle Namen, unter denen ein Dienst aufgerufen wird, in das Zertifikat aufnehmen und die Erneuerung automatisieren.",
+    "scale": "hygiene",
+    "severity": "HIGH",
+    "source": "aktiv (httpx, testssl)",
+    "title": "Zertifikate auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de) mit Beanstandungen",
+    "urgency": "In Kürze",
+    "verification": "Eine verschlüsselte Verbindung zu den genannten Diensten aufbauen; erwartet wird ein gültiges Zertifikat mit vollständiger Kette und passendem Namen."
+   },
+   {
+    "affected": "exchange.huendgen-entsorgung.de (Outlook)",
+    "category": "A",
+    "description": "Aus dem Internet sind Portale erreichbar, die eine Anmeldung anbieten: exchange.huendgen-entsorgung.de (Outlook).",
+    "evidence": "web_probe · argument:host_inventory\nexchange.huendgen-entsorgung.de Status=200 Titel=Outlook Zieladresse=https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0 erreichbar=ja",
+    "id": "VS-2026-002",
+    "impact": "Ein öffentlich erreichbares Anmeldeportal ist ein gewollter Zugangsweg und zugleich das erste Ziel für Rateangriffe auf Zugangsdaten. Wird exchange.huendgen-entsorgung.de übernommen, steht der Weg in die dahinterliegenden Systeme offen.",
+    "level": "mittel",
+    "policy_id": "login_portal_exposed",
+    "recommendation": "In Kürze: Für jedes Portal eine zweite Anmeldestufe verlangen und den Versionsstand der Portal-Software gegen die Hinweise des Herstellers abgleichen.\nMittelfristig: Den Zugriff auf die Quellnetze beschränken, aus denen eine Anmeldung fachlich nötig ist, und fehlgeschlagene Anmeldeversuche überwachen.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (web_probe)",
+    "title": "Anmelde- und Verwaltungsportale aus dem Internet erreichbar",
+    "urgency": "Mittelfristig",
+    "verification": "Die genannten Portale von außen aufrufen; erwartet wird eine Anmeldung mit zweiter Stufe oder eine Beschränkung auf bekannte Quellnetze."
+   },
+   {
+    "affected": "exchange.huendgen-entsorgung.de, exchange.huendgen-entsorgung.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
+    "category": "D",
+    "description": "Die Webdienste auf 80.90.145.166 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: exchange.huendgen-entsorgung.de, exchange.huendgen-entsorgung.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
+    "evidence": "header_check · hosts/80.90.145.166/phase2/headers_exchange.huendgen-entsorgung.de.json\nexchange.huendgen-entsorgung.de: URL=https://exchange.huendgen-entsorgung.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protecti...",
+    "id": "VS-2026-003",
+    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Auf exchange.huendgen-entsorgung.de fehlen x-frame-options, x-content-type-options, referrer-policy und permissions-policy, sodass die Anwendung jeden dieser Fälle selbst abfangen muss. Ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
+    "level": "mittel",
+    "policy_id": "csp_missing, hsts_missing, security_headers_incomplete",
+    "recommendation": "Mittelfristig: Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.\nStrategisch: Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (header_check)",
+    "title": "Sicherheits-Header und Formularschutz auf 80.90.145.166 unvollständig",
+    "urgency": "Mittelfristig",
+    "verification": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+   },
+   {
+    "affected": "18.197.248.23:8443 (nginx)",
+    "category": "A",
+    "description": "Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) beantwortet ein Webdienst Anfragen mit der unveränderten Auslieferungsseite des Herstellers, teils auf einem zusätzlichen Port: 18.197.248.23:8443 (nginx).",
+    "evidence": "nmap · hosts/18.197.248.23/phase1/nmap.xml\n18.197.248.23:8443/tcp Dienst=http Produkt=nginx Zustand=open TLS erzwungen=ja\n\nnmap · hosts/18.197.248.23/phase1/nmap.xml\n8443/tcp open http nginx tunnel=ssl",
+    "id": "VS-2026-004",
+    "impact": "Auf 18.197.248.23:8443 antwortet ein nginx mit der unveränderten Auslieferungsseite des Herstellers. Das verrät, dass hier ein Webserver ohne eigene Anwendung antwortet, und lädt zum Ausprobieren bekannter Pfade ein. Der zusätzliche Webport vergrößert die Angriffsfläche, ohne dass sein Zweck von außen erkennbar ist.",
+    "level": "niedrig",
+    "policy_id": "http_alt_port",
+    "recommendation": "In Kürze: Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen.\nMittelfristig: Die Auslieferungsseite durch eine leere Antwort oder eine gezielte Weiterleitung ersetzen, damit der Dienst keinen Rückschluss auf das eingesetzte Produkt zulässt.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (nmap)",
+    "title": "Unveränderte Auslieferungsseite und zusätzlicher Webport auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de)",
+    "urgency": "Mittelfristig",
+    "verification": "Die genannten Adressen von außen erneut aufrufen; erwartet wird keine Auslieferungsseite des Herstellers und kein zusätzlicher Webport."
+   },
+   {
+    "affected": "80.90.145.166:444 (Apache httpd)",
+    "category": "A",
+    "description": "Auf 80.90.145.166 (exchange.huendgen-entsorgung.de) beantwortet ein Webdienst Anfragen mit der unveränderten Auslieferungsseite des Herstellers, teils auf einem zusätzlichen Port: 80.90.145.166:444 (Apache httpd).",
+    "evidence": "nmap · hosts/80.90.145.166/phase1/nmap.xml\n80.90.145.166:444/tcp Dienst=http Produkt=Apache httpd Zustand=open TLS erzwungen=ja\n\nnmap · hosts/80.90.145.166/phase1/nmap.xml\n444/tcp open http Apache httpd tunnel=ssl",
+    "id": "VS-2026-005",
+    "impact": "Auf 80.90.145.166:444 antwortet ein Apache httpd mit der unveränderten Auslieferungsseite des Herstellers. Das verrät, dass hier ein Webserver ohne eigene Anwendung antwortet, und lädt zum Ausprobieren bekannter Pfade ein. Der zusätzliche Webport vergrößert die Angriffsfläche, ohne dass sein Zweck von außen erkennbar ist.",
+    "level": "niedrig",
+    "policy_id": "http_alt_port",
+    "recommendation": "In Kürze: Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen.\nMittelfristig: Die Auslieferungsseite durch eine leere Antwort oder eine gezielte Weiterleitung ersetzen, damit der Dienst keinen Rückschluss auf das eingesetzte Produkt zulässt.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (nmap)",
+    "title": "Unveränderte Auslieferungsseite und zusätzlicher Webport auf 80.90.145.166 (exchange.huendgen-entsorgung.de)",
+    "urgency": "Mittelfristig",
+    "verification": "Die genannten Adressen von außen erneut aufrufen; erwartet wird keine Auslieferungsseite des Herstellers und kein zusätzlicher Webport."
+   },
+   {
+    "affected": "huendgen-entsorgung.de (p=quarantine)",
+    "category": "C",
+    "description": "Für huendgen-entsorgung.de sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: huendgen-entsorgung.de (p=quarantine).",
+    "evidence": "dns_records · phase0/dns_records.json\nhuendgen-entsorgung.de: SPF=v=spf1 include:_spf.kundenserver.de include:spf.hornetsecurity.com include:spf.vizito.be +ip4:88.99.140.109 +ip4:157.90.214.107 -all DMARC=v=DMARC1; p=quarantine; fo=1 DKIM-Selektoren=hse1, hse2 MX=mx01.hornet...",
+    "id": "VS-2026-006",
+    "impact": "Für huendgen-entsorgung.de steht die Richtlinie auf p=quarantine und damit nicht durchsetzend. Ein Empfangssystem erfährt zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
+    "level": "niedrig",
+    "policy_id": "dmarc_quarantine",
+    "recommendation": "In Kürze: Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.\nMittelfristig: Die Richtlinie stufenweise auf Zurückweisung stellen, sobald alle Versandquellen erfasst sind, und den Abgleich der Absender scharf schalten.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (dns_records)",
+    "title": "Richtlinie zur Absender-Authentizität für huendgen-entsorgung.de nicht durchsetzend",
+    "urgency": "Mittelfristig",
+    "verification": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
+   },
+   {
+    "affected": "huendgen-entsorgung.de",
+    "category": "C",
+    "description": "Für huendgen-entsorgung.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: huendgen-entsorgung.de.",
+    "evidence": "dns_records · phase0/dns_records.json\nhuendgen-entsorgung.de: SPF=v=spf1 include:_spf.kundenserver.de include:spf.hornetsecurity.com include:spf.vizito.be +ip4:88.99.140.109 +ip4:157.90.214.107 -all DMARC=v=DMARC1; p=quarantine; fo=1 DKIM-Selektoren=hse1, hse2 MX=mx01.hornet...",
+    "id": "VS-2026-007",
+    "impact": "Für huendgen-entsorgung.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann. Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
+    "level": "niedrig",
+    "policy_id": "dane_missing, mta_sts_missing, tls_rpt_missing",
+    "recommendation": "Strategisch: Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (dns_records)",
+    "title": "Transportverschlüsselung im Mailversand für huendgen-entsorgung.de nicht erzwungen",
+    "urgency": "Strategisch",
+    "verification": "DNS-Abfrage der genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
+   },
+   {
+    "affected": "www.huendgen-entsorgung.de (fehlend: referrer-policy, permissions-policy)",
+    "category": "D",
+    "description": "Die Webdienste auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de) liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: www.huendgen-entsorgung.de (fehlend: referrer-policy, permissions-policy).",
+    "evidence": "header_check · hosts/18.197.248.23/phase2/headers_www.huendgen-entsorgung.de.json\nwww.huendgen-entsorgung.de: URL=https://www.huendgen-entsorgung.de fehlende Header=permissions-policy, referrer-policy, x-xss-protection gesetzte Header=content-security-policy: frame-ancestors 'self', strict-transport-security: max-age=...",
+    "id": "VS-2026-008",
+    "impact": "Auf www.huendgen-entsorgung.de fehlen referrer-policy und permissions-policy. Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen; fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen. Ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
+    "level": "niedrig",
+    "policy_id": "security_headers_incomplete",
+    "recommendation": "Mittelfristig: Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.\nStrategisch: Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (header_check)",
+    "title": "Sicherheits-Header und Formularschutz auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de) unvollständig",
+    "urgency": "Mittelfristig",
+    "verification": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+   },
+   {
+    "affected": "exchange.huendgen-entsorgung.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-2019)",
+    "category": "E",
+    "description": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: exchange.huendgen-entsorgung.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-2019).",
+    "evidence": "header_check · hosts/80.90.145.166/phase2/headers_exchange.huendgen-entsorgung.de.json\nexchange.huendgen-entsorgung.de: URL=https://exchange.huendgen-entsorgung.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protecti...",
+    "id": "VS-2026-009",
+    "impact": "Die Antworten von exchange.huendgen-entsorgung.de nennen Server: Microsoft-IIS/10.0 und X-FEServer: EXCHANGE-2019. Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
+    "level": "niedrig",
+    "policy_id": "http_header_disclosure",
+    "recommendation": "Mittelfristig: Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.\nStrategisch: Die Vorgabe für Antwort-Header und erlaubte Methoden an einer Stelle pflegen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (header_check)",
+    "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+    "urgency": "Mittelfristig",
+    "verification": "Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue Versionsangabe und ohne die zusätzlichen Methoden."
+   },
+   {
+    "affected": "huendgen-entsorgung.de",
+    "category": "E",
+    "description": "Für huendgen-entsorgung.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: huendgen-entsorgung.de.",
+    "evidence": "dns_records · phase0/dns_records.json\nhuendgen-entsorgung.de: SPF=v=spf1 include:_spf.kundenserver.de include:spf.hornetsecurity.com include:spf.vizito.be +ip4:88.99.140.109 +ip4:157.90.214.107 -all DMARC=v=DMARC1; p=quarantine; fo=1 DKIM-Selektoren=hse1, hse2 MX=mx01.hornet...",
+    "id": "VS-2026-010",
+    "impact": "Für huendgen-entsorgung.de fehlen die Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen. Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
+    "level": "niedrig",
+    "policy_id": "caa_missing, dnssec_missing",
+    "recommendation": "Strategisch: Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (dns_records)",
+    "title": "DNS-Absicherung für huendgen-entsorgung.de nicht eingerichtet",
+    "urgency": "Strategisch",
+    "verification": "DNS-Abfrage der Signatur und der Ausstellungseingrenzung wiederholen; erwartet wird je ein gültiger Eintrag."
+   }
+  ],
+  "overall_description": "Die Prüfung vom 23.09.2026 im Paket Perimeter umfasst 2 Hosts und 3 Hostnamen zur Domain huendgen-entsorgung.de und führt zu 10 Befunden sowie 7 positiven Feststellungen. Die Beobachtungen betreffen die Zertifikate der Website, ein aus dem Internet erreichbares Anmeldeportal, unvollständige Sicherheits-Header, zusätzliche Webports mit Auslieferungsseiten des Herstellers sowie Einträge im DNS zu Mailversand und Zonenabsicherung. Zuerst stehen die Zertifikate auf huendgen-entsorgung.de:443 und www.huendgen-entsorgung.de:443 mit einer Frist von 17 Tagen an, die erneuert und mit vollständiger Vertrauenskette am Dienst hinterlegt werden sollen. Anschließend folgen die mittelfristigen Punkte rund um das Portal exchange.huendgen-entsorgung.de, die Sicherheits-Header und die nicht benötigten Webports.",
+  "overall_risk": "MITTEL",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "caa_missing",
+   "cert_expiring",
+   "csp_missing",
+   "dane_missing",
+   "dmarc_quarantine",
+   "dnssec_missing",
+   "hsts_missing",
+   "http_alt_port",
+   "http_header_disclosure",
+   "login_portal_exposed",
+   "mta_sts_missing",
+   "security_headers_incomplete",
+   "tls_rpt_missing"
+  ],
+  "policy_version": "Katalog 2026-09-23.2 / Fakten 1.0.4",
+  "positive_findings": [
+   {
+    "category": "A",
+    "description": "Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet kein Datenbankdienst auf Verbindungen von außen.",
+    "id": "VS-P01",
+    "title": "Keine Datenbankdienste aus dem Internet erreichbar"
+   },
+   {
+    "category": "A",
+    "description": "Der Host 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), 80.90.145.166 (exchange.huendgen-entsorgung.de) bietet seinen Webdienst über HTTPS an.",
+    "id": "VS-P02",
+    "title": "Webdienst mit Transportverschlüsselung"
+   },
+   {
+    "category": "A",
+    "description": "Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet weder die Windows-Fernwartung (RDP) noch die Windows-Dateifreigabe (SMB) auf Verbindungen von außen. Andere Zugänge wie FTP, SSH oder Verwaltungsoberflächen umfasst diese Aussage nicht.",
+    "id": "VS-P03",
+    "title": "Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet erreichbar"
+   },
+   {
+    "category": "C",
+    "description": "Für huendgen-entsorgung.de lehnen die Nameserver den Abruf der gesamten Zone ab, und kein Eintrag zeigt auf ein aufgegebenes Ziel.",
+    "id": "VS-P04",
+    "title": "Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge"
+   },
+   {
+    "category": "C",
+    "description": "Für huendgen-entsorgung.de sind die grundlegenden Einträge zur Absender-Authentizität vorhanden.",
+    "id": "VS-P05",
+    "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
+   },
+   {
+    "category": "D",
+    "description": "Vor www.huendgen-entsorgung.de (+huendgen-entsorgung.de) ist eine Web Application Firewall aktiv, die Angriffe auf Anwendungsebene filtert, bevor sie den Webdienst erreichen.",
+    "id": "VS-P06",
+    "title": "Web Application Firewall vorhanden"
+   },
+   {
+    "category": "E",
+    "description": "Zu den geprüften Adressen und zur Domain liegt in den abgefragten Reputationsquellen kein Eintrag vor.",
+    "id": "VS-P07",
+    "title": "Keine Einträge in Reputationsquellen"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen.",
+    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+    "findings": [
+     "VS-2026-001"
+    ],
+    "priority": "In Kürze"
+   },
+   {
+    "action": "Für jedes Portal eine zweite Anmeldestufe verlangen und den Versionsstand der Portal-Software gegen die Hinweise des Herstellers abgleichen. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
+    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+    "findings": [
+     "VS-2026-002",
+     "VS-2026-009"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren. Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen.",
+    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+    "findings": [
+     "VS-2026-003",
+     "VS-2026-005"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+    "findings": [
+     "VS-2026-004",
+     "VS-2026-008"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
+    "effect": "Schützt die Authentizität der eigenen E-Mail",
+    "findings": [
+     "VS-2026-006"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain. Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
+    "effect": "Schützt die Authentizität der eigenen E-Mail",
+    "findings": [
+     "VS-2026-007",
+     "VS-2026-010"
+    ],
+    "priority": "Strategisch"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 1,
+   "INFO": 0,
+   "LOW": 7,
+   "MEDIUM": 2
+  },
+  "tech_profiles": [
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": "nginx"
+     },
+     {
+      "port": "443",
+      "service": "nginx"
+     },
+     {
+      "port": "8443",
+      "service": "nginx"
+     }
+    ],
+    "fqdns": [
+     "www.huendgen-entsorgung.de",
+     "huendgen-entsorgung.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "18.197.248.23",
+    "is_spa": true,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443,
+     8443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "quarantine",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      80,
+      443,
+      8443
+     ],
+     "shodan_services": {
+      "443": "nginx",
+      "80": "nginx",
+      "8443": "nginx"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "www.huendgen-entsorgung.de",
+    "redirect_data": {
+     "www.huendgen-entsorgung.de": {
+      "error": null,
+      "final_domain": "www.huendgen-entsorgung.de",
+      "final_url": "https://www.huendgen-entsorgung.de/",
+      "is_cross_domain": false,
+      "page_title": "Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn",
+      "redirect_chain": [
+       "https://www.huendgen-entsorgung.de/",
+       "https://de.cdn-website.com/fonts/css2?family=Roboto:wght@100;300;400;500;700;900&family=Montserrat:wght@100..900&family=Noto+Sans:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Lato:wght@100;300;400;700;900&subset=latin-ext&display=swap",
+       "https://de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/dms3rep/multi/HE-Logo.svg",
+       "https://de.cdn-website.com/fonts/s/notosans/v42/o-0bIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjc5a7duw.woff2",
+       "https://static.cdn-website.com/mnlt/production/6792/_dm/s/rt/dist/css/d-css-runtime-desktop-one-package-structured-global.min.css",
+       "https://de.cdn-website.com/WIDGET_CSS/c0dd8bac2ea66cc0e0629b256a09739c.css",
+       "https://static.cdn-website.com/speculations/rules/prerender-1.0.3.json",
+       "https://le-de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/dms3rep/multi/opt/willkommen-2025-2304w.jpg",
+       "https://de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/dms3rep/multi/HE-Logo-weiss.svg",
+       "https://de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/files/cad9444f725b48f8a38f3121354173a4_withFlex_1.min.css?v=e9248eec6fe42f9b269dfb776738d63e",
+       "https://de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/files/cad9444f725b48f8a38f3121354173a4_home_withFlex_1.min.css?v=04f9439efcbe2cb4228f1d31b1d34eb7",
+       "https://static.cdn-website.com/mnlt/production/6792/_dm/s/rt/dist/scripts/d-js-jquery-migrate.min.js",
+       "https://static.cdn-website.com/libs/jquery/jquery-3.7.0.min.js",
+       "https://le-de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/dms3rep/multi/opt/containerdienst-396w.jpg",
+       "https://le-de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/dms3rep/multi/opt/selbstanlieferung-1-396w.jpg",
+       "https://le-de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/dms3rep/multi/opt/recycling-396w.jpg",
+       "https://le-de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/dms3rep/multi/opt/he-logo-l-396w.png",
+       "https://static-cdn.dwhitelabel.com/fonts/fontawesome-webfont.woff2?v=6",
+       "https://static.cdn-website.com/mnlt/production/6792/_dm/s/rt/dist/scripts/d-js-one-runtime-unified-desktop.min.js",
+       "https://consent.cookiebot.com/uc.js",
+       "https://consentcdn.cookiebot.com/sdk/bc-v4.min.html",
+       "https://le-de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/dms3rep/multi/opt/huendgen-enstorgung-keyvisual-01_1-1920w.jpg",
+       "https://le-de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/dms3rep/multi/opt/sortieranlage-header-2025-1920w.jpg",
+       "https://code.etracker.com/code/e.js",
+       "https://consentcdn.cookiebot.com/consentconfig/765c6b15-4d38-4b7e-be7c-808d86d97d89/settings.json",
+       "https://consentcdn.cookiebot.com/consentconfig/765c6b15-4d38-4b7e-be7c-808d86d97d89/huendgen-entsorgung.de/configuration.js",
+       "https://de-ms-cdn.multiscreensite.com/runtime-react/4264/res/js/runtime-react.js",
+       "https://static-cdn.dwhitelabel.com/fonts/dm-common-icons.ttf?5f0fg",
+       "https://consent.cookiebot.com/765c6b15-4d38-4b7e-be7c-808d86d97d89/cc.js?renew=false&referer=www.huendgen-entsorgung.de&dnt=false&init=false",
+       "https://code.etracker.com/t.js?v=2026.923.31900&et=dLs1sx",
+       "https://static.cdn-website.com/mnlt/production/6792/_dm/s/rt/dist/scripts/d-js-jquery-migrate.min.js",
+       "https://de-ms-cdn.multiscreensite.com/runtime-react/4264/res/js/runtime-react.js",
+       "https://de-ms-cdn.multiscreensite.com/runtime-react/4264/res/js/react-vendor-By6GEW-g.js",
+       "https://le-de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/dms3rep/multi/opt/containerdienst-slide-2025-2304w.jpg",
+       "https://le-de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/dms3rep/multi/opt/wertstoffhof-slide-2025-adaec1d4-2304w.jpg",
+       "https://www.etracker.de/cntcc?&&et=dLs1sx&v=2026.923.31900&tc=17901920379594&pagename=Containerdienst%20%26%20Wertstoffhof%20%7C%20H%C3%BCndgen%20Entsorgung%20Swisttal%20%2F%20Bonn&ilevel=1&et_source_url=https%3A%2F%2Fwww.huendgen-entsorgung.de%2F&block_cookies=true&et_bs=1&code_source=%2F%2Fcode.etracker.com%2Fcode%2Fe.js&code_async=true&page_id=192037802&trcl=aW&et_sbscr=0&coid=3bca1303b34b8097f730bbebf0af4bf9&et_cblk=1&et_cd=www.huendgen-entsorgung.de&dh=2R7eLz%2FF%2FEkl5MtdH%2Bjah00FQkVCEtmw&clt=24",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/265.3f77af9ed647faa2a5d3.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/336.d882766316ca7e82a165.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/930.e6efc422c901c8564b01.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/533.b0097e92d091512339c2.js",
+       "https://static.cdn-website.com/libs/bower-skrollr/skrollr.min.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/runtime-module-anchors.f2babd881de1bd164333.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/runtime-module-layout.dd49aad9f47fafa46b8f.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/537.57eeadcf885276ad51b1.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/rt-widgets.5ed5bb5e181e0c3d0a0d.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/807.b67633a5b83330e3c46f.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/663.9af2253b3b816aa46209.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/489.abccb5691e6559baa370.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/292.32b1c6b1a80048888583.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/187.8a02ee0119f3b2c7cb18.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/389.08c3f004bc3ca0f1d492.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/764.73b0e9d264c58506ec0a.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/400.7e486226eb8949dc05e2.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/76.ecbc33163d71dc644a4d.js",
+       "https://static.cdn-website.com/mnlt/production/6792/editor/apps/modules/runtime/271.3c9079fbdd6aa567948e.js",
+       "https://rtc.eu-multiscreensite.com/performance/metrics",
+       "https://rtc.eu-multiscreensite.com/performance/metrics",
+       "https://consent.cookiebot.com/logconsent.ashx?action=accept&nocache=1790192040113&dnt=false&method=strict&clp=true&cls=true&clm=true&cbid=765c6b15-4d38-4b7e-be7c-808d86d97d89&cbt=leveloptin&hasdata=true&usercountry=DE&referer=https%3A%2F%2Fwww.huendgen-entsorgung.de&rc=false",
+       "https://consentcdn.cookiebot.com/consentconfig/765c6b15-4d38-4b7e-be7c-808d86d97d89/state.js",
+       "https://consent.cookiebot.com/Scripts/widgetIcon.min.js",
+       "https://d3uzsv7k2lpopp.cloudfront.net/sp-2.0.0-dm-0.1.min.js",
+       "https://d3uzsv7k2lpopp.cloudfront.net/i?e=pv&page=Containerdienst%20%26%20Wertstoffhof%20%7C%20H%C3%BCndgen%20Entsorgung%20Swisttal%20%2F%20Bonn&dtm=1790192040371&tid=004786&vp=1280x720&ds=1280x5443&vid=1&duid=bb2107ee6bb48fb1&p=web&tv=js-2.0.0&fp=1784316636&aid=cad9444f725b48f8a38f3121354173a4&lang=en-US&cs=UTF-8&tz=UTC&tna=cf&res=1280x720&cd=24&cookie=1&url=https%3A%2F%2Fwww.huendgen-entsorgung.de%2F"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache, must-revalidate",
+       "content-encoding": "gzip",
+       "content-length": "54560",
+       "content-security-policy": "frame-ancestors 'self'",
+       "content-type": "text/html;charset=utf-8",
+       "d-cache": "from-cache",
+       "d-geo": "EU",
+       "date": "Wed, 23 Sep 2026 19:33:57 GMT",
+       "etag": "\"-720847095\"",
+       "expires": "Thu, 01 Jan 1970 00:00:00 GMT",
+       "server": "nginx",
+       "speculation-rules": "\"https://static.cdn-website.com/speculations/rules/prerender-1.0.3.json\"",
+       "strict-transport-security": "max-age=31536000; preload",
+       "vary": "user-agent,accept-encoding",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "SAMEORIGIN"
+      },
+      "screenshot_path": "/tmp/scan-3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/hosts/18.197.248.23/phase2/screenshot_www.huendgen-entsorgung.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "dmRoot dmDesktopBody fix-mobile-scrolling addCanvasBorder dmResellerSite dmLargeBody responsiveTablet pcCustomScrollbar d1SiteBody dmBodyNoIscroll",
+       "cookies": "dm_timezone_offset=0; dm_last_page_view=1790192039019; dm_this_page_view=1790192039019; dm_last_visit=1790192039019; dm_total_visits=1; CookieConsent={stamp:%27yjjdVPjoktHuLhxI3NIi+ssxDOx8nLidSgw+r3HQ1Z4ojCZbk1ntKw==%27%2Cnecessary:true%2Cpreferences:true%2Cstatistics:true%2Cmarketing:true%2Cmethod:%27explicit%27%2Cver:1%2Cutc:1790192040159%2Cregion:%27de%27}; _sp_id.3ae8=bb2107ee6bb48fb1.1790192040.1.1790192040.1790192040; _sp_ses.3ae8=1790193840369",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "initial-scale=1, minimum-scale=1, maximum-scale=5, viewport-fit=cover",
+         "name": "viewport"
+        },
+        {
+         "content": "dm:lcp-frozen",
+         "name": "dm:lcp-preload"
+        },
+        {
+         "content": "yes",
+         "name": "apple-mobile-web-app-capable"
+        },
+        {
+         "content": " ✓ Container mieten in Bonn &amp; Rhein-Sieg ✓ Wertstoffhöfe in Swisttal &amp; Bonn-Beuel ✓ Schnelle Lieferung, feste Preise. Jetzt Angebot für Bauschutt, Gartenabfälle &amp; Co. anfragen!",
+         "name": "description"
+        },
+        {
+         "content": "summary",
+         "name": "twitter:card"
+        },
+        {
+         "content": "Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn",
+         "name": "twitter:title"
+        },
+        {
+         "content": " ✓ Container mieten in Bonn &amp; Rhein-Sieg ✓ Wertstoffhöfe in Swisttal &amp; Bonn-Beuel ✓ Schnelle Lieferung, feste Preise. Jetzt Angebot für Bauschutt, Gartenabfälle &amp; Co. anfragen!",
+         "name": "twitter:description"
+        },
+        {
+         "content": "https://le-de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/dms3rep/multi/opt/social-logo-1920w.png",
+         "name": "twitter:image"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://d3uzsv7k2lpopp.cloudfront.net/sp-2.0.0-dm-0.1.min.js",
+        "https://consentcdn.cookiebot.com/consentconfig/765c6b15-4d38-4b7e-be7c-808d86d97d89/state.js",
+        "https://consent.cookiebot.com/Scripts/widgetIcon.min.js",
+        "https://consent.cookiebot.com/logconsent.ashx?action=accept&nocache=1790192040113&dnt=false&method=strict&clp=true&cls=true&clm=true&cbid=765c6b15-4d38-4b7e-be7c-808d86d97d89&cbt=leveloptin&hasdata=true&usercountry=DE&referer=https%3A%2F%2Fwww.huendgen-entsorgung.de&rc=false",
+        "https://consent.cookiebot.com/765c6b15-4d38-4b7e-be7c-808d86d97d89/cc.js?renew=false&referer=www.huendgen-entsorgung.de&dnt=false&init=false",
+        "https://consentcdn.cookiebot.com/consentconfig/765c6b15-4d38-4b7e-be7c-808d86d97d89/huendgen-entsorgung.de/configuration.js",
+        "https://code.etracker.com/code/e.js",
+        "https://code.etracker.com/t.js?v=2026.923.31900&et=dLs1sx",
+        "https://www.etracker.de/cntcc?&&et=dLs1sx&v=2026.923.31900&tc=17901920379594&pagename=Containerdienst%20%26%20Wertstoffhof%20%7C%20H%C3%BCndgen%20Entsorgung%20Swisttal%20%2F%20Bonn&ilevel=1&et_source_url=https%3A%2F%2Fwww.huendgen-entsorgung.de%2F&block_cookies=true&et_bs=1&code_source=%2F%2Fcode.etracker.com%2Fcode%2Fe.js&code_async=true&page_id=192037802&trcl=aW&et_sbscr=0&coid=3bca1303b34b8097f730bbebf0af4bf9&et_cblk=1&et_cd=www.huendgen-entsorgung.de&dh=2R7eLz%2FF%2FEkl5MtdH%2Bjah00FQkVCEtmw&clt=24",
+        "https://static.cdn-website.com/libs/bower-skrollr/skrollr.min.js",
+        "https://static.cdn-website.com/libs/jquery/jquery-3.7.0.min.js",
+        "https://consent.cookiebot.com/uc.js",
+        "https://static.cdn-website.com/mnlt/production/6792/_dm/s/rt/dist/scripts/d-js-one-runtime-unified-desktop.min.js",
+        "https://static.cdn-website.com/mnlt/production/6792/_dm/s/rt/dist/scripts/d-js-jquery-migrate.min.js",
+        "https://de-ms-cdn.multiscreensite.com/runtime-react/4264/res/js/runtime-react.js"
+       ],
+       "stylesheets": [
+        "https://de.cdn-website.com/fonts/css2?family=Roboto:wght@100;300;400;500;700;900&family=Montserrat:wght@100..900&family=Noto+Sans:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Lato:wght@100;300;400;700;900&subset=latin-ext&display=swap",
+        "https://static.cdn-website.com/mnlt/production/6792/_dm/s/rt/dist/css/d-css-runtime-desktop-one-package-structured-global.min.css",
+        "https://de.cdn-website.com/WIDGET_CSS/c0dd8bac2ea66cc0e0629b256a09739c.css",
+        "https://de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/files/cad9444f725b48f8a38f3121354173a4_withFlex_1.min.css?v=e9248eec6fe42f9b269dfb776738d63e",
+        "https://de.cdn-website.com/cad9444f725b48f8a38f3121354173a4/files/cad9444f725b48f8a38f3121354173a4_home_withFlex_1.min.css?v=04f9439efcbe2cb4228f1d31b1d34eb7"
+       ],
+       "title": "Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn"
+      }
+     }
+    },
+    "server": "nginx",
+    "tech_rows": [
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Cookiebot",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Etracker",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery Migrate",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "WAF/Schutz",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "WAF-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Generic",
+      "patch_status": "unbekannt",
+      "source": "waf_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nginx",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "nginx",
+      "version": ""
+     },
+     {
+      "name": "Cookiebot",
+      "version": ""
+     },
+     {
+      "name": "Etracker",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     },
+     {
+      "name": "jQuery Migrate",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "www.huendgen-entsorgung.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": "Generic"
+     }
+    },
+    "waf": "Generic",
+    "web_fqdn": "www.huendgen-entsorgung.de"
+   },
+   {
+    "cms": "Microsoft Exchange",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "enriched_from": "header_check"
+    },
+    "cms_version": "15.2.1748",
+    "exposed_services": [
+     {
+      "port": "443",
+      "service": "Outlook Web App"
+     },
+     {
+      "port": "444",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "exchange.huendgen-entsorgung.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "80.90.145.166",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     443,
+     444,
+     1000,
+     1001,
+     1002
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "quarantine",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      443,
+      444
+     ],
+     "shodan_services": {
+      "443": "Outlook Web App"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "exchange.huendgen-entsorgung.de",
+    "redirect_data": {
+     "exchange.huendgen-entsorgung.de": {
+      "error": null,
+      "final_domain": "exchange.huendgen-entsorgung.de",
+      "final_url": "https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0",
+      "is_cross_domain": false,
+      "page_title": "Outlook",
+      "redirect_chain": [
+       "https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0",
+       "https://exchange.huendgen-entsorgung.de/owa/auth/15.2.1748/themes/resources/segoeui-regular.ttf"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache, no-store",
+       "content-length": "58738",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Wed, 23 Sep 2026 19:35:04 GMT",
+       "expires": "-1",
+       "pragma": "no-cache",
+       "request-id": "44912ccd-b829-4d9c-8f50-219510d81e5c",
+       "server": "Microsoft-IIS/10.0",
+       "x-aspnet-version": "4.0.30319",
+       "x-frame-options": "SAMEORIGIN",
+       "x-powered-by": "ASP.NET"
+      },
+      "screenshot_path": "/tmp/scan-3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/hosts/80.90.145.166/phase2/screenshot_exchange.huendgen-entsorgung.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "signInBg",
+       "cookies": "cookieTest=1",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "IE=10",
+         "name": "X-UA-Compatible"
+        },
+        {
+         "content": "text/html; CHARSET=utf-8",
+         "name": "Content-Type"
+        },
+        {
+         "content": "NOINDEX, NOFOLLOW",
+         "name": "Robots"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Outlook"
+      }
+     }
+    },
+    "server": "Apache httpd",
+    "tech_rows": [
+     {
+      "category": "Mail",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft Exchange",
+      "patch_status": "aktuell",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "15.2.1748",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Outlook Web App",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "15.2.1748",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft-IIS",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "10.0",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Outlook Web App",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 444)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 444",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "OS",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Windows Server",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ASP.NET",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft ASP.NET",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Apache httpd",
+      "version": ""
+     },
+     {
+      "name": "Microsoft-IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "ASP.NET",
+      "version": ""
+     },
+     {
+      "name": "Microsoft Exchange",
+      "version": "2019"
+     },
+     {
+      "name": "IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "Microsoft ASP.NET",
+      "version": ""
+     },
+     {
+      "name": "Outlook Web App",
+      "version": "15.2.1748"
+     },
+     {
+      "name": "Windows Server",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "exchange.huendgen-entsorgung.de": {
+      "cms": "Microsoft Exchange",
+      "cms_confidence": 0.95,
+      "cms_version": "15.2.1748",
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "exchange.huendgen-entsorgung.de"
+   }
+  ]
+ },
+ "success": true
+}
