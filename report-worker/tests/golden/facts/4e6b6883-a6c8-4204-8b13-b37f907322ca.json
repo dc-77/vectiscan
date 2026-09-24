@@ -10278,7 +10278,7 @@
    }
   ]
  },
- "schema_version": "1.0.4",
+ "schema_version": "1.0.5",
  "services": [
   {
    "auth_mechanisms": [],
@@ -11493,6 +11493,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
+    "httpx",
     "nmap",
     "webtech"
    ],
@@ -11507,6 +11508,11 @@
    },
    "evidence": [
     {
+     "excerpt": "technologies: Apache HTTP Server",
+     "ref": "hosts/159.69.143.80/phase1/tech_profile.json",
+     "tool": "httpx"
+    },
+    {
      "excerpt": "443/tcp open http Apache httpd tunnel=ssl",
      "ref": "hosts/159.69.143.80/phase1/nmap.xml",
      "tool": "nmap"
@@ -11517,17 +11523,12 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "technologies: Apache",
-     "ref": "hosts/159.69.143.80/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
-     "excerpt": "technologies: Apache HTTP Server",
-     "ref": "hosts/159.69.143.80/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
      "excerpt": "technologies: Apache httpd",
+     "ref": "hosts/159.69.143.80/phase1/tech_profile.json",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Apache",
      "ref": "hosts/159.69.143.80/phase1/tech_profile.json",
      "tool": "webtech"
     }
@@ -11594,7 +11595,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -11609,7 +11610,7 @@
     {
      "excerpt": "technologies: HSTS",
      "ref": "hosts/159.69.143.80/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "hsts",
@@ -11620,9 +11621,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:15:08Z",
+   "observed_at": "2026-07-22T08:29:28Z",
    "product": "HSTS",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -11631,7 +11632,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -11646,7 +11647,7 @@
     {
      "excerpt": "technologies: jQuery",
      "ref": "hosts/159.69.143.80/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "jquery",
@@ -11657,9 +11658,9 @@
    "kind": "library",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:15:08Z",
+   "observed_at": "2026-07-22T08:29:28Z",
    "product": "jQuery",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -11668,7 +11669,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -11683,7 +11684,7 @@
     {
      "excerpt": "technologies: PHP",
      "ref": "hosts/159.69.143.80/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "php",
@@ -11694,9 +11695,9 @@
    "kind": "language",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:15:08Z",
+   "observed_at": "2026-07-22T08:29:28Z",
    "product": "PHP",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -11859,7 +11860,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -11874,7 +11875,7 @@
     {
      "excerpt": "technologies: HSTS",
      "ref": "hosts/195.50.179.2/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "hsts",
@@ -11885,9 +11886,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:19:13Z",
+   "observed_at": "2026-07-22T08:44:22Z",
    "product": "HSTS",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -11896,7 +11897,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -11911,7 +11912,7 @@
     {
      "excerpt": "technologies: jQuery",
      "ref": "hosts/195.50.179.2/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "jquery",
@@ -11922,9 +11923,9 @@
    "kind": "library",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:19:13Z",
+   "observed_at": "2026-07-22T08:44:22Z",
    "product": "jQuery",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -11933,8 +11934,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -11954,12 +11954,12 @@
     {
      "excerpt": "server: Web Server",
      "ref": "hosts/195.50.179.2/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: Web Server",
      "ref": "hosts/195.50.179.2/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "web_server",
@@ -12055,6 +12055,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
+    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -12068,12 +12069,12 @@
    },
    "evidence": [
     {
-     "excerpt": "technologies: ASP.NET",
+     "excerpt": "technologies: Microsoft ASP.NET 4.0.30319",
      "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     },
     {
-     "excerpt": "technologies: Microsoft ASP.NET 4.0.30319",
+     "excerpt": "technologies: ASP.NET",
      "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
      "tool": "webtech"
     }
@@ -12086,9 +12087,9 @@
    "kind": "language",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:15:34Z",
+   "observed_at": "2026-07-22T08:39:20Z",
    "product": "ASP.NET",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": "4.0.30319",
    "version_raw": "4.0.30319",
    "vulnerabilities_count": null
@@ -12097,8 +12098,9 @@
    "build": "15.1.2507",
    "confidence": 0.8,
    "detection_sources": [
+    "cms_fingerprint",
+    "httpx",
     "redirect_probe",
-    "webtech",
     "zap_spider"
    ],
    "distro": null,
@@ -12111,6 +12113,16 @@
     "upstream_eol_date": null
    },
    "evidence": [
+    {
+     "excerpt": "technologies: Microsoft Exchange EXCHANGE01",
+     "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
+     "tool": "cms_fingerprint"
+    },
+    {
+     "excerpt": "technologies: Outlook Web App 15.1.2507",
+     "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
+     "tool": "httpx"
+    },
     {
      "excerpt": "redirect_chain: https://mail.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf",
      "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
@@ -12125,16 +12137,6 @@
      "excerpt": "redirect_chain: https://owa.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf",
      "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
      "tool": "redirect_probe"
-    },
-    {
-     "excerpt": "technologies: Microsoft Exchange EXCHANGE01",
-     "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
-     "excerpt": "technologies: Outlook Web App 15.1.2507",
-     "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
-     "tool": "webtech"
     }
    ],
    "family": "exchange",
@@ -12151,9 +12153,9 @@
    "kind": "mail",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:15:34Z",
+   "observed_at": "2026-07-22T08:56:04Z",
    "product": "Microsoft Exchange",
-   "source": "webtech",
+   "source": "cms_fingerprint",
    "version_norm": "2016",
    "version_raw": "15.1.2507",
    "vulnerabilities_count": null
@@ -12162,6 +12164,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
+    "httpx",
     "nmap",
     "webtech"
    ],
@@ -12176,6 +12179,11 @@
    },
    "evidence": [
     {
+     "excerpt": "technologies: IIS 10.0",
+     "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
+     "tool": "httpx"
+    },
+    {
      "excerpt": "443/tcp open http Microsoft IIS httpd 10.0 tunnel=ssl",
      "ref": "hosts/195.50.179.4/phase1/nmap.xml",
      "tool": "nmap"
@@ -12183,17 +12191,12 @@
     {
      "excerpt": "server: Microsoft IIS httpd/10.0",
      "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
-     "excerpt": "technologies: IIS 10.0",
-     "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: Microsoft IIS httpd 10.0",
      "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: Microsoft-IIS 10.0",
@@ -12220,8 +12223,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -12241,7 +12243,7 @@
     {
      "excerpt": "technologies: Postfix smtpd",
      "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "postfix",
@@ -12263,7 +12265,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -12278,7 +12280,7 @@
     {
      "excerpt": "technologies: Windows Server",
      "ref": "hosts/195.50.179.4/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "windows_server",
@@ -12289,9 +12291,9 @@
    "kind": "os",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:15:34Z",
+   "observed_at": "2026-07-22T08:39:20Z",
    "product": "Windows Server",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -12936,6 +12938,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
+    "httpx",
     "nmap",
     "webtech"
    ],
@@ -12950,6 +12953,11 @@
    },
    "evidence": [
     {
+     "excerpt": "technologies: Apache HTTP Server",
+     "ref": "hosts/195.50.179.5/phase1/tech_profile.json",
+     "tool": "httpx"
+    },
+    {
      "excerpt": "443/tcp open http Apache httpd tunnel=ssl",
      "ref": "hosts/195.50.179.5/phase1/nmap.xml",
      "tool": "nmap"
@@ -12957,20 +12965,15 @@
     {
      "excerpt": "server: Apache httpd",
      "ref": "hosts/195.50.179.5/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
-     "excerpt": "technologies: Apache",
-     "ref": "hosts/195.50.179.5/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
-     "excerpt": "technologies: Apache HTTP Server",
-     "ref": "hosts/195.50.179.5/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: Apache httpd",
+     "ref": "hosts/195.50.179.5/phase1/tech_profile.json",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Apache",
      "ref": "hosts/195.50.179.5/phase1/tech_profile.json",
      "tool": "webtech"
     }
@@ -12994,7 +12997,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -13009,7 +13012,7 @@
     {
      "excerpt": "technologies: HSTS",
      "ref": "hosts/195.50.179.5/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "hsts",
@@ -13020,9 +13023,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:16:13Z",
+   "observed_at": "2026-07-22T08:40:15Z",
    "product": "HSTS",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -13031,7 +13034,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "cms_fingerprint"
    ],
    "distro": null,
    "edition": null,
@@ -13046,7 +13049,7 @@
     {
      "excerpt": "technologies: Nextcloud",
      "ref": "hosts/195.50.179.5/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "cms_fingerprint"
     }
    ],
    "family": "nextcloud",
@@ -13057,9 +13060,9 @@
    "kind": "application",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:16:13Z",
+   "observed_at": "2026-07-22T08:56:04Z",
    "product": "Nextcloud",
-   "source": "webtech",
+   "source": "cms_fingerprint",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -13068,7 +13071,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -13083,7 +13086,7 @@
     {
      "excerpt": "technologies: PHP",
      "ref": "hosts/195.50.179.5/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "php",
@@ -13094,9 +13097,9 @@
    "kind": "language",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:16:13Z",
+   "observed_at": "2026-07-22T08:40:15Z",
    "product": "PHP",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -13222,7 +13225,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -13237,7 +13240,7 @@
     {
      "excerpt": "technologies: HSTS",
      "ref": "hosts/195.50.179.6/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "hsts",
@@ -13248,9 +13251,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:17:33Z",
+   "observed_at": "2026-07-22T08:46:10Z",
    "product": "HSTS",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -13259,8 +13262,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -13280,12 +13282,12 @@
     {
      "excerpt": "server: nginx",
      "ref": "hosts/195.50.179.6/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: nginx",
      "ref": "hosts/195.50.179.6/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "nginx",
@@ -13349,6 +13351,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
+    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -13362,12 +13365,12 @@
    },
    "evidence": [
     {
-     "excerpt": "technologies: ASP.NET",
+     "excerpt": "technologies: Microsoft ASP.NET",
      "ref": "hosts/195.50.179.7/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     },
     {
-     "excerpt": "technologies: Microsoft ASP.NET",
+     "excerpt": "technologies: ASP.NET",
      "ref": "hosts/195.50.179.7/phase1/tech_profile.json",
      "tool": "webtech"
     }
@@ -13391,6 +13394,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
+    "httpx",
     "nmap",
     "webtech"
    ],
@@ -13405,6 +13409,11 @@
    },
    "evidence": [
     {
+     "excerpt": "technologies: IIS 10.0",
+     "ref": "hosts/195.50.179.7/phase1/tech_profile.json",
+     "tool": "httpx"
+    },
+    {
      "excerpt": "443/tcp open http Microsoft IIS httpd 10.0 tunnel=ssl",
      "ref": "hosts/195.50.179.7/phase1/nmap.xml",
      "tool": "nmap"
@@ -13412,17 +13421,12 @@
     {
      "excerpt": "server: Microsoft IIS httpd/10.0",
      "ref": "hosts/195.50.179.7/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
-     "excerpt": "technologies: IIS 10.0",
-     "ref": "hosts/195.50.179.7/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: Microsoft IIS httpd 10.0",
      "ref": "hosts/195.50.179.7/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: Microsoft-IIS 10.0",
@@ -13449,7 +13453,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -13464,7 +13468,7 @@
     {
      "excerpt": "technologies: Windows Server",
      "ref": "hosts/195.50.179.7/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "windows_server",
@@ -13475,9 +13479,9 @@
    "kind": "os",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:18:25Z",
+   "observed_at": "2026-07-22T08:48:09Z",
    "product": "Windows Server",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -13609,6 +13613,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
+    "httpx",
     "nmap",
     "webtech"
    ],
@@ -13623,6 +13628,11 @@
    },
    "evidence": [
     {
+     "excerpt": "technologies: Apache HTTP Server",
+     "ref": "hosts/195.50.179.9/phase1/tech_profile.json",
+     "tool": "httpx"
+    },
+    {
      "excerpt": "443/tcp open http Apache httpd tunnel=ssl",
      "ref": "hosts/195.50.179.9/phase1/nmap.xml",
      "tool": "nmap"
@@ -13630,20 +13640,15 @@
     {
      "excerpt": "server: Apache httpd",
      "ref": "hosts/195.50.179.9/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
-     "excerpt": "technologies: Apache",
-     "ref": "hosts/195.50.179.9/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
-     "excerpt": "technologies: Apache HTTP Server",
-     "ref": "hosts/195.50.179.9/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: Apache httpd",
+     "ref": "hosts/195.50.179.9/phase1/tech_profile.json",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Apache",
      "ref": "hosts/195.50.179.9/phase1/tech_profile.json",
      "tool": "webtech"
     }
@@ -13667,7 +13672,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -13682,7 +13687,7 @@
     {
      "excerpt": "technologies: HSTS",
      "ref": "hosts/195.50.179.9/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "hsts",
@@ -13693,9 +13698,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:18:43Z",
+   "observed_at": "2026-07-22T08:52:15Z",
    "product": "HSTS",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -13747,8 +13752,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -13768,12 +13772,12 @@
     {
      "excerpt": "server: Amazon CloudFront httpd",
      "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: Amazon CloudFront httpd",
      "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "amazon_cloudfront_httpd",
@@ -13795,6 +13799,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
+    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -13808,12 +13813,12 @@
    },
    "evidence": [
     {
-     "excerpt": "technologies: Apache",
+     "excerpt": "technologies: Apache HTTP Server",
      "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     },
     {
-     "excerpt": "technologies: Apache HTTP Server",
+     "excerpt": "technologies: Apache",
      "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
      "tool": "webtech"
     }
@@ -13880,7 +13885,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -13895,7 +13900,7 @@
     {
      "excerpt": "technologies: HSTS",
      "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "hsts",
@@ -13906,9 +13911,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:20:41Z",
+   "observed_at": "2026-07-22T08:53:47Z",
    "product": "HSTS",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -13917,7 +13922,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -13932,7 +13937,7 @@
     {
      "excerpt": "technologies: jQuery",
      "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "jquery",
@@ -13943,9 +13948,9 @@
    "kind": "library",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:20:41Z",
+   "observed_at": "2026-07-22T08:53:47Z",
    "product": "jQuery",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -13954,7 +13959,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -13969,7 +13974,7 @@
     {
      "excerpt": "technologies: PHP",
      "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "php",
@@ -13980,9 +13985,9 @@
    "kind": "language",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:20:41Z",
+   "observed_at": "2026-07-22T08:53:47Z",
    "product": "PHP",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -14145,8 +14150,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -14181,7 +14185,7 @@
     {
      "excerpt": "technologies: Dovecot pop3d",
      "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "dovecot",
@@ -14203,7 +14207,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -14218,7 +14222,7 @@
     {
      "excerpt": "technologies: HSTS",
      "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "hsts",
@@ -14229,9 +14233,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:16:26Z",
+   "observed_at": "2026-07-22T08:30:39Z",
    "product": "HSTS",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -14240,7 +14244,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -14255,7 +14259,7 @@
     {
      "excerpt": "technologies: HTTP/3",
      "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "http",
@@ -14266,9 +14270,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:16:26Z",
+   "observed_at": "2026-07-22T08:30:39Z",
    "product": "HTTP",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": "3",
    "version_raw": "HTTP/3",
    "vulnerabilities_count": null
@@ -14277,8 +14281,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -14298,7 +14301,7 @@
     {
      "excerpt": "technologies: Icecast streaming media server 2.4.4",
      "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "icecast",
@@ -14320,7 +14323,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -14335,25 +14338,57 @@
     {
      "excerpt": "technologies: jQuery",
      "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
-     "excerpt": "technologies: jQuery Migrate 3.4.1",
-     "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "jquery",
    "fqdn": null,
    "hints": [],
    "host_ip": "92.205.163.53",
-   "id": "sw:92.205.163.53:-:jquery:3.4.1",
+   "id": "sw:92.205.163.53:-:jquery:unknown",
    "kind": "library",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:16:26Z",
+   "observed_at": "2026-07-22T08:30:39Z",
    "product": "jQuery",
-   "source": "webtech",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: jQuery Migrate 3.4.1",
+     "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery_migrate",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "92.205.163.53",
+   "id": "sw:92.205.163.53:-:jquery_migrate:3.4.1",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-07-22T08:30:39Z",
+   "product": "jQuery Migrate",
+   "source": "httpx",
    "version_norm": "3.4.1",
    "version_raw": "3.4.1",
    "vulnerabilities_count": null
@@ -14362,7 +14397,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -14377,7 +14412,7 @@
     {
      "excerpt": "technologies: MySQL",
      "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "mysql",
@@ -14388,9 +14423,9 @@
    "kind": "database",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:16:26Z",
+   "observed_at": "2026-07-22T08:30:39Z",
    "product": "MySQL",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -14399,8 +14434,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -14425,12 +14459,12 @@
     {
      "excerpt": "server: nginx",
      "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: nginx",
      "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "nginx",
@@ -14494,8 +14528,8 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "header_check",
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -14508,19 +14542,19 @@
    },
    "evidence": [
     {
+     "excerpt": "technologies: PleskLin",
+     "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
+     "tool": "header_check"
+    },
+    {
      "excerpt": "8443/tcp open https-alt sw-cp-server tunnel=ssl",
      "ref": "hosts/92.205.163.53/phase1/nmap.xml",
      "tool": "nmap"
     },
     {
-     "excerpt": "technologies: PleskLin",
-     "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
      "excerpt": "technologies: sw-cp-server",
      "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "plesk",
@@ -14542,8 +14576,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -14573,7 +14606,7 @@
     {
      "excerpt": "technologies: Postfix smtpd",
      "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "postfix",
@@ -14595,8 +14628,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -14616,7 +14648,7 @@
     {
      "excerpt": "technologies: ProFTPD",
      "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "proftpd",
@@ -14638,7 +14670,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -14653,7 +14685,7 @@
     {
      "excerpt": "technologies: Underscore.js 1.13.8",
      "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "underscore_js",
@@ -14664,9 +14696,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T08:16:26Z",
+   "observed_at": "2026-07-22T08:30:39Z",
    "product": "Underscore.js",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": "1.13.8",
    "version_raw": "1.13.8",
    "vulnerabilities_count": null
@@ -14734,23 +14766,55 @@
      "excerpt": "tech: jQuery",
      "ref": "hosts/92.205.163.53/phase2/httpx.json",
      "tool": "httpx"
-    },
-    {
-     "excerpt": "tech: jQuery Migrate:3.4.1",
-     "ref": "hosts/92.205.163.53/phase2/httpx.json",
-     "tool": "httpx"
     }
    ],
    "family": "jquery",
    "fqdn": "ubb-wiki.castenow.de",
    "hints": [],
    "host_ip": "92.205.163.53",
-   "id": "sw:92.205.163.53:ubb-wiki.castenow.de:jquery:3.4.1",
+   "id": "sw:92.205.163.53:ubb-wiki.castenow.de:jquery:unknown",
    "kind": "library",
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-22T08:30:39Z",
    "product": "jQuery",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: jQuery Migrate:3.4.1",
+     "ref": "hosts/92.205.163.53/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery_migrate",
+   "fqdn": "ubb-wiki.castenow.de",
+   "hints": [],
+   "host_ip": "92.205.163.53",
+   "id": "sw:92.205.163.53:ubb-wiki.castenow.de:jquery_migrate:3.4.1",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-07-22T08:30:39Z",
+   "product": "jQuery Migrate",
    "source": "httpx",
    "version_norm": "3.4.1",
    "version_raw": "3.4.1",

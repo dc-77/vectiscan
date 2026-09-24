@@ -1,0 +1,15 @@
+{"ip": "203.0.113.10", "fqdns": ["www.example.test"], "cms": null, "cms_version": null, "server": "nginx/1.24.0",
+ "open_ports": [21, 80, 110, 143, 443, 465, 587, 993, 3306, 5432, 8443],
+ "technologies": [
+  {"name": "ProFTPD", "version": ""},
+  {"name": "nginx", "version": "1.24.0"},
+  {"name": "Courier pop3d", "version": ""},
+  {"name": "Dovecot imapd", "version": ""},
+  {"name": "Apache httpd", "version": ""},
+  {"name": "Exim smtpd", "version": "4.96"},
+  {"name": "MySQL", "version": "5.5.5-10.11.18-MariaDB-0+deb12u1"},
+  {"name": "PostgreSQL DB", "version": "9.6.0 or later"},
+  {"name": "Microsoft IIS httpd", "version": "10.0"},
+  {"name": "jQuery", "version": ""},
+  {"name": "jQuery Migrate", "version": "3.4.1"}
+ ]}

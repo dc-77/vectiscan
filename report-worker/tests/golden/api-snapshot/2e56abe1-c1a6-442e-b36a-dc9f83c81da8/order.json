@@ -1,0 +1,829 @@
+{
+ "data": {
+  "businessImpactScore": 6,
+  "correlationCount": 2487,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "heuel.com",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-09-23T20:39:35.735Z",
+  "hasReport": true,
+  "id": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8",
+  "isRescan": false,
+  "overallRisk": "MITTEL",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": true,
+     "fo": null,
+     "issues": [],
+     "p": "quarantine",
+     "pct": 100,
+     "raw": "v=DMARC1;p=quarantine;pct=100;rua=mailto:dmarcrua@heuel.com",
+     "rua": [
+      "mailto:dmarcrua@heuel.com"
+     ],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/heuel.com",
+     "domain": "heuel.com",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/heuel.com"
+    }
+   },
+   "passive_subdomains": [
+    "_dmarc.heuel.com",
+    "dl.heuel.com",
+    "edi.heuel.com",
+    "jobs.heuel.com",
+    "mail.heuel.com",
+    "mails.heuel.com",
+    "online.heuel.com",
+    "ose.heuel.com",
+    "smtp.heuel.com",
+    "webportal.heuel.com",
+    "www.heuel.com"
+   ],
+   "securitytrails": {
+    "dns_history": [],
+    "domain": null,
+    "subdomains": []
+   },
+   "shodan_domain": {
+    "domain": "heuel.com",
+    "records": [
+     {
+      "last_seen": "2026-09-23T04:53:39.465000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "217.72.203.132"
+     },
+     {
+      "last_seen": "2026-09-23T04:58:30.364000",
+      "options": {
+       "priority": 10,
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-09-23T04:58:30.364000",
+      "options": {
+       "priority": 20,
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx02.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-09-23T04:58:30.364000",
+      "options": {
+       "priority": 30,
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx03.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-09-23T04:58:30.364000",
+      "options": {
+       "priority": 40,
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx04.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-09-23T04:57:27.259000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.second-ns.com"
+     },
+     {
+      "last_seen": "2026-09-23T04:57:27.259000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1.your-server.de"
+     },
+     {
+      "last_seen": "2026-09-23T04:57:27.259000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns3.second-ns.de"
+     },
+     {
+      "last_seen": "2026-09-23T04:59:03.452000",
+      "options": {
+       "expires": 3600000,
+       "hostmaster": "postmaster.your-server.de",
+       "minttl": 7200,
+       "refresh": 86400,
+       "retry": 1800,
+       "serial": 2026032507,
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns1.your-server.de"
+     },
+     {
+      "last_seen": "2026-09-23T04:55:16.938000",
+      "options": {
+       "ttl": 599
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "MS=7596C8AEEA14348B00B41FC0FE5146AC550E5613"
+     },
+     {
+      "last_seen": "2026-09-23T04:55:16.938000",
+      "options": {
+       "ttl": 599
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "MS=ms67921799"
+     },
+     {
+      "last_seen": "2026-09-23T04:55:16.938000",
+      "options": {
+       "ttl": 599
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "_globalsign-domain-verification=DjwpbI_kEmRMGz7btGf2L4madxJt-I4kHwgk56MvA0"
+     },
+     {
+      "last_seen": "2026-09-23T04:55:16.938000",
+      "options": {
+       "ttl": 599
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "anthropic-domain-verification-h1jvxc=rOfxf5MAHdTdvKSvxYnQHfukm"
+     },
+     {
+      "last_seen": "2026-09-23T04:55:16.938000",
+      "options": {
+       "ttl": 599
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "apple-domain-verification=pR99BviNsYRZmQGK"
+     },
+     {
+      "last_seen": "2026-09-23T04:55:16.938000",
+      "options": {
+       "ttl": 599
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "asv=a235691dbbc98a5ce9705f6fb9610bc8"
+     },
+     {
+      "last_seen": "2026-09-23T04:55:16.938000",
+      "options": {
+       "ttl": 599
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "e7c4410a0de34e09afb5f9ec1892da66"
+     },
+     {
+      "last_seen": "2026-09-23T04:55:16.938000",
+      "options": {
+       "ttl": 599
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "facebook-domain-verification=mgv9h34g1smnc9y8btaojp3u7vfuiy"
+     },
+     {
+      "last_seen": "2026-09-23T04:55:16.938000",
+      "options": {
+       "ttl": 599
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "google-site-verification=ZjVwGnApyXYFP1sVzHeieeJVTO3gAK7pSG6qHm-5i20"
+     },
+     {
+      "last_seen": "2026-09-23T04:55:16.938000",
+      "options": {
+       "ttl": 599
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "openai-domain-verification=dv-rFDjbrgUmni90Jvx5Pxcb6vH"
+     },
+     {
+      "last_seen": "2026-09-23T04:55:16.938000",
+      "options": {
+       "ttl": 599
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 ip4:20.52.130.35 ip4:168.245.40.44 ip4:167.89.99.179 ip4:149.72.147.186 ip4:167.89.101.239 ip4:88.99.138.97 ip6:2a01:4f8:10a:22a2::2 include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.crsend.com include:_spf.samanage.com include:spf-de.emailsignatures365.com ~all"
+     },
+     {
+      "last_seen": "2026-09-23T04:55:16.838000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "_dmarc",
+      "type": "TXT",
+      "value": "v=DMARC1;p=quarantine;pct=100;rua=mailto:dmarcrua@heuel.com"
+     },
+     {
+      "last_seen": "2026-09-23T04:53:39.458000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "dl",
+      "type": "A",
+      "value": "213.133.104.51"
+     },
+     {
+      "last_seen": "2026-09-23T04:53:39.465000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "edi",
+      "type": "A",
+      "value": "20.79.218.75"
+     },
+     {
+      "last_seen": "2026-09-23T04:53:39.458000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "jobs",
+      "type": "A",
+      "value": "217.72.203.132"
+     },
+     {
+      "last_seen": "2026-09-23T04:53:39.461000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "mail",
+      "type": "A",
+      "value": "20.79.218.75"
+     },
+     {
+      "last_seen": "2026-09-23T04:53:39.458000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "mails",
+      "type": "A",
+      "value": "195.225.241.75"
+     },
+     {
+      "last_seen": "2026-09-23T04:53:39.461000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "online",
+      "type": "CNAME",
+      "value": "connect.funnelcockpit.com"
+     },
+     {
+      "last_seen": "2026-09-23T04:53:39.461000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "ose",
+      "type": "A",
+      "value": "20.79.218.75"
+     },
+     {
+      "last_seen": "2026-09-23T04:53:39.465000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "smtp",
+      "type": "A",
+      "value": "195.225.241.75"
+     },
+     {
+      "last_seen": "2026-09-23T04:53:39.458000",
+      "options": {
+       "ttl": 60
+      },
+      "subdomain": "webportal",
+      "type": "A",
+      "value": "213.133.104.51"
+     },
+     {
+      "last_seen": "2026-09-23T05:35:50.959000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "webportal",
+      "type": "AAAA",
+      "value": "2a01:4f8:d0a:2757::2"
+     },
+     {
+      "last_seen": "2026-09-23T04:53:39.458000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "www",
+      "type": "A",
+      "value": "217.72.203.132"
+     }
+    ],
+    "subdomains": [
+     "_dmarc",
+     "dl",
+     "edi",
+     "jobs",
+     "mail",
+     "mails",
+     "online",
+     "ose",
+     "smtp",
+     "webportal",
+     "www"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": null,
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 17,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 6,
+      "crtsh": 10,
+      "gobuster_dns": 3,
+      "phase0a_passive": 11,
+      "subfinder": 11
+     },
+     "tools_with_zero_results": [],
+     "total_subdomains": 17
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": true,
+     "dmarc": "v=DMARC1;p=quarantine;pct=100;rua=mailto:dmarcrua@heuel.com",
+     "mx": [
+      "mx01.hornetsecurity.com",
+      "mx02.hornetsecurity.com",
+      "mx03.hornetsecurity.com",
+      "mx04.hornetsecurity.com"
+     ],
+     "ns": [
+      "ns1.your-server.de",
+      "ns3.second-ns.de",
+      "ns.second-ns.com"
+     ],
+     "spf": "v=spf1 ip4:20.52.130.35 ip4:168.245.40.44 ip4:167.89.99.179 ip4:149.72.147.186 ip4:167.89.101.239 ip4:88.99.138.97 ip6:2a01:4f8:10a:22a2::2 include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.crsend.com include:_spf.samanage.com \" \"include:spf-de.emailsignatures365.com ~all",
+     "zone_transfer": false
+    },
+    "domain": "heuel.com",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain heuel.com mit www-Subdomain, primärer Web-Host mit Produktions-Content (Speditions-Logistik-Website), HTTP 200, niedrig-Risiko-Profil.",
+      "fqdns": [
+       "heuel.com",
+       "www.heuel.com",
+       "jobs.heuel.com"
+      ],
+      "ip": "217.72.203.132",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "quarantine",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80,
+        443
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "ip217-72-203-132.pbiaas.com",
+      "screenshot_minio_key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/217.72.203.132__www.heuel.com.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [
+         {
+          "fqdn": "heuel.com",
+          "reason": "redirect",
+          "status": 200
+         },
+         {
+          "fqdn": "jobs.heuel.com",
+          "reason": "redirect",
+          "status": 200
+         }
+        ],
+        "body_hash": "d48706fdba0fe7222a79d224c6d28597f9304378c5a7a1d4af5917f7e4196bdd",
+        "final_url": "https://www.heuel.com",
+        "fqdn": "www.heuel.com",
+        "is_primary": true,
+        "screenshot_minio_key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/217.72.203.132__www.heuel.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Speditionsunternehmen für Stückguttransporte in Deutschland und Europa mit NEOS auf nginx.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Spedition für Stückguttransporte,  LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://www.heuel.com",
+       "has_web": true,
+       "status": 200,
+       "title": "Spedition für Stückguttransporte,  LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS",
+       "web_fqdn": "www.heuel.com"
+      }
+     },
+     {
+      "_reasoning": "Zwei primary VHosts (ose.heuel.com HTTP 200, edi.heuel.com HTTP 403) mit exponierten Management-Ports (21, 22, 8443, 4433) in Shodan — kritische Infrastruktur-Ports erfordern Sicherheitsprüfung trotz generischer Titel.",
+      "fqdns": [
+       "edi.heuel.com",
+       "ose.heuel.com",
+       "mail.heuel.com"
+      ],
+      "ip": "20.79.218.75",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "quarantine",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        8443,
+        80,
+        4433,
+        21,
+        22,
+        443
+       ],
+       "shodan_services": {
+        "443": "Apache httpd",
+        "80": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/20.79.218.75__ose.heuel.com.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "ca5ed6db0f2b7069549161180e3586c05e8aa25aa2b1f4182926375877238f06",
+        "final_url": "https://ose.heuel.com",
+        "fqdn": "ose.heuel.com",
+        "is_primary": true,
+        "screenshot_minio_key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/20.79.218.75__ose.heuel.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Redirector-Service auf Apache httpd.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Redirector"
+       },
+       {
+        "aliases": [
+         {
+          "fqdn": "mail.heuel.com",
+          "reason": "body-hash-dup",
+          "status": 403
+         }
+        ],
+        "body_hash": "ab768623070128ccef048c88def86155dbe776c3d8db423cc8fa89432673d8a8",
+        "final_url": "https://edi.heuel.com",
+        "fqdn": "edi.heuel.com",
+        "is_primary": true,
+        "screenshot_minio_key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/20.79.218.75__edi.heuel.com.png",
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "HTTP 403 — keine erreichbare Webseite",
+         "is_real_content": false
+        },
+        "status": 403,
+        "title": "403 Forbidden"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://ose.heuel.com",
+       "has_web": true,
+       "status": 200,
+       "title": "Redirector",
+       "web_fqdn": "ose.heuel.com"
+      }
+     },
+     {
+      "_reasoning": "Mailserver (mails.heuel.com, smtp.heuel.com) ohne Web-Content — Port-Scan + testssl für SMTP/IMAP-Sicherheit erforderlich, DMARC/SPF konfiguriert.",
+      "fqdns": [
+       "mails.heuel.com",
+       "smtp.heuel.com"
+      ],
+      "ip": "195.225.241.75",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "quarantine",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "[AUTO-OVERRIDE] Host hat Live-Web-Content auf VHost webportal.heuel.com (HTTP 200) — KI-Skip verworfen. Original: Beide primary VHosts (webportal.heuel.com, dl.heuel.com) redirecten zu ose.heuel.com (20.79.218.75) oder liefern 403 — reiner Redirector/Proxy, wird durch Scan von 20.79.218.75 abgedeckt.",
+      "fqdns": [
+       "dl.heuel.com",
+       "webportal.heuel.com"
+      ],
+      "ip": "213.133.104.51",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "quarantine",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        993,
+        995,
+        587,
+        110,
+        143,
+        80,
+        465,
+        21,
+        22,
+        25,
+        443
+       ],
+       "shodan_services": {
+        "443": "Apache httpd",
+        "80": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "www51.your-server.de",
+      "screenshot_minio_key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/2a01:4f8:d0a:2757::2__webportal.heuel.com.png",
+      "status": "skipped",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "ca5ed6db0f2b7069549161180e3586c05e8aa25aa2b1f4182926375877238f06",
+        "final_url": "https://ose.heuel.com/",
+        "fqdn": "webportal.heuel.com",
+        "is_primary": true,
+        "screenshot_minio_key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/2a01:4f8:d0a:2757::2__webportal.heuel.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Redirector-Service ohne erkannte Technologie.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Redirector"
+       },
+       {
+        "aliases": [],
+        "body_hash": "cea46b7e0ff49a96fca5e9046918eab480667758e1d8382f8b3c1946b64b200b",
+        "final_url": "https://dl.heuel.com",
+        "fqdn": "dl.heuel.com",
+        "is_primary": true,
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "HTTP 403 — keine erreichbare Webseite",
+         "is_real_content": false
+        },
+        "status": 403,
+        "title": "403 Forbidden"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://ose.heuel.com/",
+       "has_web": true,
+       "status": 200,
+       "title": "Redirector",
+       "web_fqdn": "webportal.heuel.com"
+      }
+     },
+     {
+      "_reasoning": "Vercel-gehostete Subdomain (online.heuel.com) mit HTTP 429 Security Checkpoint — scannen um WAF-Konfiguration und Backend-Sicherheit zu prüfen, nicht skippen.",
+      "fqdns": [
+       "online.heuel.com"
+      ],
+      "ip": "216.150.1.65",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "quarantine",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80,
+        443
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/216.150.1.65__online.heuel.com.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "ae63d45c82d37ca0aa7a47c4af0f312e091cfea487c42df0bbc2b13120b98dff",
+        "final_url": "https://online.heuel.com",
+        "fqdn": "online.heuel.com",
+        "is_primary": true,
+        "screenshot_minio_key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/216.150.1.65__online.heuel.com.png",
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "HTTP 429 — keine erreichbare Webseite",
+         "is_real_content": false
+        },
+        "status": 429,
+        "title": "Vercel Security Checkpoint"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://online.heuel.com",
+       "has_web": true,
+       "status": 429,
+       "title": "Vercel Security Checkpoint",
+       "web_fqdn": "online.heuel.com"
+      }
+     },
+     {
+      "_reasoning": "[AUTO-OVERRIDE] Host hat Live-Web-Content auf VHost webportal.heuel.com (HTTP 200) — KI-Skip verworfen. Original: IPv6-Duplikat von 213.133.104.51 (gleiche FQDN webportal.heuel.com, identischer Redirect zu ose.heuel.com) — redundant, wird durch IPv4-Host abgedeckt.",
+      "fqdns": [
+       "webportal.heuel.com"
+      ],
+      "ip": "2a01:4f8:d0a:2757::2",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "quarantine",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80,
+        443
+       ],
+       "shodan_services": {
+        "443": "Apache httpd",
+        "80": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "www51.your-server.de",
+      "screenshot_minio_key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/2a01:4f8:d0a:2757::2__webportal.heuel.com.png",
+      "status": "skipped",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "ca5ed6db0f2b7069549161180e3586c05e8aa25aa2b1f4182926375877238f06",
+        "final_url": "https://ose.heuel.com/",
+        "fqdn": "webportal.heuel.com",
+        "is_primary": true,
+        "screenshot_minio_key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/2a01:4f8:d0a:2757::2__webportal.heuel.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Redirector-Service ohne erkannte Technologie.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Redirector"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://ose.heuel.com/",
+       "has_web": true,
+       "status": 200,
+       "title": "Redirector",
+       "web_fqdn": "webportal.heuel.com"
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 6,
+   "hostsTotal": 6,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 1,
+   "INFO": 0,
+   "LOW": 7,
+   "MEDIUM": 3
+  },
+  "startedAt": "2026-09-23T19:48:08.260Z",
+  "status": "pending_review",
+  "subscriptionId": null,
+  "validationWarnings": null
+ },
+ "success": true
+}

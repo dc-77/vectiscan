@@ -565,7 +565,7 @@
       "c": "MariaDB",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.11.18 (debian)"
@@ -574,7 +574,7 @@
       "c": "PostgreSQL",
       "conf": "mittel",
       "note": "Version von außen nicht genau bestimmbar",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -583,7 +583,7 @@
       "c": "ProFTPD",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -592,7 +592,7 @@
       "c": "Courier",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -601,7 +601,7 @@
       "c": "Dovecot",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -610,7 +610,7 @@
       "c": "OpenSSH",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "9.2p1"
@@ -619,7 +619,7 @@
       "c": "ProFTPD mod_sftp",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -628,7 +628,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -642,7 +642,7 @@
       "c": "ASP.NET",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "4.0.30319"
@@ -660,7 +660,7 @@
       "c": "Microsoft Exchange",
       "conf": "mittel",
       "note": "",
-      "src": "redirect_probe, webtech, zap_spider",
+      "src": "cms_fingerprint, httpx, redirect_probe, zap_spider",
       "st": "grau",
       "status": "unbekannt",
       "v": "SE (Build 15.2.2562)"
@@ -669,7 +669,7 @@
       "c": "Windows Server",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -678,7 +678,7 @@
       "c": "Microsoft IIS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.0"
@@ -692,7 +692,7 @@
       "c": "ASP.NET",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -701,7 +701,7 @@
       "c": "Windows Server",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -710,7 +710,7 @@
       "c": "Microsoft IIS",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.0"
@@ -1250,7 +1250,7 @@
    "junkerwerk.de",
    "junkerwerk.hu"
   ],
-  "facts_schema_version": "1.0.4",
+  "facts_schema_version": "1.0.5",
   "fqdns_total": 8,
   "hosts_ipv4": 3,
   "hosts_ipv6": 1,

@@ -214,6 +214,7 @@ PASSIVE INTELLIGENCE (wenn verfügbar):
 
 ERWEITERTE REGELN (Passive Intel):
 - Hosts mit veralteten Service-Versionen aus Shodan (alte OpenSSH, alte nginx) → Priorität 1
+- Versionsangaben mit "or later", "or newer" oder ">=" (z.B. "PostgreSQL 9.6.0 or later") sind Untergrenzen: die tatsächliche Version ist gleich oder neuer und unbekannt. Daraus folgt keine Aussage über Aktualität. Solche Dienste nicht als veraltet bezeichnen und nicht deshalb hochstufen.
 - Hosts mit exponierten Management-Ports (22, 3389, 5900, 8080, 8443) aus Shodan → Priorität 1
 - Hosts mit hohem AbuseIPDB-Score (>50) → Priorität 1 (mögliche Kompromittierung)
 - Hosts mit nur Port 80/443 und niedrigem AbuseIPDB-Score → Priorität 2
@@ -296,10 +297,15 @@ Antwort im Format:
     # C2: content_hash aus (domain, hosts, dns_findings) — Order-uebergreifend
     # cache hit wenn host_inventory identisch ist (Subdomain-Snapshot + Tool-
     # Output-Normalizer sorgen dafuer).
+    # S6a2: der System-Prompt gehoert in den Schluessel. Sonst lieferte der Cache
+    # nach einer Prompt-Aenderung sieben Tage lang die alte Antwort (spec/09 Q11:
+    # "veraltete PostgreSQL 9.6" aus "9.6.0 or later"). Nur KI #1, CACHE_VERSION
+    # und damit KI #2 bis #4 bleiben unberuehrt.
     ch = compute_content_hash(
         domain, package,
         json.dumps(hosts, sort_keys=True, ensure_ascii=False),
         json.dumps(dns_findings, sort_keys=True, ensure_ascii=False),
+        HOST_STRATEGY_SYSTEM,
     )
 
     result = _call_haiku(

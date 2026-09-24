@@ -10,6 +10,7 @@ from __future__ import annotations
 import os
 import re
 from collections import Counter
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -524,16 +525,34 @@ _EOL_STATUS = {
 }
 
 
-def build_tech(facts: FS.Facts) -> list[TechBlock]:
+@dataclass(frozen=True)
+class TechLine:
+    """Eine Zeile der Technologietabelle, bevor sie Bericht (``TechRow``) oder
+    Dashboard (``reports.tech_profiles[].tech_rows``) wird. Beide lesen dieselben
+    Zeilen, damit Komponente, Version und Patch-Status nie auseinanderlaufen
+    (spec/09 Q11)."""
+    software: FS.SoftwareFact
+    product: str
+    version: str
+    eol_status: str
+    eol_date: Optional[str]
+    note: str
+    sources: str
+    confidence: float
+    conf_label: str
+
+
+def tech_lines(facts: FS.Facts) -> dict[str, list[TechLine]]:
+    """Zeilen je Host-IP in Berichtsreihenfolge; Hosts ohne Software fehlen."""
     by_host: dict[str, list[FS.SoftwareFact]] = {}
     for sw in facts.software:
         by_host.setdefault(sw.host_ip, []).append(sw)
-    blocks: list[TechBlock] = []
+    out: dict[str, list[TechLine]] = {}
     for host in sorted(facts.hosts, key=lambda h: (h.family, h.ip)):
         entries = sorted(by_host.get(host.ip, []), key=lambda s: (s.kind, s.product, s.id))
         if not entries:
             continue
-        rows: list[TechRow] = []
+        lines: list[TechLine] = []
         seen: set[tuple[str, str]] = set()
         for sw in entries:
             version = sw.version_norm or UNKNOWN
@@ -545,15 +564,30 @@ def build_tech(facts: FS.Facts) -> list[TechBlock]:
             if key in seen:
                 continue
             seen.add(key)
-            status, colour = _EOL_STATUS.get(sw.eol.status, (UNKNOWN, "grau"))
             note = T.tech_note(sw.note)
             if sw.eol.status == "eol" and sw.eol.date:
                 note = f"Herstellerpflege endete am {sw.eol.date}"
             elif sw.eol.upstream_eol_date:
                 note = f"Lifecycle prüfen, Hersteller nennt {sw.eol.upstream_eol_date}"
-            rows.append(TechRow(
-                c=sw.product, v=version, src=", ".join(sorted(sw.detection_sources)) or sw.source,
-                conf=_confidence_label(sw.confidence), status=status, st=colour, note=note))
+            lines.append(TechLine(
+                software=sw, product=sw.product, version=version, eol_status=sw.eol.status,
+                eol_date=sw.eol.date, note=note,
+                sources=", ".join(sorted(sw.detection_sources)) or sw.source,
+                confidence=sw.confidence, conf_label=_confidence_label(sw.confidence)))
+        out[host.ip] = lines
+    return out
+
+
+def build_tech(facts: FS.Facts) -> list[TechBlock]:
+    hosts = {h.ip: h for h in facts.hosts}
+    blocks: list[TechBlock] = []
+    for ip, lines in tech_lines(facts).items():
+        host = hosts[ip]
+        rows: list[TechRow] = []
+        for line in lines:
+            status, colour = _EOL_STATUS.get(line.eol_status, (UNKNOWN, "grau"))
+            rows.append(TechRow(c=line.product, v=line.version, src=line.sources, conf=line.conf_label,
+                                status=status, st=colour, note=line.note))
         label = f"{host.ip} ({host.reverse})" if host.reverse else host.ip
         blocks.append(TechBlock(host=label, rows=rows))
     return blocks

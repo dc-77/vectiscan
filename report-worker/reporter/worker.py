@@ -1348,6 +1348,7 @@ def process_job(job_data: dict) -> None:
         report_defects_payload: dict | None = None
         v3_data = None
         v3_output = None
+        v3_facts = None
         if layout == "v3":
             # S4: Renderer v3 (Jinja2 + WeasyPrint). Er liest nicht `report_data`,
             # sondern baut sein eigenes Modell aus Fakten und Pruefkatalog.
@@ -1471,16 +1472,25 @@ def process_job(job_data: dict) -> None:
             policy_version = (f"Katalog {v3_data.meta.catalog_version} / "
                               f"Fakten {v3_data.meta.facts_schema_version}")
             policy_id_distinct = policy_ids(v3_data) or None
-        # Migration 027: tech_profiles (1:1 aus Phase 1, mit pre-computed tech_rows
-        # via tech_table_builder als Single Source of Truth — Frontend nutzt diese
-        # statt eigener Klassifikation) + additional_findings (Voll-Body).
-        from reporter.tech_table_builder import build_tech_table_for_host
+        # Migration 027: tech_profiles (1:1 aus Phase 1, mit pre-computed tech_rows,
+        # die Hostkarte und Techniktabelle im Dashboard lesen) + additional_findings.
         enriched_profiles: list[dict] | None = None
-        if effective_profiles:
-            enriched_profiles = []
-            for p in effective_profiles:
-                tech_rows = build_tech_table_for_host(p)
-                enriched_profiles.append({**p, "tech_rows": tech_rows})
+        if uses_legacy or v3_facts is None:
+            from reporter.tech_table_builder import build_tech_table_for_host
+
+            if effective_profiles:
+                enriched_profiles = []
+                for p in effective_profiles:
+                    tech_rows = build_tech_table_for_host(p)
+                    enriched_profiles.append({**p, "tech_rows": tech_rows})
+        else:
+            # S6a2 (spec/09 Q11): im Katalogweg kommen die Zeilen aus den Fakten,
+            # mit derselben Versionsnormalisierung und demselben Lebenszyklus-
+            # Abgleich wie die Technologietabelle im Bericht. Der alte Builder las
+            # "5.5.5-10.11.18-MariaDB" als MySQL 5.5 und "9.6.0 or later" als 9.6.
+            from reporter.v3.dashboard import tech_profiles_from_facts
+
+            enriched_profiles = tech_profiles_from_facts(v3_facts, effective_profiles) or None
         additional_findings = claude_output.get("additional_findings_summary") or None
         if not uses_legacy:
             # Der Katalogweg kappt keine Befunde fuer den Bericht; es gibt

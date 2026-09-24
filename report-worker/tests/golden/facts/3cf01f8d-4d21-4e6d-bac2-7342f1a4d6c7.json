@@ -1,0 +1,7274 @@
+{
+ "coverage": [
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:abuseipdb",
+     "tool": "abuseipdb"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:abuseipdb:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:03Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "abuseipdb"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"80.90.145.166\": {\"ip\": \"80.90.145.166\", \"abuseConfidenceScore\": 0, \"totalReports\": 0, \"numDistinctUsers\": 0, \"lastReportedAt\": null, \"isWhitelisted\": false...",
+     "ref": "scan_results:abuseipdb",
+     "tool": "abuseipdb"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:abuseipdb:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:32:39Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "abuseipdb"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 410,
+   "evidence": [
+    {
+     "excerpt": "{\"subdomains\": [\"huendgen-entsorgung.de\", \"www.huendgen-entsorgung.de\"], \"error\": null}",
+     "ref": "scan_results:certspotter",
+     "tool": "certspotter"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:certspotter:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:18Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "certspotter"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 6147,
+   "evidence": [
+    {
+     "excerpt": "[{\"issuer_ca_id\":432477,\"issuer_name\":\"C=US, O=Let's Encrypt, CN=YR2\",\"common_name\":\"www.huendgen-entsorgung.de\",\"name_value\":\"huendgen-entsorgung.de\",\"id\":2...",
+     "ref": "scan_results:crtsh",
+     "tool": "crtsh"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:crtsh:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:24Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "crtsh"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"huendgen-entsorgung.de\", \"spf\": \"v=spf1 include:_spf.kundenserver.de include:spf.hornetsecurity.com include:spf.vizito.be +ip4:88.99.140.109 +ip...",
+     "ref": "scan_results:dns_records",
+     "tool": "dns_records"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_records:huendgen-entsorgung.de",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:19Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_records"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"huendgen-entsorgung.de\", \"dnssec\": {\"dnssec_signed\": false, \"dnssec_valid\": false, \"ds_algorithm\": null, \"dnskey_count\": 0, \"nsec3_iterations\":...",
+     "ref": "scan_results:dns_security",
+     "tool": "dns_security"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_security:huendgen-entsorgung.de",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:04Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_security"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"huendgen-entsorgung.de\", \"dnssec\": {\"dnssec_signed\": false, \"dnssec_valid\": false, \"ds_algorithm\": null, \"dnskey_count\": 0, \"nsec3_iterations\":...",
+     "ref": "scan_results:dns_security",
+     "tool": "dns_security"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_security:huendgen-entsorgung.de#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:33:19Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_security"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 12288,
+   "evidence": [
+    {
+     "excerpt": "{\"all\": [\"\\n;; OPT PSEUDOSECTION:\\n; EDNS: version 0; flags:; udp: 1232\", \"huendgen-entsorgung.de.\\t300\\tIN\\tSOA\\tns1029.ui-dns.biz. hostmaster.kundenserver....",
+     "ref": "scan_results:dnsx",
+     "tool": "dnsx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dnsx:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:32:30Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dnsx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 180100,
+   "evidence": [
+    {
+     "excerpt": "TIMEOUT after 180s --- PARTIAL OUTPUT (171 chars) --- exchange.huendgen-entsorgung.de 80.90.145.166 ftp.huendgen-entsorgung.de 87.79.4.40 ftp.mail.huendgen-e...",
+     "ref": "scan_results:gobuster_dns",
+     "tool": "gobuster_dns"
+    }
+   ],
+   "exit_code": -1,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:gobuster_dns:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:32:18Z",
+   "phase": 0,
+   "raw_status": "timeout",
+   "reason": "timeout_after_180s",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "failed",
+   "tool": "gobuster_dns"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:greynoise",
+     "tool": "greynoise"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:greynoise:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:03Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "greynoise"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:greynoise",
+     "tool": "greynoise"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:greynoise:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:32:39Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "greynoise"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"huendgen-entsorgung.de\", \"domain\": {\"domain\": \"huendgen-entsorgung.de\", \"pulse_count\": 0, \"pulses\": [], \"validation\": [], \"type\": \"domain\", \"ale...",
+     "ref": "scan_results:otx",
+     "tool": "otx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:otx:huendgen-entsorgung.de",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:04Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "otx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:otx",
+     "tool": "otx"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:otx:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:32:39Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "otx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"huendgen-entsorgung.de\", \"domain\": null, \"subdomains\": [], \"dns_history\": []}",
+     "ref": "scan_results:securitytrails",
+     "tool": "securitytrails"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:securitytrails:huendgen-entsorgung.de",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:18Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "securitytrails"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:securitytrails",
+     "tool": "securitytrails"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:securitytrails:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:32:39Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "securitytrails"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"shodan_domain\": {\"domain\": \"huendgen-entsorgung.de\", \"subdomains\": [\"_dmarc\", \"exchange\", \"www\"], \"records\": [{\"subdomain\": \"\", \"type\": \"A\", \"options\": {\"t...",
+     "ref": "scan_results:shodan",
+     "tool": "shodan"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:shodan:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:04Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "shodan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"shodan_domain\": {\"domain\": \"huendgen-entsorgung.de\", \"subdomains\": [\"_dmarc\", \"exchange\", \"www\"], \"records\": [{\"subdomain\": \"\", \"type\": \"A\", \"options\": {\"t...",
+     "ref": "scan_results:shodan",
+     "tool": "shodan"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:shodan:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:32:39Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "shodan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 6143,
+   "evidence": [
+    {
+     "excerpt": "{\"host\":\"exchange.huendgen-entsorgung.de\",\"input\":\"huendgen-entsorgung.de\",\"source\":\"hackertarget\"} {\"host\":\"www.huendgen-entsorgung.de\",\"input\":\"huendgen-en...",
+     "ref": "scan_results:subfinder",
+     "tool": "subfinder"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:subfinder:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:24Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "subfinder"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:urlhaus:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:03Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "urlhaus"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:urlhaus:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:32:39Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "urlhaus"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:virustotal",
+     "tool": "virustotal"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:virustotal:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:03Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "virustotal"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:virustotal",
+     "tool": "virustotal"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:virustotal:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:32:39Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "virustotal"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"18.197.248.23\": { \"web_probe\": { \"has_web\": true, \"status\": 200, \"final_url\": \"https://www.huendgen-entsorgung.de\", \"title\": \"Containerdienst & Wertstoffh...",
+     "ref": "scan_results:web_probe",
+     "tool": "web_probe"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:web_probe:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:32:39Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "web_probe"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:whois",
+     "tool": "whois"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:whois:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:03Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "whois"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:whois",
+     "tool": "whois"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:whois:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:32:39Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "whois"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 27570,
+   "evidence": [
+    {
+     "excerpt": "Starting Nmap 7.93 ( https://nmap.org ) Nmap scan report for 18.197.248.23 Host is up, received user-set (0.0037s latency). Not shown: 996 filtered tcp ports...",
+     "ref": "scan_results:nmap:18.197.248.23",
+     "tool": "nmap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "cov:1:nmap:18.197.248.23",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:33:53Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "nmap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 94317,
+   "evidence": [
+    {
+     "excerpt": "Starting Nmap 7.93 ( https://nmap.org ) Nmap scan report for 80.90.145.166 Host is up, received user-set (0.0058s latency). Not shown: 993 filtered tcp ports...",
+     "ref": "scan_results:nmap:80.90.145.166",
+     "tool": "nmap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "cov:1:nmap:80.90.145.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:34:59Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "nmap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 16691,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://www.huendgen-entsorgung.de [+] Generic Detection results: [*] The site https://www.huendgen-entsorgung.de seems to be behind a WAF or so...",
+     "ref": "scan_results:wafw00f:18.197.248.23",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "www.huendgen-entsorgung.de",
+   "host_ip": "18.197.248.23",
+   "id": "cov:1:wafw00f:18.197.248.23:www.huendgen-entsorgung.de",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:34:17Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 60060,
+   "evidence": [
+    {
+     "excerpt": "TIMEOUT after 60s",
+     "ref": "scan_results:wafw00f:80.90.145.166",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": -1,
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "cov:1:wafw00f:80.90.145.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:36:07Z",
+   "phase": 1,
+   "raw_status": "timeout",
+   "reason": "timeout_after_60s",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "failed",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"tech\": [ { \"name\": \"nginx\", \"version\": \"\" }, { \"name\": \"Cookiebot\", \"version\": \"\" } ] }",
+     "ref": "scan_results:webtech:18.197.248.23",
+     "tool": "webtech"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "cov:1:webtech:18.197.248.23",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:34:00Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "webtech"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"tech\": [ { \"name\": \"Microsoft-IIS\", \"version\": \"10.0\" }, { \"name\": \"ASP.NET\", \"version\": \"\" } ] }",
+     "ref": "scan_results:webtech:80.90.145.166",
+     "tool": "webtech"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "cov:1:webtech:80.90.145.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:35:07Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "webtech"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 4842,
+   "evidence": [
+    {
+     "excerpt": "{\"add_slash\": false, \"auto_bail\": true, \"auto_tune\": false, \"backup_extensions\": [\"~\", \".bak\", \".bak2\", \".old\", \".1\"], \"client_cert\": \"\", \"client_key\": \"\", \"...",
+     "ref": "scan_results:feroxbuster:18.197.248.23",
+     "tool": "feroxbuster"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "cov:2:feroxbuster:18.197.248.23",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:43:07Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "feroxbuster"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 180043,
+   "evidence": [
+    {
+     "excerpt": "{\"content_length\": 207, \"extension\": \"\", \"headers\": {\"content-length\": \"207\", \"content-type\": \"text/html; charset=UTF-8\", \"date\": \"Wed, 23 Sep 2026 19:48:12...",
+     "ref": "scan_results:feroxbuster:80.90.145.166",
+     "tool": "feroxbuster"
+    }
+   ],
+   "exit_code": 1,
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "cov:2:feroxbuster:80.90.145.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:49:36Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "feroxbuster"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_api_urls",
+     "ref": "scan_results:ffuf_param:18.197.248.23",
+     "tool": "ffuf_param"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "cov:2:ffuf_param:18.197.248.23",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:43:02Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_api_urls",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "ffuf_param"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_api_urls",
+     "ref": "scan_results:ffuf_param:80.90.145.166",
+     "tool": "ffuf_param"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "cov:2:ffuf_param:80.90.145.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:46:36Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_api_urls",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "ffuf_param"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 117794,
+   "evidence": [
+    {
+     "excerpt": "{ \"content-type\": \"image/x-icon\", \"duration\": 9611985, \"host\": \"huendgen-entsorgung.de\", \"input\": { \"FFUFHASH\": \"YTY1ZDA2Ng==\", \"FUZZ\": \"ZmF2aWNvbi5pY28=\" },...",
+     "ref": "scan_results:ffuf_sensitive:18.197.248.23",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "cov:2:ffuf_sensitive:18.197.248.23",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:45:04Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "ffuf_sensitive"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 114301,
+   "evidence": [
+    {
+     "excerpt": "{\"input\":{\"FFUFHASH\":\"NThmZGE0\",\"FUZZ\":\"bG9naW4ucGhw\"},\"position\":4,\"status\":302,\"length\":131,\"words\":6,\"lines\":4,\"content-type\":\"text/html; charset=utf-8\",\"...",
+     "ref": "scan_results:ffuf_sensitive:80.90.145.166",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "cov:2:ffuf_sensitive:80.90.145.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:51:30Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "ffuf_sensitive"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"www.huendgen-entsorgung.de\", \"result\": { \"url\": \"https://www.huendgen-entsorgung.de\", \"reachable\": true, \"headers\": { \"server\": \"nginx\", \"date\":...",
+     "ref": "scan_results:header_check:18.197.248.23",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "www.huendgen-entsorgung.de",
+   "host_ip": "18.197.248.23",
+   "id": "cov:2:header_check:18.197.248.23:www.huendgen-entsorgung.de",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:39:10Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"exchange.huendgen-entsorgung.de\", \"result\": { \"url\": \"https://exchange.huendgen-entsorgung.de\", \"reachable\": true, \"headers\": { \"cache-control\":...",
+     "ref": "scan_results:header_check:80.90.145.166",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "exchange.huendgen-entsorgung.de",
+   "host_ip": "80.90.145.166",
+   "id": "cov:2:header_check:80.90.145.166:exchange.huendgen-entsorgung.de",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:45:24Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 1187,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"www.huendgen-entsorgung.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_128_GCM_SHA256\",\"not_before\":\"2026-07-13...",
+     "ref": "scan_results:httpx:18.197.248.23",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "cov:2:httpx:18.197.248.23",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:39:11Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 1397,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"exchange.huendgen-entsorgung.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_256_GCM_SHA384\",\"not_before\":\"2025-...",
+     "ref": "scan_results:httpx:80.90.145.166",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "cov:2:httpx:80.90.145.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:45:25Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 73145,
+   "evidence": [
+    {
+     "excerpt": "Start 2026-09-23 19:39:19 -->> 52.59.120.70:443 (huendgen-entsorgung.de) <<-- Further IP addresses: 18.197.248.23 A record via: supplied IP \"52.59.120.70\" rD...",
+     "ref": "scan_results:testssl:18.197.248.23",
+     "tool": "testssl"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "cov:2:testssl:18.197.248.23",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:40:19Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "testssl"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 76942,
+   "evidence": [
+    {
+     "excerpt": "Start 2026-09-23 19:45:29 -->> 80.90.145.166:443 (exchange.huendgen-entsorgung.de) <<-- A record via: supplied IP \"80.90.145.166\" rDNS (80.90.145.166): (inst...",
+     "ref": "scan_results:testssl:80.90.145.166",
+     "tool": "testssl"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "cov:2:testssl:80.90.145.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:46:36Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "testssl"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: cms_not_wordpress",
+     "ref": "scan_results:wpscan:18.197.248.23",
+     "tool": "wpscan"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "cov:2:wpscan:18.197.248.23",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:45:04Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "cms_not_wordpress",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "wpscan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: cms_not_wordpress",
+     "ref": "scan_results:wpscan:80.90.145.166",
+     "tool": "wpscan"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "cov:2:wpscan:80.90.145.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:51:31Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "cms_not_wordpress",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "wpscan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"active\": 0, \"passive\": 0, \"top_alerts\": [], \"total_alerts\": 0, \"unique_types\": 0 }",
+     "ref": "scan_results:zap:18.197.248.23",
+     "tool": "zap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "cov:2:zap:18.197.248.23",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:45:19Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": "zap_no_alerts",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "empty",
+   "tool": "zap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"active\": 0, \"passive\": 0, \"top_alerts\": [], \"total_alerts\": 0, \"unique_types\": 0 }",
+     "ref": "scan_results:zap:80.90.145.166",
+     "tool": "zap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "cov:2:zap:80.90.145.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:51:42Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": "zap_no_alerts",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "empty",
+   "tool": "zap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 121575,
+   "evidence": [
+    {
+     "excerpt": "{ \"categories\": [ \"sqli\", \"xss\", \"lfi\", \"cmdi\", \"pathtraversal\" ], \"dropped_scanners\": [ 40024 ], \"duration_ms\": 121575, \"enabled_scanners\": [ 6, 40009, 4001...",
+     "ref": "scan_results:zap_active:18.197.248.23",
+     "tool": "zap_active"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "cov:2:zap_active:18.197.248.23",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:43:02Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap_active"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 30130,
+   "evidence": [
+    {
+     "excerpt": "{ \"categories\": [ \"sqli\", \"xss\", \"cmdi\" ], \"dropped_scanners\": [ 40024 ], \"duration_ms\": 30130, \"enabled_scanners\": [ 40012, 40014, 40016, 40017, 40018, 4001...",
+     "ref": "scan_results:zap_active:80.90.145.166",
+     "tool": "zap_active"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "cov:2:zap_active:80.90.145.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:47:06Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap_active"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"urls_found\": 41, \"fqdns_spidered\": 1, \"vhosts\": [ \"www.huendgen-entsorgung.de\" ], \"urls\": [ \"https://www.huendgen-entsorgung.de\", \"https://www.huendgen-en...",
+     "ref": "scan_results:zap_spider:18.197.248.23",
+     "tool": "zap_spider"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "cov:2:zap_spider:18.197.248.23",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:41:00Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap_spider"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"urls_found\": 10, \"fqdns_spidered\": 1, \"vhosts\": [ \"exchange.huendgen-entsorgung.de\" ], \"urls\": [ \"https://exchange.huendgen-entsorgung.de\", \"https://excha...",
+     "ref": "scan_results:zap_spider:80.90.145.166",
+     "tool": "zap_spider"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "cov:2:zap_spider:80.90.145.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:45:29Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap_spider"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "huendgen-entsorgung.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"total_findings\": 12, \"false_positives\": 0, \"valid_findings\": 12, \"severity_counts\": { \"medium\": 2, \"low\": 10 }, \"cves_enriched\": 0, \"cisa_kev_matches\": 0,...",
+     "ref": "scan_results:phase3_correlation",
+     "tool": "phase3_correlation"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:3:phase3_correlation:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:51:42Z",
+   "phase": 3,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "phase3_correlation"
+  }
+ ],
+ "decisions": [
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Beide Hosts werden gescannt. Host 1 ist die öffentliche Website (Priorität 1), Host 2 ist der interne Exchange-Server (Priorität 2). Keine Skips — beide haben primäre VHosts mit echtem Content und...",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:ai_host_strategy:scan",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:33:25Z",
+   "payload": {
+    "passive_intel_summary": "Beide IPs haben AbuseIPDB-Score 0 (keine Reputation-Probleme), sind keine Tor-Nodes, DMARC/SPF/DKIM sind konfiguriert. Shodan zeigt Standard-Ports (80/443 für Web, 443/444 für Exchange). Keine veralteten Service-Versionen erkannt. Keine OTX-Pulse-Treffer.",
+    "strategy_notes": "Beide Hosts werden gescannt. Host 1 ist die öffentliche Website (Priorität 1), Host 2 ist der interne Exchange-Server (Priorität 2). Keine Skips — beide haben primäre VHosts mit echtem Content und sind in-scope."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Basisdomain mit primärem VHost (www.huendgen-entsorgung.de, Status 200, echte Business-Website). Nginx auf Ports 80/443/8443, saubere Passive Intel (AbuseIPDB 0, kein Tor), DMARC/SPF konfiguriert.",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "dec:ai_host_strategy:18.197.248.23",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:33:25Z",
+   "payload": {
+    "action": "scan",
+    "priority": 1,
+    "reasoning": "Basisdomain mit primärem VHost (www.huendgen-entsorgung.de, Status 200, echte Business-Website). Nginx auf Ports 80/443/8443, saubere Passive Intel (AbuseIPDB 0, kein Tor), DMARC/SPF konfiguriert."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Exchange/Outlook-Server mit primärem VHost (Status 200, Login-Seite). Mailserver sind kritische Infrastruktur und müssen gescannt werden trotz niedrigerer Priorität. Passive Intel sauber (AbuseIPDB...",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "dec:ai_host_strategy:80.90.145.166",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:33:25Z",
+   "payload": {
+    "action": "scan",
+    "priority": 2,
+    "reasoning": "Exchange/Outlook-Server mit primärem VHost (Status 200, Login-Seite). Mailserver sind kritische Infrastruktur und müssen gescannt werden trotz niedrigerer Priorität. Passive Intel sauber (AbuseIPDB 0)."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"standard\", \"zap_spider_max_depth\": 6, \"zap_ajax_spider_enabled\": true, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\", \"cmdi\", \"pathtr...",
+     "ref": "scan_results:ai_phase2_config:18.197.248.23",
+     "tool": "ai_phase2_config"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "dec:ai_phase2_config:18.197.248.23",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:01Z",
+   "payload": {
+    "_rule_based": true,
+    "reasoning": "[RULE-BASED] rule:spa-ajax",
+    "skip_tools": [
+     "wpscan"
+    ],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi",
+     "cmdi",
+     "pathtraversal"
+    ],
+    "zap_ajax_spider_enabled": true,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 60,
+    "zap_scan_policy": "standard",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 6,
+    "zap_threads": 5
+   },
+   "source": "ai_phase2_config"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"standard\", \"zap_spider_max_depth\": 4, \"zap_ajax_spider_enabled\": false, \"zap_active_categories\": [ \"sqli\", \"xss\", \"cmdi\" ], \"zap_rate_r...",
+     "ref": "scan_results:ai_phase2_config:80.90.145.166",
+     "tool": "ai_phase2_config"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "dec:ai_phase2_config:80.90.145.166",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:05Z",
+   "payload": {
+    "reasoning": "Microsoft Exchange 15.2.1748 (Outlook Web App) auf IIS 10.0 mit ASP.NET. Keine WAF erkannt → standard policy, hohe Rate/Threads. is_spa=false → kein AJAX Spider. Active Categories: sqli, xss, cmdi sind für ASP.NET/Exchange relevant; lfi/rfi/xxe weniger kritisch bei dieser Architektur. Spider-Depth 4 ausreichend für OWA-Login-Flow. Zusätzliche Ports (444, 1000-1002) in extra_urls aufgenommen für vollständige Coverage. skip_tools bleibt leer da Basisdomain und Web-Content vorhanden.",
+    "skip_tools": [],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "cmdi"
+    ],
+    "zap_ajax_spider_enabled": false,
+    "zap_extra_urls": [
+     "https://exchange.huendgen-entsorgung.de:444",
+     "https://exchange.huendgen-entsorgung.de:1000",
+     "https://exchange.huendgen-entsorgung.de:1001",
+     "https://exchange.huendgen-entsorgung.de:1002"
+    ],
+    "zap_rate_req_per_sec": 80,
+    "zap_scan_policy": "standard",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 4,
+    "zap_threads": 5
+   },
+   "source": "ai_phase2_config"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"system_prompt\": \"Du bist ein Security-Scanner-Orchestrator. Du konfigurierst Phase-2-Scan-Tools optimal basierend auf dem erkannten Tech-Stack eines Hosts...",
+     "ref": "scan_results:ai_phase2_config_debug:80.90.145.166",
+     "tool": "ai_phase2_config_debug"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "dec:ai_phase2_config_debug:80.90.145.166",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:05Z",
+   "payload": {
+    "cache_hit": false,
+    "model": "claude-haiku-4-5-20251001",
+    "status": "ok"
+   },
+   "source": "ai_phase2_config_debug"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"standard\", \"zap_spider_max_depth\": 6, \"zap_ajax_spider_enabled\": true, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\", \"cmdi\", \"pathtr...",
+     "ref": "scan_results:ai_phase2_config_rule_based:18.197.248.23",
+     "tool": "ai_phase2_config_rule_based"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "18.197.248.23",
+   "id": "dec:ai_phase2_config_rule_based:18.197.248.23",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:01Z",
+   "payload": {
+    "_rule_based": true,
+    "reasoning": "[RULE-BASED] rule:spa-ajax",
+    "skip_tools": [
+     "wpscan"
+    ],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi",
+     "cmdi",
+     "pathtraversal"
+    ],
+    "zap_ajax_spider_enabled": true,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 60,
+    "zap_scan_policy": "standard",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 6,
+    "zap_threads": 5
+   },
+   "source": "ai_phase2_config_rule_based"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "[SKIP-GATE] Cross-Tool-Korrelation uebersprungen: findings=12 < 5 ODER tools=2 <= 1 ODER cve=False",
+     "ref": "phase3/ai_prioritization.json",
+     "tool": "ai_prioritization"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:ai_prioritization:scan",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:51:42Z",
+   "payload": {
+    "confidence_scores": 0,
+    "skipped_by_gate": true,
+    "strategy_notes": "[SKIP-GATE] Cross-Tool-Korrelation uebersprungen: findings=12 < 5 ODER tools=2 <= 1 ODER cve=False"
+   },
+   "source": "ai_prioritization"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "cms=Microsoft Exchange cms_version=15.2.1748 cms_confidence=0.95",
+     "ref": "hosts/80.90.145.166/phase1/tech_profile.json",
+     "tool": "tech_profile"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "80.90.145.166",
+   "id": "dec:cms_profile:80.90.145.166",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:01Z",
+   "payload": {
+    "cms": "Microsoft Exchange",
+    "cms_confidence": 0.95,
+    "cms_details_version": null,
+    "cms_version": "15.2.1748",
+    "is_spa": false
+   },
+   "source": "ai_tech_analysis"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"cisa_kev_matches\": 0, \"cves_enriched\": 0, \"false_positives\": 0, \"total_findings\": 12, \"valid_findings\": 12 }",
+     "ref": "scan_results:phase3_correlation",
+     "tool": "phase3_correlation"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:phase3_correlation:scan",
+   "mode": "active",
+   "note": "Bilanz der Korrelation, kein Befund.",
+   "observed_at": "2026-09-23T19:51:42Z",
+   "payload": {
+    "cisa_kev_matches": 0,
+    "cves_enriched": 0,
+    "false_positives": 0,
+    "fp_by_reason": {},
+    "total_findings": 12,
+    "valid_findings": 12
+   },
+   "source": "phase3_correlation"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "Containerdienst und Wertstoffhof in Swisttal/Bonn mit nginx-Webserver.",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "www.huendgen-entsorgung.de",
+   "host_ip": "18.197.248.23",
+   "id": "dec:site_summary:www.huendgen-entsorgung.de",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:32:39Z",
+   "payload": {
+    "classification": "web_content",
+    "confidence": 0.95,
+    "description": "Containerdienst und Wertstoffhof in Swisttal/Bonn mit nginx-Webserver.",
+    "is_real_content": true
+   },
+   "source": "site_summary"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "Microsoft Exchange 15.2.1748 Mailserver auf Apache httpd.",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "exchange.huendgen-entsorgung.de",
+   "host_ip": "80.90.145.166",
+   "id": "dec:site_summary:exchange.huendgen-entsorgung.de",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:32:39Z",
+   "payload": {
+    "classification": "web_content",
+    "confidence": 0.95,
+    "description": "Microsoft Exchange 15.2.1748 Mailserver auf Apache httpd.",
+    "is_real_content": true
+   },
+   "source": "site_summary"
+  }
+ ],
+ "dns": [
+  {
+   "bimi": {
+    "present": false
+   },
+   "caa": {
+    "issuers": [],
+    "present": false,
+    "records": []
+   },
+   "confidence": 1.0,
+   "dane": {
+    "https": false,
+    "smtp": false
+   },
+   "dangling_cnames": [],
+   "dkim": {
+    "present": true,
+    "probed": [
+     "1und1",
+     "amazonses",
+     "brevo",
+     "default",
+     "dkim",
+     "dkim-1",
+     "dkim-2",
+     "dkim01",
+     "dkim1",
+     "dkim2",
+     "email",
+     "fd",
+     "fd2",
+     "gmx",
+     "google",
+     "googledomains",
+     "hse1",
+     "hse2",
+     "ionos1",
+     "ionos2",
+     "k1",
+     "k2",
+     "key1",
+     "key2",
+     "mail",
+     "mailgun",
+     "mailin",
+     "mailjet",
+     "mailo",
+     "mandrill",
+     "mg",
+     "mj",
+     "mta",
+     "mta1",
+     "mta2",
+     "mxvault",
+     "pf2014",
+     "pm",
+     "postmark",
+     "primary",
+     "s1",
+     "s1024",
+     "s2",
+     "s2048",
+     "scph",
+     "scph0123",
+     "scph0124",
+     "secondary",
+     "selector",
+     "selector1",
+     "selector2",
+     "sendinblue",
+     "sib",
+     "sig1",
+     "sig2",
+     "smtp",
+     "smtpapi",
+     "strato1",
+     "strato2",
+     "t-online",
+     "zmail",
+     "zoho"
+    ],
+    "probed_basis": "scan",
+    "selectors": [
+     "hse1",
+     "hse2"
+    ]
+   },
+   "dmarc": {
+    "adkim": "r",
+    "aspf": "r",
+    "p": "quarantine",
+    "pct": 100,
+    "present": true,
+    "raw": "v=DMARC1; p=quarantine; fo=1",
+    "rua": [],
+    "ruf": [],
+    "sp": null
+   },
+   "dnssec": {
+    "issues": [
+     "Domain is not DNSSEC-signed"
+    ],
+    "signed": false,
+    "valid": false
+   },
+   "domain": "huendgen-entsorgung.de",
+   "evidence": [
+    {
+     "excerpt": "spf=v=spf1 include:_spf.kundenserver.de include:spf.hornetsecurity.com include:spf.vizito.be +ip4:88.99.140.109 +ip4:157.90.214.107 -all dmarc=v=DMARC1; p=quarantine; fo=1 dkim=ja mx=mx03.hornetsecurity.com, mx04.hornetsecurity.com, mx01...",
+     "ref": "phase0/dns_records.json",
+     "tool": "dns_records"
+    },
+    {
+     "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
+     "ref": "phase0a/dns_security.json",
+     "tool": "dns_security"
+    }
+   ],
+   "id": "dns:huendgen-entsorgung.de",
+   "mode": "active",
+   "mta_sts": {
+    "dns_record": false,
+    "mode": null,
+    "policy": false
+   },
+   "mx": [
+    "mx01.hornetsecurity.com",
+    "mx02.hornetsecurity.com",
+    "mx03.hornetsecurity.com",
+    "mx04.hornetsecurity.com"
+   ],
+   "ns": [
+    "ns1029.ui-dns.biz",
+    "ns1029.ui-dns.com",
+    "ns1029.ui-dns.de",
+    "ns1029.ui-dns.org"
+   ],
+   "observed_at": "2026-09-23T19:29:19Z",
+   "source": "dns_records",
+   "spf": {
+    "all_qualifier": "-all",
+    "raw": "v=spf1 include:_spf.kundenserver.de include:spf.hornetsecurity.com include:spf.vizito.be +ip4:88.99.140.109 +ip4:157.90.214.107 -all"
+   },
+   "tls_rpt": {
+    "present": false,
+    "rua": []
+   },
+   "zone_transfer": {
+    "allowed": false,
+    "ns_tested": [
+     "ns1029.ui-dns.biz",
+     "ns1029.ui-dns.com",
+     "ns1029.ui-dns.de",
+     "ns1029.ui-dns.org"
+    ]
+   }
+  }
+ ],
+ "fqdns": [
+  {
+   "aliases": [],
+   "body_hash": "9e5526f743025bc138b90bfde0965abb80a54b8de9ead61f30235f9df05694cd",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "exchange.huendgen-entsorgung.de: status=200 titel=Outlook final_url=https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0",
+   "host_ip": "80.90.145.166",
+   "http_status": 200,
+   "id": "fqdn:exchange.huendgen-entsorgung.de",
+   "is_primary": true,
+   "mode": "active",
+   "name": "exchange.huendgen-entsorgung.de",
+   "observed_at": "2026-09-23T19:32:39Z",
+   "screenshot_key": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/80.90.145.166__exchange.huendgen-entsorgung.de.png",
+   "source": "web_probe",
+   "title": "Outlook",
+   "waf": null,
+   "web_probe_reachable": true,
+   "wildcard": false
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "huendgen-entsorgung.de:",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "18.197.248.23",
+   "http_status": null,
+   "id": "fqdn:huendgen-entsorgung.de",
+   "is_primary": null,
+   "mode": "active",
+   "name": "huendgen-entsorgung.de",
+   "observed_at": "2026-09-23T19:32:39Z",
+   "screenshot_key": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/18.197.248.23__www.huendgen-entsorgung.de.png",
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null,
+   "wildcard": false
+  },
+  {
+   "aliases": [
+    {
+     "fqdn": "huendgen-entsorgung.de",
+     "reason": "redirect",
+     "status": 200
+    }
+   ],
+   "body_hash": "58da14056aa17bf670fbeacc5ad2c05beb3adcb3cb7341f9a8a7a2d1bd196de2",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "www.huendgen-entsorgung.de: status=200 titel=Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn final_url=https://www.huendgen-entsorgung.de",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://www.huendgen-entsorgung.de",
+   "host_ip": "18.197.248.23",
+   "http_status": 200,
+   "id": "fqdn:www.huendgen-entsorgung.de",
+   "is_primary": true,
+   "mode": "active",
+   "name": "www.huendgen-entsorgung.de",
+   "observed_at": "2026-09-23T19:32:39Z",
+   "screenshot_key": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/18.197.248.23__www.huendgen-entsorgung.de.png",
+   "source": "web_probe",
+   "title": "Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn",
+   "waf": {
+    "detected": true,
+    "manufacturer": "Unknown",
+    "name": "Generic"
+   },
+   "web_probe_reachable": true,
+   "wildcard": false
+  }
+ ],
+ "generator": {
+  "inputs": [
+   {
+    "kind": "tar",
+    "name": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7.tar.gz",
+    "sha256": "cdc85fb66a28a1ccb1683d16d04a3cf6c0027dbacb046755507c26c7f97d53ef"
+   },
+   {
+    "kind": "tool_runs",
+    "name": "results.json",
+    "sha256": "ece3b52f59043a9edd4a96d0352ac1d310be0ebe1960e0364b25ec74cbe91498"
+   },
+   {
+    "kind": "eol_feed",
+    "name": "eol_data_generated.py",
+    "sha256": "35b5eb969453fa4788c9b973bbd5988391e18ee83a5e221f1d13602436929372"
+   }
+  ],
+  "name": "reporter.facts",
+  "version": "1.0.0"
+ },
+ "hosts": [
+  {
+   "blocked": {
+    "detected": false,
+    "reason": null,
+    "source": null
+   },
+   "cdn_provider": null,
+   "confidence": 1.0,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "Nmap done at Wed Sep 23 19:33:53 2026; 1 IP address (1 host up) scanned in 27.55 seconds",
+     "ref": "hosts/18.197.248.23/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "ip=18.197.248.23 rdns=eu-staticip.multiscreensite.com fqdns=huendgen-entsorgung.de, www.huendgen-entsorgung.de",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "huendgen-entsorgung.de",
+    "www.huendgen-entsorgung.de"
+   ],
+   "id": "host:18.197.248.23",
+   "ip": "18.197.248.23",
+   "mode": "active",
+   "nmap_state": "up",
+   "observed_at": "2026-09-23T19:33:53Z",
+   "ports_summary": {
+    "closed": 1,
+    "filtered": 996,
+    "open": 3
+   },
+   "provider": {
+    "country": "DE",
+    "isp": "A100 ROW GmbH",
+    "usage_type": "Content Delivery Network"
+   },
+   "reachable": true,
+   "reputation": {
+    "abuseipdb_score": 0,
+    "greynoise_classification": null,
+    "is_tor": false,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": "eu-staticip.multiscreensite.com",
+   "source": "nmap"
+  },
+  {
+   "blocked": {
+    "detected": false,
+    "reason": null,
+    "source": null
+   },
+   "cdn_provider": null,
+   "confidence": 1.0,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "Nmap done at Wed Sep 23 19:34:59 2026; 1 IP address (1 host up) scanned in 94.30 seconds",
+     "ref": "hosts/80.90.145.166/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "ip=80.90.145.166 rdns=gw-huendgen.bn-online.net fqdns=exchange.huendgen-entsorgung.de",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "exchange.huendgen-entsorgung.de"
+   ],
+   "id": "host:80.90.145.166",
+   "ip": "80.90.145.166",
+   "mode": "active",
+   "nmap_state": "up",
+   "observed_at": "2026-09-23T19:34:59Z",
+   "ports_summary": {
+    "closed": 2,
+    "filtered": 993,
+    "open": 5
+   },
+   "provider": {
+    "country": "DE",
+    "isp": "bn:t Blatzheim Networks Telecom GmbH",
+    "usage_type": "Fixed Line ISP"
+   },
+   "reachable": true,
+   "reputation": {
+    "abuseipdb_score": 0,
+    "greynoise_classification": null,
+    "is_tor": false,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": "gw-huendgen.bn-online.net",
+   "source": "nmap"
+  }
+ ],
+ "http": [
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": {
+    "present": false,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null
+   },
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "exchange.huendgen-entsorgung.de: erreichbar=ja score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE-2019",
+     "ref": "hosts/80.90.145.166/phase2/headers_exchange.huendgen-entsorgung.de.json",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "exchange.huendgen-entsorgung.de: status=200 titel=Outlook webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET, Outlook Web App:15.2.1748, Windows Server",
+     "ref": "hosts/80.90.145.166/phase2/httpx_exchange.huendgen-entsorgung.de.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "exchange.huendgen-entsorgung.de",
+   "headers": {
+    "cache-control": "no-cache",
+    "content-length": "0",
+    "date": "Wed, 23 Sep 2026 19:45:24 GMT",
+    "location": "https://exchange.huendgen-entsorgung.de/owa/",
+    "pragma": "no-cache",
+    "server": "Microsoft-IIS/10.0",
+    "x-feserver": "EXCHANGE-2019",
+    "x-requestid": "1920e3bf-1973-4fbd-a015-29a788239304"
+   },
+   "host_ip": "80.90.145.166",
+   "hsts": {
+    "include_subdomains": null,
+    "max_age": null,
+    "preload": null,
+    "present": false,
+    "raw": null
+   },
+   "id": "http:exchange.huendgen-entsorgung.de",
+   "login_form": true,
+   "mode": "active",
+   "observed_at": "2026-09-23T19:45:24Z",
+   "paths": [
+    {
+     "length": 139,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/!access_setup.asp"
+    },
+    {
+     "length": 138,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/!mssql_setup.asp"
+    },
+    {
+     "length": 138,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/!mysql_setup.asp"
+    },
+    {
+     "length": 132,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/!setup.asp"
+    },
+    {
+     "length": 125,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/0.1"
+    },
+    {
+     "length": 125,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/0.9"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/0.htm"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/0.html"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/0.php"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/01.html"
+    },
+    {
+     "length": 136,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/05_Gateway.asp"
+    },
+    {
+     "length": 125,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.0"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.0.2"
+    },
+    {
+     "length": 125,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.1"
+    },
+    {
+     "length": 126,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.1c"
+    },
+    {
+     "length": 125,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.2"
+    },
+    {
+     "length": 126,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.34"
+    },
+    {
+     "length": 125,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.4"
+    },
+    {
+     "length": 125,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.5"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.5.3"
+    },
+    {
+     "length": 125,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.6"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.asp"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.css"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.gif"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.htm"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.html"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.jpg"
+    },
+    {
+     "length": 126,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.js"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.pdf"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.php"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1.swf"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/10.htm"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/10.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/10.php"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/100.htm"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/100.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/101.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/102.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/103.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/104.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/105.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/106.html"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/107.htm"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/107.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/108.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/109.html"
+    },
+    {
+     "length": 134,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/10_Logon.asp"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/11.asp"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/11.htm"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/11.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/11.php"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/110.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1104.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1106.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/111.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1111.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1112.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1115.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1117.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/112.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1122.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1127.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/113.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/114.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/115.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/116.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/117.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/118.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/119.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/12.htm"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/12.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/12.php"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/120.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/121.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/122.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/123.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/124.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/125.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/126.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/127.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/128.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/129.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/13.gif"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/13.htm"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/13.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/13.php"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/130.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/131.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/132.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/133.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/134.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/135.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1357.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/136.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/137.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/138.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/139.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/14.htm"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/14.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/14.php"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/140.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/141.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/142.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/143.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/144.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/145.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/146.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/147.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/148.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/149.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/15.htm"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/15.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/150.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/151.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/152.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/153.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/154.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/155.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/156.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/157.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/158.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/159.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/16.htm"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/16.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/16.php"
+    },
+    {
+     "length": 133,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/160-600.htm"
+    },
+    {
+     "length": 133,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/160-600.php"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/160.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/161.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/162.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/163.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/164.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/165.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/166.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/167.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/168.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/169.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/17.htm"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/17.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1703.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/171.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/172.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/173.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/174.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/175.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/176.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/177.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/178.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/179.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/18.htm"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/18.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/180.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/181.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/182.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/183.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/184.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/185.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/186.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/187.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/188.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/189.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/19.htm"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/19.html"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/19.php"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/190.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/191.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/192.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/193.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/194.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/195.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/196.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/197.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/198.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/199.html"
+    },
+    {
+     "length": 136,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1checkout.aspx"
+    },
+    {
+     "length": 132,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1index.htm"
+    },
+    {
+     "length": 133,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/1index.html"
+    },
+    {
+     "length": 125,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2.0"
+    },
+    {
+     "length": 125,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2.1"
+    },
+    {
+     "length": 126,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2.14"
+    },
+    {
+     "length": 125,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2.5"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2.htm"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2.html"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2.jpg"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2.pdf"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2.php"
+    },
+    {
+     "length": 127,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2.swf"
+    },
+    {
+     "length": 128,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/20.htm"
+    },
+    {
+     "length": 129,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/20.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/200.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2000.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2004.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2006.html"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2007.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2007.pdf"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2008.htm"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2008.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2008.pdf"
+    },
+    {
+     "length": 131,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2009.html"
+    },
+    {
+     "length": 130,
+     "status": 302,
+     "url": "https://exchange.huendgen-entsorgung.de/2009.pdf"
+    }
+   ],
+   "powered_by": null,
+   "reachable": true,
+   "score": "0/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": false,
+     "value": null
+    },
+    "strict-transport-security": {
+     "present": false,
+     "value": null
+    },
+    "x-content-type-options": {
+     "present": false,
+     "value": null
+    },
+    "x-frame-options": {
+     "present": false,
+     "value": null
+    },
+    "x-xss-protection": {
+     "present": false,
+     "value": null
+    }
+   },
+   "server_header": "Microsoft-IIS/10.0",
+   "source": "header_check",
+   "spider_url_count": 10,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "IIS",
+     "version": "10.0"
+    },
+    {
+     "name": "Microsoft ASP.NET",
+     "version": null
+    },
+    {
+     "name": "Outlook Web App",
+     "version": "15.2.1748"
+    },
+    {
+     "name": "Windows Server",
+     "version": null
+    }
+   ],
+   "url": "https://exchange.huendgen-entsorgung.de",
+   "wordpress": null,
+   "x_feserver": "EXCHANGE-2019"
+  },
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": {
+    "present": true,
+    "unsafe_eval": false,
+    "unsafe_inline": false,
+    "value": "frame-ancestors 'self'",
+    "wildcard": false
+   },
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "www.huendgen-entsorgung.de: erreichbar=ja score=4/7 server=nginx",
+     "ref": "hosts/18.197.248.23/phase2/headers_www.huendgen-entsorgung.de.json",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "www.huendgen-entsorgung.de: status=200 titel=Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn webserver=nginx tech=Cookiebot, Etracker, HSTS, Nginx, jQuery, jQuery Migrate",
+     "ref": "hosts/18.197.248.23/phase2/httpx_www.huendgen-entsorgung.de.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "www.huendgen-entsorgung.de",
+   "headers": {
+    "cache-control": "no-cache, must-revalidate",
+    "content-security-policy": "frame-ancestors 'self'",
+    "content-type": "text/html;charset=utf-8",
+    "d-cache": "from-cache",
+    "d-geo": "EU",
+    "date": "Wed, 23 Sep 2026 19:39:10 GMT",
+    "etag": "W/\"-720847095\"",
+    "expires": "Thu, 01 Jan 1970 00:00:00 GMT",
+    "server": "nginx",
+    "speculation-rules": "\"https://static.cdn-website.com/speculations/rules/prerender-1.0.3.json\"",
+    "strict-transport-security": "max-age=31536000; preload",
+    "vary": "user-agent,accept-encoding",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN"
+   },
+   "host_ip": "18.197.248.23",
+   "hsts": {
+    "include_subdomains": false,
+    "max_age": 31536000,
+    "preload": true,
+    "present": true,
+    "raw": "max-age=31536000; preload"
+   },
+   "id": "http:www.huendgen-entsorgung.de",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-09-23T19:39:10Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": true,
+   "score": "4/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": true,
+     "value": "frame-ancestors 'self'"
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": false,
+     "value": null
+    },
+    "strict-transport-security": {
+     "present": true,
+     "value": "max-age=31536000; preload"
+    },
+    "x-content-type-options": {
+     "present": true,
+     "value": "nosniff"
+    },
+    "x-frame-options": {
+     "present": true,
+     "value": "SAMEORIGIN"
+    },
+    "x-xss-protection": {
+     "present": false,
+     "value": null
+    }
+   },
+   "server_header": "nginx",
+   "source": "header_check",
+   "spider_url_count": 41,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "Cookiebot",
+     "version": null
+    },
+    {
+     "name": "Etracker",
+     "version": null
+    },
+    {
+     "name": "HSTS",
+     "version": null
+    },
+    {
+     "name": "Nginx",
+     "version": null
+    },
+    {
+     "name": "jQuery",
+     "version": null
+    },
+    {
+     "name": "jQuery Migrate",
+     "version": null
+    }
+   ],
+   "url": "https://www.huendgen-entsorgung.de",
+   "wordpress": null,
+   "x_feserver": null
+  }
+ ],
+ "passive": [
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "pulse_count": 0
+   },
+   "domain": "huendgen-entsorgung.de",
+   "evidence": [
+    {
+     "excerpt": "pulse_count=0",
+     "ref": "phase0a/otx.json",
+     "tool": "otx"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:otx:huendgen-entsorgung.de",
+   "mode": "passive",
+   "observed_at": "2026-09-23T19:29:04Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "otx",
+   "transport": null,
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Server: nginx Date: Wed, 23 Sep 2026 15:23:40 GMT Content-Type: text/html Content-Length: 125 Connection: keep-alive",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "18.197.248.23:80 nginx banner=HTTP/1.1 403 Forbidden Server: nginx Date: Wed, 23 Sep 2026 15:23:40 GMT Content-Type: text/html Content-Length: 125 Connection: keep-alive",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "18.197.248.23",
+   "hostnames": [
+    "bunzel-transporte.de",
+    "eu-staticip.multiscreensite.com",
+    "multiscreensite.com",
+    "www.bunzel-transporte.de"
+   ],
+   "id": "passive:shodan:18.197.248.23:80",
+   "mode": "passive",
+   "observed_at": "2026-09-23T15:23:40Z",
+   "port": 80,
+   "product": "nginx",
+   "seen_at": "2026-09-23T15:23:40Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden server: nginx date: Wed, 23 Sep 2026 12:11:45 GMT content-type: text/html content-length: 125",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "18.197.248.23:443 nginx banner=HTTP/1.1 403 Forbidden server: nginx date: Wed, 23 Sep 2026 12:11:45 GMT content-type: text/html content-length: 125",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "18.197.248.23",
+   "hostnames": [
+    "bunzel-transporte.de",
+    "eu-staticip.multiscreensite.com",
+    "multiscreensite.com",
+    "www.bunzel-transporte.de"
+   ],
+   "id": "passive:shodan:18.197.248.23:443",
+   "mode": "passive",
+   "observed_at": "2026-09-23T15:23:40Z",
+   "port": 443,
+   "product": "nginx",
+   "seen_at": "2026-09-23T15:23:40Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Server: nginx Date: Sun, 20 Sep 2026 09:38:02 GMT Content-Type: text/html Content-Length: 125 Connection: keep-alive",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "18.197.248.23:8443 nginx banner=HTTP/1.1 403 Forbidden Server: nginx Date: Sun, 20 Sep 2026 09:38:02 GMT Content-Type: text/html Content-Length: 125 Connection: keep-alive",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "18.197.248.23",
+   "hostnames": [
+    "bunzel-transporte.de",
+    "eu-staticip.multiscreensite.com",
+    "multiscreensite.com",
+    "www.bunzel-transporte.de"
+   ],
+   "id": "passive:shodan:18.197.248.23:8443",
+   "mode": "passive",
+   "observed_at": "2026-09-23T15:23:40Z",
+   "port": 8443,
+   "product": "nginx",
+   "seen_at": "2026-09-23T15:23:40Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 200 OK Cache-Control: no-cache, no-store Pragma: no-cache Content-Type: text/html; charset=utf-8 Expires: -1 Server: Microsoft-IIS/10.0 request-id:...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "80.90.145.166:443 Outlook Web App banner=HTTP/1.1 200 OK Cache-Control: no-cache, no-store Pragma: no-cache Content-Type: text/html; charset=utf-8 Expires: -1 Server: Microsoft-IIS/10.0 request-id:...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "80.90.145.166",
+   "hostnames": [
+    "gw-huendgen.bn-online.net",
+    "huendgen-entsorgung.de"
+   ],
+   "id": "passive:shodan:80.90.145.166:443",
+   "mode": "passive",
+   "observed_at": "2026-09-21T01:27:54Z",
+   "port": 443,
+   "product": "Outlook Web App",
+   "seen_at": "2026-09-21T01:27:54Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 200 OK Date: Mon, 31 Aug 2026 04:19:49 GMT Server: Apache X-Frame-Options: sameorigin X-XSS-Protection: 1; mode=block X-Content-Type-Options: nosnif...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "80.90.145.166:444 banner=HTTP/1.1 200 OK Date: Mon, 31 Aug 2026 04:19:49 GMT Server: Apache X-Frame-Options: sameorigin X-XSS-Protection: 1; mode=block X-Content-Type-Options: nosniff Referrer-Poli...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "80.90.145.166",
+   "hostnames": [
+    "gw-huendgen.bn-online.net",
+    "huendgen-entsorgung.de"
+   ],
+   "id": "passive:shodan:80.90.145.166:444",
+   "mode": "passive",
+   "observed_at": "2026-09-21T01:27:54Z",
+   "port": 444,
+   "product": null,
+   "seen_at": "2026-09-21T01:27:54Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "compromised": false
+   },
+   "domain": "huendgen-entsorgung.de",
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:urlhaus:huendgen-entsorgung.de",
+   "mode": "passive",
+   "observed_at": "2026-09-23T19:29:03Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "urlhaus",
+   "transport": null,
+   "verified": null,
+   "version": null
+  }
+ ],
+ "scan": {
+  "confidence": 1.0,
+  "counts": {
+   "correlated_findings": 12,
+   "correlated_fp": 0,
+   "tool_runs": 59
+  },
+  "domain": "huendgen-entsorgung.de",
+  "domains": [
+   "huendgen-entsorgung.de"
+  ],
+  "evidence": [
+   {
+    "excerpt": "Beginn=2026-09-23T19:29:03.658392+00:00 Ende=2026-09-23T19:51:42.814529+00:00",
+    "ref": "meta.json",
+    "tool": "meta"
+   }
+  ],
+  "finished_at": "2026-09-23T19:51:42Z",
+  "hosts_scanned": 2,
+  "id": "scan:3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7",
+  "mode": "active",
+  "nmap_args": "nmap -Pn -n -sV --version-intensity 7 -sC --script-timeout 60s -T4 --max-retries 2 --host-timeout 240s --min-rate 100 --defeat-rst-ratelimit --top-ports 1000 --open -oX <scan-dir> -oN <scan-dir> --reason 18.197.248.23",
+  "observed_at": "2026-09-23T19:51:42Z",
+  "order_id": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7",
+  "package": "perimeter",
+  "policy_version": null,
+  "scanner_egress": null,
+  "source": "meta",
+  "started_at": "2026-09-23T19:29:03Z",
+  "tool_versions": [
+   {
+    "name": "dnsx",
+    "version": null
+   },
+   {
+    "name": "feroxbuster",
+    "version": "2.11.0"
+   },
+   {
+    "name": "ffuf",
+    "version": "2.1.0"
+   },
+   {
+    "name": "gobuster",
+    "version": null
+   },
+   {
+    "name": "httpx",
+    "version": null
+   },
+   {
+    "name": "nmap",
+    "version": "7.93"
+   },
+   {
+    "name": "searchsploit",
+    "version": null
+   },
+   {
+    "name": "subfinder",
+    "version": "2.13.0"
+   },
+   {
+    "name": "testssl.sh",
+    "version": null
+   },
+   {
+    "name": "wafw00f",
+    "version": null
+   },
+   {
+    "name": "wpscan",
+    "version": null
+   }
+  ]
+ },
+ "schema_version": "1.0.5",
+ "services": [
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "80/tcp open http nginx",
+     "ref": "hosts/18.197.248.23/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "nginx",
+   "host_ip": "18.197.248.23",
+   "id": "svc:18.197.248.23:80/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:33:53Z",
+   "port": 80,
+   "product": "nginx",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 0.3,
+   "evidence": [
+    {
+     "excerpt": "443/tcp open https",
+     "ref": "hosts/18.197.248.23/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "18.197.248.23",
+   "id": "svc:18.197.248.23:443/tcp",
+   "login_disabled": null,
+   "method": "table",
+   "mode": "active",
+   "nmap_conf": 3,
+   "observed_at": "2026-09-23T19:33:53Z",
+   "port": 443,
+   "product": null,
+   "proto": "tcp",
+   "service": "https",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "multiscreensite.com",
+    "not_after": "2026-12-08T03:54:34Z",
+    "san": [
+     "*.cdn-website.com",
+     "*.editor-sandbox.multiscreensite.com",
+     "*.editor.multiscreensite.com",
+     "*.eu.partnerwebsitedns.com",
+     "*.multiscreensite.com",
+     "*.partnerwebsitedns.com",
+     "*.website.thryv.com",
+     "multiscreensite.com"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "8443/tcp open http nginx tunnel=ssl",
+     "ref": "hosts/18.197.248.23/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "nginx",
+   "host_ip": "18.197.248.23",
+   "id": "svc:18.197.248.23:8443/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:33:53Z",
+   "port": 8443,
+   "product": "nginx",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "*.huendgen-entsorgung.de",
+    "not_after": "2027-01-03T23:59:59Z",
+    "san": [
+     "*.huendgen-entsorgung.de",
+     "huendgen-entsorgung.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "443/tcp open https tunnel=ssl",
+     "ref": "hosts/80.90.145.166/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "80.90.145.166",
+   "id": "svc:80.90.145.166:443/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:34:59Z",
+   "port": 443,
+   "product": null,
+   "proto": "tcp",
+   "service": "https",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "*.huendgen-entsorgung.de",
+    "not_after": "2027-01-03T23:59:59Z",
+    "san": [
+     "*.huendgen-entsorgung.de",
+     "huendgen-entsorgung.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "444/tcp open http Apache httpd tunnel=ssl",
+     "ref": "hosts/80.90.145.166/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "apache",
+   "host_ip": "80.90.145.166",
+   "id": "svc:80.90.145.166:444/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:34:59Z",
+   "port": 444,
+   "product": "Apache httpd",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 0.3,
+   "evidence": [
+    {
+     "excerpt": "1000/tcp open cadlock",
+     "ref": "hosts/80.90.145.166/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "80.90.145.166",
+   "id": "svc:80.90.145.166:1000/tcp",
+   "login_disabled": null,
+   "method": "table",
+   "mode": "active",
+   "nmap_conf": 3,
+   "observed_at": "2026-09-23T19:34:59Z",
+   "port": 1000,
+   "product": null,
+   "proto": "tcp",
+   "service": "cadlock",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 0.3,
+   "evidence": [
+    {
+     "excerpt": "1001/tcp open webpush",
+     "ref": "hosts/80.90.145.166/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "80.90.145.166",
+   "id": "svc:80.90.145.166:1001/tcp",
+   "login_disabled": null,
+   "method": "table",
+   "mode": "active",
+   "nmap_conf": 3,
+   "observed_at": "2026-09-23T19:34:59Z",
+   "port": 1001,
+   "product": null,
+   "proto": "tcp",
+   "service": "webpush",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 0.3,
+   "evidence": [
+    {
+     "excerpt": "1002/tcp open windows-icfw",
+     "ref": "hosts/80.90.145.166/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "80.90.145.166",
+   "id": "svc:80.90.145.166:1002/tcp",
+   "login_disabled": null,
+   "method": "table",
+   "mode": "active",
+   "nmap_conf": 3,
+   "observed_at": "2026-09-23T19:34:59Z",
+   "port": 1002,
+   "product": null,
+   "proto": "tcp",
+   "service": "windows-icfw",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  }
+ ],
+ "software": [
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Cookiebot",
+     "ref": "hosts/18.197.248.23/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "cookiebot",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "18.197.248.23",
+   "id": "sw:18.197.248.23:-:cookiebot:unknown",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:34:00Z",
+   "product": "Cookiebot",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Etracker",
+     "ref": "hosts/18.197.248.23/phase1/tech_profile.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "etracker",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "18.197.248.23",
+   "id": "sw:18.197.248.23:-:etracker:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:11Z",
+   "product": "Etracker",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: HSTS",
+     "ref": "hosts/18.197.248.23/phase1/tech_profile.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "hsts",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "18.197.248.23",
+   "id": "sw:18.197.248.23:-:hsts:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:11Z",
+   "product": "HSTS",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: jQuery",
+     "ref": "hosts/18.197.248.23/phase1/tech_profile.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "18.197.248.23",
+   "id": "sw:18.197.248.23:-:jquery:unknown",
+   "kind": "library",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:11Z",
+   "product": "jQuery",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: jQuery Migrate",
+     "ref": "hosts/18.197.248.23/phase1/tech_profile.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery_migrate",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "18.197.248.23",
+   "id": "sw:18.197.248.23:-:jquery_migrate:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:11Z",
+   "product": "jQuery Migrate",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "80/tcp open http nginx",
+     "ref": "hosts/18.197.248.23/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "8443/tcp open http nginx tunnel=ssl",
+     "ref": "hosts/18.197.248.23/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "server: nginx",
+     "ref": "hosts/18.197.248.23/phase1/tech_profile.json",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: nginx",
+     "ref": "hosts/18.197.248.23/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "nginx",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "18.197.248.23",
+   "id": "sw:18.197.248.23:-:nginx:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:33:53Z",
+   "product": "nginx",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Cookiebot",
+     "ref": "hosts/18.197.248.23/phase2/httpx_www.huendgen-entsorgung.de.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "cookiebot",
+   "fqdn": "www.huendgen-entsorgung.de",
+   "hints": [],
+   "host_ip": "18.197.248.23",
+   "id": "sw:18.197.248.23:www.huendgen-entsorgung.de:cookiebot:unknown",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:11Z",
+   "product": "Cookiebot",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Etracker",
+     "ref": "hosts/18.197.248.23/phase2/httpx_www.huendgen-entsorgung.de.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "etracker",
+   "fqdn": "www.huendgen-entsorgung.de",
+   "hints": [],
+   "host_ip": "18.197.248.23",
+   "id": "sw:18.197.248.23:www.huendgen-entsorgung.de:etracker:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:11Z",
+   "product": "Etracker",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: jQuery",
+     "ref": "hosts/18.197.248.23/phase2/httpx_www.huendgen-entsorgung.de.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery",
+   "fqdn": "www.huendgen-entsorgung.de",
+   "hints": [],
+   "host_ip": "18.197.248.23",
+   "id": "sw:18.197.248.23:www.huendgen-entsorgung.de:jquery:unknown",
+   "kind": "library",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:11Z",
+   "product": "jQuery",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: jQuery Migrate",
+     "ref": "hosts/18.197.248.23/phase2/httpx_www.huendgen-entsorgung.de.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery_migrate",
+   "fqdn": "www.huendgen-entsorgung.de",
+   "hints": [],
+   "host_ip": "18.197.248.23",
+   "id": "sw:18.197.248.23:www.huendgen-entsorgung.de:jquery_migrate:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:11Z",
+   "product": "jQuery Migrate",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "header_check",
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "server: nginx",
+     "ref": "hosts/18.197.248.23/phase2/headers_www.huendgen-entsorgung.de.json",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "tech: Nginx",
+     "ref": "hosts/18.197.248.23/phase2/httpx_www.huendgen-entsorgung.de.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "nginx",
+   "fqdn": "www.huendgen-entsorgung.de",
+   "hints": [],
+   "host_ip": "18.197.248.23",
+   "id": "sw:18.197.248.23:www.huendgen-entsorgung.de:nginx:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:39:11Z",
+   "product": "nginx",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "444/tcp open http Apache httpd tunnel=ssl",
+     "ref": "hosts/80.90.145.166/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "server: Apache httpd",
+     "ref": "hosts/80.90.145.166/phase1/tech_profile.json",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Apache httpd",
+     "ref": "hosts/80.90.145.166/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "apache",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "80.90.145.166",
+   "id": "sw:80.90.145.166:-:apache:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:34:59Z",
+   "product": "Apache httpd",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Microsoft ASP.NET",
+     "ref": "hosts/80.90.145.166/phase1/tech_profile.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "technologies: ASP.NET",
+     "ref": "hosts/80.90.145.166/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "aspnet",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "80.90.145.166",
+   "id": "sw:80.90.145.166:-:aspnet:unknown",
+   "kind": "language",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:35:07Z",
+   "product": "ASP.NET",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": "15.2.1748",
+   "confidence": 0.8,
+   "detection_sources": [
+    "cms_fingerprint",
+    "httpx",
+    "redirect_probe",
+    "zap_spider"
+   ],
+   "distro": null,
+   "edition": "2019",
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Microsoft Exchange 2019",
+     "ref": "hosts/80.90.145.166/phase1/tech_profile.json",
+     "tool": "cms_fingerprint"
+    },
+    {
+     "excerpt": "technologies: Outlook Web App 15.2.1748",
+     "ref": "hosts/80.90.145.166/phase1/tech_profile.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "redirect_chain: https://exchange.huendgen-entsorgung.de/owa/auth/15.2.1748/themes/resources/segoeui-regular.ttf",
+     "ref": "hosts/80.90.145.166/phase1/tech_profile.json",
+     "tool": "redirect_probe"
+    },
+    {
+     "excerpt": "spider url: https://exchange.huendgen-entsorgung.de/owa/auth/15.2.1748/themes/resources/favicon.ico",
+     "ref": "hosts/80.90.145.166/phase2/zap_spider_urls.json",
+     "tool": "zap_spider"
+    }
+   ],
+   "family": "exchange",
+   "fqdn": null,
+   "hints": [
+    "2019",
+    "X-FEServer exchange.huendgen-entsorgung.de: EXCHANGE-2019"
+   ],
+   "host_ip": "80.90.145.166",
+   "id": "sw:80.90.145.166:-:exchange:2019",
+   "kind": "mail",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:51:42Z",
+   "product": "Microsoft Exchange",
+   "source": "cms_fingerprint",
+   "version_norm": "2019",
+   "version_raw": "15.2.1748",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: IIS 10.0",
+     "ref": "hosts/80.90.145.166/phase1/tech_profile.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "technologies: Microsoft-IIS 10.0",
+     "ref": "hosts/80.90.145.166/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "iis",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "80.90.145.166",
+   "id": "sw:80.90.145.166:-:iis:10.0",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:35:07Z",
+   "product": "Microsoft IIS",
+   "source": "webtech",
+   "version_norm": "10.0",
+   "version_raw": "10.0",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Windows Server",
+     "ref": "hosts/80.90.145.166/phase1/tech_profile.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "windows_server",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "80.90.145.166",
+   "id": "sw:80.90.145.166:-:windows_server:unknown",
+   "kind": "os",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:45:25Z",
+   "product": "Windows Server",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Microsoft ASP.NET",
+     "ref": "hosts/80.90.145.166/phase2/httpx_exchange.huendgen-entsorgung.de.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "aspnet",
+   "fqdn": "exchange.huendgen-entsorgung.de",
+   "hints": [],
+   "host_ip": "80.90.145.166",
+   "id": "sw:80.90.145.166:exchange.huendgen-entsorgung.de:aspnet:unknown",
+   "kind": "language",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:45:25Z",
+   "product": "ASP.NET",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": "15.2.1748",
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": "2019",
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Outlook Web App:15.2.1748",
+     "ref": "hosts/80.90.145.166/phase2/httpx_exchange.huendgen-entsorgung.de.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "exchange",
+   "fqdn": "exchange.huendgen-entsorgung.de",
+   "hints": [
+    "X-FEServer exchange.huendgen-entsorgung.de: EXCHANGE-2019"
+   ],
+   "host_ip": "80.90.145.166",
+   "id": "sw:80.90.145.166:exchange.huendgen-entsorgung.de:exchange:2019",
+   "kind": "mail",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:45:25Z",
+   "product": "Microsoft Exchange",
+   "source": "httpx",
+   "version_norm": "2019",
+   "version_raw": "15.2.1748",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "header_check",
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "server: Microsoft-IIS/10.0",
+     "ref": "hosts/80.90.145.166/phase2/headers_exchange.huendgen-entsorgung.de.json",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "tech: IIS:10.0",
+     "ref": "hosts/80.90.145.166/phase2/httpx_exchange.huendgen-entsorgung.de.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "iis",
+   "fqdn": "exchange.huendgen-entsorgung.de",
+   "hints": [],
+   "host_ip": "80.90.145.166",
+   "id": "sw:80.90.145.166:exchange.huendgen-entsorgung.de:iis:10.0",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:45:25Z",
+   "product": "Microsoft IIS",
+   "source": "httpx",
+   "version_norm": "10.0",
+   "version_raw": "10.0",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Windows Server",
+     "ref": "hosts/80.90.145.166/phase2/httpx_exchange.huendgen-entsorgung.de.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "windows_server",
+   "fqdn": "exchange.huendgen-entsorgung.de",
+   "hints": [],
+   "host_ip": "80.90.145.166",
+   "id": "sw:80.90.145.166:exchange.huendgen-entsorgung.de:windows_server:unknown",
+   "kind": "os",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:45:25Z",
+   "product": "Windows Server",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  }
+ ],
+ "targets": [
+  {
+   "confidence": 1.0,
+   "discovery_health": {
+    "ct_sources_empty": false,
+    "discovery_added_count": 7,
+    "snapshot_age_minutes": null,
+    "snapshot_seed_count": 0,
+    "snapshot_seeded": false,
+    "tool_counts": {
+     "certspotter": 2,
+     "crtsh": 1,
+     "gobuster_dns": 3,
+     "phase0a_passive": 3,
+     "subfinder": 2
+    },
+    "tools_with_zero_results": [],
+    "total_subdomains": 7
+   },
+   "domain": "huendgen-entsorgung.de",
+   "evidence": [
+    {
+     "excerpt": "domain=huendgen-entsorgung.de",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "id": "target:huendgen-entsorgung.de",
+   "is_primary": true,
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:03Z",
+   "out_of_scope": [],
+   "source": "host_inventory",
+   "targets_source": "orders.json",
+   "whois": null
+  }
+ ],
+ "threats": [
+  {
+   "affected_software_ref": null,
+   "confidence": 1.0,
+   "cve_id": "CVE-2013-0169",
+   "cvss_nvd": null,
+   "cwes": [],
+   "epss": null,
+   "evidence": [
+    {
+     "excerpt": "LUCKY13: potentially vulnerable, uses obsolete TLS CBC ciphers",
+     "ref": "scan_results:testssl:80.90.145.166",
+     "tool": "testssl"
+    }
+   ],
+   "exploitdb": null,
+   "host_ip": "80.90.145.166",
+   "id": "threat:CVE-2013-0169:exchange.huendgen-entsorgung.de:443",
+   "kev": null,
+   "mode": "active",
+   "observed_at": "2026-09-23T19:45:29Z",
+   "port": 443,
+   "source": "testssl"
+  }
+ ],
+ "tls": [
+  {
+   "cert": {
+    "chain_ok": true,
+    "cn": "www.huendgen-entsorgung.de",
+    "days_left": 17,
+    "expired": false,
+    "issuer": "YR2 (Let's Encrypt from US)",
+    "mismatch": false,
+    "not_after": "2026-10-11T03:14:00Z",
+    "not_before": "2026-07-13T03:14:00Z",
+    "san": [
+     "huendgen-entsorgung.de",
+     "www.huendgen-entsorgung.de"
+    ],
+    "self_signed": null,
+    "wildcard": false
+   },
+   "ciphers_weak": [],
+   "confidence": 1.0,
+   "entries": [
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "HTTP",
+     "id": "service",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No 128 cipher limit bug",
+     "id": "pre_128cipher",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "SSLv2",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "SSLv3",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "TLS1",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "TLS1_1",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "offered",
+     "id": "TLS1_2",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "offered with final",
+     "id": "TLS1_3",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "NPN",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "h2",
+     "id": "ALPN_HTTP2",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "http/1.1",
+     "id": "ALPN",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "cipherlist_NULL",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "cipherlist_aNULL",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "cipherlist_EXPORT",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "cipherlist_LOW",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "cipherlist_3DES_IDEA",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "cipherlist_OBSOLETED",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "cipherlist_STRONG_NOFS",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "offered",
+     "id": "cipherlist_STRONG_FS",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "server",
+     "id": "cipher_order-tls1_2",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2   xc02f   ECDHE-RSA-AES128-GCM-SHA256       ECDH 253   AESGCM      128      TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+     "id": "cipher-tls1_2_xc02f",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2   xc030   ECDHE-RSA-AES256-GCM-SHA384       ECDH 253   AESGCM      256      TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+     "id": "cipher-tls1_2_xc030",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2   xcca8   ECDHE-RSA-CHACHA20-POLY1305       ECDH 253   ChaCha20    256      TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+     "id": "cipher-tls1_2_xcca8",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "ECDHE-RSA-AES128-GCM-SHA256 ECDHE-RSA-AES256-GCM-SHA384 ECDHE-RSA-CHACHA20-POLY1305",
+     "id": "cipherorder_TLSv1_2",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "false",
+     "id": "prioritize_chacha_TLSv1_2",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "NOT a cipher order configured",
+     "id": "cipher_order-tls1_3",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3   x1302   TLS_AES_256_GCM_SHA384            ECDH 253   AESGCM      256      TLS_AES_256_GCM_SHA384",
+     "id": "cipher-tls1_3_x1302",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3   x1303   TLS_CHACHA20_POLY1305_SHA256      ECDH 253   ChaCha20    256      TLS_CHACHA20_POLY1305_SHA256",
+     "id": "cipher-tls1_3_x1303",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3   x1301   TLS_AES_128_GCM_SHA256            ECDH 253   AESGCM      128      TLS_AES_128_GCM_SHA256",
+     "id": "cipher-tls1_3_x1301",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLS_AES_256_GCM_SHA384 TLS_CHACHA20_POLY1305_SHA256 TLS_AES_128_GCM_SHA256",
+     "id": "supportedciphers_TLSv1_3",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "server -- TLS 1.3 client determined",
+     "id": "cipher_order",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "offered",
+     "id": "FS",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLS_AES_256_GCM_SHA384 TLS_CHACHA20_POLY1305_SHA256 ECDHE-RSA-AES256-GCM-SHA384 ECDHE-RSA-CHACHA20-POLY1305 TLS_AES_128_GCM_SHA256 ECDHE-RSA-AES128-GCM-SHA256",
+     "id": "FS_ciphers",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No KEMs offered",
+     "id": "FS_KEMs",
+     "severity": "LOW"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "prime256v1 X25519",
+     "id": "FS_ECDHE_curves",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "RSA-PSS-RSAE+SHA256 RSA+SHA256 RSA-PSS-RSAE+SHA384 RSA+SHA384 RSA-PSS-RSAE+SHA512 RSA+SHA512 RSA+SHA1",
+     "id": "FS_TLS12_sig_algs",
+     "severity": "LOW"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "RSA-PSS-RSAE+SHA256 RSA-PSS-RSAE+SHA384 RSA-PSS-RSAE+SHA512",
+     "id": "FS_TLS13_sig_algs",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "'server name/#0' 'EC point formats/#11' 'application layer protocol negotiation/#16' 'extended master secret/#23' 'session ticket/#35' 'supported versions/#43' 'key share/#51' 'renegotiation info/#65281'",
+     "id": "TLS_extensions",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "valid for 7200 seconds only (<daily)",
+     "id": "TLS_session_ticket",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "yes",
+     "id": "SSL_sessionID_support",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not supported",
+     "id": "sessionresumption_ticket",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not supported",
+     "id": "sessionresumption_ID",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "random",
+     "id": "TLS_timestamp",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "none",
+     "id": "certificate_compression",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "none",
+     "id": "clientAuth",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "1",
+     "id": "cert_numbers",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "SHA256 with RSA",
+     "id": "cert_signatureAlgorithm",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "RSA 4096 bits (exponent is 65537)",
+     "id": "cert_keySize",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "Digital Signature, Key Encipherment",
+     "id": "cert_keyUsage",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLS Web Server Authentication",
+     "id": "cert_extKeyUsage",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "050C5DD243C50C5BCA88AE43C2AC2F8334E8",
+     "id": "cert_serialNumber",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "18",
+     "id": "cert_serialNumberLen",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "0AAD9145A5F8C7DB80F345162A11EA278BFB2BBB",
+     "id": "cert_fingerprintSHA1",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "7C27E2061A228A7FC3C53BA136048500D5E89156A4F7EADC99ECE49F3C7BE3F9",
+     "id": "cert_fingerprintSHA256",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "-----BEGIN CERTIFICATE-----\nMIIGKTCCBRGgAwIBAgISBQxd0kPFDFvKiK5DwqwvgzToMA0GCSqGSIb3DQEBCwUAMDMxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQwwCgYDVQQDEwNZUjIwHhcNMjYwNzEzMDMxNDM4WhcNMjYxMDExMDMxNDM3WjAlMSMwIQYDVQQDExp3d3cuaHVlbmRnZW4tZW50c29yZ3VuZy5kZTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIB",
+     "id": "cert",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "www.huendgen-entsorgung.de",
+     "id": "cert_commonName",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "request w/o SNI didn't succeed",
+     "id": "cert_commonName_wo_SNI",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "huendgen-entsorgung.de www.huendgen-entsorgung.de",
+     "id": "cert_subjectAltName",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "Ok via SAN (SNI mandatory)",
+     "id": "cert_trust",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "passed.",
+     "id": "cert_chain_of_trust",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "no",
+     "id": "cert_certificatePolicies_EV",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "expires < 30 days (17)",
+     "id": "cert_expirationStatus",
+     "severity": "MEDIUM"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "2026-07-13 03:14",
+     "id": "cert_notBefore",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "2026-10-11 03:14",
+     "id": "cert_notAfter",
+     "severity": "MEDIUM"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "certificate has no extended life time according to browser forum",
+     "id": "cert_extlifeSpan",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not present",
+     "id": "cert_eTLS",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "http://yr2.c.lencr.org/105.crl",
+     "id": "cert_crlDistributionPoints",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "--",
+     "id": "cert_ocspURL",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "OCSP_stapling",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "--",
+     "id": "cert_mustStapleExtension",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "check skipped as instructed",
+     "id": "DNS_CAArecord",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "yes (certificate extension)",
+     "id": "certificate_transparency",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "3",
+     "id": "certs_countServer",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "no",
+     "id": "certs_list_ordering_problem",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "YR2 (Let's Encrypt from US)",
+     "id": "cert_caIssuers",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "-----BEGIN CERTIFICATE-----\nMIIE2jCCAsKgAwIBAgIQTr0klH4k05SALYSlL9WzGTANBgkqhkiG9w0BAQsFADAuMQswCQYDVQQGEwJVUzENMAsGA1UEChMESVNSRzEQMA4GA1UEAxMHUm9vdCBZUjAeFw0yNTA5MDMwMDAwMDBaFw0yODA5MDIyMzU5NTlaMDMxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQwwCgYDVQQDEwNZUjIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw",
+     "id": "intermediate_cert <#1>",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "238B85A0099C65B970477D5724F1A1D475CE5058CFFE4EFA8733899BDB863C47",
+     "id": "intermediate_cert_fingerprintSHA256 <#1>",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "2025-09-03 00:00",
+     "id": "intermediate_cert_notBefore <#1>",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "2028-09-02 23:59",
+     "id": "intermediate_cert_notAfter <#1>",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "ok > 40 days",
+     "id": "intermediate_cert_expiration <#1>",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "YR2 <-- Root YR",
+     "id": "intermediate_cert_chain <#1>",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "-----BEGIN CERTIFICATE-----\nMIIF9DCCA9ygAwIBAgIRAPJLbRf52a18scn+p4eCaZ8wDQYJKoZIhvcNAQELBQAwTzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2VhcmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMjYwNTEzMDAwMDAwWhcNMzIwOTAyMjM1OTU5WjAuMQswCQYDVQQGEwJVUzENMAsGA1UEChMESVNSRzEQMA4GA1UEAxMHUm9v",
+     "id": "intermediate_cert <#2>",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "072639D0B140D5BFFAE16AD9C3F6CC6086040621F51EE61A6D46A8915C07CF76",
+     "id": "intermediate_cert_fingerprintSHA256 <#2>",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "2026-05-13 00:00",
+     "id": "intermediate_cert_notBefore <#2>",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "2032-09-02 23:59",
+     "id": "intermediate_cert_notAfter <#2>",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "ok > 40 days",
+     "id": "intermediate_cert_expiration <#2>",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "Root YR <-- ISRG Root X1",
+     "id": "intermediate_cert_chain <#2>",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "intermediate certificate(s) is/are ok",
+     "id": "intermediate_cert_badOCSP",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "301 Moved Permanently ('/')",
+     "id": "HTTP_status_code",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "0 seconds from localtime",
+     "id": "HTTP_clock_skew",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "1790192392",
+     "id": "HTTP_headerTime",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "365 days (=31536000 seconds) > 15552000 seconds",
+     "id": "HSTS_time",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "only for this domain",
+     "id": "HSTS_subdomains",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "domain IS marked for preloading",
+     "id": "HSTS_preload",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No support for HTTP Public Key Pinning",
+     "id": "HPKP",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "nginx",
+     "id": "banner_server",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No application banner found",
+     "id": "banner_application",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "0 at '/' (30x detected, better try target URL of 30x)",
+     "id": "cookie_count",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "SAMEORIGIN",
+     "id": "X-Frame-Options",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "nosniff",
+     "id": "X-Content-Type-Options",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "frame-ancestors 'self'",
+     "id": "Content-Security-Policy",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "no-cache, no-store, must-revalidate",
+     "id": "Cache-Control",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "--",
+     "id": "banner_reverseproxy",
+     "severity": "INFO"
+    },
+    {
+     "cve": "CVE-2014-0160",
+     "cves": [
+      "CVE-2014-0160"
+     ],
+     "finding": "not vulnerable, no heartbeat extension",
+     "id": "heartbleed",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2014-0224",
+     "cves": [
+      "CVE-2014-0224"
+     ],
+     "finding": "not vulnerable",
+     "id": "CCS",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2016-9244",
+     "cves": [
+      "CVE-2016-9244"
+     ],
+     "finding": "not vulnerable",
+     "id": "ticketbleed",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2017-17382",
+     "cves": [
+      "CVE-2017-17382",
+      "CVE-2017-17427",
+      "CVE-2017-17428",
+      "CVE-2017-13098",
+      "CVE-2017-1000385",
+      "CVE-2017-13099",
+      "CVE-2016-6883",
+      "CVE-2012-5081",
+      "CVE-2017-6168"
+     ],
+     "finding": "not vulnerable, no RSA key transport cipher",
+     "id": "ROBOT",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "supported",
+     "id": "secure_renego",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2011-1473",
+     "cves": [
+      "CVE-2011-1473"
+     ],
+     "finding": "not vulnerable",
+     "id": "secure_client_renego",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2012-4929",
+     "cves": [
+      "CVE-2012-4929"
+     ],
+     "finding": "not vulnerable",
+     "id": "CRIME_TLS",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2013-3587",
+     "cves": [
+      "CVE-2013-3587"
+     ],
+     "finding": "not vulnerable, no gzip/deflate/compress/br HTTP compression  - only supplied '/' tested",
+     "id": "BREACH",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2014-3566",
+     "cves": [
+      "CVE-2014-3566"
+     ],
+     "finding": "not vulnerable, no SSLv3",
+     "id": "POODLE_SSL",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "no protocol below TLS 1.2 offered",
+     "id": "fallback_SCSV",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2016-2183",
+     "cves": [
+      "CVE-2016-2183",
+      "CVE-2016-6329"
+     ],
+     "finding": "not vulnerable",
+     "id": "SWEET32",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2015-0204",
+     "cves": [
+      "CVE-2015-0204"
+     ],
+     "finding": "not vulnerable",
+     "id": "FREAK",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2016-0800",
+     "cves": [
+      "CVE-2016-0800",
+      "CVE-2016-0703"
+     ],
+     "finding": "not vulnerable on this host and port",
+     "id": "DROWN",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2016-0800",
+     "cves": [
+      "CVE-2016-0800",
+      "CVE-2016-0703"
+     ],
+     "finding": "Make sure you don't use this certificate elsewhere with SSLv2 enabled services, see https://search.censys.io/search?resource=hosts&virtual_hosts=INCLUDE&q=7C27E2061A228A7FC3C53BA136048500D5E89156A4F7EADC99ECE49F3C7BE3F9",
+     "id": "DROWN_hint",
+     "severity": "INFO"
+    },
+    {
+     "cve": "CVE-2015-4000",
+     "cves": [
+      "CVE-2015-4000"
+     ],
+     "finding": "not vulnerable, no DH EXPORT ciphers,",
+     "id": "LOGJAM",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2015-4000",
+     "cves": [
+      "CVE-2015-4000"
+     ],
+     "finding": "no DH key with <= TLS 1.2",
+     "id": "LOGJAM-common_primes",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2011-3389",
+     "cves": [
+      "CVE-2011-3389"
+     ],
+     "finding": "not vulnerable, no SSL3 or TLS1",
+     "id": "BEAST",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2013-0169",
+     "cves": [
+      "CVE-2013-0169"
+     ],
+     "finding": "not vulnerable",
+     "id": "LUCKY13",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2014-6321",
+     "cves": [
+      "CVE-2014-6321"
+     ],
+     "finding": "not vulnerable",
+     "id": "winshock",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2013-2566",
+     "cves": [
+      "CVE-2013-2566",
+      "CVE-2015-2808"
+     ],
+     "finding": "not vulnerable",
+     "id": "RC4",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES128-GCM-SHA256",
+     "id": "clientsimulation-android_70",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES128-GCM-SHA256",
+     "id": "clientsimulation-android_81",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-android_90",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-android_X",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-android_11_12",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-android_13_14",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-android_15",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-chrome_101_win10",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-chromium_137_win11",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-firefox_100_win10",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-firefox_137_win11",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No connection",
+     "id": "clientsimulation-ie_8_win7",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No connection",
+     "id": "clientsimulation-ie_11_win7",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No connection",
+     "id": "clientsimulation-ie_11_win81",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No connection",
+     "id": "clientsimulation-ie_11_winphone81",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES128-GCM-SHA256",
+     "id": "clientsimulation-ie_11_win10",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES128-GCM-SHA256",
+     "id": "clientsimulation-edge_15_win10",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-edge_101_win10_21h2",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-edge_133_win11_23h2",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-safari_184_ios_184",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-safari_154_osx_1231",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-safari_184_osx_154",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No connection",
+     "id": "clientsimulation-java_7u25",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-java_80442",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-java_1102",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-java_1703",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-java_2106",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-go_1178",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_CHACHA20_POLY1305_SHA256",
+     "id": "clientsimulation-libressl_336",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES128-GCM-SHA256",
+     "id": "clientsimulation-openssl_102e",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-openssl_111d",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-openssl_315",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-openssl_350",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES128-GCM-SHA256",
+     "id": "clientsimulation-apple_mail_16_0",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_128_GCM_SHA256",
+     "id": "clientsimulation-thunderbird_91_9",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "SSL Labs's 'SSL Server Rating Guide' (version 2009r from 2025-05-16)",
+     "id": "rating_spec",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "https://github.com/ssllabs/research/wiki/SSL-Server-Rating-Guide",
+     "id": "rating_doc",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "100",
+     "id": "protocol_support_score",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "30",
+     "id": "protocol_support_score_weighted",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "100",
+     "id": "key_exchange_score",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "30",
+     "id": "key_exchange_score_weighted",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "90",
+     "id": "cipher_strength_score",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "36",
+     "id": "cipher_strength_score_weighted",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "96",
+     "id": "final_score",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "A+",
+     "id": "overall_grade",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "73",
+     "id": "scanTime",
+     "severity": "INFO"
+    }
+   ],
+   "evidence": [
+    {
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
+     "ref": "scan_results:testssl:18.197.248.23",
+     "tool": "testssl"
+    },
+    {
+     "excerpt": "service=HTTP; pre_128cipher=No 128 cipher limit bug; SSLv2=not offered; SSLv3=not offered; TLS1=not offered; TLS1_1=not offered",
+     "ref": "hosts/18.197.248.23/phase2/testssl.json",
+     "tool": "testssl"
+    }
+   ],
+   "fallback_scsv": true,
+   "fqdn": "huendgen-entsorgung.de",
+   "grade": "A+",
+   "host_ip": "18.197.248.23",
+   "hsts": {
+    "include_subdomains": false,
+    "max_age": 31536000,
+    "preload": true,
+    "present": true,
+    "raw": "365 days (=31536000 seconds) > 15552000 seconds"
+   },
+   "id": "tls:huendgen-entsorgung.de:443@18.197.248.23",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-09-23T19:39:19Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": false,
+    "SSLv3": false,
+    "TLS1.0": false,
+    "TLS1.1": false,
+    "TLS1.2": true,
+    "TLS1.3": true
+   },
+   "source": "testssl",
+   "vulns": []
+  },
+  {
+   "cert": {
+    "chain_ok": null,
+    "cn": "www.huendgen-entsorgung.de",
+    "days_left": 17,
+    "expired": false,
+    "issuer": "YR2",
+    "mismatch": null,
+    "not_after": "2026-10-11T03:14:37Z",
+    "not_before": "2026-07-13T03:14:38Z",
+    "san": [
+     "huendgen-entsorgung.de",
+     "www.huendgen-entsorgung.de"
+    ],
+    "self_signed": null,
+    "wildcard": false
+   },
+   "ciphers_weak": [],
+   "confidence": 1.0,
+   "entries": [],
+   "evidence": [
+    {
+     "excerpt": "www.huendgen-entsorgung.de:443 tls=tls13 cn=www.huendgen-entsorgung.de gueltig_bis=2026-10-11T03:14:37Z",
+     "ref": "hosts/18.197.248.23/phase2/httpx.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "www.huendgen-entsorgung.de:443 tls=tls13 cn=www.huendgen-entsorgung.de gueltig_bis=2026-10-11T03:14:37Z",
+     "ref": "hosts/18.197.248.23/phase2/httpx_www.huendgen-entsorgung.de.json",
+     "tool": "httpx"
+    }
+   ],
+   "fallback_scsv": null,
+   "fqdn": "www.huendgen-entsorgung.de",
+   "grade": null,
+   "host_ip": "18.197.248.23",
+   "hsts": null,
+   "id": "tls:www.huendgen-entsorgung.de:443@18.197.248.23",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-09-23T19:39:11Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": null,
+    "SSLv3": null,
+    "TLS1.0": null,
+    "TLS1.1": null,
+    "TLS1.2": null,
+    "TLS1.3": true
+   },
+   "source": "httpx",
+   "vulns": []
+  },
+  {
+   "cert": {
+    "chain_ok": true,
+    "cn": "*.huendgen-entsorgung.de",
+    "days_left": 102,
+    "expired": false,
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
+    "mismatch": false,
+    "not_after": "2027-01-03T23:59:59Z",
+    "not_before": "2025-12-04T00:00:00Z",
+    "san": [
+     "*.huendgen-entsorgung.de",
+     "huendgen-entsorgung.de"
+    ],
+    "self_signed": null,
+    "wildcard": true
+   },
+   "ciphers_weak": [
+    "cbc"
+   ],
+   "confidence": 1.0,
+   "entries": [
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "HTTP",
+     "id": "service",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No 128 cipher limit bug",
+     "id": "pre_128cipher",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "SSLv2",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "SSLv3",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "TLS1",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "TLS1_1",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "offered",
+     "id": "TLS1_2",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "offered with final",
+     "id": "TLS1_3",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "NPN",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "h2",
+     "id": "ALPN_HTTP2",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "http/1.1",
+     "id": "ALPN",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "cipherlist_NULL",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "cipherlist_aNULL",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "cipherlist_EXPORT",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "cipherlist_LOW",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "cipherlist_3DES_IDEA",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "offered",
+     "id": "cipherlist_OBSOLETED",
+     "severity": "LOW"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "cipherlist_STRONG_NOFS",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "offered",
+     "id": "cipherlist_STRONG_FS",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "server",
+     "id": "cipher_order-tls1_2",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2   xc030   ECDHE-RSA-AES256-GCM-SHA384       ECDH 384   AESGCM      256      TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+     "id": "cipher-tls1_2_xc030",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2   xc02f   ECDHE-RSA-AES128-GCM-SHA256       ECDH 256   AESGCM      128      TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+     "id": "cipher-tls1_2_xc02f",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2   xc028   ECDHE-RSA-AES256-SHA384           ECDH 384   AES         256      TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+     "id": "cipher-tls1_2_xc028",
+     "severity": "LOW"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2   xc027   ECDHE-RSA-AES128-SHA256           ECDH 256   AES         128      TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+     "id": "cipher-tls1_2_xc027",
+     "severity": "LOW"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "ECDHE-RSA-AES256-GCM-SHA384 ECDHE-RSA-AES128-GCM-SHA256 ECDHE-RSA-AES256-SHA384 ECDHE-RSA-AES128-SHA256",
+     "id": "cipherorder_TLSv1_2",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "server",
+     "id": "cipher_order-tls1_3",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3   x1302   TLS_AES_256_GCM_SHA384            ECDH 256   AESGCM      256      TLS_AES_256_GCM_SHA384",
+     "id": "cipher-tls1_3_x1302",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3   x1301   TLS_AES_128_GCM_SHA256            ECDH 256   AESGCM      128      TLS_AES_128_GCM_SHA256",
+     "id": "cipher-tls1_3_x1301",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLS_AES_256_GCM_SHA384 TLS_AES_128_GCM_SHA256",
+     "id": "cipherorder_TLSv1_3",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "server",
+     "id": "cipher_order",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "offered",
+     "id": "FS",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLS_AES_256_GCM_SHA384 ECDHE-RSA-AES256-GCM-SHA384 ECDHE-RSA-AES256-SHA384 TLS_AES_128_GCM_SHA256 ECDHE-RSA-AES128-GCM-SHA256 ECDHE-RSA-AES128-SHA256",
+     "id": "FS_ciphers",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No KEMs offered",
+     "id": "FS_KEMs",
+     "severity": "LOW"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "prime256v1 secp384r1",
+     "id": "FS_ECDHE_curves",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "RSA-PSS-RSAE+SHA256 RSA+SHA256 RSA-PSS-RSAE+SHA384 RSA+SHA384 RSA-PSS-RSAE+SHA512 RSA+SHA512 RSA+SHA1",
+     "id": "FS_TLS12_sig_algs",
+     "severity": "LOW"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "RSA-PSS-RSAE+SHA256 RSA-PSS-RSAE+SHA384 RSA-PSS-RSAE+SHA512",
+     "id": "FS_TLS13_sig_algs",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "'status request/#5' 'application layer protocol negotiation/#16' 'extended master secret/#23' 'supported versions/#43' 'key share/#51' 'renegotiation info/#65281'",
+     "id": "TLS_extensions",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "no -- no lifetime advertised",
+     "id": "TLS_session_ticket",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "yes",
+     "id": "SSL_sessionID_support",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not supported",
+     "id": "sessionresumption_ticket",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not supported",
+     "id": "sessionresumption_ID",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "random",
+     "id": "TLS_timestamp",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "none",
+     "id": "certificate_compression",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "none",
+     "id": "clientAuth",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "1",
+     "id": "cert_numbers",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "SHA256 with RSA",
+     "id": "cert_signatureAlgorithm",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "RSA 4096 bits (exponent is 65537)",
+     "id": "cert_keySize",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "Digital Signature, Key Encipherment",
+     "id": "cert_keyUsage",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLS Web Server Authentication, TLS Web Client Authentication",
+     "id": "cert_extKeyUsage",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "DAEDB79D2FC602838E6F64DFFDDF3F5C",
+     "id": "cert_serialNumber",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "16",
+     "id": "cert_serialNumberLen",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "9A71ED8BCA7E48E0BB58D65267B1211F94FD68A1",
+     "id": "cert_fingerprintSHA1",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "11A2AE2EDF22A6AD7253BFCC213315A5DFF3B397E739AE76B42D9E4B62F7AB03",
+     "id": "cert_fingerprintSHA256",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "-----BEGIN CERTIFICATE-----\nMIIHsTCCBhmgAwIBAgIRANrtt50vxgKDjm9k3/3fP1wwDQYJKoZIhvcNAQELBQAwYDELMAkGA1UEBhMCR0IxGDAWBgNVBAoTD1NlY3RpZ28gTGltaXRlZDE3MDUGA1UEAxMuU2VjdGlnbyBQdWJsaWMgU2VydmVyIEF1dGhlbnRpY2F0aW9uIENBIERWIFIzNjAeFw0yNTEyMDQwMDAwMDBaFw0yNzAxMDMyMzU5NTlaMCMxITAfBgNVBAMMGCouaHVlbmRnZW4tZW50",
+     "id": "cert",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "*.huendgen-entsorgung.de",
+     "id": "cert_commonName",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "*.huendgen-entsorgung.de",
+     "id": "cert_commonName_wo_SNI",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "*.huendgen-entsorgung.de huendgen-entsorgung.de",
+     "id": "cert_subjectAltName",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "Ok via SAN wildcard and CN wildcard (same w/o SNI)",
+     "id": "cert_trust",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "trust is via wildcard",
+     "id": "cert_trust_wildcard",
+     "severity": "LOW"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "passed.",
+     "id": "cert_chain_of_trust",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "no",
+     "id": "cert_certificatePolicies_EV",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "102 >= 60 days",
+     "id": "cert_expirationStatus",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "2025-12-04 00:00",
+     "id": "cert_notBefore",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "2027-01-03 23:59",
+     "id": "cert_notAfter",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "certificate has no extended life time according to browser forum",
+     "id": "cert_extlifeSpan",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not present",
+     "id": "cert_eTLS",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "--",
+     "id": "cert_crlDistributionPoints",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "http://ocsp.sectigo.com",
+     "id": "cert_ocspURL",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "offered",
+     "id": "OCSP_stapling",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not revoked",
+     "id": "cert_ocspRevoked",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "--",
+     "id": "cert_mustStapleExtension",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "check skipped as instructed",
+     "id": "DNS_CAArecord",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "yes (certificate extension)",
+     "id": "certificate_transparency",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "2",
+     "id": "certs_countServer",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "no",
+     "id": "certs_list_ordering_problem",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "Sectigo Public Server Authentication CA DV R36 (Sectigo Limited from GB)",
+     "id": "cert_caIssuers",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "-----BEGIN CERTIFICATE-----\nMIIGTDCCBDSgAwIBAgIQOXpmzCdWNi4NqofKbqvjsTANBgkqhkiG9w0BAQwFADBfMQswCQYDVQQGEwJHQjEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMTYwNAYDVQQDEy1TZWN0aWdvIFB1YmxpYyBTZXJ2ZXIgQXV0aGVudGljYXRpb24gUm9vdCBSNDYwHhcNMjEwMzIyMDAwMDAwWhcNMzYwMzIxMjM1OTU5WjBgMQswCQYDVQQGEwJHQjEYMBYGA1UEChMPU2Vj",
+     "id": "intermediate_cert <#1>",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "8C54C334B66BA4E426772AF4A3F9136C19A1AEC729FDB28C535C07A5A4EF22E0",
+     "id": "intermediate_cert_fingerprintSHA256 <#1>",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "2021-03-22 00:00",
+     "id": "intermediate_cert_notBefore <#1>",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "2036-03-21 23:59",
+     "id": "intermediate_cert_notAfter <#1>",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "ok > 40 days",
+     "id": "intermediate_cert_expiration <#1>",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "Sectigo Public Server Authentication CA DV R36 <-- Sectigo Public Server Authentication Root R46",
+     "id": "intermediate_cert_chain <#1>",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "intermediate certificate(s) is/are ok",
+     "id": "intermediate_cert_badOCSP",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "302 Moved Temporarily ('/')",
+     "id": "HTTP_status_code",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "0 seconds from localtime",
+     "id": "HTTP_clock_skew",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "1790192761",
+     "id": "HTTP_headerTime",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "not offered",
+     "id": "HSTS",
+     "severity": "LOW"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No support for HTTP Public Key Pinning",
+     "id": "HPKP",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "Microsoft-IIS/10.0",
+     "id": "banner_server",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No application banner found",
+     "id": "banner_application",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "0 at '/' (30x detected, better try target URL of 30x)",
+     "id": "cookie_count",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "no-cache",
+     "id": "Cache-Control",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "no-cache",
+     "id": "Pragma",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "--",
+     "id": "banner_reverseproxy",
+     "severity": "INFO"
+    },
+    {
+     "cve": "CVE-2014-0160",
+     "cves": [
+      "CVE-2014-0160"
+     ],
+     "finding": "not vulnerable, no heartbeat extension",
+     "id": "heartbleed",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2014-0224",
+     "cves": [
+      "CVE-2014-0224"
+     ],
+     "finding": "not vulnerable",
+     "id": "CCS",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2016-9244",
+     "cves": [
+      "CVE-2016-9244"
+     ],
+     "finding": "no session ticket extension",
+     "id": "ticketbleed",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2017-17382",
+     "cves": [
+      "CVE-2017-17382",
+      "CVE-2017-17427",
+      "CVE-2017-17428",
+      "CVE-2017-13098",
+      "CVE-2017-1000385",
+      "CVE-2017-13099",
+      "CVE-2016-6883",
+      "CVE-2012-5081",
+      "CVE-2017-6168"
+     ],
+     "finding": "not vulnerable, no RSA key transport cipher",
+     "id": "ROBOT",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "supported",
+     "id": "secure_renego",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2011-1473",
+     "cves": [
+      "CVE-2011-1473"
+     ],
+     "finding": "not vulnerable",
+     "id": "secure_client_renego",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2012-4929",
+     "cves": [
+      "CVE-2012-4929"
+     ],
+     "finding": "not vulnerable",
+     "id": "CRIME_TLS",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2013-3587",
+     "cves": [
+      "CVE-2013-3587"
+     ],
+     "finding": "not vulnerable, no gzip/deflate/compress/br HTTP compression  - only supplied '/' tested",
+     "id": "BREACH",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2014-3566",
+     "cves": [
+      "CVE-2014-3566"
+     ],
+     "finding": "not vulnerable, no SSLv3",
+     "id": "POODLE_SSL",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "no protocol below TLS 1.2 offered",
+     "id": "fallback_SCSV",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2016-2183",
+     "cves": [
+      "CVE-2016-2183",
+      "CVE-2016-6329"
+     ],
+     "finding": "not vulnerable",
+     "id": "SWEET32",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2015-0204",
+     "cves": [
+      "CVE-2015-0204"
+     ],
+     "finding": "not vulnerable",
+     "id": "FREAK",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2016-0800",
+     "cves": [
+      "CVE-2016-0800",
+      "CVE-2016-0703"
+     ],
+     "finding": "not vulnerable on this host and port",
+     "id": "DROWN",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2016-0800",
+     "cves": [
+      "CVE-2016-0800",
+      "CVE-2016-0703"
+     ],
+     "finding": "Make sure you don't use this certificate elsewhere with SSLv2 enabled services, see https://search.censys.io/search?resource=hosts&virtual_hosts=INCLUDE&q=11A2AE2EDF22A6AD7253BFCC213315A5DFF3B397E739AE76B42D9E4B62F7AB03",
+     "id": "DROWN_hint",
+     "severity": "INFO"
+    },
+    {
+     "cve": "CVE-2015-4000",
+     "cves": [
+      "CVE-2015-4000"
+     ],
+     "finding": "not vulnerable, no DH EXPORT ciphers,",
+     "id": "LOGJAM",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2015-4000",
+     "cves": [
+      "CVE-2015-4000"
+     ],
+     "finding": "no DH key with <= TLS 1.2",
+     "id": "LOGJAM-common_primes",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2011-3389",
+     "cves": [
+      "CVE-2011-3389"
+     ],
+     "finding": "not vulnerable, no SSL3 or TLS1",
+     "id": "BEAST",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2013-0169",
+     "cves": [
+      "CVE-2013-0169"
+     ],
+     "finding": "potentially vulnerable, uses obsolete TLS CBC ciphers",
+     "id": "LUCKY13",
+     "severity": "LOW"
+    },
+    {
+     "cve": "CVE-2014-6321",
+     "cves": [
+      "CVE-2014-6321"
+     ],
+     "finding": "not vulnerable",
+     "id": "winshock",
+     "severity": "OK"
+    },
+    {
+     "cve": "CVE-2013-2566",
+     "cves": [
+      "CVE-2013-2566",
+      "CVE-2015-2808"
+     ],
+     "finding": "not vulnerable",
+     "id": "RC4",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
+     "id": "clientsimulation-android_70",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
+     "id": "clientsimulation-android_81",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-android_90",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-android_X",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-android_11_12",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-android_13_14",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-android_15",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-chrome_101_win10",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-chromium_137_win11",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-firefox_100_win10",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-firefox_137_win11",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No connection",
+     "id": "clientsimulation-ie_8_win7",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES256-SHA384",
+     "id": "clientsimulation-ie_11_win7",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES256-SHA384",
+     "id": "clientsimulation-ie_11_win81",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES128-SHA256",
+     "id": "clientsimulation-ie_11_winphone81",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
+     "id": "clientsimulation-ie_11_win10",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
+     "id": "clientsimulation-edge_15_win10",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-edge_101_win10_21h2",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-edge_133_win11_23h2",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-safari_184_ios_184",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-safari_154_osx_1231",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-safari_184_osx_154",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "No connection",
+     "id": "clientsimulation-java_7u25",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-java_80442",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-java_1102",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-java_1703",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-java_2106",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-go_1178",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-libressl_336",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
+     "id": "clientsimulation-openssl_102e",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-openssl_111d",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-openssl_315",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-openssl_350",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
+     "id": "clientsimulation-apple_mail_16_0",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
+     "id": "clientsimulation-thunderbird_91_9",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "SSL Labs's 'SSL Server Rating Guide' (version 2009r from 2025-05-16)",
+     "id": "rating_spec",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "https://github.com/ssllabs/research/wiki/SSL-Server-Rating-Guide",
+     "id": "rating_doc",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "100",
+     "id": "protocol_support_score",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "30",
+     "id": "protocol_support_score_weighted",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "100",
+     "id": "key_exchange_score",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "30",
+     "id": "key_exchange_score_weighted",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "90",
+     "id": "cipher_strength_score",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "36",
+     "id": "cipher_strength_score_weighted",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "96",
+     "id": "final_score",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "A+",
+     "id": "overall_grade",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "cves": [],
+     "finding": "77",
+     "id": "scanTime",
+     "severity": "INFO"
+    }
+   ],
+   "evidence": [
+    {
+     "excerpt": "exchange.huendgen-entsorgung.de:443 tls=tls13 cn=*.huendgen-entsorgung.de gueltig_bis=2027-01-03T23:59:59Z",
+     "ref": "hosts/80.90.145.166/phase2/httpx.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "exchange.huendgen-entsorgung.de:443 tls=tls13 cn=*.huendgen-entsorgung.de gueltig_bis=2027-01-03T23:59:59Z",
+     "ref": "hosts/80.90.145.166/phase2/httpx_exchange.huendgen-entsorgung.de.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
+     "ref": "scan_results:testssl:80.90.145.166",
+     "tool": "testssl"
+    },
+    {
+     "excerpt": "service=HTTP; pre_128cipher=No 128 cipher limit bug; SSLv2=not offered; SSLv3=not offered; TLS1=not offered; TLS1_1=not offered",
+     "ref": "hosts/80.90.145.166/phase2/testssl.json",
+     "tool": "testssl"
+    }
+   ],
+   "fallback_scsv": true,
+   "fqdn": "exchange.huendgen-entsorgung.de",
+   "grade": "A+",
+   "host_ip": "80.90.145.166",
+   "hsts": {
+    "include_subdomains": null,
+    "max_age": null,
+    "preload": null,
+    "present": false,
+    "raw": "not offered"
+   },
+   "id": "tls:exchange.huendgen-entsorgung.de:443@80.90.145.166",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-09-23T19:45:29Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": false,
+    "SSLv3": false,
+    "TLS1.0": false,
+    "TLS1.1": false,
+    "TLS1.2": true,
+    "TLS1.3": true
+   },
+   "source": "testssl",
+   "vulns": [
+    {
+     "name": "LUCKY13",
+     "status": "potential"
+    }
+   ]
+  }
+ ],
+ "unprocessed": [],
+ "warnings": []
+}

@@ -2455,7 +2455,7 @@
    }
   ]
  },
- "schema_version": "1.0.4",
+ "schema_version": "1.0.5",
  "services": [
   {
    "auth_mechanisms": [],
@@ -3003,6 +3003,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
+    "httpx",
     "nmap",
     "webtech"
    ],
@@ -3017,6 +3018,11 @@
    },
    "evidence": [
     {
+     "excerpt": "technologies: Apache HTTP Server 2.4.67",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "httpx"
+    },
+    {
      "excerpt": "443/tcp open http Apache httpd 2.4.67 ((Debian)) tunnel=ssl",
      "ref": "hosts/88.99.35.112/phase1/nmap.xml",
      "tool": "nmap"
@@ -3027,17 +3033,12 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "technologies: Apache 2.4.67 (Debian)",
-     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
-     "excerpt": "technologies: Apache HTTP Server 2.4.67",
-     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
      "excerpt": "technologies: Apache httpd 2.4.67",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Apache 2.4.67 (Debian)",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
      "tool": "webtech"
     }
@@ -3061,7 +3062,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -3076,7 +3077,7 @@
     {
      "excerpt": "technologies: BeTheme 27.4.5",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "betheme",
@@ -3087,9 +3088,9 @@
    "kind": "theme",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-17T22:48:12Z",
+   "observed_at": "2026-09-17T22:50:58Z",
    "product": "BeTheme",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": "27.4.5",
    "version_raw": "27.4.5",
    "vulnerabilities_count": null
@@ -3098,7 +3099,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -3113,7 +3114,7 @@
     {
      "excerpt": "technologies: Burst",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "burst",
@@ -3124,9 +3125,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-17T22:48:12Z",
+   "observed_at": "2026-09-17T22:50:58Z",
    "product": "Burst",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -3135,7 +3136,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -3150,7 +3151,7 @@
     {
      "excerpt": "technologies: Complianz",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "complianz",
@@ -3161,9 +3162,9 @@
    "kind": "plugin",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-17T22:48:12Z",
+   "observed_at": "2026-09-17T22:50:58Z",
    "product": "Complianz",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -3172,7 +3173,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": "debian",
    "edition": null,
@@ -3187,7 +3188,7 @@
     {
      "excerpt": "technologies: Debian",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "debian",
@@ -3198,9 +3199,9 @@
    "kind": "os",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-17T22:48:12Z",
+   "observed_at": "2026-09-17T22:50:58Z",
    "product": "Debian",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -3209,8 +3210,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -3235,12 +3235,12 @@
     {
      "excerpt": "technologies: Dovecot imapd",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: Dovecot pop3d",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "dovecot",
@@ -3262,7 +3262,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -3277,7 +3277,7 @@
     {
      "excerpt": "technologies: Google Analytics",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "google_analytics",
@@ -3288,9 +3288,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-17T22:48:12Z",
+   "observed_at": "2026-09-17T22:50:58Z",
    "product": "Google Analytics",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -3336,7 +3336,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -3351,7 +3351,7 @@
     {
      "excerpt": "technologies: HSTS",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "hsts",
@@ -3362,9 +3362,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-17T22:48:12Z",
+   "observed_at": "2026-09-17T22:50:58Z",
    "product": "HSTS",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -3373,7 +3373,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -3388,25 +3388,57 @@
     {
      "excerpt": "technologies: jQuery",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
-     "excerpt": "technologies: jQuery Migrate 3.4.1",
-     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "jquery",
    "fqdn": null,
    "hints": [],
    "host_ip": "88.99.35.112",
-   "id": "sw:88.99.35.112:-:jquery:3.4.1",
+   "id": "sw:88.99.35.112:-:jquery:unknown",
    "kind": "library",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-17T22:48:12Z",
+   "observed_at": "2026-09-17T22:50:58Z",
    "product": "jQuery",
-   "source": "webtech",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: jQuery Migrate 3.4.1",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery_migrate",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:jquery_migrate:3.4.1",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:58Z",
+   "product": "jQuery Migrate",
+   "source": "httpx",
    "version_norm": "3.4.1",
    "version_raw": "3.4.1",
    "vulnerabilities_count": null
@@ -3415,7 +3447,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -3430,7 +3462,7 @@
     {
      "excerpt": "technologies: MySQL",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "mysql",
@@ -3441,9 +3473,9 @@
    "kind": "database",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-17T22:48:12Z",
+   "observed_at": "2026-09-17T22:50:58Z",
    "product": "MySQL",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -3452,8 +3484,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": "debian",
    "edition": null,
@@ -3473,7 +3504,7 @@
     {
      "excerpt": "technologies: OpenSSH 8.4p1 Debian 5+deb11u7",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "openssh",
@@ -3495,7 +3526,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -3510,7 +3541,7 @@
     {
      "excerpt": "technologies: PHP",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "php",
@@ -3521,9 +3552,9 @@
    "kind": "language",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-17T22:48:12Z",
+   "observed_at": "2026-09-17T22:50:58Z",
    "product": "PHP",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -3532,8 +3563,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -3558,7 +3588,7 @@
     {
      "excerpt": "technologies: Postfix smtpd",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "postfix",
@@ -3617,8 +3647,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -3638,7 +3667,7 @@
     {
      "excerpt": "technologies: Pure-FTPd",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "pureftpd",
@@ -3660,7 +3689,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -3675,7 +3704,7 @@
     {
      "excerpt": "technologies: Slider Revolution 6.7.11",
      "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "slider_revolution",
@@ -3686,9 +3715,9 @@
    "kind": "plugin",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-17T22:48:12Z",
+   "observed_at": "2026-09-17T22:50:58Z",
    "product": "Slider Revolution",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": "6.7.11",
    "version_raw": "6.7.11",
    "vulnerabilities_count": null
@@ -4132,23 +4161,55 @@
      "excerpt": "tech: jQuery",
      "ref": "hosts/88.99.35.112/phase2/httpx.json",
      "tool": "httpx"
-    },
-    {
-     "excerpt": "tech: jQuery Migrate:3.4.1",
-     "ref": "hosts/88.99.35.112/phase2/httpx.json",
-     "tool": "httpx"
     }
    ],
    "family": "jquery",
    "fqdn": "dortmund-beach.com",
    "hints": [],
    "host_ip": "88.99.35.112",
-   "id": "sw:88.99.35.112:dortmund-beach.com:jquery:3.4.1",
+   "id": "sw:88.99.35.112:dortmund-beach.com:jquery:unknown",
    "kind": "library",
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-17T22:50:58Z",
    "product": "jQuery",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: jQuery Migrate:3.4.1",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery_migrate",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:jquery_migrate:3.4.1",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:58Z",
+   "product": "jQuery Migrate",
    "source": "httpx",
    "version_norm": "3.4.1",
    "version_raw": "3.4.1",

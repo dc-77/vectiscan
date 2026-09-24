@@ -114,6 +114,54 @@ ROLES: dict[str, tuple[list[str], str]] = {
         "beide Ziele hinter derselben Traefik-Instanz mit Rate-Limit. Interner "
         "Nachweislauf aus S2b, wird nicht ausgeliefert",
     ),
+    # Scan-Runde 23.09.2026 (S6a2): sieben Perimeter-Auftraege bei Pilotkunden mit
+    # schriftlicher Freigabe, Engine catalog, Layout v3, Gate strict, gegengelesen in
+    # spec/09. Soll-Listen abgeleitet (strict false), Eintraege, die spec/09 als falsch
+    # belegt, tragen in expected_map_<slug>.json die Q-Nummer.
+    "1fbc92b9-34ab-414e-8843-a1f1e9f15431": (
+        ["golden", "drift"],
+        "dortmund-beach.com, Scan-Runde 23.09.2026; Soll-Liste "
+        "expected/dortmund-beach-0923.json. Traegt jQuery Migrate 3.4.1 (Namensgrenze, "
+        "spec/09 Q11), Webmin auf 10000 (Q13) und csrf_token_missing mit Konfidenz Low (Q14)",
+    ),
+    "c3d5724c-bdbf-4da8-982f-4f1a52210e28": (
+        ["golden", "drift"],
+        "lumbeck-wolter.de, Scan-Runde 23.09.2026; Soll-Liste "
+        "expected/lumbeck-wolter-0923.json. Regressionsfall der Dashboard-Techniktabelle: "
+        "MariaDB mit Praefix 5.5.5- und PostgreSQL 9.6.0 or later (spec/09 Q11)",
+    ),
+    "31d67a02-b485-4d05-b228-dbdde092cc68": (
+        ["golden", "drift"],
+        "Junkerwerk Lauf 5, junkerwerk.de und junkerwerk.hu, Scan-Runde 23.09.2026; "
+        "Soll-Liste expected/junkerwerk-0923.json. Wie c3d5724c MariaDB mit Praefix und "
+        "PostgreSQL or later auf dem Hetzner-Server (spec/09 Q11); archiv.junkerwerk.de fehlt "
+        "(Discovery, Q1). Nicht im Junkerwerk-Drift-Test, der Scanner hat sich seit Lauf 4 "
+        "geaendert",
+    ),
+    "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7": (
+        ["golden"],
+        "huendgen-entsorgung.de, Scan-Runde 23.09.2026; Soll-Liste "
+        "expected/huendgen-0923.json. Exchange 2019 mit OWA, Duda-Plattform als "
+        "geteiltes System (spec/09 Q3); die FTP-Namen fehlen (Q1)",
+    ),
+    "68d59573-7a93-4efa-89cc-e7b10cc4d140": (
+        ["golden", "coverage"],
+        "bergersysteme.com, Scan-Runde 23.09.2026; Soll-Liste "
+        "expected/bergersysteme-0923.json. Vier Hosts ohne Messergebnis (leere "
+        "nmap-Ausgabe, spec/09 Q9 und E4), Cloudflare-Kante und Plesk-Sammelserver (Q3), "
+        "24 Namen gehen in der Discovery verloren (Q1)",
+    ),
+    "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52": (
+        ["golden", "drift"],
+        "castenow.de, Scan-Runde 23.09.2026; Soll-Liste expected/castenow-0923.json. "
+        "Groesster Bericht der Runde, Plesk-Sammelserver mit Fremdkunden (spec/09 Q3), "
+        "jQuery Migrate (Q11), CAA vorhanden (Q4)",
+    ),
+    "2e56abe1-c1a6-442e-b36a-dc9f83c81da8": (
+        ["golden", "drift"],
+        "heuel.com, Scan-Runde 23.09.2026; Soll-Liste expected/heuel-0923.json. "
+        "IPv6-Host, Vercel- und IONOS-Kanten, AbuseIPDB mit isWhitelisted (spec/09 Q12)",
+    ),
 }
 
 

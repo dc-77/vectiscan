@@ -1,0 +1,3021 @@
+{
+ "coverage": [
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:abuseipdb",
+     "tool": "abuseipdb"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:abuseipdb:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:13:39Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "abuseipdb"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"116.202.77.64\": {\"ip\": \"116.202.77.64\", \"abuseConfidenceScore\": 0, \"totalReports\": 0, \"numDistinctUsers\": 0, \"lastReportedAt\": null, \"isWhitelisted\": false...",
+     "ref": "scan_results:abuseipdb",
+     "tool": "abuseipdb"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:abuseipdb:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:17:04Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "abuseipdb"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 441,
+   "evidence": [
+    {
+     "excerpt": "{\"subdomains\": [\"lumbeck-wolter.de\", \"www.lumbeck-wolter.de\"], \"error\": null}",
+     "ref": "scan_results:certspotter",
+     "tool": "certspotter"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:certspotter:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:13:54Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "certspotter"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 8910,
+   "evidence": [
+    {
+     "excerpt": "[{\"issuer_ca_id\":204406,\"issuer_name\":\"C=GB, O=Sectigo Limited, CN=Sectigo Public Server Authentication CA DV R36\",\"common_name\":\"*.lumbeck-wolter.de\",\"name_...",
+     "ref": "scan_results:crtsh",
+     "tool": "crtsh"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:crtsh:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:14:03Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "crtsh"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"lumbeck-wolter.de\", \"spf\": \"v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout...",
+     "ref": "scan_results:dns_records",
+     "tool": "dns_records"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_records:lumbeck-wolter.de",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:13:54Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_records"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"lumbeck-wolter.de\", \"dnssec\": {\"dnssec_signed\": false, \"dnssec_valid\": false, \"ds_algorithm\": null, \"dnskey_count\": 0, \"nsec3_iterations\": null,...",
+     "ref": "scan_results:dns_security",
+     "tool": "dns_security"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_security:lumbeck-wolter.de",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:13:40Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_security"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"lumbeck-wolter.de\", \"dnssec\": {\"dnssec_signed\": false, \"dnssec_valid\": false, \"ds_algorithm\": null, \"dnskey_count\": 0, \"nsec3_iterations\": null,...",
+     "ref": "scan_results:dns_security",
+     "tool": "dns_security"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_security:lumbeck-wolter.de#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:17:44Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_security"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 6332,
+   "evidence": [
+    {
+     "excerpt": "{\"all\": [\"\\n;; OPT PSEUDOSECTION:\\n; EDNS: version 0; flags:; udp: 512\", \".\\t86399\\tIN\\tSOA\\ta.root-servers.net. nstld.verisign-grs.com. 2026092301 1800 900...",
+     "ref": "scan_results:dnsx",
+     "tool": "dnsx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dnsx:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:17:00Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dnsx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 180097,
+   "evidence": [
+    {
+     "excerpt": "TIMEOUT after 180s --- PARTIAL OUTPUT (246 chars) --- autodiscover.lumbeck-wolter.de 52.98.241.168,52.97.135.104,52.98.171.232,52.98.179.72,2603:1026:c0d:c2f...",
+     "ref": "scan_results:gobuster_dns",
+     "tool": "gobuster_dns"
+    }
+   ],
+   "exit_code": -1,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:gobuster_dns:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:16:54Z",
+   "phase": 0,
+   "raw_status": "timeout",
+   "reason": "timeout_after_180s",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "failed",
+   "tool": "gobuster_dns"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:greynoise",
+     "tool": "greynoise"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:greynoise:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:13:39Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "greynoise"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:greynoise",
+     "tool": "greynoise"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:greynoise:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:17:04Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "greynoise"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"lumbeck-wolter.de\", \"domain\": {\"domain\": \"lumbeck-wolter.de\", \"pulse_count\": 0, \"pulses\": [], \"validation\": [], \"type\": \"domain\", \"alexa_rank\":...",
+     "ref": "scan_results:otx",
+     "tool": "otx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:otx:lumbeck-wolter.de",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:13:39Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "otx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:otx",
+     "tool": "otx"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:otx:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:17:04Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "otx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"lumbeck-wolter.de\", \"domain\": null, \"subdomains\": [], \"dns_history\": []}",
+     "ref": "scan_results:securitytrails",
+     "tool": "securitytrails"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:securitytrails:lumbeck-wolter.de",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:13:54Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "securitytrails"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:securitytrails",
+     "tool": "securitytrails"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:securitytrails:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:17:04Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "securitytrails"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"shodan_domain\": {\"domain\": \"lumbeck-wolter.de\", \"subdomains\": [\"www\"], \"records\": [{\"subdomain\": \"\", \"type\": \"A\", \"options\": {\"ttl\": 60}, \"value\": \"116.202...",
+     "ref": "scan_results:shodan",
+     "tool": "shodan"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:shodan:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:13:40Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "shodan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"shodan_domain\": {\"domain\": \"lumbeck-wolter.de\", \"subdomains\": [\"www\"], \"records\": [{\"subdomain\": \"\", \"type\": \"A\", \"options\": {\"ttl\": 60}, \"value\": \"116.202...",
+     "ref": "scan_results:shodan",
+     "tool": "shodan"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:shodan:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:17:04Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "shodan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 651,
+   "evidence": [
+    {
+     "excerpt": "{\"host\":\"www.lumbeck-wolter.de\",\"input\":\"lumbeck-wolter.de\",\"source\":\"hackertarget\"}",
+     "ref": "scan_results:subfinder",
+     "tool": "subfinder"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:subfinder:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:13:55Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "subfinder"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:urlhaus:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:13:39Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "urlhaus"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:urlhaus:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:17:04Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "urlhaus"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:virustotal",
+     "tool": "virustotal"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:virustotal:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:13:39Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "virustotal"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:virustotal",
+     "tool": "virustotal"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:virustotal:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:17:04Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "virustotal"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"116.202.77.64\": { \"web_probe\": { \"has_web\": true, \"status\": 200, \"final_url\": \"https://www.lumbeck-wolter.de\", \"title\": \"Schneidwerkzeuge für Fleischwölfe...",
+     "ref": "scan_results:web_probe",
+     "tool": "web_probe"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:web_probe:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:17:03Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "web_probe"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:whois",
+     "tool": "whois"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:whois:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:13:39Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "whois"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:whois",
+     "tool": "whois"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:whois:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:17:04Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "whois"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 87776,
+   "evidence": [
+    {
+     "excerpt": "Starting Nmap 7.93 ( https://nmap.org ) Nmap scan report for 116.202.77.64 Host is up, received user-set (0.011s latency). Not shown: 936 filtered tcp ports...",
+     "ref": "scan_results:nmap:116.202.77.64",
+     "tool": "nmap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "cov:1:nmap:116.202.77.64",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:19:18Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "nmap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 11160,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://www.lumbeck-wolter.de",
+     "ref": "scan_results:wafw00f:116.202.77.64",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "www.lumbeck-wolter.de",
+   "host_ip": "116.202.77.64",
+   "id": "cov:1:wafw00f:116.202.77.64:www.lumbeck-wolter.de",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:20:30Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "Keine Tech-Signaturen erkennbar fuer www.lumbeck-wolter.de, lumbeck-wolter.de (moderne SPA ohne Server/X-Powered-By/generator-Header und ohne Cookie-/Script-...",
+     "ref": "scan_results:webtech:116.202.77.64",
+     "tool": "webtech"
+    }
+   ],
+   "exit_code": 1,
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "cov:1:webtech:116.202.77.64",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:20:18Z",
+   "phase": 1,
+   "raw_status": "failed",
+   "reason": "web_unreachable_after_portscan",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "blocked",
+   "tool": "webtech"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 5046,
+   "evidence": [
+    {
+     "excerpt": "{\"add_slash\": false, \"auto_bail\": true, \"auto_tune\": false, \"backup_extensions\": [\"~\", \".bak\", \".bak2\", \".old\", \".1\"], \"client_cert\": \"\", \"client_key\": \"\", \"...",
+     "ref": "scan_results:feroxbuster:116.202.77.64",
+     "tool": "feroxbuster"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "cov:2:feroxbuster:116.202.77.64",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:25:38Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "feroxbuster"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_api_urls",
+     "ref": "scan_results:ffuf_param:116.202.77.64",
+     "tool": "ffuf_param"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "cov:2:ffuf_param:116.202.77.64",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:25:33Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_api_urls",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "ffuf_param"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 180061,
+   "evidence": [
+    {
+     "excerpt": "TIMEOUT after 180s",
+     "ref": "scan_results:ffuf_sensitive:116.202.77.64",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "exit_code": -1,
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "cov:2:ffuf_sensitive:116.202.77.64",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:28:38Z",
+   "phase": 2,
+   "raw_status": "timeout",
+   "reason": "web_unreachable_after_portscan",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "blocked",
+   "tool": "ffuf_sensitive"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"www.lumbeck-wolter.de\", \"result\": { \"url\": \"https://www.lumbeck-wolter.de\", \"reachable\": false, \"score\": null, \"headers\": {}, \"security_headers\":...",
+     "ref": "scan_results:header_check:116.202.77.64",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "www.lumbeck-wolter.de",
+   "host_ip": "116.202.77.64",
+   "id": "cov:2:header_check:116.202.77.64:www.lumbeck-wolter.de",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:24:07Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": "web_unreachable_after_portscan",
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "blocked",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 20446,
+   "evidence": [
+    {
+     "excerpt": "",
+     "ref": "scan_results:httpx:116.202.77.64",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "cov:2:httpx:116.202.77.64",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:24:28Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": "web_unreachable_after_portscan",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "blocked",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 23590,
+   "evidence": [
+    {
+     "excerpt": "Start 2026-09-23 19:23:51 -->> 116.202.77.64:443 (lumbeck-wolter.de) <<-- A record via: supplied IP \"116.202.77.64\" rDNS (116.202.77.64): (instructed to mini...",
+     "ref": "scan_results:testssl:116.202.77.64",
+     "tool": "testssl"
+    }
+   ],
+   "exit_code": 246,
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "cov:2:testssl:116.202.77.64",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:24:01Z",
+   "phase": 2,
+   "raw_status": "failed",
+   "reason": "web_unreachable_after_portscan",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "blocked",
+   "tool": "testssl"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: cms_not_wordpress",
+     "ref": "scan_results:wpscan:116.202.77.64",
+     "tool": "wpscan"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "cov:2:wpscan:116.202.77.64",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:28:38Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "cms_not_wordpress",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "wpscan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"active\": 0, \"passive\": 0, \"top_alerts\": [], \"total_alerts\": 0, \"unique_types\": 0 }",
+     "ref": "scan_results:zap:116.202.77.64",
+     "tool": "zap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "cov:2:zap:116.202.77.64",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:02Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": "web_unreachable_after_portscan",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "blocked",
+   "tool": "zap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "FAILED: ZAP API error 400: url_not_found / URL Not Found in the Scan Tree [endpoint=/JSON/ascan/action/scan/, params={'url': 'https://www.lumbeck-wolter.de',...",
+     "ref": "scan_results:zap_active:116.202.77.64",
+     "tool": "zap_active"
+    }
+   ],
+   "exit_code": -2,
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "cov:2:zap_active:116.202.77.64",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:25:34Z",
+   "phase": 2,
+   "raw_status": "failed",
+   "reason": "web_unreachable_after_portscan",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "blocked",
+   "tool": "zap_active"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"urls_found\": 3, \"fqdns_spidered\": 1, \"vhosts\": [ \"www.lumbeck-wolter.de\" ], \"urls\": [ \"https://www.lumbeck-wolter.de\", \"https://www.lumbeck-wolter.de/robo...",
+     "ref": "scan_results:zap_spider:116.202.77.64",
+     "tool": "zap_spider"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "cov:2:zap_spider:116.202.77.64",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:25:33Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap_spider"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "lumbeck-wolter.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"total_findings\": 0, \"false_positives\": 0, \"valid_findings\": 0, \"severity_counts\": {}, \"cves_enriched\": 0, \"cisa_kev_matches\": 0, \"fp_details\": [], \"fp_by_...",
+     "ref": "scan_results:phase3_correlation",
+     "tool": "phase3_correlation"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:3:phase3_correlation:scan",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:29:02Z",
+   "phase": 3,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "phase3_correlation"
+  }
+ ],
+ "decisions": [
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Host ist Basisdomain mit aktivem Web-Shop und muss gescannt werden. Passive Intelligence zeigt mehrere Sicherheitsrisiken: offene Datenbank-Ports (3306 MariaDB, 5432 PostgreSQL 9.6), FTP (21), SSH...",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:ai_host_strategy:scan",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:17:50Z",
+   "payload": {
+    "passive_intel_summary": "Shodan zeigt 14 offene Ports inkl. kritischer Services: MariaDB 10.11.18, PostgreSQL 9.6 (veraltet), FTP, SSH, Mail-Ports (25, 110, 143, 587, 993, 995, 465, 4190). AbuseIPDB-Score 0 (sauber), kein Tor, DNSSEC nicht signiert. DNS: SPF vorhanden (Mailjet, IONOS, Hornetsecurity, Outlook), DKIM aktiv, aber DMARC fehlt. MX auf Hornetsecurity (Managed Security). Keine Zone-Transfer-Anfälligkeit.",
+    "strategy_notes": "Host ist Basisdomain mit aktivem Web-Shop und muss gescannt werden. Passive Intelligence zeigt mehrere Sicherheitsrisiken: offene Datenbank-Ports (3306 MariaDB, 5432 PostgreSQL 9.6), FTP (21), SSH (22) und veraltete PostgreSQL-Version. AbuseIPDB-Score 0 ist positiv, aber die exponierten Ports und Legacy-Services rechtfertigen höchste Priorität."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Basisdomain mit produktivem Web-Content (E-Commerce: Schneidwerkzeuge-Shop), primary VHost liefert 200-Status. Passive Intel zeigt exponierte Management-Ports (22, 21, 3306, 5432) und veraltete Pos...",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "dec:ai_host_strategy:116.202.77.64",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:17:50Z",
+   "payload": {
+    "action": "scan",
+    "priority": 1,
+    "reasoning": "Basisdomain mit produktivem Web-Content (E-Commerce: Schneidwerkzeuge-Shop), primary VHost liefert 200-Status. Passive Intel zeigt exponierte Management-Ports (22, 21, 3306, 5432) und veraltete PostgreSQL 9.6 → Priorität 1. Fehlende DMARC trotz SPF/DKIM ist zusätzliches Risiko."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"standard\", \"zap_spider_max_depth\": 5, \"zap_ajax_spider_enabled\": false, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\", \"cmdi\" ], \"zap...",
+     "ref": "scan_results:ai_phase2_config:116.202.77.64",
+     "tool": "ai_phase2_config"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "dec:ai_phase2_config:116.202.77.64",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:23:37Z",
+   "payload": {
+    "reasoning": "Apache httpd auf Standard-Ports (80/443), keine WAF erkannt, keine SPA/JS-Framework. Statischer oder traditioneller Web-Content ohne CMS-Erkennung. Standard-Scan-Policy mit moderater Tiefe (5) ausreichend. Active Categories für Apache/PHP-typische Vulnerabilities (sqli, xss, lfi, cmdi). Keine WAF → volle Rate (80 req/s), 5 Threads, kein Delay. AJAX Spider deaktiviert (is_spa=false). skip_tools leer für Basisdomain — feroxbuster und ZAP sollten beide laufen für vollständige Coverage. Exposed Databases (MariaDB, PostgreSQL) und Mail-Services sind separate Findings, nicht Web-spezifisch.",
+    "skip_tools": [],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi",
+     "cmdi"
+    ],
+    "zap_ajax_spider_enabled": false,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 80,
+    "zap_scan_policy": "standard",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 5,
+    "zap_threads": 5
+   },
+   "source": "ai_phase2_config"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"system_prompt\": \"Du bist ein Security-Scanner-Orchestrator. Du konfigurierst Phase-2-Scan-Tools optimal basierend auf dem erkannten Tech-Stack eines Hosts...",
+     "ref": "scan_results:ai_phase2_config_debug:116.202.77.64",
+     "tool": "ai_phase2_config_debug"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "116.202.77.64",
+   "id": "dec:ai_phase2_config_debug:116.202.77.64",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:23:37Z",
+   "payload": {
+    "cache_hit": true,
+    "model": "claude-haiku-4-5-20251001",
+    "status": "ok"
+   },
+   "source": "ai_phase2_config_debug"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"cisa_kev_matches\": 0, \"cves_enriched\": 0, \"false_positives\": 0, \"total_findings\": 0, \"valid_findings\": 0 }",
+     "ref": "scan_results:phase3_correlation",
+     "tool": "phase3_correlation"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:phase3_correlation:scan",
+   "mode": "active",
+   "note": "Bilanz der Korrelation, kein Befund.",
+   "observed_at": "2026-09-23T19:29:02Z",
+   "payload": {
+    "cisa_kev_matches": 0,
+    "cves_enriched": 0,
+    "false_positives": 0,
+    "fp_by_reason": {},
+    "total_findings": 0,
+    "valid_findings": 0
+   },
+   "source": "phase3_correlation"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "Lumbeck & Wolter vertreibt Schneidwerkzeuge für Fleischwölfe mit Apache httpd.",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "www.lumbeck-wolter.de",
+   "host_ip": "116.202.77.64",
+   "id": "dec:site_summary:www.lumbeck-wolter.de",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:17:03Z",
+   "payload": {
+    "classification": "web_content",
+    "confidence": 0.95,
+    "description": "Lumbeck & Wolter vertreibt Schneidwerkzeuge für Fleischwölfe mit Apache httpd.",
+    "is_real_content": true
+   },
+   "source": "site_summary"
+  }
+ ],
+ "dns": [
+  {
+   "bimi": {
+    "present": false
+   },
+   "caa": {
+    "issuers": [],
+    "present": false,
+    "records": []
+   },
+   "confidence": 1.0,
+   "dane": {
+    "https": false,
+    "smtp": false
+   },
+   "dangling_cnames": [],
+   "dkim": {
+    "present": true,
+    "probed": [
+     "1und1",
+     "amazonses",
+     "brevo",
+     "default",
+     "dkim",
+     "dkim-1",
+     "dkim-2",
+     "dkim01",
+     "dkim1",
+     "dkim2",
+     "email",
+     "fd",
+     "fd2",
+     "gmx",
+     "google",
+     "googledomains",
+     "hse1",
+     "hse2",
+     "ionos1",
+     "ionos2",
+     "k1",
+     "k2",
+     "key1",
+     "key2",
+     "mail",
+     "mailgun",
+     "mailin",
+     "mailjet",
+     "mailo",
+     "mandrill",
+     "mg",
+     "mj",
+     "mta",
+     "mta1",
+     "mta2",
+     "mxvault",
+     "pf2014",
+     "pm",
+     "postmark",
+     "primary",
+     "s1",
+     "s1024",
+     "s2",
+     "s2048",
+     "scph",
+     "scph0123",
+     "scph0124",
+     "secondary",
+     "selector",
+     "selector1",
+     "selector2",
+     "sendinblue",
+     "sib",
+     "sig1",
+     "sig2",
+     "smtp",
+     "smtpapi",
+     "strato1",
+     "strato2",
+     "t-online",
+     "zmail",
+     "zoho"
+    ],
+    "probed_basis": "scan",
+    "selectors": [
+     "hse1",
+     "hse2"
+    ]
+   },
+   "dmarc": {
+    "adkim": "r",
+    "aspf": "r",
+    "p": null,
+    "pct": 100,
+    "present": false,
+    "raw": null,
+    "rua": [],
+    "ruf": [],
+    "sp": null
+   },
+   "dnssec": {
+    "issues": [
+     "Domain is not DNSSEC-signed"
+    ],
+    "signed": false,
+    "valid": false
+   },
+   "domain": "lumbeck-wolter.de",
+   "evidence": [
+    {
+     "excerpt": "spf=v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all...",
+     "ref": "phase0/dns_records.json",
+     "tool": "dns_records"
+    },
+    {
+     "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
+     "ref": "phase0a/dns_security.json",
+     "tool": "dns_security"
+    }
+   ],
+   "id": "dns:lumbeck-wolter.de",
+   "mode": "active",
+   "mta_sts": {
+    "dns_record": false,
+    "mode": null,
+    "policy": false
+   },
+   "mx": [
+    "mx01.hornetsecurity.com",
+    "mx02.hornetsecurity.com",
+    "mx03.hornetsecurity.com",
+    "mx04.hornetsecurity.com"
+   ],
+   "ns": [
+    "ns1119.ui-dns.biz",
+    "ns1119.ui-dns.com",
+    "ns1119.ui-dns.de",
+    "ns1119.ui-dns.org"
+   ],
+   "observed_at": "2026-09-23T19:13:54Z",
+   "source": "dns_records",
+   "spf": {
+    "all_qualifier": "~all",
+    "raw": "v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all"
+   },
+   "tls_rpt": {
+    "present": false,
+    "rua": []
+   },
+   "zone_transfer": {
+    "allowed": false,
+    "ns_tested": [
+     "ns1119.ui-dns.biz",
+     "ns1119.ui-dns.com",
+     "ns1119.ui-dns.de",
+     "ns1119.ui-dns.org"
+    ]
+   }
+  }
+ ],
+ "fqdns": [
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "lumbeck-wolter.de:",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "116.202.77.64",
+   "http_status": null,
+   "id": "fqdn:lumbeck-wolter.de",
+   "is_primary": null,
+   "mode": "active",
+   "name": "lumbeck-wolter.de",
+   "observed_at": "2026-09-23T19:17:03Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null,
+   "wildcard": false
+  },
+  {
+   "aliases": [
+    {
+     "fqdn": "lumbeck-wolter.de",
+     "reason": "redirect",
+     "status": 200
+    }
+   ],
+   "body_hash": "638a0582057bbac46065bbdc3e6a1f753d544fc9255458c24eb6277df45eabc5",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "www.lumbeck-wolter.de: status=200 titel=Schneidwerkzeuge für Fleischwölfe | Lumbeck & Wolter final_url=https://www.lumbeck-wolter.de",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://www.lumbeck-wolter.de",
+   "host_ip": "116.202.77.64",
+   "http_status": 200,
+   "id": "fqdn:www.lumbeck-wolter.de",
+   "is_primary": true,
+   "mode": "active",
+   "name": "www.lumbeck-wolter.de",
+   "observed_at": "2026-09-23T19:17:03Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": "Schneidwerkzeuge für Fleischwölfe | Lumbeck & Wolter",
+   "waf": null,
+   "web_probe_reachable": true,
+   "wildcard": false
+  }
+ ],
+ "generator": {
+  "inputs": [
+   {
+    "kind": "tar",
+    "name": "c3d5724c-bdbf-4da8-982f-4f1a52210e28.tar.gz",
+    "sha256": "54324d0e5e6cdf671bfc7999ebd32ddc023364afc10597dcd3f658ed2febc8fe"
+   },
+   {
+    "kind": "tool_runs",
+    "name": "results.json",
+    "sha256": "47dcfb1d33fc76707a7b3510e1fc11b580a88b724d11e8e365e4b11869cddfa7"
+   },
+   {
+    "kind": "eol_feed",
+    "name": "eol_data_generated.py",
+    "sha256": "35b5eb969453fa4788c9b973bbd5988391e18ee83a5e221f1d13602436929372"
+   }
+  ],
+  "name": "reporter.facts",
+  "version": "1.0.0"
+ },
+ "hosts": [
+  {
+   "blocked": {
+    "detected": true,
+    "reason": "web_unreachable_after_portscan",
+    "source": "derived"
+   },
+   "cdn_provider": null,
+   "confidence": 1.0,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "Nmap done at Wed Sep 23 19:19:18 2026; 1 IP address (1 host up) scanned in 87.76 seconds",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "ip=116.202.77.64 rdns=dedi5705.your-server.de fqdns=lumbeck-wolter.de, www.lumbeck-wolter.de",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "lumbeck-wolter.de",
+    "www.lumbeck-wolter.de"
+   ],
+   "id": "host:116.202.77.64",
+   "ip": "116.202.77.64",
+   "mode": "active",
+   "nmap_state": "up",
+   "observed_at": "2026-09-23T19:19:18Z",
+   "ports_summary": {
+    "closed": 51,
+    "filtered": 936,
+    "open": 13
+   },
+   "provider": {
+    "country": "DE",
+    "isp": "Hetzner Online GmbH",
+    "usage_type": "Data Center/Web Hosting/Transit"
+   },
+   "reachable": true,
+   "reputation": {
+    "abuseipdb_score": 0,
+    "greynoise_classification": null,
+    "is_tor": false,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": "dedi5705.your-server.de",
+   "source": "nmap"
+  }
+ ],
+ "http": [
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": null,
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "www.lumbeck-wolter.de: erreichbar=nein",
+     "ref": "hosts/116.202.77.64/phase2/headers_www.lumbeck-wolter.de.json",
+     "tool": "header_check"
+    }
+   ],
+   "forms": [],
+   "fqdn": "www.lumbeck-wolter.de",
+   "headers": {},
+   "host_ip": "116.202.77.64",
+   "hsts": null,
+   "id": "http:www.lumbeck-wolter.de",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-09-23T19:24:07Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": false,
+   "score": null,
+   "security_headers": {},
+   "server_header": null,
+   "source": "header_check",
+   "spider_url_count": 3,
+   "status_code": null,
+   "technologies": [],
+   "url": "https://www.lumbeck-wolter.de",
+   "wordpress": null,
+   "x_feserver": null
+  }
+ ],
+ "passive": [
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "pulse_count": 0
+   },
+   "domain": "lumbeck-wolter.de",
+   "evidence": [
+    {
+     "excerpt": "pulse_count=0",
+     "ref": "phase0a/otx.json",
+     "tool": "otx"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:otx:lumbeck-wolter.de",
+   "mode": "passive",
+   "observed_at": "2026-09-23T19:13:39Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "otx",
+   "transport": null,
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOS...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:21 banner=220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOST LANG ru-RU.UTF...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:21",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 21,
+   "product": null,
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "SSH-2.0-mod_sftp Key type: ssh-ed25519 Key: AAAAC3NzaC1lZDI1NTE5AAAAIGFu5Fjuml/0rtF1KTmimKw1xoNLSG5hrr7401SzTajO Fingerprint: c0:d6:f0:fd:f1:96:ad:51:24:c9:3...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:22 banner=SSH-2.0-mod_sftp Key type: ssh-ed25519 Key: AAAAC3NzaC1lZDI1NTE5AAAAIGFu5Fjuml/0rtF1KTmimKw1xoNLSG5hrr7401SzTajO Fingerprint: c0:d6:f0:fd:f1:96:ad:51:24:c9:36:9c:83:c7:85:35...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:22",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 22,
+   "product": null,
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.2.110.187 [224.2.110.187] 250-SIZE 104857600 250-8BITMIME 250-ETRN...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:25 banner=220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.2.110.187 [224.2.110.187] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:25",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 25,
+   "product": null,
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 301 Moved Permanently Date: Tue, 22 Sep 2026 22:33:41 GMT Server: Apache X-dlm-no-waypoints: true X-Pingback: http://www.flott.de/xmlrpc.php Expires...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:80 Apache httpd banner=HTTP/1.1 301 Moved Permanently Date: Tue, 22 Sep 2026 22:33:41 GMT Server: Apache X-dlm-no-waypoints: true X-Pingback: http://www.flott.de/xmlrpc.php Expires: T...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:80",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 80,
+   "product": "Apache httpd",
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:110 banner=+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:110",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 110,
+   "product": null,
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-RE...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:143 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENAB...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:143",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 143,
+   "product": null,
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 200 OK Date: Tue, 22 Sep 2026 23:23:56 GMT Server: Apache X-dlm-no-waypoints: true X-Pingback: https://www.flott.de/xmlrpc.php Link: <https://www.fl...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:443 Apache httpd banner=HTTP/1.1 200 OK Date: Tue, 22 Sep 2026 23:23:56 GMT Server: Apache X-dlm-no-waypoints: true X-Pingback: https://www.flott.de/xmlrpc.php Link: <https://www.flot...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:443",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 443,
+   "product": "Apache httpd",
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.124.255.102 [224.124.255.102] 250-SIZE 104857600 250-8BITMIME 250-...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:465 banner=220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.124.255.102 [224.124.255.102] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELI...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:465",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 465,
+   "product": null,
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.129.54.193 [224.129.54.193] 250-SIZE 104857600 250-8BITMIME 250-ET...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:587 banner=220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.129.54.193 [224.129.54.193] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINI...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:587",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 587,
+   "product": null,
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID E...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:993 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITE...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:993",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 993,
+   "product": null,
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:995 banner=+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:995",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 995,
+   "product": null,
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "MariaDB: Protocol Version: 10 Version: 10.11.18-MariaDB-0+deb12u1 Capabilities: 65534 Server Language: 33 Server Status: 2 Extended Server Capabilities: 3327...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:3306 MariaDB 10.11.18-MariaDB-0+deb12u1 banner=MariaDB: Protocol Version: 10 Version: 10.11.18-MariaDB-0+deb12u1 Capabilities: 65534 Server Language: 33 Server Status: 2 Extended Serv...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:3306",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 3306,
+   "product": "MariaDB",
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": "10.11.18-MariaDB-0+deb12u1"
+  },
+  {
+   "banner_excerpt": "\"IMPLEMENTATION\" \"Dovecot (Debian) Pigeonhole\"\\r\\n\"SIEVE\" \"fileinto reject envelope encoded-character vacation subaddress comparator-i;ascii-numeric relation...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:4190 banner=\"IMPLEMENTATION\" \"Dovecot (Debian) Pigeonhole\"\\r\\n\"SIEVE\" \"fileinto reject envelope encoded-character vacation subaddress comparator-i;ascii-numeric relational regex imap4...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:4190",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 4190,
+   "product": null,
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "PostgreSQL FATAL: no pg_hba.conf entry for host \"224.238.127.246\", user \"postgres\", database \"template0\", SSL encryption FATAL: no pg_hba.conf entry for host...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "116.202.77.64:5432 PostgreSQL 9.6.0 or later banner=PostgreSQL FATAL: no pg_hba.conf entry for host \"224.238.127.246\", user \"postgres\", database \"template0\", SSL encryption FATAL: no pg_hba.conf en...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "116.202.77.64",
+   "hostnames": [
+    "dedi5705.your-server.de",
+    "flott.de",
+    "www.flott.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:116.202.77.64:5432",
+   "mode": "passive",
+   "observed_at": "2026-09-23T14:41:24Z",
+   "port": 5432,
+   "product": "PostgreSQL",
+   "seen_at": "2026-09-23T14:41:24Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": "9.6.0 or later"
+  },
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "compromised": false
+   },
+   "domain": "lumbeck-wolter.de",
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:urlhaus:lumbeck-wolter.de",
+   "mode": "passive",
+   "observed_at": "2026-09-23T19:13:39Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "urlhaus",
+   "transport": null,
+   "verified": null,
+   "version": null
+  }
+ ],
+ "scan": {
+  "confidence": 1.0,
+  "counts": {
+   "correlated_findings": 0,
+   "correlated_fp": 0,
+   "tool_runs": 44
+  },
+  "domain": "lumbeck-wolter.de",
+  "domains": [
+   "lumbeck-wolter.de"
+  ],
+  "evidence": [
+   {
+    "excerpt": "Beginn=2026-09-23T19:13:39.552653+00:00 Ende=2026-09-23T19:29:02.419262+00:00",
+    "ref": "meta.json",
+    "tool": "meta"
+   }
+  ],
+  "finished_at": "2026-09-23T19:29:02Z",
+  "hosts_scanned": 1,
+  "id": "scan:c3d5724c-bdbf-4da8-982f-4f1a52210e28",
+  "mode": "active",
+  "nmap_args": "nmap -Pn -n -sV --version-intensity 7 -sC --script-timeout 60s -T4 --max-retries 2 --host-timeout 240s --min-rate 100 --defeat-rst-ratelimit --top-ports 1000 --open -oX <scan-dir> -oN <scan-dir> --reason 116.202.77.64",
+  "observed_at": "2026-09-23T19:29:02Z",
+  "order_id": "c3d5724c-bdbf-4da8-982f-4f1a52210e28",
+  "package": "perimeter",
+  "policy_version": null,
+  "scanner_egress": "62.217.52.174",
+  "source": "meta",
+  "started_at": "2026-09-23T19:13:39Z",
+  "tool_versions": [
+   {
+    "name": "dnsx",
+    "version": null
+   },
+   {
+    "name": "feroxbuster",
+    "version": "2.11.0"
+   },
+   {
+    "name": "ffuf",
+    "version": "2.1.0"
+   },
+   {
+    "name": "gobuster",
+    "version": null
+   },
+   {
+    "name": "httpx",
+    "version": null
+   },
+   {
+    "name": "nmap",
+    "version": "7.93"
+   },
+   {
+    "name": "searchsploit",
+    "version": null
+   },
+   {
+    "name": "subfinder",
+    "version": "2.13.0"
+   },
+   {
+    "name": "testssl.sh",
+    "version": null
+   },
+   {
+    "name": "wafw00f",
+    "version": null
+   },
+   {
+    "name": "wpscan",
+    "version": null
+   }
+  ]
+ },
+ "schema_version": "1.0.5",
+ "services": [
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "21/tcp open ftp ProFTPD (requires SSL)",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "proftpd",
+   "host_ip": "116.202.77.64",
+   "id": "svc:116.202.77.64:21/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "port": 21,
+   "product": "ProFTPD",
+   "proto": "tcp",
+   "service": "ftp",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "22/tcp open ssh ProFTPD mod_sftp (protocol 2.0)",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "proftpd_sftp",
+   "host_ip": "116.202.77.64",
+   "id": "svc:116.202.77.64:22/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "port": 22,
+   "product": "ProFTPD mod_sftp",
+   "proto": "tcp",
+   "service": "ssh",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "80/tcp open http Apache httpd",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "apache",
+   "host_ip": "116.202.77.64",
+   "id": "svc:116.202.77.64:80/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "port": 80,
+   "product": "Apache httpd",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [
+    "STLS",
+    "TOP",
+    "PIPELINING",
+    "SASL",
+    "CAPA",
+    "RESP-CODES",
+    "AUTH-RESP-CODE",
+    "UIDL"
+   ],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "110/tcp open pop3 Courier pop3d",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "pop3-capabilities: STLS TOP PIPELINING SASL CAPA RESP-CODES AUTH-RESP-CODE UIDL",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "courier",
+   "host_ip": "116.202.77.64",
+   "id": "svc:116.202.77.64:110/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "port": 110,
+   "product": "Courier pop3d",
+   "proto": "tcp",
+   "service": "pop3",
+   "source": "nmap",
+   "starttls": true,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [
+    "more",
+    "have",
+    "STARTTLS",
+    "OK",
+    "listed",
+    "IDLE",
+    "ID",
+    "SASL-IR",
+    "capabilities",
+    "IMAP4rev1",
+    "ENABLE",
+    "post-login",
+    "LOGIN-REFERRALS",
+    "LITERAL+",
+    "LOGINDISABLEDA0001",
+    "Pre-login"
+   ],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "143/tcp open imap Dovecot imapd",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "imap-capabilities: more have STARTTLS OK listed IDLE ID SASL-IR capabilities IMAP4rev1 ENABLE post-login LOGIN-REFERRALS LITERAL+ LOGINDISABLEDA0001 Pre-login",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "dovecot",
+   "host_ip": "116.202.77.64",
+   "id": "svc:116.202.77.64:143/tcp",
+   "login_disabled": true,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "port": 143,
+   "product": "Dovecot imapd",
+   "proto": "tcp",
+   "service": "imap",
+   "source": "nmap",
+   "starttls": true,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "222/tcp open ssh OpenSSH 9.2p1 (protocol 2.0)",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "openssh",
+   "host_ip": "116.202.77.64",
+   "id": "svc:116.202.77.64:222/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "port": 222,
+   "product": "OpenSSH",
+   "proto": "tcp",
+   "service": "ssh",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": "9.2p1",
+   "version_raw": "9.2p1"
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http Apache httpd tunnel=ssl",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "apache",
+   "host_ip": "116.202.77.64",
+   "id": "svc:116.202.77.64:443/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "port": 443,
+   "product": "Apache httpd",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "dedi5705.your-server.de Hello nmap.scanme.org [62.217.52.174]",
+    "SIZE 104857600",
+    "8BITMIME",
+    "ETRN",
+    "PIPELINING",
+    "PIPECONNECT",
+    "AUTH LOGIN PLAIN",
+    "CHUNKING",
+    "HELP"
+   ],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "465/tcp open smtp tunnel=ssl",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "smtp-commands: dedi5705.your-server.de Hello nmap.scanme.org [62.217.52.174], SIZE 104857600, 8BITMIME, ETRN, PIPELINING, PIPECONNECT, AUTH LOGIN PLAIN, CHUNKING, HELP Commands supported: AUTH HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSET...",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "116.202.77.64",
+   "id": "svc:116.202.77.64:465/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "port": 465,
+   "product": null,
+   "proto": "tcp",
+   "service": "smtp",
+   "source": "nmap",
+   "starttls": false,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [
+    "dedi5705.your-server.de Hello nmap.scanme.org [62.217.52.174]",
+    "SIZE 104857600",
+    "8BITMIME",
+    "ETRN",
+    "PIPELINING",
+    "PIPECONNECT",
+    "CHUNKING",
+    "STARTTLS",
+    "HELP"
+   ],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "587/tcp open smtp",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "smtp-commands: dedi5705.your-server.de Hello nmap.scanme.org [62.217.52.174], SIZE 104857600, 8BITMIME, ETRN, PIPELINING, PIPECONNECT, CHUNKING, STARTTLS, HELP Commands supported: AUTH STARTTLS HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSE...",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "116.202.77.64",
+   "id": "svc:116.202.77.64:587/tcp",
+   "login_disabled": true,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "port": 587,
+   "product": null,
+   "proto": "tcp",
+   "service": "smtp",
+   "source": "nmap",
+   "starttls": true,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "AUTH=PLAINA0001",
+    "have",
+    "more",
+    "ENABLE",
+    "IDLE",
+    "ID",
+    "SASL-IR",
+    "listed",
+    "IMAP4rev1",
+    "capabilities",
+    "post-login",
+    "LOGIN-REFERRALS",
+    "LITERAL+",
+    "OK",
+    "Pre-login"
+   ],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 0.3,
+   "evidence": [
+    {
+     "excerpt": "993/tcp open imaps",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "imap-capabilities: AUTH=PLAINA0001 have more ENABLE IDLE ID SASL-IR listed IMAP4rev1 capabilities post-login LOGIN-REFERRALS LITERAL+ OK Pre-login",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "116.202.77.64",
+   "id": "svc:116.202.77.64:993/tcp",
+   "login_disabled": false,
+   "method": "table",
+   "mode": "active",
+   "nmap_conf": 3,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "port": 993,
+   "product": null,
+   "proto": "tcp",
+   "service": "imaps",
+   "source": "nmap",
+   "starttls": false,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "USER",
+    "TOP",
+    "PIPELINING",
+    "SASL(PLAIN)",
+    "CAPA",
+    "RESP-CODES",
+    "AUTH-RESP-CODE",
+    "UIDL"
+   ],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 0.3,
+   "evidence": [
+    {
+     "excerpt": "995/tcp open pop3s",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "pop3-capabilities: USER TOP PIPELINING SASL(PLAIN) CAPA RESP-CODES AUTH-RESP-CODE UIDL",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "116.202.77.64",
+   "id": "svc:116.202.77.64:995/tcp",
+   "login_disabled": null,
+   "method": "table",
+   "mode": "active",
+   "nmap_conf": 3,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "port": 995,
+   "product": null,
+   "proto": "tcp",
+   "service": "pop3s",
+   "source": "nmap",
+   "starttls": false,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "mysql_native_password"
+   ],
+   "auth_required": true,
+   "capabilities": [],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2030-02-10T15:03:07Z",
+    "san": [
+     "*.your-database.de",
+     "*.your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "mysql-info: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 1208244 Capabilities flags: 65534 Some Capabilities: FoundRows, Support41Auth, LongColumnFlag, Speaks41ProtocolOld, SupportsTransactions, SupportsCompression,...",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "mariadb",
+   "host_ip": "116.202.77.64",
+   "id": "svc:116.202.77.64:3306/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "port": 3306,
+   "product": "MySQL",
+   "proto": "tcp",
+   "service": "mysql",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": "10.11.18",
+   "version_raw": "5.5.5-10.11.18-MariaDB-0+deb12u1"
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2030-02-10T15:08:59Z",
+    "san": [
+     "*.your-database.de",
+     "*.your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "5432/tcp open postgresql PostgreSQL DB 9.6.0 or later",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "postgresql",
+   "host_ip": "116.202.77.64",
+   "id": "svc:116.202.77.64:5432/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "port": 5432,
+   "product": "PostgreSQL DB",
+   "proto": "tcp",
+   "service": "postgresql",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": "9.6.0 or later"
+  }
+ ],
+ "software": [
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http Apache httpd tunnel=ssl",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "80/tcp open http Apache httpd",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "server: Apache httpd",
+     "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Apache httpd",
+     "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "apache",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "116.202.77.64",
+   "id": "sw:116.202.77.64:-:apache:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "product": "Apache httpd",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "110/tcp open pop3 Courier pop3d",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Courier pop3d",
+     "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "courier",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "116.202.77.64",
+   "id": "sw:116.202.77.64:-:courier:unknown",
+   "kind": "mail",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "product": "Courier",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "143/tcp open imap Dovecot imapd",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Dovecot imapd",
+     "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "dovecot",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "116.202.77.64",
+   "id": "sw:116.202.77.64:-:dovecot:unknown",
+   "kind": "mail",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "product": "Dovecot",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": "debian",
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
+     "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "mariadb",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "116.202.77.64",
+   "id": "sw:116.202.77.64:-:mariadb:10.11.18",
+   "kind": "database",
+   "mode": "active",
+   "note": "MariaDB-Kompatibilitaetspraefix 5.5.5 entfernt",
+   "observed_at": "2026-09-23T19:19:18Z",
+   "product": "MariaDB",
+   "source": "nmap",
+   "version_norm": "10.11.18",
+   "version_raw": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "222/tcp open ssh OpenSSH 9.2p1 (protocol 2.0)",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: OpenSSH 9.2p1",
+     "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "openssh",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "116.202.77.64",
+   "id": "sw:116.202.77.64:-:openssh:9.2p1",
+   "kind": "ssh",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "product": "OpenSSH",
+   "source": "nmap",
+   "version_norm": "9.2p1",
+   "version_raw": "9.2p1",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "5432/tcp open postgresql PostgreSQL DB 9.6.0 or later",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: PostgreSQL DB 9.6.0 or later",
+     "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "postgresql",
+   "fqdn": null,
+   "hints": [
+    "9.6.0 or later"
+   ],
+   "host_ip": "116.202.77.64",
+   "id": "sw:116.202.77.64:-:postgresql:unknown",
+   "kind": "database",
+   "mode": "active",
+   "note": "Bereichsangabe, Version nicht bestimmbar",
+   "observed_at": "2026-09-23T19:19:18Z",
+   "product": "PostgreSQL",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": "9.6.0 or later",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "21/tcp open ftp ProFTPD (requires SSL)",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: ProFTPD",
+     "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "proftpd",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "116.202.77.64",
+   "id": "sw:116.202.77.64:-:proftpd:unknown",
+   "kind": "ftp",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "product": "ProFTPD",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "22/tcp open ssh ProFTPD mod_sftp (protocol 2.0)",
+     "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: ProFTPD mod_sftp",
+     "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "proftpd_sftp",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "116.202.77.64",
+   "id": "sw:116.202.77.64:-:proftpd_sftp:unknown",
+   "kind": "ssh",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-23T19:19:18Z",
+   "product": "ProFTPD mod_sftp",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  }
+ ],
+ "targets": [
+  {
+   "confidence": 1.0,
+   "discovery_health": {
+    "ct_sources_empty": false,
+    "discovery_added_count": 5,
+    "snapshot_age_minutes": null,
+    "snapshot_seed_count": 0,
+    "snapshot_seeded": false,
+    "tool_counts": {
+     "certspotter": 2,
+     "crtsh": 1,
+     "gobuster_dns": 3,
+     "phase0a_passive": 1,
+     "subfinder": 1
+    },
+    "tools_with_zero_results": [],
+    "total_subdomains": 5
+   },
+   "domain": "lumbeck-wolter.de",
+   "evidence": [
+    {
+     "excerpt": "domain=lumbeck-wolter.de",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "id": "target:lumbeck-wolter.de",
+   "is_primary": true,
+   "mode": "active",
+   "observed_at": "2026-09-23T19:13:39Z",
+   "out_of_scope": [],
+   "source": "host_inventory",
+   "targets_source": "orders.json",
+   "whois": null
+  }
+ ],
+ "threats": [],
+ "tls": [],
+ "unprocessed": [],
+ "warnings": []
+}

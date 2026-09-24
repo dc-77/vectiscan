@@ -1,0 +1,459 @@
+{
+ "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/heuel-0923.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
+ "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
+ "strict": false,
+ "orders": {
+  "main": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8"
+ },
+ "findings": {
+  "VS-2026-001": {
+   "checks": [
+    "admin_service_exposed_passive"
+   ],
+   "spec09": "Q13",
+   "warum": "4433 nur aus einem Shodan-Banner „Server: xxxx“ vom 11.09. ohne Fingerabdruck; ein Verwaltungsdienst ist nicht belegt."
+  },
+  "VS-2026-002": {
+   "checks": [
+    "caa_missing"
+   ]
+  },
+  "VS-2026-003": {
+   "checks": [
+    "cors_misconfiguration"
+   ],
+   "spec09": "Q14",
+   "warum": "ZAP-Meldung „Cross-Domain Misconfiguration“ mit Konfidenz Medium; unter Konfidenz High nur Werkzeugmeldung."
+  },
+  "VS-2026-004": {
+   "checks": [
+    "csp_missing"
+   ],
+   "spec09": "Q8",
+   "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
+  },
+  "VS-2026-005": {
+   "checks": [
+    "csp_missing"
+   ],
+   "spec09": "Q8",
+   "warum": "Gemessen an der Vercel-Challenge (429 Security Checkpoint), nicht an der Anwendung."
+  },
+  "VS-2026-006": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-007": {
+   "checks": [
+    "csp_weak"
+   ]
+  },
+  "VS-2026-008": {
+   "checks": [
+    "csrf_token_missing"
+   ],
+   "spec09": "Q14",
+   "warum": "ZAP-Meldung „Absence of Anti-CSRF Tokens“ mit Konfidenz Low; unter Konfidenz High nur Werkzeugmeldung, Quelle passiv (ZAP). Am Portal login.seam."
+  },
+  "VS-2026-009": {
+   "checks": [
+    "csrf_token_missing"
+   ],
+   "spec09": "Q14",
+   "warum": "ZAP-Meldung „Absence of Anti-CSRF Tokens“ mit Konfidenz Low; unter Konfidenz High nur Werkzeugmeldung, Quelle passiv (ZAP)."
+  },
+  "VS-2026-010": {
+   "checks": [
+    "dane_missing"
+   ],
+   "spec09": "Q4",
+   "warum": "Der MX liegt in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
+  },
+  "VS-2026-011": {
+   "checks": [
+    "dmarc_quarantine"
+   ]
+  },
+  "VS-2026-012": {
+   "checks": [
+    "dnssec_missing"
+   ]
+  },
+  "VS-2026-013": {
+   "checks": [
+    "hsts_missing"
+   ],
+   "spec09": "Q8",
+   "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
+  },
+  "VS-2026-014": {
+   "checks": [
+    "hsts_missing"
+   ],
+   "spec09": "Q8",
+   "warum": "Gemessen an der Vercel-Challenge (429 Security Checkpoint), nicht an der Anwendung."
+  },
+  "VS-2026-015": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-016": {
+   "checks": [
+    "http_alt_port"
+   ]
+  },
+  "VS-2026-017": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-018": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-019": {
+   "checks": [
+    "legacy_protocols_present"
+   ]
+  },
+  "VS-2026-020": {
+   "checks": [
+    "legacy_protocols_present"
+   ],
+   "spec09": "Q3",
+   "warum": "213.133.104.51 ist Hetzner-Webhosting (www51.your-server.de, auch help-ev.de); POP3, IMAP und FTP sind Dienste des Hosters, die der Kunde nicht abschalten kann."
+  },
+  "VS-2026-021": {
+   "checks": [
+    "mta_sts_missing"
+   ]
+  },
+  "VS-2026-022": {
+   "checks": [
+    "security_headers_incomplete"
+   ],
+   "spec09": "Q8",
+   "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
+  },
+  "VS-2026-023": {
+   "checks": [
+    "security_headers_incomplete"
+   ],
+   "spec09": "Q8",
+   "warum": "Gemessen an der Vercel-Challenge (429 Security Checkpoint), nicht an der Anwendung."
+  },
+  "VS-2026-024": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-025": {
+   "checks": [
+    "service_banner_version"
+   ],
+   "spec09": "Q4, Q3",
+   "warum": "Das SSH-Banner gehört zum Protokoll und lässt sich nicht entfernen. Dienst des Hetzner-Webhostings 213.133.104.51."
+  },
+  "VS-2026-026": {
+   "checks": [
+    "spf_softfail"
+   ]
+  },
+  "VS-2026-027": {
+   "checks": [
+    "sri_missing"
+   ]
+  },
+  "VS-2026-028": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-029": {
+   "checks": [
+    "tls_rpt_missing"
+   ]
+  }
+ },
+ "positives": {
+  "VS-2026-P01": {
+   "checks": [
+    "cert_chain_incomplete"
+   ]
+  },
+  "VS-2026-P02": {
+   "checks": [
+    "cert_chain_incomplete"
+   ]
+  },
+  "VS-2026-P03": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P04": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P05": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P06": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P07": {
+   "checks": [
+    "cert_hostname_mismatch"
+   ]
+  },
+  "VS-2026-P08": {
+   "checks": [
+    "cert_hostname_mismatch"
+   ]
+  },
+  "VS-2026-P09": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-P10": {
+   "checks": [
+    "db_exposed"
+   ],
+   "spec09": "Q9",
+   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+  },
+  "VS-2026-P11": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-P12": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-P13": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-P14": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-P15": {
+   "checks": [
+    "dkim_missing"
+   ]
+  },
+  "VS-2026-P16": {
+   "checks": [
+    "dmarc_missing"
+   ]
+  },
+  "VS-2026-P17": {
+   "checks": [
+    "dns_dangling_cname"
+   ]
+  },
+  "VS-2026-P18": {
+   "checks": [
+    "dns_zone_transfer"
+   ]
+  },
+  "VS-2026-P19": {
+   "checks": [
+    "ftp_plaintext"
+   ]
+  },
+  "VS-2026-P20": {
+   "checks": [
+    "ftp_plaintext"
+   ]
+  },
+  "VS-2026-P21": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-P22": {
+   "checks": [
+    "hsts_short"
+   ]
+  },
+  "VS-2026-P23": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P24": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P25": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P26": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P27": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P28": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P29": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P30": {
+   "checks": [
+    "ip_reputation"
+   ],
+   "spec09": "Q12",
+   "warum": "AbuseIPDB meldet für 216.150.1.65 totalReports 26 von 9 Nutzern, zuletzt 2026-09-21; Score 0 nur wegen isWhitelisted."
+  },
+  "VS-2026-P31": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P32": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P33": {
+   "checks": [
+    "mail_plaintext"
+   ]
+  },
+  "VS-2026-P34": {
+   "checks": [
+    "rdp_exposed"
+   ],
+   "spec09": "Q9",
+   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+  },
+  "VS-2026-P35": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P36": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P37": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P38": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P39": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-P40": {
+   "checks": [
+    "smb_exposed"
+   ],
+   "spec09": "Q9",
+   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+  },
+  "VS-2026-P41": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P42": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P43": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P44": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P45": {
+   "checks": [
+    "spf_missing"
+   ]
+  },
+  "VS-2026-P46": {
+   "checks": [
+    "tls_legacy_protocols"
+   ]
+  },
+  "VS-2026-P47": {
+   "checks": [
+    "tls_legacy_protocols"
+   ]
+  },
+  "VS-2026-P48": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P49": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P50": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P51": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P52": {
+   "checks": [
+    "urlhaus_compromise"
+   ]
+  },
+  "VS-2026-P53": {
+   "checks": [
+    "waf_present"
+   ]
+  }
+ },
+ "subsumed": {},
+ "expected_coverage_differences": [],
+ "expected_member_differences": []
+}

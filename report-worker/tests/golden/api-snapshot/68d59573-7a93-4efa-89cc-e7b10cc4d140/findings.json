@@ -1,0 +1,2038 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 3,
+   "info": 0,
+   "low": 6,
+   "medium": 3
+  },
+  "business_impact_score": "5.8",
+  "catalog_version": "2026-09-23.2",
+  "engine": "catalog",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "facts_schema_version": "1.0.4",
+  "findings": [
+   {
+    "affected": "92.205.224.174:8443 (Plesk)",
+    "category": "A",
+    "description": "Der Host 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) bietet eine Verwaltungs- oder Firewall-Oberfläche an, die aus dem gesamten Internet erreichbar ist: 92.205.224.174:8443 (Plesk). Eine Zugriffsbeschränkung auf bestimmte Quellnetze ist von außen nicht erkennbar.",
+    "evidence": "nmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:8443/tcp Dienst=https-alt Produkt=sw-cp-server Zustand=open TLS erzwungen=ja\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\n8443/tcp open https-alt sw-cp-server tunnel=ssl",
+    "id": "VS-2026-001",
+    "impact": "Der Host 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) stellt mit 92.205.224.174:8443 (Plesk) eine Verwaltungs- oder Firewall-Oberfläche bereit, die aus dem gesamten Internet erreichbar ist; eine Beschränkung auf bestimmte Quellnetze ist von außen nicht erkennbar. Solche Oberflächen sind ein hochwertiges Ziel, da eine Übernahme den gesamten Anschluss samt der dahinter liegenden Systeme betrifft. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen.",
+    "level": "erhöht",
+    "policy_id": "admin_service_exposed",
+    "recommendation": "Unverzüglich: Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.\nIn Kürze: Mehrfaktor-Anmeldung für die Verwaltungsoberfläche aktivieren und Standardkonten deaktivieren oder umbenennen.\nMittelfristig: Softwarestand der Verwaltungsoberfläche gegen die Sicherheitshinweise des Herstellers abgleichen und Anmeldeversuche überwachen.",
+    "scale": "exposure",
+    "severity": "HIGH",
+    "source": "aktiv (nmap)",
+    "title": "Verwaltungsoberfläche aus dem Internet erreichbar",
+    "urgency": "In Kürze",
+    "verification": "Verbindungsversuch auf den betroffenen Port von einer externen Adresse außerhalb der freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung."
+   },
+   {
+    "affected": "92.205.224.174:21 (FTP ohne TLS-Zwang)",
+    "category": "A",
+    "description": "Auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) nehmen Datei- oder Mailzugänge eine Anmeldung entgegen, ohne eine Transportverschlüsselung zu erzwingen: 92.205.224.174:21 (FTP ohne TLS-Zwang).",
+    "evidence": "nmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open",
+    "id": "VS-2026-002",
+    "impact": "Auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) nimmt 92.205.224.174:21 (FTP ohne TLS-Zwang) eine Anmeldung entgegen, ohne eine Transportverschlüsselung zu erzwingen. Anmeldedaten und Inhalte gehen damit im Klartext über das Netz. Jeder Mitleser auf dem Übertragungsweg kann sie abgreifen und für weitere Zugriffe auf den Dienst oder auf wiederverwendete Konten nutzen.",
+    "level": "erhöht",
+    "policy_id": "ftp_plaintext",
+    "recommendation": "Unverzüglich: Auf den betroffenen Diensten die Transportverschlüsselung erzwingen, sodass eine Anmeldung ohne aufgebautes TLS abgelehnt wird.\nIn Kürze: Zugangsdaten rotieren und die Zugriffsprotokolle auf unverschlüsselte Anmeldeversuche prüfen.\nMittelfristig: Prüfen, ob die Klartextzugänge abgeschaltet werden können, und den Zugang danach auf Protokolle mit eingebauter Verschlüsselung beschränken.",
+    "scale": "exposure",
+    "severity": "HIGH",
+    "source": "aktiv (nmap)",
+    "title": "Datei- und Mailzugänge auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ohne erzwungene Transportverschlüsselung",
+    "urgency": "In Kürze",
+    "verification": "Anmeldung an den genannten Diensten versuchen, bevor eine Transportverschlüsselung aufgebaut ist; erwartet wird die Ablehnung dieser Anmeldung."
+   },
+   {
+    "affected": "198.202.211.1:2083 (unbekannt, laut Passivquelle), 198.202.211.1:2087 (unbekannt, laut Passivquelle), 198.202.211.1:8880 (unbekannt, laut Passivquelle), 92.205.224.174:8880 (unbekannt, laut Passivquelle)",
+    "category": "A",
+    "description": "Eine Passivquelle meldet für 198.202.211.1 (www.bergersysteme.com), 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 198.202.211.1:2083 (unbekannt, laut Passivquelle), 198.202.211.1:2087 (unbekannt, laut Passivquelle), 198.202.211.1:8880 (unbekannt, laut Passivquelle), 92.205.224.174:8880 (unbekannt, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
+    "evidence": "shodan · phase0a/shodan_hosts.json\nQuelle=shodan 198.202.211.1:2083 gesehen am=2026-09-23T12:57:05Z Banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Wed, 23 Sep 2026 12:52:31 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -\n\nshodan · phase0a/shodan_hosts.json\n198.202.211.1:2083 banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Wed, 23 Sep 2026 12:52:31 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -\n\nshodan · phase0a/shodan_hosts.json\nQuelle=shodan 198.202.211.1:2087 gesehen am=2026-09-23T12:57:05Z Banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Wed, 23 Sep 2026 11:28:46 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -\n\nshodan · phase0a/shodan_hosts.json\n198.202.211.1:2087 banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Wed, 23 Sep 2026 11:28:46 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -\n\nshodan · phase0a/shodan_hosts.json\nQuelle=shodan 198.202.211.1:8880 gesehen am=2026-09-23T12:57:05Z Banner=HTTP/1.1 403 Forbidden Date: Tue, 22 Sep 2026 18:36:23 GMT Content-Type: text/html; charset=UTF-8 Content-Length: 4549 Connection: keep-alive Cache-Control:...\n\nshodan · phase0a/shodan_hosts.json\n198.202.211.1:8880 banner=HTTP/1.1 403 Forbidden Date: Tue, 22 Sep 2026 18:36:23 GMT Content-Type: text/html; charset=UTF-8 Content-Length: 4549 Connection: keep-alive Cache-Control: private, max-a...\n\nund 2 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
+    "id": "VS-2026-003",
+    "impact": "Eine Passivquelle meldet für 198.202.211.1 (www.bergersysteme.com) und 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) eine Verwaltungs- oder Firewall-Oberfläche auf 198.202.211.1:2083, 198.202.211.1:2087, 198.202.211.1:8880 und 92.205.224.174:8880, die der Portscan nicht bestätigen konnte, weil der Port außerhalb der geprüften Ports lag oder vom Scanner aus gefiltert war. Ob es sich um ein Anmeldeportal oder die Administrationsoberfläche handelt, ist von außen nicht erkennbar. Eine Übernahme einer solchen Oberfläche betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme.",
+    "level": "hoch",
+    "policy_id": "admin_service_exposed_passive",
+    "recommendation": "In Kürze: Firmware gegen die Sicherheitshinweise des Herstellers abgleichen; lokale Benutzerkonten und Standardkonten prüfen.\nIn Kürze: Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand.\nMittelfristig: Zugriff auf benötigte Quellnetze beschränken und Anmeldeversuche überwachen.",
+    "scale": "hygiene",
+    "severity": "HIGH",
+    "source": "passiv (shodan)",
+    "title": "Verwaltungsoberfläche laut Passivquelle erreichbar",
+    "urgency": "In Kürze",
+    "verification": "Verbindungsversuch auf den gemeldeten Port von einer externen Adresse; erwartet wird keine Verwaltungsanmeldung ohne Zugriffsbeschränkung."
+   },
+   {
+    "affected": "62.217.52.166:443 (Microsoft IIS httpd 10.0, laut Passivquelle)",
+    "category": "B",
+    "description": "Für 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com) meldet eine Passivquelle eine Dienstversion, die der Portscan nicht bestätigen konnte: 62.217.52.166:443 (Microsoft IIS httpd 10.0, laut Passivquelle).",
+    "evidence": "shodan · phase0a/shodan_hosts.json\nQuelle=shodan 62.217.52.166:443 Produkt=Microsoft IIS httpd Version=10.0 gesehen am=2026-09-23T08:43:38Z Banner=HTTP/1.1 302 Moved Temporarily Cache-Control: no-cache Pragma: no-cache Location: https://62.217.52.166/owa/ Server: Microsof...\n\nshodan · phase0a/shodan_hosts.json\n62.217.52.166:443 Microsoft IIS httpd 10.0 banner=HTTP/1.1 302 Moved Temporarily Cache-Control: no-cache Pragma: no-cache Location: https://62.217.52.166/owa/ Server: Microsoft-IIS/10.0 X-FEServer:...",
+    "id": "VS-2026-004",
+    "impact": "Für 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com) meldet eine Passivquelle mit 62.217.52.166:443 (Microsoft IIS httpd 10.0) eine Dienstversion, die der Portscan nicht bestätigen konnte. Ohne aktive Bestätigung bleibt offen, ob Dienst und Version noch aktuell sind. Ein veralteter Patchstand bleibt so unentdeckt, und der Dienst kann außerhalb der eigentlich vorgesehenen Zustellwege erreichbar sein.",
+    "level": "mittel",
+    "policy_id": "passive_service_version_unverified",
+    "recommendation": "In Kürze: Anhand einer aktiven Prüfung feststellen, ob Dienst und Version aus der Passivquelle noch zutreffen, und den Patchstand mit den Sicherheitshinweisen des Herstellers abgleichen.\nMittelfristig: Zugriff auf den Dienst auf die Netze beschränken, aus denen eine Zustellung tatsächlich erfolgen muss.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "passiv (shodan)",
+    "title": "Dienstversion laut Passivquelle unbestätigt",
+    "urgency": "Mittelfristig",
+    "verification": "Verbindung zum gemeldeten Port herstellen und die zurückgegebene Version mit dem aktuellen Patchstand des Herstellers abgleichen."
+   },
+   {
+    "affected": "bergersysteme.com (p=none)",
+    "category": "C",
+    "description": "Für bergersysteme.com sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: bergersysteme.com (p=none).",
+    "evidence": "dns_records · phase0/dns_records.json\nbergersysteme.com: SPF=v=spf1 a:mail.bergersysteme.com ip4:62.217.52.167 include:spf.protection.outlook.com include:spf-de.emailsignatures365.com redirect=bergersysteme.com.spf.hornetdmarc.com DMARC=v=DMARC1; p=none; pct=100; rua=mailto:...",
+    "id": "VS-2026-005",
+    "impact": "Für bergersysteme.com ist die Richtlinie zur Absender-Authentizität mit p=none nicht scharf gestellt. Ein Empfangssystem erfährt damit zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
+    "level": "mittel",
+    "policy_id": "dmarc_none",
+    "recommendation": "In Kürze: Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.\nMittelfristig: Die Richtlinie stufenweise auf Zurückweisung stellen, sobald alle Versandquellen erfasst sind, und den Abgleich der Absender scharf schalten.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (dns_records)",
+    "title": "Richtlinie zur Absender-Authentizität für bergersysteme.com nicht durchsetzend",
+    "urgency": "Mittelfristig",
+    "verification": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
+   },
+   {
+    "affected": "bergersysteme.com, ftp.bergersysteme.com, bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), ftp.bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
+    "category": "D",
+    "description": "Die Webdienste auf 92.205.224.174 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: bergersysteme.com, ftp.bergersysteme.com, bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), ftp.bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
+    "evidence": "header_check · hosts/92.205.224.174/phase2/headers_bergersysteme.com.json\nbergersysteme.com: URL=https://bergersysteme.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx\n\nheader_check · hosts/92.205.224.174/phase2/headers_ftp.bergersysteme.com.json\nftp.bergersysteme.com: URL=https://ftp.bergersysteme.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx",
+    "id": "VS-2026-006",
+    "impact": "Die Webdienste auf 92.205.224.174 liefern Sicherheits-Header unvollständig oder ohne wirksame Einschränkung aus; bei bergersysteme.com und ftp.bergersysteme.com fehlen x-frame-options, x-content-type-options, referrer-policy und permissions-policy. Diese Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen, und ein einzelner Fehler in der Anwendung wirkt sofort nach außen.",
+    "level": "mittel",
+    "policy_id": "csp_missing, hsts_missing, security_headers_incomplete",
+    "recommendation": "Mittelfristig: Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.\nStrategisch: Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (header_check)",
+    "title": "Sicherheits-Header und Formularschutz auf 92.205.224.174 unvollständig",
+    "urgency": "Mittelfristig",
+    "verification": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+   },
+   {
+    "affected": "92.205.224.174:110 (POP3), 92.205.224.174:143 (IMAP), 92.205.224.174:21 (FTP)",
+    "category": "A",
+    "description": "Der Host 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 92.205.224.174:110 (POP3), 92.205.224.174:143 (IMAP), 92.205.224.174:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
+    "evidence": "nmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:110/tcp Dienst=pop3 Produkt=Dovecot pop3d Zustand=open STARTTLS=ja Capabilities=AUTH-RESP-CODE, RESP-CODES, SASL(PLAIN, LOGIN\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\npop3-capabilities: AUTH-RESP-CODE RESP-CODES SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) STLS UIDL PIPELINING APOP TOP USER CAPA\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:143/tcp Dienst=imap Produkt=Dovecot imapd Zustand=open TLS erzwungen=nein STARTTLS=ja Anmeldung gesperrt=nein Verfahren=CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN Capabilities=AUTH=CRAM-MD5A0001, AUTH=DIGEST-MD5, post-login, AUTH=...\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\nimap-capabilities: AUTH=CRAM-MD5A0001 AUTH=DIGEST-MD5 post-login AUTH=LOGIN capabilities ID OK listed IMAP4rev1 more STARTTLS SASL-IR have AUTH=PLAIN Pre-login LITERAL+ LOGIN-REFERRALS IDLE ENABLE",
+    "id": "VS-2026-007",
+    "impact": "Der Host 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) bietet mit 92.205.224.174:110 (POP3), 92.205.224.174:143 (IMAP) und 92.205.224.174:21 (FTP) ältere Übertragungsprotokolle an, die zur Angriffsfläche des Anschlusses zählen. Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht. Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche, und Altprotokolle bringen eigene, seltener gepflegte Serverkomponenten mit.",
+    "level": "niedrig",
+    "policy_id": "legacy_protocols_present",
+    "recommendation": "In Kürze: Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.\nMittelfristig: Falls der Dienst benötigt wird, den Zugriff auf feste Quelladressen beschränken und eine erzwungene Verschlüsselung sicherstellen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (nmap)",
+    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+    "urgency": "Mittelfristig",
+    "verification": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
+   },
+   {
+    "affected": "bergersysteme.com",
+    "category": "C",
+    "description": "Für bergersysteme.com fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: bergersysteme.com.",
+    "evidence": "dns_records · phase0/dns_records.json\nbergersysteme.com: SPF=v=spf1 a:mail.bergersysteme.com ip4:62.217.52.167 include:spf.protection.outlook.com include:spf-de.emailsignatures365.com redirect=bergersysteme.com.spf.hornetdmarc.com DMARC=v=DMARC1; p=none; pct=100; rua=mailto:...",
+    "id": "VS-2026-008",
+    "impact": "Für bergersysteme.com fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann. Ohne sie darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
+    "level": "niedrig",
+    "policy_id": "dane_missing, mta_sts_missing, tls_rpt_missing",
+    "recommendation": "Strategisch: Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (dns_records)",
+    "title": "Transportverschlüsselung im Mailversand für bergersysteme.com nicht erzwungen",
+    "urgency": "Strategisch",
+    "verification": "DNS-Abfrage der genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
+   },
+   {
+    "affected": "www.bergersysteme.com:443 (BREACH)",
+    "category": "D",
+    "description": "Die Transportverschlüsselung auf www.bergersysteme.com lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: www.bergersysteme.com:443 (BREACH).",
+    "evidence": "testssl\nwww.bergersysteme.com:443 Pruefung=BREACH Urteil=potential CVE=CVE-2013-3587 Ausgabe=potentially VULNERABLE, gzip br HTTP compression detected - only supplied '/' tested\n\nhttpx · hosts/198.202.211.1/phase2/httpx.json\nwww.bergersysteme.com:443 tls=tls13 cn=www.bergersysteme.com gueltig_bis=2026-11-27T04:15:54Z\n\ntestssl · scan_results:testssl:198.202.211.1\nangeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1\n\ntestssl · hosts/198.202.211.1/phase2/testssl.json\nservice=HTTP; pre_128cipher=No 128 cipher limit bug; SSLv2=not offered; SSLv3=not offered; TLS1=not offered; TLS1_1=not offered",
+    "id": "VS-2026-009",
+    "impact": "Die Transportverschlüsselung auf www.bergersysteme.com:443 lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen (BREACH); testssl nennt dazu CVE-2013-3587, eine Fremdbewertung liegt nicht vor. Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
+    "level": "niedrig",
+    "policy_id": "tls_weakness",
+    "recommendation": "In Kürze: Veraltete Protokolle und schwache Verfahren am Dienst abschalten.\nMittelfristig: Das aktuelle Protokoll aktivieren, den Schutz gegen eine erzwungene Rückstufung einschalten und die Gültigkeitsdauer der Transportsicherheits-Vorgabe auf mindestens ein Jahr setzen.\nStrategisch: Die Konfiguration aller verschlüsselten Dienste an einer gemeinsamen Vorgabe ausrichten und regelmäßig prüfen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (httpx, testssl)",
+    "threat": {
+     "cves": [
+      "CVE-2013-3587 (von testssl genannt, keine Fremdbewertung vorhanden)"
+     ],
+     "kev": "",
+     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+    },
+    "title": "Transportverschlüsselung auf www.bergersysteme.com mit veralteten Verfahren",
+    "urgency": "Mittelfristig",
+    "verification": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
+   },
+   {
+    "affected": "www.bergersysteme.com, www.bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
+    "category": "D",
+    "description": "Die Webdienste auf 198.202.211.1 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: www.bergersysteme.com, www.bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
+    "evidence": "header_check · hosts/198.202.211.1/phase2/headers_www.bergersysteme.com.json\nwww.bergersysteme.com: URL=https://www.bergersysteme.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-security: m...",
+    "id": "VS-2026-010",
+    "impact": "Die Webdienste auf 198.202.211.1 liefern Sicherheits-Header unvollständig aus; bei www.bergersysteme.com fehlen x-frame-options, x-content-type-options, referrer-policy und permissions-policy. Diese Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Ohne sie muss die Anwendung jeden dieser Fälle selbst abfangen, und ein einzelner Fehler wirkt sofort nach außen.",
+    "level": "niedrig",
+    "policy_id": "csp_missing, security_headers_incomplete",
+    "recommendation": "Mittelfristig: Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.\nStrategisch: Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (header_check)",
+    "title": "Sicherheits-Header und Formularschutz auf 198.202.211.1 unvollständig",
+    "urgency": "Mittelfristig",
+    "verification": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+   },
+   {
+    "affected": "92.205.224.174:22 (OpenSSH 9.9)",
+    "category": "E",
+    "description": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 92.205.224.174:22 (OpenSSH 9.9).",
+    "evidence": "nmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:22/tcp Dienst=ssh Produkt=OpenSSH Version=9.9 Zustand=open\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\n22/tcp open ssh OpenSSH 9.9 (protocol 2.0)",
+    "id": "VS-2026-011",
+    "impact": "Der Dienst auf 92.205.224.174:22 (OpenSSH 9.9) gibt seine genaue Version preis. Eine solche Angabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln zudem Anfragen zurück und helfen bei der Vorbereitung.",
+    "level": "niedrig",
+    "policy_id": "service_banner_version",
+    "recommendation": "Mittelfristig: Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.\nStrategisch: Die Vorgabe für Antwort-Header und erlaubte Methoden an einer Stelle pflegen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (nmap)",
+    "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+    "urgency": "Mittelfristig",
+    "verification": "Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue Versionsangabe und ohne die zusätzlichen Methoden."
+   },
+   {
+    "affected": "bergersysteme.com",
+    "category": "E",
+    "description": "Für bergersysteme.com fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: bergersysteme.com.",
+    "evidence": "dns_records · phase0/dns_records.json\nbergersysteme.com: SPF=v=spf1 a:mail.bergersysteme.com ip4:62.217.52.167 include:spf.protection.outlook.com include:spf-de.emailsignatures365.com redirect=bergersysteme.com.spf.hornetdmarc.com DMARC=v=DMARC1; p=none; pct=100; rua=mailto:...",
+    "id": "VS-2026-012",
+    "impact": "Für bergersysteme.com fehlen die Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen. Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
+    "level": "niedrig",
+    "policy_id": "caa_missing, dnssec_missing",
+    "recommendation": "Strategisch: Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (dns_records)",
+    "title": "DNS-Absicherung für bergersysteme.com nicht eingerichtet",
+    "urgency": "Strategisch",
+    "verification": "DNS-Abfrage der Signatur und der Ausstellungseingrenzung wiederholen; erwartet wird je ein gültiger Eintrag."
+   }
+  ],
+  "overall_description": "Die Prüfung vom 23.09.2026 im Paket Perimeter umfasst 7 Hosts, 11 Hostnamen und die Domain bergersysteme.com und führt zu 12 Befunden sowie 5 positiven Beobachtungen. Im Vordergrund stehen die aus dem Internet erreichbare Verwaltungsoberfläche auf 92.205.224.174:8443 (Plesk) und der Anmeldezugang auf 92.205.224.174:21, der keine Transportverschlüsselung erzwingt. Beginnen Sie damit, auf den betroffenen Diensten TLS als Bedingung für die Anmeldung zu erzwingen und den Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze zu beschränken. Danach folgen die mittelfristigen Punkte zu Mailrichtlinien, Sicherheits-Headern, Transportverschlüsselung und Dienstversionen sowie die strategischen Themen zur DNS-Absicherung.",
+  "overall_risk": "MITTEL",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "admin_service_exposed",
+   "admin_service_exposed_passive",
+   "caa_missing",
+   "csp_missing",
+   "dane_missing",
+   "dmarc_none",
+   "dnssec_missing",
+   "ftp_plaintext",
+   "hsts_missing",
+   "legacy_protocols_present",
+   "mta_sts_missing",
+   "passive_service_version_unverified",
+   "security_headers_incomplete",
+   "service_banner_version",
+   "tls_rpt_missing",
+   "tls_weakness"
+  ],
+  "policy_version": "Katalog 2026-09-23.2 / Fakten 1.0.4",
+  "positive_findings": [
+   {
+    "category": "A",
+    "description": "Der Host 198.202.211.1 (www.bergersysteme.com), 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) bietet seinen Webdienst über HTTPS an.",
+    "id": "VS-P01",
+    "title": "Webdienst mit Transportverschlüsselung"
+   },
+   {
+    "category": "C",
+    "description": "Für bergersysteme.com lehnen die Nameserver den Abruf der gesamten Zone ab, und kein Eintrag zeigt auf ein aufgegebenes Ziel.",
+    "id": "VS-P02",
+    "title": "Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge"
+   },
+   {
+    "category": "C",
+    "description": "Für bergersysteme.com sind die grundlegenden Einträge zur Absender-Authentizität vorhanden.",
+    "id": "VS-P03",
+    "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
+   },
+   {
+    "category": "D",
+    "description": "Vor bergersysteme.com (+cdn.bergersysteme.com), www.bergersysteme.com ist eine Web Application Firewall aktiv, die Angriffe auf Anwendungsebene filtert, bevor sie den Webdienst erreichen.",
+    "id": "VS-P04",
+    "title": "Web Application Firewall vorhanden"
+   },
+   {
+    "category": "E",
+    "description": "Zu den geprüften Adressen und zur Domain liegt in den abgefragten Reputationsquellen kein Eintrag vor.",
+    "id": "VS-P05",
+    "title": "Keine Einträge in Reputationsquellen"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Auf den betroffenen Diensten die Transportverschlüsselung erzwingen, sodass eine Anmeldung ohne aufgebautes TLS abgelehnt wird.",
+    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+    "findings": [
+     "VS-2026-002"
+    ],
+    "priority": "In Kürze"
+   },
+   {
+    "action": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst. Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand.",
+    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+    "findings": [
+     "VS-2026-001",
+     "VS-2026-003"
+    ],
+    "priority": "In Kürze"
+   },
+   {
+    "action": "Anhand einer aktiven Prüfung feststellen, ob Dienst und Version aus der Passivquelle noch zutreffen, und den Patchstand mit den Sicherheitshinweisen des Herstellers abgleichen. Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
+    "effect": "Schließt bekannte Lücken in veralteten Ständen",
+    "findings": [
+     "VS-2026-004",
+     "VS-2026-007",
+     "VS-2026-011"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
+    "effect": "Schützt die Authentizität der eigenen E-Mail",
+    "findings": [
+     "VS-2026-005"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+    "findings": [
+     "VS-2026-006"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+    "findings": [
+     "VS-2026-009",
+     "VS-2026-010"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain. Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
+    "effect": "Schützt die Authentizität der eigenen E-Mail",
+    "findings": [
+     "VS-2026-008",
+     "VS-2026-012"
+    ],
+    "priority": "Strategisch"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 3,
+   "INFO": 0,
+   "LOW": 6,
+   "MEDIUM": 3
+  },
+  "tech_profiles": [
+   {
+    "cms": "Webflow",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "Webflow",
+     "confidence": 0.95,
+     "details": {
+      "body_match": "<html[^>]*\\bdata-wf-page=",
+      "raw": {
+       "name": "Webflow",
+       "version": ""
+      },
+      "source": "webtech"
+     },
+     "detection_methods": [
+      "body_reference",
+      "webtech"
+     ],
+     "version": null
+    },
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "22",
+      "service": "OpenSSH 9.9"
+     },
+     {
+      "port": "25",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "80",
+      "service": "nginx"
+     },
+     {
+      "port": "443",
+      "service": "nginx"
+     },
+     {
+      "port": "465",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "993",
+      "service": ""
+     },
+     {
+      "port": "995",
+      "service": ""
+     },
+     {
+      "port": "8880",
+      "service": ""
+     },
+     {
+      "port": "110",
+      "service": ""
+     },
+     {
+      "port": "143",
+      "service": ""
+     },
+     {
+      "port": "21",
+      "service": ""
+     },
+     {
+      "port": "8443",
+      "service": ""
+     },
+     {
+      "port": "53",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "bergersysteme.com",
+     "cdn.bergersysteme.com",
+     "ftp.bergersysteme.com"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "92.205.224.174",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     22,
+     53,
+     80,
+     110,
+     143,
+     443,
+     465,
+     993,
+     995,
+     8443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      993,
+      995,
+      8880,
+      110,
+      143,
+      80,
+      465,
+      21,
+      22,
+      8443,
+      25,
+      443,
+      53
+     ],
+     "shodan_services": {
+      "22": "OpenSSH 9.9",
+      "25": "Postfix smtpd",
+      "443": "nginx",
+      "465": "Postfix smtpd",
+      "80": "nginx"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "bergersysteme.com",
+    "redirect_data": {
+     "bergersysteme.com": {
+      "error": null,
+      "final_domain": "www.bergersysteme.com",
+      "final_url": "https://www.bergersysteme.com/",
+      "is_cross_domain": true,
+      "page_title": "Berger Systeme",
+      "redirect_chain": [
+       "https://www.bergersysteme.com/",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/css/berger-systeme.webflow.shared.6d38ad474.min.css",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/js/webflow.schunk.36b8fb49256177c8.js",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/js/webflow.fe0a308b.505b105ef530b960.js",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646cf95e2f00862c6902e349_GoogleMaps.png",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646205dec700566da5676a2e_BS_2000px_72pdi__DSF6683.jpg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646b805c91f6fd0734fff423_BS_2000px_72pdi__DSF6694.jpg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646208fc205824415cf6e119_GettyImages-603592096-bearb.jpg",
+       "https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=645bb79068f5e873d3dfa654",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645def80edf75725c5f47e2e_Barlow-Light.ttf",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072af5298344b5a90be2_Sprechblase.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a4cbd41d88154c721_Lampe.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a28899e4fde56557c_Rakete.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a28899e4fde565538_Icon%20Zahnrad.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a24cfd1204ee25cf2_Icon%20Lampe%20positiv.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645df2bca16406e90e214f6b_Barlow-Medium.ttf",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072aac9ca1c34832dda3_Icon%20Zahnrad%20positiv.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e254a84f15fc8051084e9_bergerit.svg"
+      ],
+      "response_headers": {
+       "age": "395505",
+       "alt-svc": "h3=\":443\"; ma=86400",
+       "cf-cache-status": "HIT",
+       "cf-ray": "a3fc1dfd0d565004-DUS",
+       "content-encoding": "gzip",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Wed, 23 Sep 2026 19:57:13 GMT",
+       "last-modified": "Sun, 20 Sep 2026 09:44:39 GMT",
+       "link": "<https://cdn.prod.website-files.com>; rel=preconnect; crossorigin, <https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/css/berger-systeme.webflow.shared.6d38ad474.min.css>; rel=preload; as=style; crossorigin; integrity=\"sha384-bTitR0HyulDbxGSgIFO7C16DlS3Ruiz7kKIJ8mRbr7277Ll4pkUGHGmPJkboR8dK\"",
+       "server": "cloudflare",
+       "strict-transport-security": "max-age=31536000",
+       "surrogate-control": "max-age=432000",
+       "surrogate-key": "www.bergersysteme.com 645bb79068f5e873d3dfa654 pageId:645bb79068f5e85922dfa655 64674ae3ee79240403fe049f",
+       "vary": "accept-encoding",
+       "x-lambda-id": "1e038e41-6698-4ef6-9285-6851729701d8",
+       "x-wf-region": "us-east-1"
+      },
+      "screenshot_path": "/tmp/scan-68d59573-7a93-4efa-89cc-e7b10cc4d140/hosts/92.205.224.174/phase2/screenshot_bergersysteme.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "body",
+       "cookies": "",
+       "generator": "Webflow",
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "Webflow",
+         "name": "generator"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=645bb79068f5e873d3dfa654",
+        "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/js/webflow.schunk.36b8fb49256177c8.js",
+        "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/js/webflow.fe0a308b.505b105ef530b960.js"
+       ],
+       "stylesheets": [
+        "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/css/berger-systeme.webflow.shared.6d38ad474.min.css"
+       ],
+       "title": "Berger Systeme"
+      }
+     },
+     "ftp.bergersysteme.com": {
+      "error": null,
+      "final_domain": "ftp.bergersysteme.com",
+      "final_url": "https://ftp.bergersysteme.com/",
+      "is_cross_domain": false,
+      "page_title": "403 Forbidden",
+      "redirect_chain": [
+       "https://ftp.bergersysteme.com/",
+       "https://ftp.bergersysteme.com/error_docs/styles.css",
+       "https://ftp.bergersysteme.com/error_docs/server.svg"
+      ],
+      "response_headers": {
+       "content-encoding": "br",
+       "content-type": "text/html",
+       "date": "Wed, 23 Sep 2026 19:57:19 GMT",
+       "etag": "W/\"31b-621c390da1c2b\"",
+       "last-modified": "Tue, 10 Sep 2024 13:08:12 GMT",
+       "server": "nginx"
+      },
+      "screenshot_path": "/tmp/scan-68d59573-7a93-4efa-89cc-e7b10cc4d140/hosts/92.205.224.174/phase2/screenshot_ftp.bergersysteme.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "ie=edge",
+         "name": "x-ua-compatible"
+        },
+        {
+         "content": "width=device-width, initial-scale=1, shrink-to-fit=no",
+         "name": "viewport"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [
+        "https://ftp.bergersysteme.com/error_docs/styles.css"
+       ],
+       "title": "403 Forbidden"
+      }
+     }
+    },
+    "server": "nginx",
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Remote-Access",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "9.9",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "HTTP",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "3",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "CMS",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Webflow",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 110)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 110",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 143)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 143",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 21)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 21",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 22)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "9.9",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 465)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 53)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 53",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 8443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8443",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 8880)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8880",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 993)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 993",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 995)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 995",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "cloudflare",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot pop3d",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ProFTPD",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "sw-cp-server",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nginx",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "ProFTPD",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "9.9"
+     },
+     {
+      "name": "nginx",
+      "version": ""
+     },
+     {
+      "name": "Dovecot pop3d",
+      "version": ""
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "Postfix smtpd",
+      "version": ""
+     },
+     {
+      "name": "sw-cp-server",
+      "version": ""
+     },
+     {
+      "name": "Webflow",
+      "version": ""
+     },
+     {
+      "name": "cloudflare",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "HTTP/3",
+      "version": ""
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "bergersysteme.com": {
+      "cms": "Webflow",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": null,
+      "waf": "Cloudflare"
+     },
+     "ftp.bergersysteme.com": {
+      "cms": "Webflow",
+      "cms_confidence": 0.8,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": "Cloudflare",
+    "web_fqdn": "bergersysteme.com"
+   },
+   {
+    "cms": "Webflow",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "Webflow",
+     "confidence": 0.95,
+     "details": {
+      "body_match": "<html[^>]*\\bdata-wf-page=",
+      "raw": {
+       "name": "Webflow",
+       "version": ""
+      },
+      "source": "webtech"
+     },
+     "detection_methods": [
+      "body_reference",
+      "webtech"
+     ],
+     "version": null
+    },
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "8443",
+      "service": "CloudFlare"
+     },
+     {
+      "port": "2096",
+      "service": ""
+     },
+     {
+      "port": "2082",
+      "service": ""
+     },
+     {
+      "port": "2083",
+      "service": ""
+     },
+     {
+      "port": "2052",
+      "service": ""
+     },
+     {
+      "port": "2053",
+      "service": ""
+     },
+     {
+      "port": "2086",
+      "service": ""
+     },
+     {
+      "port": "2087",
+      "service": ""
+     },
+     {
+      "port": "2095",
+      "service": ""
+     },
+     {
+      "port": "80",
+      "service": ""
+     },
+     {
+      "port": "8880",
+      "service": ""
+     },
+     {
+      "port": "8080",
+      "service": ""
+     },
+     {
+      "port": "443",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "www.bergersysteme.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "198.202.211.1",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443,
+     8080,
+     8443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      2096,
+      2082,
+      2083,
+      2052,
+      2053,
+      2086,
+      2087,
+      2095,
+      80,
+      8880,
+      8080,
+      8443,
+      443
+     ],
+     "shodan_services": {
+      "8443": "CloudFlare"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "www.bergersysteme.com",
+    "redirect_data": {
+     "www.bergersysteme.com": {
+      "error": null,
+      "final_domain": "www.bergersysteme.com",
+      "final_url": "https://www.bergersysteme.com/",
+      "is_cross_domain": false,
+      "page_title": "Berger Systeme",
+      "redirect_chain": [
+       "https://www.bergersysteme.com/",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/css/berger-systeme.webflow.shared.6d38ad474.min.css",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/js/webflow.schunk.36b8fb49256177c8.js",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646205dec700566da5676a2e_BS_2000px_72pdi__DSF6683.jpg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646208fc205824415cf6e119_GettyImages-603592096-bearb.jpg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646b805c91f6fd0734fff423_BS_2000px_72pdi__DSF6694.jpg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646cf95e2f00862c6902e349_GoogleMaps.png",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/js/webflow.fe0a308b.505b105ef530b960.js",
+       "https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=645bb79068f5e873d3dfa654",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e254a84f15fc8051084e9_bergerit.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072af5298344b5a90be2_Sprechblase.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a28899e4fde565538_Icon%20Zahnrad.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072aac9ca1c34832dda3_Icon%20Zahnrad%20positiv.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a24cfd1204ee25cf2_Icon%20Lampe%20positiv.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a28899e4fde56557c_Rakete.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a4cbd41d88154c721_Lampe.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645df2bca16406e90e214f6b_Barlow-Medium.ttf",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645def80edf75725c5f47e2e_Barlow-Light.ttf"
+      ],
+      "response_headers": {
+       "age": "395486",
+       "alt-svc": "h3=\":443\"; ma=86400",
+       "cf-cache-status": "HIT",
+       "cf-ray": "a3fc1d856e8bf807-DUS",
+       "content-encoding": "gzip",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Wed, 23 Sep 2026 19:56:53 GMT",
+       "last-modified": "Sun, 20 Sep 2026 09:44:39 GMT",
+       "link": "<https://cdn.prod.website-files.com>; rel=preconnect; crossorigin, <https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/css/berger-systeme.webflow.shared.6d38ad474.min.css>; rel=preload; as=style; crossorigin; integrity=\"sha384-bTitR0HyulDbxGSgIFO7C16DlS3Ruiz7kKIJ8mRbr7277Ll4pkUGHGmPJkboR8dK\"",
+       "server": "cloudflare",
+       "strict-transport-security": "max-age=31536000",
+       "surrogate-control": "max-age=432000",
+       "surrogate-key": "www.bergersysteme.com 645bb79068f5e873d3dfa654 pageId:645bb79068f5e85922dfa655 64674ae3ee79240403fe049f",
+       "vary": "accept-encoding",
+       "x-lambda-id": "1e038e41-6698-4ef6-9285-6851729701d8",
+       "x-wf-region": "us-east-1"
+      },
+      "screenshot_path": "/tmp/scan-68d59573-7a93-4efa-89cc-e7b10cc4d140/hosts/198.202.211.1/phase2/screenshot_www.bergersysteme.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "body",
+       "cookies": "",
+       "generator": "Webflow",
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "Webflow",
+         "name": "generator"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=645bb79068f5e873d3dfa654",
+        "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/js/webflow.schunk.36b8fb49256177c8.js",
+        "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/js/webflow.fe0a308b.505b105ef530b960.js"
+       ],
+       "stylesheets": [
+        "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/css/berger-systeme.webflow.shared.6d38ad474.min.css"
+       ],
+       "title": "Berger Systeme"
+      }
+     }
+    },
+    "server": "Cloudflare http proxy",
+    "tech_rows": [
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "HTTP",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "3",
+      "vuln_name": ""
+     },
+     {
+      "category": "CMS",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Webflow",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2052)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2052",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2053)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2053",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2082)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2082",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2083)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2083",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2086)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2086",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2087)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2087",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2095)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2095",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2096)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2096",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 443",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 80",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8080)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8080",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "CloudFlare",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8880)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8880",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "cloudflare",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Cloudflare Http Proxy",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Cloudflare http proxy",
+      "version": ""
+     },
+     {
+      "name": "cloudflare",
+      "version": ""
+     },
+     {
+      "name": "Webflow",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "HTTP/3",
+      "version": ""
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "www.bergersysteme.com": {
+      "cms": "Webflow",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": null,
+      "waf": "Cloudflare"
+     }
+    },
+    "waf": "Cloudflare",
+    "web_fqdn": "www.bergersysteme.com"
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "443",
+      "service": "Apache httpd"
+     }
+    ],
+    "fqdns": [
+     "bstasks.bergersysteme.com",
+     "ticket.bergersysteme.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": false,
+    "has_web": false,
+    "ip": "62.217.52.162",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      80,
+      443
+     ],
+     "shodan_services": {
+      "443": "Apache httpd",
+      "80": "Apache httpd"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "bstasks.bergersysteme.com",
+    "redirect_data": {
+     "bstasks.bergersysteme.com": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://bstasks.bergersysteme.com/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "bstasks.bergersysteme.com",
+      "final_url": "https://bstasks.bergersysteme.com/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     },
+     "ticket.bergersysteme.com": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://ticket.bergersysteme.com/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "ticket.bergersysteme.com",
+      "final_url": "https://ticket.bergersysteme.com/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": null,
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [],
+    "vhost_results": {
+     "bstasks.bergersysteme.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "ticket.bergersysteme.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "443",
+      "service": "Microsoft IIS httpd 10.0"
+     },
+     {
+      "port": "25",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "owa.bergersysteme.com",
+     "mail.bergersysteme.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": false,
+    "has_web": false,
+    "ip": "62.217.52.166",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      25,
+      443
+     ],
+     "shodan_services": {
+      "443": "Microsoft IIS httpd 10.0"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "owa.bergersysteme.com",
+    "redirect_data": {
+     "mail.bergersysteme.com": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://mail.bergersysteme.com/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "mail.bergersysteme.com",
+      "final_url": "https://mail.bergersysteme.com/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     },
+     "owa.bergersysteme.com": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://owa.bergersysteme.com/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "owa.bergersysteme.com",
+      "final_url": "https://owa.bergersysteme.com/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": null,
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 25",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft IIS httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "10.0",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [],
+    "vhost_results": {
+     "mail.bergersysteme.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "owa.bergersysteme.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "443",
+      "service": "nginx"
+     }
+    ],
+    "fqdns": [
+     "bitwarden.bergersysteme.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": false,
+    "has_web": false,
+    "ip": "62.217.52.171",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      443
+     ],
+     "shodan_services": {
+      "443": "nginx"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "bitwarden.bergersysteme.com",
+    "redirect_data": {
+     "bitwarden.bergersysteme.com": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://bitwarden.bergersysteme.com/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "bitwarden.bergersysteme.com",
+      "final_url": "https://bitwarden.bergersysteme.com/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": null,
+    "tech_rows": [
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [],
+    "vhost_results": {
+     "bitwarden.bergersysteme.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "mail2.bergersysteme.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": false,
+    "has_web": false,
+    "ip": "79.140.188.181",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "mail2.bergersysteme.com",
+    "redirect_data": {
+     "mail2.bergersysteme.com": {
+      "error": "Page.goto: net::ERR_CONNECTION_REFUSED at http://mail2.bergersysteme.com/\nCall log:\n  - navigating to \"http://mail2.bergersysteme.com/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "mail2.bergersysteme.com",
+      "final_url": "https://mail2.bergersysteme.com/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": null,
+    "tech_rows": [],
+    "technologies": [],
+    "vhost_results": {
+     "mail2.bergersysteme.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   }
+  ]
+ },
+ "success": true
+}

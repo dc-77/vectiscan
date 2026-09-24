@@ -1,0 +1,1 @@
+{"domain": "example.test", "hosts": [{"ip": "203.0.113.10", "fqdns": ["www.example.test"], "alive": true, "vhosts": [{"fqdn": "www.example.test"}]}]}

@@ -9,6 +9,9 @@ Regeln (jede mit Testfall in tests/test_facts_versions.py):
 4. Banner (nginx, Apache, PHP, OpenSSH, IIS, Exim ...) werden in Produkt,
    Version und Distribution zerlegt.
 5. ``kind`` kommt aus einer kuratierten Tabelle; unbekannt ist ``component``.
+   Eine Familie gilt nur, wenn der Name ausserhalb des Treffers nur neutrale Zusaetze
+   traegt (``httpd``, ``pop3d``, ``HTTP Server``, Hersteller); ``jQuery Migrate`` ist
+   nicht ``jQuery`` und ``Apache Tomcat`` nicht ``Apache httpd`` (spec/09 Q11).
 6. EOL nur bei sicherer Familie und Version; Distro-Pakete ergeben ``unknown``
    mit dem Upstream-Termin als Hinweis (Entscheidung DC 18.09.2026).
 "unbekannt" ist ueberall ein zulaessiges Ergebnis.
@@ -42,7 +45,7 @@ _FAMILIES: list[tuple[re.Pattern[str], str, str, str, tuple[str, str] | None]] =
     (re.compile(r"^php\b", re.I), "php", "language", "PHP", ("php", "")),
     (re.compile(r"asp\.net", re.I), "aspnet", "language", "ASP.NET", None),
     (re.compile(r"^python", re.I), "python", "language", "Python", ("python", "")),
-    (re.compile(r"node\.?js|^express", re.I), "nodejs", "language", "Node.js", ("nodejs", "")),
+    (re.compile(r"node\.?js", re.I), "nodejs", "language", "Node.js", ("nodejs", "")),
     (re.compile(r"openssl", re.I), "openssl", "library", "OpenSSL", ("openssl", "")),
     (re.compile(r"^jquery", re.I), "jquery", "library", "jQuery", None),
     (re.compile(r"bootstrap", re.I), "bootstrap", "library", "Bootstrap", None),
@@ -63,7 +66,7 @@ _FAMILIES: list[tuple[re.Pattern[str], str, str, str, tuple[str, str] | None]] =
     (re.compile(r"dovecot", re.I), "dovecot", "mail", "Dovecot", ("dovecot", "")),
     (re.compile(r"courier", re.I), "courier", "mail", "Courier", None),
     (re.compile(r"sendmail", re.I), "sendmail", "mail", "Sendmail", None),
-    (re.compile(r"mod_sftp", re.I), "proftpd_sftp", "ssh", "ProFTPD mod_sftp", None),
+    (re.compile(r"(?:proftpd\s+)?mod_sftp", re.I), "proftpd_sftp", "ssh", "ProFTPD mod_sftp", None),
     (re.compile(r"openssh", re.I), "openssh", "ssh", "OpenSSH", ("openssh", "")),
     (re.compile(r"dropbear", re.I), "dropbear", "ssh", "Dropbear", None),
     (re.compile(r"proftpd", re.I), "proftpd", "ftp", "ProFTPD", None),
@@ -147,8 +150,43 @@ def split_name_version(text: str | None) -> tuple[str, Optional[str], str]:
     return first, None, ""
 
 
+# Zusaetze, die den Produktnamen beschreiben, aber kein anderes Produkt benennen:
+# nmap-Dienstbezeichnungen (``Dovecot imapd``, ``Apache HTTP Server``), Hersteller
+# (``Microsoft ASP.NET``), Distributionen und beschreibende Generator-Texte
+# (``Joomla! - Open Source Content Management``). Alles andere ist eine Namensgrenze.
+_NEUTRAL_NAME_TOKENS = frozenset({
+    "httpd", "http", "https", "server", "db", "database", "daemon", "web", "service",
+    "smtpd", "imapd", "pop3d", "ftpd", "sshd",
+    "microsoft",
+    "streaming", "media",
+    "open", "source", "content", "management", "system",
+    "debian", "ubuntu", "centos", "linux",
+})
+_NAME_TOKEN_RE = re.compile(r"[a-z0-9]+")
+
+
+def _outside_match(name: str, m: re.Match[str]) -> list[str]:
+    """Woerter ausserhalb des Familientreffers; ein angeschnittenes Wort zaehlt zum
+    Treffer (``PostgreSQL`` bei Muster ``postgres``, ``PleskLin`` bei ``plesk``)."""
+    start, end = m.start(), m.end()
+    while start > 0 and name[start - 1].isalnum():
+        start -= 1
+    while end < len(name) and name[end].isalnum():
+        end += 1
+    rest = f"{name[:start]} {name[end:]}".lower()
+    return [t for t in _NAME_TOKEN_RE.findall(rest) if not t.isdigit()]
+
+
+def _generic(name: str, low: str) -> tuple[Optional[str], str, Optional[str], None]:
+    return re.sub(r"[^a-z0-9]+", "_", low).strip("_") or None, "component", name.strip(), None
+
+
 def classify(name: str | None) -> tuple[Optional[str], str, Optional[str], Optional[tuple[str, str]]]:
-    """(family, kind, canonical product, eol_key) fuer einen Produktnamen."""
+    """(family, kind, canonical product, eol_key) fuer einen Produktnamen.
+
+    Normalisiert nie ueber Namensgrenzen: traegt der Name ausserhalb des Treffers ein
+    Wort, das nicht neutral ist, bleibt er ein eigenes Produkt ohne EOL-Schluessel
+    (``jQuery Migrate`` -> ``jquery_migrate``, nicht ``jQuery``)."""
     if not name:
         return None, "component", None, None
     low = name.strip().lower()
@@ -157,9 +195,12 @@ def classify(name: str | None) -> tuple[Optional[str], str, Optional[str], Optio
     if low in WP_PLUGINS:
         return re.sub(r"[^a-z0-9]+", "_", low), "plugin", name.strip(), None
     for pat, family, kind, product, eol_key in _FAMILIES:
-        if pat.search(name):
+        m = pat.search(name)
+        if m:
+            if any(t not in _NEUTRAL_NAME_TOKENS for t in _outside_match(name, m)):
+                return _generic(name, low)
             return family, kind, product, eol_key
-    return re.sub(r"[^a-z0-9]+", "_", low).strip("_") or None, "component", name.strip(), None
+    return _generic(name, low)
 
 
 def detect_distro(text: str | None) -> Optional[str]:

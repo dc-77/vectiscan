@@ -1,0 +1,755 @@
+{
+ "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/castenow-0923.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
+ "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
+ "strict": false,
+ "orders": {
+  "main": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52"
+ },
+ "findings": {
+  "VS-2026-001": {
+   "checks": [
+    "admin_service_exposed"
+   ],
+   "spec09": "Q13, Q3",
+   "warum": "Plesk mit Anmeldung auf dem Plesk-Sammelserver 92.205.163.53 (auch netscope-media.de); nach E1 ein Hosting-Panel des Hosters, erhöht mit Empfehlung an den Hoster."
+  },
+  "VS-2026-002": {
+   "checks": [
+    "admin_service_exposed_passive"
+   ],
+   "spec09": "Q13",
+   "warum": "8880 zeigt im Banner sw-cp-server (Plesk) und ist derselbe Dienst wie VS-2026-001; „unbekannt“ und ein zweiter Befund sind nicht belegt."
+  },
+  "VS-2026-003": {
+   "checks": [
+    "cert_chain_incomplete"
+   ]
+  },
+  "VS-2026-004": {
+   "checks": [
+    "cert_expiring"
+   ],
+   "spec09": "Q18",
+   "warum": "Restlaufzeit ein Tag (24.09.2026 23:59 UTC); nach E2 ist das bis sieben Tage Unverzüglich, nicht Hygiene hoch."
+  },
+  "VS-2026-005": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-006": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-007": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-008": {
+   "checks": [
+    "csp_missing"
+   ],
+   "spec09": "Q8",
+   "warum": "Gemessen an der Weiterleitung; /login/ liefert frame-ancestors 'self'."
+  },
+  "VS-2026-009": {
+   "checks": [
+    "csp_missing"
+   ],
+   "spec09": "Q3",
+   "warum": "umfrage.castenow.de ist CloudFront der Plattform umfrageonline.com; die Header setzt der Plattformbetreiber."
+  },
+  "VS-2026-010": {
+   "checks": [
+    "csp_weak"
+   ],
+   "spec09": "Q8",
+   "warum": "mailstore liefert nur „Access through untrusted domain“ (400); gemessen an der Fehlerseite."
+  },
+  "VS-2026-011": {
+   "checks": [
+    "csp_weak"
+   ]
+  },
+  "VS-2026-012": {
+   "checks": [
+    "csrf_token_missing"
+   ],
+   "spec09": "Q14",
+   "warum": "ZAP-Meldung „Absence of Anti-CSRF Tokens“ mit Konfidenz Low; unter Konfidenz High nur Werkzeugmeldung, Quelle passiv (ZAP)."
+  },
+  "VS-2026-013": {
+   "checks": [
+    "dane_missing"
+   ],
+   "spec09": "Q4",
+   "warum": "Der MX liegt in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
+  },
+  "VS-2026-014": {
+   "checks": [
+    "dmarc_none"
+   ]
+  },
+  "VS-2026-015": {
+   "checks": [
+    "dnssec_missing"
+   ]
+  },
+  "VS-2026-016": {
+   "checks": [
+    "ftp_plaintext"
+   ],
+   "spec09": "Q3",
+   "warum": "FTP auf dem Plesk-Sammelserver 92.205.163.53 ist ein Dienst des Hosters."
+  },
+  "VS-2026-017": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-018": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-019": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-020": {
+   "checks": [
+    "http_alt_port"
+   ],
+   "spec09": "Q3",
+   "warum": "8000 ist der Shoutcast-Stream eines Fremdkunden (tonausstrom.de), 8800 Icecast auf dem Sammelserver; kein Dienst des Kunden."
+  },
+  "VS-2026-021": {
+   "checks": [
+    "http_header_disclosure"
+   ]
+  },
+  "VS-2026-022": {
+   "checks": [
+    "http_header_disclosure"
+   ]
+  },
+  "VS-2026-023": {
+   "checks": [
+    "http_header_disclosure"
+   ]
+  },
+  "VS-2026-024": {
+   "checks": [
+    "http_header_disclosure"
+   ],
+   "spec09": "Q3",
+   "warum": "umfrage.castenow.de ist CloudFront der Plattform umfrageonline.com; der Server-Header gehört dem Plattformbetreiber."
+  },
+  "VS-2026-025": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-026": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-027": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-028": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-029": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-030": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-031": {
+   "checks": [
+    "js_library_outdated"
+   ]
+  },
+  "VS-2026-032": {
+   "checks": [
+    "legacy_protocols_present"
+   ],
+   "spec09": "Q3",
+   "warum": "92.205.163.53 ist ein Plesk-Sammelserver (auch netscope-media.de); POP3, IMAP und FTP sind Dienste des Hosters, die der Kunde nicht abschalten kann."
+  },
+  "VS-2026-033": {
+   "checks": [
+    "login_portal_exposed"
+   ]
+  },
+  "VS-2026-034": {
+   "checks": [
+    "login_portal_exposed"
+   ]
+  },
+  "VS-2026-035": {
+   "checks": [
+    "login_portal_exposed"
+   ]
+  },
+  "VS-2026-036": {
+   "checks": [
+    "login_portal_exposed"
+   ]
+  },
+  "VS-2026-037": {
+   "checks": [
+    "login_portal_exposed"
+   ]
+  },
+  "VS-2026-038": {
+   "checks": [
+    "mta_sts_missing"
+   ]
+  },
+  "VS-2026-039": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-040": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-041": {
+   "checks": [
+    "security_headers_incomplete"
+   ],
+   "spec09": "Q8",
+   "warum": "mailstore liefert nur „Access through untrusted domain“ (400); gemessen an der Fehlerseite."
+  },
+  "VS-2026-042": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-043": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-044": {
+   "checks": [
+    "security_headers_incomplete"
+   ],
+   "spec09": "Q3",
+   "warum": "umfrage.castenow.de ist CloudFront der Plattform umfrageonline.com; die Header setzt der Plattformbetreiber."
+  },
+  "VS-2026-045": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-046": {
+   "checks": [
+    "service_banner_version"
+   ]
+  },
+  "VS-2026-047": {
+   "checks": [
+    "spf_softfail"
+   ]
+  },
+  "VS-2026-048": {
+   "checks": [
+    "tls_rpt_missing"
+   ]
+  },
+  "VS-2026-049": {
+   "checks": [
+    "tls_weakness"
+   ],
+   "spec09": "Q4",
+   "warum": "BREACH gilt laut testssl für statische Seiten nicht („Can be ignored for static pages“) und hängt im Bericht als CVE am Zertifikatsbefund."
+  },
+  "VS-2026-050": {
+   "checks": [
+    "tls_weakness"
+   ],
+   "spec09": "Q3, Q4",
+   "warum": "Plattform umfrageonline.com (CloudFront); BREACH gilt laut testssl für statische Seiten nicht."
+  },
+  "VS-2026-051": {
+   "checks": [
+    "web_vulnerability_reported"
+   ]
+  },
+  "VS-2026-052": {
+   "checks": [
+    "wordpress_user_enumeration"
+   ]
+  }
+ },
+ "positives": {
+  "VS-2026-P01": {
+   "checks": [
+    "caa_missing"
+   ]
+  },
+  "VS-2026-P02": {
+   "checks": [
+    "cert_chain_incomplete"
+   ]
+  },
+  "VS-2026-P03": {
+   "checks": [
+    "cert_chain_incomplete"
+   ]
+  },
+  "VS-2026-P04": {
+   "checks": [
+    "cert_chain_incomplete"
+   ]
+  },
+  "VS-2026-P05": {
+   "checks": [
+    "cert_chain_incomplete"
+   ]
+  },
+  "VS-2026-P06": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P07": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P08": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P09": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P10": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P11": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P12": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P13": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P14": {
+   "checks": [
+    "cert_hostname_mismatch"
+   ]
+  },
+  "VS-2026-P15": {
+   "checks": [
+    "cert_hostname_mismatch"
+   ]
+  },
+  "VS-2026-P16": {
+   "checks": [
+    "cert_hostname_mismatch"
+   ]
+  },
+  "VS-2026-P17": {
+   "checks": [
+    "cert_hostname_mismatch"
+   ]
+  },
+  "VS-2026-P18": {
+   "checks": [
+    "cert_hostname_mismatch"
+   ]
+  },
+  "VS-2026-P19": {
+   "checks": [
+    "csp_missing"
+   ],
+   "spec09": "Q8",
+   "warum": "Gemessen an der Fehlerseite (400 „Access through untrusted domain“), nicht an der Anwendung."
+  },
+  "VS-2026-P20": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-P21": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-P22": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-P23": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-P24": {
+   "checks": [
+    "db_exposed"
+   ],
+   "spec09": "Q9",
+   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+  },
+  "VS-2026-P25": {
+   "checks": [
+    "db_exposed"
+   ],
+   "spec09": "Q9",
+   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+  },
+  "VS-2026-P26": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-P27": {
+   "checks": [
+    "dkim_missing"
+   ]
+  },
+  "VS-2026-P28": {
+   "checks": [
+    "dmarc_missing"
+   ]
+  },
+  "VS-2026-P29": {
+   "checks": [
+    "dns_dangling_cname"
+   ]
+  },
+  "VS-2026-P30": {
+   "checks": [
+    "dns_zone_transfer"
+   ]
+  },
+  "VS-2026-P31": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-P32": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-P33": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-P34": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-P35": {
+   "checks": [
+    "hsts_short"
+   ]
+  },
+  "VS-2026-P36": {
+   "checks": [
+    "hsts_short"
+   ]
+  },
+  "VS-2026-P37": {
+   "checks": [
+    "hsts_short"
+   ]
+  },
+  "VS-2026-P38": {
+   "checks": [
+    "hsts_short"
+   ]
+  },
+  "VS-2026-P39": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P40": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P41": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P42": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P43": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P44": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P45": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P46": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P47": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P48": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P49": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P50": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P51": {
+   "checks": [
+    "mail_plaintext"
+   ]
+  },
+  "VS-2026-P52": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P53": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P54": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P55": {
+   "checks": [
+    "rdp_exposed"
+   ],
+   "spec09": "Q9",
+   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+  },
+  "VS-2026-P56": {
+   "checks": [
+    "rdp_exposed"
+   ],
+   "spec09": "Q9",
+   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+  },
+  "VS-2026-P57": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P58": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P59": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P60": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P61": {
+   "checks": [
+    "smb_exposed"
+   ],
+   "spec09": "Q9",
+   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+  },
+  "VS-2026-P62": {
+   "checks": [
+    "smb_exposed"
+   ],
+   "spec09": "Q9",
+   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+  },
+  "VS-2026-P63": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P64": {
+   "checks": [
+    "software_eol"
+   ],
+   "spec09": "Teil 2",
+   "warum": "Belegt ist nur die Produktlinie Exchange SE aus dem OWA-Pfad, nicht der Patchstand; „laufende Herstellerpflege“ ist nicht nachgewiesen."
+  },
+  "VS-2026-P65": {
+   "checks": [
+    "spf_missing"
+   ]
+  },
+  "VS-2026-P66": {
+   "checks": [
+    "tls_legacy_protocols"
+   ]
+  },
+  "VS-2026-P67": {
+   "checks": [
+    "tls_legacy_protocols"
+   ]
+  },
+  "VS-2026-P68": {
+   "checks": [
+    "tls_legacy_protocols"
+   ]
+  },
+  "VS-2026-P69": {
+   "checks": [
+    "tls_legacy_protocols"
+   ]
+  },
+  "VS-2026-P70": {
+   "checks": [
+    "tls_legacy_protocols"
+   ]
+  },
+  "VS-2026-P71": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P72": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P73": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P74": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P75": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P76": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P77": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P78": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P79": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P80": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P81": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P82": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P83": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P84": {
+   "checks": [
+    "urlhaus_compromise"
+   ]
+  },
+  "VS-2026-P85": {
+   "checks": [
+    "waf_present"
+   ],
+   "spec09": "Q12",
+   "warum": "Die WAF-Erkennung stammt aus der Generic-Heuristik von wafw00f ohne benanntes Produkt."
+  },
+  "VS-2026-P86": {
+   "checks": [
+    "wordpress_core_outdated"
+   ]
+  }
+ },
+ "subsumed": {},
+ "expected_coverage_differences": [],
+ "expected_member_differences": []
+}

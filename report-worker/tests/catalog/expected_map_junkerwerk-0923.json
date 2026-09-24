@@ -1,0 +1,436 @@
+{
+ "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/junkerwerk-0923.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
+ "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
+ "strict": false,
+ "orders": {
+  "main": "31d67a02-b485-4d05-b228-dbdde092cc68"
+ },
+ "findings": {
+  "VS-2026-001": {
+   "checks": [
+    "admin_service_exposed_passive"
+   ],
+   "spec09": "Q13",
+   "warum": "Die SonicWall auf 4433 steht nur laut Passivquelle und als Hygiene hoch; A.2 und E1 verlangen für eine Verwaltungsoberfläche die Einstufung über die Exposition, ein Passivfund zuerst den Nachweis."
+  },
+  "VS-2026-002": {
+   "checks": [
+    "caa_missing"
+   ]
+  },
+  "VS-2026-003": {
+   "checks": [
+    "caa_missing"
+   ]
+  },
+  "VS-2026-004": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-005": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-006": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-007": {
+   "checks": [
+    "dane_missing"
+   ],
+   "spec09": "Q4",
+   "warum": "Der MX liegt in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
+  },
+  "VS-2026-008": {
+   "checks": [
+    "dane_missing"
+   ],
+   "spec09": "Q4",
+   "warum": "Der MX liegt in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
+  },
+  "VS-2026-009": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-010": {
+   "checks": [
+    "default_page_exposed"
+   ]
+  },
+  "VS-2026-011": {
+   "checks": [
+    "dmarc_missing"
+   ]
+  },
+  "VS-2026-012": {
+   "checks": [
+    "dmarc_missing"
+   ]
+  },
+  "VS-2026-013": {
+   "checks": [
+    "dnssec_missing"
+   ]
+  },
+  "VS-2026-014": {
+   "checks": [
+    "dnssec_missing"
+   ]
+  },
+  "VS-2026-015": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-016": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-017": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-018": {
+   "checks": [
+    "http_alt_port"
+   ]
+  },
+  "VS-2026-019": {
+   "checks": [
+    "http_header_disclosure"
+   ]
+  },
+  "VS-2026-020": {
+   "checks": [
+    "http_header_disclosure"
+   ]
+  },
+  "VS-2026-021": {
+   "checks": [
+    "http_header_disclosure"
+   ]
+  },
+  "VS-2026-022": {
+   "checks": [
+    "http_trace_enabled"
+   ],
+   "spec09": "Q4",
+   "warum": "„TRACE aktiv“ stammt nur aus der OPTIONS-Antwort (nmap http-methods); eine TRACE-Anfrage ist nicht belegt."
+  },
+  "VS-2026-023": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-024": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-025": {
+   "checks": [
+    "legacy_protocols_present"
+   ],
+   "spec09": "Q3",
+   "warum": "188.40.3.130 ist ein Hetzner Managed Server (auch erbbauverein.de); POP3, IMAP und FTP sind Dienste des Hosters, die der Kunde nicht abschalten kann."
+  },
+  "VS-2026-026": {
+   "checks": [
+    "login_portal_exposed"
+   ]
+  },
+  "VS-2026-027": {
+   "checks": [
+    "login_portal_exposed"
+   ]
+  },
+  "VS-2026-028": {
+   "checks": [
+    "mta_sts_missing"
+   ]
+  },
+  "VS-2026-029": {
+   "checks": [
+    "mta_sts_missing"
+   ]
+  },
+  "VS-2026-030": {
+   "checks": [
+    "security_headers_incomplete"
+   ],
+   "spec09": "Q8",
+   "warum": "Gemessen an der Weiterleitung des Outlook-Portals; die Endseite /owa/auth/logon.aspx setzt X-Frame-Options SAMEORIGIN."
+  },
+  "VS-2026-031": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-032": {
+   "checks": [
+    "security_headers_incomplete"
+   ],
+   "spec09": "Q8",
+   "warum": "Gemessen an der Weiterleitung des Outlook-Portals; die Endseite /owa/auth/logon.aspx setzt X-Frame-Options SAMEORIGIN."
+  },
+  "VS-2026-033": {
+   "checks": [
+    "service_banner_version"
+   ],
+   "spec09": "Q4",
+   "warum": "SSH-Banner und MariaDB-Handshake gehören zum Protokoll und lassen sich nicht entfernen; „PostgreSQL unbekannt“ ist keine Versionspreisgabe."
+  },
+  "VS-2026-034": {
+   "checks": [
+    "service_banner_version"
+   ]
+  },
+  "VS-2026-035": {
+   "checks": [
+    "spf_softfail"
+   ]
+  },
+  "VS-2026-036": {
+   "checks": [
+    "spf_softfail"
+   ]
+  },
+  "VS-2026-037": {
+   "checks": [
+    "tls_legacy_protocols"
+   ]
+  },
+  "VS-2026-038": {
+   "checks": [
+    "tls_no_fallback_scsv"
+   ]
+  },
+  "VS-2026-039": {
+   "checks": [
+    "tls_rpt_missing"
+   ]
+  },
+  "VS-2026-040": {
+   "checks": [
+    "tls_rpt_missing"
+   ]
+  },
+  "VS-2026-041": {
+   "checks": [
+    "tls_weakness"
+   ]
+  }
+ },
+ "positives": {
+  "VS-2026-P01": {
+   "checks": [
+    "cert_chain_incomplete"
+   ]
+  },
+  "VS-2026-P02": {
+   "checks": [
+    "cert_chain_incomplete"
+   ]
+  },
+  "VS-2026-P03": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P04": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P05": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P06": {
+   "checks": [
+    "cert_hostname_mismatch"
+   ]
+  },
+  "VS-2026-P07": {
+   "checks": [
+    "cert_hostname_mismatch"
+   ]
+  },
+  "VS-2026-P08": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-P09": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-P10": {
+   "checks": [
+    "dkim_missing"
+   ]
+  },
+  "VS-2026-P11": {
+   "checks": [
+    "dkim_missing"
+   ]
+  },
+  "VS-2026-P12": {
+   "checks": [
+    "dns_dangling_cname"
+   ]
+  },
+  "VS-2026-P13": {
+   "checks": [
+    "dns_dangling_cname"
+   ]
+  },
+  "VS-2026-P14": {
+   "checks": [
+    "dns_zone_transfer"
+   ]
+  },
+  "VS-2026-P15": {
+   "checks": [
+    "ftp_plaintext"
+   ]
+  },
+  "VS-2026-P16": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P17": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P18": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P19": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P20": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P21": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P22": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P23": {
+   "checks": [
+    "mail_plaintext"
+   ]
+  },
+  "VS-2026-P24": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P25": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P26": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P27": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P28": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P29": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P30": {
+   "checks": [
+    "software_eol"
+   ]
+  },
+  "VS-2026-P31": {
+   "checks": [
+    "software_eol"
+   ]
+  },
+  "VS-2026-P32": {
+   "checks": [
+    "spf_missing"
+   ]
+  },
+  "VS-2026-P33": {
+   "checks": [
+    "spf_missing"
+   ]
+  },
+  "VS-2026-P34": {
+   "checks": [
+    "tls_legacy_protocols"
+   ]
+  },
+  "VS-2026-P35": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P36": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P37": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P38": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P39": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P40": {
+   "checks": [
+    "urlhaus_compromise"
+   ]
+  }
+ },
+ "subsumed": {},
+ "expected_coverage_differences": [],
+ "expected_member_differences": []
+}
