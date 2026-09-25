@@ -67,6 +67,22 @@ def distribution_line(total: int, counts: list[tuple[str, int]]) -> str:
             "Anhang A.2 zusätzlich mit Einstufung.")
 
 
+def excluded_note(ids: list[str]) -> str:
+    """Satz zu den Befunden, die der Admin auf Wunsch des Auftraggebers ausgeschlossen hat.
+
+    Issue #28 Punkt 4: die uebrigen Befunde behalten ihre Nummer, die Folge hat an den
+    ausgeschlossenen Stellen Luecken. Ohne diesen Satz waere die Luecke unerklaert.
+    """
+    if not ids:
+        return ""
+    liste = ", ".join(ids)
+    if len(ids) == 1:
+        return (f"Auf Wunsch des Auftraggebers ist ein Befund nicht aufgeführt ({liste}); "
+                "die übrigen Befunde behalten ihre Nummer.")
+    return (f"Auf Wunsch des Auftraggebers sind {len(ids)} Befunde nicht aufgeführt ({liste}); "
+            "die übrigen Befunde behalten ihre Nummer.")
+
+
 def split_note(main_n: int, more_n: int, total: int) -> str:
     """Hinweis im Kopf von Kapitel 6, wenn der Anhang gebraucht wird."""
     return (f"Dieses Kapitel zeigt die {main_n} dringendsten der {total} Befunde. Die "

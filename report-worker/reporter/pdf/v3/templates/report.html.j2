@@ -212,7 +212,7 @@ tr{break-inside:avoid;}
  <div class="lever"><div class="n">HEBEL {{ l.n }}</div><div class="ti">{{ l.title }}</div><div class="ef">{{ l.effect|dot_br }}</div><div class="rf">Adressiert: {{ l.refs|join(', ') }}</div></div>
  {% endfor %}
  <div class="wrapup">
- <p class="small">{{ distribution_line }}</p>
+ <p class="small">{{ distribution_line }}</p>{% if excluded_note %}<p class="small">{{ excluded_note }}</p>{% endif %}
  <p class="small" style="margin-top:2mm">Rot = unverzüglich handeln · Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung · Grün = positiv. Diese Seite nennt bewusst keine CVSS-Werte; Umsetzungsdetails ab Kapitel 5.</p>
  </div>
 </section>
@@ -369,7 +369,7 @@ tr{break-inside:avoid;}
 <section>
  <div class="sec-head" style="margin-top:7mm"><div class="kicker">Kapitel 6 · Für Administration und Dienstleister</div><h2>Befunde im Detail</h2></div>
  <p class="lead">Jeder Befund nennt, was gefunden wurde, den Nachweis aus den Werkzeugdaten, die Auswirkung, gestufte Empfehlungen und einen Verifikationsschritt, mit dem die Umsetzung geprüft werden kann. Die Einstufung (Exposition oder Hygiene) ist die eigene Bewertung; CVSS-Werte erscheinen nur als Fremdreferenz bei zitierten CVEs. Befunde aus Passivquellen sind als solche gekennzeichnet.</p>
- {% if findings_more %}<p class="lead">{{ split_note }}</p>{% endif %}
+ {% if findings_more %}<p class="lead">{{ split_note }}</p>{% endif %}{% if excluded_note %}<p class="lead">{{ excluded_note }}</p>{% endif %}
  {% for f in findings_main %}{{ finding_block(f) }}{% endfor %}
 </section>
 
