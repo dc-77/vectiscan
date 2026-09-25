@@ -2014,7 +2014,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -2103,7 +2106,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -2162,6 +2168,7 @@
      "name": "Re-examine Cache-control Directives",
      "plugin_id": "10015",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://openotp.junkerwerk.hu/robots.txt",
      "urls_sample": [
       "https://openotp.junkerwerk.hu/robots.txt"
@@ -2175,6 +2182,7 @@
      "name": "Multiple X-Frame-Options Header Entries",
      "plugin_id": "10020",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://openotp.junkerwerk.hu",
      "urls_sample": [
       "https://openotp.junkerwerk.hu",
@@ -2192,6 +2200,7 @@
      "name": "X-Content-Type-Options Header Missing",
      "plugin_id": "10021",
      "risk": "Low",
+     "run": "passive",
      "url": "https://openotp.junkerwerk.hu/favicon.png",
      "urls_sample": [
       "https://openotp.junkerwerk.hu/favicon.png",
@@ -2206,6 +2215,7 @@
      "name": "Information Disclosure - Suspicious Comments",
      "plugin_id": "10027",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://openotp.junkerwerk.hu/jspopup.js",
      "urls_sample": [
       "https://openotp.junkerwerk.hu/jspopup.js"
@@ -2219,6 +2229,7 @@
      "name": "Strict-Transport-Security Header Not Set",
      "plugin_id": "10035",
      "risk": "Low",
+     "run": "passive",
      "url": "https://openotp.junkerwerk.hu/favicon.png",
      "urls_sample": [
       "https://openotp.junkerwerk.hu/favicon.png",
@@ -2236,6 +2247,7 @@
      "name": "Content Security Policy (CSP) Header Not Set",
      "plugin_id": "10038",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://openotp.junkerwerk.hu/icon.php?webapp=SelfReg",
      "urls_sample": [
       "https://openotp.junkerwerk.hu/icon.php?webapp=SelfReg",
@@ -2253,6 +2265,7 @@
      "name": "CSP: Failure to Define Directive with No Fallback",
      "plugin_id": "10055",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://openotp.junkerwerk.hu",
      "urls_sample": [
       "https://openotp.junkerwerk.hu",
@@ -2270,6 +2283,7 @@
      "name": "Modern Web Application",
      "plugin_id": "10109",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://openotp.junkerwerk.hu/openid/login_uid.php",
      "urls_sample": [
       "https://openotp.junkerwerk.hu/openid/login_uid.php",
@@ -2286,6 +2300,7 @@
      "name": "Authentication Request Identified",
      "plugin_id": "10111",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://openotp.junkerwerk.hu/openid/login_uid.php",
      "urls_sample": [
       "https://openotp.junkerwerk.hu/openid/login_uid.php"
@@ -2299,6 +2314,7 @@
      "name": "Absence of Anti-CSRF Tokens",
      "plugin_id": "10202",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://openotp.junkerwerk.hu/openid/login_uid.php",
      "urls_sample": [
       "https://openotp.junkerwerk.hu/openid/login_uid.php"
@@ -2417,6 +2433,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -2462,6 +2479,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "securitytrails",
    "transport": null,
    "verified": null,
@@ -2493,6 +2511,7 @@
    "product": null,
    "seen_at": "2026-08-31T08:47:45Z",
    "service": "ftp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2524,6 +2543,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-08-31T08:47:45Z",
    "service": "http",
+   "service_seen_at": "2026-08-31T08:14:43Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -2555,6 +2575,7 @@
    "product": null,
    "seen_at": "2026-08-31T08:47:45Z",
    "service": "pop3",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2586,6 +2607,7 @@
    "product": null,
    "seen_at": "2026-08-31T08:47:45Z",
    "service": "imap",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2617,6 +2639,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-08-31T08:47:45Z",
    "service": "https",
+   "service_seen_at": "2026-08-31T08:47:44Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -2648,6 +2671,7 @@
    "product": null,
    "seen_at": "2026-08-31T08:47:45Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2679,6 +2703,7 @@
    "product": null,
    "seen_at": "2026-08-31T08:47:45Z",
    "service": "imap-ssl",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2710,6 +2735,7 @@
    "product": null,
    "seen_at": "2026-08-31T08:47:45Z",
    "service": "pop3-ssl",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2741,6 +2767,7 @@
    "product": "MariaDB",
    "seen_at": "2026-08-31T08:47:45Z",
    "service": "mysql",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2772,6 +2799,7 @@
    "product": "PostgreSQL",
    "seen_at": "2026-08-31T08:47:45Z",
    "service": "postgresql",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2800,6 +2828,7 @@
    "product": "Exim smtpd",
    "seen_at": "2026-08-31T00:28:05Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -2828,6 +2857,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-08-31T00:28:05Z",
    "service": "https",
+   "service_seen_at": "2026-08-31T00:28:05Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2856,6 +2886,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "urlhaus",
    "transport": null,
    "verified": null,
@@ -2939,7 +2970,7 @@
    }
   ]
  },
- "schema_version": "1.0.6",
+ "schema_version": "1.0.7",
  "services": [
   {
    "auth_mechanisms": [],
@@ -2962,6 +2993,9 @@
     }
    ],
    "family": "proftpd",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:21/tcp",
    "login_disabled": null,
@@ -2972,6 +3006,7 @@
    "port": 21,
    "product": "ProFTPD",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ftp",
    "source": "nmap",
    "starttls": null,
@@ -2995,6 +3030,9 @@
     }
    ],
    "family": "proftpd_sftp",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:22/tcp",
    "login_disabled": null,
@@ -3005,6 +3043,7 @@
    "port": 22,
    "product": "ProFTPD mod_sftp",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ssh",
    "source": "nmap",
    "starttls": null,
@@ -3049,6 +3088,9 @@
     }
    ],
    "family": "courier",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:110/tcp",
    "login_disabled": null,
@@ -3059,6 +3101,7 @@
    "port": 110,
    "product": "Courier pop3d",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "pop3",
    "source": "nmap",
    "starttls": true,
@@ -3111,6 +3154,9 @@
     }
    ],
    "family": "dovecot",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:143/tcp",
    "login_disabled": true,
@@ -3121,6 +3167,7 @@
    "port": 143,
    "product": "Dovecot imapd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "imap",
    "source": "nmap",
    "starttls": true,
@@ -3144,6 +3191,9 @@
     }
    ],
    "family": "openssh",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:222/tcp",
    "login_disabled": null,
@@ -3154,6 +3204,7 @@
    "port": 222,
    "product": "OpenSSH",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ssh",
    "source": "nmap",
    "starttls": null,
@@ -3202,6 +3253,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:465/tcp",
    "login_disabled": null,
@@ -3212,6 +3266,7 @@
    "port": 465,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": false,
@@ -3257,6 +3312,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:587/tcp",
    "login_disabled": true,
@@ -3267,6 +3325,7 @@
    "port": 587,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": true,
@@ -3320,6 +3379,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:993/tcp",
    "login_disabled": false,
@@ -3330,6 +3392,7 @@
    "port": 993,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "imaps",
    "source": "nmap",
    "starttls": false,
@@ -3376,6 +3439,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:995/tcp",
    "login_disabled": null,
@@ -3386,6 +3452,7 @@
    "port": 995,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "pop3s",
    "source": "nmap",
    "starttls": false,
@@ -3423,6 +3490,9 @@
     }
    ],
    "family": "mariadb",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:3306/tcp",
    "login_disabled": null,
@@ -3433,6 +3503,7 @@
    "port": 3306,
    "product": "MySQL",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "mysql",
    "source": "nmap",
    "starttls": null,
@@ -3463,6 +3534,9 @@
     }
    ],
    "family": "postgresql",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:5432/tcp",
    "login_disabled": null,
@@ -3473,6 +3547,7 @@
    "port": 5432,
    "product": "PostgreSQL DB",
    "proto": "tcp",
+   "rejects_before_auth": true,
    "service": "postgresql",
    "source": "nmap",
    "starttls": null,
@@ -3503,6 +3578,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": "Apache",
+   "fp_title": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal",
    "host_ip": "217.243.248.30",
    "id": "svc:217.243.248.30:443/tcp",
    "login_disabled": null,
@@ -3513,6 +3591,7 @@
    "port": 443,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -3561,9 +3640,55 @@
    "note": null,
    "observed_at": "2026-08-31T14:32:40Z",
    "product": "Courier",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": "2028-06-30",
+    "latest_patch": null,
+    "source": "Debian LTS, https://wiki.debian.org/LTS",
+    "status": "supported",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
+     "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "debian",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "188.40.3.130",
+   "id": "sw:188.40.3.130:-:debian:12",
+   "kind": "os",
+   "mode": "active",
+   "note": "Release aus dem Paketsuffix eines Dienstes abgeleitet",
+   "observed_at": "2026-08-31T14:32:40Z",
+   "product": "Debian GNU/Linux",
+   "release_date": null,
+   "source": "nmap",
+   "version_norm": "12",
+   "version_raw": "deb12",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3603,9 +3728,11 @@
    "note": null,
    "observed_at": "2026-08-31T14:32:40Z",
    "product": "Dovecot",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3645,9 +3772,11 @@
    "note": "MariaDB-Kompatibilitaetspraefix 5.5.5 entfernt",
    "observed_at": "2026-08-31T14:32:40Z",
    "product": "MariaDB",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "10.11.18",
    "version_raw": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3687,9 +3816,11 @@
    "note": null,
    "observed_at": "2026-08-31T14:32:40Z",
    "product": "OpenSSH",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "9.2p1",
    "version_raw": "9.2p1",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3731,9 +3862,11 @@
    "note": "Bereichsangabe, Version nicht bestimmbar",
    "observed_at": "2026-08-31T14:32:40Z",
    "product": "PostgreSQL",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": "9.6.0 or later",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3773,9 +3906,11 @@
    "note": null,
    "observed_at": "2026-08-31T14:32:40Z",
    "product": "ProFTPD",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3815,9 +3950,11 @@
    "note": null,
    "observed_at": "2026-08-31T14:32:40Z",
    "product": "ProFTPD mod_sftp",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3874,9 +4011,11 @@
    "note": null,
    "observed_at": "2026-08-31T14:32:12Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3916,9 +4055,11 @@
    "note": null,
    "observed_at": "2026-08-31T14:40:22Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   }
  ],

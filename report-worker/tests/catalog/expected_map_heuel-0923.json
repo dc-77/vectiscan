@@ -1,6 +1,8 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/heuel-0923.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
  "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
+ "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben.",
+ "hinweis_s6b2": "S6b-2 hat sieben Markierungen aufgeloest: Q13 4433 ohne Fingerabdruck nur noch als Werkzeugmeldung; Q14 cors_misconfiguration und zweimal csrf_token_missing als Werkzeugmeldung; Q4 dane_missing und SSH-Banner entfallen; Q12 ip_reputation nur ohne Meldungen, die Vercel-Adresse 216.150.1.65 zaehlt nicht. Es bleiben sechs Q8-Markierungen (S6c).",
  "strict": false,
  "orders": {
   "main": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8"
@@ -8,10 +10,8 @@
  "findings": {
   "VS-2026-001": {
    "checks": [
-    "admin_service_exposed_passive"
-   ],
-   "spec09": "Q13",
-   "warum": "4433 nur aus einem Shodan-Banner „Server: xxxx“ vom 11.09. ohne Fingerabdruck; ein Verwaltungsdienst ist nicht belegt."
+    "admin_port_passive_unidentified"
+   ]
   },
   "VS-2026-002": {
    "checks": [
@@ -20,164 +20,149 @@
   },
   "VS-2026-003": {
    "checks": [
-    "cors_misconfiguration"
+    "csp_missing"
    ],
-   "spec09": "Q14",
-   "warum": "ZAP-Meldung „Cross-Domain Misconfiguration“ mit Konfidenz Medium; unter Konfidenz High nur Werkzeugmeldung."
+   "spec09": "Q8",
+   "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
   },
   "VS-2026-004": {
    "checks": [
     "csp_missing"
    ],
    "spec09": "Q8",
-   "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
+   "warum": "Gemessen an der Vercel-Challenge (429 Security Checkpoint), nicht an der Anwendung."
   },
   "VS-2026-005": {
    "checks": [
     "csp_missing"
-   ],
-   "spec09": "Q8",
-   "warum": "Gemessen an der Vercel-Challenge (429 Security Checkpoint), nicht an der Anwendung."
-  },
-  "VS-2026-006": {
-   "checks": [
-    "csp_missing"
    ]
   },
-  "VS-2026-007": {
+  "VS-2026-006": {
    "checks": [
     "csp_weak"
    ]
   },
-  "VS-2026-008": {
-   "checks": [
-    "csrf_token_missing"
-   ],
-   "spec09": "Q14",
-   "warum": "ZAP-Meldung „Absence of Anti-CSRF Tokens“ mit Konfidenz Low; unter Konfidenz High nur Werkzeugmeldung, Quelle passiv (ZAP). Am Portal login.seam."
-  },
-  "VS-2026-009": {
-   "checks": [
-    "csrf_token_missing"
-   ],
-   "spec09": "Q14",
-   "warum": "ZAP-Meldung „Absence of Anti-CSRF Tokens“ mit Konfidenz Low; unter Konfidenz High nur Werkzeugmeldung, Quelle passiv (ZAP)."
-  },
-  "VS-2026-010": {
-   "checks": [
-    "dane_missing"
-   ],
-   "spec09": "Q4",
-   "warum": "Der MX liegt in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
-  },
-  "VS-2026-011": {
+  "VS-2026-007": {
    "checks": [
     "dmarc_quarantine"
    ]
   },
-  "VS-2026-012": {
+  "VS-2026-008": {
    "checks": [
     "dnssec_missing"
    ]
   },
-  "VS-2026-013": {
+  "VS-2026-009": {
    "checks": [
     "hsts_missing"
    ],
    "spec09": "Q8",
    "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
   },
-  "VS-2026-014": {
+  "VS-2026-010": {
    "checks": [
     "hsts_missing"
    ],
    "spec09": "Q8",
    "warum": "Gemessen an der Vercel-Challenge (429 Security Checkpoint), nicht an der Anwendung."
   },
-  "VS-2026-015": {
+  "VS-2026-011": {
    "checks": [
     "hsts_missing"
    ]
   },
-  "VS-2026-016": {
+  "VS-2026-012": {
    "checks": [
     "http_alt_port"
    ]
   },
+  "VS-2026-013": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-014": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-015": {
+   "checks": [
+    "legacy_protocols_present"
+   ]
+  },
+  "VS-2026-016": {
+   "checks": [
+    "legacy_protocols_present"
+   ]
+  },
   "VS-2026-017": {
-   "checks": [
-    "info_disclosure"
-   ]
-  },
-  "VS-2026-018": {
-   "checks": [
-    "info_disclosure"
-   ]
-  },
-  "VS-2026-019": {
-   "checks": [
-    "legacy_protocols_present"
-   ]
-  },
-  "VS-2026-020": {
-   "checks": [
-    "legacy_protocols_present"
-   ]
-  },
-  "VS-2026-021": {
    "checks": [
     "mta_sts_missing"
    ]
   },
-  "VS-2026-022": {
+  "VS-2026-018": {
    "checks": [
     "security_headers_incomplete"
    ],
    "spec09": "Q8",
    "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
   },
-  "VS-2026-023": {
+  "VS-2026-019": {
    "checks": [
     "security_headers_incomplete"
    ],
    "spec09": "Q8",
    "warum": "Gemessen an der Vercel-Challenge (429 Security Checkpoint), nicht an der Anwendung."
   },
-  "VS-2026-024": {
+  "VS-2026-020": {
    "checks": [
     "security_headers_incomplete"
    ]
   },
-  "VS-2026-025": {
-   "checks": [
-    "service_banner_version"
-   ],
-   "spec09": "Q4",
-   "warum": "Das SSH-Banner gehört zum Protokoll und lässt sich nicht entfernen. Dienst des Hetzner-Webhostings 213.133.104.51."
-  },
-  "VS-2026-026": {
+  "VS-2026-021": {
    "checks": [
     "spf_softfail"
    ]
   },
-  "VS-2026-027": {
+  "VS-2026-022": {
    "checks": [
     "sri_missing"
    ]
   },
-  "VS-2026-028": {
+  "VS-2026-023": {
    "checks": [
     "tls_no_13"
+   ]
+  },
+  "VS-2026-024": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-025": {
+   "checks": [
+    "tls_rpt_missing"
+   ]
+  },
+  "VS-2026-026": {
+   "checks": [
+    "tls_weakness_reported"
+   ]
+  },
+  "VS-2026-027": {
+   "checks": [
+    "tls_weakness_reported"
+   ]
+  },
+  "VS-2026-028": {
+   "checks": [
+    "web_vulnerability_reported"
    ]
   },
   "VS-2026-029": {
    "checks": [
-    "tls_no_13"
-   ]
-  },
-  "VS-2026-030": {
-   "checks": [
-    "tls_rpt_missing"
+    "web_vulnerability_reported"
    ]
   }
  },
@@ -325,9 +310,7 @@
   "VS-2026-P29": {
    "checks": [
     "ip_reputation"
-   ],
-   "spec09": "Q12",
-   "warum": "AbuseIPDB meldet für 216.150.1.65 totalReports 26 von 9 Nutzern, zuletzt 2026-09-21; Score 0 nur wegen isWhitelisted."
+   ]
   },
   "VS-2026-P30": {
    "checks": [
@@ -336,12 +319,12 @@
   },
   "VS-2026-P31": {
    "checks": [
-    "ip_reputation"
+    "mail_plaintext"
    ]
   },
   "VS-2026-P32": {
    "checks": [
-    "mail_plaintext"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P33": {
@@ -361,12 +344,12 @@
   },
   "VS-2026-P36": {
    "checks": [
-    "rdp_exposed"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-P37": {
    "checks": [
-    "security_headers_incomplete"
+    "smb_exposed"
    ]
   },
   "VS-2026-P38": {
@@ -386,12 +369,12 @@
   },
   "VS-2026-P41": {
    "checks": [
-    "smb_exposed"
+    "spf_missing"
    ]
   },
   "VS-2026-P42": {
    "checks": [
-    "spf_missing"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P43": {
@@ -406,7 +389,7 @@
   },
   "VS-2026-P45": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P46": {
@@ -416,7 +399,7 @@
   },
   "VS-2026-P47": {
    "checks": [
-    "tls_no_13"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P48": {
@@ -431,15 +414,10 @@
   },
   "VS-2026-P50": {
    "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P51": {
-   "checks": [
     "urlhaus_compromise"
    ]
   },
-  "VS-2026-P52": {
+  "VS-2026-P51": {
    "checks": [
     "waf_present"
    ]
@@ -447,6 +425,5 @@
  },
  "subsumed": {},
  "expected_coverage_differences": [],
- "expected_member_differences": [],
- "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben."
+ "expected_member_differences": []
 }

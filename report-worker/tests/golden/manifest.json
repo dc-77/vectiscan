@@ -87,7 +87,7 @@
     "negative"
    ],
    "note": "securess.de 19.07.2026, juengster von acht Laeufen",
-   "negative_entries": 2,
+   "negative_entries": 1,
    "api_snapshot": true,
    "tar": {
     "present": true,
@@ -305,7 +305,7 @@
     "golden"
    ],
    "note": "lumbeck-wolter.de 20.09.2026, Pilotkunde mit schriftlicher Freigabe und erster Fixture-Lauf nach den S2b-Scannerfixen. Ein Ziel, ein Host. Der AAAA 2a01:4f8:d0a:668b::2 taucht im Lauf nicht auf: Haupt- und www-Adresse teilen ihr FQDN-Set mit der A-Adresse, und die Zusammenfassung in phase0 bevorzugt IPv4. Der Lauf belegt damit den Dual-Stack-Defekt, nicht den IPv6-Scan",
-   "negative_entries": 0,
+   "negative_entries": 3,
    "api_snapshot": true,
    "tar": {
     "present": true,
@@ -330,7 +330,7 @@
     "drift"
    ],
    "note": "Junkerwerk Lauf 4, beide Domains, 20.09.2026. Erster Fixture-Lauf mit einem AAAA-Host (2a01:4f8:d0a:3124::2) und erster mit den S2b-Fixen: DNS je Domain (Issue #12), testssl ohne Severity-Filter (#9), Header und httpx je VHost (#10). Vierter Lauf im Junkerwerk-Drift-Test",
-   "negative_entries": 0,
+   "negative_entries": 2,
    "api_snapshot": true,
    "tar": {
     "present": true,
@@ -351,10 +351,11 @@
    "finished": "2026-09-23T19:38:55.743Z",
    "roles": [
     "golden",
-    "drift"
+    "drift",
+    "negative"
    ],
    "note": "dortmund-beach.com, Scan-Runde 23.09.2026; Soll-Liste expected/dortmund-beach-0923.json. Traegt jQuery Migrate 3.4.1 (Namensgrenze, spec/09 Q11), Webmin auf 10000 (Q13) und csrf_token_missing mit Konfidenz Low (Q14)",
-   "negative_entries": 0,
+   "negative_entries": 10,
    "api_snapshot": true,
    "tar": {
     "present": true,
@@ -375,10 +376,11 @@
    "finished": "2026-09-23T19:29:02.441Z",
    "roles": [
     "golden",
-    "drift"
+    "drift",
+    "negative"
    ],
    "note": "lumbeck-wolter.de, Scan-Runde 23.09.2026; Soll-Liste expected/lumbeck-wolter-0923.json. Regressionsfall der Dashboard-Techniktabelle: MariaDB mit Praefix 5.5.5- und PostgreSQL 9.6.0 or later (spec/09 Q11)",
-   "negative_entries": 0,
+   "negative_entries": 5,
    "api_snapshot": true,
    "tar": {
     "present": true,
@@ -400,10 +402,11 @@
    "finished": "2026-09-23T19:48:07.017Z",
    "roles": [
     "golden",
-    "drift"
+    "drift",
+    "negative"
    ],
    "note": "Junkerwerk Lauf 5, junkerwerk.de und junkerwerk.hu, Scan-Runde 23.09.2026; Soll-Liste expected/junkerwerk-0923.json. Wie c3d5724c MariaDB mit Praefix und PostgreSQL or later auf dem Hetzner-Server (spec/09 Q11); archiv.junkerwerk.de fehlt (Discovery, Q1). Nicht im Junkerwerk-Drift-Test, der Scanner hat sich seit Lauf 4 geaendert",
-   "negative_entries": 0,
+   "negative_entries": 8,
    "api_snapshot": true,
    "tar": {
     "present": true,
@@ -423,10 +426,11 @@
    "started": "2026-09-23T19:29:03.665Z",
    "finished": "2026-09-23T19:51:42.983Z",
    "roles": [
-    "golden"
+    "golden",
+    "negative"
    ],
    "note": "huendgen-entsorgung.de, Scan-Runde 23.09.2026; Soll-Liste expected/huendgen-0923.json. Exchange 2019 mit OWA, Duda-Plattform als geteiltes System (spec/09 Q3); die FTP-Namen fehlen (Q1)",
-   "negative_entries": 0,
+   "negative_entries": 6,
    "api_snapshot": true,
    "tar": {
     "present": true,
@@ -447,10 +451,11 @@
    "finished": "2026-09-23T20:41:32.000Z",
    "roles": [
     "golden",
-    "drift"
+    "drift",
+    "negative"
    ],
    "note": "castenow.de, Scan-Runde 23.09.2026; Soll-Liste expected/castenow-0923.json. Groesster Bericht der Runde, Plesk-Sammelserver mit Fremdkunden (spec/09 Q3), jQuery Migrate (Q11), CAA vorhanden (Q4)",
-   "negative_entries": 0,
+   "negative_entries": 14,
    "api_snapshot": true,
    "tar": {
     "present": true,
@@ -471,10 +476,11 @@
    "finished": "2026-09-23T20:39:35.735Z",
    "roles": [
     "golden",
-    "drift"
+    "drift",
+    "negative"
    ],
    "note": "heuel.com, Scan-Runde 23.09.2026; Soll-Liste expected/heuel-0923.json. IPv6-Host, Vercel- und IONOS-Kanten, AbuseIPDB mit isWhitelisted (spec/09 Q12)",
-   "negative_entries": 0,
+   "negative_entries": 9,
    "api_snapshot": true,
    "tar": {
     "present": true,
@@ -495,10 +501,11 @@
    "finished": "2026-09-23T20:19:37.339Z",
    "roles": [
     "golden",
-    "coverage"
+    "coverage",
+    "negative"
    ],
    "note": "bergersysteme.com, Scan-Runde 23.09.2026; Soll-Liste expected/bergersysteme-0923.json. Vier Hosts ohne Messergebnis (leere nmap-Ausgabe, spec/09 Q9 und E4), Cloudflare-Kante und Plesk-Sammelserver (Q3), 24 Namen gehen in der Discovery verloren (Q1)",
-   "negative_entries": 0,
+   "negative_entries": 7,
    "api_snapshot": true,
    "tar": {
     "present": true,

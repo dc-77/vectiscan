@@ -1,6 +1,8 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/junkerwerk-0923.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
  "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
+ "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben.",
+ "hinweis_s6b2": "S6b-2 hat fuenf Markierungen aufgeloest: Q13 SonicWall 4433 laut Passivquelle mit Kennung als Exposition erhoeht, erste Empfehlung die Pruefung; Q4 dane_missing fuer .de und .hu entfaellt, TRACE aus der OPTIONS-Antwort nur als Werkzeugmeldung, SSH-Banner, MariaDB-Handshake und PostgreSQL-Untergrenze sind keine Versionspreisgabe. Es bleiben zwei Q8-Markierungen (S6c).",
  "strict": false,
  "orders": {
   "main": "31d67a02-b485-4d05-b228-dbdde092cc68"
@@ -9,9 +11,7 @@
   "VS-2026-001": {
    "checks": [
     "admin_service_exposed_passive"
-   ],
-   "spec09": "Q13",
-   "warum": "Die SonicWall auf 4433 steht nur laut Passivquelle und als Hygiene hoch; A.2 und E1 verlangen für eine Verwaltungsoberfläche die Einstufung über die Exposition, ein Passivfund zuerst den Nachweis."
+   ]
   },
   "VS-2026-002": {
    "checks": [
@@ -40,46 +40,42 @@
   },
   "VS-2026-007": {
    "checks": [
-    "dane_missing"
-   ],
-   "spec09": "Q4",
-   "warum": "Der MX liegt in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
-  },
-  "VS-2026-008": {
-   "checks": [
-    "dane_missing"
-   ],
-   "spec09": "Q4",
-   "warum": "Der MX liegt in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
-  },
-  "VS-2026-009": {
-   "checks": [
     "db_exposed"
    ]
   },
-  "VS-2026-010": {
+  "VS-2026-008": {
    "checks": [
     "default_page_exposed"
    ]
   },
-  "VS-2026-011": {
+  "VS-2026-009": {
    "checks": [
     "dmarc_missing"
+   ]
+  },
+  "VS-2026-010": {
+   "checks": [
+    "dmarc_missing"
+   ]
+  },
+  "VS-2026-011": {
+   "checks": [
+    "dnssec_missing"
    ]
   },
   "VS-2026-012": {
    "checks": [
-    "dmarc_missing"
+    "dnssec_missing"
    ]
   },
   "VS-2026-013": {
    "checks": [
-    "dnssec_missing"
+    "hsts_missing"
    ]
   },
   "VS-2026-014": {
    "checks": [
-    "dnssec_missing"
+    "hsts_missing"
    ]
   },
   "VS-2026-015": {
@@ -89,17 +85,17 @@
   },
   "VS-2026-016": {
    "checks": [
-    "hsts_missing"
+    "http_alt_port"
    ]
   },
   "VS-2026-017": {
    "checks": [
-    "hsts_missing"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-018": {
    "checks": [
-    "http_alt_port"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-019": {
@@ -109,54 +105,54 @@
   },
   "VS-2026-020": {
    "checks": [
-    "http_header_disclosure"
+    "http_trace_enabled"
    ]
   },
   "VS-2026-021": {
    "checks": [
-    "http_header_disclosure"
+    "info_disclosure"
    ]
   },
   "VS-2026-022": {
    "checks": [
-    "http_trace_enabled"
-   ],
-   "spec09": "Q4",
-   "warum": "„TRACE aktiv“ stammt nur aus der OPTIONS-Antwort (nmap http-methods); eine TRACE-Anfrage ist nicht belegt."
+    "info_disclosure"
+   ]
   },
   "VS-2026-023": {
-   "checks": [
-    "info_disclosure"
-   ]
-  },
-  "VS-2026-024": {
-   "checks": [
-    "info_disclosure"
-   ]
-  },
-  "VS-2026-025": {
    "checks": [
     "legacy_protocols_present"
    ]
   },
-  "VS-2026-026": {
+  "VS-2026-024": {
    "checks": [
     "login_portal_exposed"
+   ]
+  },
+  "VS-2026-025": {
+   "checks": [
+    "login_portal_exposed"
+   ]
+  },
+  "VS-2026-026": {
+   "checks": [
+    "mta_sts_missing"
    ]
   },
   "VS-2026-027": {
    "checks": [
-    "login_portal_exposed"
+    "mta_sts_missing"
    ]
   },
   "VS-2026-028": {
    "checks": [
-    "mta_sts_missing"
-   ]
+    "security_headers_incomplete"
+   ],
+   "spec09": "Q8",
+   "warum": "Gemessen an der Weiterleitung des Outlook-Portals; die Endseite /owa/auth/logon.aspx setzt X-Frame-Options SAMEORIGIN."
   },
   "VS-2026-029": {
    "checks": [
-    "mta_sts_missing"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-030": {
@@ -168,61 +164,57 @@
   },
   "VS-2026-031": {
    "checks": [
-    "security_headers_incomplete"
+    "service_banner_version"
    ]
   },
   "VS-2026-032": {
    "checks": [
-    "security_headers_incomplete"
-   ],
-   "spec09": "Q8",
-   "warum": "Gemessen an der Weiterleitung des Outlook-Portals; die Endseite /owa/auth/logon.aspx setzt X-Frame-Options SAMEORIGIN."
+    "spf_softfail"
+   ]
   },
   "VS-2026-033": {
    "checks": [
-    "service_banner_version"
-   ],
-   "spec09": "Q4",
-   "warum": "SSH-Banner und MariaDB-Handshake gehören zum Protokoll und lassen sich nicht entfernen; „PostgreSQL unbekannt“ ist keine Versionspreisgabe."
+    "spf_softfail"
+   ]
   },
   "VS-2026-034": {
-   "checks": [
-    "service_banner_version"
-   ]
-  },
-  "VS-2026-035": {
-   "checks": [
-    "spf_softfail"
-   ]
-  },
-  "VS-2026-036": {
-   "checks": [
-    "spf_softfail"
-   ]
-  },
-  "VS-2026-037": {
    "checks": [
     "tls_legacy_protocols"
    ]
   },
-  "VS-2026-038": {
+  "VS-2026-035": {
    "checks": [
     "tls_no_fallback_scsv"
    ]
   },
-  "VS-2026-039": {
+  "VS-2026-036": {
    "checks": [
     "tls_rpt_missing"
+   ]
+  },
+  "VS-2026-037": {
+   "checks": [
+    "tls_rpt_missing"
+   ]
+  },
+  "VS-2026-038": {
+   "checks": [
+    "tls_weakness"
+   ]
+  },
+  "VS-2026-039": {
+   "checks": [
+    "tls_weakness_reported"
    ]
   },
   "VS-2026-040": {
    "checks": [
-    "tls_rpt_missing"
+    "tls_weakness_reported"
    ]
   },
   "VS-2026-041": {
    "checks": [
-    "tls_weakness"
+    "tls_weakness_reported"
    ]
   }
  },
@@ -435,6 +427,5 @@
  },
  "subsumed": {},
  "expected_coverage_differences": [],
- "expected_member_differences": [],
- "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben."
+ "expected_member_differences": []
 }

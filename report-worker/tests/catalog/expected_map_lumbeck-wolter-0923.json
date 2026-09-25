@@ -1,6 +1,8 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/lumbeck-wolter-0923.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
  "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
+ "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben.",
+ "hinweis_s6b2": "S6b-2 hat drei Markierungen aufgeloest: Q4 dane_missing (MX bei Hornetsecurity) und der Banner-Befund (SSH, MariaDB-Handshake, PostgreSQL-Untergrenze) entfallen; Q12 der Positivbefund zu verwaisten CNAME-Eintraegen steht im Bericht nicht mehr.",
  "strict": false,
  "orders": {
   "main": "c3d5724c-bdbf-4da8-982f-4f1a52210e28"
@@ -13,49 +15,35 @@
   },
   "VS-2026-002": {
    "checks": [
-    "dane_missing"
-   ],
-   "spec09": "Q4",
-   "warum": "Der MX liegt bei Hornetsecurity in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
-  },
-  "VS-2026-003": {
-   "checks": [
     "db_exposed"
    ]
   },
-  "VS-2026-004": {
+  "VS-2026-003": {
    "checks": [
     "dmarc_missing"
    ]
   },
-  "VS-2026-005": {
+  "VS-2026-004": {
    "checks": [
     "dnssec_missing"
    ]
   },
-  "VS-2026-006": {
+  "VS-2026-005": {
    "checks": [
     "legacy_protocols_present"
    ]
   },
-  "VS-2026-007": {
+  "VS-2026-006": {
    "checks": [
     "mta_sts_missing"
    ]
   },
-  "VS-2026-008": {
-   "checks": [
-    "service_banner_version"
-   ],
-   "spec09": "Q4",
-   "warum": "SSH-Banner und MariaDB-Handshake gehören zum Protokoll und lassen sich nicht entfernen; „PostgreSQL unbekannt“ ist keine Versionspreisgabe."
-  },
-  "VS-2026-009": {
+  "VS-2026-007": {
    "checks": [
     "spf_softfail"
    ]
   },
-  "VS-2026-010": {
+  "VS-2026-008": {
    "checks": [
     "tls_rpt_missing"
    ]
@@ -70,9 +58,7 @@
   "VS-2026-P02": {
    "checks": [
     "dns_dangling_cname"
-   ],
-   "spec09": "Q12",
-   "warum": "Die Prüfung auf verwaiste Einträge entfällt (Posture „entfällt“); eine entfallene Prüfung zählt nicht als bestanden."
+   ]
   },
   "VS-2026-P03": {
    "checks": [
@@ -111,10 +97,15 @@
   },
   "VS-2026-P10": {
    "checks": [
-    "spf_missing"
+    "software_eol"
    ]
   },
   "VS-2026-P11": {
+   "checks": [
+    "spf_missing"
+   ]
+  },
+  "VS-2026-P12": {
    "checks": [
     "urlhaus_compromise"
    ]
@@ -122,6 +113,5 @@
  },
  "subsumed": {},
  "expected_coverage_differences": [],
- "expected_member_differences": [],
- "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben."
+ "expected_member_differences": []
 }

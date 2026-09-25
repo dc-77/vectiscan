@@ -1,23 +1,6 @@
 {
  "appendix": {
-  "cve_refs": [
-   {
-    "cve": "CVE-2013-0169",
-    "name": "Lucky 13 (CBC-Zeitangriff)",
-    "note": "Werkzeugbefund, keine Fremdbewertung.",
-    "ref": "VS-2026-009",
-    "score": "",
-    "src": "testssl"
-   },
-   {
-    "cve": "CVE-2013-3587",
-    "name": "BREACH (HTTP-Kompression)",
-    "note": "Werkzeugbefund, keine Fremdbewertung.",
-    "ref": "VS-2026-009",
-    "score": "",
-    "src": "testssl"
-   }
-  ],
+  "cve_refs": [],
   "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 23.09.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
   "dkim_selectors": [
    "1und1",
@@ -86,14 +69,14 @@
   "exposure_scale": [
    {
     "l": "kritisch",
-    "t": "Dienst, der nicht an das öffentliche Interface gehört (Datenbanken, Verwaltungsoberflächen, Fernwartung) und aus dem Internet erreichbar ist."
+    "t": "Dienst, der nicht an das öffentliche Interface gehört und aus dem Internet erreichbar ist: Datenbanken, Fernwartung, Verwaltungsoberfläche mit Anmeldung ohne vorgelagerten Schutz auf einem System des Kunden."
    },
    {
     "l": "erhöht",
-    "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
+    "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 1106 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (1082 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 13 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 1093 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (1073 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 12 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -112,7 +95,7 @@
    {
     "host": "88.99.35.112",
     "port": "21",
-    "ref": "VS-2026-002, VS-2026-007",
+    "ref": "VS-2026-006",
     "svc": "Pure-FTPd"
    },
    {
@@ -124,19 +107,19 @@
    {
     "host": "88.99.35.112",
     "port": "110",
-    "ref": "VS-2026-007",
+    "ref": "VS-2026-002",
     "svc": "Dovecot pop3d, STARTTLS"
    },
    {
     "host": "88.99.35.112",
     "port": "143",
-    "ref": "VS-2026-007",
+    "ref": "VS-2026-002",
     "svc": "Dovecot imapd, STARTTLS"
    },
    {
     "host": "88.99.35.112",
     "port": "443",
-    "ref": "VS-2026-003, VS-2026-004, VS-2026-005, VS-2026-009, VS-2026-010, VS-2026-011, VS-2026-013",
+    "ref": "VS-2026-004, VS-2026-008, VS-2026-009, VS-2026-010, VS-2026-012",
     "svc": "Apache httpd 2.4.67, TLS erzwungen"
    },
    {
@@ -172,7 +155,7 @@
    {
     "host": "88.99.35.112",
     "port": "30000",
-    "ref": "VS-2026-011",
+    "ref": "",
     "svc": "OpenSSH 8.4p1"
    },
    {
@@ -183,19 +166,115 @@
    }
   ],
   "repeat": [
+   "Nachprüfung der Sofortmaßnahmen nach ihrer Umsetzung, gezielt auf die betroffenen Dienste.",
    "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
    "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall."
   ],
   "tool_findings": [
    {
-    "note": "Werkzeugmeldung ohne eigene Einstufung.",
-    "what": "dortmund-beach.com (Big Redirect Detected (Potential Sensitive Information Leak); Cross-Domain JavaScript Source File Inclusion; In Page Banner Information Leak; Timestamp Disclosure - Unix)",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "what": "dortmund-beach.com (Big Redirect Detected (Potential Sensitive Information Leak))",
     "where": "dortmund-beach.com (+www.dortmund-beach.com)"
    },
    {
-    "note": "Werkzeugmeldung ohne eigene Einstufung.",
-    "what": "Path Traversal auf dortmund-beach.com/wp-json/oembed/1.0/embed (Konfidenz Low, gemeldet von ZAP)",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "what": "dortmund-beach.com (Cross-Domain JavaScript Source File Inclusion)",
     "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+   },
+   {
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "what": "dortmund-beach.com (In Page Banner Information Leak)",
+    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+   },
+   {
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "what": "dortmund-beach.com (Timestamp Disclosure - Unix)",
+    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+   },
+   {
+    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "what": "dortmund-beach.com:443: BREACH (Hinweis der TLS-Analyse)",
+    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+   },
+   {
+    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "what": "dortmund-beach.com:443: LUCKY13 (Hinweis der TLS-Analyse)",
+    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+   },
+   {
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "what": "Absence of Anti-CSRF Tokens auf dortmund-beach.com/wp-login.php (Konfidenz niedrig, passiv gemeldet von ZAP)",
+    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+   },
+   {
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "what": "Cookie No HttpOnly Flag auf dortmund-beach.com/wp-login.php (Konfidenz mittel, passiv gemeldet von ZAP)",
+    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+   },
+   {
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "what": "Cookie without SameSite Attribute auf dortmund-beach.com/wp-login.php (Konfidenz mittel, passiv gemeldet von ZAP)",
+    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+   },
+   {
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "what": "Path Traversal auf dortmund-beach.com/wp-json/oembed/1.0/embed (Konfidenz niedrig, aktiv gemeldet von ZAP)",
+    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: Burst",
+    "where": "88.99.35.112"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: Google Analytics",
+    "where": "88.99.35.112"
+   },
+   {
+    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: Google Tag Manager",
+    "where": "88.99.35.112"
+   },
+   {
+    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: Powered by Slider Revolution 6.7.11",
+    "where": "88.99.35.112"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: jQuery Migrate 3.4.1",
+    "where": "88.99.35.112"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: MySQL",
+    "where": "88.99.35.112"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: PHP",
+    "where": "88.99.35.112"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: jQuery",
+    "where": "88.99.35.112"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: Complianz",
+    "where": "88.99.35.112"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: Slider Revolution 6.7.11",
+    "where": "88.99.35.112"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: BeTheme 27.4.5",
+    "where": "88.99.35.112"
    }
   ],
   "tools": [
@@ -254,7 +333,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen."
    },
    {
     "l": "Gelb",
@@ -274,15 +353,15 @@
   ]
  },
  "architecture": {
-  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 1 Host mit folgenden Aufgaben: Dateiaustausch, Fernzugang und Verwaltung und Website. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 1 System mit folgenden Aufgaben: Dateiaustausch, Fernzugang und Verwaltung und Website. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [],
   "posture": [
    {
     "items": [
      {
       "l": "SPF",
-      "ok": false,
-      "v": "Handlungsbedarf"
+      "ok": null,
+      "v": "softfail"
      },
      {
       "l": "DKIM",
@@ -343,8 +422,8 @@
      },
      {
       "l": "Zertifikate",
-      "ok": true,
-      "v": "unauffällig"
+      "ok": null,
+      "v": "nur teilweise geprüft"
      }
     ],
     "name": "Transportverschlüsselung",
@@ -362,7 +441,7 @@
     "short": "Sicherheits-Header"
    }
   ],
-  "reputation": "Reputation: keine Einträge zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus.",
+  "reputation": "Reputation: keine Meldungen zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus.",
   "screens": [
    {
     "also": [],
@@ -381,7 +460,7 @@
      {
       "p": "21",
       "s": "Pure-FTPd",
-      "st": "gelb"
+      "st": "blau"
      },
      {
       "p": "80",
@@ -391,12 +470,12 @@
      {
       "p": "110",
       "s": "Dovecot pop3d",
-      "st": "blau"
+      "st": "gelb"
      },
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "blau"
+      "st": "gelb"
      },
      {
       "p": "443",
@@ -426,12 +505,12 @@
      {
       "p": "10000",
       "s": "SNET-SENSOR-MGMT",
-      "st": "gelb"
+      "st": "rot"
      },
      {
       "p": "30000",
       "s": "OpenSSH",
-      "st": "blau"
+      "st": "gruen"
      },
      {
       "p": "25",
@@ -449,89 +528,17 @@
      {
       "c": "WordPress",
       "conf": "hoch",
-      "note": "Herstellerpflege endete am 2024-07-16",
+      "note": "Lifecycle prüfen, Hersteller nennt 2024-07-16",
       "src": "httpx, wpscan",
-      "st": "rot",
-      "status": "veraltet",
+      "st": "gruen",
+      "status": "aktuell",
       "v": "6.5.12"
-     },
-     {
-      "c": "Burst",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "Google Analytics",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "Google Tag Manager",
-      "conf": "mittel",
-      "note": "",
-      "src": "webtech",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "Powered by Slider Revolution",
-      "conf": "mittel",
-      "note": "",
-      "src": "webtech",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "6.7.11"
-     },
-     {
-      "c": "jQuery Migrate",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "3.4.1"
-     },
-     {
-      "c": "MySQL",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
      },
      {
       "c": "Pure-FTPd",
       "conf": "hoch",
       "note": "",
       "src": "nmap",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "PHP",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "jQuery",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -555,22 +562,13 @@
       "v": "unbekannt"
      },
      {
-      "c": "Complianz",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "Slider Revolution",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "6.7.11"
+      "c": "Debian GNU/Linux",
+      "conf": "hoch",
+      "note": "Herstellerpflege endete am 2026-08-31",
+      "src": "nmap",
+      "st": "rot",
+      "status": "veraltet",
+      "v": "11"
      },
      {
       "c": "burst-statistics",
@@ -607,15 +605,6 @@
       "st": "grau",
       "status": "unbekannt",
       "v": "8.4p1 (debian)"
-     },
-     {
-      "c": "BeTheme",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "27.4.5"
      },
      {
       "c": "betheme",
@@ -664,23 +653,93 @@
      "dateiaustausch",
      "website"
     ],
-    "system": "Fernzugang und Verwaltung, Dateiaustausch, Website (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com)"
+    "system": "Fernzugang und Verwaltung, Dateiaustausch, Website (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)"
    }
   ]
  },
  "findings": [
   {
-   "affected": "88.99.35.112:10000 (snet-sensor-mgmt)",
+   "affected": "88.99.35.112:10000 (Webmin)",
    "cat": "A",
-   "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:10000/tcp Dienst=snet-sensor-mgmt Zustand=open TLS erzwungen=ja\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n10000/tcp open snet-sensor-mgmt tunnel=ssl",
-   "found": "Der Host 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet eine Verwaltungs- oder Firewall-Oberfläche an, die aus dem gesamten Internet erreichbar ist: 88.99.35.112:10000 (snet-sensor-mgmt). Eine Zugriffsbeschränkung auf bestimmte Quellnetze ist von außen nicht erkennbar.",
+   "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:10000/tcp · Dienst: snet-sensor-mgmt · Server-Kennung: MiniServ · Anmeldung verlangt: ja · TLS erzwungen: ja",
+   "found": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 88.99.35.112:10000 (Webmin). Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung; eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar.",
    "id": "VS-2026-001",
    "impact": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen.",
-   "level": "erhoeht",
-   "level_label": "erhöht",
+   "key": "admin_access/88.99.35.112/kunde",
+   "level": "kritisch",
+   "level_label": "kritisch",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.",
+   "plan_effect": "Entzieht Angreifern den direkten Zugang zur Verwaltung der Systeme",
+   "plan_lever": "Verwaltungsoberflächen vom Internet trennen",
+   "plan_stage": "unverzueglich",
    "policy": "admin_service_exposed",
+   "provenance": [
+    {
+     "check": "admin_service_exposed",
+     "field": "title",
+     "members": [
+      "88.99.35.112|88.99.35.112:10000"
+     ],
+     "statement": "short",
+     "text": "Verwaltungsoberfläche mit Anmeldung"
+    },
+    {
+     "check": "admin_service_exposed",
+     "field": "observation",
+     "members": [
+      "88.99.35.112|88.99.35.112:10000"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 88.99.35.112:10000 (Webmin). Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung; eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar."
+    },
+    {
+     "check": "admin_service_exposed",
+     "field": "meaning",
+     "members": [
+      "88.99.35.112|88.99.35.112:10000"
+     ],
+     "statement": "meaning[0]",
+     "text": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen."
+    },
+    {
+     "check": "admin_service_exposed",
+     "field": "verify",
+     "members": [
+      "88.99.35.112|88.99.35.112:10000"
+     ],
+     "statement": "verify[0]",
+     "text": "Verbindungsversuch auf den betroffenen Port von einer externen Adresse außerhalb der freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung."
+    },
+    {
+     "check": "admin_service_exposed",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|88.99.35.112:10000"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst."
+    },
+    {
+     "check": "admin_service_exposed",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|88.99.35.112:10000"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Mehrfaktor-Anmeldung für die Verwaltungsoberfläche aktivieren und Standardkonten deaktivieren oder umbenennen."
+    },
+    {
+     "check": "admin_service_exposed",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|88.99.35.112:10000"
+     ],
+     "statement": "recommendation[2]",
+     "text": "Softwarestand der Verwaltungsoberfläche gegen die Sicherheitshinweise des Herstellers abgleichen und Anmeldeversuche überwachen."
+    }
+   ],
    "recommendation": [
     [
      "Unverzüglich",
@@ -697,95 +756,321 @@
    ],
    "scale": "exposure",
    "source": "aktiv (nmap)",
-   "status": "gelb",
+   "status": "rot",
    "threat": null,
-   "title": "Verwaltungsoberfläche aus dem Internet erreichbar",
-   "urgency": "In Kürze",
+   "title": "Verwaltungszugänge auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com): Verwaltungsoberfläche mit Anmeldung",
+   "urgency": "Unverzüglich",
    "verify": "Verbindungsversuch auf den betroffenen Port von einer externen Adresse außerhalb der freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung."
   },
   {
-   "affected": "88.99.35.112:21 (FTP ohne TLS-Zwang)",
+   "affected": "88.99.35.112:110 (POP3 mit Anmeldung vor STARTTLS), 88.99.35.112:143 (IMAP mit Anmeldung vor STARTTLS)",
    "cat": "A",
-   "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:21/tcp Dienst=ftp Produkt=Pure-FTPd Zustand=open",
-   "found": "Auf 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) nehmen Datei- oder Mailzugänge eine Anmeldung entgegen, ohne eine Transportverschlüsselung zu erzwingen: 88.99.35.112:21 (FTP ohne TLS-Zwang).",
+   "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:110/tcp · Dienst: pop3 · Produkt: Dovecot pop3d · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · pop3-capabilities: UIDL TOP CAPA RESP-CODES AUTH-RESP-CODE SASL(PLAIN LOGIN) USER PIPELINING STLS\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:143/tcp · Dienst: imap · Produkt: Dovecot imapd · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · Anmeldeverfahren: LOGIN, PLAIN · imap-capabilities: AUTH=PLAIN OK ENABLE ID LOGIN-REFERRALS LITERAL+ SASL-IR post-login STARTTLS IMAP4rev1 AUTH=LOGINA0001 Pre-login have listed capabilities more IDLE",
+   "found": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet der Mailabrufdienst zwar STARTTLS an, nimmt eine Anmeldung aber schon vor dem Aufbau der Verschlüsselung entgegen: 88.99.35.112:110 (POP3 mit Anmeldung vor STARTTLS), 88.99.35.112:143 (IMAP mit Anmeldung vor STARTTLS).",
    "id": "VS-2026-002",
-   "impact": "Ohne erzwungene Transportverschlüsselung gehen Anmeldedaten und Inhalte im Klartext über das Netz. Jeder Mitleser auf dem Übertragungsweg kann sie abgreifen und für weitere Zugriffe auf den Dienst oder auf wiederverwendete Konten nutzen.",
+   "impact": "Ohne STARTTLS oder eine gleichwertige Verschlüsselungspflicht übertragen POP3 und IMAP Anmeldedaten und Nachrichteninhalte im Klartext über das Netz. Jeder Mitleser auf dem Übertragungsweg kann Postfach-Zugangsdaten abgreifen und für weitere Zugriffe nutzen.",
+   "key": "plaintext_services/88.99.35.112/kunde",
    "level": "erhoeht",
    "level_label": "erhöht",
    "operator": "",
    "operator_note": "",
-   "policy": "ftp_plaintext",
+   "plan_action": "Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten.",
+   "plan_effect": "Schützt Zugangsdaten und Nachrichten auf dem Übertragungsweg",
+   "plan_lever": "TLS für POP3 und IMAP erzwingen",
+   "plan_stage": "in_kuerze",
+   "policy": "mail_plaintext",
+   "provenance": [
+    {
+     "check": "mail_plaintext",
+     "field": "title",
+     "members": [
+      "88.99.35.112|88.99.35.112:110",
+      "88.99.35.112|88.99.35.112:143"
+     ],
+     "statement": "short",
+     "text": "POP3 oder IMAP ohne TLS-Zwang"
+    },
+    {
+     "check": "mail_plaintext",
+     "field": "observation",
+     "members": [
+      "88.99.35.112|88.99.35.112:110",
+      "88.99.35.112|88.99.35.112:143"
+     ],
+     "statement": "observation[1]",
+     "text": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet der Mailabrufdienst zwar STARTTLS an, nimmt eine Anmeldung aber schon vor dem Aufbau der Verschlüsselung entgegen: 88.99.35.112:110 (POP3 mit Anmeldung vor STARTTLS), 88.99.35.112:143 (IMAP mit Anmeldung vor STARTTLS)."
+    },
+    {
+     "check": "mail_plaintext",
+     "field": "meaning",
+     "members": [
+      "88.99.35.112|88.99.35.112:110",
+      "88.99.35.112|88.99.35.112:143"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne STARTTLS oder eine gleichwertige Verschlüsselungspflicht übertragen POP3 und IMAP Anmeldedaten und Nachrichteninhalte im Klartext über das Netz. Jeder Mitleser auf dem Übertragungsweg kann Postfach-Zugangsdaten abgreifen und für weitere Zugriffe nutzen."
+    },
+    {
+     "check": "mail_plaintext",
+     "field": "verify",
+     "members": [
+      "88.99.35.112|88.99.35.112:110",
+      "88.99.35.112|88.99.35.112:143"
+     ],
+     "statement": "verify[0]",
+     "text": "Verbindung zum Mailabrufdienst von außen aufbauen, bevor STARTTLS angefordert wird; erwartet wird die Ablehnung dieser unverschlüsselten Anmeldung."
+    },
+    {
+     "check": "mail_plaintext",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|88.99.35.112:110",
+      "88.99.35.112|88.99.35.112:143"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten."
+    },
+    {
+     "check": "mail_plaintext",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|88.99.35.112:110",
+      "88.99.35.112|88.99.35.112:143"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Postfach-Zugangsdaten rotieren und die Zugriffsprotokolle auf unverschlüsselte Anmeldeversuche prüfen."
+    },
+    {
+     "check": "mail_plaintext",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|88.99.35.112:110",
+      "88.99.35.112|88.99.35.112:143"
+     ],
+     "statement": "recommendation[2]",
+     "text": "Mail-Clients auf die verschlüsselten Abrufwege umstellen und die Klartextports anschließend schließen."
+    }
+   ],
    "recommendation": [
     [
-     "Unverzüglich",
-     "Auf den betroffenen Diensten die Transportverschlüsselung erzwingen, sodass eine Anmeldung ohne aufgebautes TLS abgelehnt wird."
-    ],
-    [
      "In Kürze",
-     "Zugangsdaten rotieren und die Zugriffsprotokolle auf unverschlüsselte Anmeldeversuche prüfen."
+     "Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten."
     ],
     [
      "Mittelfristig",
-     "Prüfen, ob die Klartextzugänge abgeschaltet werden können, und den Zugang danach auf Protokolle mit eingebauter Verschlüsselung beschränken."
+     "Postfach-Zugangsdaten rotieren und die Zugriffsprotokolle auf unverschlüsselte Anmeldeversuche prüfen."
+    ],
+    [
+     "Strategisch",
+     "Mail-Clients auf die verschlüsselten Abrufwege umstellen und die Klartextports anschließend schließen."
     ]
    ],
    "scale": "exposure",
    "source": "aktiv (nmap)",
    "status": "gelb",
    "threat": null,
-   "title": "Datei- und Mailzugänge auf 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) ohne erzwungene Transportverschlüsselung",
+   "title": "Datei- und Mailzugänge auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com): POP3 oder IMAP ohne TLS-Zwang",
    "urgency": "In Kürze",
-   "verify": "Anmeldung an den genannten Diensten versuchen, bevor eine Transportverschlüsselung aufgebaut ist; erwartet wird die Ablehnung dieser Anmeldung."
+   "verify": "Verbindung zum Mailabrufdienst von außen aufbauen, bevor STARTTLS angefordert wird; erwartet wird die Ablehnung dieser unverschlüsselten Anmeldung."
   },
   {
-   "affected": "dortmund-beach.com (WordPress outdated)",
+   "affected": "88.99.35.112: Debian GNU/Linux 11 (Support beendet 2026-08-31)",
    "cat": "B",
-   "evidence": "header_check · hosts/88.99.35.112/phase2/headers_dortmund-beach.com.json\ndortmund-beach.com: URL=https://dortmund-beach.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-security: max-age...",
-   "found": "Auf dortmund-beach.com (+www.dortmund-beach.com) ist eine WordPress-Kernversion im Einsatz, die die Versionsprüfung als veraltet oder unsicher einstuft: dortmund-beach.com (WordPress outdated).",
+   "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112 · Produkt: Debian GNU/Linux · Version: 11 · Pflegestatus: ohne Herstellerpflege · Pflegeende: 2026-08-31 · Quelle der Lebenszyklusdaten: Debian LTS, https://wiki.debian.org/LTS · Beleg: 30000/tcp open ssh OpenSSH 8.4p1 Debian 5+deb11u7 (protocol 2.0)",
+   "found": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 88.99.35.112: Debian GNU/Linux 11 (Support beendet 2026-08-31).",
    "id": "VS-2026-003",
-   "impact": "Eine veraltete WordPress-Kernversion enthält Schwachstellen, die in neueren Versionen bereits behoben und öffentlich dokumentiert sind. Die Versionsangabe ist von außen sichtbar, sodass Angreifer gezielt nach passenden Schwachstellen suchen können.",
+   "impact": "Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits zurückgreifen. Das Release des Betriebssystems ist aus der Paketkennung eines Dienstes abgeleitet; mit dem Ende der Unterstützung erhalten alle Pakete dieses Releases keine Sicherheitsupdates mehr: 88.99.35.112: Debian GNU/Linux 11 (Support beendet 2026-08-31).",
+   "key": "software_eol/scan/kunde",
    "level": "erhoeht",
    "level_label": "erhöht",
    "operator": "",
    "operator_note": "",
-   "policy": "wordpress_core_outdated",
+   "plan_action": "Das Betriebssystem auf ein Release mit laufender Sicherheitsunterstützung anheben oder eine verlängerte Unterstützung für das eingesetzte Release sicherstellen.",
+   "plan_effect": "Schließt Lücken, für die der Hersteller keine Updates mehr liefert",
+   "plan_lever": "Serversoftware ohne Herstellerpflege ersetzen",
+   "plan_stage": "in_kuerze",
+   "policy": "software_eol",
+   "provenance": [
+    {
+     "check": "software_eol",
+     "field": "title",
+     "members": [
+      "88.99.35.112|sw:88.99.35.112:-:debian:11"
+     ],
+     "statement": "title",
+     "text": "Serversoftware ohne Herstellerpflege"
+    },
+    {
+     "check": "software_eol",
+     "field": "observation",
+     "members": [
+      "88.99.35.112|sw:88.99.35.112:-:debian:11"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 88.99.35.112: Debian GNU/Linux 11 (Support beendet 2026-08-31)."
+    },
+    {
+     "check": "software_eol",
+     "field": "meaning",
+     "members": [
+      "88.99.35.112|sw:88.99.35.112:-:debian:11"
+     ],
+     "statement": "meaning[0]",
+     "text": "Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits zurückgreifen."
+    },
+    {
+     "check": "software_eol",
+     "field": "meaning",
+     "members": [
+      "88.99.35.112|sw:88.99.35.112:-:debian:11"
+     ],
+     "statement": "meaning[2]",
+     "text": "Das Release des Betriebssystems ist aus der Paketkennung eines Dienstes abgeleitet; mit dem Ende der Unterstützung erhalten alle Pakete dieses Releases keine Sicherheitsupdates mehr: 88.99.35.112: Debian GNU/Linux 11 (Support beendet 2026-08-31)."
+    },
+    {
+     "check": "software_eol",
+     "field": "verify",
+     "members": [
+      "88.99.35.112|sw:88.99.35.112:-:debian:11"
+     ],
+     "statement": "verify[0]",
+     "text": "Versionsstand auf dem System prüfen und mit den Lebenszyklusangaben des Herstellers vergleichen; erwartet wird eine Version mit laufender Pflege."
+    },
+    {
+     "check": "software_eol",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|sw:88.99.35.112:-:debian:11"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Das Betriebssystem auf ein Release mit laufender Sicherheitsunterstützung anheben oder eine verlängerte Unterstützung für das eingesetzte Release sicherstellen."
+    },
+    {
+     "check": "software_eol",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|sw:88.99.35.112:-:debian:11"
+     ],
+     "statement": "recommendation[2]",
+     "text": "Auf eine vom Hersteller gepflegte Version aktualisieren und einen festen Update-Rhythmus festlegen."
+    }
+   ],
    "recommendation": [
     [
      "In Kürze",
-     "Die WordPress-Kerninstallation auf die aktuelle, vom Projekt gepflegte Version anheben."
+     "Das Betriebssystem auf ein Release mit laufender Sicherheitsunterstützung anheben oder eine verlängerte Unterstützung für das eingesetzte Release sicherstellen."
     ],
     [
      "Mittelfristig",
-     "Automatische Kernupdates aktivieren oder einen festen Update-Rhythmus für WordPress festlegen, damit neue Versionen zeitnah eingespielt werden."
+     "Auf eine vom Hersteller gepflegte Version aktualisieren und einen festen Update-Rhythmus festlegen."
     ]
    ],
    "scale": "exposure",
-   "source": "aktiv (header_check)",
+   "source": "aktiv (nmap)",
    "status": "gelb",
    "threat": null,
-   "title": "WordPress-Kernversion veraltet oder unsicher",
+   "title": "Serversoftware ohne Herstellerpflege",
    "urgency": "In Kürze",
-   "verify": "Versionsangabe im WordPress-Administrationsbereich prüfen und mit der aktuellen Version des Projekts vergleichen; erwartet wird die jeweils aktuelle, gepflegte Kernversion."
+   "verify": "Versionsstand auf dem System prüfen und mit den Lebenszyklusangaben des Herstellers vergleichen; erwartet wird eine Version mit laufender Pflege."
   },
   {
    "affected": "88.99.35.112: betheme 27.5.3 (laut wpscan bekannte Schwachstellen: 12), 88.99.35.112: burst-statistics 1.7.1 (laut wpscan bekannte Schwachstellen: 1), 88.99.35.112: complianz-gdpr 7.1.0 (laut wpscan bekannte Schwachstellen: 7), 88.99.35.112: revslider 6.7.11 (laut wpscan bekannte Schwachstellen: 4)",
    "cat": "B",
-   "evidence": "wpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112: Produkt=betheme Familie=betheme Version=27.5.3 Pflegestatus=unknown\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112: Produkt=burst-statistics Familie=burst_statistics Version=1.7.1 Pflegestatus=unknown\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\nplugin burst-statistics 1.7.1\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112: Produkt=complianz-gdpr Familie=complianz_gdpr Version=7.1.0 Pflegestatus=unknown\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\nplugin complianz-gdpr 7.1.0\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112: Produkt=revslider Familie=revslider Version=6.7.11 Pflegestatus=unknown\n\nund eine weitere Fundstelle gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
-   "found": "Auf 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) ist eine WordPress-Erweiterung mit bekannten Schwachstellen im Einsatz: 88.99.35.112: betheme 27.5.3 (laut wpscan bekannte Schwachstellen: 12), 88.99.35.112: burst-statistics 1.7.1 (laut wpscan bekannte Schwachstellen: 1), 88.99.35.112: complianz-gdpr 7.1.0 (laut wpscan bekannte Schwachstellen: 7), 88.99.35.112: revslider 6.7.11 (laut wpscan bekannte Schwachstellen: 4).",
+   "evidence": "wpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: betheme · Version: 27.5.3 · bekannte Schwachstellen laut wpscan: 12 · Betheme | Responsive Multipurpose WordPress & WooCommerce Theme <= 27.5.6 - Authenticated (Contributor+) Stored Cross-Site Scripting via Shortcode (CVE-2024-3998) · Betheme < 27.5.7 - Authenticated (Contributor+) PHP Object Injection (CVE-2024-2694), behoben in 27.5.7 · Betheme | Responsive Multipurpose WordPress & WooCommerce Theme < 27.5.6 - Authenticated (Author+) Stored Cross-Site Scripting via SVG File (CVE-2024-5567), behoben in 27.5.6 · Betheme < 27.6.2 - Authenticated (Contributor+) Stored Cross-Site Scripting via Custom JS (CVE-2025-0450), behoben in 27.6.2 · Betheme < 28.0.4 - Authenticated (Contributor+) Stored Cross-Site Scripting (CVE-2025-3077), behoben in 28.0.4 · Betheme < 28.1.4 - Authenticated (Contributor+) Stored Cross-Site Scripting (CVE-2025-7399), behoben in 28.1.4 · und 6 weitere Schwachstellen laut wpscan\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: burst-statistics · Version: 1.7.1 · bekannte Schwachstellen laut wpscan: 1 · Burst Statistics < 2.0.8 - Cross-Site Request Forgery (CVE-2025-53193), behoben in 2.0.8\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: complianz-gdpr · Version: 7.1.0 · bekannte Schwachstellen laut wpscan: 7 · Complianz | GDPR/CCPA Cookie Consent < 7.4.4 - Contributor+ Stored XSS (CVE-2025-11185), behoben in 7.4.4 · Complianz – GDPR/CCPA Cookie Consent < 7.4.5 - Contributor+ Stored XSS via Content Filter (CVE-2026-2389), behoben in 7.4.5 · Complianz < 7.4.6 - Unauthenticated Private Post Content Disclosure (CVE-2026-4019), behoben in 7.4.6 · Complianz – GDPR/CCPA Cookie Consent < 7.5.2 - Admin+ PHP Object Injection (CVE-2026-65497), behoben in 7.5.2 · Complianz – GDPR/CCPA Cookie Consent < 7.5.2 - Author+ Server-Side Request Forgery (CVE-2026-65496), behoben in 7.5.2 · Complianz – GDPR/CCPA Cookie Consent < 7.5.2 - Unauthenticated Sensitive Information Exposure (CVE-2026-65498), behoben in 7.5.2 · und 1 weitere Schwachstellen laut wpscan\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: revslider · Version: 6.7.11 · bekannte Schwachstellen laut wpscan: 4 · Slider Revolution < 6.7.14 - Authenticated (Administrator+) Stored Cross-Site Scripting (CVE-2024-37449), behoben in 6.7.14 · Slider Revolution < 6.7.19 - Authenticated (Author+) Stored Cross-Site Scripting via SVG File Upload (CVE-2024-8107), behoben in 6.7.19 · Slider Revolution < 6.7.37 - Authenticated (Contributor+) Arbitrary File Read via 'used_svg' and 'used_images' (CVE-2025-9217), behoben in 6.7.37 · Slider Revolution < 6.7.38 - Contributor+ Arbitrary File Read (CVE-2025-10249), behoben in 6.7.38",
+   "found": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) ist eine WordPress-Erweiterung mit bekannten Schwachstellen im Einsatz: 88.99.35.112: betheme 27.5.3 (laut wpscan bekannte Schwachstellen: 12), 88.99.35.112: burst-statistics 1.7.1 (laut wpscan bekannte Schwachstellen: 1), 88.99.35.112: complianz-gdpr 7.1.0 (laut wpscan bekannte Schwachstellen: 7), 88.99.35.112: revslider 6.7.11 (laut wpscan bekannte Schwachstellen: 4).",
    "id": "VS-2026-004",
    "impact": "Bekannte Schwachstellen in Plugins oder Themes sind öffentlich dokumentiert und lassen sich ohne Zugriff auf den Server nachvollziehen. Eine veraltete Erweiterung bleibt so lange angreifbar, bis die fehlerbereinigte Version eingespielt ist.",
+   "key": "wordpress_plugin_vulnerable/scan/kunde",
    "level": "erhoeht",
    "level_label": "erhöht",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Erweiterung auf die vom Hersteller freigegebene, fehlerbereinigte Version aktualisieren; lässt sich das nicht sofort umsetzen, die Erweiterung deaktivieren.",
+   "plan_effect": "Schließt bekannte Lücken in Erweiterungen",
+   "plan_lever": "Verwundbare WordPress-Erweiterungen aktualisieren",
+   "plan_stage": "in_kuerze",
    "policy": "wordpress_plugin_vulnerable",
+   "provenance": [
+    {
+     "check": "wordpress_plugin_vulnerable",
+     "field": "title",
+     "members": [
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:betheme:27.5.3",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:burst_statistics:1.7.1",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:complianz_gdpr:7.1.0",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:revslider:6.7.11"
+     ],
+     "statement": "title",
+     "text": "WordPress-Erweiterung mit bekannten Schwachstellen"
+    },
+    {
+     "check": "wordpress_plugin_vulnerable",
+     "field": "observation",
+     "members": [
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:betheme:27.5.3",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:burst_statistics:1.7.1",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:complianz_gdpr:7.1.0",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:revslider:6.7.11"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) ist eine WordPress-Erweiterung mit bekannten Schwachstellen im Einsatz: 88.99.35.112: betheme 27.5.3 (laut wpscan bekannte Schwachstellen: 12), 88.99.35.112: burst-statistics 1.7.1 (laut wpscan bekannte Schwachstellen: 1), 88.99.35.112: complianz-gdpr 7.1.0 (laut wpscan bekannte Schwachstellen: 7), 88.99.35.112: revslider 6.7.11 (laut wpscan bekannte Schwachstellen: 4)."
+    },
+    {
+     "check": "wordpress_plugin_vulnerable",
+     "field": "meaning",
+     "members": [
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:betheme:27.5.3",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:burst_statistics:1.7.1",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:complianz_gdpr:7.1.0",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:revslider:6.7.11"
+     ],
+     "statement": "meaning[0]",
+     "text": "Bekannte Schwachstellen in Plugins oder Themes sind öffentlich dokumentiert und lassen sich ohne Zugriff auf den Server nachvollziehen. Eine veraltete Erweiterung bleibt so lange angreifbar, bis die fehlerbereinigte Version eingespielt ist."
+    },
+    {
+     "check": "wordpress_plugin_vulnerable",
+     "field": "verify",
+     "members": [
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:betheme:27.5.3",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:burst_statistics:1.7.1",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:complianz_gdpr:7.1.0",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:revslider:6.7.11"
+     ],
+     "statement": "verify[0]",
+     "text": "Versionsstand der Erweiterung im Adminbereich prüfen und mit dem Eintrag im Plugin- beziehungsweise Theme-Verzeichnis des Herstellers abgleichen; erwartet wird die aktuelle, fehlerbereinigte Version ohne offene Schwachstellen."
+    },
+    {
+     "check": "wordpress_plugin_vulnerable",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:betheme:27.5.3",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:burst_statistics:1.7.1",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:complianz_gdpr:7.1.0",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:revslider:6.7.11"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Erweiterung auf die vom Hersteller freigegebene, fehlerbereinigte Version aktualisieren; lässt sich das nicht sofort umsetzen, die Erweiterung deaktivieren."
+    },
+    {
+     "check": "wordpress_plugin_vulnerable",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:betheme:27.5.3",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:burst_statistics:1.7.1",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:complianz_gdpr:7.1.0",
+      "88.99.35.112|sw:88.99.35.112:dortmund-beach.com:revslider:6.7.11"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Prüfen, ob die Erweiterung für den Betrieb noch benötigt wird, und nicht mehr genutzte Erweiterungen entfernen."
+    }
+   ],
    "recommendation": [
     [
-     "Unverzüglich",
+     "In Kürze",
      "Erweiterung auf die vom Hersteller freigegebene, fehlerbereinigte Version aktualisieren; lässt sich das nicht sofort umsetzen, die Erweiterung deaktivieren."
     ],
     [
-     "In Kürze",
+     "Mittelfristig",
      "Prüfen, ob die Erweiterung für den Betrieb noch benötigt wird, und nicht mehr genutzte Erweiterungen entfernen."
     ]
    ],
@@ -798,84 +1083,243 @@
    "verify": "Versionsstand der Erweiterung im Adminbereich prüfen und mit dem Eintrag im Plugin- beziehungsweise Theme-Verzeichnis des Herstellers abgleichen; erwartet wird die aktuelle, fehlerbereinigte Version ohne offene Schwachstellen."
   },
   {
-   "affected": "88.99.35.112: WordPress 6.5.12 (Support beendet 2024-07-16)",
-   "cat": "B",
-   "evidence": "httpx · hosts/88.99.35.112/phase2/httpx_dortmund-beach.com.json\n88.99.35.112: Produkt=WordPress Familie=wordpress Version=6.5.12 Pflegestatus=eol Pflegeende=2024-07-16 Quelle=endoflife_date\n\nhttpx · hosts/88.99.35.112/phase2/httpx_dortmund-beach.com.json\ntech: WordPress\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\nversion: 6.5.12 status=outdated",
-   "found": "Auf 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) ist eine Anwendungskomponente im Einsatz, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 88.99.35.112: WordPress 6.5.12 (Support beendet 2024-07-16).",
-   "id": "VS-2026-005",
-   "impact": "Sprachlaufzeiten, CMS-Kerne, Bibliotheken, Plugins, Themes oder sonstige Komponenten ohne Herstellerpflege erhalten keine Sicherheitsaktualisierungen mehr. Bekannte Schwachstellen bleiben über die Anwendung erreichbar, auch wenn die Komponente selbst keinen eigenen Netzwerkdienst bereitstellt.",
-   "level": "mittel",
-   "level_label": "mittel",
-   "operator": "",
-   "operator_note": "",
-   "policy": "software_eol_runtime",
-   "recommendation": [
-    [
-     "In Kürze",
-     "Bestand der betroffenen Komponente ermitteln und mit den Lebenszyklusangaben des Herstellers abgleichen."
-    ],
-    [
-     "Mittelfristig",
-     "Komponente auf eine vom Hersteller gepflegte Version anheben oder durch eine gepflegte Alternative ersetzen und einen festen Aktualisierungsrhythmus festlegen."
-    ]
-   ],
-   "scale": "hygiene",
-   "source": "aktiv (httpx, wpscan)",
-   "status": "gelb",
-   "threat": null,
-   "title": "Anwendungsnahe Software ohne Herstellerpflege",
-   "urgency": "Mittelfristig",
-   "verify": "Versionsstand der Komponente auf dem System prüfen und mit den Lebenszyklusangaben des Herstellers vergleichen; erwartet wird eine Version mit laufender Pflege."
-  },
-  {
    "affected": "dortmund-beach.com (p=none; ~all)",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\ndortmund-beach.com: SPF=v=spf1 a mx ip4:78.46.161.114 ~all DMARC=v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de; DKIM-Selektoren=keiner bekannt MX=mail1.spacekoelnsrv1.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vor...",
-   "found": "Für dortmund-beach.com sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: dortmund-beach.com (p=none; ~all).",
-   "id": "VS-2026-006",
-   "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
+   "evidence": "dns_records · phase0/dns_records.json\ndortmund-beach.com · MX-Einträge: mail1.spacekoelnsrv1.de · DMARC: v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de; · SPF: v=spf1 a mx ip4:78.46.161.114 ~all",
+   "found": "Die DMARC-Richtlinie der Domain dortmund-beach.com ist auf reine Beobachtung gesetzt: dortmund-beach.com (p=none). E-Mails, die SPF oder DKIM nicht bestehen, werden dadurch nicht zurückgewiesen oder unter Quarantäne gestellt. Der SPF-Eintrag der Domain dortmund-beach.com setzt bei nicht autorisierten Versendern nur auf eine weiche oder neutrale Fehlbehandlung: dortmund-beach.com (~all). Empfangende Mailserver dürfen die E-Mail trotzdem zustellen.",
+   "id": "VS-2026-005",
+   "impact": "Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte E-Mails im Namen der Domain kommen weiterhin beim Empfänger an. Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse. Eine weiche oder neutrale Fehlbehandlung markiert eine E-Mail lediglich als verdächtig, lehnt sie aber nicht ab. Empfangssysteme, die diese Markierung nicht auswerten, stellen gefälschte E-Mails im Namen der Domain trotzdem zu.",
+   "key": "mail_policy/dortmund-beach.com/kunde",
    "level": "mittel",
    "level_label": "mittel",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen.",
+   "plan_effect": "Weist gefälschte E-Mails im Namen der Domain ab",
+   "plan_lever": "DMARC-Richtlinie durchsetzen",
+   "plan_stage": "mittelfristig",
    "policy": "dmarc_none, spf_softfail",
+   "provenance": [
+    {
+     "check": "dmarc_none",
+     "field": "title",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "short",
+     "text": "DMARC ohne Durchsetzung"
+    },
+    {
+     "check": "spf_softfail",
+     "field": "title",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "short",
+     "text": "SPF nur mit Softfail"
+    },
+    {
+     "check": "dmarc_none",
+     "field": "observation",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "observation[0]",
+     "text": "Die DMARC-Richtlinie der Domain dortmund-beach.com ist auf reine Beobachtung gesetzt: dortmund-beach.com (p=none). E-Mails, die SPF oder DKIM nicht bestehen, werden dadurch nicht zurückgewiesen oder unter Quarantäne gestellt."
+    },
+    {
+     "check": "spf_softfail",
+     "field": "observation",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "observation[0]",
+     "text": "Der SPF-Eintrag der Domain dortmund-beach.com setzt bei nicht autorisierten Versendern nur auf eine weiche oder neutrale Fehlbehandlung: dortmund-beach.com (~all). Empfangende Mailserver dürfen die E-Mail trotzdem zustellen."
+    },
+    {
+     "check": "dmarc_none",
+     "field": "meaning",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "meaning[0]",
+     "text": "Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte E-Mails im Namen der Domain kommen weiterhin beim Empfänger an."
+    },
+    {
+     "check": "dmarc_none",
+     "field": "meaning",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "meaning[1]",
+     "text": "Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse."
+    },
+    {
+     "check": "spf_softfail",
+     "field": "meaning",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "meaning[0]",
+     "text": "Eine weiche oder neutrale Fehlbehandlung markiert eine E-Mail lediglich als verdächtig, lehnt sie aber nicht ab. Empfangssysteme, die diese Markierung nicht auswerten, stellen gefälschte E-Mails im Namen der Domain trotzdem zu."
+    },
+    {
+     "check": "dmarc_none",
+     "field": "verify",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des TXT-Eintrags _dmarc.dortmund-beach.com; erwartet wird eine Richtlinie p, die nicht auf reine Beobachtung gesetzt ist."
+    },
+    {
+     "check": "spf_softfail",
+     "field": "verify",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des TXT-Eintrags der Domain dortmund-beach.com; erwartet wird ein SPF-Eintrag mit harter Fehlbehandlung am Ende der Regel."
+    },
+    {
+     "check": "dmarc_none",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen."
+    },
+    {
+     "check": "spf_softfail",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Nach einer Beobachtungsphase ohne Fehlmeldungen den Qualifizierer des SPF-Eintrags auf eine harte Fehlbehandlung umstellen, sobald alle legitimen Versandquellen erfasst sind."
+    },
+    {
+     "check": "dmarc_none",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "recommendation[2]",
+     "text": "Die Richtlinie auf Quarantäne und danach auf Zurückweisung anheben, sobald alle legitimen Versender erfasst sind."
+    }
+   ],
    "recommendation": [
     [
-     "In Kürze",
-     "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten."
+     "Mittelfristig",
+     "Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen."
     ],
     [
      "Mittelfristig",
-     "Die Richtlinie stufenweise auf Zurückweisung stellen, sobald alle Versandquellen erfasst sind, und den Abgleich der Absender scharf schalten."
+     "Nach einer Beobachtungsphase ohne Fehlmeldungen den Qualifizierer des SPF-Eintrags auf eine harte Fehlbehandlung umstellen, sobald alle legitimen Versandquellen erfasst sind."
+    ],
+    [
+     "Strategisch",
+     "Die Richtlinie auf Quarantäne und danach auf Zurückweisung anheben, sobald alle legitimen Versender erfasst sind."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (dns_records)",
    "status": "gelb",
    "threat": null,
-   "title": "Richtlinie zur Absender-Authentizität für dortmund-beach.com nicht durchsetzend",
+   "title": "Richtlinien zur Absender-Authentizität für dortmund-beach.com: DMARC ohne Durchsetzung und SPF nur mit Softfail",
    "urgency": "Mittelfristig",
-   "verify": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
+   "verify": "DNS-Abfrage des TXT-Eintrags _dmarc.dortmund-beach.com; erwartet wird eine Richtlinie p, die nicht auf reine Beobachtung gesetzt ist. DNS-Abfrage des TXT-Eintrags der Domain dortmund-beach.com; erwartet wird ein SPF-Eintrag mit harter Fehlbehandlung am Ende der Regel."
   },
   {
-   "affected": "88.99.35.112:110 (POP3), 88.99.35.112:143 (IMAP), 88.99.35.112:21 (FTP)",
+   "affected": "88.99.35.112:21 (FTP)",
    "cat": "A",
-   "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:21/tcp Dienst=ftp Produkt=Pure-FTPd Zustand=open\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:110/tcp Dienst=pop3 Produkt=Dovecot pop3d Zustand=open STARTTLS=ja Capabilities=UIDL, TOP, CAPA, RESP-CODES\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\npop3-capabilities: UIDL TOP CAPA RESP-CODES AUTH-RESP-CODE SASL(PLAIN LOGIN) USER PIPELINING STLS\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:143/tcp Dienst=imap Produkt=Dovecot imapd Zustand=open TLS erzwungen=nein STARTTLS=ja Anmeldung gesperrt=nein Verfahren=LOGIN, PLAIN Capabilities=AUTH=PLAIN, OK, ENABLE, ID\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\nimap-capabilities: AUTH=PLAIN OK ENABLE ID LOGIN-REFERRALS LITERAL+ SASL-IR post-login STARTTLS IMAP4rev1 AUTH=LOGINA0001 Pre-login have listed capabilities more IDLE",
-   "found": "Der Host 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 88.99.35.112:110 (POP3), 88.99.35.112:143 (IMAP), 88.99.35.112:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
-   "id": "VS-2026-007",
+   "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:21/tcp · Dienst: ftp · Produkt: Pure-FTPd",
+   "found": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 88.99.35.112:21 (FTP). Ob dort eine Anmeldung ohne Transportverschlüsselung abgelehnt wird, ließ sich von außen nicht feststellen: 88.99.35.112:21 (FTP).",
+   "id": "VS-2026-006",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
+   "key": "legacy_protocols_present/scan/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
+   "plan_effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
+   "plan_lever": "Nicht benötigte Altprotokolle abschalten",
+   "plan_stage": "mittelfristig",
    "policy": "legacy_protocols_present",
+   "provenance": [
+    {
+     "check": "legacy_protocols_present",
+     "field": "title",
+     "members": [
+      "88.99.35.112|88.99.35.112:21"
+     ],
+     "statement": "title",
+     "text": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
+    },
+    {
+     "check": "legacy_protocols_present",
+     "field": "observation",
+     "members": [
+      "88.99.35.112|88.99.35.112:21"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 88.99.35.112:21 (FTP)."
+    },
+    {
+     "check": "legacy_protocols_present",
+     "field": "observation",
+     "members": [
+      "88.99.35.112|88.99.35.112:21"
+     ],
+     "statement": "observation[2]",
+     "text": "Ob dort eine Anmeldung ohne Transportverschlüsselung abgelehnt wird, ließ sich von außen nicht feststellen: 88.99.35.112:21 (FTP)."
+    },
+    {
+     "check": "legacy_protocols_present",
+     "field": "meaning",
+     "members": [
+      "88.99.35.112|88.99.35.112:21"
+     ],
+     "statement": "meaning[0]",
+     "text": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit."
+    },
+    {
+     "check": "legacy_protocols_present",
+     "field": "verify",
+     "members": [
+      "88.99.35.112|88.99.35.112:21"
+     ],
+     "statement": "verify[0]",
+     "text": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
+    },
+    {
+     "check": "legacy_protocols_present",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|88.99.35.112:21"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren."
+    },
+    {
+     "check": "legacy_protocols_present",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|88.99.35.112:21"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Falls der Dienst benötigt wird, den Zugriff auf feste Quelladressen beschränken und eine erzwungene Verschlüsselung sicherstellen."
+    }
+   ],
    "recommendation": [
     [
-     "In Kürze",
+     "Mittelfristig",
      "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren."
     ],
     [
-     "Mittelfristig",
+     "Strategisch",
      "Falls der Dienst benötigt wird, den Zugriff auf feste Quelladressen beschränken und eine erzwungene Verschlüsselung sicherstellen."
     ]
    ],
@@ -890,168 +1334,662 @@
   {
    "affected": "dortmund-beach.com",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\ndortmund-beach.com: SPF=v=spf1 a mx ip4:78.46.161.114 ~all DMARC=v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de; DKIM-Selektoren=keiner bekannt MX=mail1.spacekoelnsrv1.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vor...",
-   "found": "Für dortmund-beach.com fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: dortmund-beach.com.",
-   "id": "VS-2026-008",
-   "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
+   "evidence": "dns_records · phase0/dns_records.json\ndortmund-beach.com · MX-Einträge: mail1.spacekoelnsrv1.de\n\ndns_security · phase0a/dns_security.json\ndortmund-beach.com · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
+   "found": "Für dortmund-beach.com ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain dortmund-beach.com fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten. Für dortmund-beach.com ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain dortmund-beach.com fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können.",
+   "id": "VS-2026-007",
+   "impact": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen. Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.",
+   "key": "mail_transport_enforcement/dortmund-beach.com/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
-   "policy": "dane_missing, mta_sts_missing, tls_rpt_missing",
+   "plan_action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
+   "plan_effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
+   "plan_lever": "MTA-STS für die Domain veröffentlichen",
+   "plan_stage": "strategisch",
+   "policy": "mta_sts_missing, tls_rpt_missing",
+   "provenance": [
+    {
+     "check": "mta_sts_missing",
+     "field": "title",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "short",
+     "text": "kein MTA-STS"
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "title",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "short",
+     "text": "kein TLS-RPT"
+    },
+    {
+     "check": "mta_sts_missing",
+     "field": "observation",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "observation[0]",
+     "text": "Für dortmund-beach.com ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain dortmund-beach.com fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten."
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "observation",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "observation[0]",
+     "text": "Für dortmund-beach.com ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain dortmund-beach.com fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können."
+    },
+    {
+     "check": "mta_sts_missing",
+     "field": "meaning",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen."
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "meaning",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten."
+    },
+    {
+     "check": "mta_sts_missing",
+     "field": "verify",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des TXT-Eintrags _mta-sts.dortmund-beach.com sowie Abruf der Richtliniendatei unter der zugehörigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine Richtliniendatei mit mode enforce."
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "verify",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des TXT-Eintrags _smtp._tls.dortmund-beach.com; erwartet wird ein Eintrag, der mit v=TLSRPTv1 beginnt und eine Meldeadresse (rua) nennt."
+    },
+    {
+     "check": "mta_sts_missing",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden."
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten."
+    }
+   ],
    "recommendation": [
     [
      "Strategisch",
-     "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain."
+     "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden."
+    ],
+    [
+     "Strategisch",
+     "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten."
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records)",
+   "source": "aktiv (dns_records, dns_security)",
    "status": "blau",
    "threat": null,
-   "title": "Transportverschlüsselung im Mailversand für dortmund-beach.com nicht erzwungen",
+   "title": "Verschlüsselte Zustellung von E-Mails für dortmund-beach.com: kein MTA-STS und kein TLS-RPT",
    "urgency": "Strategisch",
-   "verify": "DNS-Abfrage der genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
+   "verify": "DNS-Abfrage des TXT-Eintrags _mta-sts.dortmund-beach.com sowie Abruf der Richtliniendatei unter der zugehörigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine Richtliniendatei mit mode enforce. DNS-Abfrage des TXT-Eintrags _smtp._tls.dortmund-beach.com; erwartet wird ein Eintrag, der mit v=TLSRPTv1 beginnt und eine Meldeadresse (rua) nennt."
   },
   {
-   "affected": "dortmund-beach.com (max-age 0), dortmund-beach.com:443 (BREACH)",
+   "affected": "dortmund-beach.com (max-age 0), dortmund-beach.com:443",
    "cat": "D",
-   "evidence": "header_check · hosts/88.99.35.112/phase2/headers_dortmund-beach.com.json\ndortmund-beach.com: URL=https://dortmund-beach.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-security: max-age...\n\nhttpx · hosts/88.99.35.112/phase2/httpx.json\ndortmund-beach.com:443 CN=dortmund-beach.com SAN=dortmund-beach.com, www.dortmund-beach.com Aussteller=YR1 gueltig_bis=2026-10-30T21:06:36Z abgelaufen=nein Resttage=37 Namensabweichung=nein Kette vollstaendig=ja Protokolle=TLS1.2 schwach...\n\nhttpx · hosts/88.99.35.112/phase2/httpx.json\ndortmund-beach.com:443 tls=tls12 cn=dortmund-beach.com gueltig_bis=2026-10-30T21:06:36Z\n\ntestssl · scan_results:testssl:88.99.35.112\nangeboten=TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1, TLS1.3\n\ntestssl · hosts/88.99.35.112/phase2/testssl.json\nservice=HTTP; pre_128cipher=No 128 cipher limit bug; SSLv2=not offered; SSLv3=not offered; TLS1=not offered; TLS1_1=not offered\n\ntestssl\ndortmund-beach.com:443 Pruefung=BREACH Urteil=potential CVE=CVE-2013-3587 Ausgabe=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested",
-   "found": "Die Transportverschlüsselung auf 88.99.35.112 lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: dortmund-beach.com (max-age 0), dortmund-beach.com:443 (BREACH).",
+   "evidence": "header_check · hosts/88.99.35.112/phase2/headers_dortmund-beach.com.json\ndortmund-beach.com · Adresse: https://dortmund-beach.com · Strict-Transport-Security: max-age=0\n\ntestssl\ndortmund-beach.com:443 · Protokolle: TLS 1.2",
+   "found": "Der Dienst dortmund-beach.com (+www.dortmund-beach.com) setzt den HTTP Strict Transport Security Header mit einer Gültigkeitsdauer, die unter dem empfohlenen Richtwert liegt: dortmund-beach.com (max-age 0). Der Dienst dortmund-beach.com (+www.dortmund-beach.com) bietet TLS 1.2 an, jedoch keine Unterstützung für TLS 1.3: dortmund-beach.com:443.",
+   "id": "VS-2026-008",
+   "impact": "Eine kurze Gültigkeitsdauer lässt den Schutz vor Downgrade-Angriffen bereits nach kurzer Zeit ohne erneuten Seitenaufruf ablaufen; wiederkehrende Besucher sind dann für einen Zeitraum wieder ungeschützt. TLS 1.3 vereinfacht den Verbindungsaufbau, entfernt veraltete Verschlüsselungsoptionen und verkleinert die Angriffsfläche gegenüber älteren Protokollversionen. Ohne TLS 1.3 bleibt der Dienst auf den größeren Funktionsumfang von TLS 1.2 angewiesen.",
+   "key": "tls_hardening/88.99.35.112/kunde",
+   "level": "niedrig",
+   "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
+   "plan_action": "Die Gültigkeitsdauer des Strict-Transport-Security-Headers auf mindestens sechs Monate anheben.",
+   "plan_effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+   "plan_lever": "Gültigkeitsdauer von HSTS verlängern",
+   "plan_stage": "mittelfristig",
+   "policy": "hsts_short, tls_no_13",
+   "provenance": [
+    {
+     "check": "hsts_short",
+     "field": "title",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "short",
+     "text": "HSTS mit kurzer Gültigkeit"
+    },
+    {
+     "check": "tls_no_13",
+     "field": "title",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com:443@88.99.35.112"
+     ],
+     "statement": "short",
+     "text": "kein TLS 1.3"
+    },
+    {
+     "check": "hsts_short",
+     "field": "observation",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Dienst dortmund-beach.com (+www.dortmund-beach.com) setzt den HTTP Strict Transport Security Header mit einer Gültigkeitsdauer, die unter dem empfohlenen Richtwert liegt: dortmund-beach.com (max-age 0)."
+    },
+    {
+     "check": "tls_no_13",
+     "field": "observation",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com:443@88.99.35.112"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Dienst dortmund-beach.com (+www.dortmund-beach.com) bietet TLS 1.2 an, jedoch keine Unterstützung für TLS 1.3: dortmund-beach.com:443."
+    },
+    {
+     "check": "hsts_short",
+     "field": "meaning",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "meaning[0]",
+     "text": "Eine kurze Gültigkeitsdauer lässt den Schutz vor Downgrade-Angriffen bereits nach kurzer Zeit ohne erneuten Seitenaufruf ablaufen; wiederkehrende Besucher sind dann für einen Zeitraum wieder ungeschützt."
+    },
+    {
+     "check": "tls_no_13",
+     "field": "meaning",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com:443@88.99.35.112"
+     ],
+     "statement": "meaning[0]",
+     "text": "TLS 1.3 vereinfacht den Verbindungsaufbau, entfernt veraltete Verschlüsselungsoptionen und verkleinert die Angriffsfläche gegenüber älteren Protokollversionen. Ohne TLS 1.3 bleibt der Dienst auf den größeren Funktionsumfang von TLS 1.2 angewiesen."
+    },
+    {
+     "check": "hsts_short",
+     "field": "verify",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein gesetzter Strict-Transport-Security-Header mit einer Gültigkeitsdauer von mindestens sechs Monaten."
+    },
+    {
+     "check": "tls_no_13",
+     "field": "verify",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com:443@88.99.35.112"
+     ],
+     "statement": "verify[0]",
+     "text": "Verbindungsversuch mit einem auf TLS 1.3 beschränkten Client gegen den Dienst durchführen; erwartet wird ein erfolgreicher Verbindungsaufbau."
+    },
+    {
+     "check": "hsts_short",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Gültigkeitsdauer des Strict-Transport-Security-Headers auf mindestens sechs Monate anheben."
+    },
+    {
+     "check": "tls_no_13",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com:443@88.99.35.112"
+     ],
+     "statement": "recommendation[0]",
+     "text": "TLS 1.3 auf dem Dienst aktivieren, sobald die eingesetzte TLS-Bibliothek und alle angebundenen Clients dies unterstützen."
+    }
+   ],
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Die Gültigkeitsdauer des Strict-Transport-Security-Headers auf mindestens sechs Monate anheben."
+    ],
+    [
+     "Strategisch",
+     "TLS 1.3 auf dem Dienst aktivieren, sobald die eingesetzte TLS-Bibliothek und alle angebundenen Clients dies unterstützen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (header_check, testssl)",
+   "status": "blau",
+   "threat": null,
+   "title": "Transportverschlüsselung auf 88.99.35.112: HSTS mit kurzer Gültigkeit und kein TLS 1.3",
+   "urgency": "Mittelfristig",
+   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein gesetzter Strict-Transport-Security-Header mit einer Gültigkeitsdauer von mindestens sechs Monaten. Verbindungsversuch mit einem auf TLS 1.3 beschränkten Client gegen den Dienst durchführen; erwartet wird ein erfolgreicher Verbindungsaufbau."
+  },
+  {
+   "affected": "dortmund-beach.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
+   "cat": "D",
+   "evidence": "header_check · hosts/88.99.35.112/phase2/headers_dortmund-beach.com.json\ndortmund-beach.com · Adresse: https://dortmund-beach.com · Content-Security-Policy: nicht gesetzt · fehlende Header: content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection",
+   "found": "Auf dortmund-beach.com (+www.dortmund-beach.com) ist keine Content-Security-Policy gesetzt: dortmund-beach.com. Auf dortmund-beach.com (+www.dortmund-beach.com) fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: dortmund-beach.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-009",
-   "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
+   "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar.",
+   "key": "web_header_hygiene/88.99.35.112/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
-   "policy": "hsts_short, tls_no_13, tls_weakness",
+   "plan_action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
+   "plan_effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+   "plan_lever": "Inhaltsrichtlinie für die Webseiten einführen",
+   "plan_stage": "mittelfristig",
+   "policy": "csp_missing, security_headers_incomplete",
+   "provenance": [
+    {
+     "check": "csp_missing",
+     "field": "title",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "short",
+     "text": "Inhaltsrichtlinie fehlt"
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "title",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "short",
+     "text": "Sicherheits-Header unvollständig"
+    },
+    {
+     "check": "csp_missing",
+     "field": "observation",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf dortmund-beach.com (+www.dortmund-beach.com) ist keine Content-Security-Policy gesetzt: dortmund-beach.com."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "observation",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf dortmund-beach.com (+www.dortmund-beach.com) fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: dortmund-beach.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)."
+    },
+    {
+     "check": "csp_missing",
+     "field": "meaning",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar."
+    },
+    {
+     "check": "csp_missing",
+     "field": "verify",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
+    },
+    {
+     "check": "csp_missing",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
+    }
+   ],
    "recommendation": [
     [
-     "In Kürze",
-     "Veraltete Protokolle und schwache Verfahren am Dienst abschalten."
+     "Mittelfristig",
+     "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt."
     ],
     [
      "Mittelfristig",
-     "Das aktuelle Protokoll aktivieren, den Schutz gegen eine erzwungene Rückstufung einschalten und die Gültigkeitsdauer der Transportsicherheits-Vorgabe auf mindestens ein Jahr setzen."
-    ],
-    [
-     "Strategisch",
-     "Die Konfiguration aller verschlüsselten Dienste an einer gemeinsamen Vorgabe ausrichten und regelmäßig prüfen."
+     "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx, testssl)",
-   "status": "blau",
-   "threat": {
-    "cves": [
-     "CVE-2013-0169 (von testssl genannt, keine Fremdbewertung vorhanden)",
-     "CVE-2013-3587 (von testssl genannt, keine Fremdbewertung vorhanden)"
-    ],
-    "kev": "",
-    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
-   },
-   "title": "Transportverschlüsselung auf 88.99.35.112 mit veralteten Verfahren",
-   "urgency": "Mittelfristig",
-   "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
-  },
-  {
-   "affected": "dortmund-beach.com (/wp-login.php; fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
-   "cat": "D",
-   "evidence": "header_check · hosts/88.99.35.112/phase2/headers_dortmund-beach.com.json\ndortmund-beach.com: URL=https://dortmund-beach.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-security: max-age...\n\nzap_active\nAbsence of Anti-CSRF Tokens ZAP-Kennung=10202 Risiko=Medium Konfidenz=Low Adresse=https://dortmund-beach.com/wp-login.php Beleg=<form name=\"loginform\" id=\"loginform\" action=\"https://dortmund-beach.com/wp-login.php\" method=\"post\"> CWE=CWE...",
-   "found": "Die Webdienste auf 88.99.35.112 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: dortmund-beach.com (/wp-login.php; fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
-   "id": "VS-2026-010",
-   "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
-   "level": "niedrig",
-   "level_label": "niedrig",
-   "operator": "",
-   "operator_note": "",
-   "policy": "csp_missing, csrf_token_missing, security_headers_incomplete",
-   "recommendation": [
-    [
-     "Mittelfristig",
-     "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren."
-    ],
-    [
-     "Strategisch",
-     "Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen."
-    ]
-   ],
-   "scale": "hygiene",
-   "source": "aktiv (header_check, zap_active)",
+   "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
-   "title": "Sicherheits-Header und Formularschutz auf 88.99.35.112 unvollständig",
+   "title": "Absicherung der Webdienste auf 88.99.35.112: Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
    "urgency": "Mittelfristig",
-   "verify": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
   },
   {
-   "affected": "dortmund-beach.com (Server: Apache/2.4.67 (Debian)), 88.99.35.112:30000 (OpenSSH 8.4p1)",
+   "affected": "dortmund-beach.com (Server: Apache/2.4.67 (Debian))",
    "cat": "E",
-   "evidence": "header_check · hosts/88.99.35.112/phase2/headers_dortmund-beach.com.json\ndortmund-beach.com: URL=https://dortmund-beach.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-security: max-age...\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:30000/tcp Dienst=ssh Produkt=OpenSSH Version=8.4p1 Debian 5+deb11u7 Zustand=open\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n30000/tcp open ssh OpenSSH 8.4p1 Debian 5+deb11u7 (protocol 2.0)",
-   "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: dortmund-beach.com (Server: Apache/2.4.67 (Debian)), 88.99.35.112:30000 (OpenSSH 8.4p1).",
-   "id": "VS-2026-011",
-   "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
+   "evidence": "header_check · hosts/88.99.35.112/phase2/headers_dortmund-beach.com.json\ndortmund-beach.com · Adresse: https://dortmund-beach.com · Server: Apache/2.4.67 (Debian)",
+   "found": "Die Webantwort von dortmund-beach.com (+www.dortmund-beach.com) nennt in ihren Antwortheadern die Version der eingesetzten Serversoftware: dortmund-beach.com (Server: Apache/2.4.67 (Debian)).",
+   "id": "VS-2026-010",
+   "impact": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs.",
+   "key": "banner_disclosure/scan/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
-   "policy": "http_header_disclosure, service_banner_version",
+   "plan_action": "Die Versionskennung in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert ohne Versionsangabe setzen.",
+   "plan_effect": "Erschwert die gezielte Suche nach passenden Schwachstellen",
+   "plan_lever": "Versionsangaben aus den Antwort-Headern entfernen",
+   "plan_stage": "mittelfristig",
+   "policy": "http_header_disclosure",
+   "provenance": [
+    {
+     "check": "http_header_disclosure",
+     "field": "title",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "short",
+     "text": "Versionsangabe im HTTP-Header"
+    },
+    {
+     "check": "http_header_disclosure",
+     "field": "observation",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "observation[0]",
+     "text": "Die Webantwort von dortmund-beach.com (+www.dortmund-beach.com) nennt in ihren Antwortheadern die Version der eingesetzten Serversoftware: dortmund-beach.com (Server: Apache/2.4.67 (Debian))."
+    },
+    {
+     "check": "http_header_disclosure",
+     "field": "meaning",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "meaning[0]",
+     "text": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs."
+    },
+    {
+     "check": "http_header_disclosure",
+     "field": "verify",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der genannten Adresse von außen abrufen; erwartet wird kein Header mit einer konkreten Versionsangabe."
+    },
+    {
+     "check": "http_header_disclosure",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Versionskennung in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert ohne Versionsangabe setzen."
+    }
+   ],
    "recommendation": [
     [
      "Mittelfristig",
-     "Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten."
-    ],
-    [
-     "Strategisch",
-     "Die Vorgabe für Antwort-Header und erlaubte Methoden an einer Stelle pflegen."
+     "Die Versionskennung in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert ohne Versionsangabe setzen."
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, nmap)",
+   "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
-   "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+   "title": "Versionsangaben in den Antworten der Dienste: Versionsangabe im HTTP-Header",
    "urgency": "Mittelfristig",
-   "verify": "Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue Versionsangabe und ohne die zusätzlichen Methoden."
+   "verify": "HTTP-Antwortheader der genannten Adresse von außen abrufen; erwartet wird kein Header mit einer konkreten Versionsangabe."
   },
   {
    "affected": "dortmund-beach.com",
    "cat": "E",
-   "evidence": "dns_records · phase0/dns_records.json\ndortmund-beach.com: SPF=v=spf1 a mx ip4:78.46.161.114 ~all DMARC=v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de; DKIM-Selektoren=keiner bekannt MX=mail1.spacekoelnsrv1.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vor...",
-   "found": "Für dortmund-beach.com fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: dortmund-beach.com.",
-   "id": "VS-2026-012",
-   "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
+   "evidence": "dns_security · phase0a/dns_security.json\ndortmund-beach.com · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
+   "found": "Für dortmund-beach.com ist kein CAA-Eintrag veröffentlicht. Für die Domain dortmund-beach.com legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen. Für dortmund-beach.com ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain dortmund-beach.com lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
+   "id": "VS-2026-011",
+   "impact": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf. Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
+   "key": "dns_hygiene/dortmund-beach.com/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
+   "plan_effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+   "plan_lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+   "plan_stage": "mittelfristig",
    "policy": "caa_missing, dnssec_missing",
+   "provenance": [
+    {
+     "check": "caa_missing",
+     "field": "title",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "short",
+     "text": "kein CAA-Eintrag"
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "title",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "short",
+     "text": "keine DNSSEC-Signatur"
+    },
+    {
+     "check": "caa_missing",
+     "field": "observation",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "observation[0]",
+     "text": "Für dortmund-beach.com ist kein CAA-Eintrag veröffentlicht. Für die Domain dortmund-beach.com legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "observation",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "observation[0]",
+     "text": "Für dortmund-beach.com ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain dortmund-beach.com lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen."
+    },
+    {
+     "check": "caa_missing",
+     "field": "meaning",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "meaning",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen."
+    },
+    {
+     "check": "caa_missing",
+     "field": "verify",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des CAA-Eintrags für die Domain dortmund-beach.com; erwartet wird mindestens ein issue-Eintrag mit der genutzten Zertifizierungsstelle."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "verify",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage der SOA mit aktivierter DNSSEC-Option für die Domain dortmund-beach.com; erwartet wird ein RRSIG-Eintrag in der Antwort."
+    },
+    {
+     "check": "caa_missing",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com|dortmund-beach.com"
+     ],
+     "statement": "recommendation[0]",
+     "text": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist."
+    }
+   ],
    "recommendation": [
     [
+     "Mittelfristig",
+     "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt."
+    ],
+    [
      "Strategisch",
-     "Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen."
+     "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist."
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records)",
+   "source": "aktiv (dns_security)",
    "status": "blau",
    "threat": null,
-   "title": "DNS-Absicherung für dortmund-beach.com nicht eingerichtet",
-   "urgency": "Strategisch",
-   "verify": "DNS-Abfrage der Signatur und der Ausstellungseingrenzung wiederholen; erwartet wird je ein gültiger Eintrag."
+   "title": "DNS-Absicherung für dortmund-beach.com: kein CAA-Eintrag und keine DNSSEC-Signatur",
+   "urgency": "Mittelfristig",
+   "verify": "DNS-Abfrage des CAA-Eintrags für die Domain dortmund-beach.com; erwartet wird mindestens ein issue-Eintrag mit der genutzten Zertifizierungsstelle. DNS-Abfrage der SOA mit aktivierter DNSSEC-Option für die Domain dortmund-beach.com; erwartet wird ein RRSIG-Eintrag in der Antwort."
   },
   {
    "affected": "dortmund-beach.com (badmin)",
    "cat": "E",
-   "evidence": "wpscan\ndortmund-beach.com: Benutzernamen unter=https://dortmund-beach.com/wp-json/wp/v2/users gefunden=badmin Kernstand=outdated",
+   "evidence": "wpscan\ndortmund-beach.com · Benutzernamen: badmin · gefunden über: https://dortmund-beach.com/wp-json/oembed/1.0/embed",
    "found": "Auf dortmund-beach.com (+www.dortmund-beach.com) lassen sich über WordPress-Schnittstellen gültige Benutzernamen ermitteln: dortmund-beach.com (badmin).",
-   "id": "VS-2026-013",
+   "id": "VS-2026-012",
    "impact": "Bekannte Benutzernamen erleichtern Passwort-Rateangriffe und gezieltes Phishing, weil ein Angreifer sich nicht mehr auf Vermutungen verlassen muss, sondern echte Anmeldenamen kennt.",
+   "key": "wordpress_user_enumeration/scan/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Die Offenlegung von Benutzernamen über die REST-Schnittstelle und die Autorenarchive einschränken, etwa durch eine entsprechende Erweiterung oder eine Anpassung der WordPress-Konfiguration.",
+   "plan_effect": "Erschwert Rateangriffe auf WordPress-Konten",
+   "plan_lever": "Ausgabe von Benutzernamen abschalten",
+   "plan_stage": "mittelfristig",
    "policy": "wordpress_user_enumeration",
+   "provenance": [
+    {
+     "check": "wordpress_user_enumeration",
+     "field": "title",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "title",
+     "text": "WordPress-Benutzernamen von außen ermittelbar"
+    },
+    {
+     "check": "wordpress_user_enumeration",
+     "field": "observation",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf dortmund-beach.com (+www.dortmund-beach.com) lassen sich über WordPress-Schnittstellen gültige Benutzernamen ermitteln: dortmund-beach.com (badmin)."
+    },
+    {
+     "check": "wordpress_user_enumeration",
+     "field": "meaning",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "meaning[0]",
+     "text": "Bekannte Benutzernamen erleichtern Passwort-Rateangriffe und gezieltes Phishing, weil ein Angreifer sich nicht mehr auf Vermutungen verlassen muss, sondern echte Anmeldenamen kennt."
+    },
+    {
+     "check": "wordpress_user_enumeration",
+     "field": "verify",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "verify[0]",
+     "text": "Die WordPress-REST-Schnittstelle und die Autorenarchive von außen abrufen; erwartet wird, dass dabei keine Benutzernamen preisgegeben werden."
+    },
+    {
+     "check": "wordpress_user_enumeration",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Offenlegung von Benutzernamen über die REST-Schnittstelle und die Autorenarchive einschränken, etwa durch eine entsprechende Erweiterung oder eine Anpassung der WordPress-Konfiguration."
+    },
+    {
+     "check": "wordpress_user_enumeration",
+     "field": "recommendation",
+     "members": [
+      "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Anmeldenamen von den öffentlich sichtbaren Anzeigenamen trennen, damit ein ermittelter Anzeigename keinen Rückschluss auf den Anmeldenamen erlaubt."
+    }
+   ],
    "recommendation": [
     [
      "Mittelfristig",
@@ -1075,37 +2013,37 @@
   "categories": [
    {
     "key": "A",
-    "level": 2,
+    "level": 4,
     "name": "Perimeter-Exposition",
-    "note": "Verwaltungsoberfläche aus dem Internet erreichbar; Datei- und Mailzugänge auf 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) ohne erzwungene Transportverschlüsselung",
-    "status": "gelb"
+    "note": "Verwaltungszugänge auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com): Verwaltungsoberfläche mit Anmeldung; Datei- und Mailzugänge auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com): POP3 oder IMAP ohne TLS-Zwang",
+    "status": "rot"
    },
    {
     "key": "B",
     "level": 2,
     "name": "Patch- und EOL-Status",
-    "note": "WordPress-Kernversion veraltet oder unsicher; WordPress-Erweiterung mit bekannten Schwachstellen",
+    "note": "Serversoftware ohne Herstellerpflege; WordPress-Erweiterung mit bekannten Schwachstellen",
     "status": "gelb"
    },
    {
     "key": "C",
     "level": 2,
     "name": "E-Mail-Authentizität",
-    "note": "Richtlinie zur Absender-Authentizität für dortmund-beach.com nicht durchsetzend; Transportverschlüsselung im Mailversand für dortmund-beach.com nicht erzwungen",
+    "note": "Richtlinien zur Absender-Authentizität für dortmund-beach.com: DMARC ohne Durchsetzung und SPF nur mit Softfail; Verschlüsselte Zustellung von E-Mails für dortmund-beach.com: kein MTA-STS und kein TLS-RPT",
     "status": "gelb"
    },
    {
     "key": "D",
     "level": 1,
     "name": "Web- und Transport-Hygiene",
-    "note": "Transportverschlüsselung auf 88.99.35.112 mit veralteten Verfahren; Sicherheits-Header und Formularschutz auf 88.99.35.112 unvollständig",
+    "note": "Transportverschlüsselung auf 88.99.35.112: HSTS mit kurzer Gültigkeit und kein TLS 1.3; Absicherung der Webdienste auf 88.99.35.112: Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
     "status": "blau"
    },
    {
     "key": "E",
     "level": 1,
     "name": "Konfiguration und Informations-Hygiene",
-    "note": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste; DNS-Absicherung für dortmund-beach.com nicht eingerichtet",
+    "note": "Versionsangaben in den Antworten der Dienste: Versionsangabe im HTTP-Header; DNS-Absicherung für dortmund-beach.com: kein CAA-Eintrag und keine DNSSEC-Signatur",
     "status": "blau"
    }
   ],
@@ -1113,54 +2051,51 @@
   "coverage_warning": "",
   "levers": [
    {
-    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+    "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugang zur Verwaltung der Systeme",
     "n": 1,
+    "refs": [
+     "VS-2026-001"
+    ],
+    "title": "Verwaltungsoberflächen vom Internet trennen"
+   },
+   {
+    "effect": "Schützt Zugangsdaten und Nachrichten auf dem Übertragungsweg",
+    "n": 2,
     "refs": [
      "VS-2026-002"
     ],
-    "title": "Datei- und Mailzugänge auf 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) ohne erzwungene Transportverschlüsselung"
+    "title": "TLS für POP3 und IMAP erzwingen"
    },
    {
-    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
-    "n": 2,
-    "refs": [
-     "VS-2026-001",
-     "VS-2026-003",
-     "VS-2026-004"
-    ],
-    "title": "Verwaltungsoberfläche aus dem Internet erreichbar"
-   },
-   {
-    "effect": "Schließt bekannte Lücken in veralteten Ständen",
+    "effect": "Schließt Lücken, für die der Hersteller keine Updates mehr liefert",
     "n": 3,
     "refs": [
-     "VS-2026-005",
-     "VS-2026-007",
-     "VS-2026-011",
-     "VS-2026-013"
+     "VS-2026-003"
     ],
-    "title": "Anwendungsnahe Software ohne Herstellerpflege"
+    "title": "Serversoftware ohne Herstellerpflege ersetzen"
    }
   ],
-  "overall": "MITTEL",
-  "overall_status": "gelb",
-  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall": "HOCH",
+  "overall_status": "rot",
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
- "landscape_lead": "13 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "12 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 24,
-  "catalog_digest": "dcd629946febcc08a9c28922053c58d8d6eb044355d63056decc79caff8a905b",
-  "catalog_version": "2026-09-25.1",
+  "after_fp": 20,
+  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
+  "catalog_version": "2026-09-25.2",
   "classification": "Vertraulich",
-  "consolidated": 13,
+  "consolidated": 12,
   "context_sources": {},
   "customer": "Auftraggeber",
   "customer_short": "Auftraggeber",
   "domains": [
    "dortmund-beach.com"
   ],
-  "facts_schema_version": "1.0.6",
+  "excluded_ids": [],
+  "facts_schema_version": "1.0.7",
   "fqdns_total": 3,
+  "generation": null,
   "hosts_ipv4": 1,
   "hosts_ipv6": 0,
   "hosts_total": 1,
@@ -1172,26 +2107,38 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-25.1",
-  "positives": 4,
+  "policy_version": "2026-09-25.2",
+  "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
   "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
   "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
-  "raw_findings": 1106,
+  "raw_findings": 1093,
   "report_date": "19.09.2026",
   "report_id": "VS-2026-0923-1fbc",
-  "report_version": "1.0",
+  "report_version": "1",
   "scan_date": "23.09.2026",
   "scan_window": "23.09.2026, 21:10 bis 21:38 Uhr (CEST)",
+  "systems_total": 1,
   "tool_runs": 41
  },
  "plan": [
   {
-   "action": "Auf den betroffenen Diensten die Transportverschlüsselung erzwingen, sodass eine Anmeldung ohne aufgebautes TLS abgelehnt wird.",
-   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+   "action": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.",
+   "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugang zur Verwaltung der Systeme",
+   "lever": "Verwaltungsoberflächen vom Internet trennen",
+   "prio": "Unverzüglich",
+   "refs": [
+    "VS-2026-001"
+   ],
+   "st": "rot"
+  },
+  {
+   "action": "Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten.",
+   "effect": "Schützt Zugangsdaten und Nachrichten auf dem Übertragungsweg",
+   "lever": "TLS für POP3 und IMAP erzwingen",
    "prio": "In Kürze",
    "refs": [
     "VS-2026-002"
@@ -1199,54 +2146,102 @@
    "st": "gelb"
   },
   {
-   "action": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst. Die WordPress-Kerninstallation auf die aktuelle, vom Projekt gepflegte Version anheben. Erweiterung auf die vom Hersteller freigegebene, fehlerbereinigte Version aktualisieren; lässt sich das nicht sofort umsetzen, die Erweiterung deaktivieren.",
-   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+   "action": "Das Betriebssystem auf ein Release mit laufender Sicherheitsunterstützung anheben oder eine verlängerte Unterstützung für das eingesetzte Release sicherstellen.",
+   "effect": "Schließt Lücken, für die der Hersteller keine Updates mehr liefert",
+   "lever": "Serversoftware ohne Herstellerpflege ersetzen",
    "prio": "In Kürze",
    "refs": [
-    "VS-2026-001",
-    "VS-2026-003",
+    "VS-2026-003"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Erweiterung auf die vom Hersteller freigegebene, fehlerbereinigte Version aktualisieren; lässt sich das nicht sofort umsetzen, die Erweiterung deaktivieren.",
+   "effect": "Schließt bekannte Lücken in Erweiterungen",
+   "lever": "Verwundbare WordPress-Erweiterungen aktualisieren",
+   "prio": "In Kürze",
+   "refs": [
     "VS-2026-004"
    ],
    "st": "gelb"
   },
   {
-   "action": "Bestand der betroffenen Komponente ermitteln und mit den Lebenszyklusangaben des Herstellers abgleichen. Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten. Die Offenlegung von Benutzernamen über die REST-Schnittstelle und die Autorenarchive einschränken, etwa durch eine entsprechende Erweiterung oder eine Anpassung der WordPress-Konfiguration.",
-   "effect": "Schließt bekannte Lücken in veralteten Ständen",
+   "action": "Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen.",
+   "effect": "Weist gefälschte E-Mails im Namen der Domain ab",
+   "lever": "DMARC-Richtlinie durchsetzen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-005",
-    "VS-2026-007",
-    "VS-2026-011",
-    "VS-2026-013"
+    "VS-2026-005"
    ],
    "st": "gelb"
   },
   {
-   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
-   "effect": "Schützt die Authentizität der eigenen E-Mail",
+   "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
+   "effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
+   "lever": "Nicht benötigte Altprotokolle abschalten",
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-006"
    ],
-   "st": "gelb"
+   "st": "blau"
   },
   {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "action": "Die Gültigkeitsdauer des Strict-Transport-Security-Headers auf mindestens sechs Monate anheben.",
+   "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+   "lever": "Gültigkeitsdauer von HSTS verlängern",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-009",
+    "VS-2026-008"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
+   "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+   "lever": "Inhaltsrichtlinie für die Webseiten einführen",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-009"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Die Versionskennung in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert ohne Versionsangabe setzen.",
+   "effect": "Erschwert die gezielte Suche nach passenden Schwachstellen",
+   "lever": "Versionsangaben aus den Antwort-Headern entfernen",
+   "prio": "Mittelfristig",
+   "refs": [
     "VS-2026-010"
    ],
    "st": "blau"
   },
   {
-   "action": "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain. Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
-   "effect": "Schützt die Authentizität der eigenen E-Mail",
+   "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
+   "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+   "lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-011"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Die Offenlegung von Benutzernamen über die REST-Schnittstelle und die Autorenarchive einschränken, etwa durch eine entsprechende Erweiterung oder eine Anpassung der WordPress-Konfiguration.",
+   "effect": "Erschwert Rateangriffe auf WordPress-Konten",
+   "lever": "Ausgabe von Benutzernamen abschalten",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-012"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
+   "effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
+   "lever": "MTA-STS für die Domain veröffentlichen",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-008",
-    "VS-2026-012"
+    "VS-2026-007"
    ],
    "st": "blau"
   }
@@ -1254,22 +2249,137 @@
  "positives": [
   {
    "cat": "A",
-   "text": "Auf 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com und weitere) antwortet kein Datenbankdienst auf Verbindungen von außen.",
+   "provenance": [
+    {
+     "check": "db_exposed",
+     "field": "positive",
+     "members": [
+      "88.99.35.112"
+     ],
+     "statement": "positive.title",
+     "text": "Keine Datenbankdienste aus dem Internet erreichbar"
+    },
+    {
+     "check": "db_exposed",
+     "field": "positive",
+     "members": [
+      "88.99.35.112"
+     ],
+     "statement": "positive.text",
+     "text": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) antwortet kein Datenbankdienst auf Verbindungen von außen."
+    }
+   ],
+   "text": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) antwortet kein Datenbankdienst auf Verbindungen von außen.",
    "title": "Keine Datenbankdienste aus dem Internet erreichbar"
   },
   {
    "cat": "A",
-   "text": "Der Host 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com und weitere) bietet seinen Webdienst über HTTPS an.",
+   "provenance": [
+    {
+     "check": "http_no_tls",
+     "field": "positive",
+     "members": [
+      "88.99.35.112"
+     ],
+     "statement": "positive.title",
+     "text": "Webdienst mit Transportverschlüsselung"
+    },
+    {
+     "check": "http_no_tls",
+     "field": "positive",
+     "members": [
+      "88.99.35.112"
+     ],
+     "statement": "positive.text",
+     "text": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet seinen Webdienst über HTTPS an."
+    }
+   ],
+   "text": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet seinen Webdienst über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
    "cat": "C",
-   "text": "Für dortmund-beach.com lehnen die Nameserver den Abruf der gesamten Zone ab, und kein Eintrag zeigt auf ein aufgegebenes Ziel.",
-   "title": "Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge"
+   "provenance": [
+    {
+     "check": "dns_zone_transfer",
+     "field": "positive",
+     "members": [
+      "dortmund-beach.com"
+     ],
+     "statement": "positive.title",
+     "text": "Zonentransfer abgewiesen"
+    },
+    {
+     "check": "dns_zone_transfer",
+     "field": "positive",
+     "members": [
+      "dortmund-beach.com"
+     ],
+     "statement": "positive.text",
+     "text": "Für die Domain dortmund-beach.com weisen die Nameserver einen vollständigen Zonentransfer ab."
+    }
+   ],
+   "text": "Für die Domain dortmund-beach.com weisen die Nameserver einen vollständigen Zonentransfer ab.",
+   "title": "Zonentransfer abgewiesen"
+  },
+  {
+   "cat": "C",
+   "provenance": [
+    {
+     "check": "spf_missing",
+     "field": "positive",
+     "members": [
+      "dortmund-beach.com"
+     ],
+     "statement": "positive.title",
+     "text": "SPF-Eintrag vorhanden"
+    },
+    {
+     "check": "spf_missing",
+     "field": "positive",
+     "members": [
+      "dortmund-beach.com"
+     ],
+     "statement": "positive.text",
+     "text": "Für die Domain dortmund-beach.com ist ein SPF-Eintrag veröffentlicht."
+    }
+   ],
+   "text": "Für die Domain dortmund-beach.com ist ein SPF-Eintrag veröffentlicht.",
+   "title": "SPF-Eintrag vorhanden"
   },
   {
    "cat": "E",
-   "text": "Zu den geprüften Adressen und zur Domain liegt in den abgefragten Reputationsquellen kein Eintrag vor.",
+   "provenance": [
+    {
+     "check": "ip_reputation,urlhaus_compromise",
+     "field": "positive",
+     "members": [
+      "88.99.35.112",
+      "scan"
+     ],
+     "statement": "positive.title",
+     "text": "Keine Einträge in Reputationsquellen"
+    },
+    {
+     "check": "ip_reputation",
+     "field": "positive",
+     "members": [
+      "88.99.35.112"
+     ],
+     "statement": "positive.text",
+     "text": "Für 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) liegen in den abgefragten Reputationsquellen keine Meldungen vor."
+    },
+    {
+     "check": "urlhaus_compromise",
+     "field": "positive",
+     "members": [
+      "scan"
+     ],
+     "statement": "positive.text",
+     "text": "Für dortmund-beach.com liegt kein Treffer in öffentlichen Datenbanken zur Schadsoftware-Verteilung vor."
+    }
+   ],
+   "text": "Für 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) liegen in den abgefragten Reputationsquellen keine Meldungen vor. Für dortmund-beach.com liegt kein Treffer in öffentlichen Datenbanken zur Schadsoftware-Verteilung vor.",
    "title": "Keine Einträge in Reputationsquellen"
   }
  ],
@@ -1293,7 +2403,7 @@
    {
     "cov": "voll",
     "coverage": "Portscan, Transportverschlüsselung und aktive Webanalyse vollständig.",
-    "fqdns": "*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com",
+    "fqdns": "dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com",
     "ip": "88.99.35.112",
     "more_ips": [],
     "operator": "Hetzner Online GmbH (vsrv2.spacekoeln.de)",
@@ -1306,7 +2416,7 @@
     "checks": [
      "Mailserver auf Port 25 (Verschlüsselung, Anmeldung)"
     ],
-    "detail": "Betroffen: 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com und weitere). Laut Passivquelle nimmt dort der Dienst SMTP Verbindungen an (gesehen am 23.09.2026); vom Prüfstand aus ist Port 25 nicht erreichbar, der Mailserver auf diesem Port ist deshalb nicht geprüft.",
+    "detail": "Betroffen: 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com). Laut Passivquelle nimmt dort der Dienst SMTP Verbindungen an (gesehen am 23.09.2026); vom Prüfstand aus ist Port 25 nicht erreichbar, der Mailserver auf diesem Port ist deshalb nicht geprüft.",
     "what": "SMTP auf Port 25 vom Prüfstand aus nicht prüfbar"
    },
    {
@@ -1320,15 +2430,15 @@
     "checks": [
      "Bekannte Schwachstellen der erkannten Versionen"
     ],
-    "detail": "Betroffen: 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com).",
+    "detail": "Betroffen: 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com).",
     "what": "Keine Fremdbewertung aus Schwachstellendatenbanken zu den erkannten Versionen"
    },
    {
     "checks": [
-     "Laufzeit der Domain"
+     "FTP-Dienste"
     ],
-    "detail": "Betroffen: dortmund-beach.com.",
-    "what": "Registrierungsdaten der Domain nicht abrufbar"
+    "detail": "Betroffen: 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com).",
+    "what": "Ob der FTP-Dienst eine Anmeldung ohne Transportverschlüsselung ablehnt, zeigt der Portscan nicht"
    },
    {
     "checks": [
@@ -1351,7 +2461,7 @@
      "Ermittlung der Hostnamen",
      "Suche nach sensiblen Dateien"
     ],
-    "detail": "Betroffen: 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com und weitere), dortmund-beach.com.",
+    "detail": "Betroffen: 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com), dortmund-beach.com.",
     "what": "Zeitlimit der Prüfung überschritten"
    }
   ],
@@ -1374,7 +2484,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 13 Befunde und 4 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 12 Befunde und 5 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -1388,11 +2498,11 @@
    },
    {
     "l": "Einzelbeobachtungen",
-    "v": "1106"
+    "v": "1093"
    },
    {
     "l": "Befunde im Bericht",
-    "v": "13"
+    "v": "12"
    }
   ],
   "out_of_scope": [

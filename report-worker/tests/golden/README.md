@@ -152,16 +152,17 @@ Engine catalog, Layout v3, Gate strict, gegengelesen in
 
 | Auftrag | Ziel | Soll-Liste | Befunde / Positive | Markiert | Zustaendig |
 |---|---|---|---|---|---|
-| 1fbc92b9 | dortmund-beach.com | `dortmund-beach-0923` | 24 / 17 | 6 | 0 |
-| c3d5724c | lumbeck-wolter.de | `lumbeck-wolter-0923` | 10 / 11 | 3 | 2 |
-| 31d67a02 | junkerwerk.de, junkerwerk.hu | `junkerwerk-0923` | 41 / 41 | 7 | 2 |
-| 3cf01f8d | huendgen-entsorgung.de | `huendgen-0923` | 15 / 31 | 4 | 3 |
-| 68d59573 | bergersysteme.com | `bergersysteme-0923` | 22 / 39 | 14 | 9 |
-| 1f8bc977 | castenow.de | `castenow-0923` | 52 / 92 | 13 | 10 |
-| 2e56abe1 | heuel.com | `heuel-0923` | 30 / 52 | 13 | 6 |
+| 1fbc92b9 | dortmund-beach.com | `dortmund-beach-0923` | 20 / 16 | 0 | 0 |
+| c3d5724c | lumbeck-wolter.de | `lumbeck-wolter-0923` | 8 / 12 | 0 | 1 |
+| 31d67a02 | junkerwerk.de, junkerwerk.hu | `junkerwerk-0923` | 41 / 41 | 2 | 1 |
+| 3cf01f8d | huendgen-entsorgung.de | `huendgen-0923` | 16 / 29 | 1 | 3 |
+| 68d59573 | bergersysteme.com | `bergersysteme-0923` | 19 / 36 | 5 | 7 |
+| 1f8bc977 | castenow.de | `castenow-0923` | 53 / 88 | 4 | 10 |
+| 2e56abe1 | heuel.com | `heuel-0923` | 29 / 51 | 6 | 5 |
 
-Stand S6b-1 (25.09.2026). Vor S6b-1 standen dort 41/40, 15/29, 22/52, 52/86 und 29/53
-Eintraege sowie 95 Markierungen; die Aenderungen stehen unter "Bekannte Abweichungen".
+Stand S6b-2 (25.09.2026). Nach S6b-1 standen dort 24/17, 10/11, 41/41, 15/31, 22/39,
+52/92 und 30/52 Eintraege sowie 60 Markierungen; vor S6b-1 41/40, 15/29, 22/52, 52/86 und
+29/53 sowie 95 Markierungen. Die Aenderungen stehen unter "Bekannte Abweichungen".
 "Zustaendig" zaehlt die Eintraege mit `zustaendig` (hoster oder platform).
 
 Die Soll-Listen sind wie bei dortmund-beach und lumbeck-wolter aus dem Katalogergebnis
@@ -177,14 +178,18 @@ Lebenszyklus (WordPress 6.5.12, Zertifikatslaufzeiten nach E2). S6b aendert dies
 Eintraege bewusst; `build-expected-order.py` erhaelt die Markierungen beim Neuerzeugen und
 meldet jede, deren Eintrag wegfaellt. Reine Textmaengel stehen nicht an den Eintraegen.
 S6b-1 hat Q3, Q9 und den Teil-2-Eintrag zu 40.99.150.120 aufgeloest (Erlaeuterung unter
-`hinweis_s6b1`); offen sind 60 Markierungen: Q4 15, Q8 18, Q12 10, Q13 7, Q14 5, Q18 4 und
-Teil 2 1 (Exchange-Patchstand bei castenow).
+`hinweis_s6b1`); danach waren 60 Markierungen offen: Q4 15, Q8 18, Q12 10, Q13 7, Q14 5,
+Q18 4 und Teil 2 1 (Exchange-Patchstand bei castenow). S6b-2 hat 42 davon aufgeloest
+(`hinweis_s6b2` je Liste, Test `test_nach_s6b2_bleiben_nur_die_q8_markierungen`); es
+bleiben die 18 Q8-Markierungen (Header an Weiterleitung, Fehler- oder Challenge-Seite)
+fuer die Scanner-Session S6c.
 
 Was die Listen nicht zeigen, weil es fehlt: die Discovery verliert Hostnamen (spec/09 Q1:
 eset und ftp bei lumbeck-wolter, archiv bei Junkerwerk, ftp und ftp.mail bei Hündgen,
-24 Namen bei bergersysteme, as2 und control bei heuel), Exchange 2019 bei Hündgen ohne
-Lebenszyklus-Befund (Q18), Port 25 sieht nmap nirgends (E5; seit S6b-1 steht das als
-Einschraenkung "SMTP auf Port 25 vom Pruefstand aus nicht pruefbar" in Kapitel 2.2).
+24 Namen bei bergersysteme, as2 und control bei heuel), Port 25 sieht nmap nirgends (E5;
+seit S6b-1 steht das als Einschraenkung "SMTP auf Port 25 vom Pruefstand aus nicht
+pruefbar" in Kapitel 2.2). Exchange 2019 bei Hündgen ist seit S6b-2 ein
+`software_eol`-Befund mit Quelle (Q18).
 
 Regressionsfaelle der Dashboard-Techniktabelle (spec/09 Q11): c3d5724c und 31d67a02
 (MariaDB mit Praefix 5.5.5-, PostgreSQL "9.6.0 or later"), 1fbc92b9 und 1f8bc977
@@ -201,10 +206,12 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
   Vokabular von `build/catalog_sim.py`, die Zuordnung steht im Generator.
   Positivbefunde haben in der Quelle keine ID, `VS-2026-P01` bis `P08` sind
   hier vergeben, `scale` und `level` bleiben leer.
-- `negative.json` enthaelt fuer das Muster `NEG-MARIADB-55` sechs statt der in
-  spec/06 genannten fuenf Eintraege. Der Grund steht in der Datei unter
-  `abweichungen`. Ebenfalls dort: der Defekt dieses Musters sitzt in der
-  Versionsableitung, nicht im Befundtext.
+- `negative.json` enthaelt fuer das Muster `NEG-MARIADB-55` acht statt der in
+  spec/06 genannten fuenf Eintraege (a6df9d9d traegt denselben Datenbankbefund, 57b3ac85
+  und 860d0d5a kamen nach S0c in den Snapshot). Der Grund steht in der Datei unter
+  `hinweis_soll`. Ebenfalls dort: der Defekt dieses Musters sitzt in der
+  Versionsableitung, nicht im Befundtext. Seit S6b-2 folgen die Sollzahlen aller alten
+  Muster dem Snapshot (SPF 8, MariaDB 8, FTP 3, Titel 6), siehe unten.
 - `expected/junkerwerk.json` fuehrt die Berichtsnummer seit S6a im Produktformat
   `VS-2026-0831-0bf1` statt der Prototyp-Nummer `VS-JW-2026-0831`; der Generator
   leitet sie ab (`s6a_report_id`), Grund in `reporter/v3/deltas.md` Punkt 14. Alle
@@ -328,6 +335,130 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
     nicht mehr halbleer, 1f8bc977 durch den Umfluss 34 statt 35 Seiten ohne halbleere
     Seite). Bekannt halbleer bleiben 2d2d4f39 Seite 27 und f77ccff2 Seite 27, beide vor
     einem Kapitelanfang mit erzwungenem Seitenwechsel (Merkposten S7).
+- S6b-2 (spec/09 Q4 bis Q7, Q12 bis Q14, Q18, spec/08 Teil 2 Punkte 4, 5, 6, 14, 15, 17, 20
+  und 21, offene Punkte nach S6a; Entscheidungen DC 25.09.): Faktenschema 1.0.7, Katalog
+  2026-09-25.2, Golden-Facts, Reportdaten aller 21 Auftraege, alle elf abgeleiteten
+  Soll-Listen, `negative.json`, Manifest und HTML-Schnappschuss neu gebaut. Je Q-Nummer:
+  - Q4 (Texte je Regel): Titel, Befundtext, Auswirkung, Empfehlung und Verifikation kommen
+    aus den getroffenen Regeln, jede Aussage mit Fakten-Bedingung (`Member.holds`,
+    `Finding.provenance`, Gate `aussage_ohne_fakt`, Text-Fixtures je Bedingung). Buendel
+    tragen nur den Sammeltitel mit `{rules}`. Soll-Listen: `dane_missing` entfaellt in allen
+    sieben (MX in fremder, unsignierter Zone); BREACH und LUCKY13 stehen als
+    `tls_weakness_reported` im Anhang, ohne CVE am Befund (castenow bitwarden und umfrage);
+    `service_banner_version` ohne SSH-Banner, MariaDB-Handshake und die nmap-Untergrenze
+    "9.6.0 or later" (lumbeck-wolter und Junkerwerk ohne Bannerbefund, heuel und
+    bergersysteme ohne SSH); `http_trace_enabled` ist eine Werkzeugmeldung ("TRACE in der
+    Antwort auf OPTIONS genannt", Junkerwerk .29); `http_alt_port` sagt "zusaetzlicher
+    Webport" statt "Auslieferungsseite"; DMARC-Aussagen zur Meldeadresse nur ohne `rua`;
+    `ftp_plaintext` nur mit Beleg, sonst `legacy_protocols_present` mit Aussage je
+    Erzwingung; `db_exposed` beschreibt PostgreSQL mit Abweisung vor der Anmeldung getrennt
+    von MariaDB mit Handshake (spec/09 Teil 2 LW, JW).
+  - Q5: die erste Empfehlung steht auf der Dringlichkeit des Befunds, weitere Stufen relativ
+    (`levels.relative_stages`); Test ueber alle 21 Auftraege.
+  - Q6: eine Planzeile je Massnahmentext und Zustaendigkeit, Effekt und Hebeltitel aus
+    `texts.plan` der Regel. Planzeilen: 1fbc92b9 6->12, c3d5724c 4->5, 31d67a02 9->11,
+    3cf01f8d 6->11, 68d59573 9->9, 1f8bc977 12->18, 2e56abe1 8->10 (vorher mischten Zeilen
+    verschiedene Texte; der Kategorieeffekt `narrative.PLAN_EFFECT` entfaellt).
+  - Q7: Nachweis je beruehrtem Fakt eine Zeile "Bezeichnung: Wert" mit Werteuebersetzung,
+    Werkzeug der Zeile ist das liefernde (DNSSEC, CAA, MTA-STS, TLS-RPT, DANE aus
+    `dns_security`), keine Kuerzung im tragenden Feld, keine Dubletten, keine
+    `scan_results:`-Fundstelle; DKIM "keine Selektoren gefunden, N geprueft"; die Fundstelle
+    der WordPress-Benutzernamen aus wpscan (oEmbed statt fest `/wp-json/wp/v2/users`);
+    wpscan-Schwachstellen je Kennung mit CVE im Nachweis (spec/08 Punkt 20).
+  - Q12: Reputation positiv nur ohne Meldungen, Plattform- und CDN-Adressen nicht anwendbar
+    (heuel 216.150.1.65 mit 26 Meldungen); WAF nur mit benanntem Produkt aus der eigenen
+    Antwort (huendgen, castenow Generic, bergersysteme Weiterleitungsziel); TLS-Positive
+    nicht auf Hosts mit ungeprueftem Mail-TLS (bergersysteme); "entfaellt" ist nicht
+    bestanden (dortmund-beach, lumbeck-wolter verwaiste Eintraege).
+  - Q13 (E1): Webmin mit Anmeldung auf einem System des Kunden ist Exposition kritisch
+    (dortmund-beach Rot); Hosting-Panels beim Hoster `admin_panel_hoster` erhoeht (Plesk
+    bei castenow und bergersysteme, bei castenow 8443 und 8880 ein Befund
+    `admin_access`); Verwaltungsport ohne Fingerabdruck oder Fingerabdruck ohne
+    Anmeldebeleg `admin_service_unconfirmed` erhoeht; Passivfund mit Kennung erhoeht mit
+    der Pruefung als erster Empfehlung (Junkerwerk SonicWall), ohne Kennung nur
+    Werkzeugmeldung (heuel 4433); die Cloudflare-Ports bei bergersysteme entfallen als
+    CDN-Kante (Ignorierliste). A.2 aus
+    `levels.ADMIN_EXPOSURE`.
+  - Q14: ZAP-Regeln nur ab Konfidenz High; darunter `web_vulnerability_reported` im Anhang,
+    Quelle nach Lauf ("passiv gemeldet von ZAP"). Die ZAP-Cookie-Meldungen 10010, 10011 und
+    10054 stehen nicht mehr in der Ignorierliste (heuel login.seam, spec/09 Teil 2 HL).
+  - Q18 (E2): Zertifikat bis sieben Tage Rot und Unverzueglich (castenow mailstore), acht
+    bis 14 Tage Hygiene hoch, 15 bis 30 Tage `cert_expiring_later` mittelfristig (huendgen
+    17 Tage); Exchange 2016 und 2019 mit Supportende 14.10.2025 und Quelle (huendgen
+    15.2.1748); WordPress veraltet nur mit Kern-Schwachstelle, kein EOL bei Release nach dem
+    EOL-Datum (dortmund-beach 6.5.12); Debian aus dem Paketsuffix mit LTS-Ende
+    (dortmund-beach Debian 11); kein Positivbefund fuer Exchange SE ohne Patchstand
+    (castenow, Junkerwerk).
+  - spec/08 Punkt 6: Domains ohne MX meldet `mail_spoofing_unprotected`; `spf_*` und
+    `dmarc_*` gelten nur mit MX; die Posture zeigt SPF `~all` als "softfail".
+  - Punkt 21: whois lieferte in keinem der 21 Auftraege Daten; keine Einschraenkungszeile,
+    kein `domain_expiring` im Bericht, bis der Scanner liefert (Issue fuer S6c).
+  - Technik (Entscheidung DC 25.09., Frage 7): Technikzeilen nur mit Konfidenz hoch oder
+    zwei Quellen, sonst Werkzeugmeldung im Anhang; "Neos Flow:neos" wird "Neos Flow".
+    PostgreSQL "or later" und jQuery Migrate (nur httpx) stehen deshalb im Anhang.
+  - Zaehlung: Prosa-Eingabe und Einleitung Kapitel 3 zaehlen Systeme (31d67a02: "3
+    Systeme"); Gate `zaehlung_widerspruch`.
+  - Anhang "Werkzeugbefunde ohne Bewertung": je Meldung eine Zeile mit ihrer eigenen Gruppe
+    und dem deutschen Regeltitel als Hinweis (vorher die Sammelbezeichnung des Buendels);
+    dazu die Technikzeilen unter der Schwelle. Zeilen: 1fbc92b9 2->21, 1f8bc977 7->30,
+    2e56abe1 2->21, 4e6b6883 9->46.
+  - `negative.json`: 98 Eintraege, davon 59 aus der Scan-Runde in 21 Mustern
+    `NEG-S6B2-*` mit maschineller Pruefung (`pruefung`) gegen den neu erzeugten Bericht und
+    Gegenprobe am ausgelieferten Bericht (`tests/v3/test_negative_scanrunde.py`).
+    `NEG-MAIL-PLAINTEXT` zaehlt nur noch Auftraege, deren Dienste die Anmeldung vor TLS
+    sperren (2 statt 4: securess und bergersysteme bieten die Anmeldung vor STARTTLS an,
+    spec/08 Punkt 4).
+
+## Abgleich spec/09 nach S6b-2
+
+Jede in spec/09 als falsch belegte Aussage der sieben Auftraege mit ihrem Stand. "Erledigt"
+nennt Session und Test, "offen" den Grund und die Session.
+
+| Stelle | Aussage | Stand |
+|---|---|---|
+| Q1 | Discovery verliert Hostnamen | offen, Scanner (S6c) |
+| Q2 | Mail-, Kalender- und Datenbankrollen ohne Fakt | erledigt S6b-1 (`roles.py`, Gate `rolle_ohne_fakt`) |
+| Q3 | geteilte Systeme als Kundensystem | Bericht erledigt S6b-1 (Zustaendigkeit); aktive Pruefung nur gegen Kunden-VHosts (E3) offen, Scanner (S6c) |
+| Q4 | Textbausteine je Buendel, Vorbedingungen, `dane_missing` | erledigt S6b-2 (Texte je Regel, `aussage_ohne_fakt`, Text-Fixtures, `NEG-S6B2-*`) |
+| Q5 | Empfehlungsstaffel vor der Dringlichkeit | erledigt S6b-2 (`test_s6b2::test_erste_empfehlung_steht_auf_der_dringlichkeit`) |
+| Q6 | Plan nach Prioritaet und Effekt | erledigt S6b-2 (`test_plan`, `test_s6b2`) |
+| Q7 | Nachweis traegt die Behauptung nicht | erledigt S6b-2 (Selbstcheck `nachweis_*`, `test_spec08`) |
+| Q8 | Header an Weiterleitung, Fehler- oder Challenge-Seite | offen, Scanner (S6c); 18 Markierungen |
+| Q9 | Hosts ohne Messergebnis vollstaendig | erledigt S6b-1 |
+| Q10 | Einschraenkungstabelle, TLS-Zuordnung | erledigt S6b-1; testssl an IP binden offen, Scanner (S6c) |
+| Q11 | Techniktabelle Dashboard und PDF | erledigt S6a2 und S6b-2 (Schwelle, Rohbezeichner, `test_tech_rows_paritaet`) |
+| Q12 | Positivbefunde ohne tragfaehigen Fakt | erledigt S6b-2 (`NEG-S6B2-WAF`, `-REPUTATION`, `-VERWAIST`, `test_s6b2`) |
+| Q13 | Einstufung der Verwaltungsoberflaechen | erledigt S6b-2 nach E1 (`levels.ADMIN_EXPOSURE`, `NEG-S6B2-WEBMIN`, `-VERWALTUNG-*`) |
+| Q14 | ZAP unter Konfidenz High traegt Befunde | erledigt S6b-2 (`NEG-S6B2-ZAP-UNTER-HIGH`) |
+| Q15 | Firmenname und Kurzname | erledigt S6b-1 |
+| Q16 | Adress- und Hostzuordnung | Bericht erledigt S6b-1; Werkzeuge an die IP binden, AAAA offen, Scanner (S6c) |
+| Q17 | Scanner-Ausfaelle und Luecken | offen, Scanner (S6c) |
+| Q18 | Lebenszyklus und Aktualitaet | erledigt S6b-2 (`test_facts_s6b2`, `NEG-S6B2-WORDPRESS`, `-ZERTIFIKAT-FRIST`, `-EXCHANGE-SE`) |
+| Teil 2 DB | Fundstelle `wp-json/wp/v2/users` | erledigt S6b-2 (`users_found_by`) |
+| Teil 2 DB | Wildcard `*.dortmund-beach.com` in Hostlisten | erledigt S6b-2 (2.1, Systemsaetze, Einschraenkungen) |
+| Teil 2 DB | Bildschirmfoto pflege zeigt die WordPress-Startseite | offen, Scanner (S6c, Bildnachweis je Name) |
+| Teil 2 DB | froxlor auf 443 ueber die IP (in spec/09 unsicher, ohne Regel) | offen: der Bericht sagt dazu nichts Falsches; froxlor-Titel als Fingerabdruck ist eine Regelfrage fuer DC (offene Frage S6b-2) |
+| Teil 2 DB | 587 mit AUTH vor STARTTLS gruen | offen: SMTP-Regel nach E5 (spec/09 Teil 4), S6c |
+| Teil 2 LW, JW | Rateangriffe bei PostgreSQL mit Abweisung | erledigt S6b-2 (`NEG-S6B2-POSTGRESQL-RATEANGRIFF`) |
+| Teil 2 JW | LUCKY13 nur bei .29 | erledigt S6b-2 (beide als Hinweis im Anhang) |
+| Teil 2 JW | RDP/SMB-Positiv fehlt fuer .29 | erklaert: entfaellt ganz, weil die IPv6-Adresse nicht pruefbar ist (Entscheidung DC S6b-1 zu Q9) |
+| Teil 2 JW | "Datenbankportsträfe" | offen, Darstellung (S7) |
+| Teil 2 HE | 444 Firmenportal nur von nmap gesehen | Text erledigt S6b-2 (kein "Auslieferungsseite"); Tiefenpruefung je Port offen, Scanner (S6c) |
+| Teil 2 HE | Duda-Plattform "Ports schliessen" | erledigt S6b-1 (Plattformbetreiber) |
+| Teil 2 BS | Cloudflare-Kante als Verwaltungsoberflaeche | erledigt S6b-2 (Q13) |
+| Teil 2 BS | autodiscover Microsoft als Host | erledigt S6b-1 (Drittanbieter) |
+| Teil 2 BS | gleicher Header-Sachverhalt mittel und niedrig | erledigt S6b-2 (Einstufung je getroffener Regel, HSTS fehlt ist mittel) |
+| Teil 2 CA | Shoutcast als Auslieferungsseite | erledigt S6b-2 (Q4) |
+| Teil 2 CA | mailstore "Access through untrusted domain" ohne Einschraenkung | offen, Scanner (S6c, zusammen mit Q8) |
+| Teil 2 CA | Exchange "nachweislich gepflegte Version" | erledigt S6b-2 (`NEG-S6B2-EXCHANGE-SE-PFLEGE`) |
+| Teil 2 CA | AUTO-OVERRIDE umfrage | offen, Scanner-KI #1 (S6c) |
+| Teil 2 CA | Nachweis VS-015 mit www-Zertifikat | entfaellt: der Befund (BREACH) steht nicht mehr im Bericht |
+| Teil 2 HL | Bildschirmfotos "Redirector" | offen, Scanner (S6c) |
+| Teil 2 HL | Cookie-Meldungen an login.seam fehlen | erledigt S6b-2 (Anhang, Q14) |
+| Teil 2 HL | Werkzeugmeldungen mit falschem "Betrifft" und englischem Titel | erledigt S6b-2 ("Betrifft" je Meldung, deutscher Regeltitel als Hinweis; der ZAP-Name bleibt als Zitat) |
+| Teil 2 HL | FortiSSH gegen WingFTPServer (unsicher) | offen, nicht geklaert (S6c) |
+| Teil 3 | Deckblatt "Version / 1.0" | erledigt S6b-2 (Auslieferungsversion, Erzeugung in der Fusszeile) |
+| Teil 3 | halbleere Seiten | offen, Darstellung (S7) |
 
 ## Golden-Facts (S1)
 

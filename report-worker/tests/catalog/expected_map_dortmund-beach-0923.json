@@ -1,6 +1,8 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/dortmund-beach-0923.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
  "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
+ "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben.",
+ "hinweis_s6b2": "S6b-2 hat sechs Markierungen aufgeloest: Q13 Webmin (Server MiniServ, session_login) als admin_service_exposed kritisch; Q14 csrf_token_missing als Werkzeugmeldung; Q4 dane_missing entfaellt; Q18 WordPress 6.5.12 ohne Kern-Schwachstelle weder veraltet noch ohne Herstellerpflege (Release nach dem EOL-Datum des Zweigs); Q12 der Positivbefund zu verwaisten CNAME-Eintraegen steht im Bericht nicht mehr (entfaellt zaehlt nicht als bestanden).",
  "strict": false,
  "orders": {
   "main": "1fbc92b9-34ab-414e-8843-a1f1e9f15431"
@@ -9,9 +11,7 @@
   "VS-2026-001": {
    "checks": [
     "admin_service_exposed"
-   ],
-   "spec09": "Q13",
-   "warum": "Port 10000 ist Webmin (nmap: Server MiniServ, session_login); eine Verwaltungsoberfläche mit Anmeldung ohne vorgelagerten Schutz ist nach E1 Exposition kritisch, nicht erhöht."
+   ]
   },
   "VS-2026-002": {
    "checks": [
@@ -25,113 +25,85 @@
   },
   "VS-2026-004": {
    "checks": [
-    "csrf_token_missing"
-   ],
-   "spec09": "Q14",
-   "warum": "ZAP-Meldung „Absence of Anti-CSRF Tokens“ mit Konfidenz Low; unter Konfidenz High nur Werkzeugmeldung, Quelle passiv (ZAP). Am WordPress-Login."
-  },
-  "VS-2026-005": {
-   "checks": [
-    "dane_missing"
-   ],
-   "spec09": "Q4",
-   "warum": "Der MX mail1.spacekoelnsrv1.de liegt in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
-  },
-  "VS-2026-006": {
-   "checks": [
     "dmarc_none"
    ]
   },
-  "VS-2026-007": {
+  "VS-2026-005": {
    "checks": [
     "dnssec_missing"
    ]
   },
-  "VS-2026-008": {
-   "checks": [
-    "ftp_plaintext"
-   ]
-  },
-  "VS-2026-009": {
+  "VS-2026-006": {
    "checks": [
     "hsts_short"
    ]
   },
-  "VS-2026-010": {
+  "VS-2026-007": {
    "checks": [
     "http_header_disclosure"
    ]
   },
-  "VS-2026-011": {
+  "VS-2026-008": {
    "checks": [
     "info_disclosure"
    ]
   },
-  "VS-2026-012": {
+  "VS-2026-009": {
    "checks": [
     "legacy_protocols_present"
    ]
   },
-  "VS-2026-013": {
+  "VS-2026-010": {
+   "checks": [
+    "mail_plaintext"
+   ]
+  },
+  "VS-2026-011": {
    "checks": [
     "mta_sts_missing"
    ]
   },
-  "VS-2026-014": {
+  "VS-2026-012": {
    "checks": [
     "security_headers_incomplete"
    ]
   },
-  "VS-2026-015": {
+  "VS-2026-013": {
    "checks": [
-    "service_banner_version"
+    "software_eol"
    ]
   },
-  "VS-2026-016": {
-   "checks": [
-    "software_eol_runtime"
-   ],
-   "spec09": "Q18",
-   "warum": "wpscan meldet WordPress 6.5.12 mit release_date 2026-09-22 und ohne Schwachstellen; der Zweig wird mit Sicherheitsupdates gepflegt, das Supportende 2024-07-16 trifft nicht zu."
-  },
-  "VS-2026-017": {
+  "VS-2026-014": {
    "checks": [
     "spf_softfail"
    ]
   },
-  "VS-2026-018": {
+  "VS-2026-015": {
    "checks": [
     "tls_no_13"
    ]
   },
-  "VS-2026-019": {
+  "VS-2026-016": {
    "checks": [
     "tls_rpt_missing"
    ]
   },
-  "VS-2026-020": {
+  "VS-2026-017": {
    "checks": [
-    "tls_weakness"
+    "tls_weakness_reported"
    ]
   },
-  "VS-2026-021": {
+  "VS-2026-018": {
    "checks": [
     "web_vulnerability_reported"
    ]
   },
-  "VS-2026-022": {
-   "checks": [
-    "wordpress_core_outdated"
-   ],
-   "spec09": "Q18",
-   "warum": "WordPress 6.5.12 ist der aktuelle Sicherheitsstand seines Zweigs (wpscan release_date 2026-09-22, keine Schwachstellen); „veraltet und unsicher“ ist nicht belegt."
-  },
-  "VS-2026-023": {
+  "VS-2026-019": {
    "checks": [
     "wordpress_plugin_vulnerable"
    ]
   },
-  "VS-2026-024": {
+  "VS-2026-020": {
    "checks": [
     "wordpress_user_enumeration"
    ]
@@ -166,9 +138,7 @@
   "VS-2026-P06": {
    "checks": [
     "dns_dangling_cname"
-   ],
-   "spec09": "Q12",
-   "warum": "Die Prüfung auf verwaiste Einträge entfällt (Posture „entfällt“); eine entfallene Prüfung zählt nicht als bestanden."
+   ]
   },
   "VS-2026-P07": {
    "checks": [
@@ -192,35 +162,30 @@
   },
   "VS-2026-P11": {
    "checks": [
-    "mail_plaintext"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P12": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P13": {
    "checks": [
-    "smb_exposed"
+    "spf_missing"
    ]
   },
   "VS-2026-P14": {
    "checks": [
-    "spf_missing"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P15": {
    "checks": [
-    "tls_legacy_protocols"
-   ]
-  },
-  "VS-2026-P16": {
-   "checks": [
     "tls_weak_ciphers"
    ]
   },
-  "VS-2026-P17": {
+  "VS-2026-P16": {
    "checks": [
     "urlhaus_compromise"
    ]
@@ -228,6 +193,5 @@
  },
  "subsumed": {},
  "expected_coverage_differences": [],
- "expected_member_differences": [],
- "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben."
+ "expected_member_differences": []
 }

@@ -1969,7 +1969,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -2037,7 +2040,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -3306,6 +3312,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -3337,6 +3344,7 @@
    "product": "nginx",
    "seen_at": "2026-09-23T15:23:40Z",
    "service": "http",
+   "service_seen_at": "2026-09-23T15:23:40Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3368,6 +3376,7 @@
    "product": "nginx",
    "seen_at": "2026-09-23T15:23:40Z",
    "service": "https",
+   "service_seen_at": "2026-09-23T12:11:45Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3399,6 +3408,7 @@
    "product": "nginx",
    "seen_at": "2026-09-23T15:23:40Z",
    "service": "https",
+   "service_seen_at": "2026-09-20T09:38:02Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3428,6 +3438,7 @@
    "product": "Outlook Web App",
    "seen_at": "2026-09-21T01:27:54Z",
    "service": "https",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3457,6 +3468,7 @@
    "product": null,
    "seen_at": "2026-09-21T01:27:54Z",
    "service": "https",
+   "service_seen_at": "2026-08-31T04:19:49Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3485,6 +3497,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "urlhaus",
    "transport": null,
    "verified": null,
@@ -3568,7 +3581,7 @@
    }
   ]
  },
- "schema_version": "1.0.6",
+ "schema_version": "1.0.7",
  "services": [
   {
    "auth_mechanisms": [],
@@ -3584,6 +3597,9 @@
     }
    ],
    "family": "nginx",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "403 Forbidden",
    "host_ip": "18.197.248.23",
    "id": "svc:18.197.248.23:80/tcp",
    "login_disabled": null,
@@ -3594,6 +3610,7 @@
    "port": 80,
    "product": "nginx",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -3617,6 +3634,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "18.197.248.23",
    "id": "svc:18.197.248.23:443/tcp",
    "login_disabled": null,
@@ -3627,6 +3647,7 @@
    "port": 443,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "https",
    "source": "nmap",
    "starttls": null,
@@ -3663,6 +3684,9 @@
     }
    ],
    "family": "nginx",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "403 Forbidden",
    "host_ip": "18.197.248.23",
    "id": "svc:18.197.248.23:8443/tcp",
    "login_disabled": null,
@@ -3673,6 +3697,7 @@
    "port": 8443,
    "product": "nginx",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -3703,6 +3728,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": "Microsoft-IIS/10.0",
+   "fp_title": "Outlook",
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:443/tcp",
    "login_disabled": null,
@@ -3713,6 +3741,7 @@
    "port": 443,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "https",
    "source": "nmap",
    "starttls": null,
@@ -3743,6 +3772,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": "Apache",
+   "fp_title": "Hündgen Entsorgungs GmbH & Co. KG Web Applications Po (Auszug)",
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:444/tcp",
    "login_disabled": null,
@@ -3753,6 +3785,7 @@
    "port": 444,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -3776,6 +3809,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:1000/tcp",
    "login_disabled": null,
@@ -3786,6 +3822,7 @@
    "port": 1000,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "cadlock",
    "source": "nmap",
    "starttls": null,
@@ -3809,6 +3846,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:1001/tcp",
    "login_disabled": null,
@@ -3819,6 +3859,7 @@
    "port": 1001,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "webpush",
    "source": "nmap",
    "starttls": null,
@@ -3842,6 +3883,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:1002/tcp",
    "login_disabled": null,
@@ -3852,6 +3896,7 @@
    "port": 1002,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "windows-icfw",
    "source": "nmap",
    "starttls": null,
@@ -3895,9 +3940,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:34:00Z",
    "product": "Cookiebot",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3932,9 +3979,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
    "product": "Etracker",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3969,9 +4018,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
    "product": "jQuery",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4006,9 +4057,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
    "product": "jQuery Migrate",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4058,9 +4111,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:33:53Z",
    "product": "nginx",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4095,9 +4150,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
    "product": "Cookiebot",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4132,9 +4189,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
    "product": "Etracker",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4169,9 +4228,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
    "product": "jQuery",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4206,9 +4267,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
    "product": "jQuery Migrate",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4249,9 +4312,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4296,9 +4361,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:34:59Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4339,9 +4406,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:35:07Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4356,10 +4425,10 @@
    "distro": null,
    "edition": "2019",
    "eol": {
-    "date": null,
+    "date": "2025-10-14",
     "latest_patch": null,
-    "source": null,
-    "status": "unknown",
+    "source": "Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2019",
+    "status": "eol",
     "upstream_eol_date": null
    },
    "evidence": [
@@ -4397,9 +4466,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:51:42Z",
    "product": "Microsoft Exchange",
+   "release_date": null,
    "source": "cms_fingerprint",
    "version_norm": "2019",
    "version_raw": "15.2.1748",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4440,9 +4511,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:35:07Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "webtech",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4477,9 +4550,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:45:25Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4514,9 +4589,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:45:25Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4528,10 +4605,10 @@
    "distro": null,
    "edition": "2019",
    "eol": {
-    "date": null,
+    "date": "2025-10-14",
     "latest_patch": null,
-    "source": null,
-    "status": "unknown",
+    "source": "Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2019",
+    "status": "eol",
     "upstream_eol_date": null
    },
    "evidence": [
@@ -4553,9 +4630,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:45:25Z",
    "product": "Microsoft Exchange",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "2019",
    "version_raw": "15.2.1748",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4596,9 +4675,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:45:25Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4633,9 +4714,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:45:25Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   }
  ],

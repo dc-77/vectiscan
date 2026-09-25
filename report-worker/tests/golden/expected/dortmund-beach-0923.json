@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-25.1 auf tests/golden/facts/1fbc92b9-34ab-414e-8843-a1f1e9f15431.json",
+ "source": "reporter.catalog 2026-09-25.2 auf tests/golden/facts/1fbc92b9-34ab-414e-8843-a1f1e9f15431.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -16,10 +16,10 @@
    "family": "admin_service_exposed",
    "cat": "A",
    "scale": "exposure",
-   "level": "erhoeht",
-   "group": "88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "level": "kritisch",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
    "affected": [
-    "88.99.35.112:10000 (snet-sensor-mgmt)"
+    "88.99.35.112:10000 (Webmin)"
    ],
    "title": "Verwaltungsoberfläche aus dem Internet erreichbar"
   },
@@ -51,32 +51,6 @@
   },
   {
    "id": "VS-2026-004",
-   "check": "csrf_token_missing",
-   "family": "csrf_token_missing",
-   "cat": "D",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "dortmund-beach.com (+www.dortmund-beach.com)",
-   "affected": [
-    "dortmund-beach.com (/wp-login.php)"
-   ],
-   "title": "Formular ohne Anti-CSRF-Token"
-  },
-  {
-   "id": "VS-2026-005",
-   "check": "dane_missing",
-   "family": "dane_missing",
-   "cat": "C",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "dortmund-beach.com",
-   "affected": [
-    "dortmund-beach.com"
-   ],
-   "title": "DANE für SMTP nicht eingerichtet"
-  },
-  {
-   "id": "VS-2026-006",
    "check": "dmarc_none",
    "family": "dmarc_none",
    "cat": "C",
@@ -89,7 +63,7 @@
    "title": "DMARC-Richtlinie ohne Durchsetzung"
   },
   {
-   "id": "VS-2026-007",
+   "id": "VS-2026-005",
    "check": "dnssec_missing",
    "family": "dnssec_missing",
    "cat": "E",
@@ -102,20 +76,7 @@
    "title": "DNS-Zone ohne DNSSEC-Signatur"
   },
   {
-   "id": "VS-2026-008",
-   "check": "ftp_plaintext",
-   "family": "ftp_exposed",
-   "cat": "A",
-   "scale": "exposure",
-   "level": "erhoeht",
-   "group": "88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
-   "affected": [
-    "88.99.35.112:21 (FTP ohne TLS-Zwang)"
-   ],
-   "title": "FTP-Dienst ohne erzwungene Transportverschlüsselung"
-  },
-  {
-   "id": "VS-2026-009",
+   "id": "VS-2026-006",
    "check": "hsts_short",
    "family": "hsts_short",
    "cat": "D",
@@ -128,7 +89,7 @@
    "title": "HTTP Strict Transport Security mit zu kurzer Gültigkeitsdauer"
   },
   {
-   "id": "VS-2026-010",
+   "id": "VS-2026-007",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -141,7 +102,7 @@
    "title": "Webdienst gibt Versionskennung preis"
   },
   {
-   "id": "VS-2026-011",
+   "id": "VS-2026-008",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -157,22 +118,34 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-012",
+   "id": "VS-2026-009",
    "check": "legacy_protocols_present",
    "family": "legacy_protocols_present",
    "cat": "A",
    "scale": "hygiene",
    "level": "niedrig",
-   "group": "88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
    "affected": [
-    "88.99.35.112:110 (POP3)",
-    "88.99.35.112:143 (IMAP)",
     "88.99.35.112:21 (FTP)"
    ],
    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-013",
+   "id": "VS-2026-010",
+   "check": "mail_plaintext",
+   "family": "mail_plaintext",
+   "cat": "A",
+   "scale": "exposure",
+   "level": "erhoeht",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "affected": [
+    "88.99.35.112:110 (POP3 mit Anmeldung vor STARTTLS)",
+    "88.99.35.112:143 (IMAP mit Anmeldung vor STARTTLS)"
+   ],
+   "title": "POP3 oder IMAP ohne erzwungene Transportverschlüsselung"
+  },
+  {
+   "id": "VS-2026-011",
    "check": "mta_sts_missing",
    "family": "mta_sts_missing",
    "cat": "C",
@@ -185,7 +158,7 @@
    "title": "MTA-STS nicht wirksam veröffentlicht"
   },
   {
-   "id": "VS-2026-014",
+   "id": "VS-2026-012",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -198,33 +171,20 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-015",
-   "check": "service_banner_version",
-   "family": "banner_version_disclosure",
-   "cat": "E",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
-   "affected": [
-    "88.99.35.112:30000 (OpenSSH 8.4p1)"
-   ],
-   "title": "Dienst gibt Versionskennung preis"
-  },
-  {
-   "id": "VS-2026-016",
-   "check": "software_eol_runtime",
+   "id": "VS-2026-013",
+   "check": "software_eol",
    "family": "software_eol",
    "cat": "B",
-   "scale": "hygiene",
-   "level": "mittel",
-   "group": "88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "scale": "exposure",
+   "level": "erhoeht",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
    "affected": [
-    "88.99.35.112: WordPress 6.5.12 (Support beendet 2024-07-16)"
+    "88.99.35.112: Debian GNU/Linux 11 (Support beendet 2026-08-31)"
    ],
-   "title": "Anwendungsnahe Software ohne Herstellerpflege"
+   "title": "Serversoftware ohne Herstellerpflege"
   },
   {
-   "id": "VS-2026-017",
+   "id": "VS-2026-014",
    "check": "spf_softfail",
    "family": "spf_softfail",
    "cat": "C",
@@ -237,7 +197,7 @@
    "title": "SPF-Eintrag ohne konsequente Durchsetzung"
   },
   {
-   "id": "VS-2026-018",
+   "id": "VS-2026-015",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -250,7 +210,7 @@
    "title": "TLS 1.3 nicht verfügbar"
   },
   {
-   "id": "VS-2026-019",
+   "id": "VS-2026-016",
    "check": "tls_rpt_missing",
    "family": "tls_rpt_missing",
    "cat": "C",
@@ -263,20 +223,21 @@
    "title": "TLS-RPT nicht eingerichtet"
   },
   {
-   "id": "VS-2026-020",
-   "check": "tls_weakness",
+   "id": "VS-2026-017",
+   "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
    "scale": "hygiene",
    "level": "niedrig",
    "group": "dortmund-beach.com (+www.dortmund-beach.com)",
    "affected": [
-    "dortmund-beach.com:443 (BREACH)"
+    "dortmund-beach.com:443: BREACH (Hinweis der TLS-Analyse)",
+    "dortmund-beach.com:443: LUCKY13 (Hinweis der TLS-Analyse)"
    ],
-   "title": "TLS-Verschlüsselung anfällig für bekannte Angriffe"
+   "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-021",
+   "id": "VS-2026-018",
    "check": "web_vulnerability_reported",
    "family": "web_vulnerability_reported",
    "cat": "E",
@@ -284,31 +245,21 @@
    "level": "niedrig",
    "group": "dortmund-beach.com (+www.dortmund-beach.com)",
    "affected": [
-    "Path Traversal auf dortmund-beach.com/wp-json/oembed/1.0/embed (Konfidenz Low, gemeldet von ZAP)"
+    "Absence of Anti-CSRF Tokens auf dortmund-beach.com/wp-login.php (Konfidenz niedrig, passiv gemeldet von ZAP)",
+    "Cookie No HttpOnly Flag auf dortmund-beach.com/wp-login.php (Konfidenz mittel, passiv gemeldet von ZAP)",
+    "Cookie without SameSite Attribute auf dortmund-beach.com/wp-login.php (Konfidenz mittel, passiv gemeldet von ZAP)",
+    "Path Traversal auf dortmund-beach.com/wp-json/oembed/1.0/embed (Konfidenz niedrig, aktiv gemeldet von ZAP)"
    ],
-   "title": "Werkzeugmeldung der aktiven Prüfung ohne eigene Einstufung"
+   "title": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-022",
-   "check": "wordpress_core_outdated",
-   "family": "wordpress_core_outdated",
-   "cat": "B",
-   "scale": "exposure",
-   "level": "erhoeht",
-   "group": "dortmund-beach.com (+www.dortmund-beach.com)",
-   "affected": [
-    "dortmund-beach.com (WordPress outdated)"
-   ],
-   "title": "WordPress-Kernversion veraltet oder unsicher"
-  },
-  {
-   "id": "VS-2026-023",
+   "id": "VS-2026-019",
    "check": "wordpress_plugin_vulnerable",
    "family": "wordpress_plugin_vulnerable",
    "cat": "B",
    "scale": "exposure",
    "level": "erhoeht",
-   "group": "88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
    "affected": [
     "88.99.35.112: betheme 27.5.3 (laut wpscan bekannte Schwachstellen: 12)",
     "88.99.35.112: burst-statistics 1.7.1 (laut wpscan bekannte Schwachstellen: 1)",
@@ -318,7 +269,7 @@
    "title": "WordPress-Erweiterung mit bekannten Schwachstellen"
   },
   {
-   "id": "VS-2026-024",
+   "id": "VS-2026-020",
    "check": "wordpress_user_enumeration",
    "family": "user_enumeration",
    "cat": "E",
@@ -361,7 +312,7 @@
    "check": "db_exposed",
    "family": "db_exposed",
    "cat": "A",
-   "group": "88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
    "title": "Keine Datenbankdienste aus dem Internet erreichbar"
   },
   {
@@ -401,7 +352,7 @@
    "check": "http_no_tls",
    "family": "http_no_tls",
    "cat": "A",
-   "group": "88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
@@ -409,35 +360,27 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
    "id": "VS-2026-P11",
-   "check": "mail_plaintext",
-   "family": "mail_plaintext",
-   "cat": "A",
-   "group": "88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
-   "title": "POP3 und IMAP erzwingen TLS vor der Anmeldung"
-  },
-  {
-   "id": "VS-2026-P12",
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P13",
+   "id": "VS-2026-P12",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
-   "group": "88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P14",
+   "id": "VS-2026-P13",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
@@ -445,7 +388,7 @@
    "title": "SPF-Eintrag vorhanden"
   },
   {
-   "id": "VS-2026-P15",
+   "id": "VS-2026-P14",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
@@ -453,7 +396,7 @@
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
-   "id": "VS-2026-P16",
+   "id": "VS-2026-P15",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -461,7 +404,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P17",
+   "id": "VS-2026-P16",
    "check": "urlhaus_compromise",
    "family": "urlhaus_compromise",
    "cat": "A",

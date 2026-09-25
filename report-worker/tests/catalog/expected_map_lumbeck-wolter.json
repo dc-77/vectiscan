@@ -12,45 +12,35 @@
   },
   "VS-2026-002": {
    "checks": [
-    "dane_missing"
+    "db_exposed"
    ]
   },
   "VS-2026-003": {
    "checks": [
-    "db_exposed"
+    "dmarc_missing"
    ]
   },
   "VS-2026-004": {
    "checks": [
-    "dmarc_missing"
+    "dnssec_missing"
    ]
   },
   "VS-2026-005": {
    "checks": [
-    "dnssec_missing"
+    "legacy_protocols_present"
    ]
   },
   "VS-2026-006": {
    "checks": [
-    "legacy_protocols_present"
+    "mta_sts_missing"
    ]
   },
   "VS-2026-007": {
    "checks": [
-    "mta_sts_missing"
-   ]
-  },
-  "VS-2026-008": {
-   "checks": [
-    "service_banner_version"
-   ]
-  },
-  "VS-2026-009": {
-   "checks": [
     "spf_softfail"
    ]
   },
-  "VS-2026-010": {
+  "VS-2026-008": {
    "checks": [
     "tls_rpt_missing"
    ]
@@ -104,10 +94,15 @@
   },
   "VS-2026-P10": {
    "checks": [
-    "spf_missing"
+    "software_eol"
    ]
   },
   "VS-2026-P11": {
+   "checks": [
+    "spf_missing"
+   ]
+  },
+  "VS-2026-P12": {
    "checks": [
     "urlhaus_compromise"
    ]

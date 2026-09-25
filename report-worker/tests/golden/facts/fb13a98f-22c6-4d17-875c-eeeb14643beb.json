@@ -2371,7 +2371,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -2426,7 +2429,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -2484,7 +2490,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -3479,6 +3488,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -3508,6 +3518,7 @@
    "product": "OpenSSH",
    "seen_at": "2026-05-26T04:56:33Z",
    "service": "ssh",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3537,6 +3548,7 @@
    "product": null,
    "seen_at": "2026-05-26T04:56:33Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3566,6 +3578,7 @@
    "product": null,
    "seen_at": "2026-05-26T04:56:33Z",
    "service": "auto",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3595,6 +3608,7 @@
    "product": "nginx",
    "seen_at": "2026-05-26T04:56:33Z",
    "service": "http",
+   "service_seen_at": "2026-05-26T04:56:33Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3624,6 +3638,7 @@
    "product": null,
    "seen_at": "2026-05-26T04:56:33Z",
    "service": "portmap-udp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "udp",
    "verified": true,
@@ -3653,6 +3668,7 @@
    "product": "nginx",
    "seen_at": "2026-05-26T04:56:33Z",
    "service": "https",
+   "service_seen_at": "2026-05-22T11:42:54Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3682,6 +3698,7 @@
    "product": null,
    "seen_at": "2026-05-26T04:56:33Z",
    "service": "http-simple-new",
+   "service_seen_at": "2026-05-02T07:03:30Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3711,6 +3728,7 @@
    "product": null,
    "seen_at": "2026-05-26T04:56:33Z",
    "service": "stun",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "udp",
    "verified": false,
@@ -3740,6 +3758,7 @@
    "product": "OpenSSH",
    "seen_at": "2026-05-24T02:18:54Z",
    "service": "ssh",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3769,6 +3788,7 @@
    "product": null,
    "seen_at": "2026-05-24T02:18:54Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3798,6 +3818,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-05-24T02:18:54Z",
    "service": "http",
+   "service_seen_at": "2026-05-23T02:55:47Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3827,6 +3848,7 @@
    "product": null,
    "seen_at": "2026-05-24T02:18:54Z",
    "service": "imap",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3856,6 +3878,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-05-24T02:18:54Z",
    "service": "https",
+   "service_seen_at": "2026-05-22T06:31:08Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3885,6 +3908,7 @@
    "product": null,
    "seen_at": "2026-05-24T02:18:54Z",
    "service": "smtps",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3914,6 +3938,7 @@
    "product": null,
    "seen_at": "2026-05-24T02:18:54Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3943,6 +3968,7 @@
    "product": null,
    "seen_at": "2026-05-24T02:18:54Z",
    "service": "imap-ssl",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3972,6 +3998,7 @@
    "product": null,
    "seen_at": "2026-05-24T02:18:54Z",
    "service": "pop3-ssl",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -4006,6 +4033,7 @@
    "product": null,
    "seen_at": "2026-04-26T17:29:20Z",
    "service": "https",
+   "service_seen_at": "2026-04-26T17:29:20Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -4089,7 +4117,7 @@
    }
   ]
  },
- "schema_version": "1.0.6",
+ "schema_version": "1.0.7",
  "services": [
   {
    "auth_mechanisms": [],
@@ -4105,6 +4133,9 @@
     }
    ],
    "family": "openssh",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:22/tcp",
    "login_disabled": null,
@@ -4115,6 +4146,7 @@
    "port": 22,
    "product": "OpenSSH",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ssh",
    "source": "nmap",
    "starttls": null,
@@ -4158,6 +4190,9 @@
     }
    ],
    "family": "postfix",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:25/tcp",
    "login_disabled": true,
@@ -4168,6 +4203,7 @@
    "port": 25,
    "product": "Postfix smtpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": true,
@@ -4212,6 +4248,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:26/tcp",
    "login_disabled": true,
@@ -4222,6 +4261,7 @@
    "port": 26,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": true,
@@ -4245,6 +4285,9 @@
     }
    ],
    "family": "nginx",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "Welcome to nginx!",
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:80/tcp",
    "login_disabled": null,
@@ -4255,6 +4298,7 @@
    "port": 80,
    "product": "nginx",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -4278,6 +4322,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:111/tcp",
    "login_disabled": null,
@@ -4288,6 +4335,7 @@
    "port": 111,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "rpcbind",
    "source": "nmap",
    "starttls": null,
@@ -4317,6 +4365,9 @@
     }
    ],
    "family": "nginx",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "Jitsi Meet",
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:443/tcp",
    "login_disabled": null,
@@ -4327,6 +4378,7 @@
    "port": 443,
    "product": "nginx",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -4350,6 +4402,9 @@
     }
    ],
    "family": "openssh",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:987/tcp",
    "login_disabled": null,
@@ -4360,6 +4415,7 @@
    "port": 987,
    "product": "OpenSSH",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ssh",
    "source": "nmap",
    "starttls": null,
@@ -4383,6 +4439,9 @@
     }
    ],
    "family": "proxmox_virtual_environment_rest_api",
+   "fp_login": null,
+   "fp_server": "pve-api-daemon/3.0",
+   "fp_title": null,
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:3128/tcp",
    "login_disabled": null,
@@ -4393,6 +4452,7 @@
    "port": 3128,
    "product": "Proxmox Virtual Environment REST API",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -4423,6 +4483,9 @@
     }
    ],
    "family": "nagios_nsca",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:21/tcp",
    "login_disabled": null,
@@ -4433,6 +4496,7 @@
    "port": 21,
    "product": "Nagios NSCA",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "nagios-nsca",
    "source": "nmap",
    "starttls": null,
@@ -4456,6 +4520,9 @@
     }
    ],
    "family": "openssh",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:22/tcp",
    "login_disabled": null,
@@ -4466,6 +4533,7 @@
    "port": 22,
    "product": "OpenSSH",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ssh",
    "source": "nmap",
    "starttls": null,
@@ -4516,6 +4584,9 @@
     }
    ],
    "family": "postfix",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:25/tcp",
    "login_disabled": null,
@@ -4526,6 +4597,7 @@
    "port": 25,
    "product": "Postfix smtpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": true,
@@ -4549,6 +4621,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": "Apache",
+   "fp_title": "503 Service Temporarily Unavailable",
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:80/tcp",
    "login_disabled": null,
@@ -4559,6 +4634,7 @@
    "port": 80,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -4605,9 +4681,12 @@
     }
    ],
    "family": "dovecot",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:110/tcp",
-   "login_disabled": null,
+   "login_disabled": false,
    "method": "probed",
    "mode": "active",
    "nmap_conf": 10,
@@ -4615,11 +4694,12 @@
    "port": 110,
    "product": "Dovecot pop3d",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "pop3",
    "source": "nmap",
    "starttls": true,
    "state": "open",
-   "tls_required": null,
+   "tls_required": false,
    "tunnel_ssl": false,
    "version_norm": null,
    "version_raw": null
@@ -4638,6 +4718,9 @@
     }
    ],
    "family": "samba_smbd",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:139/tcp",
    "login_disabled": null,
@@ -4648,6 +4731,7 @@
    "port": 139,
    "product": "Samba smbd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "netbios-ssn",
    "source": "nmap",
    "starttls": null,
@@ -4705,6 +4789,9 @@
     }
    ],
    "family": "dovecot",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:143/tcp",
    "login_disabled": false,
@@ -4715,6 +4802,7 @@
    "port": 143,
    "product": "Dovecot imapd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "imap",
    "source": "nmap",
    "starttls": true,
@@ -4745,6 +4833,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": "Apache",
+   "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:443/tcp",
    "login_disabled": null,
@@ -4755,6 +4846,7 @@
    "port": 443,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -4778,6 +4870,9 @@
     }
    ],
    "family": "samba_smbd",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:445/tcp",
    "login_disabled": null,
@@ -4788,6 +4883,7 @@
    "port": 445,
    "product": "Samba smbd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "netbios-ssn",
    "source": "nmap",
    "starttls": null,
@@ -4837,6 +4933,9 @@
     }
    ],
    "family": "postfix",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:465/tcp",
    "login_disabled": null,
@@ -4847,6 +4946,7 @@
    "port": 465,
    "product": "Postfix smtpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": false,
@@ -4897,6 +4997,9 @@
     }
    ],
    "family": "postfix",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:587/tcp",
    "login_disabled": null,
@@ -4907,6 +5010,7 @@
    "port": 587,
    "product": "Postfix smtpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": true,
@@ -4963,6 +5067,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:993/tcp",
    "login_disabled": false,
@@ -4973,6 +5080,7 @@
    "port": 993,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "imaps",
    "source": "nmap",
    "starttls": false,
@@ -5018,6 +5126,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:995/tcp",
    "login_disabled": null,
@@ -5028,6 +5139,7 @@
    "port": 995,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "pop3s",
    "source": "nmap",
    "starttls": false,
@@ -5065,6 +5177,9 @@
     }
    ],
    "family": "mariadb",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:3306/tcp",
    "login_disabled": null,
@@ -5075,6 +5190,7 @@
    "port": 3306,
    "product": "MySQL",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "mysql",
    "source": "nmap",
    "starttls": null,
@@ -5098,6 +5214,9 @@
     }
    ],
    "family": "nginx",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "87.79.190.79",
    "id": "svc:87.79.190.79:80/tcp",
    "login_disabled": null,
@@ -5108,6 +5227,7 @@
    "port": 80,
    "product": "nginx",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -5144,6 +5264,9 @@
     }
    ],
    "family": "nginx",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "Nextcloud",
    "host_ip": "87.79.190.79",
    "id": "svc:87.79.190.79:443/tcp",
    "login_disabled": null,
@@ -5154,6 +5277,7 @@
    "port": 443,
    "product": "nginx",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -5177,6 +5301,9 @@
     }
    ],
    "family": "openssh",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "87.79.190.79",
    "id": "svc:87.79.190.79:987/tcp",
    "login_disabled": null,
@@ -5187,6 +5314,7 @@
    "port": 987,
    "product": "OpenSSH",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ssh",
    "source": "nmap",
    "starttls": null,
@@ -5198,6 +5326,55 @@
   }
  ],
  "software": [
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "22/tcp open ssh OpenSSH 10.0p2 Debian 7+deb13u4 (protocol 2.0)",
+     "ref": "hosts/37.114.55.171/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "987/tcp open ssh OpenSSH 10.0p2 Debian 7+deb13u2 (protocol 2.0)",
+     "ref": "hosts/37.114.55.171/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: OpenSSH 10.0p2 Debian 7+deb13u4",
+     "ref": "hosts/37.114.55.171/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "debian",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "37.114.55.171",
+   "id": "sw:37.114.55.171:-:debian:13",
+   "kind": "os",
+   "mode": "active",
+   "note": "Release aus dem Paketsuffix eines Dienstes abgeleitet",
+   "observed_at": "2026-05-26T12:26:47Z",
+   "product": "Debian GNU/Linux",
+   "release_date": null,
+   "source": "nmap",
+   "version_norm": "13",
+   "version_raw": "deb13",
+   "vulnerabilities": [],
+   "vulnerabilities_count": null
+  },
   {
    "build": null,
    "confidence": 0.8,
@@ -5230,9 +5407,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:04Z",
    "product": "Jitsi",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5282,9 +5461,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:26:47Z",
    "product": "nginx",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5329,9 +5510,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:26:47Z",
    "product": "OpenSSH",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "10.0p2",
    "version_raw": "10.0p2 Debian 7+deb13u4",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5371,9 +5554,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:26:47Z",
    "product": "Postfix",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5413,9 +5598,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:26:47Z",
    "product": "Proxmox Virtual Environment REST API",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "3.0",
    "version_raw": "3.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5450,9 +5637,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:04Z",
    "product": "Jitsi",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5493,9 +5682,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:04Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5530,9 +5721,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:04Z",
    "product": "Jitsi",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5572,9 +5765,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:04Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5609,9 +5804,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:04Z",
    "product": "Jitsi",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5651,9 +5848,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:04Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5688,9 +5887,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:04Z",
    "product": "Jitsi",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5730,9 +5931,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:04Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5789,9 +5992,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:27:49Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5841,9 +6046,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:27:49Z",
    "product": "Dovecot",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5889,9 +6096,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:26Z",
    "product": "Joomla",
+   "release_date": null,
    "source": "cms_fingerprint",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5931,9 +6140,11 @@
    "note": "MariaDB-Kompatibilitaetspraefix 5.5.5 entfernt",
    "observed_at": "2026-05-26T12:27:49Z",
    "product": "MariaDB",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "10.11.14",
    "version_raw": "5.5.5-10.11.14-MariaDB-0ubuntu0.24.04.1-log",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -5973,9 +6184,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:27:49Z",
    "product": "Nagios NSCA",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6015,9 +6228,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:27:49Z",
    "product": "OpenSSH",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "9.6p1",
    "version_raw": "9.6p1 Ubuntu 3ubuntu13.16",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6052,9 +6267,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:36:34Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6104,9 +6321,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:27:49Z",
    "product": "Postfix",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6151,9 +6370,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:27:49Z",
    "product": "Samba smbd",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "4.6.2",
    "version_raw": "4.6.2",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6194,9 +6415,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:36:34Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6231,9 +6454,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:36:34Z",
    "product": "Joomla",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6268,9 +6493,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:36:34Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6311,9 +6538,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:36:34Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6348,9 +6577,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:36:34Z",
    "product": "Joomla",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6385,9 +6616,55 @@
    "note": null,
    "observed_at": "2026-05-26T12:36:34Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "987/tcp open ssh OpenSSH 10.0p2 Debian 7+deb13u4 (protocol 2.0)",
+     "ref": "hosts/87.79.190.79/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: OpenSSH 10.0p2 Debian 7+deb13u4",
+     "ref": "hosts/87.79.190.79/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "debian",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "87.79.190.79",
+   "id": "sw:87.79.190.79:-:debian:13",
+   "kind": "os",
+   "mode": "active",
+   "note": "Release aus dem Paketsuffix eines Dienstes abgeleitet",
+   "observed_at": "2026-05-26T12:26:45Z",
+   "product": "Debian GNU/Linux",
+   "release_date": null,
+   "source": "nmap",
+   "version_norm": "13",
+   "version_raw": "deb13",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6437,9 +6714,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:26:45Z",
    "product": "nginx",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6479,9 +6758,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:26:45Z",
    "product": "OpenSSH",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "10.0p2",
    "version_raw": "10.0p2 Debian 7+deb13u4",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6522,9 +6803,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:24Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6565,9 +6848,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:24Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6602,9 +6887,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:24Z",
    "product": "Nextcloud",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6645,9 +6932,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:24Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6682,9 +6971,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:24Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -6725,9 +7016,11 @@
    "note": null,
    "observed_at": "2026-05-26T12:37:24Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   }
  ],

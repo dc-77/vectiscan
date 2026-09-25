@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-25.1 auf tests/golden/facts/1f8bc977-39a7-47c7-b4ad-7b05dbac2d52.json",
+ "source": "reporter.catalog 2026-09-25.2 auf tests/golden/facts/1f8bc977-39a7-47c7-b4ad-7b05dbac2d52.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -12,7 +12,7 @@
  "findings": [
   {
    "id": "VS-2026-001",
-   "check": "admin_service_exposed",
+   "check": "admin_panel_hoster",
    "family": "admin_service_exposed",
    "cat": "A",
    "scale": "exposure",
@@ -21,7 +21,7 @@
    "affected": [
     "92.205.163.53:8443 (Plesk)"
    ],
-   "title": "Verwaltungsoberfläche aus dem Internet erreichbar",
+   "title": "Verwaltungsoberfläche des Hosters aus dem Internet erreichbar",
    "zustaendig": "hoster"
   },
   {
@@ -29,11 +29,11 @@
    "check": "admin_service_exposed_passive",
    "family": "admin_service_exposed",
    "cat": "A",
-   "scale": "hygiene",
-   "level": "hoch",
+   "scale": "exposure",
+   "level": "erhoeht",
    "group": "92.205.163.53 (ubb-wiki.castenow.de)",
    "affected": [
-    "92.205.163.53:8880 (unbekannt, laut Passivquelle)"
+    "92.205.163.53:8880 (Plesk, laut Passivquelle)"
    ],
    "title": "Verwaltungsoberfläche laut Passivquelle erreichbar",
    "zustaendig": "hoster"
@@ -158,32 +158,6 @@
   },
   {
    "id": "VS-2026-012",
-   "check": "csrf_token_missing",
-   "family": "csrf_token_missing",
-   "cat": "D",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "ubb-wiki.castenow.de",
-   "affected": [
-    "ubb-wiki.castenow.de (/login/)"
-   ],
-   "title": "Formular ohne Anti-CSRF-Token"
-  },
-  {
-   "id": "VS-2026-013",
-   "check": "dane_missing",
-   "family": "dane_missing",
-   "cat": "C",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "castenow.de",
-   "affected": [
-    "castenow.de"
-   ],
-   "title": "DANE für SMTP nicht eingerichtet"
-  },
-  {
-   "id": "VS-2026-014",
    "check": "dmarc_none",
    "family": "dmarc_none",
    "cat": "C",
@@ -196,7 +170,7 @@
    "title": "DMARC-Richtlinie ohne Durchsetzung"
   },
   {
-   "id": "VS-2026-015",
+   "id": "VS-2026-013",
    "check": "dnssec_missing",
    "family": "dnssec_missing",
    "cat": "E",
@@ -209,21 +183,7 @@
    "title": "DNS-Zone ohne DNSSEC-Signatur"
   },
   {
-   "id": "VS-2026-016",
-   "check": "ftp_plaintext",
-   "family": "ftp_exposed",
-   "cat": "A",
-   "scale": "exposure",
-   "level": "erhoeht",
-   "group": "92.205.163.53 (ubb-wiki.castenow.de)",
-   "affected": [
-    "92.205.163.53:21 (FTP ohne TLS-Zwang)"
-   ],
-   "title": "FTP-Dienst ohne erzwungene Transportverschlüsselung",
-   "zustaendig": "hoster"
-  },
-  {
-   "id": "VS-2026-017",
+   "id": "VS-2026-014",
    "check": "hsts_missing",
    "family": "hsts_missing",
    "cat": "D",
@@ -236,7 +196,7 @@
    "title": "HTTP Strict Transport Security nicht gesetzt"
   },
   {
-   "id": "VS-2026-018",
+   "id": "VS-2026-015",
    "check": "hsts_missing",
    "family": "hsts_missing",
    "cat": "D",
@@ -249,7 +209,7 @@
    "title": "HTTP Strict Transport Security nicht gesetzt"
   },
   {
-   "id": "VS-2026-019",
+   "id": "VS-2026-016",
    "check": "hsts_missing",
    "family": "hsts_missing",
    "cat": "D",
@@ -262,7 +222,7 @@
    "title": "HTTP Strict Transport Security nicht gesetzt"
   },
   {
-   "id": "VS-2026-020",
+   "id": "VS-2026-017",
    "check": "http_alt_port",
    "family": "http_alt_port",
    "cat": "A",
@@ -277,7 +237,7 @@
    "zustaendig": "hoster"
   },
   {
-   "id": "VS-2026-021",
+   "id": "VS-2026-018",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -290,7 +250,7 @@
    "title": "Webdienst gibt Versionskennung preis"
   },
   {
-   "id": "VS-2026-022",
+   "id": "VS-2026-019",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -303,7 +263,7 @@
    "title": "Webdienst gibt Versionskennung preis"
   },
   {
-   "id": "VS-2026-023",
+   "id": "VS-2026-020",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -316,7 +276,7 @@
    "title": "Webdienst gibt Versionskennung preis"
   },
   {
-   "id": "VS-2026-024",
+   "id": "VS-2026-021",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -330,7 +290,7 @@
    "zustaendig": "platform"
   },
   {
-   "id": "VS-2026-025",
+   "id": "VS-2026-022",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -344,7 +304,7 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-026",
+   "id": "VS-2026-023",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -359,7 +319,7 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-027",
+   "id": "VS-2026-024",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -373,7 +333,7 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-028",
+   "id": "VS-2026-025",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -386,7 +346,7 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-029",
+   "id": "VS-2026-026",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -401,7 +361,7 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-030",
+   "id": "VS-2026-027",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -415,7 +375,7 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-031",
+   "id": "VS-2026-028",
    "check": "js_library_outdated",
    "family": "js_library_outdated",
    "cat": "D",
@@ -428,7 +388,7 @@
    "title": "Veraltete JavaScript-Bibliothek eingebunden"
   },
   {
-   "id": "VS-2026-032",
+   "id": "VS-2026-029",
    "check": "legacy_protocols_present",
    "family": "legacy_protocols_present",
    "cat": "A",
@@ -436,15 +396,13 @@
    "level": "niedrig",
    "group": "92.205.163.53 (ubb-wiki.castenow.de)",
    "affected": [
-    "92.205.163.53:110 (POP3)",
-    "92.205.163.53:143 (IMAP)",
     "92.205.163.53:21 (FTP)"
    ],
    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
    "zustaendig": "hoster"
   },
   {
-   "id": "VS-2026-033",
+   "id": "VS-2026-030",
    "check": "login_portal_exposed",
    "family": "login_portal_exposed",
    "cat": "A",
@@ -457,7 +415,7 @@
    "title": "Anmeldeportal aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-034",
+   "id": "VS-2026-031",
    "check": "login_portal_exposed",
    "family": "login_portal_exposed",
    "cat": "A",
@@ -470,7 +428,7 @@
    "title": "Anmeldeportal aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-035",
+   "id": "VS-2026-032",
    "check": "login_portal_exposed",
    "family": "login_portal_exposed",
    "cat": "A",
@@ -483,7 +441,7 @@
    "title": "Anmeldeportal aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-036",
+   "id": "VS-2026-033",
    "check": "login_portal_exposed",
    "family": "login_portal_exposed",
    "cat": "A",
@@ -496,7 +454,7 @@
    "title": "Anmeldeportal aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-037",
+   "id": "VS-2026-034",
    "check": "login_portal_exposed",
    "family": "login_portal_exposed",
    "cat": "A",
@@ -509,7 +467,22 @@
    "title": "Anmeldeportal aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-038",
+   "id": "VS-2026-035",
+   "check": "mail_plaintext",
+   "family": "mail_plaintext",
+   "cat": "A",
+   "scale": "exposure",
+   "level": "erhoeht",
+   "group": "92.205.163.53 (ubb-wiki.castenow.de)",
+   "affected": [
+    "92.205.163.53:110 (POP3 mit Anmeldung vor STARTTLS)",
+    "92.205.163.53:143 (IMAP mit Anmeldung vor STARTTLS)"
+   ],
+   "title": "POP3 oder IMAP ohne erzwungene Transportverschlüsselung",
+   "zustaendig": "hoster"
+  },
+  {
+   "id": "VS-2026-036",
    "check": "mta_sts_missing",
    "family": "mta_sts_missing",
    "cat": "C",
@@ -522,7 +495,7 @@
    "title": "MTA-STS nicht wirksam veröffentlicht"
   },
   {
-   "id": "VS-2026-039",
+   "id": "VS-2026-037",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -535,7 +508,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-040",
+   "id": "VS-2026-038",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -548,7 +521,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-041",
+   "id": "VS-2026-039",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -561,7 +534,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-042",
+   "id": "VS-2026-040",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -574,7 +547,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-043",
+   "id": "VS-2026-041",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -587,7 +560,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-044",
+   "id": "VS-2026-042",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -601,7 +574,7 @@
    "zustaendig": "platform"
   },
   {
-   "id": "VS-2026-045",
+   "id": "VS-2026-043",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -614,7 +587,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-046",
+   "id": "VS-2026-044",
    "check": "service_banner_version",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -628,7 +601,7 @@
    "zustaendig": "hoster"
   },
   {
-   "id": "VS-2026-047",
+   "id": "VS-2026-045",
    "check": "spf_softfail",
    "family": "spf_softfail",
    "cat": "C",
@@ -641,7 +614,7 @@
    "title": "SPF-Eintrag ohne konsequente Durchsetzung"
   },
   {
-   "id": "VS-2026-048",
+   "id": "VS-2026-046",
    "check": "tls_rpt_missing",
    "family": "tls_rpt_missing",
    "cat": "C",
@@ -654,34 +627,73 @@
    "title": "TLS-RPT nicht eingerichtet"
   },
   {
-   "id": "VS-2026-049",
-   "check": "tls_weakness",
+   "id": "VS-2026-047",
+   "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
    "scale": "hygiene",
    "level": "niedrig",
    "group": "bitwarden.castenow.de",
    "affected": [
-    "bitwarden.castenow.de:443 (BREACH)"
+    "bitwarden.castenow.de:443: BREACH (Hinweis der TLS-Analyse)"
    ],
-   "title": "TLS-Verschlüsselung anfällig für bekannte Angriffe"
+   "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
+  },
+  {
+   "id": "VS-2026-048",
+   "check": "tls_weakness_reported",
+   "family": "tls_weakness",
+   "cat": "D",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "mail.castenow.de",
+   "affected": [
+    "mail.castenow.de:443: LUCKY13 (Hinweis der TLS-Analyse)"
+   ],
+   "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
+  },
+  {
+   "id": "VS-2026-049",
+   "check": "tls_weakness_reported",
+   "family": "tls_weakness",
+   "cat": "D",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "mail2.castenow.de",
+   "affected": [
+    "mail2.castenow.de:443: LUCKY13 (Hinweis der TLS-Analyse)"
+   ],
+   "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
   },
   {
    "id": "VS-2026-050",
-   "check": "tls_weakness",
+   "check": "tls_weakness_reported",
+   "family": "tls_weakness",
+   "cat": "D",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "owa.castenow.de",
+   "affected": [
+    "owa.castenow.de:443: LUCKY13 (Hinweis der TLS-Analyse)"
+   ],
+   "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
+  },
+  {
+   "id": "VS-2026-051",
+   "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
    "scale": "hygiene",
    "level": "niedrig",
    "group": "umfrage.castenow.de",
    "affected": [
-    "umfrage.castenow.de:443 (BREACH)"
+    "umfrage.castenow.de:443: BREACH (Hinweis der TLS-Analyse)"
    ],
-   "title": "TLS-Verschlüsselung anfällig für bekannte Angriffe",
+   "title": "TLS-Hinweis der Analyse ohne eigene Einstufung",
    "zustaendig": "platform"
   },
   {
-   "id": "VS-2026-051",
+   "id": "VS-2026-052",
    "check": "web_vulnerability_reported",
    "family": "web_vulnerability_reported",
    "cat": "E",
@@ -689,12 +701,14 @@
    "level": "niedrig",
    "group": "ubb-wiki.castenow.de",
    "affected": [
-    "Path Traversal auf ubb-wiki.castenow.de/wp-json/oembed/1.0/embed (Konfidenz Low, gemeldet von ZAP)"
+    "Absence of Anti-CSRF Tokens auf ubb-wiki.castenow.de/login/ (Konfidenz niedrig, passiv gemeldet von ZAP)",
+    "Cookie without SameSite Attribute auf ubb-wiki.castenow.de/wp-login.php (Konfidenz mittel, passiv gemeldet von ZAP)",
+    "Path Traversal auf ubb-wiki.castenow.de/wp-json/oembed/1.0/embed (Konfidenz niedrig, aktiv gemeldet von ZAP)"
    ],
-   "title": "Werkzeugmeldung der aktiven Prüfung ohne eigene Einstufung"
+   "title": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-052",
+   "id": "VS-2026-053",
    "check": "wordpress_user_enumeration",
    "family": "user_enumeration",
    "cat": "E",
@@ -1097,31 +1111,31 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "3.174.98.120 (umfrage.castenow.de)",
+   "group": "92.205.163.53 (ubb-wiki.castenow.de)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
    "id": "VS-2026-P50",
-   "check": "ip_reputation",
-   "family": "ip_reputation",
-   "cat": "E",
-   "group": "92.205.163.53 (ubb-wiki.castenow.de)",
-   "title": "Keine Einträge in Reputationsquellen"
+   "check": "rdp_exposed",
+   "family": "rdp_exposed",
+   "cat": "A",
+   "group": "159.69.143.80 (castenow.de, www.castenow.de)",
+   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
    "id": "VS-2026-P51",
-   "check": "mail_plaintext",
-   "family": "mail_plaintext",
+   "check": "rdp_exposed",
+   "family": "rdp_exposed",
    "cat": "A",
-   "group": "92.205.163.53 (ubb-wiki.castenow.de)",
-   "title": "POP3 und IMAP erzwingen TLS vor der Anmeldung"
+   "group": "195.50.179.4 (mail.castenow.de, mail2.castenow.de, owa.castenow.de)",
+   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
    "id": "VS-2026-P52",
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "159.69.143.80 (castenow.de, www.castenow.de)",
+   "group": "195.50.179.5 (mailstore.castenow.de)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
@@ -1129,7 +1143,7 @@
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "195.50.179.4 (mail.castenow.de, mail2.castenow.de, owa.castenow.de)",
+   "group": "195.50.179.6 (bitwarden.castenow.de)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
@@ -1137,7 +1151,7 @@
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "195.50.179.5 (mailstore.castenow.de)",
+   "group": "3.174.98.120 (umfrage.castenow.de)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
@@ -1145,27 +1159,11 @@
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "195.50.179.6 (bitwarden.castenow.de)",
-   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P56",
-   "check": "rdp_exposed",
-   "family": "rdp_exposed",
-   "cat": "A",
-   "group": "3.174.98.120 (umfrage.castenow.de)",
-   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P57",
-   "check": "rdp_exposed",
-   "family": "rdp_exposed",
-   "cat": "A",
    "group": "92.205.163.53 (ubb-wiki.castenow.de)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P58",
+   "id": "VS-2026-P56",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -1173,7 +1171,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P59",
+   "id": "VS-2026-P57",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -1181,7 +1179,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P60",
+   "id": "VS-2026-P58",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -1189,7 +1187,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P61",
+   "id": "VS-2026-P59",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -1197,7 +1195,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P62",
+   "id": "VS-2026-P60",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -1205,7 +1203,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P63",
+   "id": "VS-2026-P61",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -1213,15 +1211,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P64",
-   "check": "software_eol",
-   "family": "software_eol",
-   "cat": "B",
-   "group": "195.50.179.4 (mail.castenow.de, mail2.castenow.de, owa.castenow.de)",
-   "title": "Serversoftware mit laufender Herstellerpflege"
-  },
-  {
-   "id": "VS-2026-P65",
+   "id": "VS-2026-P62",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
@@ -1229,11 +1219,35 @@
    "title": "SPF-Eintrag vorhanden"
   },
   {
-   "id": "VS-2026-P66",
+   "id": "VS-2026-P63",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
    "group": "bitwarden.castenow.de",
+   "title": "Nur aktuelle TLS-Protokolle"
+  },
+  {
+   "id": "VS-2026-P64",
+   "check": "tls_legacy_protocols",
+   "family": "tls_legacy_protocols",
+   "cat": "D",
+   "group": "mail.castenow.de",
+   "title": "Nur aktuelle TLS-Protokolle"
+  },
+  {
+   "id": "VS-2026-P65",
+   "check": "tls_legacy_protocols",
+   "family": "tls_legacy_protocols",
+   "cat": "D",
+   "group": "mail2.castenow.de",
+   "title": "Nur aktuelle TLS-Protokolle"
+  },
+  {
+   "id": "VS-2026-P66",
+   "check": "tls_legacy_protocols",
+   "family": "tls_legacy_protocols",
+   "cat": "D",
+   "group": "mailstore.castenow.de",
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
@@ -1241,7 +1255,7 @@
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
-   "group": "mail.castenow.de",
+   "group": "owa.castenow.de",
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
@@ -1249,7 +1263,7 @@
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
-   "group": "mail2.castenow.de",
+   "group": "ubb-wiki.castenow.de",
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
@@ -1257,7 +1271,7 @@
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
-   "group": "mailstore.castenow.de",
+   "group": "umfrage.castenow.de",
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
@@ -1265,39 +1279,39 @@
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
-   "group": "owa.castenow.de",
+   "group": "www.castenow.de (+castenow.de)",
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
    "id": "VS-2026-P71",
-   "check": "tls_legacy_protocols",
-   "family": "tls_legacy_protocols",
+   "check": "tls_no_13",
+   "family": "tls_no_13",
    "cat": "D",
-   "group": "ubb-wiki.castenow.de",
-   "title": "Nur aktuelle TLS-Protokolle"
+   "group": "bitwarden.castenow.de",
+   "title": "TLS 1.3 verfügbar"
   },
   {
    "id": "VS-2026-P72",
-   "check": "tls_legacy_protocols",
-   "family": "tls_legacy_protocols",
+   "check": "tls_no_13",
+   "family": "tls_no_13",
    "cat": "D",
-   "group": "umfrage.castenow.de",
-   "title": "Nur aktuelle TLS-Protokolle"
+   "group": "mail.castenow.de",
+   "title": "TLS 1.3 verfügbar"
   },
   {
    "id": "VS-2026-P73",
-   "check": "tls_legacy_protocols",
-   "family": "tls_legacy_protocols",
+   "check": "tls_no_13",
+   "family": "tls_no_13",
    "cat": "D",
-   "group": "www.castenow.de (+castenow.de)",
-   "title": "Nur aktuelle TLS-Protokolle"
+   "group": "mail2.castenow.de",
+   "title": "TLS 1.3 verfügbar"
   },
   {
    "id": "VS-2026-P74",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
-   "group": "bitwarden.castenow.de",
+   "group": "mailstore.castenow.de",
    "title": "TLS 1.3 verfügbar"
   },
   {
@@ -1305,7 +1319,7 @@
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
-   "group": "mail.castenow.de",
+   "group": "owa.castenow.de",
    "title": "TLS 1.3 verfügbar"
   },
   {
@@ -1313,7 +1327,7 @@
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
-   "group": "mail2.castenow.de",
+   "group": "ubb-wiki.castenow.de",
    "title": "TLS 1.3 verfügbar"
   },
   {
@@ -1321,7 +1335,7 @@
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
-   "group": "mailstore.castenow.de",
+   "group": "umfrage.castenow.de",
    "title": "TLS 1.3 verfügbar"
   },
   {
@@ -1329,35 +1343,11 @@
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
-   "group": "owa.castenow.de",
-   "title": "TLS 1.3 verfügbar"
-  },
-  {
-   "id": "VS-2026-P79",
-   "check": "tls_no_13",
-   "family": "tls_no_13",
-   "cat": "D",
-   "group": "ubb-wiki.castenow.de",
-   "title": "TLS 1.3 verfügbar"
-  },
-  {
-   "id": "VS-2026-P80",
-   "check": "tls_no_13",
-   "family": "tls_no_13",
-   "cat": "D",
-   "group": "umfrage.castenow.de",
-   "title": "TLS 1.3 verfügbar"
-  },
-  {
-   "id": "VS-2026-P81",
-   "check": "tls_no_13",
-   "family": "tls_no_13",
-   "cat": "D",
    "group": "www.castenow.de (+castenow.de)",
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P82",
+   "id": "VS-2026-P79",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -1365,7 +1355,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P83",
+   "id": "VS-2026-P80",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -1373,7 +1363,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P84",
+   "id": "VS-2026-P81",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -1381,7 +1371,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P85",
+   "id": "VS-2026-P82",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -1389,7 +1379,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P86",
+   "id": "VS-2026-P83",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -1397,7 +1387,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P87",
+   "id": "VS-2026-P84",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -1405,7 +1395,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P88",
+   "id": "VS-2026-P85",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -1413,7 +1403,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P89",
+   "id": "VS-2026-P86",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -1421,7 +1411,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P90",
+   "id": "VS-2026-P87",
    "check": "urlhaus_compromise",
    "family": "urlhaus_compromise",
    "cat": "A",
@@ -1429,15 +1419,7 @@
    "title": "Keine Einträge in Malware-Feeds"
   },
   {
-   "id": "VS-2026-P91",
-   "check": "waf_present",
-   "family": "waf_present",
-   "cat": "D",
-   "group": "ubb-wiki.castenow.de",
-   "title": "Web Application Firewall vorhanden"
-  },
-  {
-   "id": "VS-2026-P92",
+   "id": "VS-2026-P88",
    "check": "wordpress_core_outdated",
    "family": "wordpress_core_outdated",
    "cat": "B",

@@ -1,6 +1,8 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/huendgen-0923.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
  "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
+ "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben.",
+ "hinweis_s6b2": "S6b-2 hat drei Markierungen aufgeloest: Q18 Zertifikat mit 17 Tagen als cert_expiring_later mittelfristig (E2); Q4 dane_missing entfaellt; Q12 waf_present ohne benanntes Produkt entfaellt. Es bleibt eine Q8-Markierung (S6c).",
  "strict": false,
  "orders": {
   "main": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7"
@@ -13,10 +15,8 @@
   },
   "VS-2026-002": {
    "checks": [
-    "cert_expiring"
-   ],
-   "spec09": "Q18",
-   "warum": "Restlaufzeit 17 Tage; nach E2 ist das mittelfristig, Hygiene hoch gilt für acht bis 14 Tage."
+    "cert_expiring_later"
+   ]
   },
   "VS-2026-003": {
    "checks": [
@@ -25,24 +25,22 @@
   },
   "VS-2026-004": {
    "checks": [
-    "dane_missing"
-   ],
-   "spec09": "Q4",
-   "warum": "Der MX liegt in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
-  },
-  "VS-2026-005": {
-   "checks": [
     "dmarc_quarantine"
    ]
   },
-  "VS-2026-006": {
+  "VS-2026-005": {
    "checks": [
     "dnssec_missing"
    ]
   },
-  "VS-2026-007": {
+  "VS-2026-006": {
    "checks": [
     "hsts_missing"
+   ]
+  },
+  "VS-2026-007": {
+   "checks": [
+    "http_alt_port"
    ]
   },
   "VS-2026-008": {
@@ -52,39 +50,44 @@
   },
   "VS-2026-009": {
    "checks": [
-    "http_alt_port"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-010": {
    "checks": [
-    "http_header_disclosure"
+    "login_portal_exposed"
    ]
   },
   "VS-2026-011": {
    "checks": [
-    "login_portal_exposed"
-   ]
-  },
-  "VS-2026-012": {
-   "checks": [
     "mta_sts_missing"
    ]
   },
-  "VS-2026-013": {
+  "VS-2026-012": {
    "checks": [
     "security_headers_incomplete"
    ],
    "spec09": "Q8",
    "warum": "Gemessen an der Weiterleitung des Outlook-Portals; die Endseite /owa/auth/logon.aspx setzt X-Frame-Options SAMEORIGIN."
   },
-  "VS-2026-014": {
+  "VS-2026-013": {
    "checks": [
     "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-014": {
+   "checks": [
+    "software_eol"
    ]
   },
   "VS-2026-015": {
    "checks": [
     "tls_rpt_missing"
+   ]
+  },
+  "VS-2026-016": {
+   "checks": [
+    "tls_weakness_reported"
    ]
   }
  },
@@ -171,7 +174,7 @@
   },
   "VS-2026-P17": {
    "checks": [
-    "ip_reputation"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P18": {
@@ -181,7 +184,7 @@
   },
   "VS-2026-P19": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P20": {
@@ -191,17 +194,17 @@
   },
   "VS-2026-P21": {
    "checks": [
-    "smb_exposed"
+    "spf_missing"
    ]
   },
   "VS-2026-P22": {
    "checks": [
-    "spf_missing"
+    "spf_softfail"
    ]
   },
   "VS-2026-P23": {
    "checks": [
-    "spf_softfail"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P24": {
@@ -211,7 +214,7 @@
   },
   "VS-2026-P25": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P26": {
@@ -221,7 +224,7 @@
   },
   "VS-2026-P27": {
    "checks": [
-    "tls_no_13"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P28": {
@@ -231,24 +234,11 @@
   },
   "VS-2026-P29": {
    "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P30": {
-   "checks": [
     "urlhaus_compromise"
    ]
-  },
-  "VS-2026-P31": {
-   "checks": [
-    "waf_present"
-   ],
-   "spec09": "Q12",
-   "warum": "Die WAF-Erkennung stammt aus der Generic-Heuristik von wafw00f ohne benanntes Produkt."
   }
  },
  "subsumed": {},
  "expected_coverage_differences": [],
- "expected_member_differences": [],
- "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben."
+ "expected_member_differences": []
 }

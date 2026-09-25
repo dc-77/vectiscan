@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-25.1 auf tests/golden/facts/57b3ac85-a1da-47e9-b783-d28ad9a9fa35.json",
+ "source": "reporter.catalog 2026-09-25.2 auf tests/golden/facts/57b3ac85-a1da-47e9-b783-d28ad9a9fa35.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -25,19 +25,6 @@
   },
   {
    "id": "VS-2026-002",
-   "check": "dane_missing",
-   "family": "dane_missing",
-   "cat": "C",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "lumbeck-wolter.de",
-   "affected": [
-    "lumbeck-wolter.de"
-   ],
-   "title": "DANE für SMTP nicht eingerichtet"
-  },
-  {
-   "id": "VS-2026-003",
    "check": "db_exposed",
    "family": "db_exposed",
    "cat": "A",
@@ -51,7 +38,7 @@
    "title": "Datenbankdienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-004",
+   "id": "VS-2026-003",
    "check": "dmarc_missing",
    "family": "dmarc_missing",
    "cat": "C",
@@ -64,7 +51,7 @@
    "title": "DMARC-Richtlinie fehlt"
   },
   {
-   "id": "VS-2026-005",
+   "id": "VS-2026-004",
    "check": "dnssec_missing",
    "family": "dnssec_missing",
    "cat": "E",
@@ -77,7 +64,7 @@
    "title": "DNS-Zone ohne DNSSEC-Signatur"
   },
   {
-   "id": "VS-2026-006",
+   "id": "VS-2026-005",
    "check": "legacy_protocols_present",
    "family": "legacy_protocols_present",
    "cat": "A",
@@ -93,7 +80,7 @@
    "zustaendig": "hoster"
   },
   {
-   "id": "VS-2026-007",
+   "id": "VS-2026-006",
    "check": "mta_sts_missing",
    "family": "mta_sts_missing",
    "cat": "C",
@@ -106,23 +93,7 @@
    "title": "MTA-STS nicht wirksam veröffentlicht"
   },
   {
-   "id": "VS-2026-008",
-   "check": "service_banner_version",
-   "family": "banner_version_disclosure",
-   "cat": "E",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de)",
-   "affected": [
-    "116.202.77.64:222 (OpenSSH 9.2p1)",
-    "116.202.77.64:3306 (MariaDB 10.11.18)",
-    "116.202.77.64:5432 (PostgreSQL unbekannt)"
-   ],
-   "title": "Dienst gibt Versionskennung preis",
-   "zustaendig": "hoster"
-  },
-  {
-   "id": "VS-2026-009",
+   "id": "VS-2026-007",
    "check": "spf_softfail",
    "family": "spf_softfail",
    "cat": "C",
@@ -135,7 +106,7 @@
    "title": "SPF-Eintrag ohne konsequente Durchsetzung"
   },
   {
-   "id": "VS-2026-010",
+   "id": "VS-2026-008",
    "check": "tls_rpt_missing",
    "family": "tls_rpt_missing",
    "cat": "C",
@@ -223,6 +194,14 @@
   },
   {
    "id": "VS-2026-P10",
+   "check": "software_eol",
+   "family": "software_eol",
+   "cat": "B",
+   "group": "116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de)",
+   "title": "Serversoftware mit laufender Herstellerpflege"
+  },
+  {
+   "id": "VS-2026-P11",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
@@ -230,7 +209,7 @@
    "title": "SPF-Eintrag vorhanden"
   },
   {
-   "id": "VS-2026-P11",
+   "id": "VS-2026-P12",
    "check": "urlhaus_compromise",
    "family": "urlhaus_compromise",
    "cat": "A",

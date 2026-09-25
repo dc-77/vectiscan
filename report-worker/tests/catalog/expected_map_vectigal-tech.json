@@ -52,12 +52,12 @@
   },
   "VS-2026-010": {
    "checks": [
-    "dmarc_missing"
+    "dmarc_none"
    ]
   },
   "VS-2026-011": {
    "checks": [
-    "dmarc_none"
+    "dnssec_missing"
    ]
   },
   "VS-2026-012": {
@@ -67,7 +67,7 @@
   },
   "VS-2026-013": {
    "checks": [
-    "dnssec_missing"
+    "mail_spoofing_unprotected"
    ]
   },
   "VS-2026-014": {
@@ -106,11 +106,6 @@
    ]
   },
   "VS-2026-021": {
-   "checks": [
-    "spf_missing"
-   ]
-  },
-  "VS-2026-022": {
    "checks": [
     "tls_rpt_missing"
    ]

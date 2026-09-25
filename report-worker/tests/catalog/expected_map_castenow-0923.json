@@ -1,6 +1,8 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/castenow-0923.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
  "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
+ "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben.",
+ "hinweis_s6b2": "S6b-2 hat neun Markierungen aufgeloest: Q13 Plesk 8443 als admin_panel_hoster und 8880 (sw-cp-server) im selben Befund admin_access mit Kennung Plesk; Q14 csrf_token_missing (Konfidenz Low) als Werkzeugmeldung; Q18 mailstore mit einem Tag Restlaufzeit Rot und Unverzueglich (urgent_when, E2); Q4 dane_missing und BREACH (bitwarden, umfrage) entfallen, BREACH als Hinweis im Anhang ohne CVE; Teil 2 kein Positivbefund fuer Exchange SE ohne Patchstand; Q12 waf_present nur mit benanntem Produkt. Es bleiben vier Q8-Markierungen (S6c).",
  "strict": false,
  "orders": {
   "main": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52"
@@ -8,17 +10,13 @@
  "findings": {
   "VS-2026-001": {
    "checks": [
-    "admin_service_exposed"
-   ],
-   "spec09": "Q13",
-   "warum": "Plesk mit Anmeldung auf dem Plesk-Sammelserver 92.205.163.53 (auch netscope-media.de); nach E1 ein Hosting-Panel des Hosters, erhöht mit Empfehlung an den Hoster."
+    "admin_panel_hoster"
+   ]
   },
   "VS-2026-002": {
    "checks": [
     "admin_service_exposed_passive"
-   ],
-   "spec09": "Q13",
-   "warum": "8880 zeigt im Banner sw-cp-server (Plesk) und ist derselbe Dienst wie VS-2026-001; „unbekannt“ und ein zweiter Befund sind nicht belegt."
+   ]
   },
   "VS-2026-003": {
    "checks": [
@@ -28,9 +26,7 @@
   "VS-2026-004": {
    "checks": [
     "cert_expiring"
-   ],
-   "spec09": "Q18",
-   "warum": "Restlaufzeit ein Tag (24.09.2026 23:59 UTC); nach E2 ist das bis sieben Tage Unverzüglich, nicht Hygiene hoch."
+   ]
   },
   "VS-2026-005": {
    "checks": [
@@ -73,51 +69,47 @@
   },
   "VS-2026-012": {
    "checks": [
-    "csrf_token_missing"
-   ],
-   "spec09": "Q14",
-   "warum": "ZAP-Meldung „Absence of Anti-CSRF Tokens“ mit Konfidenz Low; unter Konfidenz High nur Werkzeugmeldung, Quelle passiv (ZAP)."
-  },
-  "VS-2026-013": {
-   "checks": [
-    "dane_missing"
-   ],
-   "spec09": "Q4",
-   "warum": "Der MX liegt in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
-  },
-  "VS-2026-014": {
-   "checks": [
     "dmarc_none"
    ]
   },
-  "VS-2026-015": {
+  "VS-2026-013": {
    "checks": [
     "dnssec_missing"
    ]
   },
+  "VS-2026-014": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-015": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
   "VS-2026-016": {
    "checks": [
-    "ftp_plaintext"
+    "hsts_missing"
    ]
   },
   "VS-2026-017": {
    "checks": [
-    "hsts_missing"
+    "http_alt_port"
    ]
   },
   "VS-2026-018": {
    "checks": [
-    "hsts_missing"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-019": {
    "checks": [
-    "hsts_missing"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-020": {
    "checks": [
-    "http_alt_port"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-021": {
@@ -127,17 +119,17 @@
   },
   "VS-2026-022": {
    "checks": [
-    "http_header_disclosure"
+    "info_disclosure"
    ]
   },
   "VS-2026-023": {
    "checks": [
-    "http_header_disclosure"
+    "info_disclosure"
    ]
   },
   "VS-2026-024": {
    "checks": [
-    "http_header_disclosure"
+    "info_disclosure"
    ]
   },
   "VS-2026-025": {
@@ -157,27 +149,27 @@
   },
   "VS-2026-028": {
    "checks": [
-    "info_disclosure"
+    "js_library_outdated"
    ]
   },
   "VS-2026-029": {
    "checks": [
-    "info_disclosure"
+    "legacy_protocols_present"
    ]
   },
   "VS-2026-030": {
    "checks": [
-    "info_disclosure"
+    "login_portal_exposed"
    ]
   },
   "VS-2026-031": {
    "checks": [
-    "js_library_outdated"
+    "login_portal_exposed"
    ]
   },
   "VS-2026-032": {
    "checks": [
-    "legacy_protocols_present"
+    "login_portal_exposed"
    ]
   },
   "VS-2026-033": {
@@ -192,28 +184,30 @@
   },
   "VS-2026-035": {
    "checks": [
-    "login_portal_exposed"
+    "mail_plaintext"
    ]
   },
   "VS-2026-036": {
    "checks": [
-    "login_portal_exposed"
+    "mta_sts_missing"
    ]
   },
   "VS-2026-037": {
    "checks": [
-    "login_portal_exposed"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-038": {
    "checks": [
-    "mta_sts_missing"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-039": {
    "checks": [
     "security_headers_incomplete"
-   ]
+   ],
+   "spec09": "Q8",
+   "warum": "mailstore liefert nur „Access through untrusted domain“ (400); gemessen an der Fehlerseite."
   },
   "VS-2026-040": {
    "checks": [
@@ -223,9 +217,7 @@
   "VS-2026-041": {
    "checks": [
     "security_headers_incomplete"
-   ],
-   "spec09": "Q8",
-   "warum": "mailstore liefert nur „Access through untrusted domain“ (400); gemessen an der Fehlerseite."
+   ]
   },
   "VS-2026-042": {
    "checks": [
@@ -239,49 +231,50 @@
   },
   "VS-2026-044": {
    "checks": [
-    "security_headers_incomplete"
+    "service_banner_version"
    ]
   },
   "VS-2026-045": {
    "checks": [
-    "security_headers_incomplete"
+    "spf_softfail"
    ]
   },
   "VS-2026-046": {
    "checks": [
-    "service_banner_version"
+    "tls_rpt_missing"
    ]
   },
   "VS-2026-047": {
    "checks": [
-    "spf_softfail"
+    "tls_weakness_reported"
    ]
   },
   "VS-2026-048": {
    "checks": [
-    "tls_rpt_missing"
+    "tls_weakness_reported"
    ]
   },
   "VS-2026-049": {
    "checks": [
-    "tls_weakness"
-   ],
-   "spec09": "Q4",
-   "warum": "BREACH gilt laut testssl für statische Seiten nicht („Can be ignored for static pages“) und hängt im Bericht als CVE am Zertifikatsbefund."
+    "tls_weakness_reported"
+   ]
   },
   "VS-2026-050": {
    "checks": [
-    "tls_weakness"
-   ],
-   "spec09": "Q4",
-   "warum": "Plattform umfrageonline.com (CloudFront); BREACH gilt laut testssl für statische Seiten nicht."
+    "tls_weakness_reported"
+   ]
   },
   "VS-2026-051": {
+   "checks": [
+    "tls_weakness_reported"
+   ]
+  },
+  "VS-2026-052": {
    "checks": [
     "web_vulnerability_reported"
    ]
   },
-  "VS-2026-052": {
+  "VS-2026-053": {
    "checks": [
     "wordpress_user_enumeration"
    ]
@@ -537,12 +530,12 @@
   },
   "VS-2026-P50": {
    "checks": [
-    "ip_reputation"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P51": {
    "checks": [
-    "mail_plaintext"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P52": {
@@ -567,12 +560,12 @@
   },
   "VS-2026-P56": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P57": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P58": {
@@ -597,24 +590,22 @@
   },
   "VS-2026-P62": {
    "checks": [
-    "smb_exposed"
+    "spf_missing"
    ]
   },
   "VS-2026-P63": {
    "checks": [
-    "smb_exposed"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P64": {
    "checks": [
-    "software_eol"
-   ],
-   "spec09": "Teil 2",
-   "warum": "Belegt ist nur die Produktlinie Exchange SE aus dem OWA-Pfad, nicht der Patchstand; „laufende Herstellerpflege“ ist nicht nachgewiesen."
+    "tls_legacy_protocols"
+   ]
   },
   "VS-2026-P65": {
    "checks": [
-    "spf_missing"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P66": {
@@ -644,17 +635,17 @@
   },
   "VS-2026-P71": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P72": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P73": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P74": {
@@ -684,17 +675,17 @@
   },
   "VS-2026-P79": {
    "checks": [
-    "tls_no_13"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P80": {
    "checks": [
-    "tls_no_13"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P81": {
    "checks": [
-    "tls_no_13"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P82": {
@@ -724,32 +715,10 @@
   },
   "VS-2026-P87": {
    "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P88": {
-   "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P89": {
-   "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P90": {
-   "checks": [
     "urlhaus_compromise"
    ]
   },
-  "VS-2026-P91": {
-   "checks": [
-    "waf_present"
-   ],
-   "spec09": "Q12",
-   "warum": "Die WAF-Erkennung stammt aus der Generic-Heuristik von wafw00f ohne benanntes Produkt."
-  },
-  "VS-2026-P92": {
+  "VS-2026-P88": {
    "checks": [
     "wordpress_core_outdated"
    ]
@@ -757,6 +726,5 @@
  },
  "subsumed": {},
  "expected_coverage_differences": [],
- "expected_member_differences": [],
- "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben."
+ "expected_member_differences": []
 }

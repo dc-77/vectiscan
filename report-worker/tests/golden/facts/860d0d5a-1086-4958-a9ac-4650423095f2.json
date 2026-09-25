@@ -3428,7 +3428,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -3524,7 +3527,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -3579,7 +3585,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -3641,7 +3650,10 @@
    },
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -3705,6 +3717,7 @@
      "name": "Re-examine Cache-control Directives",
      "plugin_id": "10015",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2fsitemap.xml",
      "urls_sample": [
       "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2fsitemap.xml"
@@ -3718,6 +3731,7 @@
      "name": "X-Content-Type-Options Header Missing",
      "plugin_id": "10021",
      "risk": "Low",
+     "run": "passive",
      "url": "https://autodiscover.junkerwerk.de/owa/auth/15.2.2562/themes/resources/favicon.ico",
      "urls_sample": [
       "https://autodiscover.junkerwerk.de/owa/auth/15.2.2562/themes/resources/favicon.ico",
@@ -3732,6 +3746,7 @@
      "name": "Information Disclosure - Suspicious Comments",
      "plugin_id": "10027",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2fsitemap.xml",
      "urls_sample": [
       "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2fsitemap.xml"
@@ -3745,6 +3760,7 @@
      "name": "Strict-Transport-Security Header Not Set",
      "plugin_id": "10035",
      "risk": "Low",
+     "run": "passive",
      "url": "https://autodiscover.junkerwerk.de/owa/auth/15.2.2562/themes/resources/favicon.ico",
      "urls_sample": [
       "https://autodiscover.junkerwerk.de/owa/auth/15.2.2562/themes/resources/favicon.ico",
@@ -3759,6 +3775,7 @@
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
      "plugin_id": "10036",
      "risk": "Low",
+     "run": "passive",
      "url": "https://autodiscover.junkerwerk.de",
      "urls_sample": [
       "https://autodiscover.junkerwerk.de",
@@ -3776,6 +3793,7 @@
      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
      "plugin_id": "10037",
      "risk": "Low",
+     "run": "passive",
      "url": "https://autodiscover.junkerwerk.de/owa/",
      "urls_sample": [
       "https://autodiscover.junkerwerk.de/owa/",
@@ -3793,6 +3811,7 @@
      "name": "Content Security Policy (CSP) Header Not Set",
      "plugin_id": "10038",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2fsitemap.xml",
      "urls_sample": [
       "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2fsitemap.xml"
@@ -3806,6 +3825,7 @@
      "name": "X-AspNet-Version Response Header",
      "plugin_id": "10061",
      "risk": "Low",
+     "run": "passive",
      "url": "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2fsitemap.xml",
      "urls_sample": [
       "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2fsitemap.xml"
@@ -3819,6 +3839,7 @@
      "name": "Modern Web Application",
      "plugin_id": "10109",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2fsitemap.xml",
      "urls_sample": [
       "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2fsitemap.xml"
@@ -3941,6 +3962,7 @@
      "name": "Re-examine Cache-control Directives",
      "plugin_id": "10015",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://cloud.junkerwerk.de",
      "urls_sample": [
       "https://cloud.junkerwerk.de"
@@ -3954,6 +3976,7 @@
      "name": "Missing Anti-clickjacking Header",
      "plugin_id": "10020",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://cloud.junkerwerk.de",
      "urls_sample": [
       "https://cloud.junkerwerk.de"
@@ -3967,6 +3990,7 @@
      "name": "X-Content-Type-Options Header Missing",
      "plugin_id": "10021",
      "risk": "Low",
+     "run": "passive",
      "url": "https://cloud.junkerwerk.de",
      "urls_sample": [
       "https://cloud.junkerwerk.de",
@@ -3981,6 +4005,7 @@
      "name": "Strict-Transport-Security Header Not Set",
      "plugin_id": "10035",
      "risk": "Low",
+     "run": "passive",
      "url": "https://cloud.junkerwerk.de",
      "urls_sample": [
       "https://cloud.junkerwerk.de",
@@ -3997,6 +4022,7 @@
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
      "plugin_id": "10036",
      "risk": "Low",
+     "run": "passive",
      "url": "https://cloud.junkerwerk.de",
      "urls_sample": [
       "https://cloud.junkerwerk.de",
@@ -4013,6 +4039,7 @@
      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
      "plugin_id": "10037",
      "risk": "Low",
+     "run": "passive",
      "url": "https://cloud.junkerwerk.de",
      "urls_sample": [
       "https://cloud.junkerwerk.de",
@@ -4029,6 +4056,7 @@
      "name": "Content Security Policy (CSP) Header Not Set",
      "plugin_id": "10038",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://cloud.junkerwerk.de",
      "urls_sample": [
       "https://cloud.junkerwerk.de",
@@ -4242,6 +4270,7 @@
      "name": "Re-examine Cache-control Directives",
      "plugin_id": "10015",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://outlook.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2frobots.txt",
      "urls_sample": [
       "https://outlook.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2frobots.txt"
@@ -4255,6 +4284,7 @@
      "name": "X-Content-Type-Options Header Missing",
      "plugin_id": "10021",
      "risk": "Low",
+     "run": "passive",
      "url": "https://outlook.junkerwerk.de/owa/auth/15.2.2562/themes/resources/favicon.ico",
      "urls_sample": [
       "https://outlook.junkerwerk.de/owa/auth/15.2.2562/themes/resources/favicon.ico",
@@ -4269,6 +4299,7 @@
      "name": "Information Disclosure - Suspicious Comments",
      "plugin_id": "10027",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://outlook.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2frobots.txt",
      "urls_sample": [
       "https://outlook.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2frobots.txt"
@@ -4282,6 +4313,7 @@
      "name": "Strict-Transport-Security Header Not Set",
      "plugin_id": "10035",
      "risk": "Low",
+     "run": "passive",
      "url": "https://outlook.junkerwerk.de/owa/auth/",
      "urls_sample": [
       "https://outlook.junkerwerk.de/owa/auth/",
@@ -4299,6 +4331,7 @@
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
      "plugin_id": "10036",
      "risk": "Low",
+     "run": "passive",
      "url": "https://outlook.junkerwerk.de",
      "urls_sample": [
       "https://outlook.junkerwerk.de",
@@ -4316,6 +4349,7 @@
      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
      "plugin_id": "10037",
      "risk": "Low",
+     "run": "passive",
      "url": "https://outlook.junkerwerk.de/owa",
      "urls_sample": [
       "https://outlook.junkerwerk.de/owa",
@@ -4333,6 +4367,7 @@
      "name": "Content Security Policy (CSP) Header Not Set",
      "plugin_id": "10038",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://outlook.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2frobots.txt",
      "urls_sample": [
       "https://outlook.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2frobots.txt"
@@ -4346,6 +4381,7 @@
      "name": "X-AspNet-Version Response Header",
      "plugin_id": "10061",
      "risk": "Low",
+     "run": "passive",
      "url": "https://outlook.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2frobots.txt",
      "urls_sample": [
       "https://outlook.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2frobots.txt"
@@ -4359,6 +4395,7 @@
      "name": "Modern Web Application",
      "plugin_id": "10109",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://outlook.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2frobots.txt",
      "urls_sample": [
       "https://outlook.junkerwerk.de/owa/auth/logon.aspx?reason=0&url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2frobots.txt"
@@ -4372,6 +4409,7 @@
      "name": "Application Error Disclosure",
      "plugin_id": "90022",
      "risk": "Low",
+     "run": "passive",
      "url": "https://outlook.junkerwerk.de/owa/auth/",
      "urls_sample": [
       "https://outlook.junkerwerk.de/owa/auth/",
@@ -5549,6 +5587,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -5580,6 +5619,7 @@
    "product": null,
    "seen_at": "2026-09-20T06:33:57Z",
    "service": "ftp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -5611,6 +5651,7 @@
    "product": null,
    "seen_at": "2026-09-20T06:33:57Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -5642,6 +5683,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-09-20T06:33:57Z",
    "service": "http",
+   "service_seen_at": "2026-09-19T13:37:46Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -5673,6 +5715,7 @@
    "product": null,
    "seen_at": "2026-09-20T06:33:57Z",
    "service": "pop3",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -5704,6 +5747,7 @@
    "product": null,
    "seen_at": "2026-09-20T06:33:57Z",
    "service": "imap",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -5735,6 +5779,7 @@
    "product": "OpenSSH",
    "seen_at": "2026-09-20T06:33:57Z",
    "service": "auto",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -5766,6 +5811,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-09-20T06:33:57Z",
    "service": "https",
+   "service_seen_at": "2026-09-19T13:38:07Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -5797,6 +5843,7 @@
    "product": null,
    "seen_at": "2026-09-20T06:33:57Z",
    "service": "smtps",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -5828,6 +5875,7 @@
    "product": null,
    "seen_at": "2026-09-20T06:33:57Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -5859,6 +5907,7 @@
    "product": null,
    "seen_at": "2026-09-20T06:33:57Z",
    "service": "imap-ssl",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -5890,6 +5939,7 @@
    "product": null,
    "seen_at": "2026-09-20T06:33:57Z",
    "service": "pop3-ssl",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -5921,6 +5971,7 @@
    "product": "MariaDB",
    "seen_at": "2026-09-20T06:33:57Z",
    "service": "mysql",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -5952,6 +6003,7 @@
    "product": "PostgreSQL",
    "seen_at": "2026-09-20T06:33:57Z",
    "service": "postgresql",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -5981,6 +6033,7 @@
    "product": null,
    "seen_at": "2026-09-19T17:59:34Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -6010,6 +6063,7 @@
    "product": "Outlook Web App",
    "seen_at": "2026-09-19T17:59:34Z",
    "service": "https",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6039,6 +6093,7 @@
    "product": "SonicWall",
    "seen_at": "2026-09-19T17:59:34Z",
    "service": "https-simple-new",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -6067,6 +6122,7 @@
    "product": "Microsoft IIS httpd",
    "seen_at": "2026-09-10T14:32:57Z",
    "service": "https",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6097,6 +6153,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-09-12T23:19:46Z",
    "service": "http",
+   "service_seen_at": "2026-09-12T23:19:44Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -6127,6 +6184,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-09-12T23:19:46Z",
    "service": "https",
+   "service_seen_at": "2026-09-09T16:47:23Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -6155,6 +6213,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "urlhaus",
    "transport": null,
    "verified": null,
@@ -6239,7 +6298,7 @@
    }
   ]
  },
- "schema_version": "1.0.6",
+ "schema_version": "1.0.7",
  "services": [
   {
    "auth_mechanisms": [],
@@ -6262,6 +6321,9 @@
     }
    ],
    "family": "proftpd",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:21/tcp",
    "login_disabled": null,
@@ -6272,6 +6334,7 @@
    "port": 21,
    "product": "ProFTPD",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ftp",
    "source": "nmap",
    "starttls": null,
@@ -6295,6 +6358,9 @@
     }
    ],
    "family": "proftpd_sftp",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:22/tcp",
    "login_disabled": null,
@@ -6305,6 +6371,7 @@
    "port": 22,
    "product": "ProFTPD mod_sftp",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ssh",
    "source": "nmap",
    "starttls": null,
@@ -6328,6 +6395,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "404 Not Found",
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:80/tcp",
    "login_disabled": null,
@@ -6338,6 +6408,7 @@
    "port": 80,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -6382,6 +6453,9 @@
     }
    ],
    "family": "courier",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:110/tcp",
    "login_disabled": null,
@@ -6392,6 +6466,7 @@
    "port": 110,
    "product": "Courier pop3d",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "pop3",
    "source": "nmap",
    "starttls": true,
@@ -6444,6 +6519,9 @@
     }
    ],
    "family": "dovecot",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:143/tcp",
    "login_disabled": true,
@@ -6454,6 +6532,7 @@
    "port": 143,
    "product": "Dovecot imapd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "imap",
    "source": "nmap",
    "starttls": true,
@@ -6477,6 +6556,9 @@
     }
    ],
    "family": "openssh",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:222/tcp",
    "login_disabled": null,
@@ -6487,6 +6569,7 @@
    "port": 222,
    "product": "OpenSSH",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ssh",
    "source": "nmap",
    "starttls": null,
@@ -6517,6 +6600,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "404 Not Found",
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:443/tcp",
    "login_disabled": null,
@@ -6527,6 +6613,7 @@
    "port": 443,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -6575,6 +6662,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:465/tcp",
    "login_disabled": null,
@@ -6585,6 +6675,7 @@
    "port": 465,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": false,
@@ -6630,6 +6721,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:587/tcp",
    "login_disabled": true,
@@ -6640,6 +6734,7 @@
    "port": 587,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": true,
@@ -6693,6 +6788,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:993/tcp",
    "login_disabled": false,
@@ -6703,6 +6801,7 @@
    "port": 993,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "imaps",
    "source": "nmap",
    "starttls": false,
@@ -6749,6 +6848,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:995/tcp",
    "login_disabled": null,
@@ -6759,6 +6861,7 @@
    "port": 995,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "pop3s",
    "source": "nmap",
    "starttls": false,
@@ -6796,6 +6899,9 @@
     }
    ],
    "family": "mariadb",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:3306/tcp",
    "login_disabled": null,
@@ -6806,6 +6912,7 @@
    "port": 3306,
    "product": "MySQL",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "mysql",
    "source": "nmap",
    "starttls": null,
@@ -6836,6 +6943,9 @@
     }
    ],
    "family": "postgresql",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:5432/tcp",
    "login_disabled": null,
@@ -6846,6 +6956,7 @@
    "port": 5432,
    "product": "PostgreSQL DB",
    "proto": "tcp",
+   "rejects_before_auth": true,
    "service": "postgresql",
    "source": "nmap",
    "starttls": null,
@@ -6876,6 +6987,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": "Microsoft-IIS/10.0",
+   "fp_title": "Outlook",
    "host_ip": "217.243.248.28",
    "id": "svc:217.243.248.28:443/tcp",
    "login_disabled": null,
@@ -6886,6 +7000,7 @@
    "port": 443,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "https",
    "source": "nmap",
    "starttls": null,
@@ -6923,6 +7038,9 @@
     }
    ],
    "family": "iis",
+   "fp_login": null,
+   "fp_server": "Microsoft-IIS/10.0",
+   "fp_title": "IIS Windows Server",
    "host_ip": "217.243.248.29",
    "id": "svc:217.243.248.29:443/tcp",
    "login_disabled": null,
@@ -6933,6 +7051,7 @@
    "port": 443,
    "product": "Microsoft IIS httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -6970,6 +7089,9 @@
     }
    ],
    "family": "iis",
+   "fp_login": null,
+   "fp_server": "Microsoft-IIS/10.0",
+   "fp_title": "IIS Windows Server",
    "host_ip": "217.243.248.29",
    "id": "svc:217.243.248.29:8443/tcp",
    "login_disabled": null,
@@ -6980,6 +7102,7 @@
    "port": 8443,
    "product": "Microsoft IIS httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -7038,9 +7161,11 @@
    "note": null,
    "observed_at": "2026-09-20T10:50:15Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7080,9 +7205,55 @@
    "note": null,
    "observed_at": "2026-09-20T10:50:15Z",
    "product": "Courier",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": "2028-06-30",
+    "latest_patch": null,
+    "source": "Debian LTS, https://wiki.debian.org/LTS",
+    "status": "supported",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
+     "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
+     "tool": "nmap"
+    }
+   ],
+   "family": "debian",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "188.40.3.130",
+   "id": "sw:188.40.3.130:-:debian:12",
+   "kind": "os",
+   "mode": "active",
+   "note": "Release aus dem Paketsuffix eines Dienstes abgeleitet",
+   "observed_at": "2026-09-20T10:50:15Z",
+   "product": "Debian GNU/Linux",
+   "release_date": null,
+   "source": "nmap",
+   "version_norm": "12",
+   "version_raw": "deb12",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7122,9 +7293,11 @@
    "note": null,
    "observed_at": "2026-09-20T10:50:15Z",
    "product": "Dovecot",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7164,9 +7337,11 @@
    "note": "MariaDB-Kompatibilitaetspraefix 5.5.5 entfernt",
    "observed_at": "2026-09-20T10:50:15Z",
    "product": "MariaDB",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "10.11.18",
    "version_raw": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7206,9 +7381,11 @@
    "note": null,
    "observed_at": "2026-09-20T10:50:15Z",
    "product": "OpenSSH",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "9.2p1",
    "version_raw": "9.2p1",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7250,9 +7427,11 @@
    "note": "Bereichsangabe, Version nicht bestimmbar",
    "observed_at": "2026-09-20T10:50:15Z",
    "product": "PostgreSQL",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": "9.6.0 or later",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7292,9 +7471,11 @@
    "note": null,
    "observed_at": "2026-09-20T10:50:15Z",
    "product": "ProFTPD",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7334,9 +7515,11 @@
    "note": null,
    "observed_at": "2026-09-20T10:50:15Z",
    "product": "ProFTPD mod_sftp",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7377,9 +7560,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:05:18Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "4.0.30319",
    "version_raw": "4.0.30319",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7441,9 +7626,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:18:54Z",
    "product": "Microsoft Exchange",
+   "release_date": null,
    "source": "cms_fingerprint",
    "version_norm": "SE",
    "version_raw": "15.2.2562",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7484,9 +7671,11 @@
    "note": null,
    "observed_at": "2026-09-20T10:49:21Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "webtech",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7521,9 +7710,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:05:18Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7558,9 +7749,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:05:18Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7598,9 +7791,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:05:18Z",
    "product": "Microsoft Exchange",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "SE",
    "version_raw": "15.2.2562",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7641,9 +7836,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:05:18Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7678,9 +7875,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:05:18Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7715,9 +7914,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:05:18Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "4.0.30319",
    "version_raw": "4.0.30319",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7755,9 +7956,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:05:18Z",
    "product": "Microsoft Exchange",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "SE",
    "version_raw": "15.2.2562",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7798,9 +8001,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:05:18Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7835,9 +8040,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:05:18Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7878,9 +8085,11 @@
    "note": null,
    "observed_at": "2026-09-20T10:49:19Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7937,9 +8146,11 @@
    "note": null,
    "observed_at": "2026-09-20T10:49:12Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -7974,9 +8185,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:08:11Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8017,9 +8230,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:08:11Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8060,9 +8275,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:08:11Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8097,9 +8314,11 @@
    "note": null,
    "observed_at": "2026-09-20T11:08:11Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   }
  ],

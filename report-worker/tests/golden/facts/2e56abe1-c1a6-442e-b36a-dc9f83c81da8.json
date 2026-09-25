@@ -4254,7 +4254,10 @@
    },
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4310,7 +4313,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4365,7 +4371,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4448,7 +4457,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": "2026-09-21T02:20:43Z",
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 26,
+    "abuseipdb_whitelisted": true,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4518,7 +4530,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4605,7 +4620,10 @@
    },
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4820,6 +4838,7 @@
      "name": "Strict-Transport-Security Header Not Set",
      "plugin_id": "10035",
      "risk": "Low",
+     "run": "passive",
      "url": "https://online.heuel.com/transportunternehmen/",
      "urls_sample": [
       "https://online.heuel.com/transportunternehmen/"
@@ -4833,6 +4852,7 @@
      "name": "Content Security Policy (CSP) Header Not Set",
      "plugin_id": "10038",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://online.heuel.com/transportunternehmen/",
      "urls_sample": [
       "https://online.heuel.com/transportunternehmen/"
@@ -4846,6 +4866,7 @@
      "name": "Timestamp Disclosure - Unix",
      "plugin_id": "10096",
      "risk": "Low",
+     "run": "passive",
      "url": "https://online.heuel.com/transportunternehmen/",
      "urls_sample": [
       "https://online.heuel.com/transportunternehmen/"
@@ -4859,6 +4880,7 @@
      "name": "Modern Web Application",
      "plugin_id": "10109",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://online.heuel.com/transportunternehmen/",
      "urls_sample": [
       "https://online.heuel.com/transportunternehmen/"
@@ -5969,6 +5991,7 @@
      "name": "Cookie No HttpOnly Flag",
      "plugin_id": "10010",
      "risk": "Low",
+     "run": "passive",
      "url": "https://ose.heuel.com/webmodule-ee/login.seam",
      "urls_sample": [
       "https://ose.heuel.com/webmodule-ee/login.seam"
@@ -5982,6 +6005,7 @@
      "name": "Cookie Without Secure Flag",
      "plugin_id": "10011",
      "risk": "Low",
+     "run": "passive",
      "url": "https://ose.heuel.com/webmodule-ee/login.seam",
      "urls_sample": [
       "https://ose.heuel.com/webmodule-ee/login.seam"
@@ -5995,6 +6019,7 @@
      "name": "Re-examine Cache-control Directives",
      "plugin_id": "10015",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://ose.heuel.com/",
      "urls_sample": [
       "https://ose.heuel.com/",
@@ -6010,6 +6035,7 @@
      "name": "Missing Anti-clickjacking Header",
      "plugin_id": "10020",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://ose.heuel.com/",
      "urls_sample": [
       "https://ose.heuel.com/",
@@ -6025,6 +6051,7 @@
      "name": "X-Content-Type-Options Header Missing",
      "plugin_id": "10021",
      "risk": "Low",
+     "run": "passive",
      "url": "https://ose.heuel.com/",
      "urls_sample": [
       "https://ose.heuel.com/",
@@ -6040,6 +6067,7 @@
      "name": "Strict-Transport-Security Header Not Set",
      "plugin_id": "10035",
      "risk": "Low",
+     "run": "passive",
      "url": "https://ose.heuel.com/",
      "urls_sample": [
       "https://ose.heuel.com/",
@@ -6055,6 +6083,7 @@
      "name": "Content Security Policy (CSP) Header Not Set",
      "plugin_id": "10038",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://ose.heuel.com/",
      "urls_sample": [
       "https://ose.heuel.com/",
@@ -6070,6 +6099,7 @@
      "name": "Cookie without SameSite Attribute",
      "plugin_id": "10054",
      "risk": "Low",
+     "run": "passive",
      "url": "https://ose.heuel.com/webmodule-ee/login.seam",
      "urls_sample": [
       "https://ose.heuel.com/webmodule-ee/login.seam"
@@ -6083,6 +6113,7 @@
      "name": "Cross-Domain Misconfiguration",
      "plugin_id": "10098",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://ose.heuel.com/webmodule-ee/",
      "urls_sample": [
       "https://ose.heuel.com/webmodule-ee/",
@@ -6097,6 +6128,7 @@
      "name": "Modern Web Application",
      "plugin_id": "10109",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://ose.heuel.com/webmodule-ee/login.seam",
      "urls_sample": [
       "https://ose.heuel.com/webmodule-ee/login.seam"
@@ -6110,6 +6142,7 @@
      "name": "Session Management Response Identified",
      "plugin_id": "10112",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://ose.heuel.com/webmodule-ee/login.seam",
      "urls_sample": [
       "https://ose.heuel.com/webmodule-ee/login.seam"
@@ -6123,6 +6156,7 @@
      "name": "Absence of Anti-CSRF Tokens",
      "plugin_id": "10202",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://ose.heuel.com/webmodule-ee/login.seam",
      "urls_sample": [
       "https://ose.heuel.com/webmodule-ee/login.seam"
@@ -6136,6 +6170,7 @@
      "name": "Charset Mismatch (Header Versus Meta Content-Type Charset)",
      "plugin_id": "90011",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://ose.heuel.com/webmodule-ee/login.seam",
      "urls_sample": [
       "https://ose.heuel.com/webmodule-ee/login.seam"
@@ -6354,6 +6389,7 @@
      "name": "Cookie Without Secure Flag",
      "plugin_id": "10011",
      "risk": "Low",
+     "run": "passive",
      "url": "https://www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fahrplan%20Landverkehre%20Jahreswechsel%2025-26.pdf",
      "urls_sample": [
       "https://www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fahrplan%20Landverkehre%20Jahreswechsel%2025-26.pdf",
@@ -6371,6 +6407,7 @@
      "name": "Re-examine Cache-control Directives",
      "plugin_id": "10015",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://www.heuel.com",
      "urls_sample": [
       "https://www.heuel.com",
@@ -6388,6 +6425,7 @@
      "name": "Cross-Domain JavaScript Source File Inclusion",
      "plugin_id": "10017",
      "risk": "Low",
+     "run": "passive",
      "url": "https://www.heuel.com/en/freight-inquiry.html",
      "urls_sample": [
       "https://www.heuel.com/en/freight-inquiry.html",
@@ -6405,6 +6443,7 @@
      "name": "User Controllable HTML Element Attribute (Potential XSS)",
      "plugin_id": "10031",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://www.heuel.com/en/kontakt-heuel-logistics.html",
      "urls_sample": [
       "https://www.heuel.com/en/kontakt-heuel-logistics.html",
@@ -6422,6 +6461,7 @@
      "name": "CSP: Failure to Define Directive with No Fallback",
      "plugin_id": "10055",
      "risk": "Medium",
+     "run": "passive",
      "url": "http://www.heuel.com/",
      "urls_sample": [
       "http://www.heuel.com/",
@@ -6439,6 +6479,7 @@
      "name": "Timestamp Disclosure - Unix",
      "plugin_id": "10096",
      "risk": "Low",
+     "run": "passive",
      "url": "https://www.heuel.com/_res/13e5aa58eb2182d8ace63266856c8cc29c47c083/site.webmanifest",
      "urls_sample": [
       "https://www.heuel.com/_res/13e5aa58eb2182d8ace63266856c8cc29c47c083/site.webmanifest",
@@ -6456,6 +6497,7 @@
      "name": "Modern Web Application",
      "plugin_id": "10109",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://www.heuel.com",
      "urls_sample": [
       "https://www.heuel.com",
@@ -6473,6 +6515,7 @@
      "name": "Session Management Response Identified",
      "plugin_id": "10112",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fahrplan%20Landverkehre%20Jahreswechsel%2025-26.pdf",
      "urls_sample": [
       "https://www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fahrplan%20Landverkehre%20Jahreswechsel%2025-26.pdf",
@@ -6490,6 +6533,7 @@
      "name": "Absence of Anti-CSRF Tokens",
      "plugin_id": "10202",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://www.heuel.com/en/kontakt-heuel-logistics.html",
      "urls_sample": [
       "https://www.heuel.com/en/kontakt-heuel-logistics.html",
@@ -6507,6 +6551,7 @@
      "name": "Sub Resource Integrity Attribute Missing",
      "plugin_id": "90003",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://www.heuel.com/en/freight-inquiry.html",
      "urls_sample": [
       "https://www.heuel.com/en/freight-inquiry.html",
@@ -6615,7 +6660,7 @@
      "version": null
     },
     {
-     "name": "Neos Flow:neos",
+     "name": "Neos Flow",
      "version": null
     },
     {
@@ -6652,6 +6697,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -6681,6 +6727,7 @@
    "product": null,
    "seen_at": "2026-09-23T09:11:19Z",
    "service": "auto",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6710,6 +6757,7 @@
    "product": null,
    "seen_at": "2026-09-23T09:11:19Z",
    "service": "ssh",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6739,6 +6787,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-09-23T09:11:19Z",
    "service": "http",
+   "service_seen_at": "2026-09-23T04:27:32Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6768,6 +6817,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-09-23T09:11:19Z",
    "service": "https",
+   "service_seen_at": "2026-09-23T09:11:19Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6797,6 +6847,7 @@
    "product": null,
    "seen_at": "2026-09-23T09:11:19Z",
    "service": "https-simple-new",
+   "service_seen_at": "2026-09-11T17:52:16Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -6826,6 +6877,7 @@
    "product": null,
    "seen_at": "2026-09-23T09:11:19Z",
    "service": "https",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6855,6 +6907,7 @@
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
    "service": "ftp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6884,6 +6937,7 @@
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
    "service": "ssh",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6913,6 +6967,7 @@
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -6942,6 +6997,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-09-23T19:14:43Z",
    "service": "http",
+   "service_seen_at": "2026-09-23T19:14:43Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6971,6 +7027,7 @@
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
    "service": "pop3",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7000,6 +7057,7 @@
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
    "service": "imap",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7029,6 +7087,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-09-23T19:14:43Z",
    "service": "https",
+   "service_seen_at": "2026-09-23T17:40:06Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7058,6 +7117,7 @@
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
    "service": "smtps",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7087,6 +7147,7 @@
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7116,6 +7177,7 @@
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
    "service": "imap-ssl",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7145,6 +7207,7 @@
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
    "service": "pop3-ssl",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7175,6 +7238,7 @@
    "product": null,
    "seen_at": "2026-09-23T18:11:24Z",
    "service": "http",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7205,6 +7269,7 @@
    "product": null,
    "seen_at": "2026-09-23T18:11:24Z",
    "service": "https",
+   "service_seen_at": "2026-09-23T18:05:09Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7235,6 +7300,7 @@
    "product": null,
    "seen_at": "2026-09-23T19:36:42Z",
    "service": "http",
+   "service_seen_at": "2026-09-23T00:55:11Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7265,6 +7331,7 @@
    "product": null,
    "seen_at": "2026-09-23T19:36:42Z",
    "service": "https",
+   "service_seen_at": "2026-09-23T19:36:41Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7296,6 +7363,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-09-22T07:38:16Z",
    "service": "http",
+   "service_seen_at": "2026-09-22T07:38:16Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7327,6 +7395,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-09-22T07:38:16Z",
    "service": "https",
+   "service_seen_at": "2026-09-22T07:29:44Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7355,6 +7424,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "urlhaus",
    "transport": null,
    "verified": null,
@@ -7438,7 +7508,7 @@
    }
   ]
  },
- "schema_version": "1.0.6",
+ "schema_version": "1.0.7",
  "services": [
   {
    "auth_mechanisms": [],
@@ -7461,6 +7531,9 @@
     }
    ],
    "family": "wing_ftp_server",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "20.79.218.75",
    "id": "svc:20.79.218.75:21/tcp",
    "login_disabled": null,
@@ -7471,6 +7544,7 @@
    "port": 21,
    "product": "Wing FTP Server",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ftp",
    "source": "nmap",
    "starttls": null,
@@ -7494,6 +7568,9 @@
     }
    ],
    "family": "fortissh",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "20.79.218.75",
    "id": "svc:20.79.218.75:22/tcp",
    "login_disabled": null,
@@ -7504,6 +7581,7 @@
    "port": 22,
    "product": "FortiSSH",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ssh",
    "source": "nmap",
    "starttls": null,
@@ -7527,6 +7605,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": "Apache",
+   "fp_title": "403 Forbidden",
    "host_ip": "20.79.218.75",
    "id": "svc:20.79.218.75:80/tcp",
    "login_disabled": null,
@@ -7537,6 +7618,7 @@
    "port": 80,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -7567,6 +7649,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": "Apache",
+   "fp_title": "403 Forbidden",
    "host_ip": "20.79.218.75",
    "id": "svc:20.79.218.75:443/tcp",
    "login_disabled": null,
@@ -7577,6 +7662,7 @@
    "port": 443,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -7600,6 +7686,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "20.79.218.75",
    "id": "svc:20.79.218.75:8443/tcp",
    "login_disabled": null,
@@ -7610,6 +7699,7 @@
    "port": 8443,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "https-alt",
    "source": "nmap",
    "starttls": null,
@@ -7640,6 +7730,9 @@
     }
    ],
    "family": "proftpd",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "213.133.104.51",
    "id": "svc:213.133.104.51:21/tcp",
    "login_disabled": null,
@@ -7650,6 +7743,7 @@
    "port": 21,
    "product": "ProFTPD",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ftp",
    "source": "nmap",
    "starttls": null,
@@ -7673,6 +7767,9 @@
     }
    ],
    "family": "proftpd_sftp",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "213.133.104.51",
    "id": "svc:213.133.104.51:22/tcp",
    "login_disabled": null,
@@ -7683,6 +7780,7 @@
    "port": 22,
    "product": "ProFTPD mod_sftp",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ssh",
    "source": "nmap",
    "starttls": null,
@@ -7706,6 +7804,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "404 Not Found",
    "host_ip": "213.133.104.51",
    "id": "svc:213.133.104.51:80/tcp",
    "login_disabled": null,
@@ -7716,6 +7817,7 @@
    "port": 80,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -7760,6 +7862,9 @@
     }
    ],
    "family": "courier",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "213.133.104.51",
    "id": "svc:213.133.104.51:110/tcp",
    "login_disabled": null,
@@ -7770,6 +7875,7 @@
    "port": 110,
    "product": "Courier pop3d",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "pop3",
    "source": "nmap",
    "starttls": true,
@@ -7822,6 +7928,9 @@
     }
    ],
    "family": "dovecot",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "213.133.104.51",
    "id": "svc:213.133.104.51:143/tcp",
    "login_disabled": true,
@@ -7832,6 +7941,7 @@
    "port": 143,
    "product": "Dovecot imapd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "imap",
    "source": "nmap",
    "starttls": true,
@@ -7855,6 +7965,9 @@
     }
    ],
    "family": "openssh",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "213.133.104.51",
    "id": "svc:213.133.104.51:222/tcp",
    "login_disabled": null,
@@ -7865,6 +7978,7 @@
    "port": 222,
    "product": "OpenSSH",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ssh",
    "source": "nmap",
    "starttls": null,
@@ -7895,6 +8009,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "404 Not Found",
    "host_ip": "213.133.104.51",
    "id": "svc:213.133.104.51:443/tcp",
    "login_disabled": null,
@@ -7905,6 +8022,7 @@
    "port": 443,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -7953,6 +8071,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "213.133.104.51",
    "id": "svc:213.133.104.51:465/tcp",
    "login_disabled": null,
@@ -7963,6 +8084,7 @@
    "port": 465,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": false,
@@ -8008,6 +8130,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "213.133.104.51",
    "id": "svc:213.133.104.51:587/tcp",
    "login_disabled": true,
@@ -8018,6 +8143,7 @@
    "port": 587,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": true,
@@ -8071,6 +8197,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "213.133.104.51",
    "id": "svc:213.133.104.51:993/tcp",
    "login_disabled": false,
@@ -8081,6 +8210,7 @@
    "port": 993,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "imaps",
    "source": "nmap",
    "starttls": false,
@@ -8127,6 +8257,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "213.133.104.51",
    "id": "svc:213.133.104.51:995/tcp",
    "login_disabled": null,
@@ -8137,6 +8270,7 @@
    "port": 995,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "pop3s",
    "source": "nmap",
    "starttls": false,
@@ -8160,6 +8294,9 @@
     }
    ],
    "family": "vercel",
+   "fp_login": null,
+   "fp_server": "Vercel",
+   "fp_title": null,
    "host_ip": "216.150.1.65",
    "id": "svc:216.150.1.65:80/tcp",
    "login_disabled": null,
@@ -8170,6 +8307,7 @@
    "port": 80,
    "product": "Vercel",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -8199,6 +8337,9 @@
     }
    ],
    "family": "vercel",
+   "fp_login": null,
+   "fp_server": "Vercel",
+   "fp_title": null,
    "host_ip": "216.150.1.65",
    "id": "svc:216.150.1.65:443/tcp",
    "login_disabled": null,
@@ -8209,6 +8350,7 @@
    "port": 443,
    "product": "Vercel",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "https",
    "source": "nmap",
    "starttls": null,
@@ -8232,6 +8374,9 @@
     }
    ],
    "family": "nginx",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "404 Not Found",
    "host_ip": "217.72.203.132",
    "id": "svc:217.72.203.132:80/tcp",
    "login_disabled": null,
@@ -8242,6 +8387,7 @@
    "port": 80,
    "product": "nginx",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -8271,6 +8417,9 @@
     }
    ],
    "family": "nginx",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "404 Not Found",
    "host_ip": "217.72.203.132",
    "id": "svc:217.72.203.132:443/tcp",
    "login_disabled": null,
@@ -8281,6 +8430,7 @@
    "port": 443,
    "product": "nginx",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -8346,9 +8496,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:53:30Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8388,9 +8540,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:53:30Z",
    "product": "FortiSSH",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8425,9 +8579,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:53:45Z",
    "product": "Java/Servlet",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8467,9 +8623,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:53:30Z",
    "product": "Wing FTP Server",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8510,9 +8668,11 @@
    "note": null,
    "observed_at": "2026-09-23T20:21:14Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8553,9 +8713,11 @@
    "note": null,
    "observed_at": "2026-09-23T20:21:14Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8611,9 +8773,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:55:52Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8653,9 +8817,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:55:52Z",
    "product": "Courier",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8695,9 +8861,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:55:52Z",
    "product": "Dovecot",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8732,9 +8900,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:56:40Z",
    "product": "Java/Servlet",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8774,9 +8944,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:55:52Z",
    "product": "OpenSSH",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "9.2p1",
    "version_raw": "9.2p1",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8816,9 +8988,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:55:52Z",
    "product": "ProFTPD",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8858,9 +9032,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:55:52Z",
    "product": "ProFTPD mod_sftp",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8895,9 +9071,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:54:50Z",
    "product": "Facebook Pixel",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8932,9 +9110,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:54:50Z",
    "product": "Google Tag Manager",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -8984,9 +9164,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:54:37Z",
    "product": "Vercel",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9027,9 +9209,11 @@
    "note": null,
    "observed_at": "2026-09-23T20:24:19Z",
    "product": "Vercel",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9064,9 +9248,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:53:24Z",
    "product": "Google Tag Manager",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9106,9 +9292,11 @@
    "note": null,
    "observed_at": "2026-09-23T20:39:35Z",
    "product": "NEOS",
+   "release_date": null,
    "source": "cms_fingerprint",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9143,9 +9331,11 @@
    "note": null,
    "observed_at": "2026-09-23T20:08:00Z",
    "product": "Neos CMS",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9182,9 +9372,11 @@
    "note": "Versionsangabe nicht numerisch",
    "observed_at": "2026-09-23T20:08:00Z",
    "product": "Neos Flow",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": "neos",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9234,9 +9426,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:53:16Z",
    "product": "nginx",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9271,9 +9465,11 @@
    "note": null,
    "observed_at": "2026-09-23T20:08:00Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9308,9 +9504,11 @@
    "note": null,
    "observed_at": "2026-09-23T20:08:00Z",
    "product": "Neos CMS",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9335,19 +9533,21 @@
      "tool": "httpx"
     }
    ],
-   "family": "neos_flow_neos",
+   "family": "neos_flow",
    "fqdn": "www.heuel.com",
    "hints": [],
    "host_ip": "217.72.203.132",
-   "id": "sw:217.72.203.132:www.heuel.com:neos_flow_neos:unknown",
+   "id": "sw:217.72.203.132:www.heuel.com:neos_flow:unknown",
    "kind": "component",
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T20:08:00Z",
-   "product": "Neos Flow:neos",
+   "product": "Neos Flow",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9382,9 +9582,11 @@
    "note": null,
    "observed_at": "2026-09-23T20:08:00Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9419,9 +9621,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:55:40Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9456,9 +9660,11 @@
    "note": null,
    "observed_at": "2026-09-23T19:55:40Z",
    "product": "Java/Servlet",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   }
  ],
