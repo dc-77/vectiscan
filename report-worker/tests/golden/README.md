@@ -408,6 +408,11 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
     `NEG-MAIL-PLAINTEXT` zaehlt nur noch Auftraege, deren Dienste die Anmeldung vor TLS
     sperren (2 statt 4: securess und bergersysteme bieten die Anmeldung vor STARTTLS an,
     spec/08 Punkt 4).
+  - Seitenerwartung (`render/expected-pages.json`, ops-update-pages in der MR-Pipeline
+    3208): Scan-Runde 1fbc92b9 22->24, 31d67a02 26->28, 3cf01f8d 19->21, 68d59573 25->23,
+    die uebrigen drei unveraendert; castenow-Vorlaeufe 4e6b6883 46->45,
+    f77ccff2 46->44. Halbleer vor einem Kapitelanfang bleiben 2d2d4f39 Seite 28 (vorher 27)
+    und neu 4e6b6883 Seite 27, f77ccff2 nicht mehr (Merkposten S7, wie in S6b-1).
 
 ## Abgleich spec/09 nach S6b-2
 
