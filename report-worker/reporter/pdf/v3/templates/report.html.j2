@@ -128,8 +128,11 @@ tr{break-inside:avoid;}
 .shots .cap{font-size:7.6pt;color:var(--muted);line-height:1.3;margin-top:1mm;}
 .shots .cap b{color:var(--navy);font-weight:600;}
 /* ---- Landscape ---- */
+/* S6b-1 Nachtrag 3: ein langer Block (mehr als CAT_KEEP Zeilen) darf nach der Kopfzeile
+   umbrechen; sonst liess er die Seite davor halb leer (f77ccff2 Seite 11). */
 .cat{margin:0 0 4mm;break-inside:avoid;}
-.cat .h{display:flex;align-items:center;gap:2.5mm;border-bottom:0.6pt solid var(--line2);padding-bottom:1.2mm;margin-bottom:1.5mm;}
+.cat.lang{break-inside:auto;}
+.cat .h{display:flex;align-items:center;gap:2.5mm;border-bottom:0.6pt solid var(--line2);padding-bottom:1.2mm;margin-bottom:1.5mm;break-inside:avoid;break-after:avoid;}
 .cat .h .k{font-size:8pt;font-weight:700;letter-spacing:0.12em;color:var(--cyan-deep);}
 .cat .h .nm{font-size:10pt;font-weight:600;color:var(--navy);flex:1;}
 .cat .h .ct{font-size:8pt;color:var(--muted);}
@@ -317,11 +320,11 @@ tr{break-inside:avoid;}
  <p class="lead">{{ landscape_lead }}</p>
  {% for c in g.categories %}
  {% set fs = findings|selectattr('cat','equalto',c.key)|list %}
- <div class="cat"><div class="h"><span class="k">KATEGORIE {{ c.key }}</span><span class="nm">{{ c.name }}</span><span class="pill p-{{ c.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU','gruen':'GRÜN'}[c.status] }}</span><span class="ct">{{ fs|length }} Befund{{ 'e' if fs|length != 1 else '' }}</span></div>
+ <div class="cat{% if fs|length > cat_keep %} lang{% endif %}"><div class="h"><span class="k">KATEGORIE {{ c.key }}</span><span class="nm">{{ c.name }}</span><span class="pill p-{{ c.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU','gruen':'GRÜN'}[c.status] }}</span><span class="ct">{{ fs|length }} Befund{{ 'e' if fs|length != 1 else '' }}</span></div>
   <table><colgroup><col style="width:24mm"><col style="width:22mm"><col style="width:122mm"></colgroup>{% for f in fs %}<tr><td class="mono">{{ f.id }}</td><td><span class="pill p-{{ f.status }}">{{ f.urgency }}</span></td><td>{{ f.title }}</td></tr>{% endfor %}</table>
  </div>
  {% endfor %}
- <div class="cat"><div class="h"><span class="k">POSITIV</span><span class="nm">Wirksame Schutzmaßnahmen</span><span class="pill p-gruen">GRÜN</span><span class="ct">{{ positives|length }} Feststellungen</span></div>
+ <div class="cat{% if positives|length > cat_keep %} lang{% endif %}"><div class="h"><span class="k">POSITIV</span><span class="nm">Wirksame Schutzmaßnahmen</span><span class="pill p-gruen">GRÜN</span><span class="ct">{{ positives|length }} Feststellungen</span></div>
   <table><colgroup><col style="width:24mm"><col style="width:144mm"></colgroup>{% for p in positives %}<tr><td><span class="dot d-gruen"></span><span class="small">Kat. {{ p.cat }}</span></td><td><b>{{ p.title }}</b><br><span class="small">{{ p.text }}</span></td></tr>{% endfor %}</table>
  </div>
 </section>

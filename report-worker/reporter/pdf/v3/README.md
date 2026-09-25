@@ -116,6 +116,15 @@ Warnung, die Golden-Suite als Fehler. Die Vorlage haelt Kicker, Ueberschrift und
 Tabellenkopf zusammen (`break-after: avoid`, `<thead>`), der Block Anhang D bis F steht
 ohne erzwungenen Umbruch davor.
 
+Seit Nachtrag 3 (Entscheidung DC 25.09.) nennt die Pruefung je halbleerer Seite die
+Ursache (`RenderResult.sparse_causes`, Warnung und Ausgabe von `--update-pages`): den
+freien Rest in mm und womit die Folgeseite beginnt, einen nicht umbrechbaren Block mit
+Name und Hoehe, einen Kapitelanfang mit erzwungenem Seitenwechsel oder umbrechbaren
+Inhalt. Regel: ist es ein einzelner Block, darf er nach seiner Kopfzeile umbrechen
+(Kategorieblock in Kapitel 4 ab mehr als `CAT_KEEP` Zeilen, f77ccff2 Seite 11); vor
+einem Kapitelanfang bleibt die Luecke stehen und ist ein Merkposten fuer S7 (1f8bc977
+Seite 25, 2d2d4f39 Seite 27, je 165 mm frei).
+
 Neu festschreiben nach einer gewollten Aenderung:
 
 ```bash
