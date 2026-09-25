@@ -359,6 +359,17 @@ def test_recherche_kurzname_ist_nur_vorschlag(quelle, erwartet):
     assert data.meta.customer_short == erwartet
 
 
+def test_prosa_bekommt_den_wirksamen_kurznamen():
+    # Produktion 31d67a02: die Prosa-KI schrieb "Junkerwerk Linder GmbH + Co. betreibt ...",
+    # weil sie den gespeicherten Recherche-Vorschlag aus dem Kontext las.
+    kontext = {"firmenname": "Junkerwerk Linder GmbH + Co. KG", "kurzname": "Junkerwerk Linder GmbH + Co.",
+               "sources": {"kurzname": {"source": "recherche"}}}
+    data = data_for(JW, customer_context=kontext)
+    payload = build_payload(data, kontext)
+    assert payload["kunde"]["kurzname"] == "Junkerwerk Linder"
+    assert payload["kunde"]["firmenname"] == "Junkerwerk Linder GmbH + Co. KG"
+
+
 def test_netzbetreiber_nie_als_kundenname():
     data = data_for(BS)
     assert data.meta.customer_short != "Berger EDV-Systemberatungs"

@@ -84,6 +84,20 @@ inhaltlich unverändert."""
 
 # ---------------------------------------------------------------- Eingabe
 
+def _kunde(data: ReportData, customer_context: dict[str, Any] | None) -> dict[str, Any]:
+    """Kundenkontext fuer die KI; ein gespeicherter Kurzname wird der wirksame.
+
+    S6b-1 (spec/09 Q15): aeltere Laeufe haben den Recherche-Vorschlag mit der alten
+    Rechtsformliste gespeichert ("Junkerwerk Linder GmbH + Co."), und die KI schrieb
+    ihn in den Text. Ohne gespeicherten Kurznamen bleibt die Nutzlast unveraendert,
+    damit der Prosa-Cache der uebrigen Auftraege gilt.
+    """
+    kunde = dict(customer_context or {})
+    if kunde.get("kurzname"):
+        kunde["kurzname"] = data.meta.customer_short
+    return kunde
+
+
 def build_payload(data: ReportData, customer_context: dict[str, Any] | None = None) -> dict:
     """Fertige Befunde und Fakten als JSON. Keine Rohdaten, keine Werkzeugausgaben."""
     return {
@@ -96,7 +110,7 @@ def build_payload(data: ReportData, customer_context: dict[str, Any] | None = No
             "befunde": data.meta.consolidated,
             "positive": data.meta.positives,
         },
-        "kunde": dict(customer_context or {}),
+        "kunde": _kunde(data, customer_context),
         "kategorien": [
             {"schluessel": c.key, "name": c.name, "status": c.status, "hinweis": c.note}
             for c in data.glance.categories
