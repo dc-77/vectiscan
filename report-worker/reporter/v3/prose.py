@@ -65,6 +65,10 @@ Harte Regeln:
 - Deutsch, Sie-Form, echte Umlaute, keine Gedankenstriche, keine Aufzählungszeichen.
 - Keine Zusagen zu Vollständigkeit, kein Hinweis auf Werkzeuge oder Sprachmodelle.
 - Keine Aufwände, keine Kosten, keine Fristen außer denen aus der Eingabe.
+- Schreibe einem System nur die Rollen zu, die unter "systeme" mit Beleg stehen. Nenne
+  keine Aufgabe (E-Mail, Kalender, Datenbank, Fernzugang, Passwortverwaltung,
+  Zusammenarbeit, Webmail, Anmeldung), die dort nicht steht.
+- "netzbetreiber" ist der Betreiber des Netzes laut Reputationsquelle, nie der Kunde.
 
 Antworte ausschließlich mit einem JSON-Objekt dieser Form:
 {"overall_text": "...", "implication": "...",
@@ -97,9 +101,13 @@ def build_payload(data: ReportData, customer_context: dict[str, Any] | None = No
             {"schluessel": c.key, "name": c.name, "status": c.status, "hinweis": c.note}
             for c in data.glance.categories
         ],
-        "systeme": [{"system": o.system, "bedeutung": o.meaning} for o in data.business.observed],
+        # S6b-1 (spec/09 Q2): nur Systeme mit belegter Rolle, dazu die Belege. Ein System
+        # ohne Rolle bekommt keinen KI-Satz; dort bleibt der Katalogtext stehen.
+        "systeme": [{"system": o.system, "bedeutung": o.meaning, "belege": list(o.evidence)}
+                    for o in data.business.observed if o.role_keys],
+        # S6b-1 (spec/09 Q15): AbuseIPDB nennt den Netzbetreiber, nie den Kunden.
         "hosts": [
-            {"ip": h.ip, "hostnamen": h.fqdns, "betreiber": h.operator, "rolle": h.role,
+            {"ip": h.ip, "hostnamen": h.fqdns, "netzbetreiber": h.operator, "rolle": h.role,
              "abdeckung": h.cov}
             for h in data.scope.hosts
         ],
@@ -205,36 +213,51 @@ def apply_prose(data: ReportData, fields: dict[str, Any],
     """Uebernimmt die Felder, die das Gate passieren. Liefert die abgelehnten."""
     haystack = gate.corpus(payload if payload is not None else build_payload(data))
     rejected: list[str] = []
+    # S6b-1 (spec/09 Q2): ein Satz ueber eine Rolle ohne Fakt faellt durch. Je Feld gilt
+    # der deterministische Text als Bezug: was dort schon steht, ist keine neue Aussage.
+    alle_rollen = {k for o in data.business.observed for k in o.role_keys}
+    # Was ein Befund des Berichts selbst nennt ("Datenbankdienst erreichbar"), ist belegt.
+    befundtexte = " ".join(f"{f.title} {f.found}" for f in data.findings)
 
-    def accept(name: str, text: Any) -> Optional[str]:
+    def accept(name: str, text: Any, *, rollen: set[str] | None = None,
+               bezug: str = "") -> Optional[str]:
         if not isinstance(text, str):
             return None
-        verdict = gate.check_field(name, text.strip(), haystack)
+        verdict = gate.check_field(name, text.strip(), haystack,
+                                   role_keys=alle_rollen if rollen is None else rollen,
+                                   reference=bezug)
         if verdict.ok:
             return text.strip()
         log.warning("report_prose_rejected", field=name, reasons=verdict.reasons)
         rejected.append(f"{name}: {'; '.join(verdict.reasons)}")
         return None
 
-    value = accept("overall_text", fields.get("overall_text"))
+    value = accept("overall_text", fields.get("overall_text"),
+                   bezug=f"{data.glance.overall_text} {befundtexte}")
     if value:
         data.glance.overall_text = value
 
-    value = accept("implication", fields.get("implication"))
+    value = accept("implication", fields.get("implication"),
+                   bezug=f"{data.business.implication} {befundtexte}")
     if value:
         data.business.implication = value
 
     observed = fields.get("observed") or {}
     if isinstance(observed, dict):
         for entry in data.business.observed:
-            value = accept(f"observed[{entry.system}]", observed.get(entry.system))
+            if not entry.role_keys:
+                # Ohne belegte Rolle stand das System nicht in der Eingabe.
+                continue
+            value = accept(f"observed[{entry.system}]", observed.get(entry.system),
+                           rollen=set(entry.role_keys), bezug=f"{entry.system} {entry.meaning}")
             if value:
                 entry.meaning = value
 
     impact = fields.get("impact") or {}
     if isinstance(impact, dict):
         for finding in data.findings:
-            value = accept(f"impact[{finding.id}]", impact.get(finding.id))
+            value = accept(f"impact[{finding.id}]", impact.get(finding.id),
+                           bezug=f"{finding.title} {finding.found} {finding.impact}")
             if value:
                 finding.impact = value
 

@@ -28,6 +28,14 @@ Historie:
   bisher pauschal ``webtech``, auch wenn webtech nichts lieferte. Die Familie wird
   nie ueber Namensgrenzen vergeben (``jQuery Migrate`` ist ``jquery_migrate``, nicht
   ``jquery``). Kein Feld geaendert, Bedeutung praeziser; Golden-Facts neu gebaut.
+- 1.0.6 (S6b-1, spec/09 Q3, Q9, Q10, Q15, Q16, E4, E5, Issue #33): neue optionale
+  Felder ``FqdnFact.cname`` (dnsx), ``Spf.mechanisms``, ``PassiveFact.service``
+  (Shodan-Modul), ``HostFact.shared`` (geteiltes System), ``HostFact.third_party``
+  (Drittanbieter), ``HostFact.reach`` (vom Pruefstand aus erreichbar?),
+  ``TlsFact.assigned_from`` und ``Facts.context`` (Kundenkontext mit Quelle je Feld).
+  nmap ohne offenen Port ist ``empty`` statt ``ok``. Softwarefakten eines VHosts mit
+  Weiterleitung auf einen anderen Host gehoeren diesem Host; OWA-Builds aus
+  Spider-URLs nur fuer den Host im Namen der URL.
 """
 from __future__ import annotations
 
@@ -35,7 +43,7 @@ from typing import Any, ClassVar, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-FACTS_SCHEMA_VERSION = "1.0.5"
+FACTS_SCHEMA_VERSION = "1.0.6"
 
 Mode = Literal["active", "passive"]
 
@@ -149,6 +157,50 @@ class Reputation(Base):
     greynoise_classification: Optional[str] = None
 
 
+SharedKind = Literal["hoster", "platform"]
+ReachStatus = Literal["no_open_ports", "unreachable_from_scanner", "no_ipv6_route"]
+
+
+class SharedSystem(Base):
+    """Fakt "geteiltes System" (spec/09 Q3, S6b-1).
+
+    ``platform``: ein Name des Kunden zeigt per CNAME auf eine fremde Domain (SaaS,
+    Baukasten, CDN) oder der Scanner hat den Host als CDN-Kante erkannt. ``hoster``:
+    auf der Adresse liegen fremde Namen (Zertifikat, Shodan), das rDNS gehoert dem
+    Betreiber und die Adresse ist kein eigener Anschluss des Kunden. ``signals`` sind
+    Codes, ``evidence`` die woertlichen Belege.
+    """
+    kind: SharedKind
+    operator: Optional[str] = None
+    foreign_names: list[str] = Field(default_factory=list)
+    signals: list[str] = Field(default_factory=list)
+    evidence: list[Evidence] = Field(default_factory=list)
+
+
+class ThirdParty(Base):
+    """Drittanbieter-Adresse: der Scanner hat sie begruendet uebersprungen
+    (``ai_host_skip``) und jeder Kundenname darauf zeigt per CNAME auf eine fremde
+    Domain. Zaehlt nicht als Host des Kunden (spec/09 Teil 2, S6b-1)."""
+    operator: Optional[str] = None
+    reason: str = "ai_host_skip_cname"
+    evidence: list[Evidence] = Field(default_factory=list)
+
+
+class Reach(Base):
+    """Erreichbarkeit vom Pruefstand aus (spec/09 Q9, E4).
+
+    ``no_open_ports``: nmap lief, fand aber keinen offenen Port. Dann liegt kein
+    Messergebnis vor, und die Abwesenheit eines Dienstes ist nicht belegt.
+    ``unreachable_from_scanner``: zusaetzlich meldet eine Passivquelle, die hoechstens
+    sieben Tage vor dem Scanende gesehen wurde, Dienste auf dieser Adresse.
+    ``no_ipv6_route``: der Pruefstand hatte keine IPv6-Verbindung.
+    """
+    status: ReachStatus
+    passive_ports: list[int] = Field(default_factory=list)
+    passive_seen_at: Optional[str] = None
+    passive_source: Optional[str] = None
+
+
 class HostFact(Fact):
     ip: str
     family: Literal[4, 6]
@@ -162,6 +214,9 @@ class HostFact(Fact):
     edge_ips: list[str] = Field(default_factory=list)
     reputation: Optional[Reputation] = None
     fqdns: list[str] = Field(default_factory=list)
+    shared: Optional[SharedSystem] = None
+    third_party: Optional[ThirdParty] = None
+    reach: Optional[Reach] = None
 
 
 class Alias(Base):
@@ -192,6 +247,8 @@ class FqdnFact(Fact):
     screenshot_key: Optional[str] = None
     web_probe_reachable: Optional[bool] = None
     waf: Optional[Waf] = None
+    # S6b-1 (spec/09 Q3): CNAME-Kette aus der dnsx-Aufloesung, erstes Ziel zuerst.
+    cname: list[str] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------- service / tls
@@ -283,6 +340,10 @@ class TlsFact(Fact):
     grade: Optional[str] = None
     entries: list[TlsEntry] = Field(default_factory=list)
     json_filtered: bool = False
+    # S6b-1 (spec/09 Q10): Protokolle, Verfahren und Schwachstellen stammen aus dem
+    # testssl-Lauf desselben IP:Port mit anderem Namen, dessen Zertifikat diesen Namen
+    # abdeckt. Wert ist "<gepruefter Name>:<Port>".
+    assigned_from: Optional[str] = None
 
 
 # ---------------------------------------------------------------- http
@@ -363,9 +424,19 @@ class HttpFact(Fact):
 
 # ---------------------------------------------------------------- dns
 
+class SpfMechanism(Base):
+    """Ein Mechanismus des SPF-Eintrags (``ip4:85.22.176.0/24``, ``a``, ``a:mail.x.de``,
+    ``mx``, ``include:...``, ``redirect=...``). ``value`` ist leer bei ``a`` und ``mx``
+    ohne Namen."""
+    qualifier: str = "+"
+    kind: str
+    value: Optional[str] = None
+
+
 class Spf(Base):
     raw: str
     all_qualifier: Optional[str] = None
+    mechanisms: list[SpfMechanism] = Field(default_factory=list)
 
 
 class Dmarc(Base):
@@ -484,6 +555,8 @@ class PassiveFact(Fact):
     domain: Optional[str] = None
     port: Optional[int] = None
     transport: Optional[str] = None
+    # S6b-1 (E5): Dienstname laut Passivquelle (Shodan-Modul ``smtp``, ``https`` ...).
+    service: Optional[str] = None
     product: Optional[str] = None
     version: Optional[str] = None
     banner_excerpt: Optional[str] = None
@@ -561,6 +634,32 @@ class DecisionFact(Fact):
     note: Optional[str] = None
 
 
+ContextSource = Literal["kunde", "recherche", "admin"]
+
+
+class ContextField(Base):
+    """Ein Feld des Kundenkontexts mit Herkunft (spec/09 Q15)."""
+    name: str
+    value: str
+    source: Optional[ContextSource] = None
+    url: Optional[str] = None
+
+
+class ContextSystem(Base):
+    fqdn: str
+    zweck: str
+
+
+class CustomerContext(Base):
+    """Kundenkontext der Order, wie er in den Bericht eingeht. Kein Werkzeugfakt:
+    er steht hier, damit im Nachhinein pruefbar ist, woher Firmenname, Kurzname,
+    Branche und Mitarbeiterzahl stammen (Kunde, Recherche oder Admin)."""
+    fields: list[ContextField] = Field(default_factory=list)
+    systeme: list[ContextSystem] = Field(default_factory=list)
+    systeme_source: Optional[ContextSource] = None
+    systeme_url: Optional[str] = None
+
+
 class GeneratorInput(Base):
     kind: str
     name: str
@@ -591,6 +690,7 @@ class Facts(Base):
     unprocessed: list[UnprocessedFact] = Field(default_factory=list)
     decisions: list[DecisionFact] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
+    context: Optional[CustomerContext] = None
 
     ENTITY_FIELDS: ClassVar[tuple[str, ...]] = (
         "targets", "hosts", "fqdns", "services", "tls", "http", "dns", "software",

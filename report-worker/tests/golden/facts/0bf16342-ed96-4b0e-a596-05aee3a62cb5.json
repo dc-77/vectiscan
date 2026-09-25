@@ -1,4 +1,5 @@
 {
+ "context": null,
  "coverage": [
   {
    "confidence": 0.8,
@@ -741,7 +742,7 @@
    "reason": "no_open_ports",
    "scope": "host",
    "source": "scan_results",
-   "status": "ok",
+   "status": "empty",
    "tool": "nmap"
   },
   {
@@ -3796,6 +3797,33 @@
    "source": "dns_records",
    "spf": {
     "all_qualifier": "~all",
+    "mechanisms": [
+     {
+      "kind": "a",
+      "qualifier": "+",
+      "value": null
+     },
+     {
+      "kind": "mx",
+      "qualifier": "+",
+      "value": null
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "217.243.248.28"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.protection.outlook.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.hornetsecurity.com"
+     }
+    ],
     "raw": "v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all"
    },
    "tls_rpt": {
@@ -3816,6 +3844,9 @@
   {
    "aliases": [],
    "body_hash": "ac1bdc68ee9f81dbdc5b90fa5bdd03c3c19ea0f9f7ab62b39a3a4ac7bb29fb0a",
+   "cname": [
+    "outlook.junkerwerk.de"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3862,6 +3893,7 @@
     }
    ],
    "body_hash": "557b5e9015b4963a130c7039e077b3ec0306d401b6ee13d631721d5d969d2917",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3892,6 +3924,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3918,6 +3951,7 @@
   {
    "aliases": [],
    "body_hash": "cec01d121c42a98915a96794761c7a45cec8fd525ad176178b1a50c4d63ddc58",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3948,6 +3982,7 @@
   {
    "aliases": [],
    "body_hash": "1c7411fd3cf1caddd079022a5352368555fcb0b5417edcd5ff49ef2b38940de9",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3974,6 +4009,7 @@
   {
    "aliases": [],
    "body_hash": "1c7411fd3cf1caddd079022a5352368555fcb0b5417edcd5ff49ef2b38940de9",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4000,6 +4036,7 @@
   {
    "aliases": [],
    "body_hash": "66de10c312faf09835072ee2758f02bc5355fb8ebfff736e9cffe5f556b20ba4",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4030,6 +4067,7 @@
   {
    "aliases": [],
    "body_hash": "06ba3eb59b7465221a30c273cd94360619f7ebd014aed96ee5f76a77c014c5a4",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4060,6 +4098,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4086,6 +4125,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4112,6 +4152,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4138,6 +4179,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4170,6 +4212,7 @@
     }
    ],
    "body_hash": "2434c244a701938f40ebac3af041260fbb42fc056d2c4c3c380800fd7ec76781",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4258,6 +4301,7 @@
     "isp": "Hetzner Online AG - Rechenzentrum Haustechnik",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4267,7 +4311,51 @@
     "urlhaus_compromised": null
    },
    "reverse": "dedi2230.your-server.de",
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "Shodan-Hostnamen 2a01:4f8:d0a:3124::2: dedi2230.your-server.de, erbbauverein.de, www.erbbauverein.de",
+      "ref": "phase0a/shodan_hosts.json",
+      "tool": "shodan"
+     },
+     {
+      "excerpt": "Shodan-Hostnamen 188.40.3.130: dedi2230.your-server.de, junkerwerk.com, www.junkerwerk.com, your-server.de",
+      "ref": "phase0a/shodan_hosts.json",
+      "tool": "shodan"
+     },
+     {
+      "excerpt": "Zertifikat 188.40.3.130:3306: *.your-server.de, *.your-database.de, *.your-server.de",
+      "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+      "tool": "nmap"
+     },
+     {
+      "excerpt": "rDNS dedi2230.your-server.de",
+      "ref": "phase0/host_inventory.json",
+      "tool": "host_inventory"
+     },
+     {
+      "excerpt": "Nutzungsart content delivery network, data center/web hosting/transit",
+      "ref": "phase0a/abuseipdb.json",
+      "tool": "abuseipdb"
+     }
+    ],
+    "foreign_names": [
+     "erbbauverein.de",
+     "junkerwerk.com",
+     "www.erbbauverein.de",
+     "www.junkerwerk.com",
+     "your-database.de"
+    ],
+    "kind": "hoster",
+    "operator": "Hetzner Online AG",
+    "signals": [
+     "fremde_namen_shodan",
+     "fremde_namen_zertifikat",
+     "rdns_betreiber"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4309,6 +4397,12 @@
     "isp": "Junkerwerk Linder GmbH & Co.",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": {
+    "passive_ports": [],
+    "passive_seen_at": null,
+    "passive_source": null,
+    "status": "no_open_ports"
+   },
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4318,7 +4412,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4362,6 +4458,7 @@
     "isp": "Junkerwerk Linder GmbH & Co.",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4371,7 +4468,9 @@
     "urlhaus_compromised": null
    },
    "reverse": "junkerwerk-solingen.de",
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4416,6 +4515,7 @@
     "isp": "Junkerwerk Linder GmbH & Co.",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4425,7 +4525,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4467,6 +4569,7 @@
     "isp": "Junkerwerk Linder GmbH & Co.",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4476,7 +4579,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4518,6 +4623,12 @@
     "isp": "Hetzner Online GmbH",
     "usage_type": "Content Delivery Network"
    },
+   "reach": {
+    "passive_ports": [],
+    "passive_seen_at": null,
+    "passive_source": null,
+    "status": "no_ipv6_route"
+   },
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4527,7 +4638,51 @@
     "urlhaus_compromised": null
    },
    "reverse": "dedi2230.your-server.de",
-   "source": "host_inventory"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "Shodan-Hostnamen 2a01:4f8:d0a:3124::2: dedi2230.your-server.de, erbbauverein.de, www.erbbauverein.de",
+      "ref": "phase0a/shodan_hosts.json",
+      "tool": "shodan"
+     },
+     {
+      "excerpt": "Shodan-Hostnamen 188.40.3.130: dedi2230.your-server.de, junkerwerk.com, www.junkerwerk.com, your-server.de",
+      "ref": "phase0a/shodan_hosts.json",
+      "tool": "shodan"
+     },
+     {
+      "excerpt": "Zertifikat 188.40.3.130:3306: *.your-server.de, *.your-database.de, *.your-server.de",
+      "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+      "tool": "nmap"
+     },
+     {
+      "excerpt": "rDNS dedi2230.your-server.de",
+      "ref": "phase0/host_inventory.json",
+      "tool": "host_inventory"
+     },
+     {
+      "excerpt": "Nutzungsart content delivery network, data center/web hosting/transit",
+      "ref": "phase0a/abuseipdb.json",
+      "tool": "abuseipdb"
+     }
+    ],
+    "foreign_names": [
+     "erbbauverein.de",
+     "junkerwerk.com",
+     "www.erbbauverein.de",
+     "www.junkerwerk.com",
+     "your-database.de"
+    ],
+    "kind": "hoster",
+    "operator": "Hetzner Online AG",
+    "signals": [
+     "fremde_namen_shodan",
+     "fremde_namen_zertifikat",
+     "rdns_betreiber"
+    ]
+   },
+   "source": "host_inventory",
+   "third_party": null
   }
  ],
  "http": [
@@ -5933,6 +6088,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -5973,6 +6129,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "securitytrails",
    "transport": null,
    "verified": null,
@@ -6003,6 +6160,7 @@
    "port": 21,
    "product": null,
    "seen_at": "2026-08-31T08:47:45Z",
+   "service": "ftp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6033,6 +6191,7 @@
    "port": 80,
    "product": "Apache httpd",
    "seen_at": "2026-08-31T08:47:45Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6063,6 +6222,7 @@
    "port": 110,
    "product": null,
    "seen_at": "2026-08-31T08:47:45Z",
+   "service": "pop3",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6093,6 +6253,7 @@
    "port": 143,
    "product": null,
    "seen_at": "2026-08-31T08:47:45Z",
+   "service": "imap",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6123,6 +6284,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-08-31T08:47:45Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6153,6 +6315,7 @@
    "port": 587,
    "product": null,
    "seen_at": "2026-08-31T08:47:45Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6183,6 +6346,7 @@
    "port": 993,
    "product": null,
    "seen_at": "2026-08-31T08:47:45Z",
+   "service": "imap-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6213,6 +6377,7 @@
    "port": 995,
    "product": null,
    "seen_at": "2026-08-31T08:47:45Z",
+   "service": "pop3-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6243,6 +6408,7 @@
    "port": 3306,
    "product": "MariaDB",
    "seen_at": "2026-08-31T08:47:45Z",
+   "service": "mysql",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6273,6 +6439,7 @@
    "port": 5432,
    "product": "PostgreSQL",
    "seen_at": "2026-08-31T08:47:45Z",
+   "service": "postgresql",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6301,6 +6468,7 @@
    "port": 25,
    "product": null,
    "seen_at": "2026-08-30T23:27:49Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -6329,6 +6497,7 @@
    "port": 4433,
    "product": "SonicWall",
    "seen_at": "2026-08-30T23:27:49Z",
+   "service": "https-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -6356,6 +6525,7 @@
    "port": 443,
    "product": "Microsoft IIS httpd",
    "seen_at": "2026-08-24T21:24:14Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6383,6 +6553,7 @@
    "port": 8443,
    "product": "Microsoft IIS httpd",
    "seen_at": "2026-08-24T21:24:14Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6410,6 +6581,7 @@
    "port": 25,
    "product": "Exim smtpd",
    "seen_at": "2026-08-31T00:28:05Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -6437,6 +6609,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-08-31T00:28:05Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6466,6 +6639,7 @@
    "port": 80,
    "product": "Apache httpd",
    "seen_at": "2026-08-31T11:22:04Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -6495,6 +6669,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-08-31T11:22:04Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -6522,6 +6697,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "urlhaus",
    "transport": null,
    "verified": null,
@@ -6606,7 +6782,7 @@
    }
   ]
  },
- "schema_version": "1.0.5",
+ "schema_version": "1.0.6",
  "services": [
   {
    "auth_mechanisms": [],
@@ -8731,43 +8907,6 @@
   },
   {
    "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/217.243.248.30/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "217.243.248.30",
-   "id": "sw:217.243.248.30:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-08-31T14:35:48Z",
-   "product": "HSTS",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
    "confidence": 1.0,
    "detection_sources": [
     "header_check",
@@ -8919,6 +9058,7 @@
  ],
  "tls": [
   {
+   "assigned_from": "outlook.junkerwerk.de:443",
    "cert": {
     "chain_ok": null,
     "cn": "*.junkerwerk.de",
@@ -8935,17 +9075,24 @@
     "self_signed": null,
     "wildcard": true
    },
-   "ciphers_weak": [],
+   "ciphers_weak": [
+    "cbc"
+   ],
    "confidence": 1.0,
    "entries": [],
    "evidence": [
+    {
+     "excerpt": "autodiscover.junkerwerk.de:443 geprüft über outlook.junkerwerk.de:443, dessen Zertifikat autodiscover.junkerwerk.de abdeckt; angeboten: TLS1.2, TLS1.3",
+     "ref": "scan_results:testssl:217.243.248.28",
+     "tool": "testssl"
+    },
     {
      "excerpt": "autodiscover.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de gueltig_bis=2026-12-11T23:59:59Z",
      "ref": "hosts/217.243.248.28/phase2/httpx.json",
      "tool": "httpx"
     }
    ],
-   "fallback_scsv": null,
+   "fallback_scsv": true,
    "fqdn": "autodiscover.junkerwerk.de",
    "grade": null,
    "host_ip": "217.243.248.28",
@@ -8956,17 +9103,23 @@
    "observed_at": "2026-08-31T14:37:46Z",
    "port": 443,
    "protocols": {
-    "SSLv2": null,
-    "SSLv3": null,
-    "TLS1.0": null,
-    "TLS1.1": null,
-    "TLS1.2": null,
+    "SSLv2": false,
+    "SSLv3": false,
+    "TLS1.0": false,
+    "TLS1.1": false,
+    "TLS1.2": true,
     "TLS1.3": true
    },
    "source": "httpx",
-   "vulns": []
+   "vulns": [
+    {
+     "name": "LUCKY13",
+     "status": "potential"
+    }
+   ]
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "*.junkerwerk.de",
@@ -9028,6 +9181,7 @@
    ]
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "*.junkerwerk.de",
@@ -9134,6 +9288,7 @@
    ]
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "*.junkerwerk.de",

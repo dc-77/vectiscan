@@ -10,22 +10,20 @@
    "checks": [
     "admin_service_exposed"
    ],
-   "spec09": "Q13, Q3",
+   "spec09": "Q13",
    "warum": "Plesk mit Anmeldung auf dem Plesk-Sammelserver 92.205.224.174 (auch dirak.de); nach E1 ein Hosting-Panel des Hosters, erhöht mit Empfehlung an den Hoster und als „beim Hoster“ gekennzeichnet."
   },
   "VS-2026-002": {
    "checks": [
     "admin_service_exposed_passive"
    ],
-   "spec09": "Q3, Q13",
+   "spec09": "Q13",
    "warum": "198.202.211.1 ist eine Cloudflare-Kante; 2083, 2087 und 8880 sind Cloudflare-Standardports, keine Verwaltungsoberfläche von www."
   },
   "VS-2026-003": {
    "checks": [
     "admin_service_exposed_passive"
-   ],
-   "spec09": "Q3",
-   "warum": "8880 auf dem Plesk-Sammelserver 92.205.224.174 (auch dirak.de) gehört zum Panel des Hosters."
+   ]
   },
   "VS-2026-004": {
    "checks": [
@@ -71,9 +69,7 @@
   "VS-2026-011": {
    "checks": [
     "ftp_plaintext"
-   ],
-   "spec09": "Q3",
-   "warum": "FTP auf dem Plesk-Sammelserver 92.205.224.174 ist ein Dienst des Hosters."
+   ]
   },
   "VS-2026-012": {
    "checks": [
@@ -90,9 +86,7 @@
   "VS-2026-014": {
    "checks": [
     "legacy_protocols_present"
-   ],
-   "spec09": "Q3",
-   "warum": "92.205.224.174 ist ein Plesk-Sammelserver (auch dirak.de); POP3, IMAP und FTP sind Dienste des Hosters, die der Kunde nicht abschalten kann."
+   ]
   },
   "VS-2026-015": {
    "checks": [
@@ -127,7 +121,7 @@
    "checks": [
     "service_banner_version"
    ],
-   "spec09": "Q4, Q3",
+   "spec09": "Q4",
    "warum": "Das SSH-Banner gehört zum Protokoll und lässt sich nicht entfernen. Dienst des Plesk-Sammelservers 92.205.224.174."
   },
   "VS-2026-021": {
@@ -193,74 +187,66 @@
   "VS-2026-P09": {
    "checks": [
     "db_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
-  },
-  "VS-2026-P10": {
-   "checks": [
-    "db_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
-  },
-  "VS-2026-P11": {
-   "checks": [
-    "db_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
-  },
-  "VS-2026-P12": {
-   "checks": [
-    "db_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
-  },
-  "VS-2026-P13": {
-   "checks": [
-    "db_exposed"
    ]
   },
-  "VS-2026-P14": {
+  "VS-2026-P10": {
    "checks": [
     "dkim_missing"
    ]
   },
-  "VS-2026-P15": {
+  "VS-2026-P11": {
    "checks": [
     "dmarc_missing"
    ]
   },
-  "VS-2026-P16": {
+  "VS-2026-P12": {
    "checks": [
     "dns_dangling_cname"
    ]
   },
-  "VS-2026-P17": {
+  "VS-2026-P13": {
    "checks": [
     "dns_zone_transfer"
    ]
   },
-  "VS-2026-P18": {
+  "VS-2026-P14": {
    "checks": [
     "hsts_missing"
    ]
   },
-  "VS-2026-P19": {
+  "VS-2026-P15": {
    "checks": [
     "hsts_short"
    ]
   },
-  "VS-2026-P20": {
+  "VS-2026-P16": {
    "checks": [
     "http_no_tls"
    ]
   },
-  "VS-2026-P21": {
+  "VS-2026-P17": {
    "checks": [
     "http_no_tls"
+   ]
+  },
+  "VS-2026-P18": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P19": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P20": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P21": {
+   "checks": [
+    "ip_reputation"
    ]
   },
   "VS-2026-P22": {
@@ -271,169 +257,86 @@
   "VS-2026-P23": {
    "checks": [
     "ip_reputation"
-   ],
-   "spec09": "Teil 2",
-   "warum": "40.99.150.120 ist die Microsoft-Adresse von autodiscover, ein Drittanbieter und kein geprüftes Kundensystem."
+   ]
   },
   "VS-2026-P24": {
-   "checks": [
-    "ip_reputation"
-   ]
-  },
-  "VS-2026-P25": {
-   "checks": [
-    "ip_reputation"
-   ]
-  },
-  "VS-2026-P26": {
-   "checks": [
-    "ip_reputation"
-   ]
-  },
-  "VS-2026-P27": {
-   "checks": [
-    "ip_reputation"
-   ]
-  },
-  "VS-2026-P28": {
-   "checks": [
-    "ip_reputation"
-   ]
-  },
-  "VS-2026-P29": {
    "checks": [
     "mail_plaintext"
    ]
   },
-  "VS-2026-P30": {
+  "VS-2026-P25": {
    "checks": [
     "rdp_exposed"
    ]
   },
-  "VS-2026-P31": {
-   "checks": [
-    "rdp_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
-  },
-  "VS-2026-P32": {
-   "checks": [
-    "rdp_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
-  },
-  "VS-2026-P33": {
-   "checks": [
-    "rdp_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
-  },
-  "VS-2026-P34": {
-   "checks": [
-    "rdp_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
-  },
-  "VS-2026-P35": {
+  "VS-2026-P26": {
    "checks": [
     "rdp_exposed"
    ]
   },
-  "VS-2026-P36": {
+  "VS-2026-P27": {
    "checks": [
     "smb_exposed"
    ]
   },
-  "VS-2026-P37": {
-   "checks": [
-    "smb_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
-  },
-  "VS-2026-P38": {
-   "checks": [
-    "smb_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
-  },
-  "VS-2026-P39": {
-   "checks": [
-    "smb_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
-  },
-  "VS-2026-P40": {
-   "checks": [
-    "smb_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
-  },
-  "VS-2026-P41": {
+  "VS-2026-P28": {
    "checks": [
     "smb_exposed"
    ]
   },
-  "VS-2026-P42": {
+  "VS-2026-P29": {
    "checks": [
     "spf_missing"
    ]
   },
-  "VS-2026-P43": {
+  "VS-2026-P30": {
    "checks": [
     "tls_legacy_protocols"
    ]
   },
-  "VS-2026-P44": {
+  "VS-2026-P31": {
    "checks": [
     "tls_legacy_protocols"
    ]
   },
-  "VS-2026-P45": {
+  "VS-2026-P32": {
    "checks": [
     "tls_no_13"
    ]
   },
-  "VS-2026-P46": {
+  "VS-2026-P33": {
    "checks": [
     "tls_no_13"
    ]
   },
-  "VS-2026-P47": {
+  "VS-2026-P34": {
    "checks": [
     "tls_no_13"
    ]
   },
-  "VS-2026-P48": {
+  "VS-2026-P35": {
    "checks": [
     "tls_weak_ciphers"
    ]
   },
-  "VS-2026-P49": {
+  "VS-2026-P36": {
    "checks": [
     "tls_weak_ciphers"
    ]
   },
-  "VS-2026-P50": {
+  "VS-2026-P37": {
    "checks": [
     "urlhaus_compromise"
    ]
   },
-  "VS-2026-P51": {
+  "VS-2026-P38": {
    "checks": [
     "waf_present"
    ],
    "spec09": "Q12",
    "warum": "Die WAF-Erkennung stammt aus der Antwort des Weiterleitungsziels www.bergersysteme.com, nicht aus der eigenen Antwort."
   },
-  "VS-2026-P52": {
+  "VS-2026-P39": {
    "checks": [
     "waf_present"
    ]
@@ -441,5 +344,6 @@
  },
  "subsumed": {},
  "expected_coverage_differences": [],
- "expected_member_differences": []
+ "expected_member_differences": [],
+ "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben."
 }

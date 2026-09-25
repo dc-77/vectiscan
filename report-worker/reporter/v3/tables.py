@@ -263,16 +263,218 @@ def tech_note(note: str | None) -> str:
     return ""
 
 
+# ---------------------------------------------------------------- Pruefungen in Kundensprache
+# S6b-1 (spec/09 Q10): jede Zeile der Einschraenkungstabelle nennt die betroffenen
+# Pruefungen, nie ein Werkzeug. Test: jedes Werkzeug der Abdeckung und jede Familie des
+# Katalogs hat hier einen Namen (tests/v3/test_s6b1_coverage.py).
+TOOL_CHECKS: dict[str, str] = {
+    "nmap": "Portscan und Diensterkennung",
+    "testssl": "Transportverschlüsselung",
+    "header_check": "Sicherheits-Header",
+    "httpx": "Erkennung der Webdienste",
+    "webtech": "Erkennung der Web-Technologien",
+    "wafw00f": "Erkennung vorgelagerter Schutzsysteme",
+    "zap": "Webanalyse",
+    "zap_spider": "Webanalyse",
+    "zap_ajax_spider": "Webanalyse",
+    "zap_active": "Aktive Prüfung der Webanwendung",
+    "feroxbuster": "Suche nach nicht verlinkten Pfaden",
+    "gobuster_dir": "Suche nach nicht verlinkten Pfaden",
+    "ffuf_sensitive": "Suche nach sensiblen Dateien",
+    "ffuf_param": "Suche nach Parametern der Webanwendung",
+    "wpscan": "WordPress-Prüfung",
+    "whois": "Registrierungsdaten der Domain",
+    "dns": "DNS- und E-Mail-Einträge",
+    "dns_records": "DNS- und E-Mail-Einträge",
+    "dns_security": "DNS-Sicherheitseinträge",
+    "axfr": "Abruf der gesamten DNS-Zone",
+    "dnsx": "Auflösung der Hostnamen",
+    "gobuster_dns": "Ermittlung der Hostnamen",
+    "subfinder": "Ermittlung der Hostnamen",
+    "crtsh": "Ermittlung der Hostnamen",
+    "certspotter": "Ermittlung der Hostnamen",
+    "web_probe": "Erreichbarkeit der Hostnamen",
+    "shodan": "Passive Dienstdaten",
+    "securitytrails": "Passive DNS-Daten",
+    "abuseipdb": "Reputationsdaten",
+    "otx": "Reputationsdaten",
+    "urlhaus": "Reputationsdaten",
+    "greynoise": "Reputationsdaten",
+    "virustotal": "Reputationsdaten",
+    "phase3_correlation": "Abgleich mit Schwachstellendatenbanken",
+    "searchsploit": "Abgleich mit Schwachstellendatenbanken",
+}
+TOOL_CHECKS_FALLBACK = "Weitere Prüfungen"
+
+FAMILY_CHECKS: dict[str, str] = {
+    "admin_service_exposed": "Verwaltungsoberflächen",
+    "banner_version_disclosure": "Versionsangaben der Dienste",
+    "caa_missing": "CAA-Einträge",
+    "cert_chain_incomplete": "Zertifikatskette",
+    "cert_expired": "Gültigkeit der Zertifikate",
+    "cert_expiring": "Gültigkeit der Zertifikate",
+    "cert_hostname_mismatch": "Namen im Zertifikat",
+    "cert_self_signed": "Aussteller der Zertifikate",
+    "cookie_flags": "Cookie-Attribute",
+    "cors_misconfiguration": "Freigaben für fremde Ursprünge (CORS)",
+    "csp_missing": "Content-Security-Policy",
+    "csp_weak": "Content-Security-Policy",
+    "csrf_token_missing": "Schutz der Formulare",
+    "cve_known": "Bekannte Schwachstellen der erkannten Versionen",
+    "dane_missing": "DANE",
+    "db_exposed": "Datenbankdienste",
+    "default_page_exposed": "Auslieferungsseiten der Hersteller",
+    "dev_host_public": "Test- und Entwicklungssysteme",
+    "directory_listing": "Verzeichnisauflistung",
+    "dkim_missing": "DKIM-Signatur",
+    "dmarc_missing": "DMARC-Richtlinie",
+    "dmarc_none": "DMARC-Richtlinie",
+    "dmarc_quarantine": "DMARC-Richtlinie",
+    "dns_axfr": "Abruf der gesamten DNS-Zone",
+    "dns_dangling": "Verwaiste DNS-Einträge",
+    "dnssec_missing": "DNSSEC",
+    "domain_expiring": "Laufzeit der Domain",
+    "ftp_exposed": "FTP-Dienste",
+    "header_duplicate": "Doppelte Header",
+    "hsts_missing": "HSTS",
+    "hsts_short": "HSTS",
+    "http_alt_port": "Webdienste auf Zusatzports",
+    "http_no_tls": "HTTPS-Angebot",
+    "http_trace_enabled": "HTTP-Methoden",
+    "info_disclosure": "Preisgegebene Angaben",
+    "ip_reputation": "Reputation der Adressen",
+    "js_library_outdated": "JavaScript-Bibliotheken",
+    "legacy_protocols_present": "Ältere Übertragungsprotokolle",
+    "login_portal_exposed": "Anmeldeportale",
+    "mail_plaintext": "Verschlüsselung der Mailzugänge",
+    "mta_sts_missing": "MTA-STS",
+    "passive_service_unverified": "Dienste laut Passivquelle",
+    "rdp_exposed": "Windows-Fernwartung (RDP)",
+    "security_headers_incomplete": "Sicherheits-Header",
+    "sensitive_path_exposed": "Sensible Pfade und Dateien",
+    "session_in_url": "Sitzungskennungen in Adressen",
+    "smb_exposed": "Windows-Dateifreigabe (SMB)",
+    "software_eol": "Herstellerpflege der Software",
+    "software_eol_runtime": "Herstellerpflege der Software",
+    "software_lifecycle_review": "Herstellerpflege der Software",
+    "spf_missing": "SPF-Eintrag",
+    "spf_permissive": "SPF-Eintrag",
+    "spf_softfail": "SPF-Eintrag",
+    "sri_missing": "Integrität eingebundener Skripte",
+    "ssh_alt_port": "SSH auf Zusatzports",
+    "tls_known_vulnerability": "Bekannte TLS-Schwachstellen",
+    "tls_legacy_protocols": "TLS-Protokollversionen",
+    "tls_no_13": "TLS 1.3",
+    "tls_no_fallback_protection": "Schutz vor Protokoll-Herabstufung",
+    "tls_rpt_missing": "TLS-Berichte (TLS-RPT)",
+    "tls_weak_ciphers": "Verschlüsselungsverfahren",
+    "tls_weakness": "TLS-Schwächen",
+    "urlhaus_compromise": "Einträge in Schadcode-Listen",
+    "user_enumeration": "Preisgabe von Benutzernamen",
+    "waf_present": "Vorgelagerte Schutzsysteme",
+    "web_vulnerability_active": "Aktive Prüfung der Webanwendung",
+    "web_vulnerability_reported": "Meldungen der Webanalyse",
+    "wordpress_core_outdated": "WordPress-Kern",
+    "wordpress_plugin_vulnerable": "WordPress-Erweiterungen",
+}
+
+# Dienstname laut Passivquelle (Shodan-Modul), wenn kein Produkt genannt ist (E5).
+PASSIVE_SERVICES: dict[str, str] = {
+    "smtp": "SMTP", "smtps": "SMTPS", "submission": "SMTP-Submission", "imap": "IMAP", "imap-ssl": "IMAPS",
+    "pop3": "POP3", "pop3-ssl": "POP3S", "http": "HTTP", "https": "HTTPS", "ftp": "FTP", "ssh": "SSH",
+    "dns-tcp": "DNS", "dns-udp": "DNS", "rdp": "RDP", "mysql": "MySQL", "postgresql": "PostgreSQL",
+}
+
+# Werkzeuge, die bewusst nicht Teil des Produkts sind. Ihr Fehlen ist keine
+# Einschraenkung der Pruefung, sondern eine Festlegung (Entscheidung DC, spec/07).
+OUT_OF_PRODUCT_TOOLS: frozenset[str] = frozenset({"virustotal"})
+
 # ---------------------------------------------------------------- Dienste und Rollen
 
 LEGACY_PORTS: frozenset[int] = frozenset({21, 23, 25, 110, 143})
 DB_PORTS: frozenset[int] = frozenset({1433, 3306, 5432, 6379, 9200, 27017})
 
-# Rolle eines Hosts fuer die Tabelle in Kapitel 2, nach erkannter Software und Ports.
-ROLE_RULES: list[tuple[str, tuple[str, ...], tuple[int, ...]]] = [
-    ("Mail- und Kalenderplattform", ("exchange", "dovecot", "postfix", "exim", "courier"), (25, 465, 587, 993, 995)),
-    ("Website und Datenbanken", ("apache", "nginx", "iis", "litespeed"), (80, 443, 3306, 5432)),
-    ("Fernzugang und Verwaltung", ("openssh", "rdgateway", "sonicwall", "fortinet", "pfsense"), (22, 3389, 4433, 8443)),
-    ("Dateiaustausch", ("proftpd", "vsftpd", "pure-ftpd"), (21,)),
-]
+# S6b-1 (spec/09 Q2): Rollen nur mit Fakt. Je Rolle Anzeigename und Risikotext; die
+# Belegregeln stehen in reporter/v3/roles.py. "Kalender" nur mit Exchange-Fakt,
+# "Datenbank" nur mit Datenbankport, Mail nur, wenn MX, ein SPF-Mechanismus oder ein
+# Autodiscover-Name auf den Host zeigt.
+ROLE_DEFS: dict[str, tuple[str, str]] = {
+    "mail_kalender": (
+        "Mail- und Kalenderplattform",
+        "Über dieses System laufen E-Mail und Termine des Unternehmens. Ein Zugriff darauf trifft "
+        "Vertraulichkeit und Arbeitsfähigkeit zugleich."),
+    "mail": (
+        "E-Mail-Server",
+        "Über dieses System läuft E-Mail des Unternehmens. Ein Zugriff darauf trifft die "
+        "Vertraulichkeit der Korrespondenz."),
+    "mail_versand": (
+        "E-Mail-Versand laut SPF",
+        "Dieses System darf laut SPF-Eintrag E-Mail im Namen der Domain versenden. Ein Missbrauch "
+        "trifft die Glaubwürdigkeit der eigenen Absenderadresse."),
+    "webmail": (
+        "Mail-Webzugang",
+        "Webzugang zu den Postfächern. Erbeutete Zugangsdaten öffnen darüber die E-Mail der "
+        "Mitarbeitenden."),
+    "passwort": (
+        "Passwortverwaltung",
+        "Tresor für Zugangsdaten. Ein Zugriff darauf öffnet die Konten, deren Kennwörter dort liegen."),
+    "kollaboration": (
+        "Kollaboration",
+        "Gemeinsame Ablage und Zusammenarbeit. Betroffen wären Dokumente und die Konten der "
+        "Beteiligten."),
+    "anmeldeportal": (
+        "Anmeldeportal",
+        "Zentrale Anmeldung für Anwendungen. Wer hier Zugangsdaten errät oder abgreift, erreicht die "
+        "dahinterliegenden Dienste."),
+    "website": (
+        "Website",
+        "Außendarstellung des Unternehmens. Betroffen wären vor allem Seiteninhalte und "
+        "Formulareingaben."),
+    "datenbank": (
+        "Datenbankdienst",
+        "Datenbestände hinter den Anwendungen. Ein von außen erreichbarer Datenbankdienst ist ein "
+        "direktes Ziel für Anmeldeversuche."),
+    "fernzugang": (
+        "Fernzugang und Verwaltung",
+        "Der Weg von außen in das Unternehmensnetz. Solche Zugänge sind das bevorzugte Ziel, weil "
+        "hinter ihnen alles Weitere liegt."),
+    "dateiaustausch": (
+        "Dateiaustausch",
+        "Austausch von Dateien mit Dritten. Die Inhalte und die verwendeten Zugangsdaten sind hier "
+        "das Schutzgut."),
+}
+# Reihenfolge, in der Rollen genannt werden; die spezifischere zuerst.
+ROLE_ORDER: tuple[str, ...] = ("mail_kalender", "mail", "webmail", "passwort", "kollaboration",
+                               "anmeldeportal", "fernzugang", "datenbank", "dateiaustausch", "website",
+                               "mail_versand")
 ROLE_FALLBACK = "Nicht näher bestimmbar"
+ROLE_FALLBACK_MEANING = ("Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte "
+                         "intern geklärt werden.")
+
+# Woerter, mit denen ein Text eine Rolle behauptet (Prosa-Gate und v3_checks). Ein Wort
+# steht nur, wenn eine Rolle mit dieser Kategorie belegt ist.
+ROLE_WORDS: dict[str, tuple[str, ...]] = {
+    "kalender": ("kalender", "termine"),
+    "mail": ("korrespondenz", "postfach", "postfächer", "mailserver", "e-mail-server", "mailsystem",
+             "e-mail-system", "mailplattform"),
+    "datenbank": ("datenbank",),
+    "fernzugang": ("fernzugang", "fernwartung", "vpn"),
+    "passwort": ("passwortverwaltung", "passworttresor", "passwort-tresor", "kennworttresor"),
+    "kollaboration": ("kollaboration", "zusammenarbeit", "dateiablage"),
+    "webmail": ("webmail", "mail-webzugang", "outlook im web"),
+    "anmeldeportal": ("anmeldeportal", "single sign-on"),
+}
+# Welche Wortkategorien eine belegte Rolle erlaubt.
+ROLE_CATEGORIES: dict[str, frozenset[str]] = {
+    "mail_kalender": frozenset({"mail", "kalender"}),
+    "mail": frozenset({"mail"}),
+    "mail_versand": frozenset({"mail"}),
+    "webmail": frozenset({"webmail", "mail"}),
+    "passwort": frozenset({"passwort"}),
+    "kollaboration": frozenset({"kollaboration"}),
+    "anmeldeportal": frozenset({"anmeldeportal"}),
+    "fernzugang": frozenset({"fernzugang"}),
+    "datenbank": frozenset({"datenbank"}),
+    "dateiaustausch": frozenset(),
+    "website": frozenset(),
+}

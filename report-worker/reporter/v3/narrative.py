@@ -194,9 +194,12 @@ def architecture_lead(hosts: int, roles: list[str]) -> str:
     )
 
 
+# S6b-1 (spec/09 Teil 3): Legende nach Ampel. Die Farbe eines Ports ist die Ampel des
+# schwersten Befunds, der ihn nennt (auch VHost-Befunde auf dem Webport); Blau hiess
+# vorher "Altprotokoll" und stand auch an Webports mit niedrigem Befund.
 SERVICES_NOTE = (
-    "Rot: Dienst mit kritischem Befund · Gelb: Dienst mit Befund · Blau: Altprotokoll · "
-    "Grün: unauffällig · Grau: nur aus einer Passivquelle bekannt."
+    "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · "
+    "Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt."
 )
 
 SCREENS_LEAD = "Sichtprüfung der erreichbaren Web-Oberflächen der geprüften Hosts."

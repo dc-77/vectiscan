@@ -36,9 +36,7 @@
   "VS-2026-006": {
    "checks": [
     "legacy_protocols_present"
-   ],
-   "spec09": "Q3",
-   "warum": "116.202.77.64 ist ein Hetzner Managed Server (dedi5705, auch flott.de); POP3, IMAP und FTP sind Dienste des Hosters, die der Kunde nicht abschalten kann."
+   ]
   },
   "VS-2026-007": {
    "checks": [
@@ -124,5 +122,6 @@
  },
  "subsumed": {},
  "expected_coverage_differences": [],
- "expected_member_differences": []
+ "expected_member_differences": [],
+ "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben."
 }

@@ -26,15 +26,20 @@ Regeln:
   unabhaengig von seiner Einstufung; die Abbildung dazu steht in ``levels.py``.
 * Skala, Einstufung und Kategorie eines Buendelbefunds kommen vom schwersten
   fehlgeschlagenen Mitglied; der Positivbefund traegt die Kategorie des Buendels.
+* S6b-1 (spec/09 Q3): Ein Sachverhalt beim Hoster oder Plattformbetreiber laeuft nicht
+  mit einem Sachverhalt des Kunden zusammen; die Zustaendigkeit ist Teil des Schluessels
+  (``reporter/v3/operators.py``).
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Iterable
+from typing import Iterable, Optional
 
 from reporter.catalog.schema import BundleSpec, CatalogOutput, CheckInfo, CheckResult, Texts
+from reporter.facts import schema as FS
 from reporter.facts.serialize import sort_key
 from reporter.v3 import levels as L
+from reporter.v3.operators import Operator, hosts_by_ip, operator_for
 
 GLOBAL_KEY = "scan"
 
@@ -57,10 +62,13 @@ class Consolidated:
     results: list[CheckResult] = field(default_factory=list)
     # S6a: Hosts, die wegen positive_conflicts aus dem Positivbefund herausfallen.
     excluded_hosts: list[str] = field(default_factory=list)
+    # S6b-1: zustaendiger Betreiber auf einem geteilten System, sonst None (Kunde).
+    operator: Optional[Operator] = None
 
     @property
     def sort_key(self) -> tuple:
-        return (L.severity_key(self.scale, self.level), self.category, self.key, self.merge_key)
+        return (L.severity_key(self.scale, self.level), self.category, self.key, self.merge_key,
+                self.operator.key if self.operator else "")
 
 
 def _merge_key(result: CheckResult, merge_by: str) -> str:
@@ -116,13 +124,20 @@ def _worst(results: Iterable[CheckResult]) -> tuple[str, str, str]:
     return worst.scale, worst.level, worst.category
 
 
-def consolidate(output: CatalogOutput) -> tuple[list[Consolidated], list[Consolidated]]:
-    """(Befunde, Positivbefunde) als Sachverhalte, stabil sortiert."""
+def consolidate(output: CatalogOutput,
+                facts: FS.Facts | None = None) -> tuple[list[Consolidated], list[Consolidated]]:
+    """(Befunde, Positivbefunde) als Sachverhalte, stabil sortiert.
+
+    Mit ``facts`` trennt die Konsolidierung nach Zustaendigkeit (S6b-1); ohne Fakten
+    liegt alles beim Kunden wie bisher.
+    """
     by_check: dict[str, CheckInfo] = {c.id: c for c in output.checks}
     bundles: dict[str, BundleSpec] = {b.id: b for b in output.bundles}
     bundle_of: dict[str, str] = {m: b.id for b in output.bundles for m in b.members}
+    hosts = hosts_by_ip(facts) if facts is not None else {}
+    operators: dict[str, Operator] = {}
 
-    fails: dict[tuple[str, str], list[CheckResult]] = {}
+    fails: dict[tuple[str, str, str], list[CheckResult]] = {}
     passes: dict[tuple[str, str], list[CheckResult]] = {}
     # S6 (spec/08 Punkt 7): Ein Positivbefund entsteht nur, wenn die Pruefung fuer
     # alle betroffenen Hosts bestanden ist. Nicht pruefbar zaehlt nicht als
@@ -136,7 +151,11 @@ def consolidate(output: CatalogOutput) -> tuple[list[Consolidated], list[Consoli
         merge_by = bundles[bid].merge_by if bid else "global"
         owner = bid or result.check_id
         if result.status == "fail":
-            fails.setdefault((owner, _merge_key(result, merge_by)), []).append(result)
+            op = operator_for(result, by_check[result.check_id].scope, hosts) if hosts else None
+            op_key = op.key if op else ""
+            if op is not None:
+                operators[op_key] = op
+            fails.setdefault((owner, _merge_key(result, merge_by), op_key), []).append(result)
         elif result.status == "not_testable":
             unpruefbar.add(owner)
         elif result.positive:
@@ -145,7 +164,7 @@ def consolidate(output: CatalogOutput) -> tuple[list[Consolidated], list[Consoli
             passes.setdefault((owner, _merge_key(result, merge_by)), []).append(result)
 
     findings: list[Consolidated] = []
-    for (owner, merge_key), results in fails.items():
+    for (owner, merge_key, op_key), results in fails.items():
         results.sort(key=lambda r: sort_key(r.check_id, r.group_key))
         bundle = bundles.get(owner)
         scale, level, category = _worst(results)
@@ -154,16 +173,18 @@ def consolidate(output: CatalogOutput) -> tuple[list[Consolidated], list[Consoli
             findings.append(Consolidated(
                 key=owner, is_bundle=True, merge_key=merge_key, category=category, scale=scale,
                 level=level, title=bundle.title, texts=bundle.texts, target=bundle.target,
-                positive=False, active_proof=aktiv, results=results))
+                positive=False, active_proof=aktiv, results=results,
+                operator=operators.get(op_key)))
         else:
             info = by_check[owner]
             findings.append(Consolidated(
                 key=owner, is_bundle=False, merge_key=merge_key, category=info.category,
                 scale=info.scale, level=info.level, title=info.title, texts=info.texts,
-                target="findings", positive=False, active_proof=aktiv, results=results))
+                target="findings", positive=False, active_proof=aktiv, results=results,
+                operator=operators.get(op_key)))
 
     positives: list[Consolidated] = []
-    failed_groups = set(fails)
+    failed_groups = {(owner, merge_key) for owner, merge_key, _ in fails}
     by_owner: dict[str, list[CheckResult]] = {}
     konflikt: dict[str, set[str]] = {
         bid: _conflict_hosts(output, bundle) for bid, bundle in bundles.items()

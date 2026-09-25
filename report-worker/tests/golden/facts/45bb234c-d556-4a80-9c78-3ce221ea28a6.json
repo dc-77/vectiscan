@@ -1,4 +1,5 @@
 {
+ "context": null,
  "coverage": [
   {
    "confidence": 1.0,
@@ -1011,6 +1012,13 @@
    "source": "dns_records",
    "spf": {
     "all_qualifier": "-all",
+    "mechanisms": [
+     {
+      "kind": "mx",
+      "qualifier": "+",
+      "value": null
+     }
+    ],
     "raw": "v=spf1 mx -all"
    },
    "tls_rpt": {
@@ -1030,6 +1038,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1060,6 +1069,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1090,6 +1100,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1120,6 +1131,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1150,6 +1162,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1244,6 +1257,7 @@
     "isp": "WIIT AG",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -1253,7 +1267,37 @@
     "urlhaus_compromised": null
    },
    "reverse": "home4.publishsoft.de",
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "Shodan-Hostnamen 5.199.141.24: herzogin-luisen-residenz.de, home4.publishsoft.de, www.herzogin-luisen-residenz.de",
+      "ref": "phase0a/shodan_hosts.json",
+      "tool": "shodan"
+     },
+     {
+      "excerpt": "rDNS home4.publishsoft.de",
+      "ref": "phase0/host_inventory.json",
+      "tool": "host_inventory"
+     },
+     {
+      "excerpt": "Nutzungsart data center/web hosting/transit",
+      "ref": "phase0a/abuseipdb.json",
+      "tool": "abuseipdb"
+     }
+    ],
+    "foreign_names": [
+     "herzogin-luisen-residenz.de",
+     "www.herzogin-luisen-residenz.de"
+    ],
+    "kind": "hoster",
+    "operator": "WIIT AG",
+    "signals": [
+     "fremde_namen_shodan",
+     "rdns_betreiber"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   }
  ],
  "http": [
@@ -1785,6 +1829,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -1814,6 +1859,7 @@
    "port": 21,
    "product": null,
    "seen_at": "2026-05-10T06:31:37Z",
+   "service": "ftp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1843,6 +1889,7 @@
    "port": 22,
    "product": "OpenSSH",
    "seen_at": "2026-05-10T06:31:37Z",
+   "service": "ssh",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1872,6 +1919,7 @@
    "port": 25,
    "product": "Postfix smtpd",
    "seen_at": "2026-05-10T06:31:37Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1901,6 +1949,7 @@
    "port": 80,
    "product": "nginx",
    "seen_at": "2026-05-10T06:31:37Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1930,6 +1979,7 @@
    "port": 110,
    "product": null,
    "seen_at": "2026-05-10T06:31:37Z",
+   "service": "pop3",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1959,6 +2009,7 @@
    "port": 143,
    "product": null,
    "seen_at": "2026-05-10T06:31:37Z",
+   "service": "imap",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1988,6 +2039,7 @@
    "port": 443,
    "product": "nginx",
    "seen_at": "2026-05-10T06:31:37Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2017,6 +2069,7 @@
    "port": 465,
    "product": "Postfix smtpd",
    "seen_at": "2026-05-10T06:31:37Z",
+   "service": "smtps",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2046,6 +2099,7 @@
    "port": 587,
    "product": "Postfix smtpd",
    "seen_at": "2026-05-10T06:31:37Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2075,6 +2129,7 @@
    "port": 3306,
    "product": "MariaDB",
    "seen_at": "2026-05-10T06:31:37Z",
+   "service": "mysql",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2104,6 +2159,7 @@
    "port": 8443,
    "product": null,
    "seen_at": "2026-05-10T06:31:37Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2133,6 +2189,7 @@
    "port": 8880,
    "product": null,
    "seen_at": "2026-05-10T06:31:37Z",
+   "service": "https-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -2216,7 +2273,7 @@
    }
   ]
  },
- "schema_version": "1.0.5",
+ "schema_version": "1.0.6",
  "services": [
   {
    "auth_mechanisms": [],
@@ -4490,6 +4547,7 @@
  "threats": [],
  "tls": [
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "home4.publishsoft.de",

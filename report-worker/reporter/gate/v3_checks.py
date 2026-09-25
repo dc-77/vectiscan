@@ -268,6 +268,77 @@ def abdeckung_ohne_ergebnis(facts: Any) -> list[Defect]:
     )]
 
 
+# ---------------------------------------------------------------- S6b-1
+
+# Werkzeugnamen, die im Kundentext von Kapitel 2 und im Hinweis auf Seite 3 nichts zu
+# suchen haben (spec/09 Q10). Im Nachweis, in der Quellenangabe und in der
+# Werkzeugliste des Anhangs stehen sie zu Recht; die werden hier nicht geprueft.
+TOOL_TOKENS = re.compile(
+    r"\b(nmap|testssl|zap_(?:active|spider|ajax_spider)|ffuf(?:_sensitive|_param)?|feroxbuster|"
+    r"header_check|httpx|webtech|wafw00f|wpscan|gobuster(?:_dns|_dir)?|subfinder|dnsx|crtsh|"
+    r"certspotter|abuseipdb|securitytrails|web_probe|phase3_correlation)\b", re.I)
+
+
+def einschraenkung_ohne_pruefung(data: Any) -> list[Defect]:
+    """Jede Zeile der Einschraenkungstabelle nennt die betroffenen Pruefungen (spec/09 Q10)."""
+    out: list[Defect] = []
+    for row in getattr(data.scope, "limitations", []) or []:
+        if not [c for c in (row.checks or []) if str(c).strip()]:
+            out.append(Defect(
+                engine=ENGINE_V3, check="einschraenkung_ohne_pruefung", severity=SEVERITY_ERROR,
+                message=f"Einschraenkung ohne Pruefungsnamen: {row.what}",
+                detail={"what": row.what}))
+    return out
+
+
+def werkzeugname_im_kundentext(data: Any) -> list[Defect]:
+    """Kein Werkzeugname in Abdeckung, Einschraenkungen, Hinweiskasten und Posture."""
+    texte: list[tuple[str, str]] = [("glance.coverage_warning", data.glance.coverage_warning or "")]
+    for h in data.scope.hosts:
+        texte.append((f"scope.hosts[{h.ip}].coverage", h.coverage or ""))
+    for row in data.scope.limitations:
+        texte.append((f"scope.limitations[{row.what}]", " ".join([row.what, row.detail, *row.checks])))
+    for block in data.architecture.posture:
+        for item in block.items:
+            texte.append((f"posture[{block.short}]", f"{item.l} {item.v}"))
+    out: list[Defect] = []
+    for where, text in texte:
+        treffer = sorted({m.group(0) for m in TOOL_TOKENS.finditer(text)})
+        if treffer:
+            out.append(Defect(
+                engine=ENGINE_V3, check="werkzeugname_im_kundentext", severity=SEVERITY_ERROR,
+                message=f"Werkzeugname im Kundentext ({where}): {', '.join(treffer)}",
+                detail={"where": where, "werkzeuge": treffer}))
+    return out
+
+
+def rolle_ohne_fakt(data: Any) -> list[Defect]:
+    """Ein Satz ueber eine Rolle ohne Fakt ist ein Gate-Fehler (spec/09 Q2).
+
+    Geprueft wird der Endtext der Zusammenfassung, des Kontextabsatzes und der
+    Systemsaetze, nachdem die Prosa-KI eingesetzt wurde. Zusammenfassung und
+    Kontextabsatz duerfen nennen, was eine belegte Rolle oder ein Befund des Berichts
+    traegt; ein Systemsatz nur die Rollen seines Systems.
+    """
+    from reporter.v3.roles import role_words_without_fact
+
+    alle = {k for o in data.business.observed for k in o.role_keys}
+    befundtexte = " ".join(f"{f.title} {f.found}" for f in data.findings)
+    out: list[Defect] = []
+    pruefen = [("glance.overall_text", data.glance.overall_text or "", alle, befundtexte),
+               ("business.implication", data.business.implication or "", alle, befundtexte)]
+    pruefen += [(f"business.observed[{o.system}]", o.meaning or "", set(o.role_keys), "")
+                for o in data.business.observed]
+    for where, text, rollen, bezug in pruefen:
+        ohne = role_words_without_fact(text, rollen, bezug)
+        if ohne:
+            out.append(Defect(
+                engine=ENGINE_V3, check="rolle_ohne_fakt", severity=SEVERITY_ERROR,
+                message=f"Rolle ohne Fakt in {where}: {', '.join(ohne)}",
+                detail={"where": where, "woerter": ohne}))
+    return out
+
+
 def run_all(data: Any, facts: Any, output: Any, *, strict: bool = False) -> list[Defect]:
     """Alle Pruefungen in fester Reihenfolge."""
     defects: list[Defect] = []
@@ -276,4 +347,7 @@ def run_all(data: Any, facts: Any, output: Any, *, strict: bool = False) -> list
     defects.extend(tech_widerspricht_befund(data, facts))
     defects.extend(unprocessed_ueber_schwelle(output))
     defects.extend(auftraggeber_fehlt(data, strict=strict))
+    defects.extend(einschraenkung_ohne_pruefung(data))
+    defects.extend(werkzeugname_im_kundentext(data))
+    defects.extend(rolle_ohne_fakt(data))
     return defects

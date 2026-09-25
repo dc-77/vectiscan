@@ -253,4 +253,20 @@ describe('S5 — sanitizeCustomerContext', () => {
 
     expect(context.systeme).toEqual([{ fqdn: 'www.beispiel.de', zweck: 'Unternehmenswebsite' }]);
   });
+
+  it('S6b-1 (spec/09 Q15): Kurzname ist ein eigenes Feld mit Herkunft', () => {
+    const previous = {
+      firmenname: 'Junkerwerk Linder GmbH + Co. KG', kurzname: 'Junkerwerk Linder',
+      sources: { firmenname: { source: 'recherche' as const, url: 'https://x.de' },
+                 kurzname: { source: 'recherche' as const, url: 'https://x.de' } },
+    };
+
+    const bleibt = sanitizeCustomerContext({ branche: 'Metall' }, 'admin', previous);
+    expect(bleibt.kurzname).toBe('Junkerwerk Linder');
+    expect(bleibt.sources?.kurzname?.source).toBe('recherche');
+
+    const gesetzt = sanitizeCustomerContext({ kurzname: '  Hündgen Entsorgung ' }, 'admin', previous);
+    expect(gesetzt.kurzname).toBe('Hündgen Entsorgung');
+    expect(gesetzt.sources?.kurzname).toEqual({ source: 'admin' });
+  });
 });

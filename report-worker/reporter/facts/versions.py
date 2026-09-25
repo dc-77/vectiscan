@@ -161,6 +161,8 @@ _NEUTRAL_NAME_TOKENS = frozenset({
     "streaming", "media",
     "open", "source", "content", "management", "system",
     "debian", "ubuntu", "centos", "linux",
+    # Produktlinien von Plesk ("Plesk Obsidian 18.0.80" aus dem nmap-Titel, Issue #33)
+    "obsidian", "onyx",
 })
 _NAME_TOKEN_RE = re.compile(r"[a-z0-9]+")
 

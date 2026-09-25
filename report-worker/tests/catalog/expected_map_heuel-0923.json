@@ -122,9 +122,7 @@
   "VS-2026-020": {
    "checks": [
     "legacy_protocols_present"
-   ],
-   "spec09": "Q3",
-   "warum": "213.133.104.51 ist Hetzner-Webhosting (www51.your-server.de, auch help-ev.de); POP3, IMAP und FTP sind Dienste des Hosters, die der Kunde nicht abschalten kann."
+   ]
   },
   "VS-2026-021": {
    "checks": [
@@ -154,7 +152,7 @@
    "checks": [
     "service_banner_version"
    ],
-   "spec09": "Q4, Q3",
+   "spec09": "Q4",
    "warum": "Das SSH-Banner gehört zum Protokoll und lässt sich nicht entfernen. Dienst des Hetzner-Webhostings 213.133.104.51."
   },
   "VS-2026-026": {
@@ -173,6 +171,11 @@
    ]
   },
   "VS-2026-029": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-030": {
    "checks": [
     "tls_rpt_missing"
    ]
@@ -227,9 +230,7 @@
   "VS-2026-P10": {
    "checks": [
     "db_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+   ]
   },
   "VS-2026-P11": {
    "checks": [
@@ -248,27 +249,27 @@
   },
   "VS-2026-P14": {
    "checks": [
-    "db_exposed"
+    "dkim_missing"
    ]
   },
   "VS-2026-P15": {
    "checks": [
-    "dkim_missing"
+    "dmarc_missing"
    ]
   },
   "VS-2026-P16": {
    "checks": [
-    "dmarc_missing"
+    "dns_dangling_cname"
    ]
   },
   "VS-2026-P17": {
    "checks": [
-    "dns_dangling_cname"
+    "dns_zone_transfer"
    ]
   },
   "VS-2026-P18": {
    "checks": [
-    "dns_zone_transfer"
+    "ftp_plaintext"
    ]
   },
   "VS-2026-P19": {
@@ -278,17 +279,17 @@
   },
   "VS-2026-P20": {
    "checks": [
-    "ftp_plaintext"
+    "hsts_missing"
    ]
   },
   "VS-2026-P21": {
    "checks": [
-    "hsts_missing"
+    "hsts_short"
    ]
   },
   "VS-2026-P22": {
    "checks": [
-    "hsts_short"
+    "http_no_tls"
    ]
   },
   "VS-2026-P23": {
@@ -308,7 +309,7 @@
   },
   "VS-2026-P26": {
    "checks": [
-    "http_no_tls"
+    "ip_reputation"
    ]
   },
   "VS-2026-P27": {
@@ -324,14 +325,14 @@
   "VS-2026-P29": {
    "checks": [
     "ip_reputation"
-   ]
+   ],
+   "spec09": "Q12",
+   "warum": "AbuseIPDB meldet für 216.150.1.65 totalReports 26 von 9 Nutzern, zuletzt 2026-09-21; Score 0 nur wegen isWhitelisted."
   },
   "VS-2026-P30": {
    "checks": [
     "ip_reputation"
-   ],
-   "spec09": "Q12",
-   "warum": "AbuseIPDB meldet für 216.150.1.65 totalReports 26 von 9 Nutzern, zuletzt 2026-09-21; Score 0 nur wegen isWhitelisted."
+   ]
   },
   "VS-2026-P31": {
    "checks": [
@@ -340,20 +341,18 @@
   },
   "VS-2026-P32": {
    "checks": [
-    "ip_reputation"
+    "mail_plaintext"
    ]
   },
   "VS-2026-P33": {
    "checks": [
-    "mail_plaintext"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P34": {
    "checks": [
     "rdp_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+   ]
   },
   "VS-2026-P35": {
    "checks": [
@@ -367,25 +366,23 @@
   },
   "VS-2026-P37": {
    "checks": [
-    "rdp_exposed"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-P38": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P39": {
    "checks": [
-    "security_headers_incomplete"
+    "smb_exposed"
    ]
   },
   "VS-2026-P40": {
    "checks": [
     "smb_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+   ]
   },
   "VS-2026-P41": {
    "checks": [
@@ -394,42 +391,42 @@
   },
   "VS-2026-P42": {
    "checks": [
-    "smb_exposed"
+    "spf_missing"
    ]
   },
   "VS-2026-P43": {
    "checks": [
-    "smb_exposed"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P44": {
    "checks": [
-    "smb_exposed"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P45": {
    "checks": [
-    "spf_missing"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P46": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P47": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P48": {
    "checks": [
-    "tls_no_13"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P49": {
    "checks": [
-    "tls_no_13"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P50": {
@@ -439,15 +436,10 @@
   },
   "VS-2026-P51": {
    "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P52": {
-   "checks": [
     "urlhaus_compromise"
    ]
   },
-  "VS-2026-P53": {
+  "VS-2026-P52": {
    "checks": [
     "waf_present"
    ]
@@ -455,5 +447,6 @@
  },
  "subsumed": {},
  "expected_coverage_differences": [],
- "expected_member_differences": []
+ "expected_member_differences": [],
+ "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben."
 }

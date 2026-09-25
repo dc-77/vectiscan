@@ -88,7 +88,7 @@ def test_item_not_testable_macht_gruppe_not_testable():
          "protocols": {"SSLv2": None, "SSLv3": None, "TLS1.0": None, "TLS1.1": None, "TLS1.2": None, "TLS1.3": True}},
     ]}, coverage_default="ok")
     r = _one(run_check("tls_legacy_protocols", facts), "a.example.test@10.0.0.1")
-    assert r.status == "not_testable" and r.reason_code == "tls_protocols_unknown"
+    assert r.status == "not_testable" and r.reason_code == "tls_protocols_partial"
     assert {m.key: m.status for m in r.members} == {"a.example.test:443@10.0.0.1": "pass", "a.example.test:8443@10.0.0.1": "not_testable"}
 
 

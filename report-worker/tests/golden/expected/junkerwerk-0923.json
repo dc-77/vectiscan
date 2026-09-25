@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-23.2 auf tests/golden/facts/31d67a02-b485-4d05-b228-dbdde092cc68.json",
+ "source": "reporter.catalog 2026-09-25.1 auf tests/golden/facts/31d67a02-b485-4d05-b228-dbdde092cc68.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -342,7 +342,8 @@
     "188.40.3.130:143 (IMAP)",
     "188.40.3.130:21 (FTP)"
    ],
-   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
+   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+   "zustaendig": "hoster"
   },
   {
    "id": "VS-2026-026",
@@ -448,7 +449,8 @@
     "188.40.3.130:3306 (MariaDB 10.11.18)",
     "188.40.3.130:5432 (PostgreSQL unbekannt)"
    ],
-   "title": "Dienst gibt Versionskennung preis"
+   "title": "Dienst gibt Versionskennung preis",
+   "zustaendig": "hoster"
   },
   {
    "id": "VS-2026-034",
@@ -793,19 +795,11 @@
    "check": "software_eol",
    "family": "software_eol",
    "cat": "B",
-   "group": "188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de)",
-   "title": "Serversoftware mit laufender Herstellerpflege"
-  },
-  {
-   "id": "VS-2026-P31",
-   "check": "software_eol",
-   "family": "software_eol",
-   "cat": "B",
    "group": "217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de)",
    "title": "Serversoftware mit laufender Herstellerpflege"
   },
   {
-   "id": "VS-2026-P32",
+   "id": "VS-2026-P31",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
@@ -813,12 +807,20 @@
    "title": "SPF-Eintrag vorhanden"
   },
   {
-   "id": "VS-2026-P33",
+   "id": "VS-2026-P32",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
    "group": "junkerwerk.hu",
    "title": "SPF-Eintrag vorhanden"
+  },
+  {
+   "id": "VS-2026-P33",
+   "check": "tls_legacy_protocols",
+   "family": "tls_legacy_protocols",
+   "cat": "D",
+   "group": "autodiscover.junkerwerk.de",
+   "title": "Nur aktuelle TLS-Protokolle"
   },
   {
    "id": "VS-2026-P34",
@@ -857,7 +859,7 @@
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
-   "group": "cloud.junkerwerk.de (+team.junkerwerk.de)",
+   "group": "autodiscover.junkerwerk.de",
    "title": "Keine schwachen TLS-Cipher"
   },
   {
@@ -865,11 +867,19 @@
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
-   "group": "outlook.junkerwerk.de",
+   "group": "cloud.junkerwerk.de (+team.junkerwerk.de)",
    "title": "Keine schwachen TLS-Cipher"
   },
   {
    "id": "VS-2026-P40",
+   "check": "tls_weak_ciphers",
+   "family": "tls_weak_ciphers",
+   "cat": "D",
+   "group": "outlook.junkerwerk.de",
+   "title": "Keine schwachen TLS-Cipher"
+  },
+  {
+   "id": "VS-2026-P41",
    "check": "urlhaus_compromise",
    "family": "urlhaus_compromise",
    "cat": "A",

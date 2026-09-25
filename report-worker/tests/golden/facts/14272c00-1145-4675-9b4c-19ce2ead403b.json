@@ -1,4 +1,5 @@
 {
+ "context": null,
  "coverage": [
   {
    "confidence": 1.0,
@@ -1327,6 +1328,23 @@
    "source": "dns_records",
    "spf": {
     "all_qualifier": "~all",
+    "mechanisms": [
+     {
+      "kind": "a",
+      "qualifier": "+",
+      "value": null
+     },
+     {
+      "kind": "mx",
+      "qualifier": "+",
+      "value": null
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "78.46.161.114"
+     }
+    ],
     "raw": "v=spf1 a mx ip4:78.46.161.114 ~all"
    },
    "tls_rpt": {
@@ -1347,6 +1365,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1379,6 +1398,7 @@
     }
    ],
    "body_hash": "332cfeab7ebf854d4038ba710720a7749a6ac2152e731db8d189d7a3cbf9d4d0",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1409,6 +1429,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1435,6 +1456,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1524,6 +1546,7 @@
     "isp": "Hetzner Online GmbH",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -1533,7 +1556,9 @@
     "urlhaus_compromised": null
    },
    "reverse": "vsrv2.spacekoeln.de",
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   }
  ],
  "http": [
@@ -2034,6 +2059,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -2075,6 +2101,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "securitytrails",
    "transport": null,
    "verified": null,
@@ -2102,6 +2129,7 @@
    "port": 21,
    "product": "Pure-FTPd",
    "seen_at": "2026-09-17T09:29:21Z",
+   "service": "ftp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2129,6 +2157,7 @@
    "port": 25,
    "product": "Postfix smtpd",
    "seen_at": "2026-09-17T09:29:21Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -2156,6 +2185,7 @@
    "port": 80,
    "product": "Apache httpd",
    "seen_at": "2026-09-17T09:29:21Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2183,6 +2213,7 @@
    "port": 110,
    "product": null,
    "seen_at": "2026-09-17T09:29:21Z",
+   "service": "pop3",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2210,6 +2241,7 @@
    "port": 143,
    "product": null,
    "seen_at": "2026-09-17T09:29:21Z",
+   "service": "imap",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2237,6 +2269,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-09-17T09:29:21Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2264,6 +2297,7 @@
    "port": 465,
    "product": "Postfix smtpd",
    "seen_at": "2026-09-17T09:29:21Z",
+   "service": "smtps",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2291,6 +2325,7 @@
    "port": 587,
    "product": "Postfix smtpd",
    "seen_at": "2026-09-17T09:29:21Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2318,6 +2353,7 @@
    "port": 993,
    "product": null,
    "seen_at": "2026-09-17T09:29:21Z",
+   "service": "imap-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2345,6 +2381,7 @@
    "port": 995,
    "product": null,
    "seen_at": "2026-09-17T09:29:21Z",
+   "service": "pop3-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2372,6 +2409,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "urlhaus",
    "transport": null,
    "verified": null,
@@ -2455,7 +2493,7 @@
    }
   ]
  },
- "schema_version": "1.0.5",
+ "schema_version": "1.0.6",
  "services": [
   {
    "auth_mechanisms": [],
@@ -3171,43 +3209,6 @@
   },
   {
    "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": "debian",
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: Debian",
-     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "debian",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "88.99.35.112",
-   "id": "sw:88.99.35.112:-:debian:unknown",
-   "kind": "os",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-17T22:50:58Z",
-   "product": "Debian",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
    "confidence": 1.0,
    "detection_sources": [
     "nmap"
@@ -3328,43 +3329,6 @@
    "observed_at": "2026-09-17T22:48:12Z",
    "product": "Google Tag Manager",
    "source": "webtech",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "88.99.35.112",
-   "id": "sw:88.99.35.112:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-17T22:50:58Z",
-   "product": "HSTS",
-   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -4073,43 +4037,6 @@
    "detection_sources": [
     "httpx"
    ],
-   "distro": "debian",
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "tech: Debian",
-     "ref": "hosts/88.99.35.112/phase2/httpx.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "debian",
-   "fqdn": "dortmund-beach.com",
-   "hints": [],
-   "host_ip": "88.99.35.112",
-   "id": "sw:88.99.35.112:dortmund-beach.com:debian:unknown",
-   "kind": "os",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-17T22:50:58Z",
-   "product": "Debian",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
    "distro": null,
    "edition": null,
    "eol": {
@@ -4481,6 +4408,7 @@
  ],
  "tls": [
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "dortmund-beach.com",

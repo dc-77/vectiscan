@@ -117,3 +117,47 @@ def test_markierungen_nach_spec09_sind_vollstaendig(name):
             assert MARK_RE.match(entry["spec09"]), f"{name} {eid}: {entry['spec09']}"
             assert (entry.get("warum") or "").strip(), f"{name} {eid}: Grund fehlt"
             assert entry["checks"] == [ids[eid]["check"]]
+
+
+# ---------------------------------------------------------------- S6b-1
+
+_FACTS: dict[str, Facts] = {}
+
+
+def _facts(name: str) -> Facts:
+    if name not in _FACTS:
+        order = _map(name)["orders"]["main"]
+        _FACTS[name] = Facts.from_dict(json.loads(
+            (GOLDEN / "facts" / f"{order}.json").read_text(encoding="utf-8")))
+    return _FACTS[name]
+
+
+@pytest.mark.parametrize("name", NAMES)
+def test_zustaendigkeit_auf_geteilten_systemen(name):
+    """spec/09 Q3 (Berichtsteil): ein Befund auf einem geteilten System, den der Kunde
+    nicht selbst beheben kann, liegt beim Hoster oder Plattformbetreiber. Die Soll-Liste
+    haelt die Zuordnung je Pruefung und Gruppe fest."""
+    from reporter.v3.operators import hosts_by_ip, operator_for
+
+    out = evaluate(_facts(name), load_catalog())
+    scopes = {c.id: c.scope for c in out.checks}
+    hosts = hosts_by_ip(_facts(name))
+    ist = {}
+    for r in out.results:
+        if r.kind == "check" and r.status == "fail":
+            op = operator_for(r, scopes[r.check_id], hosts)
+            ist[(r.check_id, r.group_label)] = op.kind if op else None
+    for e in _expected(name)["findings"]:
+        assert ist.get((e["check"], e["group"])) == e.get("zustaendig"), (name, e["id"], e["check"], e["group"])
+
+
+@pytest.mark.parametrize("name", NAMES)
+def test_markierungen_q3_und_q9_sind_aufgeloest(name):
+    """S6b-1 loest Q3 (Zustaendigkeit), Q9 (Hosts ohne Messergebnis) und den
+    Drittanbieter-Eintrag auf; die uebrigen Markierungen bleiben fuer S6b-2."""
+    mapping = _map(name)
+    assert mapping.get("hinweis_s6b1"), f"{name}: hinweis_s6b1 fehlt"
+    for liste in ("findings", "positives"):
+        for eid, entry in mapping[liste].items():
+            marks = {m.strip() for m in entry.get("spec09", "").split(",") if m.strip()}
+            assert not marks & {"Q3", "Q9"}, f"{name} {eid}: {entry['spec09']}"

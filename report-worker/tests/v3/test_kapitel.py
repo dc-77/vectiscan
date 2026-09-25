@@ -50,7 +50,9 @@ def test_abdeckungshinweis_nur_bei_luecken(data):
 # ---------------------------------------------------------------- Kapitel 2
 
 def test_lead_und_hosttabelle_widersprechen_sich_nicht(data):
-    luecken = sum(1 for h in data.scope.hosts if h.cov != "voll")
+    # S6b-1: je System eine Zeile (IPv4 und IPv6 mit gleichem rDNS); Drittanbieter
+    # stehen als "extern" da und zaehlen nicht mit.
+    luecken = sum(1 for h in data.scope.hosts if h.cov not in ("voll", "extern"))
     if luecken:
         assert str(luecken) in data.scope.lead
         assert "Alle Hosts" not in data.scope.lead
@@ -60,14 +62,16 @@ def test_lead_und_hosttabelle_widersprechen_sich_nicht(data):
 
 def test_jeder_host_traegt_eine_abdeckung(data):
     for host in data.scope.hosts:
-        assert host.cov in ("voll", "teil", "keine")
+        assert host.cov in ("voll", "teil", "keine", "unerreichbar", "extern")
         assert host.coverage.strip()
 
 
 def test_ipv6_host_ohne_portscan_ist_ohne_abdeckung(data):
-    ipv6 = [h for h in data.scope.hosts if ":" in h.ip]
+    """S6b-1 (spec/09 Q16): IPv4 und IPv6 mit gleichem rDNS sind ein System mit zwei
+    Adressen; die IPv6-Adresse steht in derselben Zeile und nennt ihren Grund."""
+    ipv6 = [h for h in data.scope.hosts if any(":" in a for a in [h.ip, *h.more_ips])]
     assert ipv6, "der Junkerwerk-Auftrag hat einen IPv6-Host"
-    assert ipv6[0].cov == "keine"
+    assert ipv6[0].cov != "voll"
     assert "IPv6" in ipv6[0].coverage
 
 

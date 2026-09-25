@@ -1,4 +1,5 @@
 {
+ "context": null,
  "coverage": [
   {
    "confidence": 1.0,
@@ -1763,6 +1764,33 @@
    "source": "dns_records",
    "spf": {
     "all_qualifier": "-all",
+    "mechanisms": [
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "_spf.kundenserver.de"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.hornetsecurity.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.vizito.be"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "88.99.140.109"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "157.90.214.107"
+     }
+    ],
     "raw": "v=spf1 include:_spf.kundenserver.de include:spf.hornetsecurity.com include:spf.vizito.be +ip4:88.99.140.109 +ip4:157.90.214.107 -all"
    },
    "tls_rpt": {
@@ -1784,6 +1812,7 @@
   {
    "aliases": [],
    "body_hash": "9e5526f743025bc138b90bfde0965abb80a54b8de9ead61f30235f9df05694cd",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1810,6 +1839,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1842,6 +1872,9 @@
     }
    ],
    "body_hash": "58da14056aa17bf670fbeacc5ad2c05beb3adcb3cb7341f9a8a7a2d1bd196de2",
+   "cname": [
+    "s.eu-multiscreensite.com"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1933,6 +1966,7 @@
     "isp": "A100 ROW GmbH",
     "usage_type": "Content Delivery Network"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -1942,7 +1976,23 @@
     "urlhaus_compromised": null
    },
    "reverse": "eu-staticip.multiscreensite.com",
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "www.huendgen-entsorgung.de CNAME s.eu-multiscreensite.com",
+      "ref": "phase0/dnsx_validation.json",
+      "tool": "dnsx"
+     }
+    ],
+    "foreign_names": [],
+    "kind": "platform",
+    "operator": "eu-multiscreensite.com",
+    "signals": [
+     "cname_fremd"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -1984,6 +2034,7 @@
     "isp": "bn:t Blatzheim Networks Telecom GmbH",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -1993,7 +2044,9 @@
     "urlhaus_compromised": null
    },
    "reverse": "gw-huendgen.bn-online.net",
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   }
  ],
  "http": [
@@ -3252,6 +3305,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -3282,6 +3336,7 @@
    "port": 80,
    "product": "nginx",
    "seen_at": "2026-09-23T15:23:40Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3312,6 +3367,7 @@
    "port": 443,
    "product": "nginx",
    "seen_at": "2026-09-23T15:23:40Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3342,6 +3398,7 @@
    "port": 8443,
    "product": "nginx",
    "seen_at": "2026-09-23T15:23:40Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3370,6 +3427,7 @@
    "port": 443,
    "product": "Outlook Web App",
    "seen_at": "2026-09-21T01:27:54Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3398,6 +3456,7 @@
    "port": 444,
    "product": null,
    "seen_at": "2026-09-21T01:27:54Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3425,6 +3484,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "urlhaus",
    "transport": null,
    "verified": null,
@@ -3508,7 +3568,7 @@
    }
   ]
  },
- "schema_version": "1.0.5",
+ "schema_version": "1.0.6",
  "services": [
   {
    "auth_mechanisms": [],
@@ -3872,43 +3932,6 @@
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
    "product": "Etracker",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/18.197.248.23/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "18.197.248.23",
-   "id": "sw:18.197.248.23:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-23T19:39:11Z",
-   "product": "HSTS",
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
@@ -4680,6 +4703,7 @@
  ],
  "tls": [
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "www.huendgen-entsorgung.de",
@@ -5971,6 +5995,7 @@
    "vulns": []
   },
   {
+   "assigned_from": "huendgen-entsorgung.de:443",
    "cert": {
     "chain_ok": null,
     "cn": "www.huendgen-entsorgung.de",
@@ -5992,6 +6017,11 @@
    "entries": [],
    "evidence": [
     {
+     "excerpt": "www.huendgen-entsorgung.de:443 geprüft über huendgen-entsorgung.de:443, dessen Zertifikat www.huendgen-entsorgung.de abdeckt; angeboten: TLS1.2, TLS1.3",
+     "ref": "scan_results:testssl:18.197.248.23",
+     "tool": "testssl"
+    },
+    {
      "excerpt": "www.huendgen-entsorgung.de:443 tls=tls13 cn=www.huendgen-entsorgung.de gueltig_bis=2026-10-11T03:14:37Z",
      "ref": "hosts/18.197.248.23/phase2/httpx.json",
      "tool": "httpx"
@@ -6002,7 +6032,7 @@
      "tool": "httpx"
     }
    ],
-   "fallback_scsv": null,
+   "fallback_scsv": true,
    "fqdn": "www.huendgen-entsorgung.de",
    "grade": null,
    "host_ip": "18.197.248.23",
@@ -6013,17 +6043,18 @@
    "observed_at": "2026-09-23T19:39:11Z",
    "port": 443,
    "protocols": {
-    "SSLv2": null,
-    "SSLv3": null,
-    "TLS1.0": null,
-    "TLS1.1": null,
-    "TLS1.2": null,
+    "SSLv2": false,
+    "SSLv3": false,
+    "TLS1.0": false,
+    "TLS1.1": false,
+    "TLS1.2": true,
     "TLS1.3": true
    },
    "source": "httpx",
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "*.huendgen-entsorgung.de",

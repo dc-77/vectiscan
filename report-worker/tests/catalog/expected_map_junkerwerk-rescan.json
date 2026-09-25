@@ -259,7 +259,7 @@
   },
   "VS-2026-P10": {
    "checks": [
-    "db_exposed"
+    "dkim_missing"
    ]
   },
   "VS-2026-P11": {
@@ -269,7 +269,7 @@
   },
   "VS-2026-P12": {
    "checks": [
-    "dkim_missing"
+    "dns_dangling_cname"
    ]
   },
   "VS-2026-P13": {
@@ -279,17 +279,17 @@
   },
   "VS-2026-P14": {
    "checks": [
-    "dns_dangling_cname"
+    "dns_zone_transfer"
    ]
   },
   "VS-2026-P15": {
    "checks": [
-    "dns_zone_transfer"
+    "ftp_plaintext"
    ]
   },
   "VS-2026-P16": {
    "checks": [
-    "ftp_plaintext"
+    "http_no_tls"
    ]
   },
   "VS-2026-P17": {
@@ -304,7 +304,7 @@
   },
   "VS-2026-P19": {
    "checks": [
-    "http_no_tls"
+    "ip_reputation"
    ]
   },
   "VS-2026-P20": {
@@ -324,12 +324,12 @@
   },
   "VS-2026-P23": {
    "checks": [
-    "ip_reputation"
+    "mail_plaintext"
    ]
   },
   "VS-2026-P24": {
    "checks": [
-    "mail_plaintext"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P25": {
@@ -344,12 +344,12 @@
   },
   "VS-2026-P27": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P28": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P29": {
@@ -359,37 +359,37 @@
   },
   "VS-2026-P30": {
    "checks": [
-    "smb_exposed"
+    "software_eol"
    ]
   },
   "VS-2026-P31": {
    "checks": [
-    "smb_exposed"
+    "spf_missing"
    ]
   },
   "VS-2026-P32": {
    "checks": [
-    "smb_exposed"
+    "spf_missing"
    ]
   },
   "VS-2026-P33": {
    "checks": [
-    "software_eol"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P34": {
    "checks": [
-    "spf_missing"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P35": {
    "checks": [
-    "spf_missing"
+    "tls_no_13"
    ]
   },
   "VS-2026-P36": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P37": {
@@ -399,12 +399,12 @@
   },
   "VS-2026-P38": {
    "checks": [
-    "tls_no_13"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P39": {
    "checks": [
-    "tls_no_13"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P40": {
@@ -413,11 +413,6 @@
    ]
   },
   "VS-2026-P41": {
-   "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P42": {
    "checks": [
     "urlhaus_compromise"
    ]

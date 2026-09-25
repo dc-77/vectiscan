@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-20.1 auf tests/golden/facts/860d0d5a-1086-4958-a9ac-4650423095f2.json",
+ "source": "reporter.catalog 2026-09-25.1 auf tests/golden/facts/860d0d5a-1086-4958-a9ac-4650423095f2.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -341,7 +341,8 @@
     "188.40.3.130:143 (IMAP)",
     "188.40.3.130:21 (FTP)"
    ],
-   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
+   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+   "zustaendig": "hoster"
   },
   {
    "id": "VS-2026-026",
@@ -447,7 +448,8 @@
     "188.40.3.130:3306 (MariaDB 10.11.18)",
     "188.40.3.130:5432 (PostgreSQL unbekannt)"
    ],
-   "title": "Dienst gibt Versionskennung preis"
+   "title": "Dienst gibt Versionskennung preis",
+   "zustaendig": "hoster"
   },
   {
    "id": "VS-2026-034",
@@ -629,46 +631,38 @@
   },
   {
    "id": "VS-2026-P10",
-   "check": "db_exposed",
-   "family": "db_exposed",
-   "cat": "A",
-   "group": "2a01:4f8:d0a:3124::2 (nachhaltigkeit.junkerwerk.de)",
-   "title": "Keine Datenbankdienste aus dem Internet erreichbar"
+   "check": "dkim_missing",
+   "family": "dkim_missing",
+   "cat": "C",
+   "group": "junkerwerk.de",
+   "title": "DKIM vorhanden"
   },
   {
    "id": "VS-2026-P11",
    "check": "dkim_missing",
    "family": "dkim_missing",
    "cat": "C",
-   "group": "junkerwerk.de",
+   "group": "junkerwerk.hu",
    "title": "DKIM vorhanden"
   },
   {
    "id": "VS-2026-P12",
-   "check": "dkim_missing",
-   "family": "dkim_missing",
+   "check": "dns_dangling_cname",
+   "family": "dns_dangling",
    "cat": "C",
-   "group": "junkerwerk.hu",
-   "title": "DKIM vorhanden"
+   "group": "junkerwerk.de",
+   "title": "Keine verwaisten CNAME-Einträge"
   },
   {
    "id": "VS-2026-P13",
    "check": "dns_dangling_cname",
    "family": "dns_dangling",
    "cat": "C",
-   "group": "junkerwerk.de",
-   "title": "Keine verwaisten CNAME-Einträge"
-  },
-  {
-   "id": "VS-2026-P14",
-   "check": "dns_dangling_cname",
-   "family": "dns_dangling",
-   "cat": "C",
    "group": "junkerwerk.hu",
    "title": "Keine verwaisten CNAME-Einträge"
   },
   {
-   "id": "VS-2026-P15",
+   "id": "VS-2026-P14",
    "check": "dns_zone_transfer",
    "family": "dns_axfr",
    "cat": "C",
@@ -676,7 +670,7 @@
    "title": "Zonentransfer abgewiesen"
   },
   {
-   "id": "VS-2026-P16",
+   "id": "VS-2026-P15",
    "check": "ftp_plaintext",
    "family": "ftp_exposed",
    "cat": "A",
@@ -684,11 +678,19 @@
    "title": "FTP erzwingt TLS vor der Anmeldung"
   },
   {
-   "id": "VS-2026-P17",
+   "id": "VS-2026-P16",
    "check": "http_no_tls",
    "family": "http_no_tls",
    "cat": "A",
    "group": "188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de)",
+   "title": "Webdienst mit Transportverschlüsselung"
+  },
+  {
+   "id": "VS-2026-P17",
+   "check": "http_no_tls",
+   "family": "http_no_tls",
+   "cat": "A",
+   "group": "217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de)",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
@@ -696,23 +698,23 @@
    "check": "http_no_tls",
    "family": "http_no_tls",
    "cat": "A",
-   "group": "217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de)",
+   "group": "217.243.248.29 (cloud.junkerwerk.de, team.junkerwerk.de)",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
    "id": "VS-2026-P19",
-   "check": "http_no_tls",
-   "family": "http_no_tls",
-   "cat": "A",
-   "group": "217.243.248.29 (cloud.junkerwerk.de, team.junkerwerk.de)",
-   "title": "Webdienst mit Transportverschlüsselung"
+   "check": "ip_reputation",
+   "family": "ip_reputation",
+   "cat": "E",
+   "group": "188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de)",
+   "title": "Keine Einträge in Reputationsquellen"
   },
   {
    "id": "VS-2026-P20",
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de)",
+   "group": "217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
@@ -720,7 +722,7 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de)",
+   "group": "217.243.248.29 (cloud.junkerwerk.de, team.junkerwerk.de)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
@@ -728,19 +730,11 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "217.243.248.29 (cloud.junkerwerk.de, team.junkerwerk.de)",
-   "title": "Keine Einträge in Reputationsquellen"
-  },
-  {
-   "id": "VS-2026-P23",
-   "check": "ip_reputation",
-   "family": "ip_reputation",
-   "cat": "E",
    "group": "2a01:4f8:d0a:3124::2 (nachhaltigkeit.junkerwerk.de)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
-   "id": "VS-2026-P24",
+   "id": "VS-2026-P23",
    "check": "mail_plaintext",
    "family": "mail_plaintext",
    "cat": "A",
@@ -748,11 +742,19 @@
    "title": "POP3 und IMAP erzwingen TLS vor der Anmeldung"
   },
   {
-   "id": "VS-2026-P25",
+   "id": "VS-2026-P24",
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
    "group": "188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de)",
+   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
+  },
+  {
+   "id": "VS-2026-P25",
+   "check": "rdp_exposed",
+   "family": "rdp_exposed",
+   "cat": "A",
+   "group": "217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
@@ -760,27 +762,11 @@
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de)",
-   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P27",
-   "check": "rdp_exposed",
-   "family": "rdp_exposed",
-   "cat": "A",
    "group": "217.243.248.29 (cloud.junkerwerk.de, team.junkerwerk.de)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P28",
-   "check": "rdp_exposed",
-   "family": "rdp_exposed",
-   "cat": "A",
-   "group": "2a01:4f8:d0a:3124::2 (nachhaltigkeit.junkerwerk.de)",
-   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P29",
+   "id": "VS-2026-P27",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -788,7 +774,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P30",
+   "id": "VS-2026-P28",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -796,7 +782,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P31",
+   "id": "VS-2026-P29",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -804,15 +790,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P32",
-   "check": "smb_exposed",
-   "family": "smb_exposed",
-   "cat": "A",
-   "group": "2a01:4f8:d0a:3124::2 (nachhaltigkeit.junkerwerk.de)",
-   "title": "Kein SMB-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P33",
+   "id": "VS-2026-P30",
    "check": "software_eol",
    "family": "software_eol",
    "cat": "B",
@@ -820,7 +798,7 @@
    "title": "Serversoftware mit laufender Herstellerpflege"
   },
   {
-   "id": "VS-2026-P34",
+   "id": "VS-2026-P31",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
@@ -828,7 +806,7 @@
    "title": "SPF-Eintrag vorhanden"
   },
   {
-   "id": "VS-2026-P35",
+   "id": "VS-2026-P32",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
@@ -836,7 +814,15 @@
    "title": "SPF-Eintrag vorhanden"
   },
   {
-   "id": "VS-2026-P36",
+   "id": "VS-2026-P33",
+   "check": "tls_legacy_protocols",
+   "family": "tls_legacy_protocols",
+   "cat": "D",
+   "group": "autodiscover.junkerwerk.de",
+   "title": "Nur aktuelle TLS-Protokolle"
+  },
+  {
+   "id": "VS-2026-P34",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
@@ -844,7 +830,7 @@
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
-   "id": "VS-2026-P37",
+   "id": "VS-2026-P35",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -852,7 +838,7 @@
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P38",
+   "id": "VS-2026-P36",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -860,31 +846,39 @@
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P39",
+   "id": "VS-2026-P37",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
    "group": "outlook.junkerwerk.de",
    "title": "TLS 1.3 verfügbar"
+  },
+  {
+   "id": "VS-2026-P38",
+   "check": "tls_weak_ciphers",
+   "family": "tls_weak_ciphers",
+   "cat": "D",
+   "group": "autodiscover.junkerwerk.de",
+   "title": "Keine schwachen TLS-Cipher"
+  },
+  {
+   "id": "VS-2026-P39",
+   "check": "tls_weak_ciphers",
+   "family": "tls_weak_ciphers",
+   "cat": "D",
+   "group": "cloud.junkerwerk.de (+team.junkerwerk.de)",
+   "title": "Keine schwachen TLS-Cipher"
   },
   {
    "id": "VS-2026-P40",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
-   "group": "cloud.junkerwerk.de (+team.junkerwerk.de)",
-   "title": "Keine schwachen TLS-Cipher"
-  },
-  {
-   "id": "VS-2026-P41",
-   "check": "tls_weak_ciphers",
-   "family": "tls_weak_ciphers",
-   "cat": "D",
    "group": "outlook.junkerwerk.de",
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P42",
+   "id": "VS-2026-P41",
    "check": "urlhaus_compromise",
    "family": "urlhaus_compromise",
    "cat": "A",

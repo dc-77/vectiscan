@@ -14,6 +14,7 @@ from reporter.catalog.schema import CatalogOutput
 from reporter.catalog.version import CATALOG_VERSION
 from reporter.facts import schema as FS
 from reporter.v3 import chapters as C
+from reporter.v3 import coverage as COV
 from reporter.v3 import findings as F
 from reporter.v3 import ids as IDS
 from reporter.v3 import narrative as N
@@ -29,19 +30,25 @@ DEFAULT_CUSTOMER = "Auftraggeber"
 
 
 def _counts(facts: FS.Facts, output: CatalogOutput, n_findings: int, n_positives: int,
-            runs: int, coverage: dict[str, tuple[str, str]]) -> N.Counts:
+            runs: int, model: COV.Model) -> N.Counts:
     members = sum(
         1 for r in output.results if r.status == "fail" for m in r.members if m.status == "fail")
     raw = members + sum(u.count for u in output.unprocessed) + sum(i.count for i in output.ignored)
     fails = output.summary.by_status.get("fail", 0)
-    cov = [c for c, _ in coverage.values()]
+    # Je System eine Zeile in 2.1 (IPv4 und IPv6 mit gleichem rDNS); der Satz ueber
+    # Luecken zaehlt dieselben Zeilen, sonst widersprechen sich Satz und Tabelle.
+    cov = [model.system_status(ips) for ips in model.system_rows()]
+    # S6b-1 (spec/09 Q16): Hostnamen eindeutig zaehlen (IPv4 und IPv6 zaehlten doppelt);
+    # Drittanbieter-Adressen und ihre Namen sind kein Host des Kunden.
+    eigene = [h for h in facts.hosts if h.third_party is None]
+    eigene_ips = {h.ip for h in eigene}
     return N.Counts(
         domains=list(facts.scan.domains) or [facts.scan.domain],
         scan_date=C.format_date(facts.scan.finished_at or facts.scan.started_at),
-        hosts_total=len(facts.hosts),
-        hosts_ipv4=sum(1 for h in facts.hosts if h.family == 4),
-        hosts_ipv6=sum(1 for h in facts.hosts if h.family == 6),
-        fqdns_total=sum(1 for f in facts.fqdns if not f.wildcard),
+        hosts_total=len(eigene),
+        hosts_ipv4=sum(1 for h in eigene if h.family == 4),
+        hosts_ipv6=sum(1 for h in eigene if h.family == 6),
+        fqdns_total=len({f.name.lower() for f in facts.fqdns if not f.wildcard and f.host_ip in eigene_ips}),
         runs=runs,
         tool_runs=len(facts.coverage),
         raw_findings=raw,
@@ -49,10 +56,20 @@ def _counts(facts: FS.Facts, output: CatalogOutput, n_findings: int, n_positives
         positives=n_positives,
         coverage_full=cov.count("voll"),
         coverage_partial=cov.count("teil"),
-        coverage_none=cov.count("keine"),
+        coverage_none=cov.count("keine") + cov.count("unerreichbar"),
         duplicates=max(raw - fails, 0),
         not_testable=output.summary.by_status.get("not_testable", 0),
     )
+
+
+def _context_sources(context: dict[str, Any]) -> dict[str, str]:
+    """Herkunft je Kontextfeld (kunde, recherche, admin) fuer die Reportdaten (Q15)."""
+    sources = context.get("sources") if isinstance(context.get("sources"), dict) else {}
+    out: dict[str, str] = {}
+    for name, entry in sorted(sources.items()):
+        if isinstance(entry, dict) and entry.get("source") and context.get(name):
+            out[str(name)] = str(entry["source"])
+    return out
 
 
 def build_report_data(
@@ -89,7 +106,7 @@ def build_report_data(
     scan_date = C.format_date(scan_end)
     year = int(scan_date.rsplit(".", 1)[-1]) if scan_date != C.UNKNOWN else 0
 
-    items, positive_items = consolidate(output)
+    items, positive_items = consolidate(output, facts)
     finding_items = [i for i in items if i.target == "findings"]
     finding_list, cve_refs, tool_findings = F.build_findings(
         output, items, facts, kuerzel=kuerzel, year=year)
@@ -97,8 +114,8 @@ def build_report_data(
 
     orders = order.get("orders") or [{"label": "Lauf 1", "id": facts.scan.order_id}]
     runs = len(orders)
-    coverage = C.coverage_by_host(facts)
-    counts = _counts(facts, output, len(finding_list), len(positives), runs, coverage)
+    model = C.coverage_model(facts)
+    counts = _counts(facts, output, len(finding_list), len(positives), runs, model)
 
     pairs = list(zip(finding_items, finding_list))
     plan = P.build_plan(pairs)
@@ -107,12 +124,13 @@ def build_report_data(
     # S6 (spec/08 Punkt 10): Der Hinweis auf Seite 3 haengt an den
     # Leitwerkzeugen des Pakets, nicht an jeder Luecke. Die Abdeckungstabelle
     # in Kapitel 2 zeigt weiterhin jede Luecke.
-    gap_hosts = C.hosts_ohne_leitwerkzeug(facts)
+    # S6b-1: dieselbe Regel wie die Abdeckung in Kapitel 2.1 (coverage.py).
+    gap_hosts = model.gaps()
     glance = C.build_glance(finding_items, finding_list, counts, gap_hosts)
     glance.levers = levers
     business = C.build_business(facts, C.observed_systems(facts))
-    scope = C.build_scope(facts, output, counts, coverage)
-    architecture = C.build_architecture(facts, output, finding_items, finding_list)
+    scope = C.build_scope(facts, output, counts, model)
+    architecture = C.build_architecture(facts, output, finding_items, finding_list, model)
 
     package_name, package_label = T.package_labels(facts.scan.package)
     # S5: der Firmenname steht im Kundenkontext unter "firmenname" (Migration 045,
@@ -155,6 +173,7 @@ def build_report_data(
         catalog_version=output.catalog_version,
         catalog_digest=output.catalog_digest,
         facts_schema_version=output.facts_schema_version,
+        context_sources=_context_sources(context),
         **T.PROVIDER,
     )
 
@@ -169,7 +188,8 @@ def build_report_data(
         plan=plan,
         findings=finding_list,
         appendix=build_appendix(facts, output, finding_list, cve_refs, tool_findings,
-                                counts, scan_date, T.PROVIDER["provider"]),
+                                counts, scan_date, T.PROVIDER["provider"],
+                                port_refs=C.finding_ports(facts, finding_items, finding_list)),
     )
 
     if prose:

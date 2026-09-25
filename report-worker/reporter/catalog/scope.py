@@ -93,6 +93,30 @@ def _fqdn_key(name: str | None, ip: str) -> str:
     return f"{name or ip_token(ip)}@{ip_token(ip)}"
 
 
+def without_third_party(facts: FS.Facts) -> FS.Facts:
+    """Fakten ohne Drittanbieter-Adressen (S6b-1, spec/09 Teil 2).
+
+    Eine Adresse, die der Scanner begruendet uebersprungen hat und auf die jeder
+    Kundenname per CNAME nach draussen zeigt (Microsoft-Autodiscover bei
+    bergersysteme), ist kein System des Kunden. Sie liefert weder Befunde noch
+    Positivbefunde; der Bericht nennt sie als "Drittanbieter, nicht geprueft".
+    """
+    fremd = {h.ip for h in facts.hosts if h.third_party is not None}
+    if not fremd:
+        return facts
+
+    def keep(items: list, attr: str = "host_ip") -> list:
+        return [x for x in items if getattr(x, attr, None) not in fremd]
+
+    return facts.model_copy(update={
+        "hosts": [h for h in facts.hosts if h.ip not in fremd],
+        "fqdns": keep(facts.fqdns), "services": keep(facts.services), "tls": keep(facts.tls),
+        "http": keep(facts.http), "software": keep(facts.software), "passive": keep(facts.passive),
+        "threats": keep(facts.threats), "coverage": keep(facts.coverage),
+        "unprocessed": keep(facts.unprocessed),
+    })
+
+
 class FactsIndex:
     """Nachschlagestrukturen ueber ein Facts-Objekt (einmal je Auswertung)."""
 

@@ -29,7 +29,7 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Der Host {group} bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des
+    {n:Der Host|Die Hosts} {group} {n:bietet|bieten} ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des
     Anschlusses zählt: {affected}. Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung
     nicht.
   meaning: >-

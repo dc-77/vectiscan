@@ -29,7 +29,7 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Der Host {group} beantwortet Verbindungen auf SMB-Freigabeports aus dem gesamten Internet:
+    {n:Der Host|Die Hosts} {group} {n:beantwortet|beantworten} Verbindungen auf SMB-Freigabeports aus dem gesamten Internet:
     {affected}. Ein Datei- und Freigabedienst gehört nicht an das öffentliche Interface.
   meaning: >-
     Ein von außen erreichbarer SMB-Dienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht

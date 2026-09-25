@@ -1,4 +1,5 @@
 {
+ "context": null,
  "coverage": [
   {
    "confidence": 1.0,
@@ -1595,6 +1596,68 @@
    "source": "dns_records",
    "spf": {
     "all_qualifier": "~all",
+    "mechanisms": [
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "20.52.130.35"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "168.245.40.44"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "167.89.99.179"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "149.72.147.186"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "167.89.101.239"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "88.99.138.97"
+     },
+     {
+      "kind": "ip6",
+      "qualifier": "+",
+      "value": "2a01:4f8:10a:22a2::2"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.protection.outlook.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.hornetsecurity.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.crsend.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "_spf.samanage.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf-de.emailsignatures365.com"
+     }
+    ],
     "raw": "v=spf1 ip4:20.52.130.35 ip4:168.245.40.44 ip4:167.89.99.179 ip4:149.72.147.186 ip4:167.89.101.239 ip4:88.99.138.97 ip6:2a01:4f8:10a:22a2::2 include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.crsend.com include:_spf.samanage.com \" \"include:spf-de.emailsignatures365.com ~all"
    },
    "tls_rpt": {
@@ -1615,6 +1678,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1647,6 +1711,7 @@
     }
    ],
    "body_hash": "5b13fb5957b84ef7bb9d0b6cd509c947ff6a37d67efdac2b896ddd3b908aad10",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1677,6 +1742,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1703,6 +1769,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1729,6 +1796,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1755,6 +1823,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1781,6 +1850,9 @@
   {
    "aliases": [],
    "body_hash": "dbfac7fe5630df78d34a4930a7cf5b19eda363160c9c0586bfadffcb8002b59c",
+   "cname": [
+    "connect.funnelcockpit.com"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1811,6 +1883,7 @@
   {
    "aliases": [],
    "body_hash": "1e3469b7dcc0d76ab034881b9012edeed5d7e626f9eb751838bd36be9cbb68f0",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1841,6 +1914,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1867,6 +1941,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1893,6 +1968,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1930,6 +2006,7 @@
     }
    ],
    "body_hash": "611836ee693c1ad6839ad148051d394f95c1ace4627ab72fa4c94109ebc3cadc",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2020,6 +2097,7 @@
     "isp": "Cloudflare, Inc.",
     "usage_type": "Content Delivery Network"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -2029,7 +2107,23 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "online.heuel.com CNAME connect.funnelcockpit.com",
+      "ref": "phase0/dnsx_validation.json",
+      "tool": "dnsx"
+     }
+    ],
+    "foreign_names": [],
+    "kind": "platform",
+    "operator": "funnelcockpit.com",
+    "signals": [
+     "cname_fremd"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -2067,6 +2161,7 @@
     "isp": "comtrance service GmbH",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": null,
    "reputation": {
     "abuseipdb_score": 0,
@@ -2076,7 +2171,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "host_inventory"
+   "shared": null,
+   "source": "host_inventory",
+   "third_party": null
   },
   {
    "blocked": {
@@ -2120,6 +2217,7 @@
     "isp": "Microsoft Corporation",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -2129,7 +2227,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -2167,6 +2267,7 @@
     "isp": "Hetzner Online AG",
     "usage_type": "Content Delivery Network"
    },
+   "reach": null,
    "reachable": null,
    "reputation": {
     "abuseipdb_score": 0,
@@ -2176,7 +2277,9 @@
     "urlhaus_compromised": null
    },
    "reverse": "www51.your-server.de",
-   "source": "host_inventory"
+   "shared": null,
+   "source": "host_inventory",
+   "third_party": null
   },
   {
    "blocked": {
@@ -2220,6 +2323,7 @@
     "isp": "IONOS SE",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -2229,7 +2333,9 @@
     "urlhaus_compromised": null
    },
    "reverse": "ip217-72-203-132.pbiaas.com",
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -2266,6 +2372,7 @@
     "isp": "Hetzner Online GmbH",
     "usage_type": "Content Delivery Network"
    },
+   "reach": null,
    "reachable": null,
    "reputation": {
     "abuseipdb_score": 0,
@@ -2275,7 +2382,9 @@
     "urlhaus_compromised": null
    },
    "reverse": "www51.your-server.de",
-   "source": "host_inventory"
+   "shared": null,
+   "source": "host_inventory",
+   "third_party": null
   }
  ],
  "http": [
@@ -3348,6 +3457,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -3375,6 +3485,7 @@
    "port": 80,
    "product": null,
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3402,6 +3513,7 @@
    "port": 443,
    "product": "CloudFlare",
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3429,6 +3541,7 @@
    "port": 2052,
    "product": null,
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "auto",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -3456,6 +3569,7 @@
    "port": 2053,
    "product": null,
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "auto",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -3483,6 +3597,7 @@
    "port": 2082,
    "product": null,
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "http-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -3510,6 +3625,7 @@
    "port": 2083,
    "product": null,
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "https-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -3537,6 +3653,7 @@
    "port": 2086,
    "product": null,
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "http-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -3564,6 +3681,7 @@
    "port": 2087,
    "product": null,
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "https-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -3591,6 +3709,7 @@
    "port": 2095,
    "product": null,
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "auto",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -3618,6 +3737,7 @@
    "port": 2096,
    "product": null,
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "auto",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -3645,6 +3765,7 @@
    "port": 6443,
    "product": null,
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "https-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -3672,6 +3793,7 @@
    "port": 8080,
    "product": null,
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "http-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3699,6 +3821,7 @@
    "port": 8443,
    "product": "CloudFlare",
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3726,6 +3849,7 @@
    "port": 8880,
    "product": null,
    "seen_at": "2026-05-21T05:18:03Z",
+   "service": "https-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -3753,6 +3877,7 @@
    "port": 21,
    "product": null,
    "seen_at": "2026-05-20T17:50:48Z",
+   "service": "auto",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3780,6 +3905,7 @@
    "port": 80,
    "product": "Apache httpd",
    "seen_at": "2026-05-20T17:50:48Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3807,6 +3933,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-05-20T17:50:48Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3834,6 +3961,7 @@
    "port": 8443,
    "product": null,
    "seen_at": "2026-05-20T17:50:48Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3862,6 +3990,7 @@
    "port": 21,
    "product": null,
    "seen_at": "2026-05-21T19:16:15Z",
+   "service": "ftp",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -3890,6 +4019,7 @@
    "port": 22,
    "product": null,
    "seen_at": "2026-05-21T19:16:15Z",
+   "service": "ssh",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -3918,6 +4048,7 @@
    "port": 25,
    "product": null,
    "seen_at": "2026-05-21T19:16:15Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -3946,6 +4077,7 @@
    "port": 80,
    "product": "Apache httpd",
    "seen_at": "2026-05-21T19:16:15Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -3974,6 +4106,7 @@
    "port": 110,
    "product": null,
    "seen_at": "2026-05-21T19:16:15Z",
+   "service": "pop3",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -4002,6 +4135,7 @@
    "port": 143,
    "product": null,
    "seen_at": "2026-05-21T19:16:15Z",
+   "service": "imap",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -4030,6 +4164,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-05-21T19:16:15Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -4058,6 +4193,7 @@
    "port": 465,
    "product": null,
    "seen_at": "2026-05-21T19:16:15Z",
+   "service": "smtps",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -4086,6 +4222,7 @@
    "port": 587,
    "product": null,
    "seen_at": "2026-05-21T19:16:15Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -4114,6 +4251,7 @@
    "port": 993,
    "product": null,
    "seen_at": "2026-05-21T19:16:15Z",
+   "service": "imap-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -4142,6 +4280,7 @@
    "port": 995,
    "product": null,
    "seen_at": "2026-05-21T19:16:15Z",
+   "service": "pop3-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -4169,6 +4308,7 @@
    "port": 80,
    "product": null,
    "seen_at": "2026-05-20T18:19:39Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -4196,6 +4336,7 @@
    "port": 443,
    "product": null,
    "seen_at": "2026-05-20T18:19:39Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -4224,6 +4365,7 @@
    "port": 80,
    "product": "Apache httpd",
    "seen_at": "2026-05-15T18:53:29Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -4252,6 +4394,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-05-15T18:53:29Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -4335,7 +4478,7 @@
    }
   ]
  },
- "schema_version": "1.0.5",
+ "schema_version": "1.0.6",
  "services": [
   {
    "auth_mechanisms": [],
@@ -5284,43 +5427,6 @@
   },
   {
    "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "217.72.203.132",
-   "id": "sw:217.72.203.132:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-05-22T00:03:58Z",
-   "product": "HSTS",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
    "confidence": 0.95,
    "detection_sources": [
     "cms_fingerprint"
@@ -5679,6 +5785,7 @@
  "threats": [],
  "tls": [
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "online.heuel.com",
@@ -5726,6 +5833,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "*.heuel.com",
@@ -5774,6 +5882,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "www.heuel.com",

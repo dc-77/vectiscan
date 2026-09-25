@@ -19,6 +19,7 @@ from reporter.v3 import levels as L
 from reporter.v3 import narrative as N
 from reporter.v3.bundles import Consolidated
 from reporter.v3.models import Finding, Lever, PlanRow
+from reporter.v3.operators import ASK_AT
 
 MAX_LEVERS = 3
 # Trenner mehrerer Effekte einer zusammengeführten Planzeile; die Vorlage setzt daraus
@@ -45,12 +46,15 @@ def build_plan(pairs: list[tuple[Consolidated, Finding]]) -> list[PlanRow]:
     # Empfehlung des Katalogs. Sonst traegt die Planzeile eines gelben Befunds
     # "Unverzueglich" und eine rote Farbe (spec/08 Punkt 1). Der Massnahmentext
     # bleibt der der dringlichsten Katalogstufe, das ist die konkrete Handlung.
-    groups: dict[tuple[str, str], list[tuple[Consolidated, Finding]]] = {}
+    # S6b-1 (spec/09 Q3): Massnahmen beim Hoster oder Plattformbetreiber stehen in eigenen
+    # Zeilen und sagen, an wen sie sich richten.
+    groups: dict[tuple[str, str, str], list[tuple[Consolidated, Finding]]] = {}
     for item, finding in pairs:
-        groups.setdefault((_stage_of(item), item.merge_key), []).append((item, finding))
+        op_key = item.operator.key if item.operator else ""
+        groups.setdefault((_stage_of(item), item.merge_key, op_key), []).append((item, finding))
 
     rows: list[tuple[tuple, PlanRow]] = []
-    for (stage, merge_key), members in groups.items():
+    for (stage, merge_key, op_key), members in groups.items():
         members.sort(key=lambda p: (L.severity_key(p[0].scale, p[0].level), p[1].id))
         lead_item, lead_finding = members[0]
         actions: list[str] = []
@@ -58,9 +62,11 @@ def build_plan(pairs: list[tuple[Consolidated, Finding]]) -> list[PlanRow]:
             text = _action(item, L.top_stage([rec.stage for rec in item.texts.recommendation]))
             if text not in actions:
                 actions.append(text)
+        if lead_item.operator is not None:
+            actions = [f"{ASK_AT[lead_item.operator.kind]} einfordern: {actions[0]}"] + actions[1:]
         rows.append((
             (L.STAGE_RANK[stage], L.severity_key(lead_item.scale, lead_item.level),
-             lead_finding.cat, merge_key),
+             lead_finding.cat, merge_key, op_key),
             PlanRow(
                 prio=L.URGENCY_BY_STAGE[stage],
                 st=lead_finding.status,

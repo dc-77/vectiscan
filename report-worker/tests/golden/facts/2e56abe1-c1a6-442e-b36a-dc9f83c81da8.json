@@ -1,4 +1,5 @@
 {
+ "context": null,
  "coverage": [
   {
    "confidence": 1.0,
@@ -647,7 +648,7 @@
    "reason": "no_open_ports",
    "scope": "host",
    "source": "scan_results",
-   "status": "ok",
+   "status": "empty",
    "tool": "nmap"
   },
   {
@@ -3742,6 +3743,68 @@
    "source": "dns_records",
    "spf": {
     "all_qualifier": "~all",
+    "mechanisms": [
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "20.52.130.35"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "168.245.40.44"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "167.89.99.179"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "149.72.147.186"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "167.89.101.239"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "88.99.138.97"
+     },
+     {
+      "kind": "ip6",
+      "qualifier": "+",
+      "value": "2a01:4f8:10a:22a2::2"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.protection.outlook.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.hornetsecurity.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.crsend.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "_spf.samanage.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf-de.emailsignatures365.com"
+     }
+    ],
     "raw": "v=spf1 ip4:20.52.130.35 ip4:168.245.40.44 ip4:167.89.99.179 ip4:149.72.147.186 ip4:167.89.101.239 ip4:88.99.138.97 ip6:2a01:4f8:10a:22a2::2 include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.crsend.com include:_spf.samanage.com \" \"include:spf-de.emailsignatures365.com ~all"
    },
    "tls_rpt": {
@@ -3762,6 +3825,7 @@
   {
    "aliases": [],
    "body_hash": "cea46b7e0ff49a96fca5e9046918eab480667758e1d8382f8b3c1946b64b200b",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3794,6 +3858,7 @@
     }
    ],
    "body_hash": "ab768623070128ccef048c88def86155dbe776c3d8db423cc8fa89432673d8a8",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3824,6 +3889,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3850,6 +3916,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3876,6 +3943,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3902,6 +3970,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3928,6 +3997,10 @@
   {
    "aliases": [],
    "body_hash": "ae63d45c82d37ca0aa7a47c4af0f312e091cfea487c42df0bbc2b13120b98dff",
+   "cname": [
+    "connect.funnelcockpit.com",
+    "ed157ad0e13aabf5.vercel-dns-016.com"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3958,6 +4031,7 @@
   {
    "aliases": [],
    "body_hash": "ca5ed6db0f2b7069549161180e3586c05e8aa25aa2b1f4182926375877238f06",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3988,6 +4062,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4014,6 +4089,7 @@
   {
    "aliases": [],
    "body_hash": "ca5ed6db0f2b7069549161180e3586c05e8aa25aa2b1f4182926375877238f06",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4040,6 +4116,7 @@
   {
    "aliases": [],
    "body_hash": "ca5ed6db0f2b7069549161180e3586c05e8aa25aa2b1f4182926375877238f06",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4077,6 +4154,7 @@
     }
    ],
    "body_hash": "d48706fdba0fe7222a79d224c6d28597f9304378c5a7a1d4af5917f7e4196bdd",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4168,6 +4246,12 @@
     "isp": "comtrance service GmbH",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": {
+    "passive_ports": [],
+    "passive_seen_at": null,
+    "passive_source": null,
+    "status": "no_open_ports"
+   },
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4177,7 +4261,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4221,6 +4307,7 @@
     "isp": "Microsoft Corporation",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4230,7 +4317,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4273,6 +4362,7 @@
     "isp": "Hetzner Online AG",
     "usage_type": "Content Delivery Network"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4282,7 +4372,38 @@
     "urlhaus_compromised": null
    },
    "reverse": "www51.your-server.de",
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "Shodan-Hostnamen 2a01:4f8:d0a:2757::2: service.help-ev.de, stage.help-ev.de, www.service.help-ev.de, www51.your-server.de",
+      "ref": "phase0a/shodan_hosts.json",
+      "tool": "shodan"
+     },
+     {
+      "excerpt": "rDNS www51.your-server.de",
+      "ref": "phase0/host_inventory.json",
+      "tool": "host_inventory"
+     },
+     {
+      "excerpt": "Nutzungsart content delivery network",
+      "ref": "phase0a/abuseipdb.json",
+      "tool": "abuseipdb"
+     }
+    ],
+    "foreign_names": [
+     "service.help-ev.de",
+     "stage.help-ev.de",
+     "www.service.help-ev.de"
+    ],
+    "kind": "hoster",
+    "operator": "Hetzner Online AG",
+    "signals": [
+     "fremde_namen_shodan",
+     "rdns_betreiber"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4324,6 +4445,7 @@
     "isp": "Vercel, Inc",
     "usage_type": "Content Delivery Network"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4333,7 +4455,23 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "online.heuel.com CNAME connect.funnelcockpit.com > ed157ad0e13aabf5.vercel-dns-016.com",
+      "ref": "phase0/dnsx_validation.json",
+      "tool": "dnsx"
+     }
+    ],
+    "foreign_names": [],
+    "kind": "platform",
+    "operator": "funnelcockpit.com",
+    "signals": [
+     "cname_fremd"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4377,6 +4515,7 @@
     "isp": "IONOS SE",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4386,7 +4525,37 @@
     "urlhaus_compromised": null
    },
    "reverse": "ip217-72-203-132.pbiaas.com",
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "Shodan-Hostnamen 217.72.203.132: akademie.umco.de, ip217-72-203-132.pbiaas.com, www.moenninghoff.net",
+      "ref": "phase0a/shodan_hosts.json",
+      "tool": "shodan"
+     },
+     {
+      "excerpt": "rDNS ip217-72-203-132.pbiaas.com",
+      "ref": "phase0/host_inventory.json",
+      "tool": "host_inventory"
+     },
+     {
+      "excerpt": "Nutzungsart data center/web hosting/transit",
+      "ref": "phase0a/abuseipdb.json",
+      "tool": "abuseipdb"
+     }
+    ],
+    "foreign_names": [
+     "akademie.umco.de",
+     "www.moenninghoff.net"
+    ],
+    "kind": "hoster",
+    "operator": "IONOS SE",
+    "signals": [
+     "fremde_namen_shodan",
+     "rdns_betreiber"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4428,6 +4597,12 @@
     "isp": "Hetzner Online GmbH",
     "usage_type": "Content Delivery Network"
    },
+   "reach": {
+    "passive_ports": [],
+    "passive_seen_at": null,
+    "passive_source": null,
+    "status": "no_ipv6_route"
+   },
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4437,7 +4612,38 @@
     "urlhaus_compromised": null
    },
    "reverse": "www51.your-server.de",
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "Shodan-Hostnamen 2a01:4f8:d0a:2757::2: service.help-ev.de, stage.help-ev.de, www.service.help-ev.de, www51.your-server.de",
+      "ref": "phase0a/shodan_hosts.json",
+      "tool": "shodan"
+     },
+     {
+      "excerpt": "rDNS www51.your-server.de",
+      "ref": "phase0/host_inventory.json",
+      "tool": "host_inventory"
+     },
+     {
+      "excerpt": "Nutzungsart content delivery network",
+      "ref": "phase0a/abuseipdb.json",
+      "tool": "abuseipdb"
+     }
+    ],
+    "foreign_names": [
+     "service.help-ev.de",
+     "stage.help-ev.de",
+     "www.service.help-ev.de"
+    ],
+    "kind": "hoster",
+    "operator": "Hetzner Online AG",
+    "signals": [
+     "fremde_namen_shodan",
+     "rdns_betreiber"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   }
  ],
  "http": [
@@ -6445,6 +6651,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -6473,6 +6680,7 @@
    "port": 21,
    "product": null,
    "seen_at": "2026-09-23T09:11:19Z",
+   "service": "auto",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6501,6 +6709,7 @@
    "port": 22,
    "product": null,
    "seen_at": "2026-09-23T09:11:19Z",
+   "service": "ssh",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6529,6 +6738,7 @@
    "port": 80,
    "product": "Apache httpd",
    "seen_at": "2026-09-23T09:11:19Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6557,6 +6767,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-09-23T09:11:19Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6585,6 +6796,7 @@
    "port": 4433,
    "product": null,
    "seen_at": "2026-09-23T09:11:19Z",
+   "service": "https-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -6613,6 +6825,7 @@
    "port": 8443,
    "product": null,
    "seen_at": "2026-09-23T09:11:19Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6641,6 +6854,7 @@
    "port": 21,
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
+   "service": "ftp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6669,6 +6883,7 @@
    "port": 22,
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
+   "service": "ssh",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6697,6 +6912,7 @@
    "port": 25,
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -6725,6 +6941,7 @@
    "port": 80,
    "product": "Apache httpd",
    "seen_at": "2026-09-23T19:14:43Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6753,6 +6970,7 @@
    "port": 110,
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
+   "service": "pop3",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6781,6 +6999,7 @@
    "port": 143,
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
+   "service": "imap",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6809,6 +7028,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-09-23T19:14:43Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6837,6 +7057,7 @@
    "port": 465,
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
+   "service": "smtps",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6865,6 +7086,7 @@
    "port": 587,
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6893,6 +7115,7 @@
    "port": 993,
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
+   "service": "imap-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6921,6 +7144,7 @@
    "port": 995,
    "product": null,
    "seen_at": "2026-09-23T19:14:43Z",
+   "service": "pop3-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6950,6 +7174,7 @@
    "port": 80,
    "product": null,
    "seen_at": "2026-09-23T18:11:24Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -6979,6 +7204,7 @@
    "port": 443,
    "product": null,
    "seen_at": "2026-09-23T18:11:24Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7008,6 +7234,7 @@
    "port": 80,
    "product": null,
    "seen_at": "2026-09-23T19:36:42Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7037,6 +7264,7 @@
    "port": 443,
    "product": null,
    "seen_at": "2026-09-23T19:36:42Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7067,6 +7295,7 @@
    "port": 80,
    "product": "Apache httpd",
    "seen_at": "2026-09-22T07:38:16Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7097,6 +7326,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-09-22T07:38:16Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7124,6 +7354,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "urlhaus",
    "transport": null,
    "verified": null,
@@ -7207,7 +7438,7 @@
    }
   ]
  },
- "schema_version": "1.0.5",
+ "schema_version": "1.0.6",
  "services": [
   {
    "auth_mechanisms": [],
@@ -8840,43 +9071,6 @@
   },
   {
    "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "217.72.203.132",
-   "id": "sw:217.72.203.132:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-23T20:08:00Z",
-   "product": "HSTS",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
    "confidence": 0.95,
    "detection_sources": [
     "cms_fingerprint"
@@ -9332,6 +9526,7 @@
  ],
  "tls": [
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "*.heuel.com",
@@ -10654,6 +10849,7 @@
    ]
   },
   {
+   "assigned_from": "edi.heuel.com:443",
    "cert": {
     "chain_ok": null,
     "cn": "*.heuel.com",
@@ -10670,17 +10866,24 @@
     "self_signed": null,
     "wildcard": true
    },
-   "ciphers_weak": [],
+   "ciphers_weak": [
+    "cbc"
+   ],
    "confidence": 1.0,
    "entries": [],
    "evidence": [
+    {
+     "excerpt": "ose.heuel.com:443 geprüft über edi.heuel.com:443, dessen Zertifikat ose.heuel.com abdeckt; angeboten: TLS1.2",
+     "ref": "scan_results:testssl:20.79.218.75",
+     "tool": "testssl"
+    },
     {
      "excerpt": "ose.heuel.com:443 tls=tls12 cn=*.heuel.com gueltig_bis=2027-04-14T14:45:26Z",
      "ref": "hosts/20.79.218.75/phase2/httpx_ose.heuel.com.json",
      "tool": "httpx"
     }
    ],
-   "fallback_scsv": null,
+   "fallback_scsv": true,
    "fqdn": "ose.heuel.com",
    "grade": null,
    "host_ip": "20.79.218.75",
@@ -10691,17 +10894,23 @@
    "observed_at": "2026-09-23T20:21:14Z",
    "port": 443,
    "protocols": {
-    "SSLv2": null,
-    "SSLv3": null,
-    "TLS1.0": null,
-    "TLS1.1": null,
+    "SSLv2": false,
+    "SSLv3": false,
+    "TLS1.0": false,
+    "TLS1.1": false,
     "TLS1.2": true,
-    "TLS1.3": null
+    "TLS1.3": false
    },
    "source": "httpx",
-   "vulns": []
+   "vulns": [
+    {
+     "name": "LUCKY13",
+     "status": "potential"
+    }
+   ]
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "online.heuel.com",
@@ -11967,6 +12176,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "heuel.com",
@@ -13292,6 +13502,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "www.heuel.com",

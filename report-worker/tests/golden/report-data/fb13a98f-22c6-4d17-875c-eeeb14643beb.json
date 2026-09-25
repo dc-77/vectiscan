@@ -76,7 +76,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 37 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (11 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 13 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 37 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (11 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 14 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -125,7 +125,7 @@
    {
     "host": "37.114.55.171",
     "port": "443",
-    "ref": "",
+    "ref": "VS-2026-005, VS-2026-010",
     "svc": "nginx, TLS erzwungen"
    },
    {
@@ -137,13 +137,13 @@
    {
     "host": "37.114.55.171",
     "port": "3128",
-    "ref": "VS-2026-003",
+    "ref": "VS-2026-003, VS-2026-012",
     "svc": "Proxmox Virtual Environment REST API 3.0"
    },
    {
     "host": "85.13.167.158",
     "port": "21",
-    "ref": "VS-2026-004",
+    "ref": "VS-2026-004, VS-2026-007",
     "svc": "Nagios NSCA"
    },
    {
@@ -173,7 +173,7 @@
    {
     "host": "85.13.167.158",
     "port": "139",
-    "ref": "VS-2026-002",
+    "ref": "VS-2026-002, VS-2026-012",
     "svc": "Samba smbd 4.6.2"
    },
    {
@@ -185,13 +185,13 @@
    {
     "host": "85.13.167.158",
     "port": "443",
-    "ref": "",
+    "ref": "VS-2026-009, VS-2026-011",
     "svc": "Apache httpd, TLS erzwungen"
    },
    {
     "host": "85.13.167.158",
     "port": "445",
-    "ref": "VS-2026-002",
+    "ref": "VS-2026-002, VS-2026-012",
     "svc": "Samba smbd 4.6.2"
    },
    {
@@ -221,7 +221,7 @@
    {
     "host": "85.13.167.158",
     "port": "3306",
-    "ref": "VS-2026-001",
+    "ref": "VS-2026-001, VS-2026-012",
     "svc": "MySQL 10.11.14"
    },
    {
@@ -233,20 +233,20 @@
    {
     "host": "87.79.190.79",
     "port": "443",
-    "ref": "",
+    "ref": "VS-2026-006",
     "svc": "nginx, TLS erzwungen"
    },
    {
     "host": "87.79.190.79",
     "port": "987",
-    "ref": "VS-2026-012",
+    "ref": "VS-2026-013",
     "svc": "OpenSSH 10.0p2"
    },
    {
     "host": "37.114.55.171",
     "port": "3478",
     "ref": "",
-    "svc": "unbekannt, laut Passivquelle"
+    "svc": "STUN, laut Passivquelle"
    }
   ],
   "repeat": [
@@ -301,7 +301,7 @@
   ]
  },
  "architecture": {
-  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 3 Hosts mit folgenden Aufgaben: Fernzugang und Verwaltung, Mail- und Kalenderplattform und Website und Datenbanken. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 3 Hosts mit folgenden Aufgaben: Dateiaustausch, Datenbankdienst, E-Mail-Server, Fernzugang und Verwaltung und Kollaboration. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
    "2 Beobachtungen der Werkzeuge haben keine Regel des Prüfkatalogs getroffen. Sie erscheinen nicht als Befund; wir prüfen sie und nehmen wiederkehrende Fälle in den Katalog auf."
   ],
@@ -414,60 +414,70 @@
   "reputation": "Reputation: keine Einträge zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus.",
   "screens": [
    {
+    "also": [],
     "file": "87.79.190.79__filebrowser.krause-computer.de.png",
     "host": "filebrowser.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__filebrowser.krause-computer.de.png",
     "what": "Antwort von filebrowser.krause-computer.de"
    },
    {
+    "also": [],
     "file": "37.114.55.171__jitsi.krause-computer.de.png",
     "host": "jitsi.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__jitsi.krause-computer.de.png",
     "what": "Antwort von jitsi.krause-computer.de"
    },
    {
+    "also": [],
     "file": "85.13.167.158__krause-computer.de.png",
     "host": "krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/85.13.167.158__krause-computer.de.png",
     "what": "Antwort von krause-computer.de"
    },
    {
+    "also": [],
     "file": "37.114.55.171__mx.krause-computer.de.png",
     "host": "mx.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__mx.krause-computer.de.png",
     "what": "Antwort von mx.krause-computer.de"
    },
    {
+    "also": [],
     "file": "87.79.190.79__navidrome.krause-computer.de.png",
     "host": "navidrome.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__navidrome.krause-computer.de.png",
     "what": "Antwort von navidrome.krause-computer.de"
    },
    {
+    "also": [],
     "file": "87.79.190.79__nextcloud.krause-computer.de.png",
     "host": "nextcloud.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__nextcloud.krause-computer.de.png",
     "what": "Antwort von nextcloud.krause-computer.de"
    },
    {
+    "also": [],
     "file": "37.114.55.171__nospamproxy.krause-computer.de.png",
     "host": "nospamproxy.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__nospamproxy.krause-computer.de.png",
     "what": "Antwort von nospamproxy.krause-computer.de"
    },
    {
+    "also": [],
     "file": "37.114.55.171__rustdesk.krause-computer.de.png",
     "host": "rustdesk.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__rustdesk.krause-computer.de.png",
     "what": "Antwort von rustdesk.krause-computer.de"
    },
    {
+    "also": [],
     "file": "85.13.167.158__www.krause-computer.de.png",
     "host": "www.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/85.13.167.158__www.krause-computer.de.png",
     "what": "Antwort von www.krause-computer.de"
    },
    {
+    "also": [],
     "file": "87.79.190.79__youtube.krause-computer.de.png",
     "host": "youtube.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__youtube.krause-computer.de.png",
@@ -488,7 +498,7 @@
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "blau"
+      "st": "gruen"
      },
      {
       "p": "26",
@@ -522,7 +532,7 @@
      },
      {
       "p": "3478",
-      "s": "unbekannt",
+      "s": "STUN",
       "st": "grau"
      }
     ]
@@ -544,7 +554,7 @@
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "blau"
+      "st": "gruen"
      },
      {
       "p": "80",
@@ -569,7 +579,7 @@
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "blau"
      },
      {
       "p": "445",
@@ -615,7 +625,7 @@
      {
       "p": "443",
       "s": "nginx",
-      "st": "gruen"
+      "st": "gelb"
      },
      {
       "p": "987",
@@ -625,20 +635,11 @@
     ]
    }
   ],
-  "services_note": "Rot: Dienst mit kritischem Befund · Gelb: Dienst mit Befund · Blau: Altprotokoll · Grün: unauffällig · Grau: nur aus einer Passivquelle bekannt.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt.",
   "tech": [
    {
     "host": "37.114.55.171 (mx.krause-computer.de)",
     "rows": [
-     {
-      "c": "HSTS",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
      {
       "c": "Jitsi",
       "conf": "mittel",
@@ -679,7 +680,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "nmap",
+      "src": "header_check, httpx, nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -693,16 +694,7 @@
       "c": "Joomla",
       "conf": "hoch",
       "note": "",
-      "src": "cms_fingerprint, webtech",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "HSTS",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
+      "src": "cms_fingerprint, httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -774,7 +766,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "httpx, nmap, webtech",
+      "src": "header_check, httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -815,7 +807,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "nmap",
+      "src": "header_check, httpx, nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -829,16 +821,44 @@
   "lead": "Was der Scan über das Unternehmen sichtbar macht, bestimmt, welche Befunde wirklich zählen. Maßgeblich ist nicht die Zahl der Meldungen, sondern welche Systeme am Perimeter stehen und wofür sie gebraucht werden.",
   "observed": [
    {
-    "meaning": "Außendarstellung und die dahinterliegenden Datenbestände. Betroffen wären vor allem Seiteninhalte, Formulareingaben und Kontaktdaten.",
-    "system": "Website und Datenbanken, Mail- und Kalenderplattform (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de)"
+    "evidence": [
+     "MX-Eintrag von krause-computer.de: mx.krause-computer.de",
+     "MX-Eintrag von krause-computer.de: nospamproxy.krause-computer.de",
+     "SPF-Eintrag von krause-computer.de: mx",
+     "22/tcp ssh OpenSSH",
+     "987/tcp ssh OpenSSH",
+     "3128/tcp http Proxmox Virtual Environment REST API"
+    ],
+    "meaning": "Über dieses System läuft E-Mail des Unternehmens. Ein Zugriff darauf trifft die Vertraulichkeit der Korrespondenz.",
+    "role_keys": [
+     "mail",
+     "fernzugang"
+    ],
+    "system": "E-Mail-Server, Fernzugang und Verwaltung (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de)"
    },
    {
-    "meaning": "Über dieses System läuft die geschäftliche Korrespondenz. Ein Zugriff darauf trifft Vertraulichkeit und Arbeitsfähigkeit zugleich.",
-    "system": "Mail- und Kalenderplattform, Website und Datenbanken (krause-computer.de, www.krause-computer.de)"
+    "evidence": [
+     "22/tcp ssh OpenSSH",
+     "3306/tcp mysql MySQL",
+     "21/tcp nagios-nsca Nagios NSCA"
+    ],
+    "meaning": "Der Weg von außen in das Unternehmensnetz. Solche Zugänge sind das bevorzugte Ziel, weil hinter ihnen alles Weitere liegt.",
+    "role_keys": [
+     "fernzugang",
+     "datenbank",
+     "dateiaustausch"
+    ],
+    "system": "Fernzugang und Verwaltung, Datenbankdienst, Dateiaustausch (krause-computer.de, www.krause-computer.de)"
    },
    {
-    "meaning": "Außendarstellung und die dahinterliegenden Datenbestände. Betroffen wären vor allem Seiteninhalte, Formulareingaben und Kontaktdaten.",
-    "system": "Website und Datenbanken, Fernzugang und Verwaltung (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de)"
+    "evidence": [
+     "Nextcloud (httpx)"
+    ],
+    "meaning": "Gemeinsame Ablage und Zusammenarbeit. Betroffen wären Dokumente und die Konten der Beteiligten.",
+    "role_keys": [
+     "kollaboration"
+    ],
+    "system": "Kollaboration (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de)"
    }
   ]
  },
@@ -852,6 +872,8 @@
    "impact": "Ein von außen erreichbarer Datenbankdienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar. Betroffen wären die gespeicherten Inhalte, typischerweise Seiteninhalte, Formulareingaben und Kontaktdaten.",
    "level": "kritisch",
    "level_label": "kritisch",
+   "operator": "",
+   "operator_note": "",
    "policy": "db_exposed",
    "recommendation": [
     [
@@ -884,6 +906,8 @@
    "impact": "Fernwartung und Dateifreigaben gehören nicht an das öffentliche Interface. Beide Protokolle sind die häufigsten Einstiegspunkte für Erpressungsangriffe, weil sie Zugangsdaten entgegen nehmen und in der Vergangenheit schwere Schwachstellen hatten.",
    "level": "kritisch",
    "level_label": "kritisch",
+   "operator": "",
+   "operator_note": "",
    "policy": "smb_exposed",
    "recommendation": [
     [
@@ -916,6 +940,8 @@
    "impact": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen.",
    "level": "erhoeht",
    "level_label": "erhöht",
+   "operator": "",
+   "operator_note": "",
    "policy": "admin_service_exposed",
    "recommendation": [
     [
@@ -948,6 +974,8 @@
    "impact": "Ohne erzwungene Transportverschlüsselung gehen Anmeldedaten und Inhalte im Klartext über das Netz. Jeder Mitleser auf dem Übertragungsweg kann sie abgreifen und für weitere Zugriffe auf den Dienst oder auf wiederverwendete Konten nutzen.",
    "level": "erhoeht",
    "level_label": "erhöht",
+   "operator": "",
+   "operator_note": "",
    "policy": "ftp_plaintext",
    "recommendation": [
     [
@@ -980,6 +1008,8 @@
    "impact": "Ein Zertifikat mit Beanstandung führt im Browser zu einer Vertrauenswarnung. Nutzer gewöhnen sich daran, solche Warnungen wegzuklicken, und übersehen dann auch eine echte Täuschung.",
    "level": "hoch",
    "level_label": "hoch",
+   "operator": "",
+   "operator_note": "",
    "policy": "cert_hostname_mismatch",
    "recommendation": [
     [
@@ -1008,6 +1038,8 @@
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "mittel",
    "level_label": "mittel",
+   "operator": "beim Plattformbetreiber skclient.de",
+   "operator_note": "Dieser Sachverhalt liegt beim Plattformbetreiber skclient.de: der Hostname zeigt auf dessen Plattform, Server und Grundkonfiguration betreibt er. Die Empfehlung richtet sich an ihn; Sie können sie über den Vertrag oder die Einstellungen der Plattform einfordern.",
    "policy": "csp_weak, security_headers_incomplete",
    "recommendation": [
     [
@@ -1023,7 +1055,7 @@
    "source": "aktiv (header_check)",
    "status": "gelb",
    "threat": null,
-   "title": "Sicherheits-Header und Formularschutz auf 87.79.190.79 unvollständig",
+   "title": "Sicherheits-Header und Formularschutz auf 87.79.190.79 unvollständig (beim Plattformbetreiber skclient.de)",
    "urgency": "Mittelfristig",
    "verify": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
   },
@@ -1036,6 +1068,8 @@
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
    "policy": "legacy_protocols_present",
    "recommendation": [
     [
@@ -1064,6 +1098,8 @@
    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
    "policy": "dane_missing, mta_sts_missing, tls_rpt_missing",
    "recommendation": [
     [
@@ -1088,6 +1124,8 @@
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
    "policy": "hsts_short",
    "recommendation": [
     [
@@ -1120,6 +1158,8 @@
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
    "policy": "security_headers_incomplete",
    "recommendation": [
     [
@@ -1148,6 +1188,8 @@
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
    "policy": "security_headers_incomplete",
    "recommendation": [
     [
@@ -1168,14 +1210,16 @@
    "verify": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
   },
   {
-   "affected": "37.114.55.171:22 (OpenSSH 10.0p2), 37.114.55.171:3128 (Proxmox Virtual Environment REST API 3.0), 37.114.55.171:987 (OpenSSH 10.0p2), 85.13.167.158:139 (Samba smbd 4.6.2), 85.13.167.158:22 (OpenSSH 9.6p1), 85.13.167.158:3306 (MariaDB 10.11.14), 85.13.167.158:445 (Samba smbd 4.6.2), 87.79.190.79:987 (OpenSSH 10.0p2)",
+   "affected": "37.114.55.171:22 (OpenSSH 10.0p2), 37.114.55.171:3128 (Proxmox Virtual Environment REST API 3.0), 37.114.55.171:987 (OpenSSH 10.0p2), 85.13.167.158:139 (Samba smbd 4.6.2), 85.13.167.158:22 (OpenSSH 9.6p1), 85.13.167.158:3306 (MariaDB 10.11.14), 85.13.167.158:445 (Samba smbd 4.6.2)",
    "cat": "E",
-   "evidence": "nmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:22/tcp Dienst=ssh Produkt=OpenSSH Version=10.0p2 Debian 7+deb13u4 Zustand=open\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n22/tcp open ssh OpenSSH 10.0p2 Debian 7+deb13u4 (protocol 2.0)\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:987/tcp Dienst=ssh Produkt=OpenSSH Version=10.0p2 Debian 7+deb13u2 Zustand=open\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n987/tcp open ssh OpenSSH 10.0p2 Debian 7+deb13u2 (protocol 2.0)\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:3128/tcp Dienst=http Produkt=Proxmox Virtual Environment REST API Version=3.0 Zustand=open\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:22/tcp Dienst=ssh Produkt=OpenSSH Version=9.6p1 Ubuntu 3ubuntu13.16 Zustand=open\n\nund 7 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
-   "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 37.114.55.171:22 (OpenSSH 10.0p2), 37.114.55.171:3128 (Proxmox Virtual Environment REST API 3.0), 37.114.55.171:987 (OpenSSH 10.0p2), 85.13.167.158:139 (Samba smbd 4.6.2), 85.13.167.158:22 (OpenSSH 9.6p1), 85.13.167.158:3306 (MariaDB 10.11.14), 85.13.167.158:445 (Samba smbd 4.6.2), 87.79.190.79:987 (OpenSSH 10.0p2).",
+   "evidence": "nmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:22/tcp Dienst=ssh Produkt=OpenSSH Version=10.0p2 Debian 7+deb13u4 Zustand=open\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n22/tcp open ssh OpenSSH 10.0p2 Debian 7+deb13u4 (protocol 2.0)\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:987/tcp Dienst=ssh Produkt=OpenSSH Version=10.0p2 Debian 7+deb13u2 Zustand=open\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n987/tcp open ssh OpenSSH 10.0p2 Debian 7+deb13u2 (protocol 2.0)\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:3128/tcp Dienst=http Produkt=Proxmox Virtual Environment REST API Version=3.0 Zustand=open\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:22/tcp Dienst=ssh Produkt=OpenSSH Version=9.6p1 Ubuntu 3ubuntu13.16 Zustand=open\n\nund 5 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
+   "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 37.114.55.171:22 (OpenSSH 10.0p2), 37.114.55.171:3128 (Proxmox Virtual Environment REST API 3.0), 37.114.55.171:987 (OpenSSH 10.0p2), 85.13.167.158:139 (Samba smbd 4.6.2), 85.13.167.158:22 (OpenSSH 9.6p1), 85.13.167.158:3306 (MariaDB 10.11.14), 85.13.167.158:445 (Samba smbd 4.6.2).",
    "id": "VS-2026-012",
    "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
    "policy": "service_banner_version",
    "recommendation": [
     [
@@ -1196,14 +1240,46 @@
    "verify": "Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue Versionsangabe und ohne die zusätzlichen Methoden."
   },
   {
+   "affected": "87.79.190.79:987 (OpenSSH 10.0p2)",
+   "cat": "E",
+   "evidence": "nmap · hosts/87.79.190.79/phase1/nmap.xml\n87.79.190.79:987/tcp Dienst=ssh Produkt=OpenSSH Version=10.0p2 Debian 7+deb13u4 Zustand=open\n\nnmap · hosts/87.79.190.79/phase1/nmap.xml\n987/tcp open ssh OpenSSH 10.0p2 Debian 7+deb13u4 (protocol 2.0)",
+   "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 87.79.190.79:987 (OpenSSH 10.0p2).",
+   "id": "VS-2026-013",
+   "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
+   "level": "niedrig",
+   "level_label": "niedrig",
+   "operator": "beim Plattformbetreiber skclient.de",
+   "operator_note": "Dieser Sachverhalt liegt beim Plattformbetreiber skclient.de: der Hostname zeigt auf dessen Plattform, Server und Grundkonfiguration betreibt er. Die Empfehlung richtet sich an ihn; Sie können sie über den Vertrag oder die Einstellungen der Plattform einfordern.",
+   "policy": "service_banner_version",
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten."
+    ],
+    [
+     "Strategisch",
+     "Die Vorgabe für Antwort-Header und erlaubte Methoden an einer Stelle pflegen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (nmap)",
+   "status": "blau",
+   "threat": null,
+   "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste (beim Plattformbetreiber skclient.de)",
+   "urgency": "Mittelfristig",
+   "verify": "Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue Versionsangabe und ohne die zusätzlichen Methoden."
+  },
+  {
    "affected": "krause-computer.de",
    "cat": "E",
    "evidence": "dns_records · phase0/dns_records.json\nkrause-computer.de: SPF=v=spf1 mx include:mx.krause-computer.de include:w020687e.kasserver.com -all DMARC=v=DMARC1; p=reject; adkim=r; aspf=r DKIM-Selektoren=keiner bekannt MX=krause.skclient.de, mail.krause-computer.de, mx.krause-comput...",
    "found": "Für krause-computer.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: krause-computer.de.",
-   "id": "VS-2026-013",
+   "id": "VS-2026-014",
    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
    "policy": "caa_missing, dnssec_missing",
    "recommendation": [
     [
@@ -1247,19 +1323,19 @@
     "key": "D",
     "level": 2,
     "name": "Web- und Transport-Hygiene",
-    "note": "Zertifikate auf mx.krause-computer.de mit Beanstandungen; Sicherheits-Header und Formularschutz auf 87.79.190.79 unvollständig",
+    "note": "Zertifikate auf mx.krause-computer.de mit Beanstandungen; Sicherheits-Header und Formularschutz auf 87.79.190.79 unvollständig (beim Plattformbetreiber skclient.de)",
     "status": "gelb"
    },
    {
     "key": "E",
     "level": 1,
     "name": "Konfiguration und Informations-Hygiene",
-    "note": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste; DNS-Absicherung für krause-computer.de nicht eingerichtet",
+    "note": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste; Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste (beim Plattformbetreiber skclient.de)",
     "status": "blau"
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von krause-computer.de am 26.05.2026: 11 Hostnamen auf 3 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "",
+  "coverage_warning": "Für 37.114.55.171, 85.13.167.158 und 87.79.190.79 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
@@ -1291,19 +1367,20 @@
   "overall_status": "rot",
   "overall_text": "2 Befunde erfordern unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
- "landscape_lead": "13 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "14 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 26,
-  "catalog_digest": "4e255169a28aea349450a125668c81504736ef052bd84894978cd0a9e8800dab",
-  "catalog_version": "2026-09-23.2",
+  "catalog_digest": "dcd629946febcc08a9c28922053c58d8d6eb044355d63056decc79caff8a905b",
+  "catalog_version": "2026-09-25.1",
   "classification": "Vertraulich",
-  "consolidated": 13,
+  "consolidated": 14,
+  "context_sources": {},
   "customer": "Auftraggeber",
   "customer_short": "Auftraggeber",
   "domains": [
    "krause-computer.de"
   ],
-  "facts_schema_version": "1.0.5",
+  "facts_schema_version": "1.0.6",
   "fqdns_total": 11,
   "hosts_ipv4": 3,
   "hosts_ipv6": 0,
@@ -1316,7 +1393,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-23.2",
+  "policy_version": "2026-09-25.1",
   "positives": 4,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1371,12 +1448,11 @@
    "st": "gelb"
   },
   {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+   "action": "Beim Plattformbetreiber einfordern: Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-006",
-    "VS-2026-010"
+    "VS-2026-006"
    ],
    "st": "gelb"
   },
@@ -1391,6 +1467,15 @@
    "st": "blau"
   },
   {
+   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-010"
+   ],
+   "st": "blau"
+  },
+  {
    "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
@@ -1401,12 +1486,21 @@
    "st": "blau"
   },
   {
+   "action": "Beim Plattformbetreiber einfordern: Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
+   "effect": "Nimmt Angreifern Vorbereitungswissen",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-013"
+   ],
+   "st": "blau"
+  },
+  {
    "action": "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain. Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
    "effect": "Schützt die Authentizität der eigenen E-Mail",
    "prio": "Strategisch",
    "refs": [
     "VS-2026-008",
-    "VS-2026-013"
+    "VS-2026-014"
    ],
    "st": "blau"
   }
@@ -1414,7 +1508,7 @@
  "positives": [
   {
    "cat": "A",
-   "text": "Der Host 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de), 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und weitere) bietet seinen Webdienst über HTTPS an.",
+   "text": "Die Hosts 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de) und 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und weitere) bieten ihre Webdienste über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
@@ -1429,7 +1523,7 @@
   },
   {
    "cat": "D",
-   "text": "Vor krause-computer.de, www.krause-computer.de ist eine Web Application Firewall aktiv, die Angriffe auf Anwendungsebene filtert, bevor sie den Webdienst erreichen.",
+   "text": "Vor krause-computer.de und www.krause-computer.de ist eine Web Application Firewall aktiv, die Angriffe auf Anwendungsebene filtert, bevor sie den Webdienst erreichen.",
    "title": "Web Application Firewall vorhanden"
   }
  ],
@@ -1448,69 +1542,120 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
+  "domains": [],
   "hosts": [
    {
-    "cov": "voll",
-    "coverage": "Portscan und Tiefenprüfung vollständig",
+    "cov": "teil",
+    "coverage": "Portscan vollständig; nicht geprüft: Transportverschlüsselung und aktive Webanalyse.",
     "fqdns": "jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de",
     "ip": "37.114.55.171",
+    "more_ips": [],
     "operator": "intercolo GmbH (mx.krause-computer.de)",
-    "role": "Website und Datenbanken, Mail- und Kalenderplattform"
+    "role": "E-Mail-Server, Fernzugang und Verwaltung"
    },
    {
-    "cov": "voll",
-    "coverage": "Portscan und Tiefenprüfung vollständig",
+    "cov": "teil",
+    "coverage": "Portscan vollständig; nicht geprüft: Transportverschlüsselung und aktive Webanalyse.",
     "fqdns": "krause-computer.de, www.krause-computer.de",
     "ip": "85.13.167.158",
+    "more_ips": [],
     "operator": "Neue Medien Muennich GmbH (dd55420.kasserver.com)",
-    "role": "Mail- und Kalenderplattform, Website und Datenbanken"
+    "role": "Fernzugang und Verwaltung, Datenbankdienst, Dateiaustausch"
    },
    {
-    "cov": "voll",
-    "coverage": "Portscan und Tiefenprüfung vollständig",
+    "cov": "teil",
+    "coverage": "Portscan vollständig; nicht geprüft: Transportverschlüsselung und aktive Webanalyse.",
     "fqdns": "filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de, transmission.krause-computer.de, youtube.krause-computer.de",
     "ip": "87.79.190.79",
+    "more_ips": [],
     "operator": "NetCologne Gesellschaft fur Telekommunikation mbH (xdsl-87-79-190-79.nc.de)",
-    "role": "Website und Datenbanken, Fernzugang und Verwaltung"
+    "role": "Kollaboration · Plattform skclient.de"
    }
   ],
-  "lead": "Der Scan hat 3 IP-Adressen mit 11 Hostnamen erfasst. Alle Hosts konnten aktiv geprüft werden.",
+  "lead": "Der Scan hat 3 IP-Adressen mit 11 Hostnamen erfasst. Für 3 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
-    "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de), 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und weitere).",
-    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
+    "checks": [
+     "DKIM-Signatur"
+    ],
+    "detail": "Betroffen: krause-computer.de. Unter 62 abgefragten gängigen Selektoren, darunter default, selector1, selector2, google, k1, s1, war kein Schlüssel veröffentlicht (vollständige Liste im Anhang bei den eingesetzten Werkzeugen). Ob die Domain signiert, zeigt der Kopf einer echten E-Mail (DKIM-Signature, Angabe s=).",
+    "what": "DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar"
    },
    {
-    "detail": "Betroffen: krause-computer.de.",
-    "what": "DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar: unter 62 abgefragten gängigen Selektoren, darunter default, selector1, selector2, google, k1, s1, war kein Schlüssel veröffentlicht (vollständige Liste im Anhang bei den eingesetzten Werkzeugen). Ob die Domain signiert, zeigt der Kopf einer echten E-Mail (DKIM-Signature, Angabe s=)"
+    "checks": [
+     "Bekannte Schwachstellen der erkannten Versionen"
+    ],
+    "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de), 85.13.167.158 (krause-computer.de, www.krause-computer.de), 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de, transmission.krause-computer.de, youtube.krause-computer.de).",
+    "what": "Keine Fremdbewertung aus Schwachstellendatenbanken zu den erkannten Versionen"
    },
    {
+    "checks": [
+     "Aktive Prüfung der Webanwendung",
+     "Aussteller der Zertifikate",
+     "Bekannte TLS-Schwachstellen",
+     "Einträge in Schadcode-Listen",
+     "Freigaben für fremde Ursprünge (CORS)",
+     "Gültigkeit der Zertifikate",
+     "Integrität eingebundener Skripte",
+     "JavaScript-Bibliotheken",
+     "Laufzeit der Domain",
+     "Meldungen der Webanalyse",
+     "Namen im Zertifikat",
+     "Preisgegebene Angaben",
+     "Reputation der Adressen",
+     "Schutz der Formulare",
+     "Schutz vor Protokoll-Herabstufung",
+     "Sensible Pfade und Dateien",
+     "Sitzungskennungen in Adressen",
+     "TLS 1.3",
+     "TLS-Protokollversionen",
+     "TLS-Schwächen",
+     "Verschlüsselungsverfahren",
+     "Verzeichnisauflistung",
+     "Zertifikatskette"
+    ],
+    "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de), 85.13.167.158 (krause-computer.de, www.krause-computer.de), 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de, transmission.krause-computer.de, youtube.krause-computer.de), krause-computer.de, krause-computer.de.",
+    "what": "Lauf der Prüfung nicht belegt"
+   },
+   {
+    "checks": [
+     "TLS-Protokollversionen",
+     "Verschlüsselungsverfahren"
+    ],
     "detail": "Betroffen: mx.krause-computer.de, www.krause-computer.de, youtube.krause-computer.de.",
-    "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
+    "what": "Transportverschlüsselung nur über die ausgehandelte Verbindung belegt"
    },
    {
-    "detail": "Betroffen: mx.krause-computer.de, www.krause-computer.de, youtube.krause-computer.de.",
-    "what": "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor"
-   },
-   {
-    "detail": "Betroffen: transmission.krause-computer.de.",
-    "what": "Die Werkzeugdaten reichen für eine Aussage zu dieser Prüfung nicht aus"
-   },
-   {
+    "checks": [
+     "Content-Security-Policy",
+     "HSTS"
+    ],
     "detail": "Betroffen: filebrowser.krause-computer.de, nospamproxy.krause-computer.de, www.krause-computer.de.",
-    "what": "Virtueller Host war über HTTP nicht erreichbar"
+    "what": "Webdienst antwortete nicht"
    },
    {
+    "checks": [
+     "Content-Security-Policy",
+     "HSTS",
+     "Sicherheits-Header"
+    ],
+    "detail": "Betroffen: transmission.krause-computer.de.",
+    "what": "Werkzeugdaten reichen für eine Aussage nicht aus"
+   },
+   {
+    "checks": [
+     "Ermittlung der Hostnamen"
+    ],
     "detail": "Betroffen: krause-computer.de.",
-    "what": "Werkzeug lief in einen Timeout"
+    "what": "Zeitlimit der Prüfung überschritten"
    },
    {
+    "checks": [
+     "Namen im Zertifikat",
+     "Zertifikatskette"
+    ],
     "detail": "Betroffen: mx.krause-computer.de, www.krause-computer.de, youtube.krause-computer.de.",
     "what": "Zertifikatsdetails nicht verfügbar"
-   },
-   {
-    "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de), 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und weitere), krause-computer.de, krause-computer.de.",
-    "what": "Zu diesem Werkzeug liegt kein Laufprotokoll vor"
    }
   ],
   "method_phases": [
@@ -1532,7 +1677,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 13 Befunde und 4 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 14 Befunde und 4 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -1550,7 +1695,7 @@
    },
    {
     "l": "Befunde im Bericht",
-    "v": "13"
+    "v": "14"
    }
   ],
   "out_of_scope": [

@@ -1,4 +1,5 @@
 {
+ "context": null,
  "coverage": [
   {
    "confidence": 1.0,
@@ -822,7 +823,7 @@
    "reason": "no_open_ports",
    "scope": "host",
    "source": "scan_results",
-   "status": "ok",
+   "status": "empty",
    "tool": "nmap"
   },
   {
@@ -2455,6 +2456,7 @@
   {
    "aliases": [],
    "body_hash": "4d43b74617240f52fc82f14bfb74c6ee114af0f122b42c47472a515eeceafe7b",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2485,6 +2487,7 @@
   {
    "aliases": [],
    "body_hash": "f5f62f712f3f30c09c7202f15179a2d76a8af46cd08838268862303f189b00e9",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2511,6 +2514,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2537,6 +2541,7 @@
   {
    "aliases": [],
    "body_hash": "116271e05f7fe8e0d03530289b974c7862e456d50a5c41a7d4a4a1d1e0bb99a3",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2567,6 +2572,7 @@
   {
    "aliases": [],
    "body_hash": "024af07ba765df09131115b3d5e8bf285aeaa7d64ebb59b055e0ad13cc20a0ec",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2597,6 +2603,7 @@
   {
    "aliases": [],
    "body_hash": "f270430e64b19a95c8c5f3279b0519675f5d893047361fa020f33a0e08d24b06",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2627,6 +2634,7 @@
   {
    "aliases": [],
    "body_hash": "6c97e9b0c85720c18cdd5f3257fd886b8bca617b719fb143e36ec6efb0424a32",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2653,6 +2661,7 @@
   {
    "aliases": [],
    "body_hash": "7624c3765af10ed3b6eb9e50f416066457b419bf3d6e57f99a0ba18d3598ce6b",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2679,6 +2688,7 @@
   {
    "aliases": [],
    "body_hash": "632423e75aeb805ac4bfefb5c4d286eab8575ca599223fc6bef25bf69b99dab0",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2709,6 +2719,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2735,6 +2746,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2761,6 +2773,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2787,6 +2800,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2813,6 +2827,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2839,6 +2854,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2865,6 +2881,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2891,6 +2908,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2917,6 +2935,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2943,6 +2962,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2969,6 +2989,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2995,6 +3016,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3021,6 +3043,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3047,6 +3070,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3073,6 +3097,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3099,6 +3124,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3125,6 +3151,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3151,6 +3178,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3177,6 +3205,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3203,6 +3232,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3229,6 +3259,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3255,6 +3286,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3366,6 +3398,7 @@
     "open": 2
    },
    "provider": null,
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": null,
@@ -3375,7 +3408,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -3413,6 +3448,12 @@
     "open": 0
    },
    "provider": null,
+   "reach": {
+    "passive_ports": [],
+    "passive_seen_at": null,
+    "passive_source": null,
+    "status": "no_open_ports"
+   },
    "reachable": true,
    "reputation": {
     "abuseipdb_score": null,
@@ -3422,7 +3463,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   }
  ],
  "http": [
@@ -3999,6 +4042,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -4026,6 +4070,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "urlhaus",
    "transport": null,
    "verified": null,
@@ -4110,7 +4155,7 @@
    }
   ]
  },
- "schema_version": "1.0.5",
+ "schema_version": "1.0.6",
  "services": [
   {
    "auth_mechanisms": [],
@@ -4242,43 +4287,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/62.217.52.165/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "62.217.52.165",
-   "id": "sw:62.217.52.165:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-20T09:09:51Z",
-   "product": "HSTS",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
     "webtech"
    ],
    "distro": null,
@@ -4345,43 +4353,6 @@
    "observed_at": "2026-09-20T09:08:50Z",
    "product": "React",
    "source": "webtech",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "tech: Unpkg",
-     "ref": "hosts/62.217.52.165/phase2/httpx_10finance.vectigal.tech.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "unpkg",
-   "fqdn": "10finance.vectigal.tech",
-   "hints": [],
-   "host_ip": "62.217.52.165",
-   "id": "sw:62.217.52.165:10finance.vectigal.tech:unpkg:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-20T09:09:51Z",
-   "product": "Unpkg",
-   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -4558,6 +4529,7 @@
  "threats": [],
  "tls": [
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "10finance.vectigal.tech",
@@ -4605,6 +4577,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "board.vectigal.tech",
@@ -4652,6 +4625,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "crm.vectigal.tech",
@@ -4704,6 +4678,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "crmviewer.vectigal.tech",
@@ -4751,6 +4726,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "gutachter.vectigal.tech",
@@ -4798,6 +4774,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": false,
     "cn": "TRAEFIK DEFAULT CERT",

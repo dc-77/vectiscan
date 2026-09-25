@@ -10,7 +10,7 @@
    "checks": [
     "admin_service_exposed"
    ],
-   "spec09": "Q13, Q3",
+   "spec09": "Q13",
    "warum": "Plesk mit Anmeldung auf dem Plesk-Sammelserver 92.205.163.53 (auch netscope-media.de); nach E1 ein Hosting-Panel des Hosters, erhöht mit Empfehlung an den Hoster."
   },
   "VS-2026-002": {
@@ -57,9 +57,7 @@
   "VS-2026-009": {
    "checks": [
     "csp_missing"
-   ],
-   "spec09": "Q3",
-   "warum": "umfrage.castenow.de ist CloudFront der Plattform umfrageonline.com; die Header setzt der Plattformbetreiber."
+   ]
   },
   "VS-2026-010": {
    "checks": [
@@ -100,9 +98,7 @@
   "VS-2026-016": {
    "checks": [
     "ftp_plaintext"
-   ],
-   "spec09": "Q3",
-   "warum": "FTP auf dem Plesk-Sammelserver 92.205.163.53 ist ein Dienst des Hosters."
+   ]
   },
   "VS-2026-017": {
    "checks": [
@@ -122,9 +118,7 @@
   "VS-2026-020": {
    "checks": [
     "http_alt_port"
-   ],
-   "spec09": "Q3",
-   "warum": "8000 ist der Shoutcast-Stream eines Fremdkunden (tonausstrom.de), 8800 Icecast auf dem Sammelserver; kein Dienst des Kunden."
+   ]
   },
   "VS-2026-021": {
    "checks": [
@@ -144,9 +138,7 @@
   "VS-2026-024": {
    "checks": [
     "http_header_disclosure"
-   ],
-   "spec09": "Q3",
-   "warum": "umfrage.castenow.de ist CloudFront der Plattform umfrageonline.com; der Server-Header gehört dem Plattformbetreiber."
+   ]
   },
   "VS-2026-025": {
    "checks": [
@@ -186,9 +178,7 @@
   "VS-2026-032": {
    "checks": [
     "legacy_protocols_present"
-   ],
-   "spec09": "Q3",
-   "warum": "92.205.163.53 ist ein Plesk-Sammelserver (auch netscope-media.de); POP3, IMAP und FTP sind Dienste des Hosters, die der Kunde nicht abschalten kann."
+   ]
   },
   "VS-2026-033": {
    "checks": [
@@ -250,9 +240,7 @@
   "VS-2026-044": {
    "checks": [
     "security_headers_incomplete"
-   ],
-   "spec09": "Q3",
-   "warum": "umfrage.castenow.de ist CloudFront der Plattform umfrageonline.com; die Header setzt der Plattformbetreiber."
+   ]
   },
   "VS-2026-045": {
    "checks": [
@@ -285,7 +273,7 @@
    "checks": [
     "tls_weakness"
    ],
-   "spec09": "Q3, Q4",
+   "spec09": "Q4",
    "warum": "Plattform umfrageonline.com (CloudFront); BREACH gilt laut testssl für statische Seiten nicht."
   },
   "VS-2026-051": {
@@ -420,16 +408,12 @@
   "VS-2026-P24": {
    "checks": [
     "db_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+   ]
   },
   "VS-2026-P25": {
    "checks": [
     "db_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+   ]
   },
   "VS-2026-P26": {
    "checks": [
@@ -579,16 +563,12 @@
   "VS-2026-P55": {
    "checks": [
     "rdp_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+   ]
   },
   "VS-2026-P56": {
    "checks": [
     "rdp_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+   ]
   },
   "VS-2026-P57": {
    "checks": [
@@ -613,16 +593,12 @@
   "VS-2026-P61": {
    "checks": [
     "smb_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+   ]
   },
   "VS-2026-P62": {
    "checks": [
     "smb_exposed"
-   ],
-   "spec09": "Q9",
-   "warum": "Für diesen Host liegt kein Messergebnis vor (leere nmap-Ausgabe); die Abwesenheit des Dienstes ist nicht belegt."
+   ]
   },
   "VS-2026-P63": {
    "checks": [
@@ -668,17 +644,17 @@
   },
   "VS-2026-P71": {
    "checks": [
-    "tls_no_13"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P72": {
    "checks": [
-    "tls_no_13"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P73": {
    "checks": [
-    "tls_no_13"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P74": {
@@ -708,17 +684,17 @@
   },
   "VS-2026-P79": {
    "checks": [
-    "tls_weak_ciphers"
+    "tls_no_13"
    ]
   },
   "VS-2026-P80": {
    "checks": [
-    "tls_weak_ciphers"
+    "tls_no_13"
    ]
   },
   "VS-2026-P81": {
    "checks": [
-    "tls_weak_ciphers"
+    "tls_no_13"
    ]
   },
   "VS-2026-P82": {
@@ -733,17 +709,47 @@
   },
   "VS-2026-P84": {
    "checks": [
-    "urlhaus_compromise"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P85": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P86": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P87": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P88": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P89": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P90": {
+   "checks": [
+    "urlhaus_compromise"
+   ]
+  },
+  "VS-2026-P91": {
    "checks": [
     "waf_present"
    ],
    "spec09": "Q12",
    "warum": "Die WAF-Erkennung stammt aus der Generic-Heuristik von wafw00f ohne benanntes Produkt."
   },
-  "VS-2026-P86": {
+  "VS-2026-P92": {
    "checks": [
     "wordpress_core_outdated"
    ]
@@ -751,5 +757,6 @@
  },
  "subsumed": {},
  "expected_coverage_differences": [],
- "expected_member_differences": []
+ "expected_member_differences": [],
+ "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben."
 }

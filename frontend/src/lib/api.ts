@@ -160,6 +160,8 @@ export interface ReportDefectsPayload {
 /** Kundenkontext einer Order (Migration 045), je Feld mit Herkunft. */
 export interface CustomerContext {
   firmenname?: string;
+  /** Kurzname fuer Fusszeile und PDF-Titel (S6b-1, Migration 048). */
+  kurzname?: string;
   kuerzel?: string;
   branche?: string;
   mitarbeiter?: string;

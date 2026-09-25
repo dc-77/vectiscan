@@ -31,7 +31,7 @@ policy:
     kritisch (VS-001); SP-DB-002/003 stufen EOL- und Mehrfach-Hosts ohnehin CRITICAL ein.
 texts:
   observation: >-
-    Der Host {group} beantwortet Verbindungen auf Datenbankports aus dem gesamten Internet:
+    {n:Der Host|Die Hosts} {group} {n:beantwortet|beantworten} Verbindungen auf Datenbankports aus dem gesamten Internet:
     {affected}. Ein Datenbankdienst gehört nicht an das öffentliche Interface.
   meaning: >-
     Ein von außen erreichbarer Datenbankdienst erlaubt Passwort-Rateangriffe rund um die Uhr und

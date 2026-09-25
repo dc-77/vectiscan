@@ -1,4 +1,5 @@
 {
+ "context": null,
  "coverage": [
   {
    "confidence": 1.0,
@@ -1267,6 +1268,53 @@
    "source": "dns_records",
    "spf": {
     "all_qualifier": "~all",
+    "mechanisms": [
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.mailjet.com"
+     },
+     {
+      "kind": "mx",
+      "qualifier": "+",
+      "value": null
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "194.36.62.220"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "85.22.176.0/24"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "_spf-eu.ionos.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.mailout.iprs.de"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.protection.outlook.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf-de.emailsignatures365.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.hornetsecurity.com"
+     }
+    ],
     "raw": "v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all"
    },
    "tls_rpt": {
@@ -1288,6 +1336,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1320,6 +1369,7 @@
     }
    ],
    "body_hash": "7f220f4905a07a608f22a190a54288a5ff08ec5ce7779503baf754e8f4c84a71",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1407,6 +1457,7 @@
     "isp": "Hetzner Online GmbH",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -1416,7 +1467,44 @@
     "urlhaus_compromised": null
    },
    "reverse": "dedi5705.your-server.de",
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "Shodan-Hostnamen 116.202.77.64: dedi5705.your-server.de, flott.de, www.flott.de, your-server.de",
+      "ref": "phase0a/shodan_hosts.json",
+      "tool": "shodan"
+     },
+     {
+      "excerpt": "Zertifikat 116.202.77.64:3306: *.your-server.de, *.your-database.de, *.your-server.de",
+      "ref": "hosts/116.202.77.64/phase1/nmap.xml",
+      "tool": "nmap"
+     },
+     {
+      "excerpt": "rDNS dedi5705.your-server.de",
+      "ref": "phase0/host_inventory.json",
+      "tool": "host_inventory"
+     },
+     {
+      "excerpt": "Nutzungsart data center/web hosting/transit",
+      "ref": "phase0a/abuseipdb.json",
+      "tool": "abuseipdb"
+     }
+    ],
+    "foreign_names": [
+     "flott.de",
+     "www.flott.de",
+     "your-database.de"
+    ],
+    "kind": "hoster",
+    "operator": "Hetzner Online GmbH",
+    "signals": [
+     "fremde_namen_shodan",
+     "fremde_namen_zertifikat",
+     "rdns_betreiber"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   }
  ],
  "http": [
@@ -1480,6 +1568,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -1510,6 +1599,7 @@
    "port": 21,
    "product": null,
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "ftp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1540,6 +1630,7 @@
    "port": 22,
    "product": null,
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "ssh",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1570,6 +1661,7 @@
    "port": 25,
    "product": null,
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -1600,6 +1692,7 @@
    "port": 80,
    "product": "Apache httpd",
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1630,6 +1723,7 @@
    "port": 110,
    "product": null,
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "pop3",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1660,6 +1754,7 @@
    "port": 143,
    "product": null,
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "imap",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1690,6 +1785,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1720,6 +1816,7 @@
    "port": 465,
    "product": null,
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "smtps",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1750,6 +1847,7 @@
    "port": 587,
    "product": null,
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1780,6 +1878,7 @@
    "port": 993,
    "product": null,
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "imap-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1810,6 +1909,7 @@
    "port": 995,
    "product": null,
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "pop3-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1840,6 +1940,7 @@
    "port": 3306,
    "product": "MariaDB",
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "mysql",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1870,6 +1971,7 @@
    "port": 4190,
    "product": null,
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "auto",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -1900,6 +2002,7 @@
    "port": 5432,
    "product": "PostgreSQL",
    "seen_at": "2026-09-19T23:51:47Z",
+   "service": "postgresql",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1927,6 +2030,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "urlhaus",
    "transport": null,
    "verified": null,
@@ -2010,7 +2114,7 @@
    }
   ]
  },
- "schema_version": "1.0.5",
+ "schema_version": "1.0.6",
  "services": [
   {
    "auth_mechanisms": [],

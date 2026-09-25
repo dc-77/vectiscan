@@ -10,6 +10,7 @@ Text.
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -95,6 +96,98 @@ def font_check(pdf_path: str | Path) -> list[str]:
     fehlend = [f for f in REQUIRED_FONTS
                if not any(_flach(f) in n for n in vorhanden)]
     return [f"Schrift nicht eingebettet: {f}" for f in fehlend]
+
+
+# ----------------------------------------------------------------- Layout (S6b-1)
+# spec/09 Teil 3: Kicker allein am Seitenende, Posture-Karten und Bilder rechts ueber dem
+# Satzspiegel, halbleere Seiten, die die Wortzahl nicht fand (JW 25, HE 18, CA 17 und 23).
+# Gemessen wird am gesetzten Dokument ueber WeasyPrints Seitenboxen. Das ist keine
+# oeffentliche API; fehlt ein Attribut, liefert ``layout_scan`` None und der Renderer
+# meldet das als Warnung, statt still nichts zu pruefen.
+
+# Unter dieser Fuellhoehe gilt eine Seite als halbleer (Deckblatt und letzte Seite
+# ausgenommen: das Deckblatt ist gestaltet, die letzte Seite endet, wo der Text endet).
+FILL_MIN = 0.5
+# Toleranz fuer den Satzspiegel in CSS-Pixeln (96 je Zoll, rund 0,5 mm).
+OVERFLOW_TOLERANCE = 2.0
+
+
+@dataclass
+class Layout:
+    fill: tuple[float, ...] = ()
+    kicker_pages: tuple[int, ...] = ()
+    heading_pages: tuple[int, ...] = ()
+    overflow: tuple[str, ...] = ()
+
+
+def _classes(box: Any) -> set[str]:
+    element = getattr(box, "element", None)
+    if element is None or not hasattr(element, "get"):
+        return set()
+    return set((element.get("class") or "").split())
+
+
+def layout_scan(document: Any) -> Layout | None:
+    """Fuellhoehe je Seite, Kicker ohne Ueberschrift, Boxen ausserhalb des Satzspiegels."""
+    try:
+        from weasyprint.formatting_structure import boxes as B
+    except ImportError:
+        return None
+    try:
+        fill: list[float] = []
+        events: list[tuple[int, str, int]] = []
+        heading_last: list[int] = []
+        overflow: set[str] = set()
+        for index, page in enumerate(document.pages, start=1):
+            page_box = page._page_box
+            top = page_box.content_box_y()
+            height = page_box.height or 1
+            right = page_box.content_box_x() + page_box.width
+            bottom = top
+            last_kind = ""
+            seen: set[tuple[str, int]] = set()
+            for child in page_box.children:
+                if isinstance(child, B.MarginBox):
+                    continue
+                for box in child.descendants():
+                    if isinstance(box, (B.LineBox, B.ReplacedBox)):
+                        bottom = max(bottom, box.position_y + box.margin_height())
+                        last_kind = "text"
+                    element = getattr(box, "element", None)
+                    tag = getattr(box, "element_tag", "")
+                    klassen = _classes(box)
+                    if element is not None and "kicker" in klassen and ("kicker", id(element)) not in seen:
+                        seen.add(("kicker", id(element)))
+                        events.append((index, "kicker", id(element)))
+                    if element is not None and tag == "h2" and ("h2", id(element)) not in seen:
+                        seen.add(("h2", id(element)))
+                        events.append((index, "h2", id(element)))
+                    if tag in ("h3", "h4") and isinstance(box, B.BlockBox):
+                        last_kind = "heading"
+                    if isinstance(box, B.BlockBox) and element is not None and "cover" not in klassen:
+                        rechts = box.border_box_x() + box.border_width()
+                        if rechts > right + OVERFLOW_TOLERANCE and klassen:
+                            overflow.add(f"Seite {index}: {' '.join(sorted(klassen))}")
+            fill.append(round(max(0.0, (bottom - top) / height), 3))
+            if last_kind == "heading":
+                heading_last.append(index)
+        kicker_pages: list[int] = []
+        for i, (page_no, kind, _) in enumerate(events):
+            if kind != "kicker":
+                continue
+            folgt = next((e for e in events[i + 1:] if e[1] == "h2"), None)
+            if folgt is None or folgt[0] != page_no:
+                kicker_pages.append(page_no)
+        return Layout(fill=tuple(fill), kicker_pages=tuple(kicker_pages),
+                      heading_pages=tuple(heading_last), overflow=tuple(sorted(overflow)))
+    except (AttributeError, TypeError):
+        return None
+
+
+def sparse_from_fill(fill: tuple[float, ...], *, minimum: float = FILL_MIN) -> tuple[int, ...]:
+    """Halbleere Seiten: Fuellhoehe unter ``minimum``, ohne Deckblatt und letzte Seite."""
+    last = len(fill)
+    return tuple(i for i, f in enumerate(fill, start=1) if f < minimum and i not in (1, last))
 
 
 def text_of(html: str) -> str:

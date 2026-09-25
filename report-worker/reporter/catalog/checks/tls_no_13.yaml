@@ -10,6 +10,9 @@ applicable_when: null
 when: 'tls.protocols["TLS1.2"] is True and tls.protocols["TLS1.3"] is False'
 positive_when: 'tls.protocols["TLS1.3"] is True'
 not_testable_when:
+  - when: 'tls.protocols["TLS1.3"] is None and tls.source == "httpx"'
+    reason_code: tls_protocols_partial
+    context: item
   - when: 'tls.protocols["TLS1.3"] is None'
     reason_code: tls_protocols_unknown
     context: item

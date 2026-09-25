@@ -5,7 +5,7 @@
     "cve": "CVE-2013-3587",
     "name": "BREACH (HTTP-Kompression)",
     "note": "Werkzeugbefund, keine Fremdbewertung.",
-    "ref": "VS-2026-009",
+    "ref": "VS-2026-010",
     "score": "",
     "src": "testssl"
    }
@@ -22,7 +22,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 38 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (16 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 12 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 37 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (15 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 13 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -47,7 +47,7 @@
    {
     "host": "198.202.211.1",
     "port": "443",
-    "ref": "",
+    "ref": "VS-2026-010, VS-2026-011",
     "svc": "cloudflare, TLS erzwungen"
    },
    {
@@ -65,13 +65,13 @@
    {
     "host": "92.205.224.174",
     "port": "21",
-    "ref": "VS-2026-002",
+    "ref": "VS-2026-002, VS-2026-008",
     "svc": "ProFTPD"
    },
    {
     "host": "92.205.224.174",
     "port": "22",
-    "ref": "VS-2026-011",
+    "ref": "VS-2026-012",
     "svc": "OpenSSH 9.9"
    },
    {
@@ -89,19 +89,19 @@
    {
     "host": "92.205.224.174",
     "port": "110",
-    "ref": "VS-2026-007",
+    "ref": "VS-2026-008",
     "svc": "Dovecot pop3d, STARTTLS"
    },
    {
     "host": "92.205.224.174",
     "port": "143",
-    "ref": "VS-2026-007",
+    "ref": "VS-2026-008",
     "svc": "Dovecot imapd, STARTTLS"
    },
    {
     "host": "92.205.224.174",
     "port": "443",
-    "ref": "",
+    "ref": "VS-2026-007",
     "svc": "nginx, TLS erzwungen"
    },
    {
@@ -144,25 +144,25 @@
     "host": "198.202.211.1",
     "port": "2082",
     "ref": "",
-    "svc": "unbekannt, laut Passivquelle"
+    "svc": "HTTP, laut Passivquelle"
    },
    {
     "host": "198.202.211.1",
     "port": "2083",
-    "ref": "VS-2026-003",
-    "svc": "unbekannt, laut Passivquelle"
+    "ref": "VS-2026-004",
+    "svc": "HTTPS, laut Passivquelle"
    },
    {
     "host": "198.202.211.1",
     "port": "2086",
     "ref": "",
-    "svc": "unbekannt, laut Passivquelle"
+    "svc": "HTTP, laut Passivquelle"
    },
    {
     "host": "198.202.211.1",
     "port": "2087",
-    "ref": "VS-2026-003",
-    "svc": "unbekannt, laut Passivquelle"
+    "ref": "VS-2026-004",
+    "svc": "HTTPS, laut Passivquelle"
    },
    {
     "host": "198.202.211.1",
@@ -179,14 +179,8 @@
    {
     "host": "198.202.211.1",
     "port": "8880",
-    "ref": "VS-2026-003",
-    "svc": "unbekannt, laut Passivquelle"
-   },
-   {
-    "host": "40.99.150.120",
-    "port": "80",
-    "ref": "",
-    "svc": "unbekannt, laut Passivquelle"
+    "ref": "VS-2026-004",
+    "svc": "HTTPS, laut Passivquelle"
    },
    {
     "host": "62.217.52.162",
@@ -204,12 +198,12 @@
     "host": "62.217.52.166",
     "port": "25",
     "ref": "",
-    "svc": "unbekannt, laut Passivquelle"
+    "svc": "SMTP, laut Passivquelle"
    },
    {
     "host": "62.217.52.166",
     "port": "443",
-    "ref": "VS-2026-004",
+    "ref": "VS-2026-005",
     "svc": "Microsoft IIS httpd 10.0, laut Passivquelle"
    },
    {
@@ -228,7 +222,7 @@
     "host": "92.205.224.174",
     "port": "8880",
     "ref": "VS-2026-003",
-    "svc": "unbekannt, laut Passivquelle"
+    "svc": "HTTPS, laut Passivquelle"
    }
   ],
   "repeat": [
@@ -303,10 +297,8 @@
   ]
  },
  "architecture": {
-  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 7 Hosts mit folgenden Aufgaben: Fernzugang und Verwaltung, Mail- und Kalenderplattform und Website und Datenbanken. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
-  "notes": [
-   "6 Beobachtungen der Werkzeuge haben keine Regel des Prüfkatalogs getroffen. Sie erscheinen nicht als Befund; wir prüfen sie und nehmen wiederkehrende Fälle in den Katalog auf."
-  ],
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 6 Hosts mit folgenden Aufgaben: E-Mail-Versand laut SPF und Website. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "notes": [],
   "posture": [
    {
     "items": [
@@ -373,29 +365,24 @@
       "v": "Handlungsbedarf"
      },
      {
-      "l": "40.99.150.120",
+      "l": "62.217.52.162",
       "ok": null,
       "v": "nicht prüfbar"
      },
      {
-      "l": "62.217.52.162",
-      "ok": null,
-      "v": "entfällt"
-     },
-     {
       "l": "62.217.52.166",
       "ok": null,
-      "v": "entfällt"
+      "v": "nicht prüfbar"
      },
      {
       "l": "62.217.52.171",
       "ok": null,
-      "v": "entfällt"
+      "v": "nicht prüfbar"
      },
      {
       "l": "79.140.188.181",
       "ok": null,
-      "v": "entfällt"
+      "v": "nicht prüfbar"
      },
      {
       "l": "92.205.224.174",
@@ -417,11 +404,6 @@
       "l": "198.202.211.1",
       "ok": false,
       "v": "Handlungsbedarf"
-     },
-     {
-      "l": "40.99.150.120",
-      "ok": null,
-      "v": "nicht prüfbar"
      },
      {
       "l": "62.217.52.162",
@@ -456,18 +438,16 @@
   "reputation": "Reputation: keine Einträge zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus.",
   "screens": [
    {
-    "file": "92.205.224.174__bergersysteme.com.png",
-    "host": "bergersysteme.com",
-    "key": "68d59573-7a93-4efa-89cc-e7b10cc4d140/92.205.224.174__bergersysteme.com.png",
-    "what": "Berger Systeme"
-   },
-   {
+    "also": [],
     "file": "92.205.224.174__ftp.bergersysteme.com.png",
     "host": "ftp.bergersysteme.com",
     "key": "68d59573-7a93-4efa-89cc-e7b10cc4d140/92.205.224.174__ftp.bergersysteme.com.png",
     "what": "403 Forbidden"
    },
    {
+    "also": [
+     "bergersysteme.com"
+    ],
     "file": "198.202.211.1__www.bergersysteme.com.png",
     "host": "www.bergersysteme.com",
     "key": "68d59573-7a93-4efa-89cc-e7b10cc4d140/198.202.211.1__www.bergersysteme.com.png",
@@ -512,22 +492,22 @@
      },
      {
       "p": "2082",
-      "s": "unbekannt",
+      "s": "HTTP",
       "st": "grau"
      },
      {
       "p": "2083",
-      "s": "unbekannt",
+      "s": "HTTPS",
       "st": "grau"
      },
      {
       "p": "2086",
-      "s": "unbekannt",
+      "s": "HTTP",
       "st": "grau"
      },
      {
       "p": "2087",
-      "s": "unbekannt",
+      "s": "HTTPS",
       "st": "grau"
      },
      {
@@ -542,18 +522,7 @@
      },
      {
       "p": "8880",
-      "s": "unbekannt",
-      "st": "grau"
-     }
-    ]
-   },
-   {
-    "host": "40.99.150.120",
-    "label": "",
-    "ports": [
-     {
-      "p": "80",
-      "s": "unbekannt",
+      "s": "HTTPS",
       "st": "grau"
      }
     ]
@@ -580,7 +549,7 @@
     "ports": [
      {
       "p": "25",
-      "s": "unbekannt",
+      "s": "SMTP",
       "st": "grau"
      },
      {
@@ -638,7 +607,7 @@
      {
       "p": "443",
       "s": "nginx",
-      "st": "gruen"
+      "st": "gelb"
      },
      {
       "p": "465",
@@ -667,13 +636,13 @@
      },
      {
       "p": "8880",
-      "s": "unbekannt",
+      "s": "HTTPS",
       "st": "grau"
      }
     ]
    }
   ],
-  "services_note": "Rot: Dienst mit kritischem Befund · Gelb: Dienst mit Befund · Blau: Altprotokoll · Grün: unauffällig · Grau: nur aus einer Passivquelle bekannt.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt.",
   "tech": [
    {
     "host": "198.202.211.1",
@@ -682,7 +651,7 @@
       "c": "Cloudflare",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx",
+      "src": "header_check, httpx, nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -697,37 +666,10 @@
       "v": "unbekannt"
      },
      {
-      "c": "HSTS",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "HTTP",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "3"
-     },
-     {
       "c": "Webflow",
       "conf": "hoch",
       "note": "",
-      "src": "cms_fingerprint, webtech",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "cloudflare",
-      "conf": "hoch",
-      "note": "",
-      "src": "nmap",
+      "src": "cms_fingerprint, httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -747,73 +689,19 @@
     "host": "92.205.224.174 (174.224.205.92.host.secureserver.net)",
     "rows": [
      {
-      "c": "Cloudflare",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "HSTS",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "HTTP",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "3"
-     },
-     {
-      "c": "Webflow",
-      "conf": "hoch",
-      "note": "",
-      "src": "cms_fingerprint, webtech",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "cloudflare",
-      "conf": "mittel",
-      "note": "",
-      "src": "webtech",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
       "c": "Plesk",
       "conf": "hoch",
       "note": "",
       "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
-      "v": "unbekannt"
+      "v": "18.0.80"
      },
      {
       "c": "ProFTPD",
       "conf": "hoch",
       "note": "",
       "src": "nmap",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "jQuery",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -849,7 +737,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "nmap",
+      "src": "header_check, httpx, nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -863,32 +751,48 @@
   "lead": "Was der Scan über das Unternehmen sichtbar macht, bestimmt, welche Befunde wirklich zählen. Maßgeblich ist nicht die Zahl der Meldungen, sondern welche Systeme am Perimeter stehen und wofür sie gebraucht werden.",
   "observed": [
    {
-    "meaning": "Außendarstellung und die dahinterliegenden Datenbestände. Betroffen wären vor allem Seiteninhalte, Formulareingaben und Kontaktdaten.",
-    "system": "Website und Datenbanken, Fernzugang und Verwaltung (www.bergersysteme.com)"
+    "evidence": [
+     "www.bergersysteme.com: Seite „Berger Systeme“"
+    ],
+    "meaning": "Außendarstellung des Unternehmens. Betroffen wären vor allem Seiteninhalte und Formulareingaben.",
+    "role_keys": [
+     "website"
+    ],
+    "system": "Website (www.bergersysteme.com)"
    },
    {
+    "evidence": [],
     "meaning": "Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte intern geklärt werden.",
-    "system": "Nicht näher bestimmbar (autodiscover.bergersysteme.com)"
-   },
-   {
-    "meaning": "Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte intern geklärt werden.",
+    "role_keys": [],
     "system": "Nicht näher bestimmbar (bstasks.bergersysteme.com, ticket.bergersysteme.com)"
    },
    {
-    "meaning": "Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte intern geklärt werden.",
-    "system": "Nicht näher bestimmbar (mail.bergersysteme.com, owa.bergersysteme.com)"
+    "evidence": [
+     "SPF-Eintrag von bergersysteme.com: a:mail.bergersysteme.com"
+    ],
+    "meaning": "Dieses System darf laut SPF-Eintrag E-Mail im Namen der Domain versenden. Ein Missbrauch trifft die Glaubwürdigkeit der eigenen Absenderadresse.",
+    "role_keys": [
+     "mail_versand"
+    ],
+    "system": "E-Mail-Versand laut SPF (mail.bergersysteme.com, owa.bergersysteme.com)"
    },
    {
+    "evidence": [],
     "meaning": "Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte intern geklärt werden.",
+    "role_keys": [],
     "system": "Nicht näher bestimmbar (bitwarden.bergersysteme.com)"
    },
    {
+    "evidence": [],
     "meaning": "Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte intern geklärt werden.",
+    "role_keys": [],
     "system": "Nicht näher bestimmbar (mail2.bergersysteme.com)"
    },
    {
-    "meaning": "Über dieses System läuft die geschäftliche Korrespondenz. Ein Zugriff darauf trifft Vertraulichkeit und Arbeitsfähigkeit zugleich.",
-    "system": "Mail- und Kalenderplattform, Website und Datenbanken (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com)"
+    "evidence": [],
+    "meaning": "Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte intern geklärt werden.",
+    "role_keys": [],
+    "system": "Nicht näher bestimmbar (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com)"
    }
   ]
  },
@@ -902,6 +806,8 @@
    "impact": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen.",
    "level": "erhoeht",
    "level_label": "erhöht",
+   "operator": "beim Hoster Host Europe GmbH",
+   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Server wird mit anderen Kunden geteilt (auf derselben Adresse auch dirak.de, www.dirak.de), der Dienst gehört zum Server und nicht zu Ihrer Website. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen.",
    "policy": "admin_service_exposed",
    "recommendation": [
     [
@@ -921,7 +827,7 @@
    "source": "aktiv (nmap)",
    "status": "gelb",
    "threat": null,
-   "title": "Verwaltungsoberfläche aus dem Internet erreichbar",
+   "title": "Verwaltungsoberfläche aus dem Internet erreichbar (beim Hoster Host Europe GmbH)",
    "urgency": "In Kürze",
    "verify": "Verbindungsversuch auf den betroffenen Port von einer externen Adresse außerhalb der freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung."
   },
@@ -934,6 +840,8 @@
    "impact": "Ohne erzwungene Transportverschlüsselung gehen Anmeldedaten und Inhalte im Klartext über das Netz. Jeder Mitleser auf dem Übertragungsweg kann sie abgreifen und für weitere Zugriffe auf den Dienst oder auf wiederverwendete Konten nutzen.",
    "level": "erhoeht",
    "level_label": "erhöht",
+   "operator": "beim Hoster Host Europe GmbH",
+   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Server wird mit anderen Kunden geteilt (auf derselben Adresse auch dirak.de, www.dirak.de), der Dienst gehört zum Server und nicht zu Ihrer Website. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen.",
    "policy": "ftp_plaintext",
    "recommendation": [
     [
@@ -953,19 +861,21 @@
    "source": "aktiv (nmap)",
    "status": "gelb",
    "threat": null,
-   "title": "Datei- und Mailzugänge auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ohne erzwungene Transportverschlüsselung",
+   "title": "Datei- und Mailzugänge auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ohne erzwungene Transportverschlüsselung (beim Hoster Host Europe GmbH)",
    "urgency": "In Kürze",
    "verify": "Anmeldung an den genannten Diensten versuchen, bevor eine Transportverschlüsselung aufgebaut ist; erwartet wird die Ablehnung dieser Anmeldung."
   },
   {
-   "affected": "198.202.211.1:2083 (unbekannt, laut Passivquelle), 198.202.211.1:2087 (unbekannt, laut Passivquelle), 198.202.211.1:8880 (unbekannt, laut Passivquelle), 92.205.224.174:8880 (unbekannt, laut Passivquelle)",
+   "affected": "92.205.224.174:8880 (unbekannt, laut Passivquelle)",
    "cat": "A",
-   "evidence": "shodan · phase0a/shodan_hosts.json\nQuelle=shodan 198.202.211.1:2083 gesehen am=2026-09-23T12:57:05Z Banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Wed, 23 Sep 2026 12:52:31 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -\n\nshodan · phase0a/shodan_hosts.json\n198.202.211.1:2083 banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Wed, 23 Sep 2026 12:52:31 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -\n\nshodan · phase0a/shodan_hosts.json\nQuelle=shodan 198.202.211.1:2087 gesehen am=2026-09-23T12:57:05Z Banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Wed, 23 Sep 2026 11:28:46 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -\n\nshodan · phase0a/shodan_hosts.json\n198.202.211.1:2087 banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Wed, 23 Sep 2026 11:28:46 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -\n\nshodan · phase0a/shodan_hosts.json\nQuelle=shodan 198.202.211.1:8880 gesehen am=2026-09-23T12:57:05Z Banner=HTTP/1.1 403 Forbidden Date: Tue, 22 Sep 2026 18:36:23 GMT Content-Type: text/html; charset=UTF-8 Content-Length: 4549 Connection: keep-alive Cache-Control:...\n\nshodan · phase0a/shodan_hosts.json\n198.202.211.1:8880 banner=HTTP/1.1 403 Forbidden Date: Tue, 22 Sep 2026 18:36:23 GMT Content-Type: text/html; charset=UTF-8 Content-Length: 4549 Connection: keep-alive Cache-Control: private, max-a...\n\nund 2 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
-   "found": "Eine Passivquelle meldet für 198.202.211.1 (www.bergersysteme.com), 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 198.202.211.1:2083 (unbekannt, laut Passivquelle), 198.202.211.1:2087 (unbekannt, laut Passivquelle), 198.202.211.1:8880 (unbekannt, laut Passivquelle), 92.205.224.174:8880 (unbekannt, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
+   "evidence": "shodan · phase0a/shodan_hosts.json\nQuelle=shodan 92.205.224.174:8880 gesehen am=2026-09-23T19:09:51Z Banner=HTTP/1.1 200 OK Server: sw-cp-server Date: Thu, 17 Sep 2026 16:28:15 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-a...\n\nshodan · phase0a/shodan_hosts.json\n92.205.224.174:8880 banner=HTTP/1.1 200 OK Server: sw-cp-server Date: Thu, 17 Sep 2026 16:28:15 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-alive Expires:...",
+   "found": "Eine Passivquelle meldet für 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 92.205.224.174:8880 (unbekannt, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
    "id": "VS-2026-003",
    "impact": "Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Ob es sich um ein Anmeldeportal oder die Administrationsoberfläche handelt, ist von außen nicht erkennbar.",
    "level": "hoch",
    "level_label": "hoch",
+   "operator": "beim Hoster Host Europe GmbH",
+   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Server wird mit anderen Kunden geteilt (auf derselben Adresse auch dirak.de, www.dirak.de), der Dienst gehört zum Server und nicht zu Ihrer Website. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen.",
    "policy": "admin_service_exposed_passive",
    "recommendation": [
     [
@@ -985,7 +895,41 @@
    "source": "passiv (shodan)",
    "status": "gelb",
    "threat": null,
-   "title": "Verwaltungsoberfläche laut Passivquelle erreichbar",
+   "title": "Verwaltungsoberfläche laut Passivquelle erreichbar (beim Hoster Host Europe GmbH)",
+   "urgency": "In Kürze",
+   "verify": "Verbindungsversuch auf den gemeldeten Port von einer externen Adresse; erwartet wird keine Verwaltungsanmeldung ohne Zugriffsbeschränkung."
+  },
+  {
+   "affected": "198.202.211.1:2083 (unbekannt, laut Passivquelle), 198.202.211.1:2087 (unbekannt, laut Passivquelle), 198.202.211.1:8880 (unbekannt, laut Passivquelle)",
+   "cat": "A",
+   "evidence": "shodan · phase0a/shodan_hosts.json\nQuelle=shodan 198.202.211.1:2083 gesehen am=2026-09-23T12:57:05Z Banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Wed, 23 Sep 2026 12:52:31 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -\n\nshodan · phase0a/shodan_hosts.json\n198.202.211.1:2083 banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Wed, 23 Sep 2026 12:52:31 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -\n\nshodan · phase0a/shodan_hosts.json\nQuelle=shodan 198.202.211.1:2087 gesehen am=2026-09-23T12:57:05Z Banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Wed, 23 Sep 2026 11:28:46 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -\n\nshodan · phase0a/shodan_hosts.json\n198.202.211.1:2087 banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Wed, 23 Sep 2026 11:28:46 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -\n\nshodan · phase0a/shodan_hosts.json\nQuelle=shodan 198.202.211.1:8880 gesehen am=2026-09-23T12:57:05Z Banner=HTTP/1.1 403 Forbidden Date: Tue, 22 Sep 2026 18:36:23 GMT Content-Type: text/html; charset=UTF-8 Content-Length: 4549 Connection: keep-alive Cache-Control:...\n\nshodan · phase0a/shodan_hosts.json\n198.202.211.1:8880 banner=HTTP/1.1 403 Forbidden Date: Tue, 22 Sep 2026 18:36:23 GMT Content-Type: text/html; charset=UTF-8 Content-Length: 4549 Connection: keep-alive Cache-Control: private, max-a...",
+   "found": "Eine Passivquelle meldet für 198.202.211.1 (www.bergersysteme.com) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 198.202.211.1:2083 (unbekannt, laut Passivquelle), 198.202.211.1:2087 (unbekannt, laut Passivquelle), 198.202.211.1:8880 (unbekannt, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
+   "id": "VS-2026-004",
+   "impact": "Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Ob es sich um ein Anmeldeportal oder die Administrationsoberfläche handelt, ist von außen nicht erkennbar.",
+   "level": "hoch",
+   "level_label": "hoch",
+   "operator": "beim Plattformbetreiber webflow.com",
+   "operator_note": "Dieser Sachverhalt liegt beim Plattformbetreiber webflow.com: der Hostname zeigt auf dessen Plattform, Server und Grundkonfiguration betreibt er. Die Empfehlung richtet sich an ihn; Sie können sie über den Vertrag oder die Einstellungen der Plattform einfordern.",
+   "policy": "admin_service_exposed_passive",
+   "recommendation": [
+    [
+     "In Kürze",
+     "Firmware gegen die Sicherheitshinweise des Herstellers abgleichen; lokale Benutzerkonten und Standardkonten prüfen."
+    ],
+    [
+     "In Kürze",
+     "Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand."
+    ],
+    [
+     "Mittelfristig",
+     "Zugriff auf benötigte Quellnetze beschränken und Anmeldeversuche überwachen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "passiv (shodan)",
+   "status": "gelb",
+   "threat": null,
+   "title": "Verwaltungsoberfläche laut Passivquelle erreichbar (beim Plattformbetreiber webflow.com)",
    "urgency": "In Kürze",
    "verify": "Verbindungsversuch auf den gemeldeten Port von einer externen Adresse; erwartet wird keine Verwaltungsanmeldung ohne Zugriffsbeschränkung."
   },
@@ -994,10 +938,12 @@
    "cat": "B",
    "evidence": "shodan · phase0a/shodan_hosts.json\nQuelle=shodan 62.217.52.166:443 Produkt=Microsoft IIS httpd Version=10.0 gesehen am=2026-09-23T08:43:38Z Banner=HTTP/1.1 302 Moved Temporarily Cache-Control: no-cache Pragma: no-cache Location: https://62.217.52.166/owa/ Server: Microsof...\n\nshodan · phase0a/shodan_hosts.json\n62.217.52.166:443 Microsoft IIS httpd 10.0 banner=HTTP/1.1 302 Moved Temporarily Cache-Control: no-cache Pragma: no-cache Location: https://62.217.52.166/owa/ Server: Microsoft-IIS/10.0 X-FEServer:...",
    "found": "Für 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com) meldet eine Passivquelle eine Dienstversion, die der Portscan nicht bestätigen konnte: 62.217.52.166:443 (Microsoft IIS httpd 10.0, laut Passivquelle).",
-   "id": "VS-2026-004",
+   "id": "VS-2026-005",
    "impact": "Ohne aktive Bestätigung ist unklar, ob der gemeldete Dienst und die genannte Version noch aktuell sind. Ein veralteter Patchstand bleibt so unentdeckt, und der Dienst kann außerhalb der eigentlich vorgesehenen Zustellwege erreichbar sein.",
    "level": "mittel",
    "level_label": "mittel",
+   "operator": "",
+   "operator_note": "",
    "policy": "passive_service_version_unverified",
    "recommendation": [
     [
@@ -1022,10 +968,12 @@
    "cat": "C",
    "evidence": "dns_records · phase0/dns_records.json\nbergersysteme.com: SPF=v=spf1 a:mail.bergersysteme.com ip4:62.217.52.167 include:spf.protection.outlook.com include:spf-de.emailsignatures365.com redirect=bergersysteme.com.spf.hornetdmarc.com DMARC=v=DMARC1; p=none; pct=100; rua=mailto:...",
    "found": "Für bergersysteme.com sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: bergersysteme.com (p=none).",
-   "id": "VS-2026-005",
+   "id": "VS-2026-006",
    "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
    "level": "mittel",
    "level_label": "mittel",
+   "operator": "",
+   "operator_note": "",
    "policy": "dmarc_none",
    "recommendation": [
     [
@@ -1046,14 +994,16 @@
    "verify": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
   },
   {
-   "affected": "bergersysteme.com, ftp.bergersysteme.com, bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), ftp.bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
+   "affected": "bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), ftp.bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
    "evidence": "header_check · hosts/92.205.224.174/phase2/headers_bergersysteme.com.json\nbergersysteme.com: URL=https://bergersysteme.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx\n\nheader_check · hosts/92.205.224.174/phase2/headers_ftp.bergersysteme.com.json\nftp.bergersysteme.com: URL=https://ftp.bergersysteme.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx",
-   "found": "Die Webdienste auf 92.205.224.174 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: bergersysteme.com, ftp.bergersysteme.com, bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), ftp.bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
-   "id": "VS-2026-006",
+   "found": "Die Webdienste auf 92.205.224.174 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), ftp.bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
+   "id": "VS-2026-007",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "mittel",
    "level_label": "mittel",
+   "operator": "",
+   "operator_note": "",
    "policy": "csp_missing, hsts_missing, security_headers_incomplete",
    "recommendation": [
     [
@@ -1078,10 +1028,12 @@
    "cat": "A",
    "evidence": "nmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:110/tcp Dienst=pop3 Produkt=Dovecot pop3d Zustand=open STARTTLS=ja Capabilities=AUTH-RESP-CODE, RESP-CODES, SASL(PLAIN, LOGIN\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\npop3-capabilities: AUTH-RESP-CODE RESP-CODES SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) STLS UIDL PIPELINING APOP TOP USER CAPA\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:143/tcp Dienst=imap Produkt=Dovecot imapd Zustand=open TLS erzwungen=nein STARTTLS=ja Anmeldung gesperrt=nein Verfahren=CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN Capabilities=AUTH=CRAM-MD5A0001, AUTH=DIGEST-MD5, post-login, AUTH=...\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\nimap-capabilities: AUTH=CRAM-MD5A0001 AUTH=DIGEST-MD5 post-login AUTH=LOGIN capabilities ID OK listed IMAP4rev1 more STARTTLS SASL-IR have AUTH=PLAIN Pre-login LITERAL+ LOGIN-REFERRALS IDLE ENABLE",
    "found": "Der Host 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 92.205.224.174:110 (POP3), 92.205.224.174:143 (IMAP), 92.205.224.174:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
-   "id": "VS-2026-007",
+   "id": "VS-2026-008",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "beim Hoster Host Europe GmbH",
+   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Server wird mit anderen Kunden geteilt (auf derselben Adresse auch dirak.de, www.dirak.de), der Dienst gehört zum Server und nicht zu Ihrer Website. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen.",
    "policy": "legacy_protocols_present",
    "recommendation": [
     [
@@ -1097,7 +1049,7 @@
    "source": "aktiv (nmap)",
    "status": "blau",
    "threat": null,
-   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar (beim Hoster Host Europe GmbH)",
    "urgency": "Mittelfristig",
    "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
   },
@@ -1106,10 +1058,12 @@
    "cat": "C",
    "evidence": "dns_records · phase0/dns_records.json\nbergersysteme.com: SPF=v=spf1 a:mail.bergersysteme.com ip4:62.217.52.167 include:spf.protection.outlook.com include:spf-de.emailsignatures365.com redirect=bergersysteme.com.spf.hornetdmarc.com DMARC=v=DMARC1; p=none; pct=100; rua=mailto:...",
    "found": "Für bergersysteme.com fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: bergersysteme.com.",
-   "id": "VS-2026-008",
+   "id": "VS-2026-009",
    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
    "policy": "dane_missing, mta_sts_missing, tls_rpt_missing",
    "recommendation": [
     [
@@ -1130,10 +1084,12 @@
    "cat": "D",
    "evidence": "testssl\nwww.bergersysteme.com:443 Pruefung=BREACH Urteil=potential CVE=CVE-2013-3587 Ausgabe=potentially VULNERABLE, gzip br HTTP compression detected - only supplied '/' tested\n\nhttpx · hosts/198.202.211.1/phase2/httpx.json\nwww.bergersysteme.com:443 tls=tls13 cn=www.bergersysteme.com gueltig_bis=2026-11-27T04:15:54Z\n\ntestssl · scan_results:testssl:198.202.211.1\nangeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1\n\ntestssl · hosts/198.202.211.1/phase2/testssl.json\nservice=HTTP; pre_128cipher=No 128 cipher limit bug; SSLv2=not offered; SSLv3=not offered; TLS1=not offered; TLS1_1=not offered",
    "found": "Die Transportverschlüsselung auf www.bergersysteme.com lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: www.bergersysteme.com:443 (BREACH).",
-   "id": "VS-2026-009",
+   "id": "VS-2026-010",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "beim Plattformbetreiber webflow.com",
+   "operator_note": "Dieser Sachverhalt liegt beim Plattformbetreiber webflow.com: der Hostname zeigt auf dessen Plattform, Server und Grundkonfiguration betreibt er. Die Empfehlung richtet sich an ihn; Sie können sie über den Vertrag oder die Einstellungen der Plattform einfordern.",
    "policy": "tls_weakness",
    "recommendation": [
     [
@@ -1159,19 +1115,21 @@
     "kev": "",
     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
    },
-   "title": "Transportverschlüsselung auf www.bergersysteme.com mit veralteten Verfahren",
+   "title": "Transportverschlüsselung auf www.bergersysteme.com mit veralteten Verfahren (beim Plattformbetreiber webflow.com)",
    "urgency": "Mittelfristig",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
   },
   {
-   "affected": "www.bergersysteme.com, www.bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
+   "affected": "www.bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
    "evidence": "header_check · hosts/198.202.211.1/phase2/headers_www.bergersysteme.com.json\nwww.bergersysteme.com: URL=https://www.bergersysteme.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-security: m...",
-   "found": "Die Webdienste auf 198.202.211.1 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: www.bergersysteme.com, www.bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
-   "id": "VS-2026-010",
+   "found": "Die Webdienste auf 198.202.211.1 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: www.bergersysteme.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
+   "id": "VS-2026-011",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "beim Plattformbetreiber webflow.com",
+   "operator_note": "Dieser Sachverhalt liegt beim Plattformbetreiber webflow.com: der Hostname zeigt auf dessen Plattform, Server und Grundkonfiguration betreibt er. Die Empfehlung richtet sich an ihn; Sie können sie über den Vertrag oder die Einstellungen der Plattform einfordern.",
    "policy": "csp_missing, security_headers_incomplete",
    "recommendation": [
     [
@@ -1187,7 +1145,7 @@
    "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
-   "title": "Sicherheits-Header und Formularschutz auf 198.202.211.1 unvollständig",
+   "title": "Sicherheits-Header und Formularschutz auf 198.202.211.1 unvollständig (beim Plattformbetreiber webflow.com)",
    "urgency": "Mittelfristig",
    "verify": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
   },
@@ -1196,10 +1154,12 @@
    "cat": "E",
    "evidence": "nmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:22/tcp Dienst=ssh Produkt=OpenSSH Version=9.9 Zustand=open\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\n22/tcp open ssh OpenSSH 9.9 (protocol 2.0)",
    "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 92.205.224.174:22 (OpenSSH 9.9).",
-   "id": "VS-2026-011",
+   "id": "VS-2026-012",
    "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "beim Hoster Host Europe GmbH",
+   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Server wird mit anderen Kunden geteilt (auf derselben Adresse auch dirak.de, www.dirak.de), der Dienst gehört zum Server und nicht zu Ihrer Website. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen.",
    "policy": "service_banner_version",
    "recommendation": [
     [
@@ -1215,7 +1175,7 @@
    "source": "aktiv (nmap)",
    "status": "blau",
    "threat": null,
-   "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+   "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste (beim Hoster Host Europe GmbH)",
    "urgency": "Mittelfristig",
    "verify": "Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue Versionsangabe und ohne die zusätzlichen Methoden."
   },
@@ -1224,10 +1184,12 @@
    "cat": "E",
    "evidence": "dns_records · phase0/dns_records.json\nbergersysteme.com: SPF=v=spf1 a:mail.bergersysteme.com ip4:62.217.52.167 include:spf.protection.outlook.com include:spf-de.emailsignatures365.com redirect=bergersysteme.com.spf.hornetdmarc.com DMARC=v=DMARC1; p=none; pct=100; rua=mailto:...",
    "found": "Für bergersysteme.com fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: bergersysteme.com.",
-   "id": "VS-2026-012",
+   "id": "VS-2026-013",
    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
    "policy": "caa_missing, dnssec_missing",
    "recommendation": [
     [
@@ -1250,7 +1212,7 @@
     "key": "A",
     "level": 2,
     "name": "Perimeter-Exposition",
-    "note": "Verwaltungsoberfläche aus dem Internet erreichbar; Datei- und Mailzugänge auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ohne erzwungene Transportverschlüsselung",
+    "note": "Verwaltungsoberfläche aus dem Internet erreichbar (beim Hoster Host Europe GmbH); Datei- und Mailzugänge auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ohne erzwungene Transportverschlüsselung (beim Hoster Host Europe GmbH)",
     "status": "gelb"
    },
    {
@@ -1271,19 +1233,19 @@
     "key": "D",
     "level": 2,
     "name": "Web- und Transport-Hygiene",
-    "note": "Sicherheits-Header und Formularschutz auf 92.205.224.174 unvollständig; Transportverschlüsselung auf www.bergersysteme.com mit veralteten Verfahren",
+    "note": "Sicherheits-Header und Formularschutz auf 92.205.224.174 unvollständig; Transportverschlüsselung auf www.bergersysteme.com mit veralteten Verfahren (beim Plattformbetreiber webflow.com)",
     "status": "gelb"
    },
    {
     "key": "E",
     "level": 1,
     "name": "Konfiguration und Informations-Hygiene",
-    "note": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste; DNS-Absicherung für bergersysteme.com nicht eingerichtet",
+    "note": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste (beim Hoster Host Europe GmbH); DNS-Absicherung für bergersysteme.com nicht eingerichtet",
     "status": "blau"
    }
   ],
-  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von bergersysteme.com am 23.09.2026: 11 Hostnamen auf 7 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 40.99.150.120 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von bergersysteme.com am 23.09.2026: 10 Hostnamen auf 6 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
+  "coverage_warning": "Für 198.202.211.1, 62.217.52.162, 62.217.52.166, 62.217.52.171 und 79.140.188.181 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
@@ -1291,7 +1253,7 @@
     "refs": [
      "VS-2026-002"
     ],
-    "title": "Datei- und Mailzugänge auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ohne erzwungene Transportverschlüsselung"
+    "title": "Datei- und Mailzugänge auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ohne erzwungene Transportverschlüsselung (beim Hoster Host Europe GmbH)"
    },
    {
     "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
@@ -1300,40 +1262,39 @@
      "VS-2026-001",
      "VS-2026-003"
     ],
-    "title": "Verwaltungsoberfläche aus dem Internet erreichbar"
+    "title": "Verwaltungsoberfläche aus dem Internet erreichbar (beim Hoster Host Europe GmbH)"
    },
    {
-    "effect": "Schließt bekannte Lücken in veralteten Ständen",
+    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
     "n": 3,
     "refs": [
-     "VS-2026-004",
-     "VS-2026-007",
-     "VS-2026-011"
+     "VS-2026-004"
     ],
-    "title": "Dienstversion laut Passivquelle unbestätigt"
+    "title": "Verwaltungsoberfläche laut Passivquelle erreichbar (beim Plattformbetreiber webflow.com)"
    }
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
   "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
- "landscape_lead": "12 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "13 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 22,
-  "catalog_digest": "4e255169a28aea349450a125668c81504736ef052bd84894978cd0a9e8800dab",
-  "catalog_version": "2026-09-23.2",
+  "catalog_digest": "dcd629946febcc08a9c28922053c58d8d6eb044355d63056decc79caff8a905b",
+  "catalog_version": "2026-09-25.1",
   "classification": "Vertraulich",
-  "consolidated": 12,
+  "consolidated": 13,
+  "context_sources": {},
   "customer": "Auftraggeber",
   "customer_short": "Auftraggeber",
   "domains": [
    "bergersysteme.com"
   ],
-  "facts_schema_version": "1.0.5",
-  "fqdns_total": 11,
-  "hosts_ipv4": 7,
+  "facts_schema_version": "1.0.6",
+  "fqdns_total": 10,
+  "hosts_ipv4": 6,
   "hosts_ipv6": 0,
-  "hosts_total": 7,
+  "hosts_total": 6,
   "orders": [
    {
     "id": "68d59573-7a93-4efa-89cc-e7b10cc4d140",
@@ -1342,7 +1303,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-23.2",
+  "policy_version": "2026-09-25.1",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1350,7 +1311,7 @@
   "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
   "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
-  "raw_findings": 38,
+  "raw_findings": 37,
   "report_date": "19.09.2026",
   "report_id": "VS-2026-0923-68d5",
   "report_version": "1.0",
@@ -1360,7 +1321,7 @@
  },
  "plan": [
   {
-   "action": "Auf den betroffenen Diensten die Transportverschlüsselung erzwingen, sodass eine Anmeldung ohne aufgebautes TLS abgelehnt wird.",
+   "action": "Beim Hoster einfordern: Auf den betroffenen Diensten die Transportverschlüsselung erzwingen, sodass eine Anmeldung ohne aufgebautes TLS abgelehnt wird.",
    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
    "prio": "In Kürze",
    "refs": [
@@ -1369,7 +1330,7 @@
    "st": "gelb"
   },
   {
-   "action": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst. Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand.",
+   "action": "Beim Hoster einfordern: Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst. Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand.",
    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
    "prio": "In Kürze",
    "refs": [
@@ -1379,13 +1340,20 @@
    "st": "gelb"
   },
   {
-   "action": "Anhand einer aktiven Prüfung feststellen, ob Dienst und Version aus der Passivquelle noch zutreffen, und den Patchstand mit den Sicherheitshinweisen des Herstellers abgleichen. Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
+   "action": "Beim Plattformbetreiber einfordern: Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand.",
+   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+   "prio": "In Kürze",
+   "refs": [
+    "VS-2026-004"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Anhand einer aktiven Prüfung feststellen, ob Dienst und Version aus der Passivquelle noch zutreffen, und den Patchstand mit den Sicherheitshinweisen des Herstellers abgleichen.",
    "effect": "Schließt bekannte Lücken in veralteten Ständen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-004",
-    "VS-2026-007",
-    "VS-2026-011"
+    "VS-2026-005"
    ],
    "st": "gelb"
   },
@@ -1394,7 +1362,7 @@
    "effect": "Schützt die Authentizität der eigenen E-Mail",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-005"
+    "VS-2026-006"
    ],
    "st": "gelb"
   },
@@ -1403,17 +1371,27 @@
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-006"
+    "VS-2026-007"
    ],
    "st": "gelb"
   },
   {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+   "action": "Beim Hoster einfordern: Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
+   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-008",
+    "VS-2026-012"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Beim Plattformbetreiber einfordern: Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-009",
-    "VS-2026-010"
+    "VS-2026-010",
+    "VS-2026-011"
    ],
    "st": "blau"
   },
@@ -1422,8 +1400,8 @@
    "effect": "Schützt die Authentizität der eigenen E-Mail",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-008",
-    "VS-2026-012"
+    "VS-2026-009",
+    "VS-2026-013"
    ],
    "st": "blau"
   }
@@ -1431,7 +1409,7 @@
  "positives": [
   {
    "cat": "A",
-   "text": "Der Host 198.202.211.1 (www.bergersysteme.com), 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) bietet seinen Webdienst über HTTPS an.",
+   "text": "Die Hosts 198.202.211.1 (www.bergersysteme.com) und 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) bieten ihre Webdienste über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
@@ -1446,7 +1424,7 @@
   },
   {
    "cat": "D",
-   "text": "Vor bergersysteme.com (+cdn.bergersysteme.com), www.bergersysteme.com ist eine Web Application Firewall aktiv, die Angriffe auf Anwendungsebene filtert, bevor sie den Webdienst erreichen.",
+   "text": "Vor bergersysteme.com (+cdn.bergersysteme.com) und www.bergersysteme.com ist eine Web Application Firewall aktiv, die Angriffe auf Anwendungsebene filtert, bevor sie den Webdienst erreichen.",
    "title": "Web Application Firewall vorhanden"
   },
   {
@@ -1470,136 +1448,176 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
+  "domains": [],
   "hosts": [
    {
     "cov": "teil",
-    "coverage": "Portscan vollständig; Diese Prüfung war mit den vorliegenden Daten nicht möglich.",
+    "coverage": "Portscan vollständig; danach hat der Host weitere Verbindungen abgewiesen, Transportverschlüsselung und Webanalyse waren nicht möglich.",
     "fqdns": "www.bergersysteme.com",
     "ip": "198.202.211.1",
+    "more_ips": [],
     "operator": "Webflow, Inc",
-    "role": "Website und Datenbanken, Fernzugang und Verwaltung"
+    "role": "Website · Plattform webflow.com"
+   },
+   {
+    "cov": "unerreichbar",
+    "coverage": "Vom Prüfstand aus nicht erreichbar: der Portscan fand keinen offenen Port, eine Passivquelle meldet dort Dienste (Port 80, 443, gesehen am 23.09.2026).",
+    "fqdns": "bstasks.bergersysteme.com, ticket.bergersysteme.com",
+    "ip": "62.217.52.162",
+    "more_ips": [],
+    "operator": "Berger EDV-Systemberatungs GmbH",
+    "role": "Nicht näher bestimmbar"
+   },
+   {
+    "cov": "unerreichbar",
+    "coverage": "Vom Prüfstand aus nicht erreichbar: der Portscan fand keinen offenen Port, eine Passivquelle meldet dort Dienste (Port 25, 443, gesehen am 23.09.2026).",
+    "fqdns": "mail.bergersysteme.com, owa.bergersysteme.com",
+    "ip": "62.217.52.166",
+    "more_ips": [],
+    "operator": "Berger EDV-Systemberatungs GmbH (mail.bergersysteme.com)",
+    "role": "E-Mail-Versand laut SPF"
+   },
+   {
+    "cov": "unerreichbar",
+    "coverage": "Vom Prüfstand aus nicht erreichbar: der Portscan fand keinen offenen Port, eine Passivquelle meldet dort Dienste (Port 443, gesehen am 21.09.2026).",
+    "fqdns": "bitwarden.bergersysteme.com",
+    "ip": "62.217.52.171",
+    "more_ips": [],
+    "operator": "Berger EDV-Systemberatungs GmbH",
+    "role": "Nicht näher bestimmbar"
    },
    {
     "cov": "keine",
-    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
-    "fqdns": "autodiscover.bergersysteme.com",
-    "ip": "40.99.150.120",
-    "operator": "Microsoft Corporation",
-    "role": "Nicht näher bestimmbar"
-   },
-   {
-    "cov": "voll",
-    "coverage": "Portscan und Tiefenprüfung vollständig",
-    "fqdns": "bstasks.bergersysteme.com, ticket.bergersysteme.com",
-    "ip": "62.217.52.162",
-    "operator": "Berger EDV-Systemberatungs GmbH",
-    "role": "Nicht näher bestimmbar"
-   },
-   {
-    "cov": "voll",
-    "coverage": "Portscan und Tiefenprüfung vollständig",
-    "fqdns": "mail.bergersysteme.com, owa.bergersysteme.com",
-    "ip": "62.217.52.166",
-    "operator": "Berger EDV-Systemberatungs GmbH (mail.bergersysteme.com)",
-    "role": "Nicht näher bestimmbar"
-   },
-   {
-    "cov": "voll",
-    "coverage": "Portscan und Tiefenprüfung vollständig",
-    "fqdns": "bitwarden.bergersysteme.com",
-    "ip": "62.217.52.171",
-    "operator": "Berger EDV-Systemberatungs GmbH",
-    "role": "Nicht näher bestimmbar"
-   },
-   {
-    "cov": "voll",
-    "coverage": "Portscan und Tiefenprüfung vollständig",
+    "coverage": "Der Portscan fand keinen offenen Port; weitere Prüfungen entfielen.",
     "fqdns": "mail2.bergersysteme.com",
     "ip": "79.140.188.181",
+    "more_ips": [],
     "operator": "ecotel communication ag (mail2.bergersysteme.com)",
     "role": "Nicht näher bestimmbar"
    },
    {
     "cov": "voll",
-    "coverage": "Portscan und Tiefenprüfung vollständig",
+    "coverage": "Portscan und Transportverschlüsselung vollständig.",
     "fqdns": "bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com",
     "ip": "92.205.224.174",
+    "more_ips": [],
     "operator": "Host Europe GmbH (174.224.205.92.host.secureserver.net)",
-    "role": "Mail- und Kalenderplattform, Website und Datenbanken"
+    "role": "Nicht näher bestimmbar · geteiltes System beim Hoster"
+   },
+   {
+    "cov": "extern",
+    "coverage": "Drittanbieter, nicht geprüft",
+    "fqdns": "autodiscover.bergersysteme.com",
+    "ip": "40.99.150.120",
+    "more_ips": [],
+    "operator": "Microsoft Corporation",
+    "role": "Drittanbieter"
    }
   ],
-  "lead": "Der Scan hat 7 IP-Adressen mit 11 Hostnamen erfasst. Für 2 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 6 IP-Adressen mit 10 Hostnamen erfasst. Für 5 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
-    "detail": "Betroffen: 198.202.211.1 (www.bergersysteme.com), 40.99.150.120 (autodiscover.bergersysteme.com), 62.217.52.162 (bstasks.bergersysteme.com, ticket.bergersysteme.com), 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com), 62.217.52.171 (bitwarden.bergersysteme.com), 79.140.188.181 (mail2.bergersysteme.com) und weitere.",
-    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
+    "checks": [
+     "Portscan und Diensterkennung",
+     "Sicherheits-Header",
+     "Transportverschlüsselung",
+     "Webanalyse"
+    ],
+    "detail": "Betroffen: 62.217.52.162 (bstasks.bergersysteme.com, ticket.bergersysteme.com), 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com), 62.217.52.171 (bitwarden.bergersysteme.com). Eine Passivquelle meldet dort Dienste (gesehen vom 21.09.2026 bis 23.09.2026); der Portscan fand keinen offenen Port. Ergebnisse zu diesen Hosts liegen deshalb nicht vor.",
+    "what": "Vom Prüfstand aus nicht erreichbar"
    },
    {
-    "detail": "Betroffen: 198.202.211.1.",
-    "what": "Das Werkzeug feroxbuster hat kein Ergebnis geliefert"
+    "checks": [
+     "Diensterkennung",
+     "Sicherheits-Header",
+     "Transportverschlüsselung",
+     "Webanalyse"
+    ],
+    "detail": "Betroffen: 79.140.188.181 (mail2.bergersysteme.com).",
+    "what": "Portscan ohne offenen Port"
    },
    {
-    "detail": "Betroffen: 198.202.211.1.",
-    "what": "Das Werkzeug ffuf_sensitive hat kein Ergebnis geliefert"
+    "checks": [
+     "Sicherheits-Header",
+     "Suche nach nicht verlinkten Pfaden",
+     "Transportverschlüsselung",
+     "Webanalyse"
+    ],
+    "detail": "Betroffen: 198.202.211.1 (www.bergersysteme.com).",
+    "what": "Verbindungen nach dem Portscan abgewiesen"
    },
    {
-    "detail": "Betroffen: 62.217.52.162, 62.217.52.166, 62.217.52.171, 79.140.188.181.",
-    "what": "Das Werkzeug httpx hat kein Ergebnis geliefert"
+    "checks": [
+     "Mailserver auf Port 25 (Verschlüsselung, Anmeldung)"
+    ],
+    "detail": "Betroffen: 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com). Laut Passivquelle nimmt dort der Dienst SMTP Verbindungen an (gesehen am 23.09.2026); vom Prüfstand aus ist Port 25 nicht erreichbar, der Mailserver auf diesem Port ist deshalb nicht geprüft.",
+    "what": "SMTP auf Port 25 vom Prüfstand aus nicht prüfbar"
    },
    {
-    "detail": "Betroffen: 198.202.211.1.",
-    "what": "Das Werkzeug zap hat kein Ergebnis geliefert"
+    "checks": [
+     "Bekannte Schwachstellen der erkannten Versionen"
+    ],
+    "detail": "Betroffen: 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com).",
+    "what": "Keine Fremdbewertung aus Schwachstellendatenbanken zu den erkannten Versionen"
    },
    {
+    "checks": [
+     "Laufzeit der Domain"
+    ],
     "detail": "Betroffen: bergersysteme.com.",
-    "what": "Die Abfrage der Domain-Registrierungsdaten lieferte kein Ergebnis"
+    "what": "Registrierungsdaten der Domain nicht abrufbar"
    },
    {
+    "checks": [
+     "TLS-Protokollversionen",
+     "Verschlüsselungsverfahren"
+    ],
     "detail": "Betroffen: ftp.bergersysteme.com.",
-    "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
+    "what": "Transportverschlüsselung nur über die ausgehandelte Verbindung belegt"
    },
    {
-    "detail": "Betroffen: ftp.bergersysteme.com.",
-    "what": "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor"
+    "checks": [
+     "Freigaben für fremde Ursprünge (CORS)",
+     "Integrität eingebundener Skripte",
+     "JavaScript-Bibliotheken",
+     "Preisgegebene Angaben",
+     "Schutz der Formulare",
+     "Sitzungskennungen in Adressen",
+     "Verzeichnisauflistung",
+     "Webanalyse"
+    ],
+    "detail": "Betroffen: 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com).",
+    "what": "Webanalyse ohne Meldungen, Ergebnis nicht belastbar"
    },
    {
+    "checks": [
+     "DMARC-Richtlinie",
+     "SPF-Eintrag"
+    ],
     "detail": "Betroffen: bergersysteme.com.",
-    "what": "Die Werkzeugdaten reichen für eine Aussage zu dieser Prüfung nicht aus"
+    "what": "Werkzeugdaten reichen für eine Aussage nicht aus"
    },
    {
-    "detail": "Betroffen: bergersysteme.com (+cdn.bergersysteme.com).",
-    "what": "Die passive Webanalyse lieferte keine Meldungen; Ergebnis nicht belastbar"
-   },
-   {
-    "detail": "Betroffen: 62.217.52.162 (bstasks.bergersysteme.com, ticket.bergersysteme.com), 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com), 62.217.52.171 (bitwarden.bergersysteme.com), 79.140.188.181 (mail2.bergersysteme.com).",
-    "what": "Keine Technologie-Signale erkannt"
-   },
-   {
-    "detail": "Betroffen: bitwarden.bergersysteme.com, bstasks.bergersysteme.com, mail.bergersysteme.com, mail2.bergersysteme.com.",
-    "what": "Virtueller Host war über HTTP nicht erreichbar"
-   },
-   {
+    "checks": [
+     "Ermittlung der Hostnamen"
+    ],
     "detail": "Betroffen: bergersysteme.com.",
-    "what": "Werkzeug lief in einen Timeout"
+    "what": "Zeitlimit der Prüfung überschritten"
    },
    {
-    "detail": "Betroffen: bitwarden.bergersysteme.com, bstasks.bergersysteme.com, mail.bergersysteme.com, mail2.bergersysteme.com.",
-    "what": "Werkzeug wurde von der Scan-Steuerung übersprungen"
-   },
-   {
+    "checks": [
+     "Namen im Zertifikat",
+     "Zertifikatskette"
+    ],
     "detail": "Betroffen: ftp.bergersysteme.com.",
     "what": "Zertifikatsdetails nicht verfügbar"
-   },
-   {
-    "detail": "Betroffen: 40.99.150.120 (autodiscover.bergersysteme.com).",
-    "what": "Zu diesem Werkzeug liegt kein Laufprotokoll vor"
    }
   ],
   "method_phases": [
    {
     "n": "0",
     "name": "Aufklärung (passiv)",
-    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 11 Hostnamen auf 7 IP-Adressen."
+    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 10 Hostnamen auf 6 IP-Adressen."
    },
    {
     "n": "1",
@@ -1614,7 +1632,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 12 Befunde und 5 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 13 Befunde und 5 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -1628,11 +1646,11 @@
    },
    {
     "l": "Einzelbeobachtungen",
-    "v": "38"
+    "v": "37"
    },
    {
     "l": "Befunde im Bericht",
-    "v": "12"
+    "v": "13"
    }
   ],
   "out_of_scope": [

@@ -76,7 +76,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 22 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 9 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 22 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 9 Befunde und 2 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -101,7 +101,7 @@
    {
     "host": "62.217.52.165",
     "port": "443",
-    "ref": "",
+    "ref": "VS-2026-004, VS-2026-007",
     "svc": "Golang net/http server, TLS erzwungen"
    }
   ],
@@ -166,7 +166,7 @@
   ]
  },
  "architecture": {
-  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 2 Hosts mit folgenden Aufgaben: Website und Datenbanken. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 2 Hosts mit folgenden Aufgaben: Website. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [],
   "posture": [
    {
@@ -236,7 +236,7 @@
      {
       "l": "62.217.52.177",
       "ok": null,
-      "v": "entfällt"
+      "v": "nicht prüfbar"
      },
      {
       "l": "Zertifikate",
@@ -267,30 +267,35 @@
   "reputation": "Reputation: keine Einträge zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus.",
   "screens": [
    {
+    "also": [],
     "file": "62.217.52.165__10finance.vectigal.tech.png",
     "host": "10finance.vectigal.tech",
     "key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__10finance.vectigal.tech.png",
     "what": "10FINANCE Stabilitäts-Quickcheck"
    },
    {
+    "also": [],
     "file": "62.217.52.165__board.vectigal.tech.png",
     "host": "board.vectigal.tech",
     "key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__board.vectigal.tech.png",
     "what": "Paperclip"
    },
    {
+    "also": [],
     "file": "62.217.52.165__crm.vectigal.tech.png",
     "host": "crm.vectigal.tech",
     "key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__crm.vectigal.tech.png",
     "what": "Twenty"
    },
    {
+    "also": [],
     "file": "62.217.52.165__crmviewer.vectigal.tech.png",
     "host": "crmviewer.vectigal.tech",
     "key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__crmviewer.vectigal.tech.png",
     "what": "Streamlit"
    },
    {
+    "also": [],
     "file": "62.217.52.165__gutachter.vectigal.tech.png",
     "host": "gutachter.vectigal.tech",
     "key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__gutachter.vectigal.tech.png",
@@ -316,7 +321,7 @@
     ]
    }
   ],
-  "services_note": "Rot: Dienst mit kritischem Befund · Gelb: Dienst mit Befund · Blau: Altprotokoll · Grün: unauffällig · Grau: nur aus einer Passivquelle bekannt.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt.",
   "tech": [
    {
     "host": "62.217.52.165",
@@ -331,19 +336,10 @@
       "v": "unbekannt"
      },
      {
-      "c": "HSTS",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
       "c": "Nuxt.js",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -353,15 +349,6 @@
       "conf": "mittel",
       "note": "",
       "src": "webtech",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "Unpkg",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -393,11 +380,21 @@
   "lead": "Was der Scan über das Unternehmen sichtbar macht, bestimmt, welche Befunde wirklich zählen. Maßgeblich ist nicht die Zahl der Meldungen, sondern welche Systeme am Perimeter stehen und wofür sie gebraucht werden.",
   "observed": [
    {
-    "meaning": "Außendarstellung und die dahinterliegenden Datenbestände. Betroffen wären vor allem Seiteninhalte, Formulareingaben und Kontaktdaten.",
-    "system": "Website und Datenbanken (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech)"
+    "evidence": [
+     "10finance.vectigal.tech: Seite „10FINANCE Stabilitäts-Quickcheck“",
+     "board.vectigal.tech: Seite „Paperclip“",
+     "crm.vectigal.tech: Seite „Twenty“"
+    ],
+    "meaning": "Außendarstellung des Unternehmens. Betroffen wären vor allem Seiteninhalte und Formulareingaben.",
+    "role_keys": [
+     "website"
+    ],
+    "system": "Website (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech)"
    },
    {
+    "evidence": [],
     "meaning": "Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte intern geklärt werden.",
+    "role_keys": [],
     "system": "Nicht näher bestimmbar (test.vectigal.tech)"
    }
   ]
@@ -412,6 +409,8 @@
    "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
    "level": "hoch",
    "level_label": "hoch",
+   "operator": "",
+   "operator_note": "",
    "policy": "dmarc_missing",
    "recommendation": [
     [
@@ -440,6 +439,8 @@
    "impact": "Ohne diese Einträge kann ein Empfangssystem nicht unterscheiden, ob eine Nachricht wirklich aus Ihrer Domain stammt. Gefälschte Absender im Namen des Unternehmens sind damit ohne besonderen Aufwand möglich.",
    "level": "hoch",
    "level_label": "hoch",
+   "operator": "",
+   "operator_note": "",
    "policy": "spf_missing",
    "recommendation": [
     [
@@ -468,6 +469,8 @@
    "impact": "Ohne diese Einträge kann ein Empfangssystem nicht unterscheiden, ob eine Nachricht wirklich aus Ihrer Domain stammt. Gefälschte Absender im Namen des Unternehmens sind damit ohne besonderen Aufwand möglich.",
    "level": "hoch",
    "level_label": "hoch",
+   "operator": "",
+   "operator_note": "",
    "policy": "spf_missing",
    "recommendation": [
     [
@@ -488,14 +491,16 @@
    "verify": "DNS-Abfrage für die genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
   },
   {
-   "affected": "vectigal.tech:443, vectigal.tech:443 (Zertifikat für TRAEFIK DEFAULT CERT)",
+   "affected": "vectigal.tech:443 (Zertifikat für TRAEFIK DEFAULT CERT)",
    "cat": "D",
    "evidence": "testssl · scan_results:testssl:62.217.52.165\nvectigal.tech:443 CN=TRAEFIK DEFAULT CERT SAN=b7ac570d803b471e8b7b2b0fd41a6112.0cc7297b85e043717ea982a9e9019f1a.traefik.default Aussteller=TRAEFIK DEFAULT CERT gueltig_bis=2027-09-20T09:03:00Z abgelaufen=nein Resttage=364 Namensabweichun...\n\ntestssl · scan_results:testssl:62.217.52.165\nangeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1\n\ntestssl · hosts/62.217.52.165/phase2/testssl.json\nservice=HTTP; pre_128cipher=No 128 cipher limit bug; SSLv2=not offered; SSLv3=not offered; TLS1=not offered; TLS1_1=not offered",
-   "found": "Die Zertifikate auf 62.217.52.165 sind abgelaufen, laufen in Kürze ab, werden unvollständig ausgeliefert oder passen nicht zum aufgerufenen Namen: vectigal.tech:443, vectigal.tech:443 (Zertifikat für TRAEFIK DEFAULT CERT).",
+   "found": "Die Zertifikate auf 62.217.52.165 sind abgelaufen, laufen in Kürze ab, werden unvollständig ausgeliefert oder passen nicht zum aufgerufenen Namen: vectigal.tech:443 (Zertifikat für TRAEFIK DEFAULT CERT).",
    "id": "VS-2026-004",
    "impact": "Ein Zertifikat mit Beanstandung führt im Browser zu einer Vertrauenswarnung. Nutzer gewöhnen sich daran, solche Warnungen wegzuklicken, und übersehen dann auch eine echte Täuschung.",
    "level": "hoch",
    "level_label": "hoch",
+   "operator": "",
+   "operator_note": "",
    "policy": "cert_chain_incomplete, cert_hostname_mismatch",
    "recommendation": [
     [
@@ -524,6 +529,8 @@
    "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
    "level": "mittel",
    "level_label": "mittel",
+   "operator": "",
+   "operator_note": "",
    "policy": "dmarc_none",
    "recommendation": [
     [
@@ -552,6 +559,8 @@
    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
    "policy": "mta_sts_missing, tls_rpt_missing",
    "recommendation": [
     [
@@ -568,14 +577,16 @@
    "verify": "DNS-Abfrage der genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
   },
   {
-   "affected": "10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech, 10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy)",
+   "affected": "10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy)",
    "cat": "D",
    "evidence": "header_check · hosts/62.217.52.165/phase2/headers_10finance.vectigal.tech.json\n10finance.vectigal.tech: URL=https://10finance.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; inclu...\n\nheader_check · hosts/62.217.52.165/phase2/headers_board.vectigal.tech.json\nboard.vectigal.tech: URL=https://board.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; includeSubDom...\n\nheader_check · hosts/62.217.52.165/phase2/headers_crm.vectigal.tech.json\ncrm.vectigal.tech: URL=https://crm.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; includeSubDomains...\n\nheader_check · hosts/62.217.52.165/phase2/headers_crmviewer.vectigal.tech.json\ncrmviewer.vectigal.tech: URL=https://crmviewer.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; inclu...\n\nheader_check · hosts/62.217.52.165/phase2/headers_gutachter.vectigal.tech.json\ngutachter.vectigal.tech: URL=https://gutachter.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; inclu...",
-   "found": "Die Webdienste auf 62.217.52.165 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech, 10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy).",
+   "found": "Die Webdienste auf 62.217.52.165 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: 10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy).",
    "id": "VS-2026-007",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
    "policy": "csp_missing, security_headers_incomplete",
    "recommendation": [
     [
@@ -604,6 +615,8 @@
    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
    "policy": "caa_missing, dnssec_missing",
    "recommendation": [
     [
@@ -628,6 +641,8 @@
    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
    "level": "niedrig",
    "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
    "policy": "caa_missing, dnssec_missing",
    "recommendation": [
     [
@@ -683,7 +698,7 @@
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von vectigal.tech und vectiscan.de am 20.09.2026: 31 Hostnamen auf 2 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "",
+  "coverage_warning": "Für 62.217.52.165 und 62.217.52.177 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Schützt die Authentizität der eigenen E-Mail",
@@ -718,17 +733,18 @@
  "landscape_lead": "9 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 22,
-  "catalog_digest": "4e255169a28aea349450a125668c81504736ef052bd84894978cd0a9e8800dab",
-  "catalog_version": "2026-09-23.2",
+  "catalog_digest": "dcd629946febcc08a9c28922053c58d8d6eb044355d63056decc79caff8a905b",
+  "catalog_version": "2026-09-25.1",
   "classification": "Vertraulich",
   "consolidated": 9,
+  "context_sources": {},
   "customer": "Auftraggeber",
   "customer_short": "Auftraggeber",
   "domains": [
    "vectigal.tech",
    "vectiscan.de"
   ],
-  "facts_schema_version": "1.0.5",
+  "facts_schema_version": "1.0.6",
   "fqdns_total": 31,
   "hosts_ipv4": 2,
   "hosts_ipv6": 0,
@@ -741,8 +757,8 @@
   ],
   "package": "WebCheck",
   "package_label": "WEBCHECK",
-  "policy_version": "2026-09-23.2",
-  "positives": 4,
+  "policy_version": "2026-09-25.1",
+  "positives": 2,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
@@ -827,18 +843,8 @@
  "positives": [
   {
    "cat": "A",
-   "text": "Auf 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere) antwortet kein Datenbankdienst auf Verbindungen von außen.",
-   "title": "Keine Datenbankdienste aus dem Internet erreichbar"
-  },
-  {
-   "cat": "A",
    "text": "Der Host 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere) bietet seinen Webdienst über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
-  },
-  {
-   "cat": "A",
-   "text": "Auf 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere) antwortet weder die Windows-Fernwartung (RDP) noch die Windows-Dateifreigabe (SMB) auf Verbindungen von außen. Andere Zugänge wie FTP, SSH oder Verwaltungsoberflächen umfasst diese Aussage nicht.",
-   "title": "Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet erreichbar"
   },
   {
    "cat": "E",
@@ -861,67 +867,107 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
+  "domains": [
+   {
+    "domain": "vectigal.tech",
+    "text": "Hostermittlung, Portscan und Tiefenprüfung (31 Hostnamen), DNS- und E-Mail-Einträge"
+   },
+   {
+    "domain": "vectiscan.de",
+    "text": "nur DNS- und E-Mail-Einträge; für diese Domain wurden keine eigenen Hosts ermittelt"
+   }
+  ],
   "hosts": [
    {
     "cov": "teil",
-    "coverage": "Portscan vollständig; Ohne Ergebnis blieben: zap_spider.",
+    "coverage": "Portscan und Transportverschlüsselung vollständig; nicht geprüft: Webanalyse.",
     "fqdns": "10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, feedgenerator.vectigal.tech, gutachter-api.vectigal.tech, gutachter.vectigal.tech, id.vectigal.tech, ki-check-10finance.vectigal.tech, ki-check.vectigal.tech, logs.vectigal.tech, mcp-test.vectigal.tech, monitoring.vectigal.tech, page.vectigal.tech, protokoll-assist.vectigal.tech, rankingcoach.vectigal.tech, saferouter-admin.vectigal.tech, saferouter-api.vectigal.tech, saferouter-app.vectigal.tech, saferouter-auth.vectigal.tech, saferouter-www.vectigal.tech, scan-api.vectigal.tech, scan.vectigal.tech, shopify.vectigal.tech, status.vectigal.tech, traefik.vectigal.tech, vectigal.tech, webcheck.vectigal.tech",
     "ip": "62.217.52.165",
+    "more_ips": [],
     "operator": "unbekannt",
-    "role": "Website und Datenbanken"
+    "role": "Website"
    },
    {
-    "cov": "voll",
-    "coverage": "Portscan und Tiefenprüfung vollständig",
+    "cov": "keine",
+    "coverage": "Der Portscan fand keinen offenen Port; weitere Prüfungen entfielen.",
     "fqdns": "test.vectigal.tech",
     "ip": "62.217.52.177",
+    "more_ips": [],
     "operator": "unbekannt",
     "role": "Nicht näher bestimmbar"
    }
   ],
-  "lead": "Der Scan hat 2 IP-Adressen mit 31 Hostnamen erfasst. Für 1 Host war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 2 IP-Adressen mit 31 Hostnamen erfasst. Für 2 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
-    "detail": "Betroffen: 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere), 62.217.52.177 (test.vectigal.tech).",
-    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
-   },
-   {
-    "detail": "Betroffen: 62.217.52.165.",
-    "what": "Aktive Webanalyse ist im Scanner fehlgeschlagen"
-   },
-   {
-    "detail": "Betroffen: vectiscan.de.",
-    "what": "DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar: unter 62 abgefragten gängigen Selektoren, darunter default, selector1, selector2, google, k1, s1, war kein Schlüssel veröffentlicht (vollständige Liste im Anhang bei den eingesetzten Werkzeugen). Ob die Domain signiert, zeigt der Kopf einer echten E-Mail (DKIM-Signature, Angabe s=)"
-   },
-   {
-    "detail": "Betroffen: 62.217.52.177.",
-    "what": "Das Werkzeug httpx hat kein Ergebnis geliefert"
-   },
-   {
-    "detail": "Betroffen: vectigal.tech, vectiscan.de.",
-    "what": "Die Abfrage der Domain-Registrierungsdaten lieferte kein Ergebnis"
-   },
-   {
-    "detail": "Betroffen: 10finance.vectigal.tech.",
-    "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
-   },
-   {
-    "detail": "Betroffen: 10finance.vectigal.tech.",
-    "what": "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor"
-   },
-   {
-    "detail": "Betroffen: ki-check-10finance.vectigal.tech, vectiscan.de.",
-    "what": "Die Werkzeugdaten reichen für eine Aussage zu dieser Prüfung nicht aus"
-   },
-   {
+    "checks": [
+     "Diensterkennung",
+     "Sicherheits-Header",
+     "Transportverschlüsselung",
+     "Webanalyse"
+    ],
     "detail": "Betroffen: 62.217.52.177 (test.vectigal.tech).",
-    "what": "Keine Technologie-Signale erkannt"
+    "what": "Portscan ohne offenen Port"
    },
    {
-    "detail": "Betroffen: test.vectigal.tech.",
-    "what": "Virtueller Host war über HTTP nicht erreichbar"
+    "checks": [
+     "DKIM-Signatur"
+    ],
+    "detail": "Betroffen: vectiscan.de. Unter 62 abgefragten gängigen Selektoren, darunter default, selector1, selector2, google, k1, s1, war kein Schlüssel veröffentlicht (vollständige Liste im Anhang bei den eingesetzten Werkzeugen). Ob die Domain signiert, zeigt der Kopf einer echten E-Mail (DKIM-Signature, Angabe s=).",
+    "what": "DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar"
    },
    {
+    "checks": [
+     "Bekannte Schwachstellen der erkannten Versionen"
+    ],
+    "detail": "Betroffen: 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, feedgenerator.vectigal.tech, gutachter-api.vectigal.tech, gutachter.vectigal.tech, id.vectigal.tech, ki-check-10finance.vectigal.tech, ki-check.vectigal.tech, logs.vectigal.tech, mcp-test.vectigal.tech, monitoring.vectigal.tech, page.vectigal.tech, protokoll-assist.vectigal.tech, rankingcoach.vectigal.tech, saferouter-admin.vectigal.tech, saferouter-api.vectigal.tech, saferouter-app.vectigal.tech, saferouter-auth.vectigal.tech, saferouter-www.vectigal.tech, scan-api.vectigal.tech, scan.vectigal.tech, shopify.vectigal.tech, status.vectigal.tech, traefik.vectigal.tech, vectigal.tech, webcheck.vectigal.tech).",
+    "what": "Keine Fremdbewertung aus Schwachstellendatenbanken zu den erkannten Versionen"
+   },
+   {
+    "checks": [
+     "Laufzeit der Domain"
+    ],
+    "detail": "Betroffen: vectigal.tech, vectiscan.de.",
+    "what": "Registrierungsdaten der Domain nicht abrufbar"
+   },
+   {
+    "checks": [
+     "TLS-Protokollversionen",
+     "Verschlüsselungsverfahren"
+    ],
+    "detail": "Betroffen: 10finance.vectigal.tech.",
+    "what": "Transportverschlüsselung nur über die ausgehandelte Verbindung belegt"
+   },
+   {
+    "checks": [
+     "Webanalyse"
+    ],
+    "detail": "Betroffen: 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere).",
+    "what": "Webanalyse im Scanner fehlgeschlagen"
+   },
+   {
+    "checks": [
+     "Abruf der gesamten DNS-Zone",
+     "Content-Security-Policy",
+     "DANE",
+     "DMARC-Richtlinie",
+     "Gültigkeit der Zertifikate",
+     "HSTS",
+     "Namen im Zertifikat",
+     "Sicherheits-Header",
+     "TLS 1.3",
+     "TLS-Protokollversionen",
+     "Verschlüsselungsverfahren",
+     "Zertifikatskette"
+    ],
+    "detail": "Betroffen: ki-check-10finance.vectigal.tech, vectiscan.de.",
+    "what": "Werkzeugdaten reichen für eine Aussage nicht aus"
+   },
+   {
+    "checks": [
+     "Namen im Zertifikat",
+     "Zertifikatskette"
+    ],
     "detail": "Betroffen: 10finance.vectigal.tech.",
     "what": "Zertifikatsdetails nicht verfügbar"
    }
@@ -945,7 +991,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 9 Befunde und 4 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 9 Befunde und 2 positive Feststellungen."
    }
   ],
   "numbers": [

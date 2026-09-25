@@ -23,6 +23,7 @@ from reporter.v3 import levels as L
 from reporter.v3 import tables as T
 from reporter.v3.bundles import GLOBAL_KEY, Consolidated
 from reporter.v3.models import CveRef, Finding, Positive, Threat, ToolFinding
+from reporter.v3.operators import sentence as operator_sentence
 from reporter.v3.orthography import clean_foreign_text
 
 MAX_EVIDENCE_LINES = 6
@@ -36,7 +37,11 @@ PASSIVE_TOOLS: frozenset[str] = frozenset({
 
 # ---------------------------------------------------------------- Hilfen
 
-MANY_GROUPS = "den geprüften Hosts"
+# S6b-1 (spec/09 Teil 3): kein Platzhalter "den geprüften Hosts" mehr. Ab vier Gruppen
+# stehen drei Namen und die Gesamtzahl; die Form ist fallneutral, weil die Texte sie
+# im Nominativ ("Die Hosts {group} bieten") und im Dativ ("Auf {group} antwortet")
+# einsetzen.
+NAMED_GROUPS = 3
 
 # Ein Host mit vielen VHosts traegt sie alle im Gruppennamen, bei vectigal.tech 31 hinter
 # einer einzigen IP (spec/08 Punkt 13). In Einschraenkungen (chapters) und Positivbefunden
@@ -56,31 +61,69 @@ def kurz_label(label: str) -> str:
             f"{', '.join(namen[:_VHOSTS_IM_NAMEN])} und weitere)")
 
 
+def aufzaehlung(names: list[str]) -> str:
+    """"A", "A und B", "A, B und C"."""
+    if len(names) <= 1:
+        return "".join(names)
+    return ", ".join(names[:-1]) + " und " + names[-1]
+
+
 def _group_label(results: list[CheckResult], groups: list[str], merge_key: str,
-                 kurz: bool = False) -> str:
-    """Wie der Sachverhalt im Text benannt wird.
+                 kurz: bool = False, excluded: list[str] | None = None) -> tuple[str, int]:
+    """Wie der Sachverhalt im Text benannt wird, und wie viele Gruppen das sind.
 
     Eine einzelne Gruppe behaelt ihre ausfuehrliche Bezeichnung aus dem Katalog (IP mit
     Hostnamen, virtueller Host). Laufen mehrere Gruppen zusammen, steht der
     Zusammenfuehrungsschluessel da, also die Host-Adresse oder die Domain; die Namen
-    stehen ohnehin in der Betroffenenliste. Ein Sachverhalt ueber den ganzen Auftrag
-    bekommt eine Sammelbezeichnung. Mit ``kurz`` (Positivbefunde, S6a) nennt jede
-    Gruppe hoechstens drei ihrer virtuellen Hosts.
+    stehen ohnehin in der Betroffenenliste. Ueber den ganzen Auftrag stehen bis zu drei
+    Namen, darueber drei Namen und die Gesamtzahl. Mit ``kurz`` (Positivbefunde, S6a)
+    nennt jede Gruppe hoechstens drei ihrer virtuellen Hosts. Die Zahl steuert Einzahl
+    und Mehrzahl im Text (``{n:Der Host|Die Hosts}``).
     """
     if kurz:
         groups = [kurz_label(g) for g in groups]
     if len(results) == 1:
         label = results[0].group_label or merge_key
-        return kurz_label(label) if kurz else label
+        return (kurz_label(label) if kurz else label), 1
     if merge_key and merge_key != GLOBAL_KEY:
-        return merge_key
-    if 0 < len(groups) <= 3:
-        return ", ".join(groups)
-    return MANY_GROUPS
+        return merge_key, 1
+    count = len(groups)
+    if count <= NAMED_GROUPS:
+        label = aufzaehlung(groups)
+        if excluded and not label:
+            label = "keinem Host"
+        return label, max(count, 1)
+    zusatz = f"insgesamt {count} Hosts"
+    if excluded:
+        zusatz += f", außer {aufzaehlung(list(excluded))}"
+    return f"{', '.join(groups[:NAMED_GROUPS])} ({zusatz})", count
+
+
+_LABEL_DETAIL = re.compile(r"^(?P<kopf>[^()]+?) \((?P<detail>.+)\)$")
+
+
+def merge_affected(labels: list[str]) -> list[str]:
+    """Ein Eintrag je Name (S6b-1, spec/09 Teil 3).
+
+    Ein Buendel sammelt die Betroffenen mehrerer Pruefungen; derselbe Host stand dann
+    zweimal da ("mail.castenow.de", "mail.castenow.de (fehlend: x-frame-options)").
+    Gleicher Kopf, verschiedene Angaben laufen in einer Klammer zusammen.
+    """
+    order: list[str] = []
+    details: dict[str, list[str]] = {}
+    for label in labels:
+        m = _LABEL_DETAIL.match(label)
+        kopf, detail = (m.group("kopf"), m.group("detail")) if m else (label, "")
+        if kopf not in details:
+            order.append(kopf)
+            details[kopf] = []
+        if detail and detail not in details[kopf]:
+            details[kopf].append(detail)
+    return [f"{k} ({'; '.join(details[k])})" if details[k] else k for k in order]
 
 
 def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY,
-                kurz: bool = False) -> dict[str, Any]:
+                kurz: bool = False, excluded: list[str] | None = None) -> dict[str, Any]:
     """Platzhalterwerte fuer den zusammengefuehrten Sachverhalt."""
     affected: list[str] = []
     groups: list[str] = []
@@ -105,10 +148,13 @@ def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY,
                 notes.append(note)
         domain = domain or str(r.vars.get("domain") or "")
         host_ip = host_ip or str(r.vars.get("host_ip") or "")
+    affected = merge_affected(affected)
+    group, n = _group_label(results, groups, merge_key, kurz=kurz, excluded=excluded)
     return {
         "affected": affected,
         "count": len(affected),
-        "group": _group_label(results, groups, merge_key, kurz=kurz),
+        "group": group,
+        "n": render.Numerus(n),
         "fqdn_names": fqdns,
         "domain": domain,
         "host_ip": host_ip,
@@ -399,7 +445,11 @@ def build_findings(
             cat=item.category,
             status=L.status_for(item.scale, item.level, item.active_proof),
             urgency=L.urgency_for(item.scale, item.level, stages(item), item.active_proof),
-            title=_render(item.title, values, f"{where}.title"),
+            # S6b-1: ein Sachverhalt beim Betreiber traegt dessen Zustaendigkeit im Titel;
+            # sonst stuende derselbe Katalogtitel zweimal da (Kunde und Hoster getrennt).
+            title=(_render(item.title, values, f"{where}.title")
+                   + (f" ({item.operator.label} {item.operator.name})".replace("  ", " ").replace(" )", ")")
+                      if item.operator else "")),
             affected=", ".join(values["affected"]),
             source=source_label(item.results),
             scale=item.scale,
@@ -412,6 +462,8 @@ def build_findings(
             recommendation=recommendations(item),
             verify=_render(item.texts.verify, values, f"{where}.verify"),
             policy=policy_label(item.results, checks),
+            operator=(f"{item.operator.label} {item.operator.name}".strip() if item.operator else ""),
+            operator_note=operator_sentence(item.operator) if item.operator else "",
         ))
     for ref in cve_refs:
         erste = ref.cve.split(",")[0].strip()
@@ -429,13 +481,10 @@ def build_positives(items: list[Consolidated]) -> list[Positive]:
         if item.texts.positive is None:
             continue
         # S6a (spec/08 Punkt 13): bis zu drei VHosts je Host, sonst "und weitere".
-        values = merged_vars(item.results, item.merge_key, kurz=True)
-        if not values["group"]:
-            values["group"] = MANY_GROUPS
-        if item.excluded_hosts and values["group"] == MANY_GROUPS:
-            # S6a (#30): die Sammelbezeichnung wuerde die herausgenommenen Hosts
-            # mitmeinen; bis zu drei verbleibende Hosts stehen ohnehin namentlich da.
-            values["group"] = f"{MANY_GROUPS} außer {', '.join(item.excluded_hosts)}"
+        # S6a (#30): ab vier Hosts nennt die Bezeichnung die herausgenommenen Hosts
+        # ("insgesamt 5 Hosts, außer 10.0.0.3"); bis zu drei verbleibende Hosts stehen
+        # ohnehin namentlich da.
+        values = merged_vars(item.results, item.merge_key, kurz=True, excluded=item.excluded_hosts)
         where = f"{item.key}/{GLOBAL_KEY}"
         out.append(Positive(
             cat=item.category,

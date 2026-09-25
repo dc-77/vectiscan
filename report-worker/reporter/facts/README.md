@@ -51,6 +51,37 @@ entfernt, max 300 Zeichen).
 | unprocessed | unparsbare Dateien, Werkzeuge ohne Leser, Alerts ohne pluginId, Shodan-Hosts ausserhalb Inventar | Builder |
 | decisions | KI-Entscheidungen nur als Protokoll: Host-Strategie, Phase-2-Konfiguration, Tech-Analyse (cms-Felder), Priorisierung, Site-Summary | host_strategy.json, ai_*-Zeilen, ai_prioritization.json, tech_profile, vhosts[].site_summary |
 
+### Seit Schema 1.0.6 (S6b-1, spec/09)
+
+| Feld | Inhalt | Quelle |
+|---|---|---|
+| `fqdns[].cname` | CNAME-Kette des Namens | `phase0/dnsx_validation.json` (JSON-Zeilen) |
+| `dns[].spf.mechanisms` | Mechanismen des SPF-Eintrags (`qualifier`, `kind`, `value`) | SPF-Rohtext |
+| `passive[].service` | Modul der Passivquelle je Port (`smtp`, `https` ...) | Shodan `services[].module` |
+| `hosts[].shared` | geteiltes System: `kind` hoster oder platform, `operator`, fremde Namen, Signale | `systems.derive` |
+| `hosts[].third_party` | Drittanbieter: von der Scan-Steuerung ausgelassen und alle Kundennamen per CNAME fremd | `systems.derive` |
+| `hosts[].reach` | `no_open_ports`, `unreachable_from_scanner`, `no_ipv6_route`, dazu die Passivports | `systems.derive` |
+| `tls[].assigned_from` | Name, dessen testssl-Lauf fuer diesen VHost gilt (gleiches IP:Port, Zertifikat deckt den Namen) | `build._assign_testssl_by_san` |
+| `context` | Kundenkontext mit Wert, Quelle und Fundstelle je Feld (Golden-Facts: `null`) | `pdf/v3/pipeline` |
+
+Regeln in `systems.py`: **platform**, wenn ein Kundenname des Hosts per CNAME auf eine
+fremde Domain zeigt oder `cdn_provider` gesetzt ist. **hoster**, wenn fremde DNS-Namen
+(Zertifikat, Shodan; ohne rDNS-Domain und Kundendomains, ohne Etiketten wie "plesk" und
+interne Namen) auf dem Host liegen, das rDNS ausserhalb der Kundendomains liegt und die
+Nutzungsart laut AbuseIPDB kein eigener Anschluss ist ("Fixed Line ISP"). IPv4 und IPv6
+mit gleichem rDNS teilen die Einstufung. Der Betreibername ist der Netzbetreiber ohne
+Zusatz nach einem Strich (`network_operator`). `reach`: kein offener Port wird
+`unreachable_from_scanner`, wenn eine Passivquelle den Host hoechstens sieben Tage vor
+Scanende mit Diensten sah (Datum je Host aus Shodan `last_update`), sonst
+`no_open_ports`; nmap-Zeilen dieser Hosts werden `empty` mit dem Grund
+(`adjust_nmap_coverage`).
+
+Technologie (Issue #33): Ausgaben eines VHosts, dessen `final_url` auf einen anderen Host
+zeigt, gehoeren diesem Host oder entfallen (`REDIRECT_BUCKET`); ein OWA-Build aus einer
+Spider-URL gilt nur fuer den Host, dessen Name in der URL steht; die Plesk-Version kommt
+aus dem nmap-Titel ("Plesk Obsidian 18.0.80"); `NON_SOFTWARE_TECH` gilt auch im
+Profilweg (HSTS, HTTP/3, CDN-Namen, Betriebssystemnamen).
+
 Konfidenz: Werkzeug 1.0 (nmap: `conf/10`), abgeleitet 0.8, passiv 0.5 (0.8 wenn nmap den
 Port bestaetigt). `observed_at`: werkzeugeigen (httpx `timestamp`, nmap `@endtime`), sonst
 `createdAt` der Zeile (Ende des Laufs), sonst Scanende aus `meta.json`.
@@ -91,7 +122,8 @@ Status aus der Zeile; Legacy-Zeilen ohne `status`: parsebare Ausgabe gewinnt (te
 Start und Done ist `ok`, auch bei exit 10/246; feroxbuster exit 1 mit JSONL ist `ok`), sonst
 `exitCode -3` skipped, `-1` timeout, `-2`/`>0` failed. `timeout` wird `failed` mit
 `raw_status = timeout`. Sonderfaelle: nmap ohne gescanntes Ziel (IPv6 ohne `-6`) ist `failed`
-mit `target_invalid_ipv6`; Host oben ohne offene Ports ist `ok` mit `no_open_ports`; testssl
+mit `target_invalid_ipv6`; Host oben ohne offene Ports ist seit 1.0.6 `empty` mit
+`no_open_ports` bzw. `unreachable_from_scanner` (vorher `ok`, spec/09 Q9); testssl
 `Can't connect` ist `failed connect`; header_check `reachable: false` ist `empty`.
 
 Seit S5b gibt es einen weiteren Grund, der nur aus dem Lader kommt:

@@ -4,30 +4,35 @@
 Alles hier ist abgeleitet, nichts geschätzt: Zahlen kommen aus ``facts``, Status aus dem
 Katalogergebnis, Texte aus ``narrative.py``. Ein Wert, den die Fakten nicht hergeben,
 wird als unbekannt ausgewiesen und nicht geraten.
+
+S6b-1: Abdeckung und Einschränkungen stehen in ``coverage.py``, Rollen in ``roles.py``.
 """
 from __future__ import annotations
 
 import os
-import re
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Optional
+from urllib.parse import urlsplit
 
 from reporter.catalog.schema import CATEGORY_NAMES, CatalogOutput, CheckResult
-from reporter.catalog import scope as CS
 from reporter.catalog import tables as CT
 from reporter.facts import schema as FS
+from reporter.facts import systems as SYS
+from reporter.facts.serialize import sort_key
+from reporter.v3 import coverage as COV
 from reporter.v3 import levels as L
 from reporter.v3 import narrative as N
+from reporter.v3 import roles as R
 from reporter.v3 import tables as T
 from reporter.v3.bundles import Consolidated
 from reporter.v3.findings import kurz_label
 from reporter.v3.orthography import clean_foreign_text
-from reporter.v3.models import (Architecture, Business, CanCannot, Finding, Glance, GlanceCategory,
-                                Limitation, MethodPhase, NumberTile, ObservedSystem, PostureBlock,
-                                PostureItem, Scope, ScopeHost, Screenshot, ServiceCard, ServicePort,
-                                TechBlock, TechRow)
+from reporter.v3.models import (Architecture, Business, CanCannot, DomainScope, Finding, Glance,
+                                GlanceCategory, Limitation, MethodPhase, NumberTile, ObservedSystem,
+                                PostureBlock, PostureItem, Scope, ScopeHost, Screenshot, ServiceCard,
+                                ServicePort, TechBlock, TechRow)
 
 LOCAL_TZ = "Europe/Berlin"
 UNKNOWN = "unbekannt"
@@ -83,40 +88,20 @@ def today() -> str:
 
 
 # ---------------------------------------------------------------- Abdeckung
+# S6b-1 (spec/09 Q9, Q10, E4, E5): ein Modell fuer 2.1, 2.2, den Hinweis auf Seite 3,
+# die Zaehlungen und die Posture, siehe reporter/v3/coverage.py.
 
-WEB_TOOLS = ("header_check", "httpx", "testssl", "zap", "zap_spider", "zap_active",
-             "feroxbuster", "ffuf_param", "ffuf_sensitive", "wpscan")
-
-
-def _reason_text(rows: list[FS.CoverageFact], fallback: str) -> str:
-    """Erster Grund aus den Zeilen, der als Klartext hinterlegt ist."""
-    for row in rows:
-        code = row.reason or row.raw_status or ""
-        if code in CT.COVERAGE_REASONS:
-            return CT.COVERAGE_REASONS[code][1]
-    tools = sorted({row.tool for row in rows})
-    if tools:
-        return f"Ohne Ergebnis blieben: {', '.join(tools)}."
-    return fallback
+def coverage_model(facts: FS.Facts) -> COV.Model:
+    return COV.build_model(facts)
 
 
-def host_coverage(facts: FS.Facts, ip: str) -> tuple[str, str]:
-    """(Kurzform voll|teil|keine, Klartext) fuer einen Host."""
-    rows = [c for c in facts.coverage if c.host_ip == ip]
-    nmap = [c for c in rows if c.tool == "nmap"]
-    blocked = next((h for h in facts.hosts if h.ip == ip and h.blocked.detected), None)
-    bad = [c for c in rows if c.status in ("failed", "blocked") and c.tool in WEB_TOOLS]
-    if nmap and all(c.status not in ("ok", "empty") for c in nmap):
-        return "keine", _reason_text(nmap, CT.COVERAGE_REASONS["host_unreachable"][1])
-    if blocked is not None:
-        code = blocked.blocked.reason or "web_unreachable_after_portscan"
-        text = CT.COVERAGE_REASONS.get(code, ("", CT.GENERIC_NOT_TESTABLE))[1]
-        return "teil", f"Portscan vollständig; {text}"
-    if bad:
-        return "teil", "Portscan vollständig; " + _reason_text(bad, CT.GENERIC_NOT_TESTABLE)
-    if not rows:
-        return "keine", CT.COVERAGE_REASONS["no_tool_runs"][1]
-    return "voll", "Portscan und Tiefenprüfung vollständig"
+def hosts_ohne_leitwerkzeug(facts: FS.Facts) -> list[str]:
+    """Hosts ohne vollstaendige Leitpruefung (nmap mit Port, testssl, ZAP des Pakets).
+
+    Massstab fuer den Abdeckungshinweis auf Seite 3 (spec/08 Punkt 10). Seit S6b-1
+    dieselbe Regel wie die Abdeckung in Kapitel 2.1; Drittanbieter zaehlen nicht.
+    """
+    return COV.build_model(facts).gaps()
 
 
 # Maschinenwerte aus dem Scanner in Kundensprache. Ein Wert ohne Eintrag wird
@@ -162,45 +147,6 @@ def wildcard_hinweise(facts: FS.Facts) -> list[str]:
             for name in namen]
 
 
-def coverage_by_host(facts: FS.Facts) -> dict[str, tuple[str, str]]:
-    """Abdeckung je Host, einmal berechnet und von allen Kapiteln geteilt."""
-    return {h.ip: host_coverage(facts, h.ip) for h in facts.hosts}
-
-
-def hosts_ohne_leitwerkzeug(facts: FS.Facts) -> list[str]:
-    """Hosts, fuer die ein Leitwerkzeug des Pakets kein Ergebnis hat (spec/08 Punkt 10).
-
-    Massstab fuer den Abdeckungshinweis auf Seite 3. Ein fehlendes Nebenwerkzeug
-    (ffuf_sensitive) macht eine Pruefung nicht unvollstaendig; nmap, testssl und
-    die Webanalyse des Pakets schon. Ein Werkzeug ausserhalb des Pakets zaehlt
-    nicht, und ein Host ohne jede Abdeckungszeile zaehlt immer.
-    """
-    leit = set(T.lead_tools(facts.scan.package))
-    out: list[str] = []
-    for host in facts.hosts:
-        rows = [c for c in facts.coverage if c.host_ip == host.ip and c.tool in leit]
-        if not rows:
-            out.append(host.ip)
-            continue
-        fehlt = False
-        for tool in sorted(leit):
-            je_tool = [c for c in rows if c.tool == tool]
-            if not je_tool:
-                continue
-            if any(c.status in ("ok", "empty") for c in je_tool):
-                continue
-            # skipped mit einem Grund, der die Pruefung gar nicht vorsieht
-            # (kein TLS-Dienst, nicht im Paket), ist keine Luecke.
-            gruende = {CS.normalize_reason(c.reason, c.raw_status) for c in je_tool}
-            if all(CT.COVERAGE_REASONS.get(g, ("not_testable", ""))[0]
-                   in ("ok", "not_applicable") for g in gruende):
-                continue
-            fehlt = True
-        if fehlt:
-            out.append(host.ip)
-    return out
-
-
 def blockade_belegt(facts: FS.Facts) -> bool:
     """Hat ein Ziel den Scanner nachweislich abgewiesen? (spec/08 Punkt 9)
 
@@ -214,9 +160,8 @@ def blockade_belegt(facts: FS.Facts) -> bool:
     return any(c.status == "blocked" for c in facts.coverage)
 
 
-# Werkzeuge, die bewusst nicht Teil des Produkts sind. Ihr Fehlen ist keine
-# Einschraenkung der Pruefung, sondern eine Festlegung (Entscheidung DC, spec/07).
-OUT_OF_PRODUCT_TOOLS: frozenset[str] = frozenset({"virustotal"})
+# Werkzeuge, die bewusst nicht Teil des Produkts sind (Entscheidung DC, spec/07).
+OUT_OF_PRODUCT_TOOLS = T.OUT_OF_PRODUCT_TOOLS
 
 
 # S6a (#15 Teil 2): DKIM ohne gefundenen Selektor ist nicht pruefbar. Die Einschraenkung
@@ -225,6 +170,9 @@ OUT_OF_PRODUCT_TOOLS: frozenset[str] = frozenset({"virustotal"})
 # nicht (Dkim.probed leer), bleibt der allgemeine Text aus COVERAGE_REASONS.
 DKIM_CODE = "dkim_selector_unknown"
 DKIM_BEISPIELE = ("default", "selector1", "selector2", "google", "k1", "s1")
+DKIM_WHAT = "DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar"
+DKIM_DETAIL_ALLGEMEIN = ("Unter den gängigen Selektoren war kein Schlüssel veröffentlicht. Ob die Domain "
+                         "signiert, zeigt der Kopf einer echten E-Mail (DKIM-Signature, Angabe s=).")
 
 
 def dkim_probed(facts: FS.Facts, domain: str) -> list[str]:
@@ -248,6 +196,14 @@ def dkim_limitation_text(probed: list[str]) -> str:
             "(DKIM-Signature, Angabe s=).")
 
 
+def dkim_limitation_detail(probed: list[str]) -> str:
+    """Der erklaerende Teil fuer die Spalte Auswirkung (S6b-1: dreispaltige Tabelle)."""
+    return (f"Unter {len(probed)} abgefragten gängigen Selektoren, darunter "
+            f"{', '.join(dkim_beispiele(probed))}, war kein Schlüssel veröffentlicht (vollständige "
+            "Liste im Anhang bei den eingesetzten Werkzeugen). Ob die Domain signiert, zeigt der "
+            "Kopf einer echten E-Mail (DKIM-Signature, Angabe s=).")
+
+
 def dkim_selectors_for_appendix(facts: FS.Facts, output: CatalogOutput) -> list[str]:
     """Abgefragte Selektoren fuer den Anhang, nur wenn eine Einschraenkung darauf verweist."""
     out: set[str] = set()
@@ -259,66 +215,24 @@ def dkim_selectors_for_appendix(facts: FS.Facts, output: CatalogOutput) -> list[
     return sorted(out)
 
 
-def limitations(facts: FS.Facts, output: CatalogOutput) -> list[Limitation]:
-    """Einschraenkungen aus Abdeckungszeilen und nicht pruefbaren Pruefungen.
+def limitations(facts: FS.Facts, output: CatalogOutput,
+                model: COV.Model | None = None) -> list[Limitation]:
+    """Einschraenkungen: eine Zeile je Ursache mit Pruefungsnamen (spec/09 Q10)."""
+    model = model or COV.build_model(facts)
+    zusatz: list[str] = []
 
-    Zusammengefasst wird nach dem Klartext, nicht nach dem Code: zwei Codes mit
-    derselben Erklaerung ergeben eine Zeile. Ein Code ohne hinterlegte Erklaerung
-    bekommt eine, die das Werkzeug nennt, statt einer nichtssagenden Sammelmeldung.
-    """
-    # S6 (spec/08 Punkt 12): eine Zeile je Ursache, und je Ursache ein Eintrag je
-    # betroffenem Ort. Vorher standen derselbe Host einmal als Werkzeugzeile
-    # ("webtech auf 62.217.52.177") und einmal als Gruppenname
-    # ("62.217.52.177 (test.vectigal.tech)") in derselben Zeile; der WebCheck
-    # bekam so elf Zeilen, davon drei fuer dieselbe Ursache.
-    by_text: dict[str, dict[str, str]] = {}
+    def dkim(result: CheckResult) -> str:
+        probed = dkim_probed(facts, str(result.vars.get("domain") or result.group_key))
+        text = dkim_limitation_detail(probed) if probed else DKIM_DETAIL_ALLGEMEIN
+        if text not in zusatz:
+            zusatz.append(text)
+        return DKIM_WHAT
 
-    def merken(text: str, schluessel: str, label: str) -> None:
-        orte = by_text.setdefault(text, {})
-        vorhanden = orte.get(schluessel)
-        # Der ausfuehrlichere Name gewinnt: die IP mit ihren Namen sagt mehr als
-        # die IP allein.
-        if vorhanden is None or len(label) > len(vorhanden):
-            orte[schluessel] = label
-
-    for row in facts.coverage:
-        if row.status not in ("failed", "blocked", "empty", "skipped"):
-            continue
-        if row.tool in OUT_OF_PRODUCT_TOOLS:
-            continue
-        # S6: derselbe Weg wie im Katalog. Ohne Normalisierung landet ein
-        # Rohgrund wie "package_webcheck" oder "ZAP API error 400: {...}" in
-        # keiner Tabelle und bekommt den Sammeltext "Das Werkzeug X hat kein
-        # Ergebnis geliefert" (spec/08 Punkte 9 und 11).
-        code = CS.normalize_reason(row.reason, row.raw_status) or "insufficient_facts"
-        status, text = CT.COVERAGE_REASONS.get(code, ("not_testable", ""))
-        if status in ("ok", "not_applicable"):
-            continue
-        if not text:
-            text = f"Das Werkzeug {row.tool} hat kein Ergebnis geliefert."
-        schluessel = row.host_ip or row.fqdn or row.domain or "scanweit"
-        merken(text, schluessel, row.fqdn or row.host_ip or row.domain or "scanweit")
-    for result in output.results:
-        if result.status != "not_testable" or not result.reason_code:
-            continue
-        code = result.reason_code.split(":", 1)[-1]
-        status, text = CT.COVERAGE_REASONS.get(code, ("not_testable", ""))
-        if status != "not_testable" or not text:
-            continue
-        if code == DKIM_CODE:
-            probed = dkim_probed(facts, str(result.vars.get("domain") or result.group_key))
-            if probed:
-                text = dkim_limitation_text(probed)
-        schluessel = (str(result.vars.get("host_ip") or "")
-                      or str(result.vars.get("domain") or "")
-                      or result.group_key)
-        merken(text, schluessel, result.group_label)
-    out: list[Limitation] = []
-    for text in sorted(by_text):
-        where = sorted(_kurz(w) for w in by_text[text].values())
-        shown = ", ".join(where[:6]) + (" und weitere" if len(where) > 6 else "")
-        out.append(Limitation(what=text.rstrip("."), detail=f"Betroffen: {shown}."))
-    return out
+    rows = COV.limitations(facts, output, model, dkim_text=dkim)
+    for row in rows:
+        if row.what == DKIM_WHAT and zusatz:
+            row.detail = f"{row.detail} {' '.join(zusatz)}".strip()
+    return rows
 
 
 # Ein Host mit vielen VHosts traegt sie alle im Gruppennamen. In der
@@ -406,54 +320,36 @@ def overall_text(findings: list[Finding]) -> str:
     return f"{head} {wort} {_aufzaehlung(namen)}."
 
 
-def build_business(facts: FS.Facts, roles: list[tuple[str, str]]) -> Business:
-    observed = [ObservedSystem(system=label, meaning=meaning) for label, meaning in roles]
+def build_business(facts: FS.Facts, observed: list[ObservedSystem]) -> Business:
     return Business(lead=N.BUSINESS_LEAD, observed=observed,
                     implication=N.BUSINESS_IMPLICATION_GENERIC)
 
 
-# ---------------------------------------------------------------- Rollen
+# ---------------------------------------------------------------- Rollen und Systeme
+# S6b-1 (spec/09 Q2): Rollen nur mit Fakt, siehe reporter/v3/roles.py.
 
-ROLE_MEANING: dict[str, str] = {
-    "Mail- und Kalenderplattform":
-        "Über dieses System läuft die geschäftliche Korrespondenz. Ein Zugriff darauf trifft "
-        "Vertraulichkeit und Arbeitsfähigkeit zugleich.",
-    "Website und Datenbanken":
-        "Außendarstellung und die dahinterliegenden Datenbestände. Betroffen wären vor allem "
-        "Seiteninhalte, Formulareingaben und Kontaktdaten.",
-    "Fernzugang und Verwaltung":
-        "Der Weg von außen in das Unternehmensnetz. Solche Zugänge sind das bevorzugte Ziel, "
-        "weil hinter ihnen alles Weitere liegt.",
-    "Dateiaustausch":
-        "Austausch von Dateien mit Dritten. Die Inhalte und die verwendeten Zugangsdaten sind "
-        "hier das Schutzgut.",
-    T.ROLE_FALLBACK:
-        "Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte intern "
-        "geklärt werden.",
-}
+def _systems(facts: FS.Facts) -> list[list[FS.HostFact]]:
+    """Systeme des Kunden in Berichtsreihenfolge: IPv4 und IPv6 mit gleichem rDNS als
+    ein System, Drittanbieter ausgenommen (spec/09 Q16)."""
+    eigene = [h for h in facts.hosts if h.third_party is None]
+    groups = list(SYS.system_groups(eigene).values())
+    return sorted(groups, key=lambda g: (g[0].family, sort_key(g[0].ip)))
 
 
-MAX_ROLES = 2
+def system_roles(facts: FS.Facts, members: list[FS.HostFact]) -> list[R.Role]:
+    """Rollen eines Systems: die der Adressen zusammen, in fester Reihenfolge."""
+    by_key: dict[str, R.Role] = {}
+    for h in members:
+        for role in R.host_roles(facts, h):
+            by_key.setdefault(role.key, role)
+    order = {k: i for i, k in enumerate(T.ROLE_ORDER)}
+    return sorted(by_key.values(), key=lambda r: order.get(r.key, len(order)))[:R.MAX_ROLES]
 
 
 def host_roles(facts: FS.Facts, ip: str) -> list[str]:
-    """Aufgaben eines Hosts, nach Staerke der Anhaltspunkte.
-
-    Ein Host am Perimeter macht oft mehrere Dinge zugleich (Website und Mail-Relay auf
-    demselben gemieteten Server). Eine einzelne Rolle waere in solchen Faellen schlicht
-    falsch, deshalb stehen bis zu zwei Aufgaben da.
-    """
-    ports = {s.port for s in facts.services if s.host_ip == ip and s.state == "open"}
-    families = {(s.family or "").lower() for s in facts.software if s.host_ip == ip}
-    families |= {(s.product or "").lower() for s in facts.services if s.host_ip == ip and s.product}
-    scored: list[tuple[int, int, str]] = []
-    for order, (role, keys, role_ports) in enumerate(T.ROLE_RULES):
-        hits = 2 * sum(1 for k in keys if any(k in fam for fam in families))
-        hits += len(set(role_ports) & ports)
-        if hits:
-            scored.append((-hits, order, role))
-    scored.sort()
-    return [role for _, _, role in scored[:MAX_ROLES]]
+    """Rollen eines Hosts als Anzeigenamen (Kompatibilitaet fuer Aufrufer ausserhalb)."""
+    host = next((h for h in facts.hosts if h.ip == ip), None)
+    return [r.label for r in R.host_roles(facts, host)] if host else []
 
 
 def host_role(facts: FS.Facts, ip: str) -> str:
@@ -461,44 +357,72 @@ def host_role(facts: FS.Facts, ip: str) -> str:
     return ", ".join(roles) if roles else T.ROLE_FALLBACK
 
 
-def observed_systems(facts: FS.Facts) -> list[tuple[str, str]]:
-    """Ein Eintrag je Host mit erkennbarer Aufgabe, in stabiler Reihenfolge."""
-    out: list[tuple[str, str]] = []
-    for host in sorted(facts.hosts, key=lambda h: (h.family, h.ip)):
-        roles = host_roles(facts, host.ip)
-        label_role = ", ".join(roles) if roles else T.ROLE_FALLBACK
-        names = sorted(host.fqdns)
-        label = f"{label_role} ({', '.join(names[:3])})" if names else f"{label_role} ({host.ip})"
-        meaning = ROLE_MEANING.get(roles[0] if roles else T.ROLE_FALLBACK,
-                                   ROLE_MEANING[T.ROLE_FALLBACK])
-        out.append((label, meaning))
+def observed_systems(facts: FS.Facts) -> list[ObservedSystem]:
+    """Ein Eintrag je System mit Rolle und Risikotext; Belege fuer das Prosa-Gate."""
+    out: list[ObservedSystem] = []
+    for members in _systems(facts):
+        roles = system_roles(facts, members)
+        names = sorted({n for h in members for n in h.fqdns}, key=sort_key)
+        label_role = R.role_label(roles)
+        label = f"{label_role} ({', '.join(names[:3])})" if names else f"{label_role} ({members[0].ip})"
+        out.append(ObservedSystem(
+            system=label, meaning=R.role_meaning(roles),
+            role_keys=[r.key for r in roles],
+            evidence=[e for r in roles for e in r.evidence][:6]))
     return out
+
+
+def _shared_hint(host: FS.HostFact) -> str:
+    if host.shared is None:
+        return ""
+    if host.shared.kind == "platform":
+        return f"Plattform {host.shared.operator}" if host.shared.operator else "Plattform eines Anbieters"
+    return "geteiltes System beim Hoster"
 
 
 # ---------------------------------------------------------------- Kapitel 2
 
 def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
-                coverage: dict[str, tuple[str, str]]) -> Scope:
+                model: COV.Model) -> Scope:
     hosts: list[ScopeHost] = []
-    for host in sorted(facts.hosts, key=lambda h: (h.family, h.ip)):
-        cov, text = coverage.get(host.ip, host_coverage(facts, host.ip))
-        operator = host.provider.isp if host.provider and host.provider.isp else UNKNOWN
-        if host.reverse:
-            operator = f"{operator} ({host.reverse})"
+    for members in _systems(facts):
+        lead = members[0]
+        cov = model.hosts[lead.ip]
+        text = cov.text
+        more = [h.ip for h in members[1:]]
+        for h in members[1:]:
+            extra = model.hosts[h.ip]
+            if extra.cov != cov.cov or extra.text != cov.text:
+                text = f"{text} {h.ip}: {extra.text}"
+        status = model.system_status([h.ip for h in members])
+        operator = (SYS.network_operator(lead.provider.isp) if lead.provider else None) or UNKNOWN
+        if lead.reverse:
+            operator = f"{operator} ({lead.reverse})"
+        roles = R.role_label(system_roles(facts, members))
+        hint = _shared_hint(lead)
+        names = sorted({n for h in members for n in h.fqdns}, key=sort_key)
         hosts.append(ScopeHost(
-            ip=host.ip, fqdns=", ".join(sorted(host.fqdns)) or UNKNOWN,
-            operator=operator, role=host_role(facts, host.ip), coverage=text, cov=cov))
+            ip=lead.ip, more_ips=more, fqdns=", ".join(names) or UNKNOWN,
+            operator=operator, role=f"{roles} · {hint}" if hint else roles,
+            coverage=text, cov=status))
+    for host in sorted((h for h in facts.hosts if h.third_party is not None), key=lambda h: sort_key(h.ip)):
+        operator = host.third_party.operator or UNKNOWN
+        hosts.append(ScopeHost(
+            ip=host.ip, fqdns=", ".join(sorted(host.fqdns, key=sort_key)) or UNKNOWN,
+            operator=operator, role="Drittanbieter", coverage=model.hosts[host.ip].text, cov="extern"))
     out_of_scope = list(N.OUT_OF_SCOPE_BASE)
     extra = sorted(_unbeauftragt(facts, output))
     if extra:
         out_of_scope.append("Sichtbar, aber nicht beauftragt: " + "; ".join(extra) + ".")
     for hinweis in wildcard_hinweise(facts):
         out_of_scope.append(hinweis)
+    domains = COV.domain_scope(facts)
     return Scope(
         lead=N.scope_lead(counts),
         hosts=hosts,
+        domains=[DomainScope(domain=d, text=t) for d, t in domains] if len(domains) > 1 else [],
         out_of_scope=out_of_scope,
-        limitations=limitations(facts, output),
+        limitations=limitations(facts, output, model),
         method_phases=[MethodPhase(n=n, name=name, text=text)
                        for n, name, text in N.method_phases(counts)],
         numbers=[NumberTile(v=v, l=label) for v, label in N.numbers(counts)],
@@ -542,6 +466,12 @@ class TechLine:
     conf_label: str
 
 
+def _ohne_eigene_tabelle(host: FS.HostFact) -> bool:
+    """Drittanbieter und IPv6 ohne Route bekommen keine Technologietabelle: ihre
+    Eintraege stammen nicht aus einer Messung an dieser Adresse (spec/09 Q16)."""
+    return host.third_party is not None or bool(host.reach and host.reach.status == "no_ipv6_route")
+
+
 def tech_lines(facts: FS.Facts) -> dict[str, list[TechLine]]:
     """Zeilen je Host-IP in Berichtsreihenfolge; Hosts ohne Software fehlen."""
     by_host: dict[str, list[FS.SoftwareFact]] = {}
@@ -549,21 +479,26 @@ def tech_lines(facts: FS.Facts) -> dict[str, list[TechLine]]:
         by_host.setdefault(sw.host_ip, []).append(sw)
     out: dict[str, list[TechLine]] = {}
     for host in sorted(facts.hosts, key=lambda h: (h.family, h.ip)):
+        if _ohne_eigene_tabelle(host):
+            continue
         entries = sorted(by_host.get(host.ip, []), key=lambda s: (s.kind, s.product, s.id))
         if not entries:
             continue
-        lines: list[TechLine] = []
-        seen: set[tuple[str, str]] = set()
+        # Issue #33: eine Komponente mit belegter Version steht nicht zusaetzlich als
+        # "unbekannt" da (Plesk 18.0.81 aus dem nmap-Titel, Plesk ohne Version aus dem
+        # Header eines VHosts).
+        mit_version = {s.family for s in entries if s.version_norm}
+        # Derselbe Name in anderer Schreibweise ist dieselbe Komponente ("cloudflare"
+        # aus nmap, "Cloudflare" aus httpx): eine Zeile, Quellen zusammengefuehrt.
+        gruppen: dict[tuple[str, str], list[FS.SoftwareFact]] = {}
         for sw in entries:
-            version = sw.version_norm or UNKNOWN
-            if sw.build:
-                version = f"{version} (Build {sw.build})"
-            elif sw.distro:
-                version = f"{version} ({sw.distro})"
-            key = (sw.product, version)
-            if key in seen:
+            if not sw.version_norm and sw.family in mit_version:
                 continue
-            seen.add(key)
+            gruppen.setdefault((sw.product.lower(), _tech_version(sw)), []).append(sw)
+        lines: list[TechLine] = []
+        for (_, version), gruppe in gruppen.items():
+            sw = max(gruppe, key=lambda s: (s.confidence, s.product != s.product.lower()))
+            quellen = sorted({q for s in gruppe for q in s.detection_sources}) or [sw.source]
             note = T.tech_note(sw.note)
             if sw.eol.status == "eol" and sw.eol.date:
                 note = f"Herstellerpflege endete am {sw.eol.date}"
@@ -571,11 +506,19 @@ def tech_lines(facts: FS.Facts) -> dict[str, list[TechLine]]:
                 note = f"Lifecycle prüfen, Hersteller nennt {sw.eol.upstream_eol_date}"
             lines.append(TechLine(
                 software=sw, product=sw.product, version=version, eol_status=sw.eol.status,
-                eol_date=sw.eol.date, note=note,
-                sources=", ".join(sorted(sw.detection_sources)) or sw.source,
+                eol_date=sw.eol.date, note=note, sources=", ".join(quellen),
                 confidence=sw.confidence, conf_label=_confidence_label(sw.confidence)))
         out[host.ip] = lines
     return out
+
+
+def _tech_version(sw: FS.SoftwareFact) -> str:
+    version = sw.version_norm or UNKNOWN
+    if sw.build:
+        return f"{version} (Build {sw.build})"
+    if sw.distro:
+        return f"{version} ({sw.distro})"
+    return version
 
 
 def build_tech(facts: FS.Facts) -> list[TechBlock]:
@@ -593,32 +536,66 @@ def build_tech(facts: FS.Facts) -> list[TechBlock]:
     return blocks
 
 
-def _port_colours(items: list[Consolidated], findings: list[Finding]) -> dict[tuple[str, int], str]:
-    colours: dict[tuple[str, int], str] = {}
+# ---------------------------------------------------------------- Dienste und Befundbezug
+
+def _member_port(facts: FS.Facts, host_ip: str, fqdn: Optional[str], port: Optional[int]) -> Optional[int]:
+    """Port eines Mitglieds; VHost-Befunde ohne Port an den Port ihres Webdienstes
+    (spec/09 Teil 3: 443 stand gruen trotz VHost-Befunden)."""
+    if port is not None:
+        return port
+    if not fqdn:
+        return None
+    http = next((h for h in facts.http if h.host_ip == host_ip and h.fqdn == fqdn), None)
+    if http is not None and http.url:
+        parts = urlsplit(http.url)
+        if parts.port:
+            return parts.port
+        return 443 if parts.scheme == "https" else 80
+    if any(t.host_ip == host_ip and t.fqdn == fqdn for t in facts.tls):
+        return 443
+    return None
+
+
+def finding_ports(facts: FS.Facts, items: list[Consolidated],
+                  findings: list[Finding]) -> dict[tuple[str, int], list[Finding]]:
+    """Befunde je (Host, Port), eine Zuordnung fuer Service-Karte und Anhang B."""
+    out: dict[tuple[str, int], list[Finding]] = {}
     for item, finding in zip(items, findings):
         for result in item.results:
             for member in result.members:
-                if member.status != "fail" or member.host_ip is None or member.port is None:
+                if member.status != "fail" or member.host_ip is None:
                     continue
-                key = (member.host_ip, member.port)
-                current = colours.get(key)
-                if current is None or L.STATUS_RANK[finding.status] < L.STATUS_RANK[current]:
-                    colours[key] = finding.status
-    return colours
+                port = _member_port(facts, member.host_ip, member.fqdn, member.port)
+                if port is None:
+                    continue
+                bucket = out.setdefault((member.host_ip, port), [])
+                if finding not in bucket:
+                    bucket.append(finding)
+    return out
+
+
+def passive_service_label(pv: FS.PassiveFact) -> str:
+    """Dienstname laut Passivquelle: Produkt, sonst das Modul (E5: "SMTP" statt
+    "unbekannt")."""
+    if pv.product:
+        return pv.product
+    return COV.passive_module_name(pv) or UNKNOWN
 
 
 def build_services(facts: FS.Facts, items: list[Consolidated],
                    findings: list[Finding]) -> list[ServiceCard]:
-    colours = _port_colours(items, findings)
+    """Service-Karte: Farbe je Port nach Ampel des schwersten Befunds (Legende nach Ampel)."""
+    refs = finding_ports(facts, items, findings)
     cards: list[ServiceCard] = []
     for host in sorted(facts.hosts, key=lambda h: (h.family, h.ip)):
+        if host.third_party is not None:
+            continue
         ports: list[ServicePort] = []
         for svc in sorted((s for s in facts.services if s.host_ip == host.ip and s.state == "open"),
                           key=lambda s: s.port):
             label = svc.product or (svc.service or "").upper() or UNKNOWN
-            colour = colours.get((host.ip, svc.port))
-            if colour is None:
-                colour = "blau" if svc.port in T.LEGACY_PORTS else "gruen"
+            befunde = refs.get((host.ip, svc.port), [])
+            colour = min((f.status for f in befunde), key=lambda s: L.STATUS_RANK[s]) if befunde else "gruen"
             ports.append(ServicePort(p=str(svc.port), s=label, st=colour))
         seen = {p.p for p in ports}
         for pv in sorted((p for p in facts.passive if p.host_ip == host.ip and p.port),
@@ -626,7 +603,7 @@ def build_services(facts: FS.Facts, items: list[Consolidated],
             if str(pv.port) in seen:
                 continue
             seen.add(str(pv.port))
-            ports.append(ServicePort(p=str(pv.port), s=pv.product or UNKNOWN, st="grau"))
+            ports.append(ServicePort(p=str(pv.port), s=passive_service_label(pv), st="grau"))
         if not ports:
             continue
         cards.append(ServiceCard(host=host.ip, label=host.reverse or "", ports=ports))
@@ -657,10 +634,16 @@ def _result_state(results: list[CheckResult],
     return None, "entfällt"
 
 
-def build_posture(output: CatalogOutput) -> list[PostureBlock]:
+# Posture der Hosts ohne Messergebnis (S6b-1, spec/09 Q9): immer "nicht pruefbar".
+POSTURE_UNREACHABLE = frozenset({"unerreichbar", "keine"})
+
+
+def build_posture(output: CatalogOutput, model: COV.Model | None = None) -> list[PostureBlock]:
     by_check: dict[str, list[CheckResult]] = {}
     for r in output.results:
         by_check.setdefault(r.check_id, []).append(r)
+    ohne_messung = sorted((h.ip for h in (model.counted if model else []) if h.cov in POSTURE_UNREACHABLE),
+                          key=sort_key)
     blocks: list[PostureBlock] = []
     for spec in T.POSTURE_BLOCKS:
         items: list[PostureItem] = []
@@ -674,7 +657,10 @@ def build_posture(output: CatalogOutput) -> list[PostureBlock]:
                     by_host.setdefault(host, []).append(r)
                     if cid == per_host[0]:
                         lead_by_host.setdefault(host, []).append(r)
-            for host in sorted(by_host):
+            for host in sorted(set(by_host) | set(ohne_messung), key=sort_key):
+                if host in ohne_messung:
+                    items.append(PostureItem(l=host, ok=None, v="nicht prüfbar"))
+                    continue
                 ok, text = _result_state(by_host[host], lead_by_host.get(host))
                 items.append(PostureItem(l=host, ok=ok, v=text))
         for label, checks in spec["items"]:  # type: ignore[index]
@@ -687,39 +673,75 @@ def build_posture(output: CatalogOutput) -> list[PostureBlock]:
     return blocks
 
 
+def _same_page_key(fq: FS.FqdnFact) -> Optional[str]:
+    if fq.body_hash:
+        return f"body:{fq.body_hash}"
+    if fq.final_url:
+        parts = urlsplit(fq.final_url)
+        return f"url:{(parts.hostname or '').lower()}{parts.path.rstrip('/') or '/'}"
+    return None
+
+
 def build_screens(facts: FS.Facts) -> list[Screenshot]:
-    """Sichtnachweise aus den Fakten.
+    """Sichtnachweise aus den Fakten, jede Seite einmal.
 
     ``screenshot_key`` zeigt auf das Objekt in MinIO; die Bilddatei selbst holt der
     Renderer (S4). Der Titel stammt von der fremden Seite und wird geglaettet, bevor er
-    in den Bericht geht.
+    in den Bericht geht. S6b-1 (spec/09 Teil 3): Namen mit derselben Seite (gleicher
+    Inhalt oder gleiches Weiterleitungsziel) teilen sich ein Bild; die Unterschrift nennt
+    die weiteren Namen. Bevorzugt wird der Name, auf den die Weiterleitung zeigt.
     """
+    def eigenes_bild(fq: FS.FqdnFact) -> bool:
+        # Ein Name ohne eigene Probe erbt das Hostbild eines anderen Namens
+        # (dortmund-beach: pflege und www zeigten das Bild von dortmund-beach.com).
+        datei = (fq.screenshot_key or "").rsplit("/", 1)[-1]
+        return datei.endswith(f"__{fq.name}.png") or fq.http_status is not None
+
+    kandidaten = [fq for fq in facts.fqdns
+                  if fq.screenshot_key and not fq.wildcard and eigenes_bild(fq)
+                  and next((h for h in facts.hosts if h.ip == fq.host_ip and h.third_party is None), None)]
+
+    def rang(fq: FS.FqdnFact) -> tuple:
+        ziel = (urlsplit(fq.final_url or "").hostname or "").lower()
+        return (0 if ziel == fq.name.lower() else 1, len(fq.name), fq.name)
+
+    # Gleiche Bilddatei (Hündgen: der Apex traegt das Bild von www als Hostbild), gleicher
+    # Inhalt oder gleiches Weiterleitungsziel ergeben eine Gruppe.
+    groups: dict[str, list[FS.FqdnFact]] = {}
+    alias: dict[str, str] = {}
+    for fq in kandidaten:
+        keys = [f"shot:{fq.screenshot_key}"] + ([k] if (k := _same_page_key(fq)) else [])
+        ziel = next((alias[k] for k in keys if k in alias), keys[0])
+        for k in keys:
+            alias.setdefault(k, ziel)
+        groups.setdefault(ziel, []).append(fq)
     out: list[Screenshot] = []
-    for fq in sorted(facts.fqdns, key=lambda f: f.name):
-        # Ein Wildcard-Eintrag bekommt keine Bildunterschrift "Antwort von
-        # *.domain" (S6, spec/08 Punkt 13).
-        if not fq.screenshot_key or fq.wildcard:
-            continue
+    for members in groups.values():
+        members.sort(key=rang)
+        fq = members[0]
         out.append(Screenshot(
             file=fq.screenshot_key.rsplit("/", 1)[-1],
             key=fq.screenshot_key,
             host=fq.name,
-            what=clean_foreign_text(fq.title) or f"Antwort von {fq.name}"))
-    return out
+            what=clean_foreign_text(fq.title) or f"Antwort von {fq.name}",
+            also=sorted({m.name for m in members[1:]} - {fq.name}, key=sort_key)))
+    return sorted(out, key=lambda s: s.host)
 
 
 REPUTATION_SOURCES = ["AbuseIPDB", "OTX", "URLhaus"]
 
 
 def build_architecture(facts: FS.Facts, output: CatalogOutput, items: list[Consolidated],
-                       findings: list[Finding]) -> Architecture:
-    roles = sorted({r for h in facts.hosts for r in host_roles(facts, h.ip)})
+                       findings: list[Finding], model: COV.Model | None = None) -> Architecture:
+    model = model or COV.build_model(facts)
+    roles = sorted({r.label for members in _systems(facts) for r in system_roles(facts, members)})
+    eigene = [h for h in facts.hosts if h.third_party is None]
     clean = not any(
         (h.reputation and (
             (h.reputation.abuseipdb_score or 0) >= CT.ABUSEIPDB_FAIL_SCORE
             or (h.reputation.otx_pulse_count or 0) > 0
             or h.reputation.urlhaus_compromised))
-        for h in facts.hosts)
+        for h in eigene)
     notes: list[str] = []
     counter = Counter(u.kind for u in output.unprocessed)
     if counter:
@@ -738,13 +760,20 @@ def build_architecture(facts: FS.Facts, output: CatalogOutput, items: list[Conso
     # facts.warnings sind Hinweise des Faktenbauers an den Betreiber, keine Kundentexte.
     # Was davon den Kunden betrifft, steht ueber die Abdeckungsgruende in Kapitel 2.
     return Architecture(
-        lead=N.architecture_lead(len(facts.hosts), roles),
+        lead=N.architecture_lead(len(model.counted), roles),
         tech=build_tech(facts),
         services=build_services(facts, items, findings),
         services_note=N.SERVICES_NOTE,
-        posture=build_posture(output),
+        posture=build_posture(output, model),
         screens_lead=N.SCREENS_LEAD,
         screens=build_screens(facts),
         reputation=N.reputation_line(clean, REPUTATION_SOURCES),
         notes=notes,
     )
+
+
+__all__ = ["format_date", "format_window", "today", "coverage_model", "hosts_ohne_leitwerkzeug",
+           "blockade_belegt", "limitations", "build_glance", "overall_text", "build_business",
+           "observed_systems", "system_roles", "host_roles", "host_role", "build_scope", "tech_lines",
+           "build_tech", "finding_ports", "passive_service_label", "build_services", "build_posture",
+           "build_screens", "build_architecture", "dkim_selectors_for_appendix"]
