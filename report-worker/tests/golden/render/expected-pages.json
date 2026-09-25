@@ -28,15 +28,12 @@
  "2d2d4f39-0816-46a0-ba96-4d36b248a86c": {
   "pages": 45,
   "sparse": [
-   27,
-   44
+   27
   ]
  },
  "2e56abe1-c1a6-442e-b36a-dc9f83c81da8": {
   "pages": 24,
-  "sparse": [
-   23
-  ]
+  "sparse": []
  },
  "31d67a02-b485-4d05-b228-dbdde092cc68": {
   "pages": 26,
@@ -72,15 +69,11 @@
  },
  "a6df9d9d-eccd-49d1-8dd3-b00a5e005108": {
   "pages": 21,
-  "sparse": [
-   20
-  ]
+  "sparse": []
  },
  "ae8d1d70-7925-4e3c-84de-3113f3e57b60": {
   "pages": 35,
-  "sparse": [
-   34
-  ]
+  "sparse": []
  },
  "c3d5724c-bdbf-4da8-982f-4f1a52210e28": {
   "pages": 15,
@@ -89,14 +82,11 @@
  "f77ccff2-fc7a-4488-a9ba-540a42a25056": {
   "pages": 46,
   "sparse": [
-   11,
-   45
+   11
   ]
  },
  "fb13a98f-22c6-4d17-875c-eeeb14643beb": {
   "pages": 25,
-  "sparse": [
-   24
-  ]
+  "sparse": []
  }
 }
