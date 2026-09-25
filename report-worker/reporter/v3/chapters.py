@@ -246,7 +246,7 @@ _kurz = kurz_label
 # ---------------------------------------------------------------- Kapitel 1
 
 def build_glance(items: list[Consolidated], findings: list[Finding], counts: N.Counts,
-                 gap_hosts: list[str]) -> Glance:
+                 gap_systems: list[list[str]]) -> Glance:
     by_cat: dict[str, list[Finding]] = {}
     for f in findings:
         by_cat.setdefault(f.cat, []).append(f)
@@ -266,7 +266,7 @@ def build_glance(items: list[Consolidated], findings: list[Finding], counts: N.C
         categories=categories,
         levers=[],
         context=N.context(counts),
-        coverage_warning=N.coverage_warning(counts, gap_hosts),
+        coverage_warning=N.coverage_warning(counts, gap_systems),
     )
 
 

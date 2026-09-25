@@ -603,6 +603,12 @@ export interface TechProfile {
   technologies?: Array<{ name: string; version: string }>;
   /** Pre-computed Tech-Rows aus tech_table_builder.py — Single Source of Truth. */
   tech_rows?: TechRow[];
+  /**
+   * Weitere Adressen desselben Systems ohne eigene Messung (IPv4 und IPv6 mit
+   * gleichem rDNS, S6b-1 Nachtrag 3). Sie bekommen keine eigene Hostkarte, sondern
+   * stehen mit dem Grund in der Karte dieser Adresse, wie Kapitel 2.1 im Bericht.
+   */
+  additional_ips?: Array<{ ip: string; note: string }>;
 }
 
 export interface FindingsData {

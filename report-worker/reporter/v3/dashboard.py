@@ -21,6 +21,8 @@ from __future__ import annotations
 from typing import Any
 
 from reporter.facts import schema as FS
+from reporter.facts import systems as SYS
+from reporter.facts.serialize import sort_key
 from reporter.v3 import levels as L
 from reporter.v3.chapters import UNKNOWN, TechLine, tech_lines
 from reporter.v3.models import Finding, ReportData
@@ -176,19 +178,61 @@ def tech_profiles_from_facts(facts: FS.Facts, profiles: list[dict[str, Any]] | N
     damit Bericht und Dashboard dieselben Hosts zeigen.
     """
     lines = tech_lines(facts)
+    angehaengt = additional_ips(facts, lines)
+    mitglieder = {entry["ip"] for extra in angehaengt.values() for entry in extra}
     out: list[dict[str, Any]] = []
     seen: set[str] = set()
     for profile in profiles or []:
         if not isinstance(profile, dict):
             continue
         ip = str(profile.get("ip") or "")
-        out.append({**profile, "tech_rows": [tech_row(line) for line in lines.get(ip, [])]})
+        if ip in mitglieder:
+            continue
+        entry = {**profile, "tech_rows": [tech_row(line) for line in lines.get(ip, [])]}
+        if ip in angehaengt:
+            entry["additional_ips"] = angehaengt[ip]
+        out.append(entry)
         seen.add(ip)
     fqdns = {h.ip: list(h.fqdns) for h in facts.hosts}
-    for ip, host_lines in lines.items():
-        if ip not in seen:
-            out.append({"ip": ip, "fqdns": fqdns.get(ip, []),
-                        "tech_rows": [tech_row(line) for line in host_lines]})
+    for ip in sorted(set(lines) | set(angehaengt), key=sort_key):
+        if ip in seen:
+            continue
+        entry = {"ip": ip, "fqdns": fqdns.get(ip, []),
+                 "tech_rows": [tech_row(line) for line in lines.get(ip, [])]}
+        if ip in angehaengt:
+            entry["additional_ips"] = angehaengt[ip]
+        out.append(entry)
+    return out
+
+
+# Hinweis zu einer weiteren Adresse ohne eigene Messung, nach ihrer Erreichbarkeit.
+_REACH_NOTE: dict[str, str] = {
+    "no_ipv6_route": "über IPv6 vom Prüfstand aus nicht erreichbar",
+    "unreachable_from_scanner": "vom Prüfstand aus nicht erreichbar",
+    "no_open_ports": "kein offener Port",
+}
+
+
+def additional_ips(facts: FS.Facts, lines: dict[str, list[TechLine]]) -> dict[str, list[dict[str, str]]]:
+    """Leitadresse eines Systems -> weitere Adressen ohne eigene Messung.
+
+    Nachtrag 3 zu S6b-1 (Entscheidung DC 25.09., spec/09 Q16): IPv4 und IPv6 mit
+    gleichem rDNS sind ein System. Eine Adresse ohne eigene Technikzeilen und ohne
+    offenen Dienst bekommt keine eigene Hostkarte; sie steht in der Karte des Systems
+    als weitere Adresse mit dem Grund, wie Kapitel 2.1 im Bericht.
+    """
+    eigene = [h for h in facts.hosts if h.third_party is None]
+    offen = {s.host_ip for s in facts.services if s.state == "open"}
+    out: dict[str, list[dict[str, str]]] = {}
+    for members in SYS.system_groups(eigene).values():
+        if len(members) < 2:
+            continue
+        lead, rest = members[0], members[1:]
+        extra = [{"ip": h.ip,
+                  "note": _REACH_NOTE.get(h.reach.status if h.reach else "", "ohne eigene Messung")}
+                 for h in rest if not lines.get(h.ip) and h.ip not in offen]
+        if extra:
+            out[lead.ip] = extra
     return out
 
 

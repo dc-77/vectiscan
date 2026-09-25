@@ -37,7 +37,8 @@ def _counts(facts: FS.Facts, output: CatalogOutput, n_findings: int, n_positives
     fails = output.summary.by_status.get("fail", 0)
     # Je System eine Zeile in 2.1 (IPv4 und IPv6 mit gleichem rDNS); der Satz ueber
     # Luecken zaehlt dieselben Zeilen, sonst widersprechen sich Satz und Tabelle.
-    cov = [model.system_status(ips) for ips in model.system_rows()]
+    rows = model.system_rows()
+    cov = [model.system_status(ips) for ips in rows]
     # S6b-1 (spec/09 Q16): Hostnamen eindeutig zaehlen (IPv4 und IPv6 zaehlten doppelt);
     # Drittanbieter-Adressen und ihre Namen sind kein Host des Kunden.
     eigene = [h for h in facts.hosts if h.third_party is None]
@@ -46,6 +47,8 @@ def _counts(facts: FS.Facts, output: CatalogOutput, n_findings: int, n_positives
         domains=list(facts.scan.domains) or [facts.scan.domain],
         scan_date=C.format_date(facts.scan.finished_at or facts.scan.started_at),
         hosts_total=len(eigene),
+        systems_total=len(rows),
+        gap_addresses=sum(len(ips) for ips, status in zip(rows, cov) if status != "voll"),
         hosts_ipv4=sum(1 for h in eigene if h.family == 4),
         hosts_ipv6=sum(1 for h in eigene if h.family == 6),
         fqdns_total=len({f.name.lower() for f in facts.fqdns if not f.wildcard and f.host_ip in eigene_ips}),
@@ -125,8 +128,7 @@ def build_report_data(
     # Leitwerkzeugen des Pakets, nicht an jeder Luecke. Die Abdeckungstabelle
     # in Kapitel 2 zeigt weiterhin jede Luecke.
     # S6b-1: dieselbe Regel wie die Abdeckung in Kapitel 2.1 (coverage.py).
-    gap_hosts = model.gaps()
-    glance = C.build_glance(finding_items, finding_list, counts, gap_hosts)
+    glance = C.build_glance(finding_items, finding_list, counts, model.system_gaps())
     glance.levers = levers
     business = C.build_business(facts, C.observed_systems(facts))
     scope = C.build_scope(facts, output, counts, model)

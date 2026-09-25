@@ -1335,7 +1335,7 @@
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von krause-computer.de am 26.05.2026: 11 Hostnamen auf 3 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 37.114.55.171, 85.13.167.158 und 87.79.190.79 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "coverage_warning": "Für 3 Systeme (37.114.55.171, 85.13.167.158 und 87.79.190.79) liegt nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
@@ -1572,7 +1572,7 @@
     "role": "Kollaboration · Plattform skclient.de"
    }
   ],
-  "lead": "Der Scan hat 3 IP-Adressen mit 11 Hostnamen erfasst. Für 3 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 3 Systeme mit 3 IP-Adressen und 11 Hostnamen erfasst. Für 3 Systeme (3 Adressen) war die aktive Prüfung nur teilweise möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [

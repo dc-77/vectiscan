@@ -23,6 +23,10 @@ class Counts:
     domains: list[str] = field(default_factory=list)
     scan_date: str = ""
     hosts_total: int = 0
+    # Nachtrag 3: Systeme (IPv4 und IPv6 mit gleichem rDNS sind eines) und die
+    # Adressen der Systeme mit Luecke.
+    systems_total: int = 0
+    gap_addresses: int = 0
     hosts_ipv4: int = 0
     hosts_ipv6: int = 0
     fqdns_total: int = 0
@@ -66,13 +70,29 @@ def context(c: Counts) -> str:
     )
 
 
-def coverage_warning(c: Counts, hosts: list[str]) -> str:
-    if not hosts:
+def _system_label(ips: list[str]) -> str:
+    return ips[0] + (f" mit {_join(ips[1:])}" if len(ips) > 1 else "")
+
+
+def _gap_kind(c: Counts) -> tuple[str, str]:
+    """(Satzteil Kapitel 2, Satzteil Hinweis) nach Art der Luecken."""
+    if c.coverage_partial and not c.coverage_none:
+        return "nur teilweise möglich", "nur eine teilweise aktive Prüfung"
+    if c.coverage_none and not c.coverage_partial:
+        return "nicht möglich", "keine aktive Prüfung"
+    return "nur teilweise oder gar nicht möglich", "keine oder nur eine teilweise aktive Prüfung"
+
+
+def coverage_warning(c: Counts, systems: list[list[str]]) -> str:
+    """Hinweis auf Seite 2: je System mit seinen Adressen (Nachtrag 3, Q16)."""
+    if not systems:
         return ""
+    _, art = _gap_kind(c)
+    labels = _join([_system_label(ips) for ips in systems])
     return (
-        f"Für {_join(hosts)} liegt keine oder nur eine teilweise aktive Prüfung vor. "
-        "Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses "
-        "Berichts sind entsprechend zu lesen."
+        f"Für {len(systems)} {_plural(len(systems), 'System', 'Systeme')} ({labels}) liegt "
+        f"{art} vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse "
+        "dieses Berichts sind entsprechend zu lesen."
     )
 
 
@@ -94,17 +114,21 @@ BUSINESS_IMPLICATION_GENERIC = (
 # ---------------------------------------------------------------- Kapitel 2
 
 def scope_lead(c: Counts) -> str:
+    """Einleitungssatz Kapitel 2; Einheit ist das System (Nachtrag 3, Entscheidung DC)."""
     gaps = c.coverage_partial + c.coverage_none
+    systems = c.systems_total or c.hosts_total
+    art, _ = _gap_kind(c)
     tail = (
-        f" Für {gaps} {_plural(gaps, 'Host', 'Hosts')} war die aktive Prüfung nur teilweise "
-        "oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht "
-        "vollständiger wirken, als sie sind."
+        f" Für {gaps} {_plural(gaps, 'System', 'Systeme')} ({c.gap_addresses} "
+        f"{_plural(c.gap_addresses, 'Adresse', 'Adressen')}) war die aktive Prüfung {art}; "
+        f"{_plural(gaps, 'diese Lücke ist', 'diese Lücken sind')} unten benannt, damit die "
+        "Ergebnisse nicht vollständiger wirken, als sie sind."
         if gaps else
-        " Alle Hosts konnten aktiv geprüft werden."
+        " Alle Systeme konnten aktiv geprüft werden."
     )
     return (
-        f"Der Scan hat {c.hosts_total} "
-        f"{_plural(c.hosts_total, 'IP-Adresse', 'IP-Adressen')} mit {c.fqdns_total} "
+        f"Der Scan hat {systems} {_plural(systems, 'System', 'Systeme')} mit {c.hosts_total} "
+        f"{_plural(c.hosts_total, 'IP-Adresse', 'IP-Adressen')} und {c.fqdns_total} "
         f"{_plural(c.fqdns_total, 'Hostname', 'Hostnamen')} erfasst.{tail}"
     )
 

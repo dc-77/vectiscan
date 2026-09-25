@@ -1245,7 +1245,7 @@
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von bergersysteme.com am 23.09.2026: 10 Hostnamen auf 6 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 198.202.211.1, 62.217.52.162, 62.217.52.166, 62.217.52.171 und 79.140.188.181 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "coverage_warning": "Für 5 Systeme (198.202.211.1, 62.217.52.162, 62.217.52.166, 62.217.52.171 und 79.140.188.181) liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
@@ -1514,7 +1514,7 @@
     "role": "Drittanbieter"
    }
   ],
-  "lead": "Der Scan hat 6 IP-Adressen mit 10 Hostnamen erfasst. Für 5 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 6 Systeme mit 6 IP-Adressen und 10 Hostnamen erfasst. Für 5 Systeme (5 Adressen) war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [

@@ -1226,7 +1226,7 @@
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von heuel.com am 22.05.2026: 11 Hostnamen auf 6 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 104.16.10.6, 195.225.241.75, 20.79.218.75, 213.133.104.51, 217.72.203.132 und 2a01:4f8:d0a:2757::2 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "coverage_warning": "Für 5 Systeme (104.16.10.6, 195.225.241.75, 20.79.218.75, 213.133.104.51 mit 2a01:4f8:d0a:2757::2 und 217.72.203.132) liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
@@ -1462,7 +1462,7 @@
     "role": "Website"
    }
   ],
-  "lead": "Der Scan hat 6 IP-Adressen mit 11 Hostnamen erfasst. Für 5 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 5 Systeme mit 6 IP-Adressen und 11 Hostnamen erfasst. Für 5 Systeme (6 Adressen) war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [

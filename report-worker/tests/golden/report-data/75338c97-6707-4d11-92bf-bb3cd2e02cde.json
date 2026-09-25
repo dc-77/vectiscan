@@ -698,7 +698,7 @@
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von vectigal.tech und vectiscan.de am 20.09.2026: 31 Hostnamen auf 2 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 62.217.52.165 und 62.217.52.177 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "coverage_warning": "Für 2 Systeme (62.217.52.165 und 62.217.52.177) liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Schützt die Authentizität der eigenen E-Mail",
@@ -897,7 +897,7 @@
     "role": "Nicht näher bestimmbar"
    }
   ],
-  "lead": "Der Scan hat 2 IP-Adressen mit 31 Hostnamen erfasst. Für 2 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 2 Systeme mit 2 IP-Adressen und 31 Hostnamen erfasst. Für 2 Systeme (2 Adressen) war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [

@@ -2256,7 +2256,7 @@
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von castenow.de am 20.07.2026: 14 Hostnamen auf 9 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 159.69.143.80, 195.50.179.2, 195.50.179.4, 195.50.179.5, 195.50.179.6, 195.50.179.7, 195.50.179.9, 3.174.46.10 und 92.205.163.53 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "coverage_warning": "Für 9 Systeme (159.69.143.80, 195.50.179.2, 195.50.179.4, 195.50.179.5, 195.50.179.6, 195.50.179.7, 195.50.179.9, 3.174.46.10 und 92.205.163.53) liegt nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
@@ -2619,7 +2619,7 @@
     "role": "Anmeldeportal · geteiltes System beim Hoster"
    }
   ],
-  "lead": "Der Scan hat 9 IP-Adressen mit 14 Hostnamen erfasst. Für 9 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 9 Systeme mit 9 IP-Adressen und 14 Hostnamen erfasst. Für 9 Systeme (9 Adressen) war die aktive Prüfung nur teilweise möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [

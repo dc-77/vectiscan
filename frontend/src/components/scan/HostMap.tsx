@@ -159,8 +159,13 @@ export default function HostMap({ aiHosts, discoveredHosts, strategyNotes, order
     );
   }
 
-  const scanned = aiHosts.filter((h) => h.action !== 'skip');
-  const skipped = aiHosts.filter((h) => h.action === 'skip');
+  // S6b-1 Nachtrag 3: eine Adresse, die als weitere Adresse eines Systems in der Karte
+  // ihrer Leitadresse steht, bekommt keine eigene Karte (nur wenn die Leitadresse
+  // selbst eine Karte hat, sonst ginge die Adresse verloren).
+  const mergedInto = systemMembers(aiHosts, techProfilesByIp);
+  const visible = aiHosts.filter((h) => !mergedInto[h.ip]);
+  const scanned = visible.filter((h) => h.action !== 'skip');
+  const skipped = visible.filter((h) => h.action === 'skip');
 
   return (
     <div className="space-y-4">
@@ -175,7 +180,7 @@ export default function HostMap({ aiHosts, discoveredHosts, strategyNotes, order
 
       <div>
         <div className="mb-2 flex items-baseline justify-between">
-          <h3 className="text-sm font-medium text-slate-300">Hosts ({aiHosts.length})</h3>
+          <h3 className="text-sm font-medium text-slate-300">Hosts ({visible.length})</h3>
           <div className="text-xs text-slate-500 tabular-nums">
             {scanned.length} scan · {skipped.length} skip
           </div>
@@ -244,6 +249,22 @@ export default function HostMap({ aiHosts, discoveredHosts, strategyNotes, order
       )}
     </div>
   );
+}
+
+/** Adresse -> Leitadresse ihres Systems, fuer Adressen ohne eigene Karte. */
+export function systemMembers(
+  aiHosts: AiHost[],
+  techProfilesByIp: Record<string, TechProfile> | undefined,
+): Record<string, string> {
+  const withCard = new Set(aiHosts.map((h) => h.ip));
+  const out: Record<string, string> = {};
+  for (const profile of Object.values(techProfilesByIp ?? {})) {
+    if (!withCard.has(profile.ip)) continue;
+    for (const extra of profile.additional_ips ?? []) {
+      if (extra.ip !== profile.ip) out[extra.ip] = profile.ip;
+    }
+  }
+  return out;
 }
 
 // ─── Card-Components ──────────────────────────────────────────────────────
@@ -321,6 +342,19 @@ function ScannedHostCard({
           </button>
         )}
       </div>
+
+      {/* Weitere Adressen desselben Systems (S6b-1 Nachtrag 3) */}
+      {(techProfile?.additional_ips ?? []).map((extra) => (
+        <div
+          key={extra.ip}
+          id={`host-${extra.ip}`}
+          className="text-[11px] text-slate-500 truncate"
+          title={`${extra.ip}: ${extra.note}`}
+        >
+          <span className="font-mono text-slate-400">{extra.ip}</span>
+          <span className="ml-1.5">· {extra.note}</span>
+        </div>
+      ))}
 
       {/* Primaer-FQDN */}
       {fqdn && (
