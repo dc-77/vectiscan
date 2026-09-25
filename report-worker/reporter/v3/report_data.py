@@ -142,7 +142,13 @@ def build_report_data(
     # S6 (spec/08 Punkt 8): Der Kurzname fuer Fusszeile und PDF-Titel ist ein
     # eigenes Feld, sonst der Firmenname ohne Rechtsform. Er war vorher das erste
     # Wort, und "Dortmund Beach Design" wurde damit zu "Dortmund".
-    customer_short = str(order.get("customer_short") or context.get("kurzname") or "").strip()
+    kurzname = str(context.get("kurzname") or "").strip()
+    if kurzname and _context_sources(context).get("kurzname") == RESEARCH.SOURCE_RESEARCH:
+        # S6b-1 (spec/09 Q15): ein Kurzname aus der Recherche ist nur ein Vorschlag.
+        # Aeltere Laeufe haben ihn mit der alten Rechtsformliste gespeichert
+        # ("Junkerwerk Linder GmbH + Co."); Werte von Kunde oder Admin bleiben, wie sie sind.
+        kurzname = RESEARCH.kurzname_aus(kurzname)
+    customer_short = str(order.get("customer_short") or kurzname or "").strip()
     if not customer_short and customer != DEFAULT_CUSTOMER:
         customer_short = RESEARCH.kurzname_aus(customer)
     if not customer_short:

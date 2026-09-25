@@ -346,6 +346,19 @@ def test_kurzname_aus_dem_kontext_gewinnt_und_quelle_steht_da():
     assert data.meta.context_sources == {"firmenname": "recherche", "kurzname": "admin"}
 
 
+@pytest.mark.parametrize("quelle,erwartet", [
+    ("recherche", "Junkerwerk Linder"),
+    ("admin", "Junkerwerk Linder GmbH + Co."),
+])
+def test_recherche_kurzname_ist_nur_vorschlag(quelle, erwartet):
+    # Produktion 31d67a02 (25.09.): die Recherche hatte den Kurznamen vor S6b-1 mit der
+    # alten Rechtsformliste gespeichert. Ein Admin-Wert bleibt, wie er ist.
+    data = data_for(JW, customer_context={
+        "firmenname": "Junkerwerk Linder GmbH + Co. KG", "kurzname": "Junkerwerk Linder GmbH + Co.",
+        "sources": {"firmenname": {"source": "recherche"}, "kurzname": {"source": quelle}}})
+    assert data.meta.customer_short == erwartet
+
+
 def test_netzbetreiber_nie_als_kundenname():
     data = data_for(BS)
     assert data.meta.customer_short != "Berger EDV-Systemberatungs"
