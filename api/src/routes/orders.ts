@@ -142,6 +142,26 @@ const ALLOWED_OVERRIDE_FIELDS = new Set([
   '_ignored',  // markiert Finding als "warnings akzeptiert" ohne Field-Edit
 ]);
 
+/**
+ * S6b-2 (Issue #28): stabiler Schluessel eines Befunds aus dem aktuellen Bericht
+ * (reports.findings_data.findings[].key). Null, wenn der Bericht ihn nicht fuehrt
+ * (Legacy-Weg oder Bericht vor S6b-2).
+ */
+async function currentFindingKey(orderId: string, findingId: string): Promise<string | null> {
+  try {
+    const res = await query(
+      `SELECT findings_data FROM reports WHERE order_id = $1 ORDER BY version DESC LIMIT 1`,
+      [orderId],
+    );
+    const data = (res.rows[0] as Record<string, unknown> | undefined)?.findings_data as
+      { findings?: Array<{ id?: string; key?: string }> } | undefined;
+    const hit = (data?.findings ?? []).find((f) => f.id === findingId);
+    return hit?.key ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function orderRoutes(server: FastifyInstance): Promise<void> {
   // POST /api/orders — requireAuth, multi-target
   // Body: { package, targets: [{raw_input, exclusions?}, ...] }
@@ -1457,12 +1477,29 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         return reply.status(403).send({ success: false, error: 'Access denied' });
       }
 
-      await query(
-        `INSERT INTO finding_exclusions (order_id, finding_id, excluded_by, reason)
-         VALUES ($1, $2, $3, $4)
-         ON CONFLICT (order_id, finding_id) DO UPDATE SET reason = EXCLUDED.reason`,
-        [id, findingId, user.sub, reason || null],
-      );
+      // S6b-2 (Issue #28): zur Befundnummer der stabile Schluessel des Sachverhalts
+      // aus dem aktuellen Bericht. Mit ihm wirkt der Ausschluss im Katalogweg auch
+      // dann, wenn eine Neuerzeugung die Nummern verschiebt.
+      const findingKey = await currentFindingKey(id, findingId);
+      try {
+        await query(
+          `INSERT INTO finding_exclusions (order_id, finding_id, excluded_by, reason, finding_key)
+           VALUES ($1, $2, $3, $4, $5)
+           ON CONFLICT (order_id, finding_id) DO UPDATE SET reason = EXCLUDED.reason,
+             finding_key = COALESCE(EXCLUDED.finding_key, finding_exclusions.finding_key)`,
+          [id, findingId, user.sub, reason || null, findingKey],
+        );
+      } catch (err) {
+        // Ohne Migration 049 gibt es die Spalte noch nicht; der Ausschluss gilt dann
+        // ueber die Befundnummer wie bisher.
+        if ((err as { code?: string }).code !== '42703') throw err;
+        await query(
+          `INSERT INTO finding_exclusions (order_id, finding_id, excluded_by, reason)
+           VALUES ($1, $2, $3, $4)
+           ON CONFLICT (order_id, finding_id) DO UPDATE SET reason = EXCLUDED.reason`,
+          [id, findingId, user.sub, reason || null],
+        );
+      }
 
       audit({ orderId: id, action: 'finding.excluded', details: { findingId, reason, userId: user.sub }, ip: request.ip });
 
@@ -1732,11 +1769,14 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
 
       // Load excluded findings
       const exclusions = await query(
-        'SELECT finding_id, reason FROM finding_exclusions WHERE order_id = $1',
+        'SELECT * FROM finding_exclusions WHERE order_id = $1',
         [id],
       );
+      // S6b-2 (Issue #28): der stabile Schluessel geht mit; ohne ihn bildet der
+      // report-worker die Befundnummer ueber den letzten Bericht ab.
       const excludedFindings = exclusions.rows.map((r: Record<string, unknown>) => ({
         finding_id: r.finding_id,
+        finding_key: r.finding_key ?? null,
         reason: r.reason,
       }));
 
@@ -1842,11 +1882,14 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
 
       // Load excluded findings (admin may have marked FPs before approving)
       const exclusions = await query(
-        'SELECT finding_id, reason FROM finding_exclusions WHERE order_id = $1',
+        'SELECT * FROM finding_exclusions WHERE order_id = $1',
         [id],
       );
+      // S6b-2 (Issue #28): der stabile Schluessel geht mit; ohne ihn bildet der
+      // report-worker die Befundnummer ueber den letzten Bericht ab.
       const excludedFindings = exclusions.rows.map((r: Record<string, unknown>) => ({
         finding_id: r.finding_id,
+        finding_key: r.finding_key ?? null,
         reason: r.reason,
       }));
 

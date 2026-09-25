@@ -38,13 +38,33 @@ Bump-Historie:
                   traegt, sind keine unverarbeitete Beobachtung mehr; Numerus
                   `{n:Einzahl|Mehrzahl}` in den Texten; Zustaendigkeit auf geteilten
                   Systemen je Pruefung (`SHARED_OPERATOR_CHECKS`).
+    2026-09-25.2  S6b-2 (spec/09 Q4 bis Q7, Q12 bis Q14, Q18, spec/08 Teil 2): Texte je
+                  Regel. Buendel tragen nur den Sammeltitel (`{rules}`) und
+                  `positive_title`; jede Textaussage kann eine Fakten-Bedingung (`when`,
+                  `quantor`) tragen, Pruefungen tragen `short` und `plan` (Hebeltitel,
+                  Effekt). Neu `urgent_when` (E2, Zertifikat bis sieben Tage), neue
+                  Pruefungen `admin_panel_hoster`, `admin_service_unconfirmed`,
+                  `admin_port_passive_unidentified` (E1, Buendel `admin_access`),
+                  `cert_expiring_later`, `mail_spoofing_unprotected` (spec/08 Punkt 6),
+                  `tls_weakness_reported` (BREACH, LUCKY13 im Anhang); ZAP-Regeln nur
+                  ab Konfidenz High (Q14); `dane_missing` nur bei MX in eigener,
+                  signierter Zone; `service_banner_version` ohne SSH- und
+                  MariaDB-Handshake; `ftp_plaintext` nur mit Beleg (spec/08 Punkt 4);
+                  `waf_present` und `ip_reputation` positiv nur mit tragfaehigem Fakt
+                  (Q12); `wordpress_core_outdated` nur mit Kern-Schwachstelle (Q18).
+                  Neue Tabellen `HOSTING_PANELS`, `BANNER_FIXED`, `WAF_GENERIC`,
+                  `ZAP_RATED`, `ZAP_COOKIE`, `TLS_REPORTED_VULNS`, `CERT_URGENT_DAYS`,
+                  `CERT_SOON_DAYS`, `VERSION_LOWER_BOUND`; `http_trace_enabled` als
+                  Werkzeugmeldung (nur OPTIONS), ZAP-Cookie-Meldungen nicht mehr ignoriert.
+                  Ein neues Datum waere erst morgen; die zweite Version desselben Tages
+                  folgt der Regel "jede Aenderung bumpt".
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-25.1"
+CATALOG_VERSION = "2026-09-25.2"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"

@@ -1,0 +1,44 @@
+{
+ "check": "admin_service_unconfirmed",
+ "cases": [
+  {
+   "name": "Verwaltungssoftware ohne belegte Anmeldung und Port ohne Kennung",
+   "facts": {
+    "services": [
+     {
+      "host_ip": "10.0.0.7",
+      "port": 8443,
+      "service": "https-alt",
+      "product": "sw-cp-server",
+      "tunnel_ssl": true
+     },
+     {
+      "host_ip": "10.0.0.7",
+      "port": 10000,
+      "service": "snet-sensor-mgmt",
+      "tunnel_ssl": true
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "10.0.0.7:8443": [
+      "observation[0]"
+     ],
+     "10.0.0.7:10000": [
+      "observation[1]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.7:8443": [
+      "observation[1]"
+     ],
+     "10.0.0.7:10000": [
+      "observation[0]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  }
+ ]
+}

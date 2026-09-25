@@ -197,7 +197,60 @@ def f_has_enrichment(seq: Any) -> bool:
     return False
 
 
+def f_admin_fp(obj: Any) -> bool:
+    """Gibt sich der Dienst als Verwaltungsoberflaeche zu erkennen (S6b-2, spec/09 Q13)?
+
+    Fingerabdruck ist das Produkt aus nmap, die Server-Kennung oder der Seitentitel aus der
+    Antwort des Dienstes (``fp_server``, ``fp_title``) und bei Passivquellen das Banner. Ein
+    Port allein ist kein Fingerabdruck.
+    """
+    from reporter.catalog.tables import ADMIN_PRODUCTS, ADMIN_TITLES
+    if obj is None:
+        return False
+    for attr in ("product", "fp_server", "banner_excerpt"):
+        if ADMIN_PRODUCTS.search(str(getattr(obj, attr, "") or "")):
+            return True
+    return bool(ADMIN_TITLES.search(str(getattr(obj, "fp_title", "") or "")))
+
+
+def f_hosting_panel(obj: Any) -> bool:
+    """Hosting-Verwaltung eines Hosters (Plesk, cPanel, froxlor ...) laut Fingerabdruck."""
+    from reporter.catalog.tables import HOSTING_PANELS
+    if obj is None:
+        return False
+    return any(HOSTING_PANELS.search(str(getattr(obj, attr, "") or ""))
+               for attr in ("product", "fp_server", "fp_title", "banner_excerpt"))
+
+
+def f_mx_in_own_zone(dns: Any, domains: Any) -> bool:
+    """Liegen alle MX-Ziele unter einer der beauftragten Domains (S6b-2, spec/09 Q4)?
+
+    DANE kann nur umsetzen, wer die Zone des Mailservers pflegt; bei Hornetsecurity oder
+    einem Hoster-Mailserver liegt der MX in einer fremden Zone.
+    """
+    mx = [str(m).rstrip(".").lower() for m in (getattr(dns, "mx", None) or [])]
+    doms = [str(d).rstrip(".").lower() for d in (domains or [])]
+    if not mx or not doms:
+        return False
+    return all(any(m == d or m.endswith("." + d) for d in doms) for m in mx)
+
+
+def f_redirects_elsewhere(fqdn: Any) -> bool:
+    """Endet der Aufruf eines Namens auf einem anderen Host (Weiterleitung)?"""
+    if fqdn is None:
+        return False
+    ziel = getattr(fqdn, "final_url", None)
+    name = str(getattr(fqdn, "name", "") or "").lower()
+    if not ziel or not name:
+        return False
+    from urllib.parse import urlsplit
+    host = (urlsplit(str(ziel)).hostname or "").lower()
+    return bool(host) and host != name
+
+
 FUNCS: dict[str, Callable[..., Any]] = {
+    "admin_fp": f_admin_fp, "hosting_panel": f_hosting_panel, "mx_in_own_zone": f_mx_in_own_zone,
+    "redirects_elsewhere": f_redirects_elsewhere,
     "has_enrichment": f_has_enrichment,
     "len": f_len, "count": f_count, "any_in": f_any_in, "matches": f_matches, "any_match": f_any_match, "startswith": f_startswith,
     "contains": f_contains, "lower": f_lower, "ports": f_ports, "has_port": f_has_port,
@@ -296,10 +349,13 @@ _ALLOWED_CMP = (ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE, ast.In, ast
 class Expr:
     """Kompilierter Ausdruck. ``expr(ctx)`` liefert den Wert, ``expr.test(ctx)`` den Wahrheitswert."""
 
-    def __init__(self, text: str, fn: Fn, names: set[str]):
+    def __init__(self, text: str, fn: Fn, names: set[str], paths: frozenset[str] = frozenset()):
         self.text = text
         self._fn = fn
         self.names = names
+        # S6b-2 (spec/09 Q7): Attributpfade, auf die der Ausdruck sieht ("dns.dnssec.signed",
+        # "tls.cert.days_left"); der Nachweis eines Treffers zeigt genau diese Fakten.
+        self.paths = paths
 
     def __call__(self, ctx: Ctx) -> Any:
         return self._fn(ctx)
@@ -486,7 +542,29 @@ def compile_expr(text: str, *, where: str, types_: dict[str, Any], tables: dict[
         raise CatalogSpecError(f"{where}: Syntaxfehler {exc.msg} in Ausdruck {text!r}") from None
     comp = _Compiler(text, where, types_, tables or {})
     fn = comp.build(tree)
-    return Expr(text, fn, comp.names)
+    return Expr(text, fn, comp.names, attribute_paths(tree, set(types_)))
+
+
+def attribute_paths(tree: ast.AST, bindings: set[str]) -> frozenset[str]:
+    """Laengste Attributketten eines Ausdrucks, die an einer Bindung beginnen.
+
+    ``http.security_headers["x-frame-options"].present`` ergibt genau diesen Pfad, nicht
+    zusaetzlich ``http.security_headers``. Konstante Schluessel stehen in eckigen Klammern.
+    """
+    kinder: set[int] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Attribute, ast.Subscript)):
+            kinder.add(id(node.value))
+    out: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.Attribute, ast.Subscript)) or id(node) in kinder:
+            continue
+        root = node
+        while isinstance(root, (ast.Attribute, ast.Subscript)):
+            root = root.value
+        if isinstance(root, ast.Name) and root.id in bindings:
+            out.add(ast.unparse(node).replace("'", '"'))
+    return frozenset(out)
 
 
 __all__ = ["CatalogSpecError", "Expr", "compile_expr", "FUNCS", "CALLABLE", "is_optional_bool",

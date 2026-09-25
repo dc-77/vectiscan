@@ -362,7 +362,7 @@ def observed_systems(facts: FS.Facts) -> list[ObservedSystem]:
     out: list[ObservedSystem] = []
     for members in _systems(facts):
         roles = system_roles(facts, members)
-        names = sorted({n for h in members for n in h.fqdns}, key=sort_key)
+        names = sorted({n for h in members for n in h.fqdns if not n.startswith("*.")}, key=sort_key)
         label_role = R.role_label(roles)
         label = f"{label_role} ({', '.join(names[:3])})" if names else f"{label_role} ({members[0].ip})"
         out.append(ObservedSystem(
@@ -400,7 +400,9 @@ def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
             operator = f"{operator} ({lead.reverse})"
         roles = R.role_label(system_roles(facts, members))
         hint = _shared_hint(lead)
-        names = sorted({n for h in members for n in h.fqdns}, key=sort_key)
+        # S6b-2 (spec/09 Teil 2 DB, Rest spec/08 Punkt 13): ein Wildcard-Eintrag ist kein
+        # Hostname; die Zaehlung in 2.1 liess ihn schon aus, die Liste nannte ihn noch.
+        names = sorted({n for h in members for n in h.fqdns if not n.startswith("*.")}, key=sort_key)
         hosts.append(ScopeHost(
             ip=lead.ip, more_ips=more, fqdns=", ".join(names) or UNKNOWN,
             operator=operator, role=f"{roles} · {hint}" if hint else roles,
@@ -408,7 +410,8 @@ def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
     for host in sorted((h for h in facts.hosts if h.third_party is not None), key=lambda h: sort_key(h.ip)):
         operator = host.third_party.operator or UNKNOWN
         hosts.append(ScopeHost(
-            ip=host.ip, fqdns=", ".join(sorted(host.fqdns, key=sort_key)) or UNKNOWN,
+            ip=host.ip, fqdns=", ".join(sorted((n for n in host.fqdns if not n.startswith("*.")),
+                                               key=sort_key)) or UNKNOWN,
             operator=operator, role="Drittanbieter", coverage=model.hosts[host.ip].text, cov="extern"))
     out_of_scope = list(N.OUT_OF_SCOPE_BASE)
     extra = sorted(_unbeauftragt(facts, output))
@@ -472,8 +475,24 @@ def _ohne_eigene_tabelle(host: FS.HostFact) -> bool:
     return host.third_party is not None or bool(host.reach and host.reach.status == "no_ipv6_route")
 
 
-def tech_lines(facts: FS.Facts) -> dict[str, list[TechLine]]:
-    """Zeilen je Host-IP in Berichtsreihenfolge; Hosts ohne Software fehlen."""
+# S6b-2 (Entscheidung DC 25.09., spec/09 Q14 und Q11-Rest): eine Technikzeile braucht
+# Konfidenz hoch oder zwei unabhaengige Quellen. Sonst steht die Meldung nur als
+# Werkzeugmeldung im Anhang ("Java/Servlet" allein aus webtech bei heuel).
+TECH_MIN_CONFIDENCE = 0.9
+TECH_MIN_SOURCES = 2
+
+
+def _tech_bestaetigt(gruppe: list[FS.SoftwareFact]) -> bool:
+    quellen = {q for s in gruppe for q in s.detection_sources} or {s.source for s in gruppe}
+    return max(s.confidence for s in gruppe) >= TECH_MIN_CONFIDENCE or len(quellen) >= TECH_MIN_SOURCES
+
+
+def tech_lines(facts: FS.Facts, *, unconfirmed: list[TechLine] | None = None) -> dict[str, list[TechLine]]:
+    """Zeilen je Host-IP in Berichtsreihenfolge; Hosts ohne Software fehlen.
+
+    ``unconfirmed`` sammelt die Zeilen, die die Schwelle aus Konfidenz und Quellen nicht
+    erreichen; sie gehen als Werkzeugmeldung in den Anhang.
+    """
     by_host: dict[str, list[FS.SoftwareFact]] = {}
     for sw in facts.software:
         by_host.setdefault(sw.host_ip, []).append(sw)
@@ -498,17 +517,40 @@ def tech_lines(facts: FS.Facts) -> dict[str, list[TechLine]]:
         lines: list[TechLine] = []
         for (_, version), gruppe in gruppen.items():
             sw = max(gruppe, key=lambda s: (s.confidence, s.product != s.product.lower()))
+            bestaetigt = _tech_bestaetigt(gruppe)
             quellen = sorted({q for s in gruppe for q in s.detection_sources}) or [sw.source]
             note = T.tech_note(sw.note)
             if sw.eol.status == "eol" and sw.eol.date:
                 note = f"Herstellerpflege endete am {sw.eol.date}"
             elif sw.eol.upstream_eol_date:
                 note = f"Lifecycle prüfen, Hersteller nennt {sw.eol.upstream_eol_date}"
-            lines.append(TechLine(
+            line = TechLine(
                 software=sw, product=sw.product, version=version, eol_status=sw.eol.status,
                 eol_date=sw.eol.date, note=note, sources=", ".join(quellen),
-                confidence=sw.confidence, conf_label=_confidence_label(sw.confidence)))
-        out[host.ip] = lines
+                confidence=sw.confidence, conf_label=_confidence_label(sw.confidence))
+            if not bestaetigt:
+                if unconfirmed is not None:
+                    unconfirmed.append(line)
+                continue
+            lines.append(line)
+        if lines:
+            out[host.ip] = lines
+    return out
+
+
+def tech_tool_findings(facts: FS.Facts) -> list["ToolFinding"]:
+    """Nicht bestaetigte Technikzeilen als Werkzeugmeldung fuer den Anhang (S6b-2)."""
+    from reporter.v3.models import ToolFinding
+
+    offen: list[TechLine] = []
+    tech_lines(facts, unconfirmed=offen)
+    out: list[ToolFinding] = []
+    for line in offen:
+        was = line.product if line.version == UNKNOWN else f"{line.product} {line.version}"
+        out.append(ToolFinding(
+            what=f"Technik: {was}", where=line.software.fqdn or line.software.host_ip,
+            note=(f"Nur laut {line.sources} mit Konfidenz {line.conf_label}; ohne zweite Quelle "
+                  "nicht in der Technologietabelle.")))
     return out
 
 
@@ -638,10 +680,22 @@ def _result_state(results: list[CheckResult],
 POSTURE_UNREACHABLE = frozenset({"unerreichbar", "keine"})
 
 
-def build_posture(output: CatalogOutput, model: COV.Model | None = None) -> list[PostureBlock]:
+# S6b-2 (spec/08 Punkt 6): SPF mit ~all ist vorhanden, aber nicht hart; die Posture zeigt
+# das als "softfail", nicht als fehlend und nicht als Handlungsbedarf.
+POSTURE_SOFT: dict[str, tuple[str, str]] = {"SPF": ("spf_softfail", "softfail")}
+# S6b-2 (spec/09 Q12): "Zertifikate unauffaellig" nur, wenn alle verschluesselten Dienste
+# der Hosts geprueft sind.
+POSTURE_TLS_ITEMS = frozenset({"Zertifikate"})
+
+
+def build_posture(output: CatalogOutput, model: COV.Model | None = None,
+                  facts: FS.Facts | None = None) -> list[PostureBlock]:
+    from reporter.v3.bundles import tls_untested_hosts
+
     by_check: dict[str, list[CheckResult]] = {}
     for r in output.results:
         by_check.setdefault(r.check_id, []).append(r)
+    tls_offen = tls_untested_hosts(facts)
     ohne_messung = sorted((h.ip for h in (model.counted if model else []) if h.cov in POSTURE_UNREACHABLE),
                           key=sort_key)
     blocks: list[PostureBlock] = []
@@ -666,6 +720,13 @@ def build_posture(output: CatalogOutput, model: COV.Model | None = None) -> list
         for label, checks in spec["items"]:  # type: ignore[index]
             results = [r for cid in checks for r in by_check.get(cid, [])]
             ok, text = _result_state(results, by_check.get(checks[0], []))
+            weich = POSTURE_SOFT.get(label)
+            if weich and ok is False:
+                fails = {r.check_id for r in results if r.status == "fail"}
+                if fails == {weich[0]}:
+                    ok, text = None, weich[1]
+            if label in POSTURE_TLS_ITEMS and ok is True and tls_offen:
+                ok, text = None, "nur teilweise geprüft"
             items.append(PostureItem(l=label, ok=ok, v=text))
         if items:
             blocks.append(PostureBlock(name=str(spec["name"]), short=str(spec["short"]),
@@ -736,12 +797,18 @@ def build_architecture(facts: FS.Facts, output: CatalogOutput, items: list[Conso
     model = model or COV.build_model(facts)
     roles = sorted({r.label for members in _systems(facts) for r in system_roles(facts, members)})
     eigene = [h for h in facts.hosts if h.third_party is None]
+    # S6b-2 (spec/09 Q12): Adressen von Plattformen und Inhaltsnetzen werden nicht bewertet,
+    # sondern benannt. Score 0 heisst nicht "keine Meldungen": eine Adresse auf der
+    # Freigabeliste von AbuseIPDB hat Score 0 trotz Meldungen (Vercel bei heuel, 26).
+    fremd = [h for h in eigene if h.cdn_provider or (h.shared is not None and h.shared.kind == "platform")]
+    bewertet = [h for h in eigene if h not in fremd]
     clean = not any(
         (h.reputation and (
             (h.reputation.abuseipdb_score or 0) >= CT.ABUSEIPDB_FAIL_SCORE
+            or (h.reputation.abuseipdb_total_reports or 0) > 0
             or (h.reputation.otx_pulse_count or 0) > 0
             or h.reputation.urlhaus_compromised))
-        for h in eigene)
+        for h in bewertet)
     notes: list[str] = []
     counter = Counter(u.kind for u in output.unprocessed)
     if counter:
@@ -760,14 +827,16 @@ def build_architecture(facts: FS.Facts, output: CatalogOutput, items: list[Conso
     # facts.warnings sind Hinweise des Faktenbauers an den Betreiber, keine Kundentexte.
     # Was davon den Kunden betrifft, steht ueber die Abdeckungsgruende in Kapitel 2.
     return Architecture(
-        lead=N.architecture_lead(len(model.counted), roles),
+        # S6b-2 (Nachtrag S6b-1): Kapitel 3 zaehlt in Systemen wie Kapitel 2.1.
+        lead=N.architecture_lead(len(model.system_rows()), roles),
         tech=build_tech(facts),
         services=build_services(facts, items, findings),
         services_note=N.SERVICES_NOTE,
-        posture=build_posture(output, model),
+        posture=build_posture(output, model, facts),
         screens_lead=N.SCREENS_LEAD,
         screens=build_screens(facts),
-        reputation=N.reputation_line(clean, REPUTATION_SOURCES),
+        reputation=N.reputation_line(clean, REPUTATION_SOURCES,
+                                     sorted((h.ip for h in fremd), key=sort_key)),
         notes=notes,
     )
 

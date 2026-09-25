@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [web_probe]
 kind: check
-bundle: access_portals_exposed
+bundle: admin_access
 affected_template: "{fqdn} ({title})"
 evidence: [fqdn]
 references: [CWE-284, CISA-KEV]
@@ -31,8 +31,12 @@ policy:
     admin_service_exposed; beide Wege fuehren zur gleichen Familie und Einstufung Exposition
     erhoeht (catalog_sim R-ADMIN-EXPOSED).
 texts:
+  short: "Verwaltungsoberfläche laut Seitentitel"
+  plan:
+    lever: "Verwaltungsoberflächen vom Internet trennen"
+    effect: "Entzieht Angreifern den direkten Zugang zur Verwaltung der Systeme"
   observation: >-
-    Die Webseite {group} zeigt auf ihrer Startseite eine Verwaltungs- oder Anmeldeoberfläche,
+    {n:Die Webseite|Die Webseiten} {group} {n:zeigt|zeigen} auf {n:ihrer Startseite|ihren Startseiten} eine Verwaltungs- oder Anmeldeoberfläche,
     die aus dem gesamten Internet erreichbar ist: {affected}. Eine Zugriffsbeschränkung auf
     bestimmte Quellnetze ist von außen nicht erkennbar.
   meaning: >-

@@ -1,0 +1,47 @@
+{
+ "facts": {
+  "tls": [
+   {
+    "host_ip": "10.0.0.1",
+    "fqdn": "www.example.test",
+    "port": 443,
+    "source": "testssl",
+    "protocols": {
+     "SSLv2": false,
+     "SSLv3": false,
+     "TLS1.0": false,
+     "TLS1.1": false,
+     "TLS1.2": true,
+     "TLS1.3": true
+    },
+    "ciphers_weak": [],
+    "vulns": [
+     {
+      "name": "SWEET32",
+      "status": "vulnerable"
+     },
+     {
+      "name": "BREACH",
+      "status": "potential"
+     },
+     {
+      "name": "LUCKY13",
+      "status": "potential"
+     }
+    ],
+    "fallback_scsv": true
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "www.example.test@10.0.0.1",
+  "affected": [
+   "www.example.test:443: BREACH (Hinweis der TLS-Analyse)",
+   "www.example.test:443: LUCKY13 (Hinweis der TLS-Analyse)"
+  ],
+  "positive": false
+ },
+ "_note": "S6b-2 (spec/09 Q4): BREACH und LUCKY13 als Hinweis ohne eigene Einstufung."
+}

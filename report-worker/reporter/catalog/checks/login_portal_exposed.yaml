@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [web_probe]
 kind: check
-bundle: access_portals_exposed
+bundle: null
 affected_template: "{fqdn} ({title})"
 evidence: [fqdn]
 references: [CWE-307, CWE-521]
@@ -30,8 +30,11 @@ policy:
     Das Portal ist gewollt erreichbar; die Einstufung Hygiene mittel gilt der fehlenden
     zusaetzlichen Absicherung, nicht der Erreichbarkeit selbst (catalog_sim R-LOGIN-PORTAL).
 texts:
+  plan:
+    lever: "Anmeldeportale mit zweiter Anmeldestufe schützen"
+    effect: "Erschwert die Übernahme von Konten durch Rateangriffe"
   observation: >-
-    Die Webseite {group} zeigt ein Anmeldeportal, das aus dem gesamten Internet erreichbar ist:
+    {n:Die Webseite|Die Webseiten} {group} {n:zeigt|zeigen} ein Anmeldeportal, das aus dem gesamten Internet erreichbar ist:
     {affected}. Die Erreichbarkeit selbst ist beabsichtigt, wenn das Portal für den externen
     Zugriff vorgesehen ist.
   meaning: >-

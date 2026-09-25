@@ -260,8 +260,11 @@ def test_neg_exchange_2016():
                 assert not any("Exchange" in a and "2016" in a for a in r.affected), (oid, r.check_id, r.affected)
                 if r.check_id in ("software_eol", "software_eol_runtime"):
                     assert not any("Exchange" in a for a in r.affected), (oid, r.affected)
+        # S6b-2 (spec/09 Teil 2 castenow): Exchange SE (15.2.2562) ist gepflegt, also kein
+        # EOL-Befund; belegt ist aber nur die Produktlinie, nicht der Patchstand, deshalb
+        # auch kein Positivbefund "laufende Herstellerpflege".
         pos = [r for r in _results(out, "software_eol") if r.group_key == "217.243.248.28"]
-        assert pos and pos[0].status == "pass" and pos[0].positive, oid
+        assert pos and pos[0].status == "pass" and not pos[0].positive, oid
 
 
 def test_neg_title_placeholder():

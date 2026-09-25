@@ -1,0 +1,46 @@
+{
+ "check": "mail_plaintext",
+ "cases": [
+  {
+   "name": "POP3 ohne STARTTLS und IMAP mit Anmeldung vor STARTTLS (spec/08 Punkt 4)",
+   "facts": {
+    "services": [
+     {
+      "host_ip": "10.0.0.5",
+      "port": 110,
+      "service": "pop3",
+      "starttls": false,
+      "tls_required": false
+     },
+     {
+      "host_ip": "10.0.0.5",
+      "port": 143,
+      "service": "imap",
+      "starttls": true,
+      "login_disabled": false,
+      "tls_required": false
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "10.0.0.5:110": [
+      "observation[0]"
+     ],
+     "10.0.0.5:143": [
+      "observation[1]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.5:110": [
+      "observation[1]"
+     ],
+     "10.0.0.5:143": [
+      "observation[0]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  }
+ ]
+}

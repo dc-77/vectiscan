@@ -191,7 +191,9 @@ class FactsIndex:
     def host_fqdn_names(self, ip: str) -> list[str]:
         names = set(self.hosts_by_ip[ip].fqdns) if ip in self.hosts_by_ip else set()
         names |= {f.name for f in self.fqdns_by_ip.get(ip, [])}
-        return sorted(names)
+        # S6b-2 (spec/09 Teil 2 DB): ein Wildcard-Eintrag ist kein Hostname (spec/08 Punkt 13)
+        # und steht auch nicht im Namen einer Gruppe.
+        return sorted(n for n in names if not n.startswith("*."))
 
     def is_cdn_host(self, ip: str | None) -> bool:
         h = self.host(ip)

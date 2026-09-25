@@ -34,6 +34,10 @@ policy:
     Hygiene niedrig wird uebernommen, da TLS-RPT selbst keinen Schutz herstellt, sondern nur
     die Sichtbarkeit auf Transportprobleme verbessert und im Buendel mit MTA-STS und DANE wirkt.
 texts:
+  short: "kein TLS-RPT"
+  plan:
+    lever: "TLS-RPT für die Domain veröffentlichen"
+    effect: "Meldet fehlgeschlagene verschlüsselte Zustellungen an Sie zurück"
   observation: >-
     Für {affected} ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain {domain}
     fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene

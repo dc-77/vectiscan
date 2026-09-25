@@ -1,0 +1,20 @@
+{
+ "_note": "Domain ohne MX und ohne SPF (vectigal.tech, spec/08 Punkt 6).",
+ "facts": {
+  "dns": [
+   {
+    "domain": "example.test",
+    "mx": []
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "example.test",
+  "affected": [
+   "example.test"
+  ],
+  "positive": false
+ }
+}

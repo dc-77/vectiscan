@@ -1,13 +1,62 @@
 {
  "facts": {
   "services": [
-   {"host_ip": "10.0.0.1", "port": 443, "service": "https", "tls_required": true, "tunnel_ssl": true}
+   {
+    "host_ip": "10.0.0.1",
+    "port": 443,
+    "service": "https",
+    "tls_required": true,
+    "tunnel_ssl": true
+   }
   ],
   "software": [
-   {"host_ip": "10.0.0.1", "product": "Microsoft Exchange", "family": "exchange", "kind": "mail", "version_raw": "15.2.2562", "version_norm": "SE", "build": "15.2.2562", "edition": "SE",
-    "hints": ["X-FEServer: EXCHANGE-SE"], "eol": {"status": "unknown"}},
-   {"host_ip": "10.0.0.1", "product": "Microsoft IIS", "family": "iis", "kind": "webserver", "version_norm": "10.0", "eol": {"status": "unknown"}},
-   {"host_ip": "10.0.0.1", "product": "Windows Server", "family": "windows_server", "kind": "os", "eol": {"status": "unknown"}}
+   {
+    "host_ip": "10.0.0.1",
+    "product": "Microsoft Exchange",
+    "family": "exchange",
+    "kind": "mail",
+    "version_raw": "15.2.2562",
+    "version_norm": "SE",
+    "build": "15.2.2562",
+    "edition": "SE",
+    "hints": [
+     "X-FEServer: EXCHANGE-SE"
+    ],
+    "eol": {
+     "status": "unknown"
+    }
+   },
+   {
+    "host_ip": "10.0.0.1",
+    "product": "Microsoft IIS",
+    "family": "iis",
+    "kind": "webserver",
+    "version_norm": "10.0",
+    "eol": {
+     "status": "unknown"
+    }
+   },
+   {
+    "host_ip": "10.0.0.1",
+    "product": "Windows Server",
+    "family": "windows_server",
+    "kind": "os",
+    "eol": {
+     "status": "unknown"
+    }
+   },
+   {
+    "host_ip": "10.0.0.1",
+    "product": "nginx",
+    "family": "nginx",
+    "kind": "webserver",
+    "version_norm": "1.26",
+    "eol": {
+     "status": "supported",
+     "date": "2027-04-30",
+     "source": "endoflife_date"
+    }
+   }
   ]
  },
  "coverage_default": "ok",
@@ -16,5 +65,6 @@
   "group_key": "10.0.0.1",
   "affected": [],
   "positive": true
- }
+ },
+ "_note": "S6b-2 (spec/09 Teil 2 castenow): Exchange SE ohne belegten Patchstand ist kein Positivbefund; der gepflegte nginx-Zweig mit Lebenszyklus traegt ihn."
 }

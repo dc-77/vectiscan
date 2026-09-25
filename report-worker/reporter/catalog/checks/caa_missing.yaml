@@ -33,6 +33,10 @@ policy:
     catalog_sim stuft den fehlenden CAA-Eintrag ebenfalls als Hygiene niedrig ein, dieser
     Einstufung wird gefolgt.
 texts:
+  short: "kein CAA-Eintrag"
+  plan:
+    lever: "Ausstellung von Zertifikaten im DNS eingrenzen"
+    effect: "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen"
   observation: >-
     Für {affected} ist kein CAA-Eintrag veröffentlicht. Für die Domain {domain} legt damit
     kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen.

@@ -110,9 +110,13 @@ def test_web_vulnerability_active_ist_an_echten_daten_entschieden(results):
     treffer = [r for r in gemeldet if r.status == "fail"]
     assert treffer, "die Meldung muss als Werkzeugmeldung erhalten bleiben"
     assert not any(r.active_proof for r in treffer)
-    nachweis = treffer[0].evidence[0]
-    assert nachweis.tool == "zap_active"
-    assert "Konfidenz=" in nachweis.excerpt
+    # S6b-2 (spec/09 Q14): die Quelle nennt den Lauf; Path Traversal (6) ist eine Regel
+    # des aktiven Scanners, die Anti-CSRF-Meldung (10202) eine passive.
+    nachweise = [e for r in treffer for e in r.evidence]
+    (traversal,) = [e for e in nachweise if "Path Traversal" in e.excerpt]
+    assert traversal.tool == "zap_active"
+    assert "Konfidenz: niedrig" in traversal.excerpt
+    assert all(e.tool == "zap" for e in nachweise if "Anti-CSRF" in e.excerpt)
 
 
 def test_sensitive_path_exposed_ist_pruefbar(results):

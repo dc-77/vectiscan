@@ -23,13 +23,17 @@ ALLOWED_NUMBERS |= {str(p) for p in T.DB_PORTS} | {str(p) for p in T.ADMIN_PORTS
 
 
 def _texts(spec):
+    # S6b-2: jede Aussage einzeln (observation[0], recommendation[1] ...), dazu die Kurzform
+    # fuer den Sammeltitel und die Plantexte; alles steht im Kundenreport.
     t = spec.texts
     yield "title", spec.title
-    yield "observation", t.observation
-    yield "meaning", t.meaning
-    yield "verify", t.verify
-    for i, r in enumerate(t.recommendation):
-        yield f"recommendation[{i}]", r.text
+    for sid, text, _cond, _quantor in t.all_statements():
+        yield sid, text
+    if t.short is not None:
+        yield "short", t.short
+    if t.plan is not None:
+        yield "plan.lever", t.plan.lever
+        yield "plan.effect", t.plan.effect
     if t.positive:
         yield "positive.title", t.positive.title
         yield "positive.text", t.positive.text
@@ -114,16 +118,10 @@ def test_echte_umlaute_statt_umschrift(spec):
 
 
 def _bundle_texts(bundle):
-    t = bundle.texts
+    # S6b-2: ein Buendel traegt nur noch den Sammeltitel und den Positivtitel.
     yield "title", bundle.title
-    yield "observation", t.observation
-    yield "meaning", t.meaning
-    yield "verify", t.verify
-    for i, r in enumerate(t.recommendation):
-        yield f"recommendation[{i}]", r.text
-    if t.positive:
-        yield "positive.title", t.positive.title
-        yield "positive.text", t.positive.text
+    if bundle.positive_title:
+        yield "positive_title", bundle.positive_title
 
 
 def _bundle_params():
@@ -141,7 +139,7 @@ def test_buendeltexte_sauber(bundle):
         assert not CUSTOMER_NAMES.search(text), f"{where}: Kunden- oder Herstellername"
         assert not DU_FORM.search(text), f"{where}: keine Sie-Form"
         assert "?" not in text, f"{where}: Fragezeichen"
-        stripped = re.sub(r"\{(affected|count|group|fqdn_names|domain|host_ip|notes)\}", "", text)
+        stripped = re.sub(r"\{(affected|count|group|fqdn_names|domain|host_ip|notes|rules)\}", "", NUMERUS.sub("", text))
         assert "{" not in stripped and "}" not in stripped, f"{where}: unbekannter Platzhalter"
         for num in NUMBER.findall(text):
             assert num in ALLOWED_NUMBERS, f"{where}: Zahl {num} nicht in der Whitelist"
@@ -158,3 +156,13 @@ def test_coverage_gruende_mit_echten_umlauten():
             bad.append(f"{code}: {sorted(set(hits))}")
     assert not find_ascii_umlauts(T.GENERIC_NOT_TESTABLE), T.GENERIC_NOT_TESTABLE
     assert not bad, bad
+
+
+@pytest.mark.parametrize("spec", _params())
+def test_plan_hebel_ohne_platzhalter(spec):
+    """Ein Hebel adressiert alle Befunde seiner Zeile und nennt keinen Host (Q6)."""
+    if spec.texts.plan is None:
+        return
+    for name, text in (("plan.lever", spec.texts.plan.lever), ("plan.effect", spec.texts.plan.effect)):
+        assert "{" not in text and "}" not in text, f"{spec.id}.{name}: Platzhalter"
+        assert text.strip(), f"{spec.id}.{name} leer"

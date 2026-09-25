@@ -31,6 +31,10 @@ policy:
   start_level: erhoeht
   deviation: null
 texts:
+  short: "Abruf der gesamten Zone möglich"
+  plan:
+    lever: "Zonentransfer auf die eigenen Nameserver beschränken"
+    effect: "Verbirgt den vollständigen Namensbestand der Domain"
   observation: >-
     Für {affected} lässt ein Nameserver der Domain {domain} einen vollständigen Zonentransfer
     zu. Damit kann jede anfragende Gegenstelle die komplette Liste der Hostnamen der Zone auf

@@ -34,6 +34,9 @@ policy:
     traegt. Grundlage ist ausschliesslich der EOL-Status aus dem Lebenszyklus-Feed (S1); eigene
     Versionsschwellen werden nicht angesetzt.
 texts:
+  plan:
+    lever: "Komponenten ohne Herstellerpflege aktualisieren"
+    effect: "Schließt Lücken, für die der Hersteller keine Updates mehr liefert"
   observation: >-
     Auf {group} ist eine Anwendungskomponente im Einsatz, deren Herstellerpflege laut
     Lebenszyklusdaten beendet ist: {affected}.

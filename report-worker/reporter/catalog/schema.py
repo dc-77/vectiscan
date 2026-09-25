@@ -53,9 +53,38 @@ class NotTestableRule(Base):
     context: Literal["group", "item"] = "group"
 
 
+Quantor = Literal["alle", "eines"]
+
+# Textfelder, die aus Aussagen bestehen (S6b-2). Die Empfehlungen sind eigene Aussagen
+# mit Stufe und stehen unter ``recommendation``.
+STATEMENT_FIELDS: tuple[str, ...] = ("observation", "meaning", "verify")
+
+
+class Statement(Base):
+    """Eine Textaussage mit der Fakten-Bedingung, unter der sie stehen darf (S6b-2, spec/09 Q4).
+
+    Ohne ``when`` ist die Bedingung die Regel selbst: die Aussage steht, wenn das Mitglied
+    fehlgeschlagen ist. Mit ``when`` wird der Ausdruck im selben Kontext wie ``when`` der
+    Pruefung je fehlgeschlagenem Mitglied ausgewertet. ``quantor: alle`` verlangt die
+    Bedingung fuer jedes fehlgeschlagene Mitglied, ``eines`` fuer mindestens eines; dann
+    nennt ``{affected}`` nur die Mitglieder, fuer die sie gilt.
+    """
+    text: str
+    when: Optional[str] = None
+    quantor: Quantor = "alle"
+
+
+def _as_statements(value: Any) -> Any:
+    if isinstance(value, str):
+        return [{"text": value}]
+    return value
+
+
 class Recommendation(Base):
     stage: Stage
     text: str
+    when: Optional[str] = None
+    quantor: Quantor = "alle"
 
 
 class PositiveText(Base):
@@ -63,12 +92,54 @@ class PositiveText(Base):
     text: str
 
 
+class PlanText(Base):
+    """Hebeltitel und Effekt der Massnahme im Massnahmenplan (S6b-2, spec/09 Q6).
+
+    ``lever`` ist ein Titel ohne Hostnamen, weil ein Hebel alle Befunde seiner Zeile
+    adressiert; ``effect`` sagt, was die Massnahme bewirkt, und gilt nur fuer diese Regel.
+    """
+    lever: str
+    effect: str
+
+
 class Texts(Base):
-    observation: str
-    meaning: str
+    # Kurzform der Regel im Sammeltitel eines Buendels ("kein TLS 1.3").
+    short: Optional[str] = None
+    observation: list[Statement] = Field(min_length=1)
+    meaning: list[Statement] = Field(min_length=1)
     recommendation: list[Recommendation] = Field(min_length=1)
-    verify: str
+    verify: list[Statement] = Field(min_length=1)
+    plan: Optional[PlanText] = None
     positive: Optional[PositiveText] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _strings_are_statements(cls, data: Any) -> Any:
+        """Ein Textfeld als Zeichenkette ist eine Aussage ohne eigene Bedingung."""
+        if isinstance(data, dict):
+            data = dict(data)
+            for name in STATEMENT_FIELDS:
+                if name in data:
+                    data[name] = _as_statements(data[name])
+        return data
+
+    def statements(self, name: str) -> list[tuple[str, str, Optional[str], str]]:
+        """(Aussage-ID, Text, Bedingung, Quantor) eines Felds in Katalogreihenfolge."""
+        if name == "recommendation":
+            return [(f"recommendation[{i}]", r.text, r.when, r.quantor)
+                    for i, r in enumerate(self.recommendation)]
+        return [(f"{name}[{i}]", s.text, s.when, s.quantor)
+                for i, s in enumerate(getattr(self, name))]
+
+    def all_statements(self) -> list[tuple[str, str, Optional[str], str]]:
+        out: list[tuple[str, str, Optional[str], str]] = []
+        for name in (*STATEMENT_FIELDS, "recommendation"):
+            out.extend(self.statements(name))
+        return out
+
+    def joined(self, name: str) -> str:
+        """Alle Aussagen eines Felds als ein Text (nur fuer Stellen ohne Faktenbezug)."""
+        return " ".join(text for _, text, _, _ in self.statements(name))
 
 
 class Frameworks(Base):
@@ -105,6 +176,10 @@ class CheckSpec(Base):
     # Pruefungen, die einen eigenen Nachweis fuehren (ZAP-Meldung mit hoher
     # Konfidenz, testssl-Schwachstelle aus der harten Liste).
     active_proof_when: Optional[str] = None
+    # S6b-2 (E2): Ausnahme in der Abbildungstabelle. Trifft der Ausdruck fuer ein
+    # fehlgeschlagenes Mitglied, wird der Sachverhalt rot mit Unverzueglich, obwohl die
+    # Einstufung Hygiene ist. Zulaessig nur fuer Pruefungen in levels.URGENT_EXCEPTIONS.
+    urgent_when: Optional[str] = None
     positive_when: str = "absent"
     not_testable_when: list[NotTestableRule] = Field(default_factory=list)
     undetermined: Undetermined = "not_testable"
@@ -171,6 +246,14 @@ class BundleSpec(Base):
     Positivbefund dieses Buendels fuer denselben Host entfaellt. Die Pruefung selbst
     bleibt bestanden; nur die Aussage im Kundenreport wuerde neben dem anderen Befund
     mehr behaupten, als sie prueft.
+
+    S6b-2 (spec/09 Q4): Ein Buendel gruppiert nur. Befundtext, Auswirkung, Empfehlung und
+    Verifikation entstehen je getroffener Regel aus deren eigenen Texten; das Buendel traegt
+    nur den Sammeltitel ``title`` mit ``{group}`` und ``{rules}`` (Kurzformen der
+    getroffenen Regeln) und ``positive_title`` fuer den Fall, dass jedes Mitglied mit
+    Positivtext bestanden hat. Frueher standen hier eigene Texte, und sie behaupteten, was
+    eine andere Regel des Buendels meinte ("Kette unvollstaendig" bei einem Zertifikat, das
+    nur bald ablief).
     """
 
     id: str = Field(pattern=r"^[a-z][a-z0-9_]{2,63}$")
@@ -181,13 +264,15 @@ class BundleSpec(Base):
     target: Literal["findings", "appendix"] = "findings"
     references: list[str] = Field(default_factory=list)
     frameworks: Frameworks = Field(default_factory=Frameworks)
-    texts: Texts
+    positive_title: Optional[str] = None
     positive_conflicts: list["PositiveConflict"] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _members_unique(self) -> "BundleSpec":
         if len(set(self.members)) != len(self.members):
             raise ValueError(f"{self.id}: doppelte Mitglieder")
+        if self.target == "findings" and "{rules}" not in self.title:
+            raise ValueError(f"{self.id}: Sammeltitel braucht {{rules}}")
         return self
 
     def conflicts_label(self) -> str:
@@ -280,6 +365,11 @@ class Member(Base):
     verified: Optional[bool] = None
     via_cdn: bool = False
     alias_of: Optional[str] = None
+    # S6b-2: Aussagen der Pruefung, deren Bedingung fuer dieses fehlgeschlagene Mitglied
+    # gilt (``observation[0]``, ``recommendation[1]`` ...). Aussagen ohne eigene Bedingung
+    # stehen immer darin. Das Gate prueft jede Aussage des Berichts gegen diese Liste.
+    holds: list[str] = Field(default_factory=list)
+    urgent: bool = False
 
 
 class RenderedTexts(Base):
@@ -325,6 +415,7 @@ class CheckResult(Base):
     status: Status
     positive: bool = False
     active_proof: bool = False
+    urgent: bool = False
     verified: Optional[bool] = None
     source_mode: SourceMode = "none"
     affected: list[str] = Field(default_factory=list)

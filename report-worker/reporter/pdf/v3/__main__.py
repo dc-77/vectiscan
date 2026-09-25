@@ -154,7 +154,12 @@ def _kennzahlen(order_id: str | None, *, tar: bool) -> int:
         quelle = tar_path(order_id)
         zeilen = results_path(order_id)
 
-    facts, output, data = P.report_bundle_from_source(quelle, tool_runs=zeilen)
+    # S6b-2 (offener Punkt nach S6a): im Produktionspfad derselbe Kundenkontext wie im
+    # Worker; ohne ihn meldete die Diagnose "auftraggeber_fehlt", obwohl der Bericht
+    # den Firmennamen traegt.
+    kontext = _kundenkontext(order_id) if tar else None
+    facts, output, data = P.report_bundle_from_source(quelle, tool_runs=zeilen,
+                                                      customer_context=kontext)
     # Dieselbe Strenge wie der Worker. Ohne das meldet die Diagnose einen
     # fehlenden Auftraggeber als Warnung und "fehler": 0, waehrend derselbe
     # Bericht in der Produktion unter strict auf report_blocked laeuft. Ein

@@ -1,0 +1,15 @@
+{
+ "_note": "S6b-2 (spec/09 Q4 LW, JW): nmap leitet bei PostgreSQL die Untergrenze 9.6.0 or later aus dem Protokoll ab; der Dienst nennt keine Version.",
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 5432, "service": "postgresql", "product": "PostgreSQL DB", "version_raw": "9.6.0 or later"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.1",
+  "affected": [],
+  "positive": false
+ }
+}

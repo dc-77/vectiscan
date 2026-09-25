@@ -86,7 +86,7 @@ def test_erzaehltexte_sind_sauber():
         N.reputation_line(True, ["AbuseIPDB"]), N.disclaimer("01.01.2026", "Vectigal GmbH"),
         *N.CAN, *N.CANNOT, *N.OUT_OF_SCOPE_BASE, *N.repeat(zahlen, True, True),
         *[t for _, _, t in N.method_phases(zahlen)],
-        *N.PLAN_EFFECT.values(), N.PLAN_EFFECT_TOP,
+        N.PLAN_EFFECT_TOP,
     ]
     for text in texte:
         assert text.strip()

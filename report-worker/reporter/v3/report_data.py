@@ -2,7 +2,7 @@
 """Reportdaten v3: aus Fakten und Prüfergebnis wird das Datenmodell des Prototyps.
 
 Reihenfolge: konsolidieren, Befunde und Positivbefunde bauen, IDs vergeben, daraus
-Kapitel, Plan, Hebel und Anhang. Die vier Prosa-Felder werden zuletzt eingesetzt, und
+Kapitel, Plan, Hebel und Anhang. Die Prosa-Felder werden zuletzt eingesetzt, und
 nur, wenn sie das Gate passiert haben; sonst bleibt der deterministische Text stehen.
 """
 from __future__ import annotations
@@ -81,9 +81,11 @@ def build_report_data(
     *,
     order: dict[str, Any] | None = None,
     customer_context: dict[str, Any] | None = None,
-    report_version: str = "1.0",
+    report_version: str = "1",
     report_date: Optional[str] = None,
     prose: dict[str, Any] | None = None,
+    generation: Optional[int] = None,
+    excluded_keys: set[str] | None = None,
 ) -> ReportData:
     """Datenmodell des Reports.
 
@@ -91,6 +93,10 @@ def build_report_data(
     ``customer_context`` den optionalen Kundenkontext aus ``orders.customer_context``
     (S5): Kuerzel, Branche, Mitarbeiterzahl und Zweck je System, je Feld mit Quelle.
     Fehlt er, bleibt der Kontextabsatz generisch, und der Bericht sagt das nicht.
+
+    S6b-2: ``report_version`` ist die Auslieferungsversion (Deckblatt), ``generation`` die
+    Erzeugungsnummer aus ``reports.version`` (nur in der Fusszeile). ``excluded_keys``
+    sind die stabilen Schluessel der vom Admin ausgeschlossenen Befunde (#28).
     """
     if isinstance(facts, dict):
         facts = FS.Facts.from_dict(facts)
@@ -110,9 +116,13 @@ def build_report_data(
     year = int(scan_date.rsplit(".", 1)[-1]) if scan_date != C.UNKNOWN else 0
 
     items, positive_items = consolidate(output, facts)
-    finding_items = [i for i in items if i.target == "findings"]
+    excluded_keys = set(excluded_keys or ())
+    excluded_ids: list[str] = []
+    finding_items = [i for i in items if i.target == "findings" and i.stable_key not in excluded_keys]
     finding_list, cve_refs, tool_findings = F.build_findings(
-        output, items, facts, kuerzel=kuerzel, year=year)
+        output, items, facts, kuerzel=kuerzel, year=year, excluded_keys=excluded_keys,
+        excluded_ids=excluded_ids)
+    tool_findings = tool_findings + C.tech_tool_findings(facts)
     positives = F.build_positives(positive_items)
 
     orders = order.get("orders") or [{"label": "Lauf 1", "id": facts.scan.order_id}]
@@ -166,9 +176,12 @@ def build_report_data(
         scan_window=C.format_window(facts.scan.started_at, facts.scan.finished_at),
         report_date=report_date or C.today(),
         report_version=report_version,
+        generation=generation,
+        excluded_ids=excluded_ids,
         report_id=IDS.report_id(facts.scan.order_id or orders[0].get("id"), year, month_day),
         orders=[OrderRef(label=str(o.get("label", "Lauf")), id=str(o.get("id", ""))) for o in orders],
         hosts_total=counts.hosts_total,
+        systems_total=counts.systems_total,
         hosts_ipv4=counts.hosts_ipv4,
         hosts_ipv6=counts.hosts_ipv6,
         fqdns_total=counts.fqdns_total,

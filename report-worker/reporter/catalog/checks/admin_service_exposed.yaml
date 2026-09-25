@@ -3,19 +3,19 @@ title: Verwaltungsoberfläche aus dem Internet erreichbar
 family: admin_service_exposed
 category: A
 scale: exposure
-level: erhoeht
+level: kritisch
 group_by: host
 scope: service
 applicable_when: null
-when: (service.port in ADMIN_PORTS or matches(service.product, ADMIN_PRODUCTS)) and not is_cdn(host, services)
+when: admin_fp(service) and service.fp_login is True and (host is None or host.shared is None) and not is_cdn(host, services)
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
 requires:
   tools: [nmap]
 kind: check
-bundle: null
-affected_template: "{host_ip}:{port} ({product_or_service})"
+bundle: admin_access
+affected_template: "{host_ip}:{port} ({admin_label})"
 evidence: [service]
 references: [CWE-284, CISA-KEV]
 frameworks:
@@ -26,12 +26,21 @@ frameworks:
 policy:
   source: catalog_sim R-ADMIN-EXPOSED
   start_level: erhoeht
-  deviation: null
+  deviation: >-
+    Entscheidung DC E1 (spec/09): eine Verwaltungsoberflaeche mit belegter Anmeldung ohne
+    vorgelagerten Schutz auf einem System des Kunden ist Exposition kritisch. Ohne
+    Fingerabdruck oder ohne belegte Anmeldung gilt admin_service_unconfirmed, auf einem
+    geteilten System des Hosters admin_panel_hoster.
 texts:
+  short: "Verwaltungsoberfläche mit Anmeldung"
+  plan:
+    lever: "Verwaltungsoberflächen vom Internet trennen"
+    effect: "Entzieht Angreifern den direkten Zugang zur Verwaltung der Systeme"
   observation: >-
-    {n:Der Host|Die Hosts} {group} {n:bietet|bieten} eine Verwaltungs- oder Firewall-Oberfläche an, die aus dem gesamten
-    Internet erreichbar ist: {affected}. Eine Zugriffsbeschränkung auf bestimmte Quellnetze ist
-    von außen nicht erkennbar.
+    {n:Der Host|Die Hosts} {group} {n:bietet|bieten} eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten
+    Internet erreichbar ist: {affected}. Die Antwort des Dienstes nennt die Verwaltungssoftware
+    und verlangt eine Anmeldung; eine Zugriffsbeschränkung auf bestimmte Quellnetze war von
+    außen nicht erkennbar.
   meaning: >-
     Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten
     Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten oder

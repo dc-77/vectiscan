@@ -31,8 +31,12 @@ policy:
   start_level: MEDIUM
   deviation: null
 texts:
+  short: "schwache Verfahren"
+  plan:
+    lever: "Schwache Verschlüsselungsverfahren abschalten"
+    effect: "Schützt Verbindungen gegen das Brechen schwacher Verfahren"
   observation: >-
-    Der Dienst {group} bietet neben starken auch schwache Verschlüsselungsverfahren an, die als
+    {n:Der Dienst|Die Dienste} {group} {n:bietet|bieten} neben starken auch schwache Verschlüsselungsverfahren an, die als
     unsicher gelten: {affected}.
   meaning: >-
     Schwache Cipher-Suiten schützen die Verbindung nicht zuverlässig vor bekannten Angriffen auf
@@ -49,4 +53,4 @@ texts:
   positive:
     title: Keine schwachen TLS-Cipher
     text: >-
-      Der Dienst {group} bietet ausschließlich als sicher eingestufte Cipher-Suiten an.
+      {n:Der Dienst|Die Dienste} {group} {n:bietet|bieten} ausschließlich als sicher eingestufte Cipher-Suiten an.

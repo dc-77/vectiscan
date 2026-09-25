@@ -17,6 +17,7 @@ bleibt ``extra=forbid``: ein Tippfehler im Fixture ist ein Testfehler.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -222,6 +223,8 @@ def assert_expect(result: CheckResult, expect: dict[str, Any], where: str = "") 
         assert result.positive is expect["positive"], f"{where}: positive {result.positive} != {expect['positive']}"
     if "active_proof" in expect:
         assert result.active_proof is expect["active_proof"], f"{where}: active_proof {result.active_proof} != {expect['active_proof']}"
+    if "urgent" in expect:
+        assert result.urgent is expect["urgent"], f"{where}: urgent {result.urgent} != {expect['urgent']}"
     if "reason_code" in expect:
         assert result.reason_code == expect["reason_code"], f"{where}: reason_code {result.reason_code} != {expect['reason_code']}"
     if "notes" in expect:
@@ -250,10 +253,10 @@ def run_fixture(check_id: str, kind: str, cat: Catalog | None = None) -> CheckRe
         assert len(results) == expect["results_count"], f"{check_id}_{kind}: {len(results)} Ergebnisse"
     result = pick_result(results, expect)
     assert_expect(result, expect, f"{check_id}_{kind}")
-    if kind == "fail" and result.kind == "note":
+    if kind.startswith("fail") and result.kind == "note":
         # kind note: ein Treffer ist ein Hinweis, nie ein fail
         assert result.status == "pass" and result.notes, f"{check_id}_fail: note ohne Hinweis"
-    elif kind == "fail":
+    elif kind.startswith("fail"):
         assert result.status == "fail"
         assert result.affected, f"{check_id}_fail: Betroffenenliste leer"
         for label in result.affected:
@@ -262,9 +265,25 @@ def run_fixture(check_id: str, kind: str, cat: Catalog | None = None) -> CheckRe
     return result
 
 
+# S6b-2: neben ``_pass``, ``_fail``, ``_nt`` und ``_na`` darf ein Fixture eine Variante
+# tragen (``_fail_dringend``, ``_nt_partial``). Vorher wurden solche Dateien stumm nie
+# geladen (tls_no_13_partial.json und zwei weitere).
+FIXTURE_KIND = re.compile(r"^(pass|fail|nt|na)(_[a-z0-9]+)*$")
+
+
 def fixture_kinds(check_id: str) -> list[str]:
     return sorted(p.stem[len(check_id) + 1:] for p in FIXTURES.glob(f"{check_id}_*.json")
-                  if p.stem[len(check_id) + 1:] in ("pass", "fail", "nt", "na"))
+                  if FIXTURE_KIND.match(p.stem[len(check_id) + 1:]))
+
+
+def split_fixture(stem: str, check_ids: set[str]) -> tuple[str, str] | None:
+    """(Pruefung, Art) eines Fixture-Namens; die laengste passende Pruefung gewinnt."""
+    best: tuple[str, str] | None = None
+    for cid in check_ids:
+        if stem.startswith(cid + "_") and FIXTURE_KIND.match(stem[len(cid) + 1:]):
+            if best is None or len(cid) > len(best[0]):
+                best = (cid, stem[len(cid) + 1:])
+    return best
 
 
 def evaluate_all(facts: FS.Facts | dict[str, Any], cat: Catalog | None = None):

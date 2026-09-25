@@ -83,18 +83,10 @@ entries:
   - kind: zap_alert
     name: "^strict-transport-security disabled$"
     reason: Abgedeckt durch hsts_missing.
-  - kind: zap_alert
-    plugin_id: "10010"
-    name: "^cookie no httponly flag$"
-    reason: Abgedeckt durch cookie_flags (Quelle header_check Cookies).
-  - kind: zap_alert
-    plugin_id: "10011"
-    name: "^cookie without secure flag$"
-    reason: Abgedeckt durch cookie_flags (Quelle header_check Cookies).
-  - kind: zap_alert
-    plugin_id: "10054"
-    name: "^cookie (without|with) samesite attribute"
-    reason: Abgedeckt durch cookie_flags (Quelle header_check Cookies).
+  # S6b-2 (spec/09 Teil 2 HL): die ZAP-Cookie-Meldungen 10010, 10011 und 10054 stehen nicht
+  # mehr hier. cookie_flags sieht nur die Cookies der Startseite (header_check); die
+  # Sitzungscookies an login.seam meldete nur ZAP, und der Bericht verschwieg sie. Sie
+  # laufen jetzt als ZAP_COOKIE ueber web_vulnerability_reported in den Anhang.
   # --- Passivports an CDN-Edge-Adressen (Cloudflare meldet diese Ports an jeder Edge-IP)
   - kind: passive_port
     ports: [2052, 2053, 2082, 2083, 2086, 2087, 2095, 2096, 8080, 8443, 8880]

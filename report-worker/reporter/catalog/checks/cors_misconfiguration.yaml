@@ -7,7 +7,9 @@ level: mittel
 group_by: fqdn
 scope: http.alerts
 applicable_when: null
-when: zap_match(alert, ZAP_CORS)
+# S6b-2 (spec/09 Q14): nur Meldungen mit Konfidenz High tragen eine Regel; darunter
+# stehen sie als Werkzeugmeldung im Anhang (web_vulnerability_reported).
+when: '(zap_match(alert, ZAP_CORS)) and alert.confidence == "High"'
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
@@ -28,6 +30,10 @@ policy:
   start_level: MEDIUM
   deviation: null
 texts:
+  short: "zu weite CORS-Freigabe"
+  plan:
+    lever: "CORS-Freigaben auf bekannte Ursprünge beschränken"
+    effect: "Verhindert, dass fremde Seiten Antworten des Dienstes auslesen"
   observation: >-
     Die passive Webanalyse hat auf {group} eine zu weit gefasste Freigabe für
     ursprungsübergreifende Zugriffe (CORS) gefunden: {affected}.

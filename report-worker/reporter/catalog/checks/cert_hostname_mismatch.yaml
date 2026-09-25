@@ -34,8 +34,12 @@ policy:
     Sicherheitswarnung aus und betrifft die Authentizitaet der Verbindung; die Katalogsimulation
     (R-CERT-MISMATCH) fuehrt den Befund deshalb als Hygiene hoch.
 texts:
+  short: "Zertifikat passt nicht zum Namen"
+  plan:
+    lever: "Zertifikate auf alle aufgerufenen Namen ausstellen"
+    effect: "Beendet die Namenswarnung beim Aufruf des Dienstes"
   observation: >-
-    Für den Dienst {group} passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen
+    Für {n:den Dienst|die Dienste} {group} passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen
     Hostnamen: {affected}.
   meaning: >-
     Ein TLS-Client kann die Identität des Dienstes nicht anhand des Zertifikats bestätigen und
@@ -58,4 +62,4 @@ texts:
   positive:
     title: Zertifikat passt zum Hostnamen
     text: >-
-      Für den Dienst {group} passt das eingesetzte TLS-Zertifikat zum aufgerufenen Hostnamen.
+      Für {n:den Dienst|die Dienste} {group} passt das eingesetzte TLS-Zertifikat zum aufgerufenen Hostnamen.

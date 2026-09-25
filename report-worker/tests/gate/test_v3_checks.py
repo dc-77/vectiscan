@@ -161,11 +161,18 @@ def test_run_all_liefert_alle_pruefungen_in_fester_reihenfolge() -> None:
 
     defekte = VC.run_all(data, facts_for(order), output_for(HEUEL))
 
-    assert [d.check for d in defekte] == [
+    # Die fremde Katalogausgabe (Heuel) traegt keine Aussage der Junkerwerk-Befunde, und
+    # der angehaengte Befund hat keine Herkunft: aussage_ohne_fakt meldet beides (S6b-2).
+    erste = {}
+    for d in defekte:
+        erste.setdefault(d.check, d)
+    assert list(erste) == [
         "abdeckungskapitel_leer", "tech_widerspricht_befund",
-        "unprocessed_ueber_schwelle", "auftraggeber_fehlt",
+        "unprocessed_ueber_schwelle", "auftraggeber_fehlt", "aussage_ohne_fakt",
     ]
-    assert [d.is_error for d in defekte] == [True, True, False, False]
+    assert [d.is_error for d in erste.values()] == [True, True, False, False, True]
+    assert any(d.finding_id == "VS-2026-099" and "ohne Herkunft" in d.message
+               for d in defekte if d.check == "aussage_ohne_fakt")
 
 def test_run_all_unter_strict_haelt_den_bericht_auf() -> None:
     """Ohne Firmennamen wird der Bericht in der Produktion angehalten."""
@@ -201,3 +208,90 @@ def test_kennzahlen_misst_mit_derselben_strenge(monkeypatch) -> None:
     monkeypatch.setenv("VECTISCAN_VALIDATION_LEVEL", "warn")
     CLI._kennzahlen(JUNKERWERK["multi"], tar=False)
     assert gesehen["strict"] is False
+
+
+# ---------------------------------------------------------------- S6b-2: Aussage ohne Fakt
+
+@pytest.mark.parametrize("order", order_ids())
+def test_aussage_ohne_fakt_ohne_treffer(order: str) -> None:
+    assert VC.aussage_ohne_fakt(data_for(order), output_for(order)) == []
+
+
+def _mit_bedingung(data):
+    """Erster Befund mit einer bedingten Bedeutungsaussage (DMARC, Datenbank ...)."""
+    for f in data.findings:
+        for p in f.provenance:
+            if p.field == "meaning":
+                return f, p
+    raise AssertionError("kein Befund mit Bedeutungsaussage")
+
+
+def test_aussage_ohne_fakt_greift_bei_fremdem_satz() -> None:
+    order = JUNKERWERK["multi"]
+    data = _kopie(order)
+    f = data.findings[0]
+    f.impact = f"{f.impact} Rückmeldungen erreichen Sie nicht."
+    defekte = VC.aussage_ohne_fakt(data, output_for(order))
+    assert [(d.finding_id, d.detail.get("feld")) for d in defekte] == [(f.id, "impact")]
+    assert defekte[0].is_error
+
+
+def test_aussage_ohne_fakt_greift_bei_nicht_erfuellter_bedingung() -> None:
+    """Eine Aussage, deren Bedingung fuer das Mitglied nicht gilt (holds), ist ein Fehler."""
+    order = JUNKERWERK["multi"]
+    data = _kopie(order)
+    f, p = _mit_bedingung(data)
+    p.statement = "meaning[99]"
+    defekte = VC.aussage_ohne_fakt(data, output_for(order))
+    assert defekte and all(d.finding_id == f.id for d in defekte)
+    assert all("gilt nicht" in d.message for d in defekte)
+
+
+def test_aussage_ohne_fakt_greift_bei_nicht_fehlgeschlagener_regel() -> None:
+    order = JUNKERWERK["multi"]
+    data = _kopie(order)
+    f, p = _mit_bedingung(data)
+    p.members = ["203.0.113.250:1"]
+    defekte = VC.aussage_ohne_fakt(data, output_for(order))
+    assert [d.finding_id for d in defekte] == [f.id]
+    assert "nicht fehlgeschlagen" in defekte[0].message
+
+
+def test_aussage_ohne_fakt_greift_bei_positivbefund_ohne_bestehen() -> None:
+    order = JUNKERWERK["multi"]
+    data = _kopie(order)
+    pos = data.positives[0]
+    for p in pos.provenance:
+        if p.statement == "positive.text":
+            p.members = ["gibt-es-nicht.example.test"]
+    defekte = VC.aussage_ohne_fakt(data, output_for(order))
+    assert defekte and all(d.finding_id is None for d in defekte)
+    assert any("nicht bestanden" in d.message for d in defekte)
+
+
+# ---------------------------------------------------------------- S6b-2: Zaehlung in Systemen
+
+JW_RUNDE = "31d67a02-b485-4d05-b228-dbdde092cc68"
+
+
+@pytest.mark.parametrize("order", order_ids())
+def test_zaehlung_ohne_widerspruch(order: str) -> None:
+    assert VC.zaehlung_widerspruch(data_for(order)) == []
+
+
+def test_zaehlung_31d67a02_drei_systeme_vier_adressen_sieben_namen() -> None:
+    data = data_for(JW_RUNDE)
+    assert (data.meta.systems_total, data.meta.hosts_total, data.meta.fqdns_total) == (3, 4, 7)
+    assert "3 Systeme" in data.architecture.lead
+
+
+@pytest.mark.parametrize("satz", [
+    "Geprüft wurden 5 Systeme mit 4 IP-Adressen.",
+    "Die Prüfung umfasst 4 Hosts und 7 Hostnamen.",
+    "Auf drei Systemen mit acht Hostnamen wurden Befunde erhoben.",
+])
+def test_zaehlung_greift(satz: str) -> None:
+    data = _kopie(JW_RUNDE)
+    data.glance.overall_text = satz
+    defekte = VC.zaehlung_widerspruch(data)
+    assert defekte and all(d.check == "zaehlung_widerspruch" and d.is_error for d in defekte)

@@ -1,0 +1,59 @@
+id: admin_panel_hoster
+title: Verwaltungsoberfläche des Hosters aus dem Internet erreichbar
+family: admin_service_exposed
+category: A
+scale: exposure
+level: erhoeht
+group_by: host
+scope: service
+applicable_when: null
+# S6b-2 (spec/09 Q13, E1): Verwaltungssoftware mit Fingerabdruck auf einem geteilten System
+# des Hosters. Der Kunde kann sie nicht selbst abschalten; die Empfehlung richtet sich an den
+# Hoster (Zustaendigkeit ueber SHARED_OPERATOR_CHECKS).
+when: admin_fp(service) and host is not None and host.shared is not None and host.shared.kind == "hoster" and not is_cdn(host, services)
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [nmap]
+kind: check
+bundle: admin_access
+affected_template: "{host_ip}:{port} ({admin_label})"
+evidence: [service]
+references: [CWE-284]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: Entscheidung DC E1 (spec/09 Teil 7)
+  start_level: erhoeht
+  deviation: >-
+    Hosting-Verwaltungen des Hosters auf geteilten Systemen sind Exposition erhoeht mit
+    Empfehlung an den Hoster; eine Verwaltungsoberflaeche des Kunden mit Anmeldung ist kritisch
+    (admin_service_exposed).
+texts:
+  short: "Verwaltungsoberfläche des Hosters"
+  plan:
+    lever: "Zugang zur Verwaltung des geteilten Servers beim Hoster beschränken lassen"
+    effect: "Verkleinert die Angriffsfläche des geteilten Servers, auf dem die eigenen Dienste liegen"
+  observation: >-
+    Auf dem geteilten Server {group} ist eine Verwaltungsoberfläche aus dem gesamten Internet
+    erreichbar: {affected}. Der Server gehört dem Hoster und trägt auch Namen anderer Kunden;
+    die Verwaltung betreibt der Hoster.
+  meaning: >-
+    Eine Übernahme der Verwaltungsoberfläche beträfe alle Dienste auf diesem Server, auch die
+    eigenen Webseiten und Postfächer. Abschalten oder beschränken kann sie nur der Hoster.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Den Hoster bitten, die Verwaltungsoberfläche auf die benötigten Quellnetze zu beschränken
+        oder hinter eine zusätzliche Anmeldestufe zu legen.
+    - stage: mittelfristig
+      text: >-
+        Beim Hoster erfragen, wie die Verwaltungssoftware gepflegt wird, und die Zugangsdaten
+        des eigenen Kundenkontos mit einer zweiten Anmeldestufe schützen.
+  verify: >-
+    Den genannten Port von einer externen Adresse aufrufen; erwartet wird eine Ablehnung
+    durch die Zugriffsbeschränkung des Hosters.

@@ -1,0 +1,21 @@
+{
+ "facts": {
+  "services": [
+   {
+    "host_ip": "10.0.0.8",
+    "port": 443,
+    "service": "https",
+    "product": "nginx",
+    "tls_required": true,
+    "tunnel_ssl": true
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.8",
+  "affected": [],
+  "positive": false
+ }
+}

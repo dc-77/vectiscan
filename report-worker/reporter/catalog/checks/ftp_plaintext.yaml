@@ -8,9 +8,15 @@ group_by: host
 scope: service
 applicable_when: has_port(services, 21)
 item_when: service.port == 21
-when: service.tls_required is not True and service.tunnel_ssl is False
+# S6b-2 (spec/08 Punkt 4): ein Befund braucht den Beleg, dass eine Anmeldung ohne TLS
+# moeglich ist. Ohne Beleg ist die Pruefung nicht moeglich; der Port steht dann bei
+# legacy_protocols_present mit dem Hinweis, dass die Erzwingung offen ist.
+when: service.tls_required is False and service.tunnel_ssl is False
 positive_when: service.tls_required is True or service.tunnel_ssl is True
-not_testable_when: []
+not_testable_when:
+  - when: service.tls_required is None and service.tunnel_ssl is False
+    reason_code: ftp_tls_unknown
+    context: item
 undetermined: not_testable
 requires:
   tools: [nmap]
@@ -33,6 +39,10 @@ policy:
     unabhaengig von einer zusaetzlich moeglichen impliziten TLS-Verbindung als Klartext-Befund,
     weil die Anmeldung ohne diesen Zwang unverschluesselt erfolgen kann.
 texts:
+  short: "FTP ohne TLS-Zwang"
+  plan:
+    lever: "TLS für FTP erzwingen"
+    effect: "Schützt Zugangsdaten und Dateien auf dem Übertragungsweg"
   observation: >-
     Auf {group} nimmt der FTP-Dienst Anmeldungen entgegen, ohne eine Transportverschlüsselung
     zu erzwingen: {affected}.

@@ -23,6 +23,12 @@ CVE_ANY = re.compile(r"(CVE-\d{4}-\d+)")
 # None, True, False als eigenstaendiges Wort oder eine Liste in eckigen
 # Klammern: alles Spuren einer f-String-Formatierung ueber Python-Werte.
 PYTHON_REPR = re.compile(r"(?<![\w-])(None|True|False)(?![\w-])|\['|\[\"")
+# S6b-2 (spec/09 Q7): Rohbezeichner der Werkzeuge und der Faktenschicht gehoeren nicht in
+# den Nachweis; ebenso wenig ein im Wert gekuerzter Nachweis oder dieselbe Zeile zweimal.
+ROHBEZEICHNER = re.compile(
+    r"gueltig_bis|vollstaendig|\bPruefung\b|Pflegestatus=|Kernstand=|scan_results:|pre_128cipher|"
+    r"status=outdated|=unknown\b|Uebernahmerisiko")
+GEKUERZT = re.compile(r"\.\.\.(?=\s|$)")
 
 
 class Befund(NamedTuple):
@@ -46,7 +52,11 @@ def check_report_data_detailed(data: ReportData | dict) -> list[Befund]:
 
     ids = [f.id for f in d.findings]
     nums = [int(i.rsplit("-", 1)[-1]) for i in ids] if ids else []
-    if nums != list(range(1, len(nums) + 1)):
+    # S6b-2 (#28): ausgeschlossene Befunde behalten ihre Nummer; genau dort ist eine
+    # Luecke zulaessig, sonst nirgends.
+    frei = {int(i.rsplit("-", 1)[-1]) for i in d.meta.excluded_ids}
+    erwartet = [n for n in range(1, len(nums) + len(frei) + 1) if n not in frei]
+    if nums != erwartet:
         add("ids_lueckenhaft", f"Befund-IDs nicht lueckenlos: {ids}")
     if len(set(ids)) != len(ids):
         add("ids_doppelt", "doppelte Befund-IDs")
@@ -110,6 +120,18 @@ def check_report_data_detailed(data: ReportData | dict) -> list[Befund]:
         if treffer:
             add("nachweis_python_darstellung",
                 f"Python-Darstellung im Nachweis von {f.id}: {treffer.group(0)}", f.id)
+
+    for f in d.findings:
+        ev = f.evidence or ""
+        treffer = ROHBEZEICHNER.search(ev)
+        if treffer:
+            add("nachweis_rohbezeichner",
+                f"Rohbezeichner im Nachweis von {f.id}: {treffer.group(0)}", f.id)
+        if GEKUERZT.search(ev):
+            add("nachweis_gekuerzt", f"Gekuerzter Wert im Nachweis von {f.id}", f.id)
+        zeilen = [z for z in ev.split("\n\n") if z.strip()]
+        if len(zeilen) != len(set(zeilen)):
+            add("nachweis_doppelt", f"Doppelte Nachweiszeile in {f.id}", f.id)
 
     for tool in d.appendix.tools:
         if VERSION_IN_TOOL.search(tool.t):

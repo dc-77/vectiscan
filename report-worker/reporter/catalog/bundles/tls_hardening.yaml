@@ -1,9 +1,8 @@
 id: tls_hardening
-title: Transportverschlüsselung auf {group} mit veralteten Verfahren
+title: "Transportverschlüsselung auf {group}: {rules}"
 category: D
 merge_by: host
-members: [tls_legacy_protocols, tls_no_13, tls_no_fallback_scsv, tls_weak_ciphers, tls_weakness,
-          hsts_short]
+members: [tls_legacy_protocols, tls_no_13, tls_no_fallback_scsv, tls_weak_ciphers, tls_weakness, hsts_short]
 target: findings
 references: [CWE-326, CWE-327]
 frameworks:
@@ -11,31 +10,4 @@ frameworks:
   nis2: []
   iso27001: []
   tr03116: []
-texts:
-  observation: >-
-    Die Transportverschlüsselung auf {group} lässt veraltete Protokolle oder Verfahren zu oder
-    verzichtet auf verfügbare Absicherungen: {affected}.
-  meaning: >-
-    Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg
-    anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen
-    und Teile der übertragenen Daten entschlüsseln.
-  recommendation:
-    - stage: in_kuerze
-      text: >-
-        Veraltete Protokolle und schwache Verfahren am Dienst abschalten.
-    - stage: mittelfristig
-      text: >-
-        Das aktuelle Protokoll aktivieren, den Schutz gegen eine erzwungene Rückstufung
-        einschalten und die Gültigkeitsdauer der Transportsicherheits-Vorgabe auf mindestens ein
-        Jahr setzen.
-    - stage: strategisch
-      text: >-
-        Die Konfiguration aller verschlüsselten Dienste an einer gemeinsamen Vorgabe ausrichten
-        und regelmäßig prüfen.
-  verify: >-
-    Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet
-    werden nur aktuelle Protokolle und Verfahren.
-  positive:
-    title: Transportverschlüsselung ohne veraltete Protokolle und Verfahren
-    text: >-
-      Auf {group} bieten die verschlüsselten Dienste nur aktuelle Protokolle und Verfahren an.
+positive_title: Transportverschlüsselung ohne veraltete Protokolle und Verfahren

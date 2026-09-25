@@ -8,7 +8,9 @@ group_by: host
 scope: service
 applicable_when: has_port(services, 110) or has_port(services, 143)
 item_when: service.port in [110, 143]
-when: service.starttls is False and service.tunnel_ssl is False and service.tls_required is not True
+# S6b-2 (spec/08 Punkt 4): auch STARTTLS schuetzt nicht, wenn der Dienst die Anmeldung
+# vorher annimmt (IMAP ohne LOGINDISABLED, POP3 mit USER oder SASL vor STLS).
+when: service.tunnel_ssl is False and service.tls_required is not True and (service.starttls is False or service.tls_required is False)
 positive_when: service.starttls is True or service.tls_required is True or service.tunnel_ssl is True
 not_testable_when:
   - when: service.starttls is None and service.tls_required is None
@@ -19,7 +21,7 @@ requires:
   tools: [nmap]
 kind: check
 bundle: plaintext_services
-affected_template: "{host_ip}:{port} ({mail_name} ohne STARTTLS)"
+affected_template: "{host_ip}:{port} ({mail_name} {mail_login})"
 evidence: [service]
 references: [CWE-319, CWE-522, OWASP2025-A02]
 frameworks:
@@ -36,9 +38,21 @@ policy:
     impliziten TLS-Tunnel ein Klartext-Befund, waehrend ein Dienst ohne erkennbare
     Verschluesselungsfaehigkeit als nicht pruefbar gilt und keinen Befund ergibt.
 texts:
-  observation: >-
-    Auf {group} bietet der Mailabrufdienst keine erzwungene Transportverschlüsselung vor der
-    Anmeldung an: {affected}.
+  short: "POP3 oder IMAP ohne TLS-Zwang"
+  plan:
+    lever: "TLS für POP3 und IMAP erzwingen"
+    effect: "Schützt Zugangsdaten und Nachrichten auf dem Übertragungsweg"
+  observation:
+    - when: service.starttls is False
+      quantor: eines
+      text: >-
+        Auf {group} bietet der Mailabrufdienst keine Transportverschlüsselung vor der Anmeldung
+        an: {affected}.
+    - when: service.starttls is True
+      quantor: eines
+      text: >-
+        Auf {group} bietet der Mailabrufdienst zwar STARTTLS an, nimmt eine Anmeldung aber
+        schon vor dem Aufbau der Verschlüsselung entgegen: {affected}.
   meaning: >-
     Ohne STARTTLS oder eine gleichwertige Verschlüsselungspflicht übertragen POP3 und IMAP
     Anmeldedaten und Nachrichteninhalte im Klartext über das Netz. Jeder Mitleser auf dem

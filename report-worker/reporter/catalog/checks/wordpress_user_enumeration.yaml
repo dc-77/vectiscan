@@ -30,6 +30,9 @@ policy:
   start_level: LOW
   deviation: null
 texts:
+  plan:
+    lever: "Ausgabe von Benutzernamen abschalten"
+    effect: "Erschwert Rateangriffe auf WordPress-Konten"
   observation: >-
     Auf {group} lassen sich über WordPress-Schnittstellen gültige Benutzernamen ermitteln:
     {affected}.

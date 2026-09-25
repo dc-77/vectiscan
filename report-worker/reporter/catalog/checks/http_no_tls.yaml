@@ -28,6 +28,9 @@ policy:
   start_level: erhoeht
   deviation: null
 texts:
+  plan:
+    lever: "Webdienste nur verschlüsselt anbieten"
+    effect: "Schützt Eingaben und Inhalte auf dem Übertragungsweg"
   observation: >-
     {n:Der Host|Die Hosts} {group} {n:bietet|bieten} einen Webdienst nur über unverschlüsseltes HTTP an; ein HTTPS-Dienst
     auf Port 443 fehlt: {affected}.

@@ -25,7 +25,7 @@ from pydantic import ValidationError
 from reporter.catalog import render
 from reporter.catalog import tables as T
 from reporter.catalog.catchall import run_catchalls
-from reporter.catalog.evidence import KEEP_FACT_EVIDENCE, detail_evidence, ist_redundant
+from reporter.catalog.evidence import KEEP_FACT_EVIDENCE, auszug, detail_evidence, ist_redundant
 from reporter.catalog.expr import CatalogSpecError, Expr, compile_expr
 from reporter.catalog.schema import (CATEGORY_NAMES, LEVEL_LABELS, BundleSpec, CatalogOutput, CheckInfo,
                                      CheckResult, CheckRollup, CheckSpec, EvidenceRef, IgnoreList, Member,
@@ -50,7 +50,12 @@ class CompiledCheck:
     nt_item: list[tuple[NotTestableRule, Expr]]
     item_filter: Optional[Expr] = None
     active_proof: Optional[Expr] = None
+    urgent: Optional[Expr] = None
     path: Optional[Path] = None
+    # S6b-2: (Aussage-ID, Bedingung) aller Textaussagen; ohne eigene Bedingung None.
+    statements: list[tuple[str, Optional[Expr]]] = field(default_factory=list)
+    # S6b-2 (spec/09 Q7): Fakten, auf die die Regel sieht; daraus entsteht der Nachweis.
+    evidence_paths: frozenset[str] = frozenset()
 
 
 @dataclass
@@ -174,6 +179,7 @@ def compile_check(spec: CheckSpec, path: Path | None = None) -> CompiledCheck:
     applicable = comp(spec.applicable_when, "applicable_when")
     item_filter = comp(spec.item_when, "item_when")
     active_proof = comp(spec.active_proof_when, "active_proof_when")
+    urgent = comp(spec.urgent_when, "urgent_when")
     nt_group: list[tuple[NotTestableRule, Expr]] = []
     nt_item: list[tuple[NotTestableRule, Expr]] = []
     for i, rule in enumerate(spec.not_testable_when):
@@ -183,16 +189,28 @@ def compile_check(spec: CheckSpec, path: Path | None = None) -> CompiledCheck:
     if spec.positive_mode == "absent" and not spec.requires.tools:
         raise CatalogSpecError(f"{where}: positive_when absent braucht requires.tools")
     render.validate_template(spec.affected_template, render.ITEM_VARS[spec.scope], f"{where} affected_template")
-    render.validate_template(spec.texts.observation, render.OBSERVATION_VARS, f"{where} texts.observation")
     if spec.texts.positive:
         render.validate_template(spec.texts.positive.title, render.OBSERVATION_VARS, f"{where} texts.positive.title")
         render.validate_template(spec.texts.positive.text, render.OBSERVATION_VARS, f"{where} texts.positive.text")
-    for name, text in (("meaning", spec.texts.meaning), ("verify", spec.texts.verify), ("title", spec.title)):
-        render.validate_template(text, render.OBSERVATION_VARS, f"{where} {name}")
-    for i, rec in enumerate(spec.texts.recommendation):
-        render.validate_template(rec.text, render.OBSERVATION_VARS, f"{where} recommendation[{i}]")
+    render.validate_template(spec.title, render.OBSERVATION_VARS, f"{where} title")
+    if spec.texts.short is not None:
+        render.validate_template(spec.texts.short, (), f"{where} texts.short")
+    if spec.texts.plan is not None:
+        render.validate_template(spec.texts.plan.lever, (), f"{where} texts.plan.lever")
+        render.validate_template(spec.texts.plan.effect, (), f"{where} texts.plan.effect")
+    # S6b-2: jede Aussage wird wie ``when`` kompiliert; eine Bedingung, die der Compiler
+    # nicht kennt, ist ein Ladefehler und kein stilles Weglassen im Bericht.
+    statements: list[tuple[str, Optional[Expr]]] = []
+    for sid, text, cond, _quantor in spec.texts.all_statements():
+        render.validate_template(text, render.OBSERVATION_VARS, f"{where} {sid}")
+        statements.append((sid, comp(cond, sid)))
+    paths: set[str] = set()
+    for ex in (when, applicable, item_filter):
+        if ex is not None:
+            paths |= set(ex.paths)
     return CompiledCheck(spec=spec, when=when, positive=positive, applicable=applicable, nt_group=nt_group,
-                         nt_item=nt_item, item_filter=item_filter, active_proof=active_proof, path=path)
+                         nt_item=nt_item, item_filter=item_filter, active_proof=active_proof, urgent=urgent,
+                         path=path, statements=statements, evidence_paths=frozenset(paths))
 
 
 def load_catalog(catalog_dir: Path | str | None = None) -> Catalog:
@@ -252,7 +270,10 @@ def _evidence_of(obj: Any) -> list[EvidenceRef]:
     evs = getattr(obj, "evidence", None)
     if not fid or not evs:
         return []
-    return [EvidenceRef(fact_id=fid, tool=e.tool, ref=e.ref, excerpt=e.excerpt) for e in evs]
+    # S6b-2 (spec/09 Q7): ein von der Faktenschicht gekuerzter Auszug traegt den Hinweis
+    # "(Auszug)" statt drei Punkten; Rueckfall-Fundstellen der Datenbank stehen nicht da.
+    return [EvidenceRef(fact_id=fid, tool=e.tool, ref="" if e.ref.startswith("scan_results:") else e.ref,
+                        excerpt=auszug(e.excerpt)) for e in evs]
 
 
 def _source_mode(modes: list[str]) -> str:
@@ -266,13 +287,15 @@ def _source_mode(modes: list[str]) -> str:
     return "mixed"
 
 
-def _member(item: Item, label: str, status: str, *, reason_code: str | None = None) -> Member:
+def _member(item: Item, label: str, status: str, *, reason_code: str | None = None,
+            holds: list[str] | None = None, urgent: bool = False) -> Member:
     reason = None
     if reason_code:
         _, _, reason = _reason(reason_code)
     return Member(key=item.key, host_ip=item.host_ip, fqdn=item.fqdn, port=item.port, label=label, status=status,
                   reason_code=reason_code, reason=reason, fact_ids=[item.fact.id], source_mode=item.source_mode,
-                  verified=item.verified, via_cdn=item.via_cdn, alias_of=item.alias_of)
+                  verified=item.verified, via_cdn=item.via_cdn, alias_of=item.alias_of,
+                  holds=list(holds or []), urgent=urgent)
 
 
 class _Eval:
@@ -308,6 +331,7 @@ class _Eval:
         notes: list[str] = []
         evidence: list[EvidenceRef] = []
         active_proof = False
+        urgent = False
         for item in g.items:
             ictx = {**gctx, **item.ctx}
             if self.cc.item_filter is not None and not self.cc.item_filter.test(ictx):
@@ -320,13 +344,16 @@ class _Eval:
                     notes.append(label)
                     members.append(_member(item, label, "pass"))
                 else:
-                    members.append(_member(item, label, "fail"))
+                    holds = [sid for sid, cond in self.cc.statements if cond is None or cond.test(ictx)]
+                    dringend = self.cc.urgent is not None and self.cc.urgent.test(ictx)
+                    members.append(_member(item, label, "fail", holds=holds, urgent=dringend))
                     evidence.extend(self.evidence(item, ictx))
                     # S6: aktiver Nachweis. Trifft der Ausdruck fuer ein
                     # fehlgeschlagenes Mitglied, ist der ganze Sachverhalt
                     # belegt und wird rot mit Unverzueglich.
                     if self.cc.active_proof is not None and self.cc.active_proof.test(ictx):
                         active_proof = True
+                    urgent = urgent or dringend
                 continue
             hit = next((rule for rule, ex in self.cc.nt_item if ex.test(ictx)), None)
             if hit is not None:
@@ -349,7 +376,7 @@ class _Eval:
         fails = [m for m in members if m.status == "fail"]
         if fails:
             return self.result(g, "fail", members=members, evidence=evidence, notes=notes,
-                               seen=seen_ok, active_proof=active_proof)
+                               seen=seen_ok, active_proof=active_proof, urgent=urgent)
         nts = [m for m in members if m.status == "not_testable"]
         if nts:
             return self.result(g, "not_testable", members=members, reason_code=nts[0].reason_code, notes=notes, seen=seen_ok)
@@ -398,7 +425,8 @@ class _Eval:
         vorher nichts entstanden ist; sonst stand in sieben Befunden dieselbe
         Zusammenfassungszeile des header_check.
         """
-        out = detail_evidence(self.spec.scope, item, ictx, self.spec.evidence_detail)
+        out = detail_evidence(self.spec.scope, item, ictx, self.spec.evidence_detail,
+                              self.cc.evidence_paths)
         if not out:
             out.extend(_evidence_of(item.fact))
         elif self.spec.scope in KEEP_FACT_EVIDENCE:
@@ -423,7 +451,7 @@ class _Eval:
 
     def result(self, g: Group, status: str, *, members: list[Member] | None = None, reason_code: str | None = None,
                evidence: list[EvidenceRef] | None = None, positive: bool = False, notes: list[str] | None = None,
-               seen: int = 0, active_proof: bool = False) -> CheckResult:
+               seen: int = 0, active_proof: bool = False, urgent: bool = False) -> CheckResult:
         spec = self.spec
         members = members or []
         notes = notes or []
@@ -454,7 +482,16 @@ class _Eval:
             if len(ev) >= MAX_EVIDENCE:
                 break
         gvars = render.group_vars(g, labels, notes)
-        observation = render.format_strict(spec.texts.observation, gvars, f"check {spec.id} observation") if status == "fail" else ""
+        observation = ""
+        if status == "fail":
+            # Gruppenansicht: nur Aussagen, deren Bedingung fuer jedes fehlgeschlagene
+            # Mitglied gilt (Quantor alle) oder fuer mindestens eines (Quantor eines).
+            teile = []
+            for sid, text, _cond, quantor in spec.texts.statements("observation"):
+                gilt = [m for m in fails if sid in m.holds]
+                if gilt and (quantor == "eines" or len(gilt) == len(fails)):
+                    teile.append(render.format_strict(text, gvars, f"check {spec.id} {sid}"))
+            observation = " ".join(teile)
         pos = None
         if positive and spec.texts.positive is not None:
             pos = spec.texts.positive.model_copy(update={
@@ -465,7 +502,7 @@ class _Eval:
             check_id=spec.id, family=spec.family, bundle=spec.bundle, kind=spec.kind, title=spec.title,
             category=spec.category, scale=spec.scale, level=spec.level, group_by=spec.group_by, group_key=g.key,
             group_label=g.label, status=status, positive=positive, active_proof=active_proof,
-            verified=verified, source_mode=source_mode,
+            urgent=urgent, verified=verified, source_mode=source_mode,
             affected=labels, affected_fact_ids=fact_ids, members=members, items_seen=seen + len(members), evidence=ev,
             reason_code=reason_code, reason=reason_text, notes=sorted(set(notes), key=sort_key),
             vars={k: (v if isinstance(v, (int, list)) else render._s(v)) for k, v in gvars.items()

@@ -30,6 +30,9 @@ policy:
     Der Hostname ist ein Hinweis und kein inhaltlicher Fund; die Einstufung Hygiene mittel
     entspricht dem Prototyp (catalog_sim R-DEV-HOST).
 texts:
+  plan:
+    lever: "Entwicklungs- und Testsysteme vom Internet trennen"
+    effect: "Entfernt Systeme mit meist schwächerer Absicherung aus der Angriffsfläche"
   observation: >-
     Der Hostname von {group} beginnt mit einem Namensteil, der auf ein Entwicklungs- oder
     Testsystem hinweist, und antwortet aus dem gesamten Internet: {affected}.

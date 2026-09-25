@@ -2,20 +2,20 @@ id: admin_service_exposed_passive
 title: Verwaltungsoberfläche laut Passivquelle erreichbar
 family: admin_service_exposed
 category: A
-scale: hygiene
-level: hoch
+scale: exposure
+level: erhoeht
 group_by: host
 scope: passive
 applicable_when: null
-when: passive.source == "shodan" and passive.verified is False and (passive.port in ADMIN_PORTS or matches(passive.product, ADMIN_PRODUCTS))
+when: passive.source == "shodan" and passive.verified is False and admin_fp(passive) and not is_cdn(host, services)
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
 requires:
   tools: [shodan]
 kind: check
-bundle: null
-affected_template: "{host_ip}:{port} ({product}, laut Passivquelle)"
+bundle: admin_access
+affected_template: "{host_ip}:{port} ({product_or_banner}, laut Passivquelle)"
 evidence: [passive]
 references: [CWE-284, CISA-KEV]
 frameworks:
@@ -27,10 +27,15 @@ policy:
   source: Prototyp VS-002 (manuell, Passivquelle)
   start_level: hoch
   deviation: >-
-    Aktiv bestaetigte Verwaltungsoberflaechen sind Exposition erhoeht (admin_service_exposed). Ein
-    nur passiv gemeldeter Port ist nicht verifiziert und wird deshalb als Hygiene hoch mit
-    Pflicht-Pruefschritt gefuehrt (spec/05 M2: verified false).
+    Entscheidung DC (S6b-2, Q13): ein Passivfund mit Kennung der Verwaltungssoftware ist
+    Exposition erhoeht, nicht bestaetigt; die erste Empfehlung ist die Pruefung des Dienstes.
+    Ohne Kennung (nur Port) entsteht kein Befund, die Meldung steht als Werkzeugmeldung im
+    Anhang (admin_port_passive_unidentified).
 texts:
+  short: "Verwaltungsoberfläche laut Passivquelle"
+  plan:
+    lever: "Gemeldete Verwaltungszugänge prüfen und beschränken"
+    effect: "Klärt, ob eine Verwaltungsoberfläche offen im Internet steht"
   observation: >-
     Eine Passivquelle meldet für {group} eine Verwaltungs- oder Firewall-Oberfläche, die der
     Portscan nicht bestätigen konnte: {affected}. Der Port liegt außerhalb der geprüften Ports

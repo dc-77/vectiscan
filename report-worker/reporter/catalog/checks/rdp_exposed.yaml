@@ -32,6 +32,10 @@ policy:
     SP-RDP-002/003 stufen zusaetzliche Befunde (etwa fehlende Netzwerk-Ebenen-Authentifizierung)
     ohnehin als CRITICAL ein.
 texts:
+  short: "Fernwartung (RDP) erreichbar"
+  plan:
+    lever: "Fernwartung nur über VPN zulassen"
+    effect: "Schließt einen der häufigsten Einstiegspunkte für Erpressungsangriffe"
   observation: >-
     {n:Der Host|Die Hosts} {group} {n:beantwortet|beantworten} Verbindungen auf dem RDP-Port aus dem gesamten Internet:
     {affected}. Ein Fernwartungsdienst gehört nicht an das öffentliche Interface.

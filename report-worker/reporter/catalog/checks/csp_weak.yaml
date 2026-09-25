@@ -29,6 +29,10 @@ policy:
   start_level: MEDIUM
   deviation: null
 texts:
+  short: "Inhaltsrichtlinie mit unsicheren Freigaben"
+  plan:
+    lever: "Unsichere Freigaben aus der Inhaltsrichtlinie entfernen"
+    effect: "Begrenzt die Wirkung eingeschleuster Skripte im Browser"
   observation: >-
     Auf {group} ist eine Content-Security-Policy gesetzt, die einzelne Direktiven wieder
     lockert: {affected}.

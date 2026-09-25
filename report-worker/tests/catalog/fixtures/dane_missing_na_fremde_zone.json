@@ -1,0 +1,27 @@
+{
+ "_note": "MX in fremder Zone, Kundenzone nicht signiert: DANE kann der Kunde nicht umsetzen (spec/09 Q4).",
+ "facts": {
+  "dns": [
+   {
+    "domain": "example.test",
+    "mx": [
+     "mx01.hornetsecurity.com"
+    ],
+    "dnssec": {
+     "signed": false
+    },
+    "dane": {
+     "smtp": false,
+     "https": false
+    }
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "not_applicable",
+  "group_key": "example.test",
+  "affected": [],
+  "positive": false
+ }
+}

@@ -6,7 +6,8 @@ scale: hygiene
 level: hoch
 group_by: domain
 scope: dns
-applicable_when: null
+# S6b-2 (spec/08 Punkt 6): Domains ohne MX bewertet mail_spoofing_unprotected.
+applicable_when: len(dns.mx) > 0
 when: dns.spf is None
 positive_when: dns.spf is not None
 not_testable_when: []
@@ -30,6 +31,10 @@ policy:
     SPF hat direkten Bezug zur Absender-Authentizitaet der Domain; der Prototyp stuft ein
     fehlendes SPF als Hygiene hoch ein.
 texts:
+  short: "kein SPF-Eintrag"
+  plan:
+    lever: "SPF-Eintrag veröffentlichen"
+    effect: "Schützt die Authentizität der eigenen E-Mail"
   observation: >-
     Für die Domain {domain} liegt kein SPF-Eintrag vor: {affected}. Empfangende Mailserver
     können damit nicht prüfen, welche Server im Namen der Domain versenden dürfen.

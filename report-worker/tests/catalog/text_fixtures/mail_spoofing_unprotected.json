@@ -1,0 +1,66 @@
+{
+ "check": "mail_spoofing_unprotected",
+ "cases": [
+  {
+   "name": "Domain ohne MX, ohne SPF und ohne DMARC (vectigal.tech)",
+   "facts": {
+    "dns": [
+     {
+      "domain": "example.test",
+      "mx": []
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "example.test": [
+      "observation[1]",
+      "observation[3]"
+     ]
+    },
+    "not_holds": {
+     "example.test": [
+      "observation[2]",
+      "observation[4]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  },
+  {
+   "name": "Domain ohne MX, SPF ~all, DMARC p=none",
+   "facts": {
+    "dns": [
+     {
+      "domain": "example.test",
+      "mx": [],
+      "spf": {
+       "raw": "v=spf1 ~all",
+       "all_qualifier": "~all"
+      },
+      "dmarc": {
+       "present": true,
+       "p": "none",
+       "raw": "v=DMARC1; p=none"
+      }
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "example.test": [
+      "observation[2]",
+      "observation[4]"
+     ]
+    },
+    "not_holds": {
+     "example.test": [
+      "observation[1]",
+      "observation[3]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  }
+ ]
+}

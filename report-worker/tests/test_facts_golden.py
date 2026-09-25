@@ -116,7 +116,8 @@ def test_tar_only_build_konsistent():
 
 def test_spf_vorhanden_bei_allen_neg_spf_orders():
     orders = _neg_orders("NEG-SPF-MISSING")
-    assert len(orders) == 7
+    # S6b-2: acht Auftraege; 57b3ac85 (lumbeck-wolter, seit S2b im Snapshot) traegt dasselbe Muster.
+    assert len(orders) == 8
     for oid in orders:
         f = _facts(oid)
         assert f.dns, oid

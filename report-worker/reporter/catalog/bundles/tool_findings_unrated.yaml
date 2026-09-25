@@ -1,8 +1,8 @@
 id: tool_findings_unrated
-title: Werkzeugbefunde ohne eigene Bewertung
+title: "Werkzeugbefunde ohne eigene Bewertung"
 category: E
 merge_by: global
-members: [info_disclosure, js_library_outdated, web_vulnerability_reported]
+members: [info_disclosure, js_library_outdated, web_vulnerability_reported, http_trace_enabled, tls_weakness_reported, admin_port_passive_unidentified]
 target: appendix
 references: [CWE-200]
 frameworks:
@@ -10,19 +10,3 @@ frameworks:
   nis2: []
   iso27001: []
   tr03116: []
-texts:
-  observation: >-
-    Die eingesetzten Werkzeuge haben Beobachtungen gemeldet, die für sich genommen keine eigene
-    Einstufung tragen: {affected}.
-  meaning: >-
-    Diese Meldungen beschreiben Hinweise, aus denen sich allein kein Angriff ableiten lässt. Sie
-    stehen im Anhang, damit der Bericht nichts verschweigt, und gehören in die nächste
-    Überarbeitung der betroffenen Anwendung.
-  recommendation:
-    - stage: mittelfristig
-      text: >-
-        Die genannten Hinweise bei der nächsten Überarbeitung der betroffenen Anwendung mit
-        prüfen.
-  verify: >-
-    Die genannten Adressen erneut abrufen; erwartet wird, dass der jeweilige Hinweis nicht mehr
-    auftritt.

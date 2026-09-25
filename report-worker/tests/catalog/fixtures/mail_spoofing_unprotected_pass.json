@@ -1,0 +1,26 @@
+{
+ "facts": {
+  "dns": [
+   {
+    "domain": "example.test",
+    "mx": [],
+    "spf": {
+     "raw": "v=spf1 -all",
+     "all_qualifier": "-all"
+    },
+    "dmarc": {
+     "present": true,
+     "p": "reject",
+     "raw": "v=DMARC1; p=reject"
+    }
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "example.test",
+  "affected": [],
+  "positive": false
+ }
+}

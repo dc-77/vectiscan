@@ -41,7 +41,7 @@ def test_eingabe_der_ki_traegt_keine_rohdaten(ohne_key):
     """Die Nutzlast besteht aus fertigen Befunden, nicht aus Werkzeugausgaben."""
     data = junkerwerk_data()
     payload = prose.build_payload(data, {"branche": "Maschinenbau"})
-    assert set(payload) == {"scan", "kunde", "kategorien", "systeme", "hosts", "befunde",
+    assert set(payload) == {"scan", "kunde", "kategorien", "systeme", "systeme_2_1", "befunde",
                             "positive", "plan"}
     assert payload["kunde"] == {"branche": "Maschinenbau"}
     for befund in payload["befunde"]:

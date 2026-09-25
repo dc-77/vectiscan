@@ -102,13 +102,30 @@ Schritte fuehren dorthin:
    hinweg, hostuebergreifend (spec/03 Regel 1).
 
 Skala, Einstufung und Kategorie eines Buendelbefunds kommen vom schwersten
-fehlgeschlagenen Mitglied. Die Dringlichkeit ist die dringlichste Empfehlungsstufe der
-beteiligten Texte; daraus entsteht auch der Massnahmenplan.
+fehlgeschlagenen Mitglied. Die Dringlichkeit kommt aus der Abbildungstabelle in
+`levels.py` (Einstufung, aktiver Nachweis, benannte Ausnahme `urgent_when`).
+
+S6b-2 (spec/09 Q4 bis Q7): Texte je Regel. Der Befund reiht die Aussagen der getroffenen
+Regeln, schwerste zuerst, und nur die, deren Fakten-Bedingung fuer die Mitglieder gilt
+(`findings.compose`, Herkunft in `Finding.provenance`, Gate `aussage_ohne_fakt`). Der
+Titel eines Buendelbefunds ist der Sammeltitel mit den Kurzformen der getroffenen Regeln.
+Die erste Empfehlung steht auf der Dringlichkeit des Befunds, weitere behalten ihren
+Abstand (`levels.relative_stages`, Q5). Die Massnahme des Befunds ist die erste Empfehlung
+seiner fuehrenden Regel; der Plan fuehrt eine Zeile je Massnahmentext und Zustaendigkeit,
+Effekt und Hebeltitel kommen aus `texts.plan` der Regeln (Q6). Der Nachweis ist je
+beruehrtem Fakt eine Zeile "Bezeichnung: Wert" aus den Attributpfaden der Bedingung, nie
+im tragenden Feld gekuerzt (Q7; Selbstcheck `nachweis_rohbezeichner`, `nachweis_gekuerzt`,
+`nachweis_doppelt`). Ausschluesse des Admins wirken ueber den stabilen Schluessel
+`Finding.key` (`<Regel oder Buendel>/<Gruppe>/<Zustaendigkeit>`, Issue #28); die uebrigen
+Befunde behalten ihre Nummer, der Selbstcheck erlaubt Luecken genau dort.
 
 Positivbefunde laufen immer ueber den ganzen Auftrag zusammen. Eine Gruppe, in der ein
 Mitglied fehlgeschlagen ist, liefert keinen Positivbefund, und eine Gruppe ohne ein
 einziges gesehenes Item auch nicht: "kein Datenbankdienst" auf einem Host ohne jeden
-Dienst ist keine Aussage.
+Dienst ist keine Aussage. S6b-2 (Q12): nicht pruefbar gilt je Pruefung; TLS-Positivbefunde
+entfallen auf Hosts, deren verschluesselte Dienste nicht alle geprueft sind
+(`bundles.tls_untested_hosts`); den Buendeltitel gibt es nur, wenn jedes Mitglied mit
+Positivtext bestanden hat, sonst einen Positivbefund je bestandener Regel.
 
 ## Herkunft der Felder
 
@@ -128,13 +145,13 @@ Dienst ist keine Aussage.
 | `architecture.posture` | vier feste Bloecke, Items zeigen auf Pruefungen |
 | `architecture.screens` | `facts.fqdns[].screenshot_key`; die Bilddatei holt S4 aus MinIO |
 | `findings[].found/verify` | Katalogtexte, Platzhalter mit den zusammengefuehrten Werten |
-| `findings[].impact` | Katalogtext `texts.meaning`; **KI-Feld 4** |
+| `findings[].impact` | Katalogaussagen `texts.meaning` der getroffenen Regeln (S6b-2: kein KI-Feinschliff mehr) |
 | `findings[].evidence` | Faktreferenzen aus dem Katalogergebnis (Werkzeug, Fundstelle, Auszug) |
 | `findings[].threat`, `appendix.cve_refs` | `facts.threats`: Fremdwerte (NVD-Score, KEV) und seit S5b auch CVEs, die ein Werkzeug genannt hat |
-| `plan`, `glance.levers` | Empfehlungsstufen der fehlgeschlagenen Pruefungen |
+| `plan`, `glance.levers` | erste Empfehlung der fuehrenden Regel je Befund, Effekt und Hebeltitel aus `texts.plan` |
 | `appendix.inventory` | `facts.services` und `facts.passive` |
 | `appendix.tools` | Werkzeuge, die laut `facts.coverage` gelaufen sind, ohne Versionsnummer |
-| `appendix.tool_findings` | Buendel mit `target: appendix` |
+| `appendix.tool_findings` | Buendel mit `target: appendix` (je Meldung eine Zeile mit eigener Gruppe) und Technikzeilen unter der Schwelle (Konfidenz hoch oder zwei Quellen) |
 
 ## Anhang A.3: zwei Faelle, benannt (S5b)
 
@@ -159,7 +176,7 @@ nennt alle Befunde, der Selbstcheck prueft Zugehoerigkeit statt Gleichheit.
 `CveRef.name` bleibt leer: die Bezeichnung kaeme aus der NVD-Antwort, und die gibt es
 nicht. Der Prototyp fuellt die Spalte, dieser Bericht bislang nicht.
 
-## Die vier Prosa-Felder
+## Die Prosa-Felder
 
 Ein Aufruf, `claude-opus-4-7`, Eingabe sind fertige Befunde und aggregierte Fakten als
 JSON, nie Rohdaten. Jedes Feld laeuft einzeln durch `gate.check_field`:
@@ -168,6 +185,16 @@ JSON, nie Rohdaten. Jedes Feld laeuft einzeln durch `gate.check_field`:
 2. Keine Einstufungswoerter im Text.
 3. Laengenlimit je Feld.
 4. Keine Gedankenstriche, keine Platzhalter, keine Zusagen, Sie-Form, echte Umlaute.
+5. S6b-2: jede Zahl mit Zaehleinheit (System, IP-Adresse, Hostname; Ziffern und
+   Zahlwoerter) entspricht der Zaehlung in Kapitel 2.1, "Hosts" als Zaehleinheit ist
+   unzulaessig (`gate.count_mismatches`). Die Eingabe fuehrt unter `scan` die Zahlen
+   `systeme`, `ip_adressen` und `hostnamen`, die Zeilen aus 2.1 stehen unter
+   `systeme_2_1`. Dieselbe Pruefung laeuft als Gate `zaehlung_widerspruch` ueber
+   Zusammenfassung, Kontext, Kapiteleinleitungen und Systemsaetze.
+
+Seit S6b-2 gibt es drei Prosa-Felder: Die Bedeutung eines Befunds (`impact`) ist die
+Katalogaussage seiner Regeln mit Fakten-Bedingung und wird nicht mehr von der KI
+umformuliert (spec/09 Q4: die Prosa uebernahm die falsche Vertrauenskette).
 
 Faellt ein Feld durch, bleibt der deterministische Text stehen; Feld und Regel stehen im
 Log und in `meta.prose_rejected`. Die uebrigen Felder werden trotzdem uebernommen.

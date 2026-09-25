@@ -27,8 +27,11 @@ ADMIN_PORTS: dict[int, str] = {
 
 # Produkt- und Titelmuster fuer Verwaltungsoberflaechen (nmap product, Shodan product, Seitentitel).
 ADMIN_PRODUCTS = re.compile(
-    r"sw-cp-server|plesk|webmin|portainer|proxmox|cpanel|fortigate|fortinet|sonicwall|rustdesk|"
+    r"sw-cp-server|plesk|webmin|miniserv|portainer|proxmox|cpanel|fortigate|fortinet|sonicwall|rustdesk|"
     r"jitsi|phpmyadmin|kubernetes|swagger", re.I)
+# S6b-2 (spec/09 Q13, E1): Hosting-Verwaltungen, die ein Hoster auf geteilten Servern
+# betreibt. Auf einem geteilten System richtet sich die Empfehlung an den Hoster.
+HOSTING_PANELS = re.compile(r"sw-cp-server|plesk|cpanel|whm|directadmin|ispconfig|froxlor|webmin|miniserv", re.I)
 ADMIN_TITLES = re.compile(
     r"plesk|cpanel|portainer|proxmox|webmin|phpmyadmin|fortigate|fortinet|sonicwall|jitsi|rustdesk|"
     r"gitlab|jenkins|grafana|kibana|swagger ui|kubernetes dashboard", re.I)
@@ -68,8 +71,9 @@ KNOWN_PORTS: frozenset[int] = frozenset(
 # beim Kunden. Auf einer Plattform (SaaS, Baukasten, CDN) liegt alles Hostbezogene beim
 # Plattformbetreiber; nur DNS- und Mail-Eintraege der Domain bleiben beim Kunden.
 SHARED_OPERATOR_CHECKS: frozenset[str] = frozenset({
-    "admin_service_exposed", "admin_service_exposed_passive", "ftp_plaintext", "legacy_protocols_present",
-    "mail_plaintext", "service_banner_version", "http_alt_port", "ssh_alt_port",
+    "admin_service_exposed", "admin_service_exposed_passive", "admin_panel_hoster", "admin_service_unconfirmed",
+    "ftp_plaintext", "legacy_protocols_present", "mail_plaintext", "service_banner_version", "http_alt_port",
+    "ssh_alt_port",
 })
 PLATFORM_CUSTOMER_SCOPES: frozenset[str] = frozenset({"dns", "dns.dangling_cnames", "target", "scan"})
 
@@ -78,10 +82,18 @@ PLATFORM_CUSTOMER_SCOPES: frozenset[str] = frozenset({"dns", "dns.dangling_cname
 TLS_LEGACY = ("SSLv2", "SSLv3", "TLS1.0", "TLS1.1")
 TLS_WEAK_CIPHER_KEYS = frozenset({"null", "anon", "export", "low", "3des", "rc4"})
 TLS_HARD_VULNS = frozenset({"Heartbleed", "CCS", "ROBOT", "POODLE", "DROWN", "FREAK", "LOGJAM", "Ticketbleed"})
-TLS_SOFT_VULNS = frozenset({"SWEET32", "BEAST", "RC4", "CRIME", "LUCKY13"})
+TLS_SOFT_VULNS = frozenset({"SWEET32", "BEAST", "RC4", "CRIME"})
 TLS_COMPRESSION_VULNS = frozenset({"BREACH"})
+# S6b-2 (spec/09 Q4, Teil 2 JW): BREACH gilt laut testssl fuer statische Seiten nicht
+# ("Can be ignored for static pages"), LUCKY13 meldet testssl nur experimentell. Beide
+# loesen keinen Befund aus und stehen als Werkzeugmeldung im Anhang.
+TLS_REPORTED_VULNS = frozenset({"BREACH", "LUCKY13"})
 HSTS_MIN_MAX_AGE = 15552000
 CERT_EXPIRING_DAYS = 30
+# S6b-2 (E2): bis sieben Tage Unverzueglich, acht bis 14 Tage Hygiene hoch, darueber bis
+# CERT_EXPIRING_DAYS mittelfristig.
+CERT_URGENT_DAYS = 7
+CERT_SOON_DAYS = 14
 DOMAIN_EXPIRING_DAYS = 30
 ABUSEIPDB_FAIL_SCORE = 25
 
@@ -108,6 +120,25 @@ ZAP_DIRECTORY_LISTING = [("0", r"directory browsing")]
 ZAP_SESSION_URL = [("3", r"session id in url rewrite")]
 ZAP_CORS = [("40040", r"cors header"), ("10098", r"cross-domain misconfiguration")]
 ZAP_SRI = [("90003", r"sub resource integrity attribute missing")]
+# S6b-2 (spec/09 Q14): Familien, die eine Katalogregel ausloesen, wenn ZAP sie mit
+# Konfidenz High meldet. Darunter stehen sie als Werkzeugmeldung im Anhang.
+# Cookie-Meldungen (S6b-2, spec/09 Teil 2 HL): ohne eigene Regel, unter High im Anhang, ab
+# High als Beobachtung ohne Regel; cookie_flags bleibt die Regel fuer header_check.
+ZAP_COOKIE = [("10010", r"cookie no httponly flag"), ("10011", r"cookie without secure flag"),
+              ("10054", r"cookie (without|with) samesite attribute")]
+ZAP_RATED = (ZAP_ACTIVE + ZAP_CSRF + ZAP_CORS + ZAP_DIRECTORY_LISTING + ZAP_SESSION_URL + ZAP_SRI
+             + ZAP_COOKIE)
+
+# ---------------------------------------------------------------- Banner und Schutzsysteme
+# S6b-2 (spec/09 Q4): Versionskennungen, die zum Protokoll gehoeren und sich nicht abschalten
+# lassen. Das SSH-Protokoll verlangt die Kennung im Banner, der MariaDB/MySQL-Handshake
+# uebertraegt die Serverversion immer.
+# S6b-2 (spec/09 Q4): nmap nennt bei PostgreSQL "9.6.0 or later", eine aus dem Protokoll
+# abgeleitete Untergrenze. Das ist keine Versionsangabe des Dienstes.
+VERSION_LOWER_BOUND = re.compile(r"\bor later\b", re.I)
+BANNER_FIXED = re.compile(r"\bssh\b|openssh|dropbear|mysql|mariadb", re.I)
+# S6b-2 (spec/09 Q12): Erkennung ohne benanntes Produkt (Generic-Heuristik von wafw00f).
+WAF_GENERIC = re.compile(r"generic|unknown", re.I)
 
 # ---------------------------------------------------------------- Coverage
 # Code -> (Status, Text). Unbekannte Codes ergeben not_testable mit generischem Text.
@@ -148,6 +179,9 @@ COVERAGE_REASONS: dict[str, tuple[str, str]] = {
     "no_urls_spidered": ("not_testable", "Keine URLs gefunden, Webanalyse ohne Grundlage."),
     "no_output": ("not_testable", "Werkzeug lieferte keine Ausgabe."),
     "mail_capabilities_unknown": ("not_testable", "Der Maildienst nannte keine Fähigkeiten; STARTTLS-Angebot manuell prüfen."),
+    # S6b-2 (spec/08 Punkt 4): der Portscan belegt beim FTP-Dienst weder TLS-Zwang noch
+    # Klartext-Anmeldung. Ohne Beleg kein Befund "ohne TLS-Zwang".
+    "ftp_tls_unknown": ("not_testable", "Ob der FTP-Dienst eine Anmeldung ohne Transportverschlüsselung ablehnt, zeigt der Portscan nicht."),
     "tls_protocols_unknown": ("not_testable", "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor."),
     "tls_ciphers_unknown": ("not_testable", "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor."),
     # S6b-1 (spec/09 Q10): httpx hat den Dienst gesehen, testssl nicht. "Nicht verfuegbar"
@@ -195,6 +229,8 @@ FAMILIES: frozenset[str] = frozenset({
     "security_headers_incomplete", "header_duplicate", "banner_version_disclosure", "cookie_flags",
     "csrf_token_missing", "info_disclosure", "js_library_outdated", "directory_listing", "session_in_url",
     "cors_misconfiguration", "sri_missing", "waf_present",
+    # S6b-2 (spec/08 Punkt 6): Domain ohne Mailbetrieb ohne Faelschungsschutz.
+    "mail_spoofing_unprotected",
 })
 
 # Namen, die in Ausdruecken als Tabellen sichtbar sind.

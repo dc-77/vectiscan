@@ -29,6 +29,10 @@ policy:
   start_level: CRITICAL
   deviation: null
 texts:
+  short: "Eintrag in einer Schadsoftware-Liste"
+  plan:
+    lever: "Kompromittierung beseitigen und Löschung beantragen"
+    effect: "Beendet die Verteilung von Schadsoftware über die eigenen Adressen"
   observation: >-
     Eine öffentliche Bedrohungsdatenbank zur Schadsoftware-Verteilung meldet für {group} einen
     aktiven Treffer: {affected}.

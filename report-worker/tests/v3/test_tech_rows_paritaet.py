@@ -17,6 +17,7 @@ from pathlib import Path
 import pytest
 
 from reporter.facts.build import build_facts
+from reporter.v3.chapters import tech_tool_findings
 from reporter.v3.dashboard import tech_profiles_from_facts
 from tests.v3.conftest import data_for, facts_for, order_ids
 
@@ -99,15 +100,26 @@ def test_mariadb_praefix_ohne_eol_synthetisch() -> None:
     assert maria["version"].startswith("10.11.18") and maria["status"] != "eol" and maria["eol_date"] == ""
 
 
+def _werkzeugmeldungen_synthetisch() -> list[str]:
+    return [t.what for t in tech_tool_findings(build_facts(FIXTURE))]
+
+
 def test_postgresql_or_later_ohne_version_und_eol_synthetisch() -> None:
-    pg = _zeilen_synthetisch()["PostgreSQL"]
-    assert (pg["version"], pg["status"], pg["eol_date"]) == ("", "unbekannt", "")
+    """S6b-2 (Entscheidung DC 25.09.): nmap mit "or later" allein hat Konfidenz mittel.
+
+    Die Zeile steht nicht in der Technologietabelle, sondern als Werkzeugmeldung im
+    Anhang, weiterhin ohne Version und ohne EOL.
+    """
+    assert "PostgreSQL" not in _zeilen_synthetisch()
+    assert "Technik: PostgreSQL" in _werkzeugmeldungen_synthetisch()
 
 
 def test_jquery_migrate_bleibt_jquery_migrate_synthetisch() -> None:
     rows = _zeilen_synthetisch()
-    assert rows["jQuery Migrate"]["version"] == "3.4.1"
-    assert rows["jQuery"]["version"] == ""
+    meldungen = _werkzeugmeldungen_synthetisch()
+    assert "jQuery Migrate" not in rows and "Technik: jQuery Migrate 3.4.1" in meldungen
+    assert not any(m.startswith("Technik: jQuery 3.4.1") for m in meldungen)
+    assert "jQuery" not in rows or rows["jQuery"]["version"] == ""
 
 
 @pytest.mark.parametrize("order_id", [LUMBECK_WOLTER, JUNKERWERK])
@@ -118,16 +130,50 @@ def test_scanrunde_mariadb_und_postgresql_ohne_eol(order_id: str) -> None:
     maria = [r for r in rows if r["name"] == "MariaDB"]
     assert maria and all(r["version"].startswith("10.11.18") and r["status"] != "eol"
                          and r["eol_date"] == "" for r in maria)
-    pg = [r for r in rows if r["name"] == "PostgreSQL"]
-    assert pg and all((r["version"], r["status"], r["eol_date"]) == ("", "unbekannt", "") for r in pg)
-    # Quelle ist nmap, webtech lieferte bei beiden nichts (no_tech_signals).
-    assert all("webtech" not in r["source"] for r in maria + pg)
+    # S6b-2: PostgreSQL "9.6.0 or later" kennt nur nmap mit Konfidenz mittel; die Zeile
+    # steht als Werkzeugmeldung im Anhang, nie mit Version 9.6 oder EOL.
+    assert not [r for r in rows if r["name"] == "PostgreSQL"]
+    meldungen = [t.what for t in tech_tool_findings(facts_for(order_id))]
+    assert "Technik: PostgreSQL" in meldungen
+    assert not any("9.6" in m for m in meldungen)
+    # Quelle ist nmap, webtech lieferte nichts (no_tech_signals).
+    assert all("webtech" not in r["source"] for r in maria)
 
 
 @pytest.mark.parametrize("order_id", [DORTMUND_BEACH, DORTMUND_BEACH_S0B, CASTENOW])
 def test_scanrunde_jquery_migrate_ist_nicht_jquery(order_id: str) -> None:
     rows = _zeilen(order_id)
-    assert any(r["name"] == "jQuery Migrate" and r["version"] == "3.4.1" for r in rows)
+    # S6b-2: jQuery Migrate kennt nur httpx (Konfidenz mittel), also Anhang statt Tabelle.
+    meldungen = [t.what for t in tech_tool_findings(facts_for(order_id))]
+    assert "Technik: jQuery Migrate 3.4.1" in meldungen
+    assert not any(m == "Technik: jQuery 3.4.1" for m in meldungen)
     assert not any(r["name"] == "jQuery" and r["version"] == "3.4.1" for r in rows)
     for tech in (data_for(order_id).architecture.tech):
         assert not any(r.c == "jQuery" and r.v == "3.4.1" for r in tech.rows)
+
+
+# ---------------------------------------------------------------- S6b-2 (spec/07 Abschluss S6b-1, Frage 7)
+
+HEUEL = "2e56abe1-c1a6-442e-b36a-dc9f83c81da8"
+
+
+def test_heuel_rohbezeichner_nicht_in_tabelle_und_hostkarte() -> None:
+    """www51 zeigte "Neos Flow:neos" und "Java/Servlet" in Tabelle und Hostkarte."""
+    namen = {r.c for block in data_for(HEUEL).architecture.tech for r in block.rows}
+    namen |= {r["name"] for r in _zeilen(HEUEL)}
+    assert not any(":" in n for n in namen), namen
+    assert "Neos Flow:neos" not in namen and "Java/Servlet" not in namen
+    meldungen = [t.what for t in tech_tool_findings(facts_for(HEUEL))]
+    assert any(m.startswith("Technik: Neos Flow") for m in meldungen), meldungen
+    assert not any(":neos" in m for m in meldungen)
+
+
+@pytest.mark.parametrize("order_id", ORDERS)
+def test_jede_technikzeile_erreicht_die_schwelle(order_id: str) -> None:
+    from reporter.v3.chapters import TECH_MIN_CONFIDENCE, TECH_MIN_SOURCES, tech_lines
+
+    for lines in tech_lines(facts_for(order_id)).values():
+        for line in lines:
+            quellen = [q for q in line.sources.split(", ") if q]
+            assert line.confidence >= TECH_MIN_CONFIDENCE or len(quellen) >= TECH_MIN_SOURCES, (
+                order_id, line.product, line.sources, line.confidence)

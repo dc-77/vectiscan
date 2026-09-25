@@ -57,6 +57,8 @@ def _finding(finding: Finding, severity: str) -> dict[str, Any]:
         # Die Regel, unter der der Befund im Pruefkatalog steht. Das Feld heisst
         # policy_id, weil die API und das Dashboard es so lesen.
         "policy_id": finding.policy,
+        # S6b-2 (Issue #28): stabiler Schluessel fuer Befund-Ausschluesse.
+        "key": finding.key,
     }
     if finding.threat is not None:
         eintrag["threat"] = {

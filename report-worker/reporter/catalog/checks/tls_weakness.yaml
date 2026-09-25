@@ -7,7 +7,8 @@ level: niedrig
 group_by: fqdn
 scope: tls.vulns
 applicable_when: null
-when: '(vuln.name in TLS_SOFT_VULNS and vuln.status == "vulnerable") or (vuln.name in TLS_COMPRESSION_VULNS and vuln.status != "not_tested")'
+# S6b-2 (spec/09 Q4): BREACH und LUCKY13 meldet tls_weakness_reported im Anhang.
+when: 'vuln.name in TLS_SOFT_VULNS and vuln.status == "vulnerable"'
 positive_when: never
 not_testable_when:
   - when: 'vuln.status == "not_tested"'
@@ -31,19 +32,23 @@ policy:
   start_level: niedrig
   deviation: null
 texts:
+  short: "bekannte Schwäche der Verschlüsselung"
+  plan:
+    lever: "Bekannte Schwächen der TLS-Konfiguration beheben"
+    effect: "Schützt Verbindungen gegen bekannte Angriffe"
   observation: >-
-    Die TLS-Analyse hat auf {group} eine Schwachstelle mit geringerer Auswirkung in der
-    Verschlüsselung oder in der Antwortkomprimierung nachgewiesen: {affected}.
+    Die TLS-Analyse meldet auf {group} eine bekannte Schwäche der Verschlüsselung mit
+    geringerer Auswirkung: {affected}.
   meaning: >-
-    Unter bestimmten Voraussetzungen, etwa bei sehr langen Sitzungen oder bei aktivierter
-    Kompression, ermöglichen diese Schwachstellen bekannte Angriffe auf die Verschlüsselung.
+    Unter bestimmten Voraussetzungen, etwa bei sehr langen Sitzungen, ermöglichen diese
+    Schwächen bekannte Angriffe auf die Verschlüsselung.
     Für sich genommen ist die Auswirkung gering, in Kombination mit weiteren Schwachstellen
     steigt sie.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Die betroffene Cipher-Suite oder die TLS-Antwortkomprimierung in der
-        Serverkonfiguration deaktivieren, sofern die eingesetzte Softwareversion dies zulässt.
+        Die betroffenen Verfahren in der Serverkonfiguration deaktivieren, sofern die
+        eingesetzte Softwareversion dies zulässt.
   verify: >-
     TLS-Analyse des Dienstes von außen wiederholen; erwartet wird ein Ergebnis ohne diese
     Schwachstelle.

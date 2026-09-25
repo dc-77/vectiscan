@@ -1,9 +1,8 @@
 id: web_header_hygiene
-title: Sicherheits-Header und Formularschutz auf {group} unvollständig
+title: "Absicherung der Webdienste auf {group}: {rules}"
 category: D
 merge_by: host
-members: [csp_missing, csp_weak, hsts_missing, security_headers_incomplete, header_duplicate,
-          csrf_token_missing, cookie_flags, sri_missing, cors_misconfiguration, session_in_url]
+members: [csp_missing, csp_weak, hsts_missing, security_headers_incomplete, header_duplicate, csrf_token_missing, cookie_flags, sri_missing, cors_misconfiguration, session_in_url]
 target: findings
 references: [CWE-693, CWE-1021, CWE-352]
 frameworks:
@@ -11,27 +10,4 @@ frameworks:
   nis2: []
   iso27001: []
   tr03116: []
-texts:
-  observation: >-
-    Die Webdienste auf {group} liefern Sicherheits-Header unvollständig, widersprüchlich oder
-    ohne wirksame Einschränkung aus: {affected}.
-  meaning: >-
-    Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und
-    unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst
-    abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.
-  recommendation:
-    - stage: mittelfristig
-      text: >-
-        Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und
-        die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.
-    - stage: strategisch
-      text: >-
-        Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an
-        einem Webdienst prüfen.
-  verify: >-
-    Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und
-    eindeutige Sicherheits-Header.
-  positive:
-    title: Sicherheits-Header vollständig und eindeutig
-    text: >-
-      Die Webdienste auf {group} liefern die erwarteten Sicherheits-Header aus.
+positive_title: Inhaltsrichtlinie, HSTS und grundlegende Sicherheits-Header gesetzt

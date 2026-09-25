@@ -85,12 +85,15 @@ def test_gesamtbewertung_nennt_nur_kategorien_mit_befunden(order, daten):
 
 # None, True, False als eigenes Wort oder eine Liste in eckigen Klammern.
 PYTHON_REPR = re.compile(r"(?<![\w-])(None|True|False)(?![\w-])|\['|\[\"")
+# Werkzeugmeldungen im Anhang zitieren den ZAP-Namen; "SameSite Attribute None" ist dort der
+# Attributwert des Cookies, keine Python-Darstellung (S6b-2: ZAP-Cookie-Meldungen im Anhang).
+ZITIERTE_WERKZEUGNAMEN = re.compile(r"SameSite Attribute None")
 
 
 @pytest.mark.parametrize("order", ORDERS)
 def test_keine_python_darstellung_im_bericht(order, berichte):
     """spec/08 Punkt 3: "x-feserver=None", "reachable=True", "dkim=False"."""
-    treffer = PYTHON_REPR.findall(berichte[order][1])
+    treffer = PYTHON_REPR.findall(ZITIERTE_WERKZEUGNAMEN.sub("", berichte[order][1]))
     assert not treffer, sorted({t if isinstance(t, str) else t[0] for t in treffer})
 
 
@@ -99,16 +102,24 @@ def test_nachweis_nennt_die_fehlenden_header(daten):
     data = daten["14272c00-1145-4675-9b4c-19ce2ead403b"]
     treffer = [f for f in data.findings if "Sicherheits-Header" in f.title]
     assert treffer, "Header-Befund fehlt im Fixture"
-    assert "fehlende Header=" in treffer[0].evidence
+    # S6b-2 (spec/09 Q7): je Fakt "Bezeichnung: Wert", keine Rohschreibweise "Feld=".
+    assert "fehlende Header: " in treffer[0].evidence
     assert "content-security-policy" in treffer[0].evidence
+    assert "=" not in treffer[0].evidence.replace("://", "")
 
 
 def test_nachweis_nennt_die_rest_adresse(daten):
-    """spec/08 Punkt 3, VS-2026-015: die REST-URL fehlte."""
+    """spec/08 Punkt 3, VS-2026-015: die Fundstelle fehlte.
+
+    S6b-2 (spec/09 Teil 2 DB): die Fundstelle kommt aus wpscan (``found_by``). Die fest
+    eingesetzte REST-Adresse ``/wp-json/wp/v2/users`` stand in keinem Rohdatum; wpscan fand
+    den Namen ueber oEmbed.
+    """
     data = daten["14272c00-1145-4675-9b4c-19ce2ead403b"]
     treffer = [f for f in data.findings if "Benutzernamen" in f.title]
     assert treffer, "Benutzernamen-Befund fehlt im Fixture"
-    assert "/wp-json/wp/v2/users" in treffer[0].evidence
+    assert "/wp-json/oembed/1.0/embed" in treffer[0].evidence
+    assert "/wp-json/wp/v2/users" not in treffer[0].evidence
 
 
 def test_nachweis_nennt_die_zertifikatsdaten(daten):
@@ -117,7 +128,9 @@ def test_nachweis_nennt_die_zertifikatsdaten(daten):
     treffer = [f for f in data.findings if "Zertifikat" in f.title]
     assert treffer, "Zertifikatsbefund fehlt im Fixture"
     nachweis = treffer[0].evidence
-    assert "CN=" in nachweis and "Aussteller=" in nachweis
+    # S6b-2 (spec/09 Q7): Bezeichnungen in Kundensprache statt "CN=" und "Aussteller=".
+    assert "Zertifikat für: " in nachweis and "Aussteller: " in nachweis
+    assert "gültig bis: " in nachweis
 
 
 # --------------------------------------------------------------- Punkte 9, 10

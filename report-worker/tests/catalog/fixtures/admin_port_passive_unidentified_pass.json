@@ -1,0 +1,22 @@
+{
+ "_note": "Mit Kennung meldet admin_service_exposed_passive.",
+ "facts": {
+  "passive": [
+   {
+    "host_ip": "10.0.0.1",
+    "port": 4433,
+    "source": "shodan",
+    "product": "SonicWall",
+    "verified": false,
+    "confidence": 0.5
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.1",
+  "affected": [],
+  "positive": false
+ }
+}

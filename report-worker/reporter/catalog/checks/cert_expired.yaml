@@ -35,8 +35,12 @@ policy:
     gesicherten Zugang fuer alle Nutzer unterbricht, ohne dass ein weiterer Angriffsschritt noetig
     ist; diese Einstufung wird uebernommen.
 texts:
+  short: "Zertifikat abgelaufen"
+  plan:
+    lever: "Abgelaufene Zertifikate erneuern"
+    effect: "Beendet die Vertrauenswarnung beim Aufruf des Dienstes"
   observation: >-
-    Für den Dienst {group} ist das eingesetzte TLS-Zertifikat abgelaufen: {affected}. Ab diesem
+    Für {n:den Dienst|die Dienste} {group} ist das eingesetzte TLS-Zertifikat abgelaufen: {affected}. Ab diesem
     Zeitpunkt weisen Browser und andere TLS-Clients die Verbindung als nicht vertrauenswürdig aus.
   meaning: >-
     Ein abgelaufenes Zertifikat unterbricht die gesicherte Verbindung für alle Nutzer und gewöhnt
@@ -57,5 +61,5 @@ texts:
   positive:
     title: Zertifikat gültig
     text: >-
-      Für den Dienst {group} liegt das aktuelle Datum innerhalb des Gültigkeitszeitraums des
+      Für {n:den Dienst|die Dienste} {group} liegt das aktuelle Datum innerhalb des Gültigkeitszeitraums des
       eingesetzten TLS-Zertifikats.

@@ -28,6 +28,10 @@ policy:
   start_level: kritisch
   deviation: null
 texts:
+  short: "Dateifreigabe (SMB) erreichbar"
+  plan:
+    lever: "Dateifreigaben vom Internet trennen"
+    effect: "Schließt einen der häufigsten Einstiegspunkte für Erpressungsangriffe"
   observation: >-
     {n:Der Host|Die Hosts} {group} {n:beantwortet|beantworten} Verbindungen auf SMB-Freigabeports aus dem gesamten Internet:
     {affected}. Ein Datei- und Freigabedienst gehört nicht an das öffentliche Interface.

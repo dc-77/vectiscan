@@ -34,8 +34,12 @@ policy:
     nicht im eigenen Speicher haben, zu Vertrauensfehlern; die Katalogsimulation (R-CERT-CHAIN)
     fuehrt den Befund deshalb als Hygiene mittel.
 texts:
+  short: "Vertrauenskette unvollständig"
+  plan:
+    lever: "Vollständige Zertifikatsketten hinterlegen"
+    effect: "Vermeidet Verbindungsfehler bei Clients, denen ein Zwischenzertifikat fehlt"
   observation: >-
-    Für den Dienst {group} liefert der TLS-Handshake eine unvollständige Zertifikatskette:
+    Für {n:den Dienst|die Dienste} {group} liefert der TLS-Handshake eine unvollständige Zertifikatskette:
     {affected}. Zwischen dem Server-Zertifikat und einer allgemein bekannten Vertrauensstelle
     fehlt mindestens ein Zwischenzertifikat.
   meaning: >-
@@ -58,5 +62,5 @@ texts:
   positive:
     title: Zertifikatskette vollständig
     text: >-
-      Für den Dienst {group} liefert der TLS-Handshake eine vollständige Zertifikatskette bis
+      Für {n:den Dienst|die Dienste} {group} liefert der TLS-Handshake eine vollständige Zertifikatskette bis
       zu einer allgemein bekannten Vertrauensstelle.

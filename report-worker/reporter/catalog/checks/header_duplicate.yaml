@@ -28,8 +28,12 @@ policy:
   start_level: niedrig
   deviation: null
 texts:
+  short: "doppelt gesetzte Header"
+  plan:
+    lever: "Doppelt gesetzte Header bereinigen"
+    effect: "Sorgt für eindeutige Anweisungen an den Browser"
   observation: >-
-    Die Webantwort von {group} enthält denselben Antwortheader mehrfach mit unterschiedlichen
+    {n:Die Webantwort|Die Webantworten} von {group} {n:enthält|enthalten} denselben Antwortheader mehrfach mit unterschiedlichen
     Werten: {affected}.
   meaning: >-
     Browser und vorgelagerte Systeme werten mehrfach gesetzte Header uneinheitlich aus, manche

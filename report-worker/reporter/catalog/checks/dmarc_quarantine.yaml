@@ -6,7 +6,7 @@ scale: hygiene
 level: niedrig
 group_by: domain
 scope: dns
-applicable_when: dns.dmarc is not None and dns.dmarc.present is True
+applicable_when: len(dns.mx) > 0 and dns.dmarc is not None and dns.dmarc.present is True
 when: dns.dmarc.p == "quarantine"
 positive_when: dns.dmarc.p == "reject"
 not_testable_when: []
@@ -28,18 +28,32 @@ policy:
   start_level: LOW
   deviation: null
 texts:
+  short: "DMARC mit Quarantäne statt Zurückweisung"
+  plan:
+    lever: "DMARC-Richtlinie auf Zurückweisung stellen"
+    effect: "Weist gefälschte E-Mails ab, statt sie nur zurückzustellen"
   observation: >-
     Die DMARC-Richtlinie der Domain {domain} stellt E-Mails, die SPF oder DKIM nicht bestehen,
     unter Quarantäne, weist sie aber nicht zurück: {affected}.
-  meaning: >-
-    Eine Quarantäne-Richtlinie verschiebt verdächtige E-Mails in der Regel in einen
-    Spam-Ordner, statt sie abzulehnen. Je nach Einstellung des Empfangssystems können
-    gefälschte E-Mails im Namen der Domain trotzdem gelesen werden.
+  meaning:
+    - text: >-
+        Eine Quarantäne-Richtlinie verschiebt verdächtige E-Mails in der Regel in einen
+        Spam-Ordner, statt sie abzulehnen. Je nach Einstellung des Empfangssystems können
+        gefälschte E-Mails im Namen der Domain trotzdem gelesen werden.
+    - when: len(dns.dmarc.rua) == 0
+      text: >-
+        Eine Meldeadresse ist nicht hinterlegt; Berichte über fehlgeschlagene Prüfungen
+        erreichen Sie deshalb nicht.
   recommendation:
     - stage: mittelfristig
       text: >-
         Nach einer Beobachtungsphase ohne Fehlmeldungen die Richtlinie auf Zurückweisung
         anheben, sobald alle legitimen Versandquellen der Domain erfasst sind.
+    - stage: mittelfristig
+      when: len(dns.dmarc.rua) == 0
+      text: >-
+        Eine Meldeadresse (rua) in den DMARC-Eintrag aufnehmen und die Berichte vor der
+        Umstellung auswerten.
   verify: >-
     DNS-Abfrage des TXT-Eintrags _dmarc.{domain}; erwartet wird eine Richtlinie p mit
     Zurückweisung.

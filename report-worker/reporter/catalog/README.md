@@ -78,13 +78,38 @@ evidence_detail: null             # Bereich fuer den befundspezifischen Nachweis
 references: [CWE-284]
 frameworks: {bsi: [], nis2: [], iso27001: [], tr03116: []}
 policy: {source: SP-DB-001, start_level: HIGH, deviation: "warum abgewichen wird"}
+urgent_when: null                 # S6b-2: Itemkontext; true -> benannte Ausnahme (rot, unverzueglich)
 texts:
+  short: "..."                    # S6b-2: Kurzform fuer den Sammeltitel, Pflicht fuer Buendelmitglieder
+  plan: {lever: "...", effect: "..."}   # S6b-2: Hebeltitel ohne Hostnamen und Effekt dieser Regel
   observation: "..."              # {affected}, {count}, {group}, {fqdn_names}, {domain}, {host_ip}, {notes}
-  meaning: "..."
-  recommendation: [{stage: unverzueglich, text: "..."}]   # unverzueglich|in_kuerze|mittelfristig|strategisch
+  meaning:                        # Text oder Liste von Aussagen mit Fakten-Bedingung
+    - text: "..."                 # ohne when: gilt, wenn die Regel trifft
+    - when: service.rejects_before_auth is True
+      quantor: eines              # alle (Vorgabe) | eines: fuer alle bzw. mindestens ein Mitglied
+      text: "..."                 # {affected} nennt dann nur die Mitglieder, fuer die sie gilt
+  recommendation: [{stage: unverzueglich, text: "...", when: null}]   # unverzueglich|in_kuerze|mittelfristig|strategisch
   verify: "..."
   positive: {title: "...", text: "..."}   # optional; ohne positive bleibt pass stumm
 ```
+
+### Aussagen mit Fakten-Bedingung (S6b-2, spec/09 Q4)
+
+Jede Textaussage eines Befunds stammt aus einer getroffenen Regel und traegt die
+Bedingung, unter der sie stehen darf. `observation`, `meaning` und `verify` nehmen einen
+Text oder eine Liste von Aussagen, Empfehlungen koennen ein `when` tragen. Die Engine
+kompiliert jede Bedingung wie `when` und haelt je fehlgeschlagenem Mitglied fest, welche
+Aussagen gelten (`Member.holds`, Kennung wie `meaning[1]`); der Befund reiht nur diese.
+`Finding.provenance` nennt je Textblock Pruefung, Aussage und Mitglieder, das Gate
+`aussage_ohne_fakt` prueft den Bericht dagegen (Satz ohne Herkunft, Regel nicht
+fehlgeschlagen, Bedingung nicht erfuellt: Fehler). Jede bedingte Aussage hat unter
+`tests/catalog/text_fixtures/<id>.json` einen Fall, in dem sie gilt, und einen, in dem
+sie nicht gilt (`tests/catalog/test_text_fixtures.py`).
+
+`urgent_when` (E2) markiert eine benannte Ausnahme der Abbildungstabelle: das Ergebnis
+traegt `urgent`, der Befund wird rot mit "Unverzueglich", und die Ausnahme steht in A.1
+(`reporter/v3/levels.URGENT_EXCEPTIONS`; ein Test haelt beide Seiten gleich). Gesetzt nur
+bei `cert_expiring` (Restlaufzeit bis sieben Tage).
 
 Pflichtfelder laut Auftrag: id, title, family, scale, level, group_by, when, positive_when,
 not_testable_when, affected_template, evidence, references, frameworks, texts. Erweiterungen
@@ -318,8 +343,15 @@ members: [tls_legacy_protocols, tls_no_13, ...]
 target: findings            # findings | appendix
 references: [CWE-326]
 frameworks: {bsi: [], nis2: [], iso27001: [], tr03116: []}
-texts: {observation, meaning, recommendation[], verify, positive}
+title: "Transportverschlüsselung auf {group}: {rules}"   # Sammeltitel, {rules} aus texts.short
+positive_title: "Transportverschlüsselung ohne veraltete Protokolle und Verfahren"
 ```
+
+S6b-2 (spec/09 Q4, Q12): Ein Buendel traegt keine eigenen Texte mehr (`texts` ist ein
+Ladefehler). Der Befund einer Gruppe reiht die Aussagen der getroffenen Regeln, schwerste
+zuerst; `{rules}` im Sammeltitel zaehlt deren Kurzformen auf. `positive_title` steht nur,
+wenn jedes Mitglied mit Positivtext bestanden hat, sonst gibt es je bestandener Regel einen
+eigenen Positivbefund; "entfaellt" und "nicht pruefbar" zaehlen nie als bestanden.
 
 Regeln:
 
@@ -357,7 +389,9 @@ Befund-Buendel (S3), `2026-09-20.1` Rueckbau `zap_no_alerts` (S2b), `2026-09-22.
 Pflichtkorrekturen aus spec/08 (S6), `2026-09-23.1` `positive_conflicts` und der
 geschaerfte Positivbefund von `remote_admin_closed` (S6a, Issue #30), `2026-09-23.2`
 `dkim_missing` ohne gefundenen Selektor nicht pruefbar (S6a, #15 Teil 2), `2026-09-25.1`
-Abdeckung ohne offenen Port, TLS teilweise, Drittanbieter, Numerus (S6b-1).
+Abdeckung ohne offenen Port, TLS teilweise, Drittanbieter, Numerus (S6b-1), `2026-09-25.2`
+Texte je Regel mit Fakten-Bedingung, Sammeltitel, `urgent_when`, Verwaltungsoberflaechen
+nach E1, ZAP nur ab Konfidenz High, Lebenszyklus nach Q18 (S6b-2).
 
 ## Texte
 
@@ -414,7 +448,10 @@ def test_db_exposed(kind):
 ```
 
 `tests/catalog/test_fixtures_all.py` entdeckt alle Fixtures automatisch und prueft, dass jede
-Pruefung ihre Pflicht-Fixtures hat. Katalogtest: `cd report-worker && pytest tests/catalog`.
+Pruefung ihre Pflicht-Fixtures hat. Seit S6b-2 darf ein Fixture eine Variante tragen
+(`<id>_<art>_<variante>.json`, etwa `cert_expiring_fail_dringend.json`); eine Datei ohne
+passende Pruefung oder Art meldet der Test als verwaist (vorher wurden drei solche Dateien
+stumm nie geladen). Katalogtest: `cd report-worker && pytest tests/catalog`.
 
 ## Ablauf fuer den Subagent check-author
 

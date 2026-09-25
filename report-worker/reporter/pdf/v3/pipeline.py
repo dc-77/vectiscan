@@ -35,9 +35,11 @@ def report_bundle_from_source(source: str | Path,
                               orders_json: Any = None,
                               order: dict | None = None,
                               customer_context: dict | None = None,
-                              report_version: str = "1.0",
+                              report_version: str = "1",
                               report_date: str | None = None,
-                              prose: Any = None) -> tuple[Any, Any, ReportData]:
+                              prose: Any = None,
+                              generation: int | None = None,
+                              excluded_keys: set[str] | None = None) -> tuple[Any, Any, ReportData]:
     """Roh-Tar oder entpacktes Scan-Verzeichnis -> Fakten, Katalog, Reportdaten.
 
     Die ersten fuenf Parameter sind die Signatur von ``reporter.facts.build_facts``;
@@ -62,7 +64,7 @@ def report_bundle_from_source(source: str | Path,
     data = build_report_data(facts, output, order=order,
                              customer_context=customer_context,
                              report_version=report_version, report_date=report_date,
-                             prose=prose)
+                             prose=prose, generation=generation, excluded_keys=excluded_keys)
     log.info("report_data_v3_built", order_id=facts.scan.order_id,
              findings=len(data.findings), positives=len(data.positives),
              warnings=len(facts.warnings))

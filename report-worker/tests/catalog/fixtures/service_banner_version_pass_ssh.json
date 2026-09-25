@@ -1,0 +1,30 @@
+{
+ "_note": "SSH-Banner und MariaDB-Handshake gehören zum Protokoll (spec/09 Q4).",
+ "facts": {
+  "services": [
+   {
+    "host_ip": "10.0.0.1",
+    "port": 22,
+    "service": "ssh",
+    "product": "OpenSSH",
+    "version_raw": "9.2p1",
+    "version_norm": "9.2p1"
+   },
+   {
+    "host_ip": "10.0.0.1",
+    "port": 3306,
+    "service": "mysql",
+    "product": "MariaDB",
+    "version_raw": "10.11.18",
+    "version_norm": "10.11.18"
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.1",
+  "affected": [],
+  "positive": false
+ }
+}

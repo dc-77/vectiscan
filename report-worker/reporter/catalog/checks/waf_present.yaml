@@ -8,7 +8,9 @@ group_by: fqdn
 scope: fqdn
 applicable_when: null
 when: null
-positive_when: 'fqdn.waf is not None and fqdn.waf.detected is True'
+# S6b-2 (spec/09 Q12): nur mit benanntem Produkt aus der eigenen Antwort, nicht aus der
+# Generic-Heuristik und nicht vom Ziel einer Weiterleitung.
+positive_when: 'fqdn.waf is not None and fqdn.waf.detected is True and fqdn.waf.name is not None and not matches(fqdn.waf.name, WAF_GENERIC) and not redirects_elsewhere(fqdn)'
 not_testable_when: []
 undetermined: pass_silent
 requires:
@@ -28,6 +30,9 @@ policy:
   start_level: null
   deviation: null
 texts:
+  plan:
+    lever: "Vorgeschaltete Schutzkomponente prüfen"
+    effect: "Filtert bekannte Angriffsmuster vor der Anwendung"
   observation: >-
     Vor {group} konnte keine Web Application Firewall festgestellt werden: {affected}.
   meaning: >-
@@ -46,5 +51,4 @@ texts:
   positive:
     title: Web Application Firewall vorhanden
     text: >-
-      Vor {group} ist eine Web Application Firewall aktiv, die Angriffe auf Anwendungsebene
-      filtert, bevor sie den Webdienst erreichen.
+      Vor {group} meldet sich eine Web Application Firewall mit benanntem Produkt.

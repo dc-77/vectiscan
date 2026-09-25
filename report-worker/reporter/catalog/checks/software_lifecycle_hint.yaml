@@ -31,6 +31,9 @@ policy:
     Einstufung sinkt gegenueber dem Prototyp von mittel auf Hygiene niedrig. Der Befund ist ein
     Lebenszyklus-Pruefauftrag, keine Aussage ueber die tatsaechlich installierte Softwareversion.
 texts:
+  plan:
+    lever: "Produktstand hinter Namen mit Jahreszahl prüfen"
+    effect: "Klärt, ob hinter dem Namen ein Produkt ohne Herstellerpflege steht"
   observation: >-
     Der Hostname von {group} enthält eine Zahlenfolge, die einem gängigen Produktjahr entspricht:
     {affected}. Der Hostname allein belegt keine installierte Version, gibt aber einen Anlass für

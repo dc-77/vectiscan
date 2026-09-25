@@ -1,0 +1,21 @@
+{
+ "_note": "Ohne belegte Anmeldung ist es admin_service_unconfirmed, nicht kritisch.",
+ "facts": {
+  "services": [
+   {
+    "host_ip": "10.0.0.7",
+    "port": 8443,
+    "service": "https-alt",
+    "product": "sw-cp-server",
+    "tunnel_ssl": true
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.7",
+  "affected": [],
+  "positive": false
+ }
+}

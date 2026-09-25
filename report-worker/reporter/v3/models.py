@@ -39,10 +39,17 @@ class Meta(Base):
     scan_date: str
     scan_window: str
     report_date: str
+    # S6b-2: Auslieferungsversion (Deckblatt, 1 bei der ersten Freigabe) und die interne
+    # Erzeugungsnummer aus reports.version (nur am Ende der Fusszeile).
     report_version: str
+    generation: Optional[int] = None
     report_id: str
     orders: list[OrderRef] = Field(default_factory=list)
+    # S6b-2 (#28): Nummern der ausgeschlossenen Befunde; genau dort darf die Folge Luecken haben.
+    excluded_ids: list[str] = Field(default_factory=list)
     hosts_total: int = 0
+    # S6b-2 (spec/09 Nachtrag S6b-1): Zahl der Systeme wie in Kapitel 2.1.
+    systems_total: int = 0
     hosts_ipv4: int = 0
     hosts_ipv6: int = 0
     fqdns_total: int = 0
@@ -230,10 +237,27 @@ class Architecture(Base):
 
 # ---------------------------------------------------------------- Schicht 3
 
+class Provenance(Base):
+    """Herkunft eines Textblocks (S6b-2, spec/09 Q4): welche Aussage welcher Pruefung ihn
+    traegt und fuer welche Mitglieder ihre Bedingung gilt. Nicht Teil des Kundentexts; das
+    Gate prueft damit, dass keine Aussage ohne erfuellte Bedingung im Bericht steht.
+
+    ``field``: title, observation, meaning, recommendation, verify, positive.
+    ``members``: ``<group_key>|<member_key>`` der fehlgeschlagenen (bei Positivbefunden der
+    bestandenen) Mitglieder, fuer die die Aussage steht.
+    """
+    field: str
+    check: str
+    statement: str
+    members: list[str] = Field(default_factory=list)
+    text: str = ""
+
+
 class Positive(Base):
     cat: str
     title: str
     text: str
+    provenance: list[Provenance] = Field(default_factory=list)
 
 
 class PlanRow(Base):
@@ -242,6 +266,8 @@ class PlanRow(Base):
     action: str
     refs: list[str] = Field(default_factory=list)
     effect: str = ""
+    # S6b-2 (Q6): Hebeltitel der fuehrenden Regel dieser Zeile, ohne Hostnamen.
+    lever: str = ""
 
 
 class Threat(Base):
@@ -277,6 +303,15 @@ class Finding(Base):
     # beheben kann: "beim Hoster" oder "beim Plattformbetreiber", dazu der Satz dazu.
     operator: str = ""
     operator_note: str = ""
+    # S6b-2: stabiler Schluessel des Sachverhalts (Regel oder Buendel, Gruppe,
+    # Zustaendigkeit); Befund-Ausschluesse (#28) verweisen darauf statt auf die Nummer.
+    key: str = ""
+    # S6b-2: Herkunft jedes Textblocks und die Massnahme der fuehrenden Regel fuer den Plan.
+    provenance: list[Provenance] = Field(default_factory=list)
+    plan_action: str = ""
+    plan_stage: str = ""
+    plan_effect: str = ""
+    plan_lever: str = ""
 
 
 # ---------------------------------------------------------------- Anhang

@@ -1,0 +1,47 @@
+id: admin_port_passive_unidentified
+title: Verwaltungsport laut Passivquelle ohne Kennung
+family: admin_service_exposed
+category: A
+scale: hygiene
+level: niedrig
+group_by: host
+scope: passive
+applicable_when: null
+# S6b-2 (spec/09 Q13, Entscheidung DC 25.09.): Ein Passivfund nur ueber den Port, ohne
+# Titel- oder Banner-Fingerabdruck, ist kein Befund. Er steht als Werkzeugmeldung im Anhang
+# (heuel 4433 mit "Server: xxxx", Cloudflare-Standardports bei bergersysteme).
+when: passive.source == "shodan" and passive.verified is False and passive.port in ADMIN_PORTS and not admin_fp(passive) and not is_cdn(host, services)
+positive_when: never
+not_testable_when: []
+undetermined: not_applicable
+requires:
+  tools: [shodan]
+kind: check
+bundle: tool_findings_unrated
+affected_template: "{host_ip}:{port} laut Passivquelle, ohne Kennung der Software"
+evidence: [passive]
+references: [CWE-284]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: Entscheidung DC 25.09.2026 (S6b-2, Q13)
+  start_level: niedrig
+  deviation: "Anhang statt Befund: ohne Fingerabdruck ist ein Verwaltungsdienst nicht belegt."
+texts:
+  observation: >-
+    Eine Passivquelle meldet auf {group} einen offenen Port, der üblicherweise für eine
+    Verwaltungsoberfläche genutzt wird, ohne Kennung der Software: {affected}.
+  meaning: >-
+    Ohne Kennung und ohne Bestätigung durch den eigenen Portscan ist das ein Hinweis, kein
+    Befund.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Prüfen, ob auf dem genannten Port ein Dienst läuft und ob er aus dem Internet erreichbar
+        sein muss.
+  verify: >-
+    Den genannten Port von einer externen Adresse prüfen; erwartet wird der Zustand gefiltert
+    oder geschlossen.

@@ -7,7 +7,11 @@ level: niedrig
 group_by: host
 scope: service
 applicable_when: null
-when: has_version(service.version_raw) and service.port not in WEB_PORTS
+# S6b-2 (spec/09 Q4): SSH-Banner und MariaDB/MySQL-Handshake tragen die Version als Teil
+# des Protokolls; sie laesst sich nicht abschalten und ist kein Befund.
+# S6b-2 (spec/09 Q4 LW, JW): "9.6.0 or later" ist die Untergrenze, die nmap aus dem
+# Protokoll ableitet; der Dienst selbst nennt keine Version ("PostgreSQL unbekannt").
+when: has_version(service.version_raw) and service.port not in WEB_PORTS and not matches(service.service, BANNER_FIXED) and not matches(service.product, BANNER_FIXED) and not matches(service.version_raw, VERSION_LOWER_BOUND)
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
@@ -28,6 +32,10 @@ policy:
   start_level: LOW
   deviation: null
 texts:
+  short: "Versionsangabe im Dienstbanner"
+  plan:
+    lever: "Versionsangaben aus den Dienstbannern entfernen"
+    effect: "Erschwert die gezielte Suche nach passenden Schwachstellen"
   observation: >-
     Der Dienst auf {group} gibt beim Verbindungsaufbau seine Produkt- und Versionskennung
     preis: {affected}.

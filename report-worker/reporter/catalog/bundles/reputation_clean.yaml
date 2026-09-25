@@ -1,5 +1,5 @@
 id: reputation_clean
-title: Adressen oder Domain in Reputationsquellen auffällig
+title: "Reputation der Adressen und der Domain: {rules}"
 category: E
 merge_by: global
 members: [ip_reputation, urlhaus_compromise]
@@ -10,28 +10,4 @@ frameworks:
   nis2: []
   iso27001: []
   tr03116: []
-texts:
-  observation: >-
-    Zu den geprüften Adressen oder zur Domain liegen Einträge in Reputationsquellen vor:
-    {affected}.
-  meaning: >-
-    Ein Eintrag in einer Reputationsquelle deutet auf missbräuchliche Aktivität aus dem eigenen
-    Netz oder auf eine Kompromittierung hin. Er beeinflusst zugleich die Zustellbarkeit der
-    eigenen Mail und die Bewertung der Domain durch Dritte.
-  recommendation:
-    - stage: unverzueglich
-      text: >-
-        Die gemeldete Aktivität nachvollziehen und die Ursache auf dem betroffenen System
-        beseitigen.
-    - stage: mittelfristig
-      text: >-
-        Nach der Bereinigung die Löschung des Eintrags bei der Quelle beantragen und die
-        Reputation der eigenen Adressen überwachen.
-  verify: >-
-    Die genannten Adressen und die Domain erneut in den Reputationsquellen nachschlagen; erwartet
-    wird kein Eintrag.
-  positive:
-    title: Keine Einträge in Reputationsquellen
-    text: >-
-      Zu den geprüften Adressen und zur Domain liegt in den abgefragten Reputationsquellen kein
-      Eintrag vor.
+positive_title: Keine Einträge in Reputationsquellen

@@ -339,6 +339,120 @@ def rolle_ohne_fakt(data: Any) -> list[Defect]:
     return out
 
 
+# ---------------------------------------------------------------- S6b-2
+
+def _members_index(output: Any) -> dict[tuple[str, str], Any]:
+    """(Pruefung, ``<group_key>|<member_key>``) -> Mitglied, ueber alle Ergebnisse."""
+    out: dict[tuple[str, str], Any] = {}
+    for r in getattr(output, "results", []) or []:
+        for m in r.members:
+            out[(r.check_id, f"{r.group_key}|{m.key}")] = m
+    return out
+
+
+def _results_index(output: Any) -> dict[tuple[str, str], Any]:
+    return {(r.check_id, r.group_key): r for r in getattr(output, "results", []) or []}
+
+
+def aussage_ohne_fakt(data: Any, output: Any) -> list[Defect]:
+    """Jede Aussage im Kundentext hat eine erfuellte Fakten-Bedingung (S6b-2, spec/09 Q4).
+
+    Befund: Titel, Befundtext, Auswirkung, Empfehlung und Verifikation bestehen genau aus
+    den Aussagen in ``provenance``, jede Aussage stammt aus einer Pruefung, die fuer die
+    genannten Mitglieder fehlgeschlagen ist, und ihre Bedingung gilt dort (``holds``).
+    Positivbefund: jede genannte Pruefung hat fuer die genannten Gruppen bestanden.
+    Ohne Katalogausgabe (Golden-Render ohne Output) entfaellt die Pruefung.
+    """
+    if output is None:
+        return []
+    mitglieder = _members_index(output)
+    ergebnisse = _results_index(output)
+    out: list[Defect] = []
+
+    def fehler(fid: Optional[str], text: str, detail: dict) -> None:
+        out.append(Defect(engine=ENGINE_V3, check="aussage_ohne_fakt", severity=SEVERITY_ERROR,
+                          message=text, finding_id=fid, detail=detail))
+
+    felder = {"observation": "found", "meaning": "impact", "verify": "verify"}
+    for f in data.findings:
+        prov = list(f.provenance or [])
+        if not prov:
+            fehler(f.id, f"Befund {f.id} ohne Herkunft seiner Aussagen", {})
+            continue
+        for feld, attr in felder.items():
+            teile: list[str] = []
+            for p in prov:
+                if p.field == feld and p.text not in teile:
+                    teile.append(p.text)
+            if " ".join(teile) != (getattr(f, attr) or ""):
+                fehler(f.id, f"{f.id}: Text in {attr} ohne Herkunft aus dem Katalog",
+                       {"feld": attr})
+        empfohlen = {p.text for p in prov if p.field == "recommendation"}
+        for _stufe, text in f.recommendation:
+            if text not in empfohlen:
+                fehler(f.id, f"{f.id}: Empfehlung ohne Herkunft: {text[:60]}", {"feld": "recommendation"})
+        for p in prov:
+            if not p.members:
+                fehler(f.id, f"{f.id}: Aussage {p.check}.{p.statement} ohne Mitglied", {"aussage": p.statement})
+                continue
+            for ref in p.members:
+                m = mitglieder.get((p.check, ref))
+                if m is None or m.status != "fail":
+                    fehler(f.id, f"{f.id}: {p.check} ist fuer {ref} nicht fehlgeschlagen",
+                           {"aussage": p.statement, "mitglied": ref})
+                    continue
+                if p.field != "title" and p.statement not in m.holds:
+                    fehler(f.id, f"{f.id}: Bedingung von {p.check}.{p.statement} gilt nicht fuer {ref}",
+                           {"aussage": p.statement, "mitglied": ref})
+    for pos in data.positives:
+        prov = list(pos.provenance or [])
+        if not prov:
+            fehler(None, f"Positivbefund ohne Herkunft: {pos.title}", {})
+            continue
+        texte = [p.text for p in prov if p.statement == "positive.text"]
+        if " ".join(dict.fromkeys(texte)) != pos.text:
+            fehler(None, f"Positivtext ohne Herkunft: {pos.title}", {})
+        for p in prov:
+            if p.statement != "positive.text":
+                continue
+            for group_key in p.members:
+                r = ergebnisse.get((p.check, group_key))
+                if r is None or r.status != "pass" or not r.positive:
+                    fehler(None, f"Positivbefund {pos.title}: {p.check} fuer {group_key} nicht bestanden",
+                           {"pruefung": p.check, "gruppe": group_key})
+    return out
+
+
+def zaehlung_widerspruch(data: Any) -> list[Defect]:
+    """Keine Zahl mit Zaehleinheit widerspricht der Zaehlung in 2.1 (S6b-2).
+
+    Geprueft werden die Texte, die ueber den ganzen Auftrag sprechen: die Zusammenfassung
+    auf Seite 2, der Kontextabsatz, die Einleitung von Kapitel 3 und die Systemsaetze.
+    Teilmengen ("Fuer 1 System war die aktive Pruefung nur teilweise moeglich") stehen in
+    Kapitel 2 und im Hinweis zur Abdeckung; sie kommen aus demselben Modell und bleiben
+    hier aussen vor.
+    """
+    from reporter.v3.gate import count_mismatches
+    from reporter.v3.prose import counts_of
+
+    counts = counts_of(data)
+    felder: list[tuple[str, str]] = [
+        ("glance.overall_text", data.glance.overall_text or ""),
+        ("glance.context", data.glance.context or ""),
+        ("business.lead", data.business.lead or ""),
+        ("business.implication", data.business.implication or ""),
+        ("architecture.lead", data.architecture.lead or ""),
+    ]
+    felder += [(f"business.observed[{o.system}]", o.meaning or "") for o in data.business.observed]
+    out: list[Defect] = []
+    for where, text in felder:
+        for grund in count_mismatches(text, counts):
+            out.append(Defect(
+                engine=ENGINE_V3, check="zaehlung_widerspruch", severity=SEVERITY_ERROR,
+                message=f"{where}: {grund}", detail={"where": where}))
+    return out
+
+
 def run_all(data: Any, facts: Any, output: Any, *, strict: bool = False) -> list[Defect]:
     """Alle Pruefungen in fester Reihenfolge."""
     defects: list[Defect] = []
@@ -350,4 +464,6 @@ def run_all(data: Any, facts: Any, output: Any, *, strict: bool = False) -> list
     defects.extend(einschraenkung_ohne_pruefung(data))
     defects.extend(werkzeugname_im_kundentext(data))
     defects.extend(rolle_ohne_fakt(data))
+    defects.extend(aussage_ohne_fakt(data, output))
+    defects.extend(zaehlung_widerspruch(data))
     return defects

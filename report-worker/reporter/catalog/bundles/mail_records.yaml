@@ -1,8 +1,8 @@
 id: mail_records
-title: Grundlegende Einträge zur Absender-Authentizität fehlen für {group}
+title: "Einträge zur Absender-Authentizität für {group}: {rules}"
 category: C
 merge_by: domain
-members: [spf_missing, dkim_missing]
+members: [spf_missing, dkim_missing, mail_spoofing_unprotected]
 target: findings
 references: [CWE-290]
 frameworks:
@@ -10,26 +10,4 @@ frameworks:
   nis2: []
   iso27001: []
   tr03116: []
-texts:
-  observation: >-
-    Für {group} fehlen Einträge, mit denen Empfangssysteme einen Absender prüfen können:
-    {affected}.
-  meaning: >-
-    Ohne diese Einträge kann ein Empfangssystem nicht unterscheiden, ob eine Nachricht wirklich
-    aus Ihrer Domain stammt. Gefälschte Absender im Namen des Unternehmens sind damit ohne
-    besonderen Aufwand möglich.
-  recommendation:
-    - stage: in_kuerze
-      text: >-
-        Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im
-        Namen der Domain senden.
-    - stage: mittelfristig
-      text: >-
-        Die Einträge nach jeder Änderung an den Versandwegen prüfen und die Signatur der
-        ausgehenden Nachrichten überwachen.
-  verify: >-
-    DNS-Abfrage für die genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag.
-  positive:
-    title: Absender-Authentizität mit SPF und DKIM hinterlegt
-    text: >-
-      Für {group} sind die grundlegenden Einträge zur Absender-Authentizität vorhanden.
+positive_title: Absender-Authentizität mit SPF und DKIM hinterlegt

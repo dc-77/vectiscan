@@ -7,6 +7,8 @@ ohne Versionsnummer, weil der Gate-Check des Prototyps das verlangt (spec/03 Reg
 """
 from __future__ import annotations
 
+from reporter.v3 import levels as _levels
+
 # ---------------------------------------------------------------- Impressum
 
 PROVIDER = {
@@ -97,7 +99,7 @@ TOOL_ROWS: list[tuple[str, str, str, tuple[str, ...]]] = [
               "dns_security", "web_probe")),
     ("Shodan, AbuseIPDB, OTX, URLhaus", "Passive Dienst- und Reputationsdaten",
      "mittel (Passivquelle, Zeitversatz)",
-     ("shodan", "abuseipdb", "otx", "urlhaus", "greynoise", "securitytrails", "whois")),
+     ("shodan", "abuseipdb", "otx", "urlhaus", "greynoise", "securitytrails")),
     ("NVD, EPSS, CISA KEV", "Abgleich erkannter Versionen mit Fremdquellen zu Schwachstellen",
      "hoch (autoritative Fremdquelle)", ("phase3_correlation",)),
 ]
@@ -144,12 +146,10 @@ def testssl_name(test_id: str) -> str:
 
 # ---------------------------------------------------------------- Skalen (Anhang A)
 
-EXPOSURE_SCALE: list[tuple[str, str]] = [
-    ("kritisch", "Dienst, der nicht an das öffentliche Interface gehört (Datenbanken, "
-                 "Verwaltungsoberflächen, Fernwartung) und aus dem Internet erreichbar ist."),
-    ("erhöht", "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder "
-               "mit ungeklärter Funktion."),
-]
+# S6b-2 (spec/09 Q13, E1): die Verwaltungsfaelle stehen in ``levels.ADMIN_EXPOSURE``, aus
+# derselben Tabelle wie die Einstufung der Verwaltungspruefungen. Vorher nannte A.2
+# "Verwaltungsoberflaechen" kritisch, waehrend die Regel "erhoeht" vergab.
+EXPOSURE_SCALE: list[tuple[str, str]] = _levels.exposure_scale()
 
 HYGIENE_SCALE: list[tuple[str, str]] = [
     ("hoch", "Abweichung mit direktem Bezug zu Anmeldedaten, Authentizität oder Zugangswegen; "
@@ -181,6 +181,9 @@ def triage_rows() -> list[tuple[str, str, str]]:
     for status, meaning in TRIAGE_MEANING:
         phrase = L.urgency_phrase(status)
         text = f"{meaning} Dringlichkeit: {phrase}." if phrase else meaning
+        # S6b-2 (E2): benannte Ausnahmen der Abbildungstabelle stehen bei Rot.
+        if status == L.TRIAGE_URGENT.status and L.urgent_phrase():
+            text = f"{text} {L.urgent_phrase()}"
         out.append((L.STATUS_LABELS[status], status, text))
     return out
 
@@ -206,9 +209,9 @@ POSTURE_BLOCKS: list[dict[str, object]] = [
         "name": "E-Mail-Authentizität",
         "short": "E-Mail-Authentizität",
         "items": [
-            ("SPF", ("spf_missing", "spf_permissive", "spf_softfail")),
+            ("SPF", ("spf_missing", "spf_permissive", "spf_softfail", "mail_spoofing_unprotected")),
             ("DKIM", ("dkim_missing",)),
-            ("DMARC", ("dmarc_missing", "dmarc_none", "dmarc_quarantine")),
+            ("DMARC", ("dmarc_missing", "dmarc_none", "dmarc_quarantine", "mail_spoofing_unprotected")),
             ("MTA-STS", ("mta_sts_missing",)),
             ("TLS-RPT, DANE", ("tls_rpt_missing", "dane_missing")),
         ],
@@ -229,8 +232,8 @@ POSTURE_BLOCKS: list[dict[str, object]] = [
         "per_host": ("tls_legacy_protocols", "tls_no_13", "tls_weak_ciphers", "tls_weakness",
                      "tls_no_fallback_scsv", "hsts_short"),
         "items": [
-            ("Zertifikate", ("cert_expired", "cert_expiring", "cert_chain_incomplete",
-                             "cert_hostname_mismatch", "cert_self_signed")),
+            ("Zertifikate", ("cert_expired", "cert_expiring", "cert_expiring_later",
+                             "cert_chain_incomplete", "cert_hostname_mismatch", "cert_self_signed")),
         ],
     },
     {
@@ -347,6 +350,7 @@ FAMILY_CHECKS: dict[str, str] = {
     "legacy_protocols_present": "Ältere Übertragungsprotokolle",
     "login_portal_exposed": "Anmeldeportale",
     "mail_plaintext": "Verschlüsselung der Mailzugänge",
+    "mail_spoofing_unprotected": "Fälschungsschutz für Domains ohne Mailbetrieb",
     "mta_sts_missing": "MTA-STS",
     "passive_service_unverified": "Dienste laut Passivquelle",
     "rdp_exposed": "Windows-Fernwartung (RDP)",

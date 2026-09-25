@@ -8,7 +8,10 @@ group_by: host
 scope: software
 applicable_when: null
 when: software.eol.status == "eol" and software.kind in ["webserver", "database", "mail", "os", "ssh", "ftp", "control_panel"]
-positive_when: software.kind in ["webserver", "database", "mail", "os", "ssh", "ftp", "control_panel"] and (software.eol.status == "supported" or (software.family == "exchange" and software.edition == "SE"))
+# S6b-2 (spec/09 Teil 2 castenow): Exchange SE ist gepflegt (kein EOL-Befund), aber ohne
+# Patchstand ist "laufende Herstellerpflege" nicht belegt; nur eine Version mit Lebenszyklus
+# "supported" traegt den Positivbefund.
+positive_when: software.kind in ["webserver", "database", "mail", "os", "ssh", "ftp", "control_panel"] and software.eol.status == "supported"
 not_testable_when: []
 undetermined: pass_silent
 requires:
@@ -33,19 +36,39 @@ policy:
     Version (S1); unbekannte Versionen ergeben keinen Befund. Exchange Subscription Edition gilt
     ueber die Build-Tabelle als gepflegt (Entscheidung DC 19.09.2026).
 texts:
+  plan:
+    lever: "Serversoftware ohne Herstellerpflege ersetzen"
+    effect: "Schließt Lücken, für die der Hersteller keine Updates mehr liefert"
   observation: >-
     Auf {group} läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist:
     {affected}.
-  meaning: >-
-    Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte
-    Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits
-    zurückgreifen. Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner
-    nicht erkennbar ist.
+  meaning:
+    - text: >-
+        Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte
+        Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits
+        zurückgreifen.
+    - when: software.kind != "os"
+      quantor: eines
+      text: >-
+        Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner nicht
+        erkennbar ist: {affected}.
+    - when: software.kind == "os"
+      quantor: eines
+      text: >-
+        Das Release des Betriebssystems ist aus der Paketkennung eines Dienstes abgeleitet; mit
+        dem Ende der Unterstützung erhalten alle Pakete dieses Releases keine Sicherheitsupdates
+        mehr: {affected}.
   recommendation:
     - stage: in_kuerze
+      when: software.kind != "os"
       text: >-
         Prüfen, ob die Version tatsächlich ungepflegt ist oder ob die Distribution
         Sicherheits-Backports liefert.
+    - stage: in_kuerze
+      when: software.kind == "os"
+      text: >-
+        Das Betriebssystem auf ein Release mit laufender Sicherheitsunterstützung anheben oder
+        eine verlängerte Unterstützung für das eingesetzte Release sicherstellen.
     - stage: mittelfristig
       text: >-
         Auf eine vom Hersteller gepflegte Version aktualisieren und einen festen Update-Rhythmus

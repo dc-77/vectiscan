@@ -30,13 +30,26 @@ policy:
     Ein Datenbankdienst am oeffentlichen Interface ist nach der Expositionsskala des Prototyps
     kritisch (VS-001); SP-DB-002/003 stufen EOL- und Mehrfach-Hosts ohnehin CRITICAL ein.
 texts:
+  plan:
+    lever: "Datenbankdienste vom Internet trennen"
+    effect: "Entzieht Angreifern den direkten Zugriff auf die Datenbanken"
   observation: >-
     {n:Der Host|Die Hosts} {group} {n:beantwortet|beantworten} Verbindungen auf Datenbankports aus dem gesamten Internet:
     {affected}. Ein Datenbankdienst gehört nicht an das öffentliche Interface.
-  meaning: >-
-    Ein von außen erreichbarer Datenbankdienst erlaubt Passwort-Rateangriffe rund um die Uhr und
-    macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar. Betroffen wären die
-    gespeicherten Inhalte, typischerweise Seiteninhalte, Formulareingaben und Kontaktdaten.
+  meaning:
+    - text: >-
+        Ein von außen erreichbarer Datenbankdienst macht jede künftige Schwachstelle im
+        Datenbankserver sofort ausnutzbar.
+    - when: service.rejects_before_auth is not True
+      quantor: eines
+      text: >-
+        Wo der Dienst eine Anmeldung von außen entgegennimmt, sind Passwort-Rateangriffe rund
+        um die Uhr möglich: {affected}.
+    - when: service.rejects_before_auth is True
+      quantor: eines
+      text: >-
+        Laut Passivquelle weist der Dienst fremde Quellen vor der Anmeldung ab; die
+        Erreichbarkeit des Ports bleibt trotzdem eine unnötige Angriffsfläche: {affected}.
   recommendation:
     - stage: unverzueglich
       text: >-

@@ -17,18 +17,22 @@ from reporter.facts import schema as FS
 
 UNKNOWN = "unbekannt"
 
+# S6b-2 (spec/09 Q7): ZAP-Konfidenz im Kundentext deutsch.
+CONFIDENCE_TEXT = {"High": "hoch", "Medium": "mittel", "Low": "niedrig", "Confirmed": "bestätigt"}
+
 # Variablen je Scope fuer affected_template.
 ITEM_VARS: dict[str, tuple[str, ...]] = {
     "scan": ("domain", "domains", "order_id"),
     "service": ("host_ip", "port", "proto", "service", "product", "product_or_service", "version", "family",
-                "db_name", "admin_name", "mail_name", "legacy_name", "fqdn_names", "host_label", "tls_note"),
+                "db_name", "admin_name", "mail_name", "legacy_name", "fqdn_names", "host_label", "tls_note",
+                "mail_login", "admin_label"),
     "host": ("host_ip", "fqdn_names", "host_label", "ports_list", "reverse", "abuseipdb_score", "otx_pulse_count"),
     "fqdn": ("fqdn", "host_ip", "title", "http_status", "final_url", "waf_name", "host_label", "year_hint_names"),
     "http": ("fqdn", "host_ip", "url", "score", "missing_headers", "missing_headers_basic", "server_header", "powered_by",
              "disclosure_headers", "hsts_max_age", "csp_flags", "duplicate_headers", "x_feserver", "wp_users",
              "wp_version_status", "host_label"),
     "http.alerts": ("fqdn", "host_ip", "plugin_id", "name", "risk", "confidence", "url_path", "count",
-                    "host_label"),
+                    "host_label", "run_label"),
     "http.paths": ("fqdn", "host_ip", "url_path", "status", "host_label"),
     "http.cookies": ("fqdn", "host_ip", "name", "flags_missing", "host_label"),
     "tls": ("fqdn", "host_ip", "port", "legacy_protocols", "ciphers_weak", "vulns", "cert_cn", "days_left", "not_after",
@@ -38,7 +42,8 @@ ITEM_VARS: dict[str, tuple[str, ...]] = {
     "dns.dangling_cnames": ("domain", "fqdn", "cname_target", "takeover_risk"),
     "software": ("host_ip", "fqdn", "product", "family", "kind", "version", "build", "edition", "eol_date", "eol_status",
                  "host_label", "vulnerabilities_count"),
-    "passive": ("host_ip", "port", "product", "version", "source", "seen_at", "domain", "host_label"),
+    "passive": ("host_ip", "port", "product", "version", "source", "seen_at", "domain", "host_label",
+                "product_or_banner"),
     "threat": ("cve_id", "host_ip", "port", "cvss", "epss", "kev", "product", "version", "host_label"),
     "target": ("domain", "expires_at", "registrar", "days_left"),
 }
@@ -115,6 +120,22 @@ def format_strict(template: str, values: dict[str, Any], where: str) -> str:
         raise CatalogSpecError(f"{where}: Template-Variable {exc} fehlt") from None
 
 
+# Kennungen im Banner, die ein Produkt benennen (S6b-2, spec/09 Q13).
+_BANNER_PRODUCTS: tuple[tuple[str, str], ...] = (
+    ("sw-cp-server", "Plesk"), ("miniserv", "Webmin"), ("webmin", "Webmin"), ("plesk", "Plesk"),
+    ("sonicwall", "SonicWall"), ("fortigate", "FortiGate"), ("fortinet", "Fortinet"),
+    ("cpanel", "cPanel"), ("portainer", "Portainer"), ("proxmox", "Proxmox"),
+)
+
+
+def banner_product(banner: str | None) -> str | None:
+    low = (banner or "").lower()
+    for token, name in _BANNER_PRODUCTS:
+        if token in low:
+            return name
+    return None
+
+
 def _host_label(index: FactsIndex, ip: str | None) -> str:
     if not ip:
         return UNKNOWN
@@ -142,7 +163,23 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
         product = (sw.product if sw else None) or o.product
         if o.port in T.DB_PORTS and sw is None:
             product = o.product if (o.product and "mysql" not in o.product.lower()) else T.DB_PORTS[o.port]
+        # S6b-2 (spec/09 Q13): ohne nmap-Produkt nennt der Fingerabdruck die Software
+        # ("Server: MiniServ" ist Webmin), nicht der geratene Portname.
+        product = product or banner_product(o.fp_server) or banner_product(o.fp_title)
+        if o.starttls is False:
+            mail_login = "ohne STARTTLS"
+        elif o.starttls is True and o.tls_required is False:
+            mail_login = "mit Anmeldung vor STARTTLS"
+        elif o.tls_required is False:
+            mail_login = "ohne erzwungenes TLS"
+        else:
+            mail_login = ""
         v.update({"proto": o.proto, "service": o.service, "product": product, "product_or_service": product or o.service,
+                  "mail_login": mail_login,
+                  # S6b-2 (spec/09 Q13): die Verwaltungssoftware laut Fingerabdruck
+                  # (Plesk auf 443 des Plesk-Servers, nicht "nginx").
+                  "admin_label": (banner_product(o.fp_server) or banner_product(o.fp_title)
+                                  or banner_product(o.product) or product or o.service),
                   "version": _version_of(sw.version_norm if sw else None, o.version_norm), "family": o.family,
                   "db_name": T.DB_PORTS.get(o.port), "admin_name": T.ADMIN_PORTS.get(o.port),
                   "mail_name": T.MAIL_PORTS.get(o.port), "legacy_name": T.LEGACY_PORTS.get(o.port),
@@ -176,7 +213,11 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
     elif scope == "http.alerts":
         from reporter.catalog.scope import _url_path
         v.update({"plugin_id": o.plugin_id, "name": o.name, "risk": o.risk,
-                  "confidence": o.confidence or "", "url_path": _url_path(o.url), "count": o.count})
+                  "confidence": CONFIDENCE_TEXT.get(o.confidence or "", "nicht angegeben"),
+                  "url_path": _url_path(o.url), "count": o.count,
+                  # S6b-2 (spec/09 Q14): die Quelle nennt den Lauf, aus dem die Meldung stammt.
+                  "run_label": {"passive": "passiv gemeldet von ZAP",
+                                "active": "aktiv gemeldet von ZAP"}.get(o.run or "", "gemeldet von ZAP")})
     elif scope == "http.paths":
         from reporter.catalog.scope import _url_path
         v.update({"url_path": _url_path(o.url), "status": o.status})
@@ -213,7 +254,7 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
                   "vulnerabilities_count": o.vulnerabilities_count})
     elif scope == "passive":
         v.update({"product": o.product, "version": o.version, "source": o.source, "seen_at": (o.seen_at or "")[:10] or None,
-                  "domain": o.domain})
+                  "domain": o.domain, "product_or_banner": o.product or banner_product(o.banner_excerpt)})
     elif scope == "threat":
         sw = item.ctx.get("software")
         v.update({"cve_id": o.cve_id, "cvss": o.cvss_nvd.score if o.cvss_nvd else None,

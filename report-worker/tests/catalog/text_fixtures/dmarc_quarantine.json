@@ -1,0 +1,68 @@
+{
+ "check": "dmarc_quarantine",
+ "cases": [
+  {
+   "name": "p=quarantine mit Meldeadresse (spec/09 Q4 HE, HL)",
+   "facts": {
+    "dns": [
+     {
+      "domain": "example.test",
+      "mx": [
+       "mx.example.test"
+      ],
+      "dmarc": {
+       "present": true,
+       "p": "quarantine",
+       "raw": "v=DMARC1; p=quarantine; rua=mailto:d@example.test",
+       "rua": [
+        "mailto:d@example.test"
+       ]
+      }
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "example.test": []
+    },
+    "not_holds": {
+     "example.test": [
+      "meaning[1]",
+      "recommendation[1]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  },
+  {
+   "name": "p=quarantine ohne Meldeadresse",
+   "facts": {
+    "dns": [
+     {
+      "domain": "example.test",
+      "mx": [
+       "mx.example.test"
+      ],
+      "dmarc": {
+       "present": true,
+       "p": "quarantine",
+       "raw": "v=DMARC1; p=quarantine"
+      }
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "example.test": [
+      "meaning[1]",
+      "recommendation[1]"
+     ]
+    },
+    "not_holds": {
+     "example.test": []
+    }
+   },
+   "coverage_default": "ok"
+  }
+ ]
+}

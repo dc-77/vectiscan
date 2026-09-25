@@ -1,0 +1,44 @@
+{
+ "check": "db_exposed",
+ "cases": [
+  {
+   "name": "PostgreSQL weist ab, MariaDB nimmt Anmeldungen an (spec/09 Teil 2 LW)",
+   "facts": {
+    "services": [
+     {
+      "host_ip": "10.0.0.2",
+      "port": 5432,
+      "service": "postgresql",
+      "product": "PostgreSQL DB",
+      "rejects_before_auth": true
+     },
+     {
+      "host_ip": "10.0.0.2",
+      "port": 3306,
+      "service": "mysql",
+      "product": "MariaDB"
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "10.0.0.2:5432": [
+      "meaning[2]"
+     ],
+     "10.0.0.2:3306": [
+      "meaning[1]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.2:5432": [
+      "meaning[1]"
+     ],
+     "10.0.0.2:3306": [
+      "meaning[2]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  }
+ ]
+}

@@ -1,9 +1,8 @@
 id: cert_health
-title: Zertifikate auf {group} mit Beanstandungen
+title: "Zertifikate auf {group}: {rules}"
 category: D
 merge_by: host
-members: [cert_expired, cert_expiring, cert_chain_incomplete, cert_hostname_mismatch,
-          cert_self_signed]
+members: [cert_expired, cert_expiring, cert_expiring_later, cert_chain_incomplete, cert_hostname_mismatch, cert_self_signed]
 target: findings
 references: [CWE-295, CWE-297]
 frameworks:
@@ -11,27 +10,4 @@ frameworks:
   nis2: []
   iso27001: []
   tr03116: []
-texts:
-  observation: >-
-    Die Zertifikate auf {group} sind abgelaufen, laufen in Kürze ab, werden unvollständig
-    ausgeliefert oder passen nicht zum aufgerufenen Namen: {affected}.
-  meaning: >-
-    Ein Zertifikat mit Beanstandung führt im Browser zu einer Vertrauenswarnung. Nutzer gewöhnen
-    sich daran, solche Warnungen wegzuklicken, und übersehen dann auch eine echte Täuschung.
-  recommendation:
-    - stage: unverzueglich
-      text: >-
-        Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst
-        hinterlegen.
-    - stage: mittelfristig
-      text: >-
-        Alle Namen, unter denen ein Dienst aufgerufen wird, in das Zertifikat aufnehmen und die
-        Erneuerung automatisieren.
-  verify: >-
-    Eine verschlüsselte Verbindung zu den genannten Diensten aufbauen; erwartet wird ein gültiges
-    Zertifikat mit vollständiger Kette und passendem Namen.
-  positive:
-    title: Zertifikate gültig, vollständig verkettet und passend zum Namen
-    text: >-
-      Auf {group} liefern die verschlüsselten Dienste gültige Zertifikate mit vollständiger
-      Vertrauenskette aus.
+positive_title: Zertifikate gültig, vollständig verkettet und passend zum Namen

@@ -7,7 +7,9 @@ level: niedrig
 group_by: fqdn
 scope: http.alerts
 applicable_when: null
-when: zap_match(alert, ZAP_CSRF)
+# S6b-2 (spec/09 Q14): nur Meldungen mit Konfidenz High tragen eine Regel; darunter
+# stehen sie als Werkzeugmeldung im Anhang (web_vulnerability_reported).
+when: '(zap_match(alert, ZAP_CSRF)) and alert.confidence == "High"'
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
@@ -30,6 +32,10 @@ policy:
     SP-CSRF-001 bis 003 unterscheiden nach Zustandsaenderung und Anmeldung, was von aussen nicht
     bestimmbar ist; die Simulation fuehrt den Werkzeugbefund als Hygiene niedrig.
 texts:
+  short: "Formulare ohne Anti-CSRF-Token"
+  plan:
+    lever: "Formulare mit Anti-CSRF-Token absichern"
+    effect: "Verhindert, dass fremde Seiten Aktionen im Namen angemeldeter Nutzer auslösen"
   observation: >-
     Die passive Webanalyse hat auf {group} Formulare ohne Anti-CSRF-Token gefunden: {affected}.
   meaning: >-

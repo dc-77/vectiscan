@@ -31,6 +31,9 @@ policy:
     (catalog_sim) fuehrt die Familie als Hygiene mittel, weil ein einsehbares Verzeichnis
     unmittelbar Dateinamen und Struktur offenlegt. Diese Umsetzung folgt catalog_sim.
 texts:
+  plan:
+    lever: "Verzeichnisanzeige am Webserver abschalten"
+    effect: "Verbirgt Dateien, die nicht für Besucher bestimmt sind"
   observation: >-
     Die passive Webanalyse hat auf {group} ein einsehbares Verzeichnis ohne eigene Startseite
     gefunden: {affected}.

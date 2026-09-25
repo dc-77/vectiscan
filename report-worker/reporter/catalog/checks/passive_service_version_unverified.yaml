@@ -32,6 +32,9 @@ policy:
     false); eine Aussage zum Support-Ende ist damit nicht belastbar. Die Pruefung bleibt deshalb
     bei einem Pruefauftrag zu Patchstand und Erreichbarkeit, ohne eigene EOL-Behauptung.
 texts:
+  plan:
+    lever: "Von der Passivquelle gemeldete Dienste prüfen"
+    effect: "Klärt, ob ein ungepflegter Dienst erreichbar ist"
   observation: >-
     Für {group} meldet eine Passivquelle eine Dienstversion, die der Portscan nicht bestätigen
     konnte: {affected}.

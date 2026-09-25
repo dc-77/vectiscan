@@ -1,5 +1,5 @@
 id: mail_transport_enforcement
-title: Transportverschlüsselung im Mailversand für {group} nicht erzwungen
+title: "Verschlüsselte Zustellung von E-Mails für {group}: {rules}"
 category: C
 merge_by: domain
 members: [mta_sts_missing, tls_rpt_missing, dane_missing]
@@ -10,22 +10,4 @@ frameworks:
   nis2: []
   iso27001: []
   tr03116: []
-texts:
-  observation: >-
-    Für {group} fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung
-    erzwingen und Fehler zurückmelden kann: {affected}.
-  meaning: >-
-    Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen,
-    wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das
-    erzwingen und die Nachrichten mitlesen.
-  recommendation:
-    - stage: strategisch
-      text: >-
-        Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS
-        veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain.
-  verify: >-
-    DNS-Abfrage der genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag.
-  positive:
-    title: Transportverschlüsselung im Mailversand ist hinterlegt
-    text: >-
-      Für {group} sind die Einträge für eine erzwungene Transportverschlüsselung vorhanden.
+positive_title: Verschlüsselte Zustellung von E-Mails ist hinterlegt

@@ -553,6 +553,69 @@ def _normalize_excluded_ids(raw: object) -> list[str]:
     return ids
 
 
+def _next_delivery_version(conn: psycopg2.extensions.connection, order_id: str) -> int:
+    """Auslieferungsversion des naechsten freigegebenen Berichts (S6b-2).
+
+    1 bei der ersten Freigabe, danach je Freigabe hochgezaehlt. Ein Entwurf zeigt die
+    Version, die er bei seiner Freigabe bekaeme; die Freigabe erzeugt den Bericht ohnehin
+    neu. Ohne Migration 049 bleibt es bei 1.
+    """
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT COALESCE(MAX(delivery_version), 0) FROM reports WHERE order_id = %s",
+                (order_id,),
+            )
+            return int(cur.fetchone()[0] or 0) + 1
+    except Exception:
+        conn.rollback()
+        log.warning("delivery_version_query_failed", order_id=order_id)
+        return 1
+
+
+def _exclusion_keys(conn: psycopg2.extensions.connection, order_id: str,
+                    excluded_raw: list) -> set[str]:
+    """Stabile Schluessel der ausgeschlossenen Befunde (Issue #28).
+
+    Ein Eintrag mit ``finding_key`` (ab Migration 049) nennt den Schluessel selbst. Aeltere
+    Eintraege nennen nur die Befundnummer; sie werden ueber ``findings_data`` des letzten
+    Berichts auf den Schluessel abgebildet. Was sich nicht abbilden laesst, entfaellt mit
+    Warnung, statt einen anderen Befund zu treffen.
+    """
+    keys: set[str] = set()
+    nur_nummer: list[str] = []
+    for item in excluded_raw or []:
+        if isinstance(item, dict) and item.get("finding_key"):
+            keys.add(str(item["finding_key"]))
+            continue
+        fid = item.get("finding_id") if isinstance(item, dict) else item
+        if fid:
+            nur_nummer.append(str(fid))
+    if nur_nummer:
+        bekannt: dict[str, str] = {}
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT findings_data FROM reports WHERE order_id = %s ORDER BY version DESC LIMIT 1",
+                    (order_id,),
+                )
+                row = cur.fetchone()
+            data = row[0] if row else None
+            if isinstance(data, str):
+                data = json.loads(data)
+            for f in (data or {}).get("findings") or []:
+                if isinstance(f, dict) and f.get("id") and f.get("key"):
+                    bekannt[str(f["id"])] = str(f["key"])
+        except Exception:
+            conn.rollback()
+        for fid in nur_nummer:
+            if fid in bekannt:
+                keys.add(bekannt[fid])
+            else:
+                log.warning("excluded_finding_without_key", order_id=order_id, finding_id=fid)
+    return keys
+
+
 def _create_report_record(
     conn: psycopg2.extensions.connection,
     order_id: str,
@@ -567,6 +630,7 @@ def _create_report_record(
     additional_findings: list[dict] | None = None,
     validation_warnings: dict | None = None,
     report_number: str | None = None,
+    delivery_version: int | None = None,
 ) -> tuple[str, str]:
     """Insert a row into the reports table and return (report_id, download_token).
 
@@ -583,6 +647,9 @@ def _create_report_record(
 
     Migration 047 (S6a): report_number — die Berichtsnummer vom Deckblatt
     (VS-<Jahr>-<MMTT>-<Order>), nur im Katalogweg gesetzt.
+
+    Migration 049 (S6b-2): delivery_version — die Auslieferungsversion vom
+    Deckblatt, nur fuer Zeilen aus einer Freigabe gesetzt.
     """
     download_token = str(uuid.uuid4())
     expires_at = datetime.now(timezone.utc) + timedelta(days=30)
@@ -602,9 +669,13 @@ def _create_report_record(
                 EXISTS (
                     SELECT FROM information_schema.columns
                     WHERE table_name = 'reports' AND column_name = 'report_number'
+                ),
+                EXISTS (
+                    SELECT FROM information_schema.columns
+                    WHERE table_name = 'reports' AND column_name = 'delivery_version'
                 )
         """)
-        has_validation_warnings_col, has_report_number_col = cur.fetchone()
+        has_validation_warnings_col, has_report_number_col, has_delivery_col = cur.fetchone()
 
     columns = [
         "order_id", "minio_bucket", "minio_path", "file_size_bytes",
@@ -640,6 +711,16 @@ def _create_report_record(
             "report_number_column_missing_skipping",
             order_id=order_id,
             hint="Run Migration 047 (api initDb auto-applies on next API start)",
+        )
+
+    if has_delivery_col:
+        columns.append("delivery_version")
+        values.append(delivery_version)
+    elif delivery_version:
+        log.warning(
+            "delivery_version_column_missing_skipping",
+            order_id=order_id,
+            hint="Run Migration 049 (api initDb auto-applies on next API start)",
         )
 
     with conn.cursor() as cur:
@@ -1020,12 +1101,10 @@ def process_job(job_data: dict) -> None:
         # -- 4. Call Claude API for analysis (nur Engine legacy) --------------
         if not uses_legacy:
             # S6: Der Katalogweg laesst die KI-Befunderzeugung, die
-            # Reparaturkette und die Severity-Policy vollstaendig aus. Ein
-            # Ausschluss einzelner Befunde wirkt auf diesem Weg noch nicht; das
-            # Datenmodell v3 kennt keine Ausschlussliste (offener Punkt nach S6).
-            if excluded:
-                log.warning("excluded_findings_ignored_by_catalog_engine",
-                            order_id=order_id, count=len(excluded), ids=excluded)
+            # Reparaturkette und die Severity-Policy vollstaendig aus. S6b-2
+            # (Issue #28): Ausschluesse wirken ueber den stabilen Schluessel
+            # des Sachverhalts (_exclusion_keys), nicht ueber die Nummer.
+            pass
         elif package == "tlscompliance":
             # TLS-Compliance: build TR summary as findings text for Haiku
             from reporter.tr03116_checker import check_tr03116_compliance
@@ -1370,11 +1449,18 @@ def process_job(job_data: dict) -> None:
             customer_context = _research_customer_context(
                 conn, order_id, _load_customer_context(conn, order_id),
                 effective_inventory)
+            # S6b-2: Deckblatt mit Auslieferungsversion, Fusszeile mit der
+            # Erzeugungsnummer (reports.version); ausgeschlossene Befunde ueber
+            # ihren stabilen Schluessel (Issue #28).
+            delivery_version = _next_delivery_version(conn, order_id)
             v3_facts, v3_output, v3_data = report_bundle_from_source(
                 scan_data_dir, effective_inventory, effective_profiles,
                 job_data.get("correlatedFindings"), job_data,
                 tool_runs=tool_runs,
                 customer_context=customer_context,
+                report_version=str(delivery_version),
+                generation=version,
+                excluded_keys=_exclusion_keys(conn, order_id, excluded_raw),
             )
             _apply_report_prose(v3_data, customer_context, order_id)
 
@@ -1506,6 +1592,9 @@ def process_job(job_data: dict) -> None:
             additional_findings=additional_findings,
             validation_warnings=validation_warnings_payload,
             report_number=v3_data.meta.report_id if v3_data is not None else None,
+            delivery_version=(int(v3_data.meta.report_version)
+                              if v3_data is not None and is_approved
+                              and str(v3_data.meta.report_version).isdigit() else None),
         )
         log.info("report_record_created", report_id=report_id,
                  download_token=download_token, version=version,
