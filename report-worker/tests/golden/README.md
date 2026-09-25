@@ -325,8 +325,9 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
     Dashboard-Profile: eine Adresse ohne eigene Messung haengt als `additional_ips` an der
     Leitadresse ihres Systems. Halbleere Seiten mit Ursache; der Kategorieblock in
     Kapitel 4 bricht ab mehr als sechs Zeilen nach der Kopfzeile um (f77ccff2 Seite 11
-    nicht mehr halbleer), 1f8bc977 Seite 25 und 2d2d4f39 Seite 27 bleiben (Kapitelanfang,
-    Merkposten S7).
+    nicht mehr halbleer, 1f8bc977 durch den Umfluss 34 statt 35 Seiten ohne halbleere
+    Seite). Bekannt halbleer bleiben 2d2d4f39 Seite 27 und f77ccff2 Seite 27, beide vor
+    einem Kapitelanfang mit erzwungenem Seitenwechsel (Merkposten S7).
 
 ## Golden-Facts (S1)
 

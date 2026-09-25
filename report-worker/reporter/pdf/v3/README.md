@@ -122,8 +122,10 @@ freien Rest in mm und womit die Folgeseite beginnt, einen nicht umbrechbaren Blo
 Name und Hoehe, einen Kapitelanfang mit erzwungenem Seitenwechsel oder umbrechbaren
 Inhalt. Regel: ist es ein einzelner Block, darf er nach seiner Kopfzeile umbrechen
 (Kategorieblock in Kapitel 4 ab mehr als `CAT_KEEP` Zeilen, f77ccff2 Seite 11); vor
-einem Kapitelanfang bleibt die Luecke stehen und ist ein Merkposten fuer S7 (1f8bc977
-Seite 25, 2d2d4f39 Seite 27, je 165 mm frei).
+einem Kapitelanfang bleibt die Luecke stehen und ist ein Merkposten fuer S7. Stand nach
+dem Umbau (Pipeline 3204): 2d2d4f39 Seite 27 (165 mm frei) und f77ccff2 Seite 27
+(192 mm frei, erst durch den Umfluss entstanden), beide vor einem Kapitelanfang;
+1f8bc977 hat keine halbleere Seite mehr.
 
 Neu festschreiben nach einer gewollten Aenderung:
 

@@ -7,6 +7,10 @@ Befund aus ``--update-pages`` (MR-Pipeline 3203):
   nach seiner Kopfzeile umbrechen.
 - 1f8bc977 Seite 25 und 2d2d4f39 Seite 27: je 165 mm frei vor einem Kapitelanfang mit
   erzwungenem Seitenwechsel. Kein einzelner Block; Merkposten fuer S7, nicht gebaut.
+
+Nach dem Umbau (Pipeline 3204): 1f8bc977 ohne halbleere Seite (34 statt 35 Seiten);
+bei f77ccff2 ist durch den Umfluss Seite 27 vor einem Kapitelanfang halbleer (192 mm
+frei), ebenfalls Merkposten S7.
 """
 from __future__ import annotations
 
