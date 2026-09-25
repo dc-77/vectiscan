@@ -446,6 +446,11 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
     14272c00 21->17, 31d67a02 14->6, 860d0d5a 13->6, 2572eebc 10->4, 45bb234c 7->4,
     176db198 23->20, a6df9d9d 5->4, fb13a98f 4->3, c3d5724c und 57b3ac85 1->0 (die
     Technikmeldung steht jetzt in der Tabelle); 3cf01f8d, 68d59573 und 75338c97 gleich.
+  - Seitenerwartung (ops-update-pages, MR-Pipeline 3213): der kuerzere Anhang spart eine
+    bis zwei Seiten, 0bf16342 31->30, 176db198 22->21, 1f8bc977 34->33, 2d2d4f39 45->43,
+    2e56abe1 24->23, 31d67a02 28->27, 45bb234c 23->22, 4e6b6883 45->43, 860d0d5a 28->27,
+    ae8d1d70 36->34, f77ccff2 44->43; halbleer bleiben 2d2d4f39 Seite 28 und 4e6b6883 Seite
+    27 (Merkposten S7).
 
 ## Abgleich spec/09 nach S6b-2
 
