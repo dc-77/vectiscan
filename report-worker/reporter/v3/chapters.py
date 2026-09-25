@@ -9,6 +9,8 @@ S6b-1: Abdeckung und Einschränkungen stehen in ``coverage.py``, Rollen in ``rol
 """
 from __future__ import annotations
 
+import re
+
 import os
 from collections import Counter
 from dataclasses import dataclass
@@ -475,23 +477,46 @@ def _ohne_eigene_tabelle(host: FS.HostFact) -> bool:
     return host.third_party is not None or bool(host.reach and host.reach.status == "no_ipv6_route")
 
 
-# S6b-2 (Entscheidung DC 25.09., spec/09 Q14 und Q11-Rest): eine Technikzeile braucht
-# Konfidenz hoch oder zwei unabhaengige Quellen. Sonst steht die Meldung nur als
-# Werkzeugmeldung im Anhang ("Java/Servlet" allein aus webtech bei heuel).
-TECH_MIN_CONFIDENCE = 0.9
-TECH_MIN_SOURCES = 2
+# Technikzeile oder Anhang (Entscheidung DC 26.09., ersetzt die Schwelle vom 25.09.):
+# (a) eine Messung von nmap oder testssl steht in der Tabelle, auch ohne Version
+#     (PostgreSQL "or later" ohne Version und ohne EOL, S6a2-Regel);
+# (b) httpx- und webtech-Eintraege stehen dort mit einer Version aus dem Werkzeugbeleg
+#     (Header, Skriptpfad, Banner) oder wenn eine zweite Quelle sie bestaetigt
+#     (cms_fingerprint, wpscan, nmap, header_check); cms_fingerprint und wpscan pruefen die
+#     Anwendung gezielt und zaehlen deshalb auch allein ("NEOS" aus cms_fingerprint bei heuel);
+# (c) ein Eintrag ohne Version aus nur einer Quelle steht im Anhang ("Java/Servlet" aus
+#     webtech und "Neos Flow" aus httpx bei heuel).
+# Vorher (25.09.): Konfidenz ab 0,9 oder zwei Quellen; damit fielen jQuery Migrate 3.4.1,
+# PHP mit Version und PostgreSQL aus der Tabelle.
+TECH_MEASURED = frozenset({"nmap", "testssl", "cms_fingerprint", "wpscan"})
+
+
+def _tech_quellen(gruppe: list[FS.SoftwareFact]) -> set[str]:
+    return {q for s in gruppe for q in s.detection_sources} | {s.source for s in gruppe}
+
+
+# Eine Ziffernfolge ohne Punkt ab sechs Stellen ist kein Versionsstand, sondern ein
+# Zeitstempel aus dem Skriptpfad ("bootstrap.css?ver=1771057841", securess ae8d1d70).
+_CACHE_BUSTER = re.compile(r"\d{6,}")
+
+
+def _versionsangabe(sw: FS.SoftwareFact) -> bool:
+    v = sw.version_norm or ""
+    return bool(v) and not _CACHE_BUSTER.fullmatch(v)
 
 
 def _tech_bestaetigt(gruppe: list[FS.SoftwareFact]) -> bool:
-    quellen = {q for s in gruppe for q in s.detection_sources} or {s.source for s in gruppe}
-    return max(s.confidence for s in gruppe) >= TECH_MIN_CONFIDENCE or len(quellen) >= TECH_MIN_SOURCES
+    quellen = _tech_quellen(gruppe)
+    if quellen & TECH_MEASURED:
+        return True
+    return any(_versionsangabe(s) for s in gruppe) or len(quellen) >= 2
 
 
 def tech_lines(facts: FS.Facts, *, unconfirmed: list[TechLine] | None = None) -> dict[str, list[TechLine]]:
     """Zeilen je Host-IP in Berichtsreihenfolge; Hosts ohne Software fehlen.
 
-    ``unconfirmed`` sammelt die Zeilen, die die Schwelle aus Konfidenz und Quellen nicht
-    erreichen; sie gehen als Werkzeugmeldung in den Anhang.
+    ``unconfirmed`` sammelt die Zeilen ohne Version und ohne bestaetigende Messung
+    (``_tech_bestaetigt``); sie gehen als Werkzeugmeldung in den Anhang.
     """
     by_host: dict[str, list[FS.SoftwareFact]] = {}
     for sw in facts.software:
@@ -546,11 +571,13 @@ def tech_tool_findings(facts: FS.Facts) -> list["ToolFinding"]:
     tech_lines(facts, unconfirmed=offen)
     out: list[ToolFinding] = []
     for line in offen:
-        was = line.product if line.version == UNKNOWN else f"{line.product} {line.version}"
+        was = (line.product if line.version == UNKNOWN or not _versionsangabe(line.software)
+               else f"{line.product} {line.version}")
         out.append(ToolFinding(
-            what=f"Technik: {was}", where=line.software.fqdn or line.software.host_ip,
-            note=(f"Nur laut {line.sources} mit Konfidenz {line.conf_label}; ohne zweite Quelle "
-                  "nicht in der Technologietabelle.")))
+            what=f"Technik „{was}“", where=line.software.fqdn or line.software.host_ip,
+            note=(f"Nur laut {line.sources}, ohne Version und ohne zweite Quelle; nicht in der "
+                  "Technologietabelle."),
+            rule="technik", message=was))
     return out
 
 

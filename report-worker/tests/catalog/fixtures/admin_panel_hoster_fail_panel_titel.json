@@ -1,0 +1,37 @@
+{
+ "_note": "Derselbe froxlor-Titel auf einem geteilten Server: beim Hoster, erhoeht (E1).",
+ "facts": {
+  "hosts": [
+   {
+    "ip": "10.0.0.9",
+    "shared": {
+     "kind": "hoster",
+     "operator": "Hoster AG",
+     "signals": [
+      "fremde_namen_zertifikat"
+     ]
+    }
+   }
+  ],
+  "services": [
+   {
+    "host_ip": "10.0.0.9",
+    "port": 443,
+    "service": "https",
+    "product": "Apache httpd",
+    "tunnel_ssl": true,
+    "fp_server": "Apache/2.4.67 (Debian)",
+    "fp_title": "froxlor"
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.9",
+  "affected": [
+   "10.0.0.9:443 (froxlor)"
+  ],
+  "positive": false
+ }
+}

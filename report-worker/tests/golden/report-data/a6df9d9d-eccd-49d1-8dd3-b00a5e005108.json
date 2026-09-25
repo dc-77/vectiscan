@@ -128,29 +128,70 @@
   ],
   "tool_findings": [
    {
+    "count": 1,
+    "message": "Information Disclosure - Suspicious Comments",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10027",
+    "what": "„Information Disclosure - Suspicious Comments“ (ZAP-Regel 10027)",
+    "where": "openotp.junkerwerk.hu"
+   },
+   {
+    "count": 1,
+    "message": "BREACH",
+    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
+    "what": "„BREACH“",
+    "where": "openotp.junkerwerk.hu"
+   },
+   {
+    "count": 1,
+    "message": "LUCKY13",
+    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
+    "what": "„LUCKY13“",
+    "where": "openotp.junkerwerk.hu"
+   },
+   {
+    "count": 1,
+    "message": "Absence of Anti-CSRF Tokens",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10202",
+    "what": "„Absence of Anti-CSRF Tokens“ (ZAP-Regel 10202)",
+    "where": "openotp.junkerwerk.hu"
+   }
+  ],
+  "tool_messages": [
+   {
+    "count": 1,
+    "message": "Information Disclosure - Suspicious Comments",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10027",
     "what": "openotp.junkerwerk.hu (Information Disclosure - Suspicious Comments)",
     "where": "openotp.junkerwerk.hu"
    },
    {
+    "count": 1,
+    "message": "BREACH",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "openotp.junkerwerk.hu:443: BREACH (Hinweis der TLS-Analyse)",
     "where": "openotp.junkerwerk.hu"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "openotp.junkerwerk.hu:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "openotp.junkerwerk.hu"
    },
    {
+    "count": 1,
+    "message": "Absence of Anti-CSRF Tokens",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10202",
     "what": "Absence of Anti-CSRF Tokens auf openotp.junkerwerk.hu/openid/login_uid.php (Konfidenz niedrig, passiv gemeldet von ZAP)",
     "where": "openotp.junkerwerk.hu"
-   },
-   {
-    "note": "Nur laut nmap mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: PostgreSQL",
-    "where": "188.40.3.130"
    }
   ],
   "tools": [
@@ -432,6 +473,15 @@
       "st": "grau",
       "status": "unbekannt",
       "v": "10.11.18 (debian)"
+     },
+     {
+      "c": "PostgreSQL",
+      "conf": "mittel",
+      "note": "Version von außen nicht genau bestimmbar",
+      "src": "nmap",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
      },
      {
       "c": "ProFTPD",
@@ -1791,8 +1841,8 @@
  "landscape_lead": "10 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 18,
-  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
-  "catalog_version": "2026-09-25.2",
+  "catalog_digest": "3def4b8b695693f10cdc3c448b9600bfc7e6ba365814cf1aef184ec7b573b6fd",
+  "catalog_version": "2026-09-26.1",
   "classification": "Vertraulich",
   "consolidated": 10,
   "context_sources": {},
@@ -1816,7 +1866,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-25.2",
+  "policy_version": "2026-09-26.1",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",

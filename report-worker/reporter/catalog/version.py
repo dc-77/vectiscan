@@ -58,13 +58,20 @@ Bump-Historie:
                   Werkzeugmeldung (nur OPTIONS), ZAP-Cookie-Meldungen nicht mehr ignoriert.
                   Ein neues Datum waere erst morgen; die zweite Version desselben Tages
                   folgt der Regel "jede Aenderung bumpt".
+    2026-09-26.1  Nachtrag S6b-2 (Entscheidung DC 26.09. Frage 1): der Seitentitel eines
+                  Hosting-Panels (`panel_title`, froxlor, Plesk, cPanel ...) ist ein
+                  Fingerabdruck nach Q13 und steht fuer seine Anmeldeseite; auf einem
+                  System des Kunden `admin_service_exposed` (kritisch), beim Hoster
+                  `admin_panel_hoster` (erhoeht). Neue Aussagen fuer die Standardseite des
+                  Webservers (Port 80/443 ueber die IP). Mitglieder tragen Name und
+                  Kennung der Werkzeugmeldung (`message`, `message_id`) fuer den Anhang.
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-25.2"
+CATALOG_VERSION = "2026-09-26.1"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"

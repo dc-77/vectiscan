@@ -25,6 +25,7 @@ from reporter.catalog import render
 from reporter.catalog.evidence import merge_parts
 from reporter.catalog.schema import CatalogOutput, CheckInfo, CheckResult, Member
 from reporter.facts import schema as FS
+from reporter.facts.serialize import sort_key
 from reporter.v3 import ids as IDS
 from reporter.v3 import levels as L
 from reporter.v3 import tables as T
@@ -618,8 +619,13 @@ def build_findings(
             for r in sorted(item.results, key=lambda r: (r.check_id, r.group_key)):
                 if r.status != "fail":
                     continue
-                for label in r.affected:
-                    tool_findings.append(ToolFinding(what=label, where=r.group_label, note=f"{r.title}."))
+                for m in r.members:
+                    if m.status != "fail":
+                        continue
+                    ort = m.fqdn or (f"{m.host_ip}:{m.port}" if m.host_ip and m.port else m.host_ip) or r.group_label
+                    regel = f"{r.check_id}#{m.message_id}" if m.message_id else r.check_id
+                    tool_findings.append(ToolFinding(what=m.label, where=ort, note=f"{r.title}.",
+                                                     rule=regel, message=m.message))
             continue
         index += 1
         fid = IDS.finding_id(kuerzel, year, index)
@@ -757,4 +763,50 @@ def build_positives(items: list[Consolidated]) -> list[Positive]:
                                   members=[r.group_key for r in item.results], text=title))
         out.append(Positive(cat=item.category, title=title, text=" ".join(texte),
                             provenance=prov))
+    return out
+
+
+# ---------------------------------------------------------------- Anhang: eine Zeile je Meldung
+
+# Nachtrag S6b-2 (Entscheidung DC 26.09.): hoechstens sechs Betroffene je Zeile.
+MAX_BETROFFENE = 6
+
+
+def _meldungen(n: int) -> str:
+    return "1 Meldung" if n == 1 else f"{n} Meldungen"
+
+
+def summarize_tool_messages(messages: list[ToolFinding]) -> list[ToolFinding]:
+    """Werkzeugmeldungen fuer den Anhang: eine Zeile je Meldung mit Anzahl und Betroffenen.
+
+    Nachtrag S6b-2 (Entscheidung DC 26.09.): vorher stand jede Einzelmeldung in einer
+    eigenen Zeile, beim castenow-Vorlauf 4e6b6883 waren das 46. Jetzt eine Zeile je
+    ZAP-Regel, testssl-Hinweis, Technik oder Regel ohne Meldungsnamen; die Betroffenen
+    (Hosts oder VHosts) stehen in einer Zelle, hoechstens sechs und "und n weitere". Der
+    Meldungsname des Werkzeugs steht als Zitat, der Hinweis nennt die Regel auf Deutsch.
+    Die Einzelmeldungen bleiben in ``appendix.tool_messages``.
+    """
+    gruppen: dict[tuple[str, str], list[ToolFinding]] = {}
+    for t in messages:
+        gruppen.setdefault((t.rule, t.message or ""), []).append(t)
+    out: list[ToolFinding] = []
+    for (rule, name), rows in gruppen.items():
+        orte = sorted({r.where for r in rows if r.where}, key=sort_key)
+        betrifft = ", ".join(orte[:MAX_BETROFFENE])
+        if len(orte) > MAX_BETROFFENE:
+            betrifft += f" und {len(orte) - MAX_BETROFFENE} weitere"
+        first = rows[0]
+        if rule == "technik":
+            what = first.what
+        elif name:
+            kennung = rule.split("#", 1)[1] if "#" in rule else ""
+            what = f"„{name}“" + (f" (ZAP-Regel {kennung})" if kennung else "")
+        else:
+            # Ohne Meldungsnamen (TRACE aus OPTIONS, Passivport ohne Kennung): der Regeltitel.
+            what = first.note.rstrip(".")
+        if len(rows) > 1:
+            what = f"{what}, {_meldungen(len(rows))}"
+        note = first.note if (rule == "technik" or name) else "Werkzeugmeldung ohne eigene Einstufung."
+        out.append(ToolFinding(what=what, where=betrifft, note=note, rule=rule, message=first.message,
+                               count=len(rows)))
     return out

@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-25.2 auf tests/golden/facts/57b3ac85-a1da-47e9-b783-d28ad9a9fa35.json",
+ "source": "reporter.catalog 2026-09-26.1 auf tests/golden/facts/57b3ac85-a1da-47e9-b783-d28ad9a9fa35.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [

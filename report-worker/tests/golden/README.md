@@ -413,6 +413,39 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
     die uebrigen drei unveraendert; castenow-Vorlaeufe 4e6b6883 46->45,
     f77ccff2 46->44. Halbleer vor einem Kapitelanfang bleiben 2d2d4f39 Seite 28 (vorher 27)
     und neu 4e6b6883 Seite 27, f77ccff2 nicht mehr (Merkposten S7, wie in S6b-1).
+- Nachtrag 2 zu S6b-2 (Entscheidungen DC 26.09. zu den offenen Fragen 1 bis 3 und 6),
+  Katalog 2026-09-26.1, Reportdaten aller 21 Auftraege, Soll-Listen und HTML-Schnappschuss
+  neu gebaut; Fakten unveraendert.
+  - Frage 1 (Hosting-Panel-Titel): `panel_title` erkennt froxlor, Plesk, cPanel und
+    verwandte Panels am Seitentitel; der Titel steht fuer die Anmeldeseite. Auf einem System
+    des Kunden `admin_service_exposed` (kritisch), beim Hoster `admin_panel_hoster`
+    (erhoeht). Neue Aussagen fuer die Standardseite des Webservers (80/443 ueber die IP).
+    Nur dortmund-beach aendert sich: 88.99.35.112:443 (froxlor) steht im selben Befund wie
+    Webmin auf 10000 (Soll-Listen `dortmund-beach-0923` und `dortmund-beach`, Befundzahl
+    gleich). Die spec/09-Markierung "unsicher" ist damit entschieden.
+  - Frage 2 (Technikzeilen, ersetzt die Schwelle vom 25.09.): nmap, testssl,
+    cms_fingerprint und wpscan stehen auch ohne Version in der Tabelle, httpx und webtech
+    mit einer Version aus dem Werkzeugbeleg oder einer zweiten Quelle; ohne Version aus
+    nur einer Quelle im Anhang. Eine Ziffernfolge ab sechs Stellen ohne Punkt gilt nicht als
+    Version (Zeitstempel im Skriptpfad, "Bootstrap 1771057841" bei ae8d1d70). Zurueck in der
+    Tabelle: PostgreSQL ohne Version und EOL (0bf16342, 2572eebc, 31d67a02, 57b3ac85,
+    860d0d5a, a6df9d9d, c3d5724c), jQuery Migrate 3.4.1 (14272c00, 1f8bc977, 1fbc92b9,
+    2d2d4f39, 45bb234c, 4e6b6883, ae8d1d70, f77ccff2), dazu BeTheme, Slider Revolution,
+    Underscore.js, Elementor und Yoast SEO mit Version. Im Anhang bleiben bei heuel
+    "Java/Servlet", "Neos Flow", "Neos CMS" und PHP ohne Version; "NEOS" aus
+    cms_fingerprint steht in der Tabelle. Technikzeilen je Auftrag: 0bf16342 14->15,
+    14272c00 12->16, 1f8bc977 19->21, 1fbc92b9 12->16, 2572eebc 13->14, 2d2d4f39 24->26,
+    31d67a02 13->14, 45bb234c 9->12, 4e6b6883 24->26, 57b3ac85 8->9, 860d0d5a 13->14,
+    a6df9d9d 8->9, ae8d1d70 19->22, c3d5724c 8->9, f77ccff2 24->26; die uebrigen gleich.
+  - Frage 3 (Anhang je Meldung): eine Zeile je ZAP-Regel, testssl-Hinweis, Technik oder
+    Regel ohne Meldungsnamen, mit Anzahl und hoechstens sechs Betroffenen plus "und n
+    weitere"; die Einzelmeldungen stehen in `appendix.tool_messages` fuer den Export (S7).
+    Frage 6: Meldungsname als Zitat, deutscher Regeltitel als Hinweis. Anhangzeilen je
+    Auftrag: 4e6b6883 46->14 (44 Einzelmeldungen), 2d2d4f39 37->14, f77ccff2 32->12,
+    ae8d1d70 31->12, 1f8bc977 30->15, 0bf16342 20->8, 2e56abe1 21->15, 1fbc92b9 und
+    14272c00 21->17, 31d67a02 14->6, 860d0d5a 13->6, 2572eebc 10->4, 45bb234c 7->4,
+    176db198 23->20, a6df9d9d 5->4, fb13a98f 4->3, c3d5724c und 57b3ac85 1->0 (die
+    Technikmeldung steht jetzt in der Tabelle); 3cf01f8d, 68d59573 und 75338c97 gleich.
 
 ## Abgleich spec/09 nach S6b-2
 
@@ -442,7 +475,7 @@ nennt Session und Test, "offen" den Grund und die Session.
 | Teil 2 DB | Fundstelle `wp-json/wp/v2/users` | erledigt S6b-2 (`users_found_by`) |
 | Teil 2 DB | Wildcard `*.dortmund-beach.com` in Hostlisten | erledigt S6b-2 (2.1, Systemsaetze, Einschraenkungen) |
 | Teil 2 DB | Bildschirmfoto pflege zeigt die WordPress-Startseite | offen, Scanner (S6c, Bildnachweis je Name) |
-| Teil 2 DB | froxlor auf 443 ueber die IP (in spec/09 unsicher, ohne Regel) | offen: der Bericht sagt dazu nichts Falsches; froxlor-Titel als Fingerabdruck ist eine Regelfrage fuer DC (offene Frage S6b-2) |
+| Teil 2 DB | froxlor auf 443 ueber die IP (in spec/09 unsicher, ohne Regel) | erledigt Nachtrag 2 S6b-2 nach Entscheidung DC 26.09. (`panel_title`, kritisch auf dem System des Kunden) |
 | Teil 2 DB | 587 mit AUTH vor STARTTLS gruen | offen: SMTP-Regel nach E5 (spec/09 Teil 4), S6c |
 | Teil 2 LW, JW | Rateangriffe bei PostgreSQL mit Abweisung | erledigt S6b-2 (`NEG-S6B2-POSTGRESQL-RATEANGRIFF`) |
 | Teil 2 JW | LUCKY13 nur bei .29 | erledigt S6b-2 (beide als Hinweis im Anhang) |

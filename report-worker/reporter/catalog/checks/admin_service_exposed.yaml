@@ -7,7 +7,9 @@ level: kritisch
 group_by: host
 scope: service
 applicable_when: null
-when: admin_fp(service) and service.fp_login is True and (host is None or host.shared is None) and not is_cdn(host, services)
+# Nachtrag S6b-2 (Entscheidung DC 26.09.): der Titel eines Hosting-Panels steht fuer seine
+# Anmeldeseite (dortmund-beach 88.99.35.112:443 "froxlor" ueber die IP, Standard-VHost).
+when: admin_fp(service) and (service.fp_login is True or panel_title(service)) and (host is None or host.shared is None) and not is_cdn(host, services)
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
@@ -36,11 +38,27 @@ texts:
   plan:
     lever: "Verwaltungsoberflächen vom Internet trennen"
     effect: "Entzieht Angreifern den direkten Zugang zur Verwaltung der Systeme"
-  observation: >-
-    {n:Der Host|Die Hosts} {group} {n:bietet|bieten} eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten
-    Internet erreichbar ist: {affected}. Die Antwort des Dienstes nennt die Verwaltungssoftware
-    und verlangt eine Anmeldung; eine Zugriffsbeschränkung auf bestimmte Quellnetze war von
-    außen nicht erkennbar.
+  observation:
+    - text: >-
+        {n:Der Host|Die Hosts} {group} {n:bietet|bieten} eine Verwaltungsoberfläche mit Anmeldung an, die aus dem
+        gesamten Internet erreichbar ist: {affected}.
+    - when: service.fp_login is True
+      quantor: eines
+      text: >-
+        Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung:
+        {affected}.
+    - when: service.fp_login is not True and panel_title(service)
+      quantor: eines
+      text: >-
+        Der Seitentitel nennt ein Hosting-Panel, dessen Startseite die Anmeldung ist:
+        {affected}.
+    - when: service.port in WEB_PORTS
+      quantor: eines
+      text: >-
+        Die Oberfläche erscheint beim Aufruf über die IP-Adresse, also auf der Standardseite
+        des Webservers und nicht unter einem Hostnamen der Webseite: {affected}.
+    - text: >-
+        Eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar.
   meaning: >-
     Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten
     Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten oder
@@ -50,6 +68,12 @@ texts:
       text: >-
         Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa
         über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.
+    - stage: in_kuerze
+      when: service.port in WEB_PORTS
+      quantor: eines
+      text: >-
+        Die Standardseite des Webservers, die beim Aufruf über die IP-Adresse erscheint, auf
+        eine neutrale Seite oder eine Fehlerantwort umstellen.
     - stage: in_kuerze
       text: >-
         Mehrfaktor-Anmeldung für die Verwaltungsoberfläche aktivieren und Standardkonten

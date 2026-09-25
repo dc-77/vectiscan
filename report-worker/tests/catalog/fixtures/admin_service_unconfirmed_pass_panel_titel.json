@@ -1,0 +1,23 @@
+{
+ "_note": "Der froxlor-Titel ist kein unbestaetigter Dienst, sondern admin_service_exposed (Nachtrag S6b-2).",
+ "facts": {
+  "services": [
+   {
+    "host_ip": "10.0.0.7",
+    "port": 443,
+    "service": "https",
+    "product": "Apache httpd",
+    "tunnel_ssl": true,
+    "fp_server": "Apache/2.4.67 (Debian)",
+    "fp_title": "froxlor"
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.7",
+  "affected": [],
+  "positive": false
+ }
+}

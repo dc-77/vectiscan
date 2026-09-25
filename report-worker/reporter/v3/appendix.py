@@ -99,6 +99,7 @@ def _anreicherung_gelaufen(facts: FS.Facts) -> bool:
 
 def build_appendix(facts: FS.Facts, output: CatalogOutput, findings: list[Finding],
                    cve_refs: list[CveRef], tool_findings: list[ToolFinding],
+                   tool_messages: list[ToolFinding] | None,
                    counts: N.Counts, scan_date: str, provider: str,
                    port_refs: dict[tuple[str, int], list[Finding]] | None = None) -> Appendix:
     has_red = any(f.status == "rot" for f in findings)
@@ -114,6 +115,7 @@ def build_appendix(facts: FS.Facts, output: CatalogOutput, findings: list[Findin
         inventory=build_inventory(facts, port_refs),
         tools=build_tools(facts),
         tool_findings=tool_findings,
+        tool_messages=list(tool_messages or []),
         dkim_selectors=C.dkim_selectors_for_appendix(facts, output),
         filtering=N.filtering(counts),
         repeat=N.repeat(counts, has_red, has_gaps),

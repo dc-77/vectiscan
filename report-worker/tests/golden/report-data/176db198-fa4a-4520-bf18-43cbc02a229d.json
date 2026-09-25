@@ -240,118 +240,349 @@
   ],
   "tool_findings": [
    {
+    "count": 1,
+    "message": "In Page Banner Information Leak",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
-    "what": "ose.heuel.com (Big Redirect Detected (Potential Sensitive Information Leak))",
+    "rule": "info_disclosure#10009",
+    "what": "„In Page Banner Information Leak“ (ZAP-Regel 10009)",
     "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Big Redirect Detected (Potential Sensitive Information Leak)",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10044",
+    "what": "„Big Redirect Detected (Potential Sensitive Information Leak)“ (ZAP-Regel 10044)",
+    "where": "ose.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Private IP Disclosure",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#2",
+    "what": "„Private IP Disclosure“ (ZAP-Regel 2)",
+    "where": "ose.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Cross-Domain JavaScript Source File Inclusion",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10017",
+    "what": "„Cross-Domain JavaScript Source File Inclusion“ (ZAP-Regel 10017)",
+    "where": "www.heuel.com"
+   },
+   {
+    "count": 2,
+    "message": "Timestamp Disclosure - Unix",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
+    "what": "„Timestamp Disclosure - Unix“ (ZAP-Regel 10096), 2 Meldungen",
+    "where": "online.heuel.com, www.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Vulnerable JS Library",
+    "note": "Veraltete JavaScript-Bibliothek eingebunden.",
+    "rule": "js_library_outdated#10003",
+    "what": "„Vulnerable JS Library“ (ZAP-Regel 10003)",
+    "where": "ose.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Cookie No HttpOnly Flag",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10010",
+    "what": "„Cookie No HttpOnly Flag“ (ZAP-Regel 10010)",
+    "where": "ose.heuel.com"
+   },
+   {
+    "count": 2,
+    "message": "Cookie Without Secure Flag",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10011",
+    "what": "„Cookie Without Secure Flag“ (ZAP-Regel 10011), 2 Meldungen",
+    "where": "ose.heuel.com, www.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Cookie without SameSite Attribute",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10054",
+    "what": "„Cookie without SameSite Attribute“ (ZAP-Regel 10054)",
+    "where": "ose.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Cross-Domain Misconfiguration",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10098",
+    "what": "„Cross-Domain Misconfiguration“ (ZAP-Regel 10098)",
+    "where": "ose.heuel.com"
+   },
+   {
+    "count": 2,
+    "message": "Absence of Anti-CSRF Tokens",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10202",
+    "what": "„Absence of Anti-CSRF Tokens“ (ZAP-Regel 10202), 2 Meldungen",
+    "where": "ose.heuel.com, www.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Cookie with SameSite Attribute None",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10054",
+    "what": "„Cookie with SameSite Attribute None“ (ZAP-Regel 10054)",
+    "where": "online.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Cloudflare Bot Management",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Cloudflare Bot Management“",
+    "where": "104.16.10.6"
+   },
+   {
+    "count": 1,
+    "message": "Cloudflare CDN",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Cloudflare CDN“",
+    "where": "104.16.10.6"
+   },
+   {
+    "count": 1,
+    "message": "Java/Servlet",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Java/Servlet“",
+    "where": "20.79.218.75"
+   },
+   {
+    "count": 1,
+    "message": "Google Analytics",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Google Analytics“",
+    "where": "217.72.203.132"
+   },
+   {
+    "count": 1,
+    "message": "Google Tag Manager",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Google Tag Manager“",
+    "where": "217.72.203.132"
+   },
+   {
+    "count": 1,
+    "message": "Neos CMS",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Neos CMS“",
+    "where": "217.72.203.132"
+   },
+   {
+    "count": 1,
+    "message": "Neos Flow",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Neos Flow“",
+    "where": "217.72.203.132"
+   },
+   {
+    "count": 1,
+    "message": "PHP",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „PHP“",
+    "where": "217.72.203.132"
+   }
+  ],
+  "tool_messages": [
+   {
+    "count": 1,
+    "message": "In Page Banner Information Leak",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10009",
     "what": "ose.heuel.com (In Page Banner Information Leak)",
     "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Big Redirect Detected (Potential Sensitive Information Leak)",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10044",
+    "what": "ose.heuel.com (Big Redirect Detected (Potential Sensitive Information Leak))",
+    "where": "ose.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Private IP Disclosure",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#2",
     "what": "ose.heuel.com (Private IP Disclosure)",
     "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Cross-Domain JavaScript Source File Inclusion",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10017",
     "what": "www.heuel.com (Cross-Domain JavaScript Source File Inclusion)",
-    "where": "www.heuel.com (+heuel.com, jobs.heuel.com)"
+    "where": "www.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
     "what": "www.heuel.com (Timestamp Disclosure - Unix)",
-    "where": "www.heuel.com (+heuel.com, jobs.heuel.com)"
+    "where": "www.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Vulnerable JS Library",
     "note": "Veraltete JavaScript-Bibliothek eingebunden.",
+    "rule": "js_library_outdated#10003",
     "what": "ose.heuel.com (Vulnerable JS Library, Medium)",
     "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Cookie No HttpOnly Flag",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
-    "what": "Absence of Anti-CSRF Tokens auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz niedrig, passiv gemeldet von ZAP)",
-    "where": "ose.heuel.com"
-   },
-   {
-    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10010",
     "what": "Cookie No HttpOnly Flag auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz mittel, passiv gemeldet von ZAP)",
     "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Cookie Without Secure Flag",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10011",
     "what": "Cookie Without Secure Flag auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz mittel, passiv gemeldet von ZAP)",
     "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Cookie without SameSite Attribute",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10054",
     "what": "Cookie without SameSite Attribute auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz mittel, passiv gemeldet von ZAP)",
     "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Cross-Domain Misconfiguration",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10098",
     "what": "Cross-Domain Misconfiguration auf ose.heuel.com/webmodule-ee/ (Konfidenz mittel, passiv gemeldet von ZAP)",
     "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Absence of Anti-CSRF Tokens",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
-    "what": "Absence of Anti-CSRF Tokens auf www.heuel.com/en/kontakt-heuel-logistics.html (Konfidenz niedrig, passiv gemeldet von ZAP)",
-    "where": "www.heuel.com (+heuel.com, jobs.heuel.com)"
+    "rule": "web_vulnerability_reported#10202",
+    "what": "Absence of Anti-CSRF Tokens auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz niedrig, passiv gemeldet von ZAP)",
+    "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Cookie Without Secure Flag",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10011",
     "what": "Cookie Without Secure Flag auf www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fahrplan%20Landverkehre%20Jahreswechsel%2025-26.pdf (Konfidenz mittel, passiv gemeldet von ZAP)",
-    "where": "www.heuel.com (+heuel.com, jobs.heuel.com)"
+    "where": "www.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Absence of Anti-CSRF Tokens",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10202",
+    "what": "Absence of Anti-CSRF Tokens auf www.heuel.com/en/kontakt-heuel-logistics.html (Konfidenz niedrig, passiv gemeldet von ZAP)",
+    "where": "www.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
     "what": "online.heuel.com (Timestamp Disclosure - Unix)",
     "where": "online.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Cookie with SameSite Attribute None",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10054",
     "what": "Cookie with SameSite Attribute None auf online.heuel.com/ (Konfidenz mittel, passiv gemeldet von ZAP)",
     "where": "online.heuel.com"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Cloudflare Bot Management",
+    "count": 1,
+    "message": "Cloudflare Bot Management",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Cloudflare Bot Management“",
     "where": "104.16.10.6"
    },
    {
-    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Cloudflare CDN",
+    "count": 1,
+    "message": "Cloudflare CDN",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Cloudflare CDN“",
     "where": "104.16.10.6"
    },
    {
-    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Java/Servlet",
+    "count": 1,
+    "message": "Java/Servlet",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Java/Servlet“",
     "where": "20.79.218.75"
    },
    {
-    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Google Analytics",
+    "count": 1,
+    "message": "Google Analytics",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Google Analytics“",
     "where": "217.72.203.132"
    },
    {
-    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Google Tag Manager",
+    "count": 1,
+    "message": "Google Tag Manager",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Google Tag Manager“",
     "where": "217.72.203.132"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Neos CMS",
+    "count": 1,
+    "message": "Neos CMS",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Neos CMS“",
     "where": "217.72.203.132"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Neos Flow",
+    "count": 1,
+    "message": "Neos Flow",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Neos Flow“",
     "where": "217.72.203.132"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: PHP",
+    "count": 1,
+    "message": "PHP",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „PHP“",
     "where": "217.72.203.132"
    }
   ],
@@ -1914,8 +2145,8 @@
  "landscape_lead": "8 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 21,
-  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
-  "catalog_version": "2026-09-25.2",
+  "catalog_digest": "3def4b8b695693f10cdc3c448b9600bfc7e6ba365814cf1aef184ec7b573b6fd",
+  "catalog_version": "2026-09-26.1",
   "classification": "Vertraulich",
   "consolidated": 8,
   "context_sources": {},
@@ -1939,7 +2170,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-25.2",
+  "policy_version": "2026-09-26.1",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",

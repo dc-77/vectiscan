@@ -1,0 +1,28 @@
+{
+ "_note": "Entscheidung DC 26.09. (Nachtrag S6b-2): der Titel eines Hosting-Panels auf der Standardseite (IP:443) ist ein Fingerabdruck nach Q13; auf einem System des Kunden Exposition kritisch (dortmund-beach 88.99.35.112:443 froxlor).",
+ "facts": {
+  "services": [
+   {
+    "host_ip": "10.0.0.7",
+    "port": 443,
+    "service": "https",
+    "product": "Apache httpd",
+    "tunnel_ssl": true,
+    "fp_server": "Apache/2.4.67 (Debian)",
+    "fp_title": "froxlor"
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.7",
+  "affected": [
+   "10.0.0.7:443 (froxlor)"
+  ],
+  "positive": false,
+  "members": {
+   "10.0.0.7:443": "fail"
+  }
+ }
+}

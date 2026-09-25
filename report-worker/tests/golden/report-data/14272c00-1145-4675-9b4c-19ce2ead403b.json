@@ -76,7 +76,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 1093 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (1073 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 12 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 1094 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (1074 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 12 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -119,7 +119,7 @@
    {
     "host": "88.99.35.112",
     "port": "443",
-    "ref": "VS-2026-004, VS-2026-008, VS-2026-009, VS-2026-010, VS-2026-012",
+    "ref": "VS-2026-001, VS-2026-004, VS-2026-008, VS-2026-009, VS-2026-010, VS-2026-012",
     "svc": "Apache httpd 2.4.67, TLS erzwungen"
    },
    {
@@ -172,108 +172,277 @@
   ],
   "tool_findings": [
    {
+    "count": 1,
+    "message": "In Page Banner Information Leak",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
-    "what": "dortmund-beach.com (Big Redirect Detected (Potential Sensitive Information Leak))",
-    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+    "rule": "info_disclosure#10009",
+    "what": "„In Page Banner Information Leak“ (ZAP-Regel 10009)",
+    "where": "dortmund-beach.com"
    },
    {
+    "count": 1,
+    "message": "Cross-Domain JavaScript Source File Inclusion",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
-    "what": "dortmund-beach.com (Cross-Domain JavaScript Source File Inclusion)",
-    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+    "rule": "info_disclosure#10017",
+    "what": "„Cross-Domain JavaScript Source File Inclusion“ (ZAP-Regel 10017)",
+    "where": "dortmund-beach.com"
    },
    {
+    "count": 1,
+    "message": "Big Redirect Detected (Potential Sensitive Information Leak)",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10044",
+    "what": "„Big Redirect Detected (Potential Sensitive Information Leak)“ (ZAP-Regel 10044)",
+    "where": "dortmund-beach.com"
+   },
+   {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
+    "what": "„Timestamp Disclosure - Unix“ (ZAP-Regel 10096)",
+    "where": "dortmund-beach.com"
+   },
+   {
+    "count": 1,
+    "message": "BREACH",
+    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
+    "what": "„BREACH“",
+    "where": "dortmund-beach.com"
+   },
+   {
+    "count": 1,
+    "message": "LUCKY13",
+    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
+    "what": "„LUCKY13“",
+    "where": "dortmund-beach.com"
+   },
+   {
+    "count": 1,
+    "message": "Cookie No HttpOnly Flag",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10010",
+    "what": "„Cookie No HttpOnly Flag“ (ZAP-Regel 10010)",
+    "where": "dortmund-beach.com"
+   },
+   {
+    "count": 1,
+    "message": "Cookie without SameSite Attribute",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10054",
+    "what": "„Cookie without SameSite Attribute“ (ZAP-Regel 10054)",
+    "where": "dortmund-beach.com"
+   },
+   {
+    "count": 1,
+    "message": "Absence of Anti-CSRF Tokens",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10202",
+    "what": "„Absence of Anti-CSRF Tokens“ (ZAP-Regel 10202)",
+    "where": "dortmund-beach.com"
+   },
+   {
+    "count": 1,
+    "message": "Path Traversal",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#6",
+    "what": "„Path Traversal“ (ZAP-Regel 6)",
+    "where": "dortmund-beach.com"
+   },
+   {
+    "count": 1,
+    "message": "Burst",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Burst“",
+    "where": "88.99.35.112"
+   },
+   {
+    "count": 1,
+    "message": "Google Analytics",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Google Analytics“",
+    "where": "88.99.35.112"
+   },
+   {
+    "count": 1,
+    "message": "Google Tag Manager",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Google Tag Manager“",
+    "where": "88.99.35.112"
+   },
+   {
+    "count": 1,
+    "message": "MySQL",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „MySQL“",
+    "where": "88.99.35.112"
+   },
+   {
+    "count": 1,
+    "message": "PHP",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „PHP“",
+    "where": "88.99.35.112"
+   },
+   {
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
+    "where": "88.99.35.112"
+   },
+   {
+    "count": 1,
+    "message": "Complianz",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Complianz“",
+    "where": "88.99.35.112"
+   }
+  ],
+  "tool_messages": [
+   {
+    "count": 1,
+    "message": "In Page Banner Information Leak",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10009",
     "what": "dortmund-beach.com (In Page Banner Information Leak)",
-    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+    "where": "dortmund-beach.com"
    },
    {
+    "count": 1,
+    "message": "Cross-Domain JavaScript Source File Inclusion",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10017",
+    "what": "dortmund-beach.com (Cross-Domain JavaScript Source File Inclusion)",
+    "where": "dortmund-beach.com"
+   },
+   {
+    "count": 1,
+    "message": "Big Redirect Detected (Potential Sensitive Information Leak)",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10044",
+    "what": "dortmund-beach.com (Big Redirect Detected (Potential Sensitive Information Leak))",
+    "where": "dortmund-beach.com"
+   },
+   {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
     "what": "dortmund-beach.com (Timestamp Disclosure - Unix)",
-    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+    "where": "dortmund-beach.com"
    },
    {
+    "count": 1,
+    "message": "BREACH",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "dortmund-beach.com:443: BREACH (Hinweis der TLS-Analyse)",
-    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+    "where": "dortmund-beach.com"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "dortmund-beach.com:443: LUCKY13 (Hinweis der TLS-Analyse)",
-    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+    "where": "dortmund-beach.com"
    },
    {
+    "count": 1,
+    "message": "Cookie No HttpOnly Flag",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
-    "what": "Absence of Anti-CSRF Tokens auf dortmund-beach.com/wp-login.php (Konfidenz niedrig, passiv gemeldet von ZAP)",
-    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
-   },
-   {
-    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10010",
     "what": "Cookie No HttpOnly Flag auf dortmund-beach.com/wp-login.php (Konfidenz mittel, passiv gemeldet von ZAP)",
-    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+    "where": "dortmund-beach.com"
    },
    {
+    "count": 1,
+    "message": "Cookie without SameSite Attribute",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10054",
     "what": "Cookie without SameSite Attribute auf dortmund-beach.com/wp-login.php (Konfidenz mittel, passiv gemeldet von ZAP)",
-    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+    "where": "dortmund-beach.com"
    },
    {
+    "count": 1,
+    "message": "Absence of Anti-CSRF Tokens",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10202",
+    "what": "Absence of Anti-CSRF Tokens auf dortmund-beach.com/wp-login.php (Konfidenz niedrig, passiv gemeldet von ZAP)",
+    "where": "dortmund-beach.com"
+   },
+   {
+    "count": 1,
+    "message": "Path Traversal",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#6",
     "what": "Path Traversal auf dortmund-beach.com/wp-json/oembed/1.0/embed (Konfidenz niedrig, aktiv gemeldet von ZAP)",
-    "where": "dortmund-beach.com (+www.dortmund-beach.com)"
+    "where": "dortmund-beach.com"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Burst",
+    "count": 1,
+    "message": "Burst",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Burst“",
     "where": "88.99.35.112"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Google Analytics",
+    "count": 1,
+    "message": "Google Analytics",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Google Analytics“",
     "where": "88.99.35.112"
    },
    {
-    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Google Tag Manager",
+    "count": 1,
+    "message": "Google Tag Manager",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Google Tag Manager“",
     "where": "88.99.35.112"
    },
    {
-    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Powered by Slider Revolution 6.7.11",
+    "count": 1,
+    "message": "MySQL",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „MySQL“",
     "where": "88.99.35.112"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery Migrate 3.4.1",
+    "count": 1,
+    "message": "PHP",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „PHP“",
     "where": "88.99.35.112"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: MySQL",
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
     "where": "88.99.35.112"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: PHP",
-    "where": "88.99.35.112"
-   },
-   {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery",
-    "where": "88.99.35.112"
-   },
-   {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Complianz",
-    "where": "88.99.35.112"
-   },
-   {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Slider Revolution 6.7.11",
-    "where": "88.99.35.112"
-   },
-   {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: BeTheme 27.4.5",
+    "count": 1,
+    "message": "Complianz",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Complianz“",
     "where": "88.99.35.112"
    }
   ],
@@ -480,7 +649,7 @@
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "rot"
      },
      {
       "p": "465",
@@ -535,6 +704,24 @@
       "v": "6.5.10"
      },
      {
+      "c": "Powered by Slider Revolution",
+      "conf": "mittel",
+      "note": "",
+      "src": "webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "6.7.11"
+     },
+     {
+      "c": "jQuery Migrate",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "3.4.1"
+     },
+     {
       "c": "Pure-FTPd",
       "conf": "hoch",
       "note": "",
@@ -571,6 +758,15 @@
       "v": "11"
      },
      {
+      "c": "Slider Revolution",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "6.7.11"
+     },
+     {
       "c": "burst-statistics",
       "conf": "hoch",
       "note": "",
@@ -605,6 +801,15 @@
       "st": "grau",
       "status": "unbekannt",
       "v": "8.4p1 (debian)"
+     },
+     {
+      "c": "BeTheme",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "27.4.5"
      },
      {
       "c": "betheme",
@@ -659,10 +864,10 @@
  },
  "findings": [
   {
-   "affected": "88.99.35.112:10000 (Webmin)",
+   "affected": "88.99.35.112:10000 (Webmin), 88.99.35.112:443 (froxlor)",
    "cat": "A",
-   "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:10000/tcp · Dienst: snet-sensor-mgmt · Server-Kennung: MiniServ · Anmeldung verlangt: ja · TLS erzwungen: ja",
-   "found": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 88.99.35.112:10000 (Webmin). Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung; eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar.",
+   "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:443/tcp · Dienst: http · Produkt: Apache httpd · Version: 2.4.67 · Server-Kennung: Apache/2.4.67 (Debian) · Seitentitel: froxlor · TLS erzwungen: ja · 443/tcp open http Apache httpd 2.4.67 ((Debian)) tunnel=ssl\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:10000/tcp · Dienst: snet-sensor-mgmt · Server-Kennung: MiniServ · Anmeldung verlangt: ja · TLS erzwungen: ja",
+   "found": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 88.99.35.112:10000 (Webmin), 88.99.35.112:443 (froxlor). Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung: 88.99.35.112:10000 (Webmin). Der Seitentitel nennt ein Hosting-Panel, dessen Startseite die Anmeldung ist: 88.99.35.112:443 (froxlor). Die Oberfläche erscheint beim Aufruf über die IP-Adresse, also auf der Standardseite des Webservers und nicht unter einem Hostnamen der Webseite: 88.99.35.112:443 (froxlor). Eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar.",
    "id": "VS-2026-001",
    "impact": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen.",
    "key": "admin_access/88.99.35.112/kunde",
@@ -680,6 +885,7 @@
      "check": "admin_service_exposed",
      "field": "title",
      "members": [
+      "88.99.35.112|88.99.35.112:443",
       "88.99.35.112|88.99.35.112:10000"
      ],
      "statement": "short",
@@ -689,15 +895,54 @@
      "check": "admin_service_exposed",
      "field": "observation",
      "members": [
+      "88.99.35.112|88.99.35.112:443",
       "88.99.35.112|88.99.35.112:10000"
      ],
      "statement": "observation[0]",
-     "text": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 88.99.35.112:10000 (Webmin). Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung; eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar."
+     "text": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 88.99.35.112:10000 (Webmin), 88.99.35.112:443 (froxlor)."
+    },
+    {
+     "check": "admin_service_exposed",
+     "field": "observation",
+     "members": [
+      "88.99.35.112|88.99.35.112:10000"
+     ],
+     "statement": "observation[1]",
+     "text": "Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung: 88.99.35.112:10000 (Webmin)."
+    },
+    {
+     "check": "admin_service_exposed",
+     "field": "observation",
+     "members": [
+      "88.99.35.112|88.99.35.112:443"
+     ],
+     "statement": "observation[2]",
+     "text": "Der Seitentitel nennt ein Hosting-Panel, dessen Startseite die Anmeldung ist: 88.99.35.112:443 (froxlor)."
+    },
+    {
+     "check": "admin_service_exposed",
+     "field": "observation",
+     "members": [
+      "88.99.35.112|88.99.35.112:443"
+     ],
+     "statement": "observation[3]",
+     "text": "Die Oberfläche erscheint beim Aufruf über die IP-Adresse, also auf der Standardseite des Webservers und nicht unter einem Hostnamen der Webseite: 88.99.35.112:443 (froxlor)."
+    },
+    {
+     "check": "admin_service_exposed",
+     "field": "observation",
+     "members": [
+      "88.99.35.112|88.99.35.112:443",
+      "88.99.35.112|88.99.35.112:10000"
+     ],
+     "statement": "observation[4]",
+     "text": "Eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar."
     },
     {
      "check": "admin_service_exposed",
      "field": "meaning",
      "members": [
+      "88.99.35.112|88.99.35.112:443",
       "88.99.35.112|88.99.35.112:10000"
      ],
      "statement": "meaning[0]",
@@ -707,6 +952,7 @@
      "check": "admin_service_exposed",
      "field": "verify",
      "members": [
+      "88.99.35.112|88.99.35.112:443",
       "88.99.35.112|88.99.35.112:10000"
      ],
      "statement": "verify[0]",
@@ -716,6 +962,7 @@
      "check": "admin_service_exposed",
      "field": "recommendation",
      "members": [
+      "88.99.35.112|88.99.35.112:443",
       "88.99.35.112|88.99.35.112:10000"
      ],
      "statement": "recommendation[0]",
@@ -725,18 +972,29 @@
      "check": "admin_service_exposed",
      "field": "recommendation",
      "members": [
-      "88.99.35.112|88.99.35.112:10000"
+      "88.99.35.112|88.99.35.112:443"
      ],
      "statement": "recommendation[1]",
+     "text": "Die Standardseite des Webservers, die beim Aufruf über die IP-Adresse erscheint, auf eine neutrale Seite oder eine Fehlerantwort umstellen."
+    },
+    {
+     "check": "admin_service_exposed",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|88.99.35.112:443",
+      "88.99.35.112|88.99.35.112:10000"
+     ],
+     "statement": "recommendation[2]",
      "text": "Mehrfaktor-Anmeldung für die Verwaltungsoberfläche aktivieren und Standardkonten deaktivieren oder umbenennen."
     },
     {
      "check": "admin_service_exposed",
      "field": "recommendation",
      "members": [
+      "88.99.35.112|88.99.35.112:443",
       "88.99.35.112|88.99.35.112:10000"
      ],
-     "statement": "recommendation[2]",
+     "statement": "recommendation[3]",
      "text": "Softwarestand der Verwaltungsoberfläche gegen die Sicherheitshinweise des Herstellers abgleichen und Anmeldeversuche überwachen."
     }
    ],
@@ -744,6 +1002,10 @@
     [
      "Unverzüglich",
      "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst."
+    ],
+    [
+     "In Kürze",
+     "Die Standardseite des Webservers, die beim Aufruf über die IP-Adresse erscheint, auf eine neutrale Seite oder eine Fehlerantwort umstellen."
     ],
     [
      "In Kürze",
@@ -2082,8 +2344,8 @@
  "landscape_lead": "12 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 20,
-  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
-  "catalog_version": "2026-09-25.2",
+  "catalog_digest": "3def4b8b695693f10cdc3c448b9600bfc7e6ba365814cf1aef184ec7b573b6fd",
+  "catalog_version": "2026-09-26.1",
   "classification": "Vertraulich",
   "consolidated": 12,
   "context_sources": {},
@@ -2107,7 +2369,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-25.2",
+  "policy_version": "2026-09-26.1",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -2115,7 +2377,7 @@
   "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
   "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
-  "raw_findings": 1093,
+  "raw_findings": 1094,
   "report_date": "19.09.2026",
   "report_id": "VS-2026-0918-1427",
   "report_version": "1",
@@ -2498,7 +2760,7 @@
    },
    {
     "l": "Einzelbeobachtungen",
-    "v": "1093"
+    "v": "1094"
    },
    {
     "l": "Befunde im Bericht",

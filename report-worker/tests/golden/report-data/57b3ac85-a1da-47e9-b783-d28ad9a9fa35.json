@@ -126,13 +126,8 @@
    "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall.",
    "Freischaltung der Scanner-Adresse beim Betreiber der blockierenden Systeme, damit die offenen Prüfungen im nächsten Durchgang nachgeholt werden können."
   ],
-  "tool_findings": [
-   {
-    "note": "Nur laut nmap mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: PostgreSQL",
-    "where": "116.202.77.64"
-   }
-  ],
+  "tool_findings": [],
+  "tool_messages": [],
   "tools": [
    {
     "c": "hoch (Dienste), mittel (Versionen)",
@@ -378,6 +373,15 @@
       "st": "grau",
       "status": "unbekannt",
       "v": "10.11.18 (debian)"
+     },
+     {
+      "c": "PostgreSQL",
+      "conf": "mittel",
+      "note": "Version von außen nicht genau bestimmbar",
+      "src": "nmap",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
      },
      {
       "c": "ProFTPD",
@@ -1182,8 +1186,8 @@
  "landscape_lead": "5 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 8,
-  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
-  "catalog_version": "2026-09-25.2",
+  "catalog_digest": "3def4b8b695693f10cdc3c448b9600bfc7e6ba365814cf1aef184ec7b573b6fd",
+  "catalog_version": "2026-09-26.1",
   "classification": "Vertraulich",
   "consolidated": 5,
   "context_sources": {},
@@ -1207,7 +1211,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-25.2",
+  "policy_version": "2026-09-26.1",
   "positives": 6,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",

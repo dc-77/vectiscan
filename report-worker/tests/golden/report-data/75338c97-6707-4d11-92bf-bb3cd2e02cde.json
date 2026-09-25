@@ -111,18 +111,53 @@
   ],
   "tool_findings": [
    {
-    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: React",
+    "count": 1,
+    "message": "React",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „React“",
     "where": "62.217.52.165"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Vue.js",
+    "count": 1,
+    "message": "Vue.js",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Vue.js“",
     "where": "gutachter.vectigal.tech"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Node.js",
+    "count": 1,
+    "message": "Node.js",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Node.js“",
+    "where": "gutachter.vectigal.tech"
+   }
+  ],
+  "tool_messages": [
+   {
+    "count": 1,
+    "message": "React",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „React“",
+    "where": "62.217.52.165"
+   },
+   {
+    "count": 1,
+    "message": "Vue.js",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Vue.js“",
+    "where": "gutachter.vectigal.tech"
+   },
+   {
+    "count": 1,
+    "message": "Node.js",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Node.js“",
     "where": "gutachter.vectigal.tech"
    }
   ],
@@ -1451,8 +1486,8 @@
  "landscape_lead": "8 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 21,
-  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
-  "catalog_version": "2026-09-25.2",
+  "catalog_digest": "3def4b8b695693f10cdc3c448b9600bfc7e6ba365814cf1aef184ec7b573b6fd",
+  "catalog_version": "2026-09-26.1",
   "classification": "Vertraulich",
   "consolidated": 8,
   "context_sources": {},
@@ -1477,7 +1512,7 @@
   ],
   "package": "WebCheck",
   "package_label": "WEBCHECK",
-  "policy_version": "2026-09-25.2",
+  "policy_version": "2026-09-26.1",
   "positives": 3,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",

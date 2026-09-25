@@ -122,7 +122,10 @@ def build_report_data(
     finding_list, cve_refs, tool_findings = F.build_findings(
         output, items, facts, kuerzel=kuerzel, year=year, excluded_keys=excluded_keys,
         excluded_ids=excluded_ids)
-    tool_findings = tool_findings + C.tech_tool_findings(facts)
+    # Nachtrag S6b-2 (Entscheidung DC 26.09.): im Anhang eine Zeile je Meldung mit Anzahl
+    # und Betroffenen, die Einzelmeldungen bleiben fuer den Export in ``tool_messages``.
+    tool_messages = tool_findings + C.tech_tool_findings(facts)
+    tool_findings = F.summarize_tool_messages(tool_messages)
     positives = F.build_positives(positive_items)
 
     orders = order.get("orders") or [{"label": "Lauf 1", "id": facts.scan.order_id}]
@@ -208,7 +211,7 @@ def build_report_data(
         positives=positives,
         plan=plan,
         findings=finding_list,
-        appendix=build_appendix(facts, output, finding_list, cve_refs, tool_findings,
+        appendix=build_appendix(facts, output, finding_list, cve_refs, tool_findings, tool_messages,
                                 counts, scan_date, T.PROVIDER["provider"],
                                 port_refs=C.finding_ports(facts, finding_items, finding_list)),
     )

@@ -184,39 +184,70 @@
   ],
   "tool_findings": [
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery Migrate 3.4.1",
+    "count": 1,
+    "message": "MySQL",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „MySQL“",
     "where": "dev.trunk-immobilien.de"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: MySQL",
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
     "where": "dev.trunk-immobilien.de"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery",
+    "count": 1,
+    "message": "Complianz",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Complianz“",
     "where": "dev.trunk-immobilien.de"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Complianz",
+    "count": 1,
+    "message": "WP Fastest Cache",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „WP Fastest Cache“",
+    "where": "dev.trunk-immobilien.de"
+   }
+  ],
+  "tool_messages": [
+   {
+    "count": 1,
+    "message": "MySQL",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „MySQL“",
     "where": "dev.trunk-immobilien.de"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: WP Fastest Cache",
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
     "where": "dev.trunk-immobilien.de"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: BeTheme 27.2.11",
+    "count": 1,
+    "message": "Complianz",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Complianz“",
     "where": "dev.trunk-immobilien.de"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: BeTheme 28.2.1",
-    "where": "trunk-immobilien.de"
+    "count": 1,
+    "message": "WP Fastest Cache",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „WP Fastest Cache“",
+    "where": "dev.trunk-immobilien.de"
    }
   ],
   "tools": [
@@ -454,6 +485,15 @@
       "v": "6.4.2"
      },
      {
+      "c": "jQuery Migrate",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "3.4.1"
+     },
+     {
       "c": "Plesk",
       "conf": "hoch",
       "note": "",
@@ -515,6 +555,24 @@
       "st": "grau",
       "status": "unbekannt",
       "v": "7.4"
+     },
+     {
+      "c": "BeTheme",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "27.2.11"
+     },
+     {
+      "c": "BeTheme",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "28.2.1"
      },
      {
       "c": "nginx",
@@ -659,7 +717,7 @@
    "affected": "5.199.141.24:443 (Plesk), 5.199.141.24:80 (Plesk), 5.199.141.24:8443 (Plesk), 5.199.141.24:8880 (Plesk, laut Passivquelle)",
    "cat": "A",
    "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:80/tcp · Dienst: http · Produkt: nginx · Seitentitel: Default Parallels Plesk Page\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:443/tcp · Dienst: http · Produkt: nginx · Seitentitel: Default Parallels Plesk Page · TLS erzwungen: ja\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:8443/tcp · Dienst: https-alt · Produkt: sw-cp-server · Server-Kennung: sw-cp-server · Seitentitel: publishsoft LINUX Kundenserver · Anmeldung verlangt: ja · TLS erzwungen: ja\n\nshodan · phase0a/shodan_hosts.json\nQuelle: shodan · 5.199.141.24:8880 · Dienst gesehen am: 2026-04-18 · Banner (Auszug): HTTP/1.1 303 See Other Server: sw-cp-server Date: Sat, 18 Apr 2026 15:21:29 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection:",
-   "found": "Auf dem geteilten Server 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 5.199.141.24:443 (Plesk), 5.199.141.24:80 (Plesk), 5.199.141.24:8443 (Plesk). Der Server gehört dem Hoster und trägt auch Namen anderer Kunden; die Verwaltung betreibt der Hoster. Eine Passivquelle meldet für 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 5.199.141.24:8880 (Plesk, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
+   "found": "Auf dem geteilten Server 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 5.199.141.24:443 (Plesk), 5.199.141.24:80 (Plesk), 5.199.141.24:8443 (Plesk). Die Oberfläche erscheint beim Aufruf über die IP-Adresse, also auf der Standardseite des Webservers: 5.199.141.24:80 (Plesk), 5.199.141.24:443 (Plesk). Der Server gehört dem Hoster und trägt auch Namen anderer Kunden; die Verwaltung betreibt der Hoster. Eine Passivquelle meldet für 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 5.199.141.24:8880 (Plesk, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
    "id": "VS-2026-002",
    "impact": "Eine Übernahme der Verwaltungsoberfläche beträfe alle Dienste auf diesem Server, auch die eigenen Webseiten und Postfächer. Abschalten oder beschränken kann sie nur der Hoster. Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Ob es sich um ein Anmeldeportal oder die Administrationsoberfläche handelt, ist von außen nicht erkennbar.",
    "key": "admin_access/5.199.141.24/hoster:WIIT AG",
@@ -702,7 +760,28 @@
       "5.199.141.24|5.199.141.24:8443"
      ],
      "statement": "observation[0]",
-     "text": "Auf dem geteilten Server 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 5.199.141.24:443 (Plesk), 5.199.141.24:80 (Plesk), 5.199.141.24:8443 (Plesk). Der Server gehört dem Hoster und trägt auch Namen anderer Kunden; die Verwaltung betreibt der Hoster."
+     "text": "Auf dem geteilten Server 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 5.199.141.24:443 (Plesk), 5.199.141.24:80 (Plesk), 5.199.141.24:8443 (Plesk)."
+    },
+    {
+     "check": "admin_panel_hoster",
+     "field": "observation",
+     "members": [
+      "5.199.141.24|5.199.141.24:80",
+      "5.199.141.24|5.199.141.24:443"
+     ],
+     "statement": "observation[1]",
+     "text": "Die Oberfläche erscheint beim Aufruf über die IP-Adresse, also auf der Standardseite des Webservers: 5.199.141.24:80 (Plesk), 5.199.141.24:443 (Plesk)."
+    },
+    {
+     "check": "admin_panel_hoster",
+     "field": "observation",
+     "members": [
+      "5.199.141.24|5.199.141.24:80",
+      "5.199.141.24|5.199.141.24:443",
+      "5.199.141.24|5.199.141.24:8443"
+     ],
+     "statement": "observation[2]",
+     "text": "Der Server gehört dem Hoster und trägt auch Namen anderer Kunden; die Verwaltung betreibt der Hoster."
     },
     {
      "check": "admin_service_exposed_passive",
@@ -1858,8 +1937,8 @@
  "landscape_lead": "11 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 18,
-  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
-  "catalog_version": "2026-09-25.2",
+  "catalog_digest": "3def4b8b695693f10cdc3c448b9600bfc7e6ba365814cf1aef184ec7b573b6fd",
+  "catalog_version": "2026-09-26.1",
   "classification": "Vertraulich",
   "consolidated": 11,
   "context_sources": {},
@@ -1883,7 +1962,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-25.2",
+  "policy_version": "2026-09-26.1",
   "positives": 3,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",

@@ -223,13 +223,37 @@
   ],
   "tool_findings": [
    {
+    "count": 1,
+    "message": "BREACH",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
+    "what": "„BREACH“",
+    "where": "www.bergersysteme.com"
+   },
+   {
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
+    "where": "198.202.211.1"
+   }
+  ],
+  "tool_messages": [
+   {
+    "count": 1,
+    "message": "BREACH",
+    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "www.bergersysteme.com:443: BREACH (Hinweis der TLS-Analyse)",
     "where": "www.bergersysteme.com"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery",
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
     "where": "198.202.211.1"
    }
   ],
@@ -794,7 +818,7 @@
    "affected": "92.205.224.174:443 (Plesk), 92.205.224.174:8443 (Plesk), 92.205.224.174:8880 (Plesk, laut Passivquelle)",
    "cat": "A",
    "evidence": "nmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:443/tcp · Dienst: http · Produkt: nginx · Seitentitel: Plesk Obsidian 18.0.80 · TLS erzwungen: ja\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:8443/tcp · Dienst: https-alt · Produkt: sw-cp-server · Server-Kennung: sw-cp-server · Seitentitel: Plesk Obsidian 18.0.80 · Anmeldung verlangt: ja · TLS erzwungen: ja\n\nshodan · phase0a/shodan_hosts.json\nQuelle: shodan · 92.205.224.174:8880 · Dienst gesehen am: 2026-09-17 · Banner (Auszug): HTTP/1.1 200 OK Server: sw-cp-server Date: Thu, 17 Sep 2026 16:28:15 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-a",
-   "found": "Auf dem geteilten Server 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 92.205.224.174:443 (Plesk), 92.205.224.174:8443 (Plesk). Der Server gehört dem Hoster und trägt auch Namen anderer Kunden; die Verwaltung betreibt der Hoster. Eine Passivquelle meldet für 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 92.205.224.174:8880 (Plesk, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
+   "found": "Auf dem geteilten Server 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 92.205.224.174:443 (Plesk), 92.205.224.174:8443 (Plesk). Die Oberfläche erscheint beim Aufruf über die IP-Adresse, also auf der Standardseite des Webservers: 92.205.224.174:443 (Plesk). Der Server gehört dem Hoster und trägt auch Namen anderer Kunden; die Verwaltung betreibt der Hoster. Eine Passivquelle meldet für 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 92.205.224.174:8880 (Plesk, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
    "id": "VS-2026-001",
    "impact": "Eine Übernahme der Verwaltungsoberfläche beträfe alle Dienste auf diesem Server, auch die eigenen Webseiten und Postfächer. Abschalten oder beschränken kann sie nur der Hoster. Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Ob es sich um ein Anmeldeportal oder die Administrationsoberfläche handelt, ist von außen nicht erkennbar.",
    "key": "admin_access/92.205.224.174/hoster:Host Europe GmbH",
@@ -835,7 +859,26 @@
       "92.205.224.174|92.205.224.174:8443"
      ],
      "statement": "observation[0]",
-     "text": "Auf dem geteilten Server 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 92.205.224.174:443 (Plesk), 92.205.224.174:8443 (Plesk). Der Server gehört dem Hoster und trägt auch Namen anderer Kunden; die Verwaltung betreibt der Hoster."
+     "text": "Auf dem geteilten Server 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 92.205.224.174:443 (Plesk), 92.205.224.174:8443 (Plesk)."
+    },
+    {
+     "check": "admin_panel_hoster",
+     "field": "observation",
+     "members": [
+      "92.205.224.174|92.205.224.174:443"
+     ],
+     "statement": "observation[1]",
+     "text": "Die Oberfläche erscheint beim Aufruf über die IP-Adresse, also auf der Standardseite des Webservers: 92.205.224.174:443 (Plesk)."
+    },
+    {
+     "check": "admin_panel_hoster",
+     "field": "observation",
+     "members": [
+      "92.205.224.174|92.205.224.174:443",
+      "92.205.224.174|92.205.224.174:8443"
+     ],
+     "statement": "observation[2]",
+     "text": "Der Server gehört dem Hoster und trägt auch Namen anderer Kunden; die Verwaltung betreibt der Hoster."
     },
     {
      "check": "admin_service_exposed_passive",
@@ -2010,8 +2053,8 @@
  "landscape_lead": "9 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 19,
-  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
-  "catalog_version": "2026-09-25.2",
+  "catalog_digest": "3def4b8b695693f10cdc3c448b9600bfc7e6ba365814cf1aef184ec7b573b6fd",
+  "catalog_version": "2026-09-26.1",
   "classification": "Vertraulich",
   "consolidated": 9,
   "context_sources": {},
@@ -2035,7 +2078,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-25.2",
+  "policy_version": "2026-09-26.1",
   "positives": 6,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
