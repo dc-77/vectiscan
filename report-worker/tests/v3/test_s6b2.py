@@ -135,6 +135,17 @@ def test_ausschluss_ueber_den_schluessel_laesst_die_nummern_stehen():
     assert not [d for d in check_report_data_detailed(mit) if d.is_error], "Luecke an der Ausschlussstelle ist erlaubt"
 
 
+def test_bericht_erklaert_den_ausschluss():
+    """Issue #28 Punkt 4: ohne Satz waere die Luecke in der Nummerierung unerklaert."""
+    from reporter.pdf.v3.render import render_html
+    ohne = data_for(DORTMUND)
+    ziel = ohne.findings[1]
+    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", render_html(data_for(DORTMUND, excluded_keys={ziel.key}))[0]))
+    satz = f"Auf Wunsch des Auftraggebers ist ein Befund nicht aufgeführt ({ziel.id})"
+    assert text.count(satz) == 2, "Kapitel 1 und Kapitel 6"
+    assert "Auf Wunsch des Auftraggebers" not in render_html(ohne)[0]
+
+
 def test_schluessel_ist_stabil_und_eindeutig():
     for order in ORDERS:
         keys = [f.key for f in data_for(order).findings]

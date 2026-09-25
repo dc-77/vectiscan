@@ -158,6 +158,8 @@ def build_context(data: ReportData | dict, *, variant: Variant,
         "period_note": T.period_note(m.get("scan_window") or "", runs),
         "distribution_line": T.distribution_line(len(findings), urgency_counts(findings)),
         "split_note": T.split_note(len(main), len(more), len(findings)) if more else "",
+        # S6b-2 (Issue #28): ausgeschlossene Befunde erklaeren die Luecken der Nummerierung.
+        "excluded_note": T.excluded_note(list(m.get("excluded_ids") or [])),
         "show_screens": show_screens,
         "show_inventory": show_inventory,
         "show_tool_findings": show_tool_findings,
