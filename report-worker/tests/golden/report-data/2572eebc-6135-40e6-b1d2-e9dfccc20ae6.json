@@ -1357,7 +1357,7 @@
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von junkerwerk.de am 31.08.2026: 12 Hostnamen auf 6 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 188.40.3.130, 217.243.248.27, 217.243.248.28, 217.243.248.29, 217.243.248.30 und 2a01:4f8:d0a:3124::2 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "coverage_warning": "Für 5 Systeme (188.40.3.130 mit 2a01:4f8:d0a:3124::2, 217.243.248.27, 217.243.248.28, 217.243.248.29 und 217.243.248.30) liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
@@ -1621,7 +1621,7 @@
     "role": "Anmeldeportal"
    }
   ],
-  "lead": "Der Scan hat 6 IP-Adressen mit 12 Hostnamen erfasst. Für 5 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 5 Systeme mit 6 IP-Adressen und 12 Hostnamen erfasst. Für 5 Systeme (6 Adressen) war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [

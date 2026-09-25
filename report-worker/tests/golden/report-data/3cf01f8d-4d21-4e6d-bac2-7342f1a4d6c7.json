@@ -1002,7 +1002,7 @@
     "role": "Mail-Webzugang"
    }
   ],
-  "lead": "Der Scan hat 2 IP-Adressen mit 3 Hostnamen erfasst. Alle Hosts konnten aktiv geprüft werden.",
+  "lead": "Der Scan hat 2 Systeme mit 2 IP-Adressen und 3 Hostnamen erfasst. Alle Systeme konnten aktiv geprüft werden.",
   "limitations": [
    {
     "checks": [

@@ -1963,7 +1963,7 @@
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von securess.de am 19.07.2026: 26 Hostnamen auf 12 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 212.227.60.78, 51.116.154.224, 85.22.47.36, 85.22.47.38, 85.22.47.39, 85.22.47.40, 85.22.47.41, 85.22.47.42, 85.22.47.43, 85.22.47.45, 85.22.47.46 und 85.22.47.47 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "coverage_warning": "Für 12 Systeme (212.227.60.78, 51.116.154.224, 85.22.47.36, 85.22.47.38, 85.22.47.39, 85.22.47.40, 85.22.47.41, 85.22.47.42, 85.22.47.43, 85.22.47.45, 85.22.47.46 und 85.22.47.47) liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
@@ -2286,7 +2286,7 @@
     "role": "Nicht näher bestimmbar"
    }
   ],
-  "lead": "Der Scan hat 12 IP-Adressen mit 26 Hostnamen erfasst. Für 12 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 12 Systeme mit 12 IP-Adressen und 26 Hostnamen erfasst. Für 12 Systeme (12 Adressen) war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [

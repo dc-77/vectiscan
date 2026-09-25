@@ -1291,7 +1291,7 @@
     "role": "Fernzugang und Verwaltung, Dateiaustausch, Website"
    }
   ],
-  "lead": "Der Scan hat 1 IP-Adresse mit 3 Hostnamen erfasst. Alle Hosts konnten aktiv geprüft werden.",
+  "lead": "Der Scan hat 1 System mit 1 IP-Adresse und 3 Hostnamen erfasst. Alle Systeme konnten aktiv geprüft werden.",
   "limitations": [
    {
     "checks": [

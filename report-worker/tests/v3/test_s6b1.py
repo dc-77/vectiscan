@@ -461,3 +461,54 @@ def test_technik_ohne_schreibvarianten():
         for block in data_for(order).architecture.tech:
             keys = [(r.c.lower(), r.v) for r in block.rows]
             assert len(keys) == len(set(keys)), (order, block.host)
+
+
+# ---------------------------------------------------------------- Nachtrag 3 (DC 25.09.)
+
+def test_kapitel2_einheit_system_jw():
+    data = data_for(JW)
+    assert data.scope.lead.startswith(
+        "Der Scan hat 3 Systeme mit 4 IP-Adressen und 7 Hostnamen erfasst. Für 1 System "
+        "(2 Adressen) war die aktive Prüfung nur teilweise möglich; diese Lücke ist unten benannt")
+    assert data.glance.coverage_warning.startswith(
+        "Für 1 System (188.40.3.130 mit 2a01:4f8:d0a:3124::2) liegt nur eine teilweise "
+        "aktive Prüfung vor.")
+    assert len([h for h in data.scope.hosts if h.cov != "extern"]) == 3
+
+
+@pytest.mark.parametrize("order", RUNDE)
+def test_satz_hinweis_und_tabelle_zaehlen_systeme(order):
+    data = data_for(order)
+    zeilen = [h for h in data.scope.hosts if h.cov != "extern"]
+    luecken = [h for h in zeilen if h.cov != "voll"]
+    n = len(zeilen)
+    assert data.scope.lead.startswith(f"Der Scan hat {n} {'System' if n == 1 else 'Systeme'} mit ")
+    if luecken:
+        g = len(luecken)
+        adressen = sum(1 + len(h.more_ips) for h in luecken)
+        assert f"Für {g} {'System' if g == 1 else 'Systeme'} ({adressen} " in data.scope.lead
+        assert data.glance.coverage_warning.startswith(f"Für {g} {'System' if g == 1 else 'Systeme'} (")
+        for h in luecken:
+            assert all(ip in data.glance.coverage_warning for ip in [h.ip, *h.more_ips])
+    else:
+        assert "Alle Systeme konnten aktiv geprüft werden." in data.scope.lead
+
+
+def test_dashboard_ipv6_in_der_karte_des_systems():
+    from reporter.v3.dashboard import tech_profiles_from_facts
+    profile = tech_profiles_from_facts(facts_for(JW), [
+        {"ip": "188.40.3.130"}, {"ip": "2a01:4f8:d0a:3124::2"}, {"ip": "217.243.248.28"}])
+    ips = [p["ip"] for p in profile]
+    assert "2a01:4f8:d0a:3124::2" not in ips
+    lead = next(p for p in profile if p["ip"] == "188.40.3.130")
+    assert lead["additional_ips"] == [
+        {"ip": "2a01:4f8:d0a:3124::2", "note": "über IPv6 vom Prüfstand aus nicht erreichbar"}]
+    assert lead["tech_rows"]
+    assert "additional_ips" not in next(p for p in profile if p["ip"] == "217.243.248.28")
+
+
+def test_dashboard_ipv6_heuel_ohne_scannerprofil():
+    from reporter.v3.dashboard import tech_profiles_from_facts
+    profile = {p["ip"]: p for p in tech_profiles_from_facts(facts_for(HL), None)}
+    assert "2a01:4f8:d0a:2757::2" not in profile
+    assert [e["ip"] for e in profile["213.133.104.51"]["additional_ips"]] == ["2a01:4f8:d0a:2757::2"]

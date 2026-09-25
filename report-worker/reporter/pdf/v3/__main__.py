@@ -233,6 +233,8 @@ def _update_pages() -> int:
                                "sparse": list(result.sparse_pages)}
             print(f"{order_id[:8]} -> {result.pages} Seiten, "
                   f"halbleer {list(result.sparse_pages)}")
+            for cause in result.sparse_causes:
+                print(f"{order_id[:8]}    {cause}")
     PAGES_FILE.write_text(json.dumps(werte, indent=1, sort_keys=True) + "\n",
                           encoding="utf-8")
     print(f"geschrieben {PAGES_FILE}", file=sys.stderr)

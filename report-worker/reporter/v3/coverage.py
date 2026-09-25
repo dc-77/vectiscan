@@ -150,6 +150,14 @@ class Model:
             return "teil"
         return stati[0]
 
+    def system_gaps(self) -> list[list[str]]:
+        """Adressen je System ohne vollstaendige Leitpruefung, IPv4-Systeme zuerst.
+
+        Nachtrag 3 (Entscheidung DC 25.09.): Einheit im Hinweis auf Seite 2 und im
+        Einleitungssatz von Kapitel 2 ist das System, die Adressen stehen dabei."""
+        rows = [ips for ips in self.system_rows() if self.system_status(ips) != "voll"]
+        return sorted(rows, key=lambda ips: (":" in ips[0], sort_key(ips[0])))
+
     def system_rows(self) -> list[list[str]]:
         """Adressen je System, ohne Drittanbieter, in stabiler Reihenfolge."""
         rows: dict[tuple[str, ...], None] = {}

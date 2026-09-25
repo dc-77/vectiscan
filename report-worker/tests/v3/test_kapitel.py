@@ -55,9 +55,9 @@ def test_lead_und_hosttabelle_widersprechen_sich_nicht(data):
     luecken = sum(1 for h in data.scope.hosts if h.cov not in ("voll", "extern"))
     if luecken:
         assert str(luecken) in data.scope.lead
-        assert "Alle Hosts" not in data.scope.lead
+        assert "Alle Systeme" not in data.scope.lead
     else:
-        assert "Alle Hosts konnten aktiv geprüft werden" in data.scope.lead
+        assert "Alle Systeme konnten aktiv geprüft werden" in data.scope.lead
 
 
 def test_jeder_host_traegt_eine_abdeckung(data):

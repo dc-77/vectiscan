@@ -79,7 +79,7 @@ def test_erzaehltexte_sind_sauber():
                       fqdns_total=3, runs=1, tool_runs=10, raw_findings=5, findings=4,
                       positives=2, coverage_partial=1)
     texte = [
-        N.context(zahlen), N.coverage_warning(zahlen, ["10.0.0.1"]), N.scope_lead(zahlen),
+        N.context(zahlen), N.coverage_warning(zahlen, [["10.0.0.1"]]), N.scope_lead(zahlen),
         N.landscape_lead(zahlen), N.filtering(zahlen), N.BUSINESS_LEAD,
         N.BUSINESS_IMPLICATION_GENERIC, N.STANDARD_NOTE, N.AI_NOTE, N.ADVICE,
         N.SERVICES_NOTE, N.SCREENS_LEAD, N.architecture_lead(2, ["Website und Datenbanken"]),

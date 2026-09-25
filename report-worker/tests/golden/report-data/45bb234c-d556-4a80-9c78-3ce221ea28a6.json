@@ -1007,7 +1007,7 @@
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von trunk-immobilien.de am 11.05.2026: 5 Hostnamen auf 1 IP-Adresse. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 5.199.141.24 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "coverage_warning": "Für 1 System (5.199.141.24) liegt nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
@@ -1220,7 +1220,7 @@
     "role": "Nicht näher bestimmbar · geteiltes System beim Hoster"
    }
   ],
-  "lead": "Der Scan hat 1 IP-Adresse mit 5 Hostnamen erfasst. Für 1 Host war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 1 System mit 1 IP-Adresse und 5 Hostnamen erfasst. Für 1 System (1 Adresse) war die aktive Prüfung nur teilweise möglich; diese Lücke ist unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [

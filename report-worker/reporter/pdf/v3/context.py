@@ -25,6 +25,11 @@ from reporter.v3 import tables as V3T
 TOP_N_SCHWELLE = 20
 TOP_N_HAUPTTEIL = 15
 
+# S6b-1 Nachtrag 3 (Entscheidung DC 25.09.): ein Kategorieblock in Kapitel 4 mit mehr
+# Zeilen darf nach seiner Kopfzeile umbrechen. Als Ganzes liess er die Seite davor
+# halb leer (f77ccff2 Seite 11: 129 mm frei, Block 140 mm hoch).
+CAT_KEEP = 6
+
 # Dringlichkeitswort -> Rang. Aus derselben Tabelle wie die Reportdaten, damit eine
 # Umbenennung nicht an zwei Stellen gepflegt werden muss.
 _URGENCY_RANK: dict[str, int] = {
@@ -162,4 +167,5 @@ def build_context(data: ReportData | dict, *, variant: Variant,
         # Zeitstufen unter dem Massnahmenplan kommen aus derselben Tabelle wie
         # die Dringlichkeiten der Befunde (S6, reporter/v3/levels.py).
         "stage_box": V3T.stage_box(),
+        "cat_keep": CAT_KEEP,
     }

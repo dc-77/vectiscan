@@ -66,6 +66,8 @@ class RenderResult:
     heading_pages: tuple[int, ...] = ()
     overflow: tuple[str, ...] = ()
     layout_ok: bool = False
+    # Nachtrag 3: Ursache je halbleerer Seite ("Seite 25: 120 mm frei, ...").
+    sparse_causes: tuple[str, ...] = ()
 
 
 # ----------------------------------------------------------------- Jinja-Filter
@@ -195,6 +197,8 @@ def render_report_v3(data: ReportData | dict, output_path: str | Path, *,
             warnings.append(f"Überschrift am Seitenende auf Seite {page}")
         for where in layout.overflow:
             warnings.append(f"außerhalb des Satzspiegels: {where}")
+        for cause in layout.sparse_causes:
+            warnings.append(f"halbleer {cause}")
 
     result = RenderResult(pdf_path=out, pages=len(document.pages),
                           words_per_page=words, sparse_pages=sparse,
@@ -203,7 +207,8 @@ def render_report_v3(data: ReportData | dict, output_path: str | Path, *,
                           kicker_pages=layout.kicker_pages if layout else (),
                           heading_pages=layout.heading_pages if layout else (),
                           overflow=layout.overflow if layout else (),
-                          layout_ok=layout is not None)
+                          layout_ok=layout is not None,
+                          sparse_causes=layout.sparse_causes if layout else ())
     log.info("pdf_v3_rendered", path=str(out), pages=result.pages,
              package=variant.key, defects=len(defects), warnings=len(warnings),
              sparse=list(sparse))

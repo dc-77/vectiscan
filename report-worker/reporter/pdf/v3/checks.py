@@ -118,6 +118,76 @@ class Layout:
     kicker_pages: tuple[int, ...] = ()
     heading_pages: tuple[int, ...] = ()
     overflow: tuple[str, ...] = ()
+    # Nachtrag 3 (Entscheidung DC 25.09.): Ursache je halbleerer Seite, als Satz.
+    sparse_causes: tuple[str, ...] = ()
+
+
+# Bloecke, die in der Ursachenmeldung mit Namen stehen (Klasse im Template).
+BLOCK_NAMES: dict[str, str] = {
+    "fd": "Befundkarte", "svc": "Service-Karte", "post": "Posture-Tabelle",
+    "ev": "Nachweisblock", "box": "Hinweiskasten", "cat": "Kategorieblock",
+    "lever": "Hebel", "shots": "Bildschirmfotos", "wrapup": "Abschlussblock",
+    "impblock": "Impressum", "lastpage": "Anhang D bis F",
+}
+PX_MM = 25.4 / 96
+
+
+def _style(box: Any, key: str) -> str:
+    try:
+        return str(box.style[key])
+    except (KeyError, TypeError, AttributeError):
+        return ""
+
+
+def _first_line(box: Any, ancestors: list[Any], B: Any) -> tuple[Any, list[Any]] | None:
+    """Erste Text- oder Bildzeile unter ``box`` samt ihrer Vorfahren (ohne Randboxen)."""
+    if isinstance(box, (B.LineBox, B.ReplacedBox)):
+        return box, ancestors
+    for child in getattr(box, "children", None) or ():
+        if isinstance(child, B.MarginBox):
+            continue
+        found = _first_line(child, ancestors + [box], B)
+        if found is not None:
+            return found
+    return None
+
+
+def _snippet(element: Any, limit: int = 60) -> str:
+    try:
+        text = " ".join("".join(element.itertext()).split())
+    except AttributeError:
+        return ""
+    return text[:limit] + ("..." if len(text) > limit else "")
+
+
+def sparse_cause(page_no: int, free_mm: float, next_page: Any, B: Any) -> str:
+    """Warum Seite ``page_no`` halbleer blieb: womit die Folgeseite beginnt."""
+    found = _first_line(next_page, [], B)
+    if found is None:
+        return f"Seite {page_no}: {free_mm:.0f} mm frei, Folgeseite ohne Inhalt"
+    _, ancestors = found
+    classes = [_classes(a) for a in ancestors]
+    if any({"kicker", "sec-head"} & c for c in classes):
+        return (f"Seite {page_no}: {free_mm:.0f} mm frei, danach beginnt ein Kapitel "
+                "mit erzwungenem Seitenwechsel")
+    sperre = next((i for i, a in enumerate(ancestors)
+                   if getattr(a, "element", None) is not None and _style(a, "break_inside") == "avoid"),
+                  None)
+    if sperre is None:
+        return (f"Seite {page_no}: {free_mm:.0f} mm frei, die Folgeseite beginnt mit "
+                "umbrechbarem Inhalt (Umbruch davor)")
+    block = ancestors[sperre]
+    name, element = "", getattr(block, "element", None)
+    for a, c in zip(reversed(ancestors[: sperre + 1]), reversed(classes[: sperre + 1])):
+        treffer = next((BLOCK_NAMES[k] for k in c if k in BLOCK_NAMES), "")
+        if treffer:
+            name, element = treffer, a.element
+            break
+    name = name or f"<{getattr(block, 'element_tag', '?')}>"
+    height = block.margin_height() * PX_MM
+    text = _snippet(element)
+    return (f"Seite {page_no}: {free_mm:.0f} mm frei, die Folgeseite beginnt mit einem nicht "
+            f"umbrechbaren Block ({name}, {height:.0f} mm hoch){': ' + text if text else ''}")
 
 
 def _classes(box: Any) -> set[str]:
@@ -125,6 +195,14 @@ def _classes(box: Any) -> set[str]:
     if element is None or not hasattr(element, "get"):
         return set()
     return set((element.get("class") or "").split())
+
+
+def _cause_safe(page_no: int, free_mm: float, next_page: Any, B: Any) -> str:
+    """Die Ursachenmeldung darf die Layoutpruefung nicht kippen."""
+    try:
+        return sparse_cause(page_no, free_mm, next_page._page_box, B)
+    except (AttributeError, TypeError, KeyError, ValueError):
+        return f"Seite {page_no}: {free_mm:.0f} mm frei, Ursache nicht bestimmbar"
 
 
 def layout_scan(document: Any) -> Layout | None:
@@ -135,6 +213,7 @@ def layout_scan(document: Any) -> Layout | None:
         return None
     try:
         fill: list[float] = []
+        free_mm: list[float] = []
         events: list[tuple[int, str, int]] = []
         heading_last: list[int] = []
         overflow: set[str] = set()
@@ -169,6 +248,7 @@ def layout_scan(document: Any) -> Layout | None:
                         if rechts > right + OVERFLOW_TOLERANCE and klassen:
                             overflow.add(f"Seite {index}: {' '.join(sorted(klassen))}")
             fill.append(round(max(0.0, (bottom - top) / height), 3))
+            free_mm.append(max(0.0, height - (bottom - top)) * PX_MM)
             if last_kind == "heading":
                 heading_last.append(index)
         kicker_pages: list[int] = []
@@ -178,8 +258,12 @@ def layout_scan(document: Any) -> Layout | None:
             folgt = next((e for e in events[i + 1:] if e[1] == "h2"), None)
             if folgt is None or folgt[0] != page_no:
                 kicker_pages.append(page_no)
+        pages = document.pages
+        causes = tuple(_cause_safe(p, free_mm[p - 1], pages[p], B)
+                       for p in sparse_from_fill(tuple(fill)) if p < len(pages))
         return Layout(fill=tuple(fill), kicker_pages=tuple(kicker_pages),
-                      heading_pages=tuple(heading_last), overflow=tuple(sorted(overflow)))
+                      heading_pages=tuple(heading_last), overflow=tuple(sorted(overflow)),
+                      sparse_causes=causes)
     except (AttributeError, TypeError):
         return None
 
