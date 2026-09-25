@@ -1,0 +1,24 @@
+{
+ "_note": "Erkennung aus der Antwort des Weiterleitungsziels (bergersysteme).",
+ "facts": {
+  "fqdns": [
+   {
+    "name": "example.test",
+    "host_ip": "10.0.0.1",
+    "http_status": 301,
+    "final_url": "https://www.example.test/",
+    "waf": {
+     "detected": true,
+     "name": "Cloudflare"
+    }
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "example.test@10.0.0.1",
+  "affected": [],
+  "positive": false
+ }
+}

@@ -28,8 +28,12 @@ policy:
   start_level: niedrig
   deviation: null
 texts:
+  short: "kein Schutz vor Rückstufung"
+  plan:
+    lever: "Schutz gegen erzwungene Rückstufung aktivieren"
+    effect: "Verhindert, dass ein Angreifer eine ältere Protokollversion erzwingt"
   observation: >-
-    Der Dienst {group} bietet noch veraltete Protokollversionen an und signalisiert dabei keinen
+    {n:Der Dienst|Die Dienste} {group} {n:bietet|bieten} noch veraltete Protokollversionen an und signalisiert dabei keinen
     Fallback-SCSV-Schutz vor einer erzwungenen Rückstufung der Verbindung: {affected}.
   meaning: >-
     Ohne dieses Signal kann eine Gegenstelle auf dem Übertragungsweg einen Verbindungsabbruch

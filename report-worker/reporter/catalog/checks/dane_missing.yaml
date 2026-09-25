@@ -6,7 +6,8 @@ scale: hygiene
 level: niedrig
 group_by: domain
 scope: dns
-applicable_when: len(dns.mx) > 0
+# S6b-2 (spec/09 Q4): nur umsetzbar, wenn der MX in der eigenen, signierten Zone liegt.
+applicable_when: len(dns.mx) > 0 and mx_in_own_zone(dns, scan.domains) and dns.dnssec is not None and dns.dnssec.signed is True
 when: dns.dane is not None and dns.dane.smtp is False
 positive_when: dns.dane is not None and dns.dane.smtp is True
 not_testable_when:
@@ -35,6 +36,10 @@ policy:
     da DANE erst zusammen mit DNSSEC wirkt und in der Praxis selten flaechendeckend eingerichtet
     ist.
 texts:
+  short: "kein DANE für SMTP"
+  plan:
+    lever: "DANE für die Mailserver einrichten"
+    effect: "Verankert die Zertifikate der Mailserver im signierten DNS"
   observation: >-
     Für {affected} sind keine DANE-Einträge für den SMTP-Übertragungsweg hinterlegt. Für
     die Domain {domain} lassen sich die Zertifikate der Mailserver damit nicht zusätzlich

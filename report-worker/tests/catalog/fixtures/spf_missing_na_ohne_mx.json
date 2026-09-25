@@ -1,0 +1,18 @@
+{
+ "_note": "Ohne MX bewertet mail_spoofing_unprotected (spec/08 Punkt 6).",
+ "facts": {
+  "dns": [
+   {
+    "domain": "example.test",
+    "mx": []
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "not_applicable",
+  "group_key": "example.test",
+  "affected": [],
+  "positive": false
+ }
+}

@@ -1,15 +1,28 @@
 {
  "facts": {
   "http": [
-   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "reachable": true, "status_code": 200,
-    "wordpress": {"users": ["admin"], "version_status": "outdated"}}
+   {
+    "host_ip": "10.0.0.1",
+    "fqdn": "www.example.test",
+    "reachable": true,
+    "status_code": 200,
+    "wordpress": {
+     "users": [
+      "admin"
+     ],
+     "version_status": "outdated",
+     "core_vulnerabilities": 2
+    }
+   }
   ]
  },
  "coverage_default": "ok",
  "expect": {
   "status": "fail",
   "group_key": "www.example.test@10.0.0.1",
-  "affected": ["www.example.test (WordPress outdated)"],
+  "affected": [
+   "www.example.test (WordPress outdated)"
+  ],
   "positive": false
  }
 }

@@ -33,6 +33,10 @@ policy:
     SP-HDR-005 bis 009 bewerten die einzelnen Header mit INFO bis LOW; die Simulation fuehrt sie als
     eine Familie mit Hygiene niedrig, weil sie gemeinsam gesetzt werden.
 texts:
+  short: "Sicherheits-Header unvollständig"
+  plan:
+    lever: "Fehlende Sicherheits-Header ergänzen"
+    effect: "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen"
   observation: >-
     Auf {group} fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und
     ungewollter Weitergabe von Referrer-Informationen schützen: {affected}.

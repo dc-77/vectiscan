@@ -148,8 +148,13 @@ def test_plan_ist_nach_dringlichkeit_sortiert(data):
 
 
 def test_erste_planzeile_traegt_die_wirkung_des_roten_befunds(data):
+    """Spitzensatz, dann der Effekt der Regel (S6b-2, spec/09 Q6)."""
+    from reporter.v3 import plan as P
+
     assert data.plan[0].st == "rot"
-    assert data.plan[0].effect == "Beseitigt das dringlichste Risiko dieses Berichts"
+    teile = data.plan[0].effect.split(P.PLAN_EFFECT_SEP)
+    assert teile[0] == "Beseitigt das dringlichste Risiko dieses Berichts"
+    assert teile[1:] == ["Entzieht Angreifern den direkten Zugriff auf die Datenbanken"]
 
 
 def test_hebel_zeigen_auf_bekannte_befunde(data):

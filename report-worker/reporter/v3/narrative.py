@@ -203,18 +203,20 @@ def numbers(c: Counts) -> list[tuple[str, str]]:
 
 # ---------------------------------------------------------------- Kapitel 3
 
-def architecture_lead(hosts: int, roles: list[str]) -> str:
+def architecture_lead(systems: int, roles: list[str]) -> str:
+    """Einleitung Kapitel 3, gezaehlt in Systemen wie Kapitel 2.1 (S6b-2)."""
+    einheit = _plural(systems, "System", "Systeme")
     if roles:
         return (
-            f"Die geprüfte Angriffsfläche verteilt sich auf {hosts} "
-            f"{_plural(hosts, 'Host', 'Hosts')} mit folgenden Aufgaben: {_join(roles)}. "
-            "Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die "
-            "erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen."
+            f"Die geprüfte Angriffsfläche verteilt sich auf {systems} {einheit} mit folgenden "
+            f"Aufgaben: {_join(roles)}. Die Tabellen dieses Kapitels zeigen je Adresse die "
+            "erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten "
+            "Schutzmaßnahmen."
         )
     return (
-        f"Die geprüfte Angriffsfläche umfasst {hosts} {_plural(hosts, 'Host', 'Hosts')}. "
-        "Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren "
-        "Dienste und den Stand der wichtigsten Schutzmaßnahmen."
+        f"Die geprüfte Angriffsfläche umfasst {systems} {einheit}. Die Tabellen dieses Kapitels "
+        "zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der "
+        "wichtigsten Schutzmaßnahmen."
     )
 
 
@@ -229,13 +231,20 @@ SERVICES_NOTE = (
 SCREENS_LEAD = "Sichtprüfung der erreichbaren Web-Oberflächen der geprüften Hosts."
 
 
-def reputation_line(clean: bool, sources: list[str]) -> str:
+def reputation_line(clean: bool, sources: list[str], not_rated: list[str] | None = None) -> str:
     if not sources:
         return "Reputationsquellen wurden für diesen Auftrag nicht abgefragt."
     src = _join(sources)
     if clean:
-        return f"Reputation: keine Einträge zu den geprüften Adressen in {src}."
-    return f"Reputation: zu mindestens einer der geprüften Adressen liegt in {src} ein Eintrag vor."
+        text = f"Reputation: keine Meldungen zu den geprüften Adressen in {src}."
+    else:
+        text = f"Reputation: zu mindestens einer der geprüften Adressen liegt in {src} eine Meldung vor."
+    if not_rated:
+        # S6b-2 (spec/09 Q12): Adressen von Plattformen und Inhaltsnetzen teilt der Kunde mit
+        # vielen anderen; ihre Meldungen sind ihm nicht zuzurechnen.
+        text += (" Nicht bewertet sind Adressen von Plattformen und Inhaltsnetzen, die auch "
+                 f"andere Kunden nutzen: {_join(not_rated)}.")
+    return text
 
 
 # ---------------------------------------------------------------- Befundlandschaft
@@ -250,14 +259,9 @@ def landscape_lead(c: Counts) -> str:
 
 # ---------------------------------------------------------------- Maßnahmenplan
 
-# Wirkung einer Planzeile, deterministisch aus Kategorie und Dringlichkeit.
-PLAN_EFFECT: dict[str, str] = {
-    "A": "Verkleinert die von außen erreichbare Angriffsfläche",
-    "B": "Schließt bekannte Lücken in veralteten Ständen",
-    "C": "Schützt die Authentizität der eigenen E-Mail",
-    "D": "Härtet Transportverschlüsselung und Web-Oberflächen",
-    "E": "Nimmt Angreifern Vorbereitungswissen",
-}
+# S6b-2 (spec/09 Q6): der Effekt einer Planzeile kommt aus ``texts.plan.effect`` der Regel.
+# Die Tabelle je Kategorie entfaellt; sie setzte "Schützt die Authentizität der eigenen
+# E-Mail" auch an DNSSEC und CAA. Geblieben ist der Satz vor der ersten roten Zeile.
 PLAN_EFFECT_TOP = "Beseitigt das dringlichste Risiko dieses Berichts"
 
 

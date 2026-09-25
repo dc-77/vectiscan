@@ -71,7 +71,7 @@ def test_coverage_regel_not_in_package_ist_not_applicable(tmp_path):
 
 def test_zweite_domain_ohne_dns_ist_not_testable():
     facts = make_facts({"scan": {"domain": "a.test", "domains": ["a.test", "b.test"]},
-                        "dns": [{"domain": "a.test", "dmarc": {"present": True, "p": "reject"}}],
+                        "dns": [{"domain": "a.test", "mx": ["mx.a.test"], "dmarc": {"present": True, "p": "reject"}}],
                         "coverage": [{"scope": "domain", "domain": "b.test", "tool": "dns", "status": "unknown", "reason": "second_target_unlabeled"}]},
                        coverage_default="ok")
     res = run_check("dmarc_missing", facts)
@@ -106,7 +106,7 @@ def test_fail_gewinnt_ueber_not_testable():
     # trotzdem eine Zeile, und sie nennt genau das, was die Regel gesehen hat.
     assert len(r.evidence) == 1
     assert r.evidence[0].tool == "testssl"
-    assert "TLS1.0" in r.evidence[0].excerpt
+    assert "TLS 1.0" in r.evidence[0].excerpt
 
 
 def test_evidence_wird_uebernommen():
@@ -177,7 +177,8 @@ def test_auffangregeln_und_ignorierliste(catalog):
     assert not any(u.what.startswith("10.0.0.2:2052") for u in out.unprocessed)
     assert any(i.kind == "passive_port" and i.what.startswith("10.0.0.2:2052") for i in out.ignored)
     assert any(i.kind == "zap_alert" and i.what.startswith("Modern Web Application") for i in out.ignored)
-    assert not any(u.what.startswith("Absence of Anti-CSRF") for u in out.unprocessed)  # beansprucht durch csrf_token_missing
+    # S6b-2 (Q14): ohne Konfidenz High beansprucht web_vulnerability_reported die Meldung (Anhang).
+    assert not any(u.what.startswith("Absence of Anti-CSRF") for u in out.unprocessed)
 
 
 def test_ausgabe_ist_deterministisch_und_json_rund(catalog):

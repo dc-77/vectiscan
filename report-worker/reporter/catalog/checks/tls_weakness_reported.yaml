@@ -1,0 +1,45 @@
+id: tls_weakness_reported
+title: TLS-Hinweis der Analyse ohne eigene Einstufung
+family: tls_weakness
+category: D
+scale: hygiene
+level: niedrig
+group_by: fqdn
+scope: tls.vulns
+applicable_when: null
+# S6b-2 (spec/09 Q4, Teil 2 JW): BREACH gilt laut testssl fuer statische Seiten nicht
+# ("Can be ignored for static pages"), LUCKY13 meldet testssl nur experimentell. Beide stehen
+# als Werkzeugmeldung im Anhang, ohne Befund und ohne CVE an einem Befund.
+when: 'vuln.name in TLS_REPORTED_VULNS and vuln.status != "not_tested"'
+positive_when: never
+not_testable_when: []
+undetermined: not_applicable
+requires:
+  tools: [testssl]
+kind: check
+bundle: tool_findings_unrated
+affected_template: "{target}: {name} (Hinweis der TLS-Analyse)"
+evidence: [tls]
+references: [CWE-327]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: spec/09 Q4 (S6b-2)
+  start_level: niedrig
+  deviation: "Anhang statt Befund: testssl selbst stuft diese Meldungen als bedingt oder experimentell ein."
+texts:
+  observation: >-
+    Die TLS-Analyse meldet auf {group} Hinweise ohne eigene Einstufung: {affected}.
+  # Kein Satz je Meldung: der Text gilt fuer jede der beiden Meldungen (Q4).
+  meaning: >-
+    Die TLS-Analyse stuft diese Punkte selbst als bedingt oder experimentell ein; ob sie
+    für den Dienst zutreffen, hängt von dessen Inhalten und Konfiguration ab.
+  recommendation:
+    - stage: strategisch
+      text: >-
+        Die Hinweise bei der nächsten Überarbeitung der TLS-Konfiguration mit prüfen.
+  verify: >-
+    TLS-Analyse des Dienstes wiederholen und die Hinweise gegen die Konfiguration abgleichen.

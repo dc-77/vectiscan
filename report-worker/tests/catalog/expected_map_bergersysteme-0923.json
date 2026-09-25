@@ -1,6 +1,8 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/bergersysteme-0923.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
  "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
+ "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben.",
+ "hinweis_s6b2": "S6b-2 hat neun Markierungen aufgeloest: Q13 Plesk auf dem Sammelserver als admin_panel_hoster beim Hoster (erhoeht), Cloudflare-Ports 2083/2087/8880 ohne Fingerabdruck entfallen; Q4 dane_missing (MX in fremder Zone) und SSH-Banner entfallen; Q12 die vier Zertifikats-Positivbefunde stehen im Bericht nicht mehr, weil die Mail-TLS-Dienste des Hosts nie geprueft wurden (bundles.tls_untested_hosts; die Katalogergebnisse bleiben bestanden), waf_present entfaellt (Antwort des Weiterleitungsziels). Es bleiben fuenf Q8-Markierungen (S6c).",
  "strict": false,
  "orders": {
   "main": "68d59573-7a93-4efa-89cc-e7b10cc4d140"
@@ -8,130 +10,107 @@
  "findings": {
   "VS-2026-001": {
    "checks": [
-    "admin_service_exposed"
-   ],
-   "spec09": "Q13",
-   "warum": "Plesk mit Anmeldung auf dem Plesk-Sammelserver 92.205.224.174 (auch dirak.de); nach E1 ein Hosting-Panel des Hosters, erhöht mit Empfehlung an den Hoster und als „beim Hoster“ gekennzeichnet."
+    "admin_panel_hoster"
+   ]
   },
   "VS-2026-002": {
    "checks": [
     "admin_service_exposed_passive"
-   ],
-   "spec09": "Q13",
-   "warum": "198.202.211.1 ist eine Cloudflare-Kante; 2083, 2087 und 8880 sind Cloudflare-Standardports, keine Verwaltungsoberfläche von www."
+   ]
   },
   "VS-2026-003": {
    "checks": [
-    "admin_service_exposed_passive"
+    "caa_missing"
    ]
   },
   "VS-2026-004": {
    "checks": [
-    "caa_missing"
-   ]
+    "csp_missing"
+   ],
+   "spec09": "Q8",
+   "warum": "Gemessen an der Weiterleitung auf www.bergersysteme.com, nicht an einer Webseite."
   },
   "VS-2026-005": {
    "checks": [
     "csp_missing"
    ],
    "spec09": "Q8",
-   "warum": "Gemessen an der Weiterleitung auf www.bergersysteme.com, nicht an einer Webseite."
+   "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
   },
   "VS-2026-006": {
    "checks": [
     "csp_missing"
-   ],
-   "spec09": "Q8",
-   "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
-  },
-  "VS-2026-007": {
-   "checks": [
-    "csp_missing"
    ]
   },
-  "VS-2026-008": {
-   "checks": [
-    "dane_missing"
-   ],
-   "spec09": "Q4",
-   "warum": "Der MX liegt in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
-  },
-  "VS-2026-009": {
+  "VS-2026-007": {
    "checks": [
     "dmarc_none"
    ]
   },
-  "VS-2026-010": {
+  "VS-2026-008": {
    "checks": [
     "dnssec_missing"
    ]
   },
-  "VS-2026-011": {
-   "checks": [
-    "ftp_plaintext"
-   ]
-  },
-  "VS-2026-012": {
+  "VS-2026-009": {
    "checks": [
     "hsts_missing"
    ]
   },
-  "VS-2026-013": {
+  "VS-2026-010": {
    "checks": [
     "hsts_missing"
    ],
    "spec09": "Q8",
    "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
   },
-  "VS-2026-014": {
+  "VS-2026-011": {
    "checks": [
     "legacy_protocols_present"
    ]
   },
-  "VS-2026-015": {
+  "VS-2026-012": {
+   "checks": [
+    "mail_plaintext"
+   ]
+  },
+  "VS-2026-013": {
    "checks": [
     "mta_sts_missing"
    ]
   },
-  "VS-2026-016": {
+  "VS-2026-014": {
    "checks": [
     "passive_service_version_unverified"
    ]
   },
-  "VS-2026-017": {
+  "VS-2026-015": {
    "checks": [
     "security_headers_incomplete"
    ],
    "spec09": "Q8",
    "warum": "Gemessen an der Weiterleitung auf www.bergersysteme.com, nicht an einer Webseite."
   },
-  "VS-2026-018": {
+  "VS-2026-016": {
    "checks": [
     "security_headers_incomplete"
    ],
    "spec09": "Q8",
    "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
   },
-  "VS-2026-019": {
+  "VS-2026-017": {
    "checks": [
     "security_headers_incomplete"
    ]
   },
-  "VS-2026-020": {
-   "checks": [
-    "service_banner_version"
-   ],
-   "spec09": "Q4",
-   "warum": "Das SSH-Banner gehört zum Protokoll und lässt sich nicht entfernen. Dienst des Plesk-Sammelservers 92.205.224.174."
-  },
-  "VS-2026-021": {
+  "VS-2026-018": {
    "checks": [
     "tls_rpt_missing"
    ]
   },
-  "VS-2026-022": {
+  "VS-2026-019": {
    "checks": [
-    "tls_weakness"
+    "tls_weakness_reported"
    ]
   }
  },
@@ -139,9 +118,7 @@
   "VS-2026-P01": {
    "checks": [
     "cert_chain_incomplete"
-   ],
-   "spec09": "Q12",
-   "warum": "Nur das Webzertifikat ist geprüft; nmap zeigt auf 110, 143, 465, 993 und 995 desselben Hosts selbstsignierte, abgelaufene Plesk-Zertifikate, Mail-TLS wurde nie geprüft."
+   ]
   },
   "VS-2026-P02": {
    "checks": [
@@ -151,16 +128,12 @@
   "VS-2026-P03": {
    "checks": [
     "cert_expired"
-   ],
-   "spec09": "Q12",
-   "warum": "Nur das Webzertifikat ist geprüft; nmap zeigt auf 110, 143, 465, 993 und 995 desselben Hosts selbstsignierte, abgelaufene Plesk-Zertifikate."
+   ]
   },
   "VS-2026-P04": {
    "checks": [
     "cert_expired"
-   ],
-   "spec09": "Q12",
-   "warum": "Nur das Webzertifikat ist geprüft; nmap zeigt auf 110, 143, 465, 993 und 995 desselben Hosts selbstsignierte, abgelaufene Plesk-Zertifikate."
+   ]
   },
   "VS-2026-P05": {
    "checks": [
@@ -170,9 +143,7 @@
   "VS-2026-P06": {
    "checks": [
     "cert_hostname_mismatch"
-   ],
-   "spec09": "Q12",
-   "warum": "Nur das Webzertifikat ist geprüft; die Plesk-Zertifikate der Maildienste desselben Hosts wurden nie auf den Namen geprüft."
+   ]
   },
   "VS-2026-P07": {
    "checks": [
@@ -256,47 +227,47 @@
   },
   "VS-2026-P23": {
    "checks": [
-    "ip_reputation"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P24": {
    "checks": [
-    "mail_plaintext"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P25": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P26": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P27": {
    "checks": [
-    "smb_exposed"
+    "spf_missing"
    ]
   },
   "VS-2026-P28": {
    "checks": [
-    "smb_exposed"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P29": {
    "checks": [
-    "spf_missing"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P30": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P31": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P32": {
@@ -306,37 +277,20 @@
   },
   "VS-2026-P33": {
    "checks": [
-    "tls_no_13"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P34": {
    "checks": [
-    "tls_no_13"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P35": {
    "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P36": {
-   "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P37": {
-   "checks": [
     "urlhaus_compromise"
    ]
   },
-  "VS-2026-P38": {
-   "checks": [
-    "waf_present"
-   ],
-   "spec09": "Q12",
-   "warum": "Die WAF-Erkennung stammt aus der Antwort des Weiterleitungsziels www.bergersysteme.com, nicht aus der eigenen Antwort."
-  },
-  "VS-2026-P39": {
+  "VS-2026-P36": {
    "checks": [
     "waf_present"
    ]
@@ -344,6 +298,5 @@
  },
  "subsumed": {},
  "expected_coverage_differences": [],
- "expected_member_differences": [],
- "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben."
+ "expected_member_differences": []
 }

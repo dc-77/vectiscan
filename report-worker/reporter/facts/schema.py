@@ -36,6 +36,17 @@ Historie:
   nmap ohne offenen Port ist ``empty`` statt ``ok``. Softwarefakten eines VHosts mit
   Weiterleitung auf einen anderen Host gehoeren diesem Host; OWA-Builds aus
   Spider-URLs nur fuer den Host im Namen der URL.
+- 1.0.7 (S6b-2, spec/09 Q12 bis Q14, Q18, spec/08 Punkte 4 und 20): neue optionale Felder
+  ``ServiceFact.fp_server``, ``fp_title``, ``fp_login`` (Fingerabdruck aus der Antwort des
+  Dienstes, nmap ``servicefp`` und Skripte), ``ServiceFact.rejects_before_auth`` (der Dienst
+  weist fremde Quellen vor der Anmeldung ab, laut Passivbanner), ``Reputation``-Felder zu den
+  AbuseIPDB-Meldungen, ``WebAlert.run`` (Lauf der ZAP-Meldung), ``WordPressInfo.version``,
+  ``release_date`` und ``core_vulnerabilities``, ``SoftwareFact.release_date`` und
+  ``SoftwareFact.vulnerabilities`` (wpscan-Kennungen). Bedeutung praeziser:
+  ``WebAlert.confidence`` ist die hoechste Konfidenz der Einzelmeldungen, POP3 mit USER oder
+  SASL vor STLS gilt als Anmeldung ohne TLS-Zwang. Neu ``PassiveFact.service_seen_at``,
+  der Zeitstempel des Dienstes (HTTP-Kopf ``Date`` im Banner); ``seen_at`` bleibt die
+  Aktualisierung des Hosts bei der Quelle.
 """
 from __future__ import annotations
 
@@ -43,7 +54,7 @@ from typing import Any, ClassVar, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-FACTS_SCHEMA_VERSION = "1.0.6"
+FACTS_SCHEMA_VERSION = "1.0.7"
 
 Mode = Literal["active", "passive"]
 
@@ -151,6 +162,11 @@ class Blocked(Base):
 
 class Reputation(Base):
     abuseipdb_score: Optional[int] = None
+    # S6b-2 (spec/09 Q12): Score 0 heisst nicht "keine Meldungen"; eine Adresse auf der
+    # Freigabeliste von AbuseIPDB (Vercel bei heuel) hat Score 0 trotz 26 Meldungen.
+    abuseipdb_total_reports: Optional[int] = None
+    abuseipdb_whitelisted: Optional[bool] = None
+    abuseipdb_last_reported_at: Optional[str] = None
     is_tor: Optional[bool] = None
     otx_pulse_count: Optional[int] = None
     urlhaus_compromised: Optional[bool] = None
@@ -279,6 +295,16 @@ class ServiceFact(Fact):
     cert: Optional[CertShort] = None
     nmap_conf: Optional[int] = None
     method: Optional[str] = None
+    # S6b-2 (spec/09 Q13): Fingerabdruck aus der Antwort des Dienstes. ``fp_server`` ist die
+    # Server-Kennung (HTTP-Kopf ``Server`` aus dem nmap-Fingerprint oder http-server-header),
+    # ``fp_title`` der Seitentitel, ``fp_login`` True bei belegter Anmeldung (Anmeldemaske,
+    # ``auth-required``, Passwortfeld, HTTP-Authentifizierung).
+    fp_server: Optional[str] = None
+    fp_title: Optional[str] = None
+    fp_login: Optional[bool] = None
+    # S6b-2 (spec/09 Teil 2 LW, JW): der Dienst weist fremde Quellen vor jeder Anmeldung ab
+    # (PostgreSQL "no pg_hba.conf entry"), laut Passivbanner desselben IP:Port.
+    rejects_before_auth: Optional[bool] = None
 
 
 class TlsCert(Base):
@@ -384,6 +410,9 @@ class WebAlert(Base):
     cwe: Optional[str] = None
     evidence: Optional[str] = None
     count: int = 1
+    # S6b-2 (spec/09 Q14): Lauf, aus dem die Meldung stammt: "passive" (ZAP-Passivscanner,
+    # sourceid 3) oder "active" (aktive Pruefung, sourceid 1).
+    run: Optional[Literal["passive", "active"]] = None
 
 
 class WebPath(Base):
@@ -395,6 +424,13 @@ class WebPath(Base):
 class WordPressInfo(Base):
     users: list[str] = Field(default_factory=list)
     version_status: Optional[str] = None
+    # S6b-2 (spec/09 Q18): Kernversion, Veroeffentlichung und bekannte Kern-Schwachstellen
+    # laut wpscan; "outdated" allein heisst nicht unsicher, wenn der Zweig gepflegt wird.
+    version: Optional[str] = None
+    release_date: Optional[str] = None
+    core_vulnerabilities: Optional[int] = None
+    # S6b-2 (spec/09 Teil 2 DB): Adresse, ueber die wpscan die Benutzernamen fand.
+    users_found_by: list[str] = Field(default_factory=list)
 
 
 class HttpFact(Fact):
@@ -530,6 +566,13 @@ class Eol(Base):
     upstream_eol_date: Optional[str] = None
 
 
+class VulnRef(Base):
+    """Eine vom Werkzeug genannte Schwachstelle (wpscan): Titel, Kennungen, behoben in."""
+    title: str
+    cves: list[str] = Field(default_factory=list)
+    fixed_in: Optional[str] = None
+
+
 class SoftwareFact(Fact):
     host_ip: str
     fqdn: Optional[str] = None
@@ -546,6 +589,9 @@ class SoftwareFact(Fact):
     note: Optional[str] = None
     detection_sources: list[str] = Field(default_factory=list)
     vulnerabilities_count: Optional[int] = None
+    # S6b-2: Veroeffentlichung der Version (wpscan) und die genannten Schwachstellen (#16).
+    release_date: Optional[str] = None
+    vulnerabilities: list[VulnRef] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------- passive
@@ -561,6 +607,9 @@ class PassiveFact(Fact):
     version: Optional[str] = None
     banner_excerpt: Optional[str] = None
     seen_at: Optional[str] = None
+    # S6b-2 (spec/09 Q13): Zeitstempel dieses Dienstes laut Banner (HTTP-Kopf ``Date``);
+    # ``seen_at`` ist die letzte Aktualisierung des ganzen Hosts bei der Quelle.
+    service_seen_at: Optional[str] = None
     verified: Optional[bool] = None
     hostnames: list[str] = Field(default_factory=list)
     details: dict[str, Any] = Field(default_factory=dict)

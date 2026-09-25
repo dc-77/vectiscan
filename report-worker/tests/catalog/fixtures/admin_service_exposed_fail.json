@@ -1,15 +1,27 @@
 {
+ "_note": "E1: Webmin mit belegter Anmeldung auf einem System des Kunden (dortmund-beach, spec/09 Q13).",
  "facts": {
   "services": [
-   {"host_ip": "10.0.0.7", "port": 2087, "service": "whm"}
+   {
+    "host_ip": "10.0.0.7",
+    "port": 10000,
+    "service": "snet-sensor-mgmt",
+    "tunnel_ssl": true,
+    "fp_server": "MiniServ",
+    "fp_login": true
+   }
   ]
  },
  "coverage_default": "ok",
  "expect": {
   "status": "fail",
   "group_key": "10.0.0.7",
-  "affected": ["10.0.0.7:2087 (whm)"],
+  "affected": [
+   "10.0.0.7:10000 (Webmin)"
+  ],
   "positive": false,
-  "members": {"10.0.0.7:2087": "fail"}
+  "members": {
+   "10.0.0.7:10000": "fail"
+  }
  }
 }

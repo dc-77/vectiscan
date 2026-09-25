@@ -37,42 +37,42 @@
   },
   "VS-2026-007": {
    "checks": [
-    "dane_missing"
+    "db_exposed"
    ]
   },
   "VS-2026-008": {
    "checks": [
-    "dane_missing"
+    "default_page_exposed"
    ]
   },
   "VS-2026-009": {
    "checks": [
-    "db_exposed"
+    "dmarc_missing"
    ]
   },
   "VS-2026-010": {
    "checks": [
-    "default_page_exposed"
+    "dmarc_missing"
    ]
   },
   "VS-2026-011": {
    "checks": [
-    "dmarc_missing"
+    "dnssec_missing"
    ]
   },
   "VS-2026-012": {
    "checks": [
-    "dmarc_missing"
+    "dnssec_missing"
    ]
   },
   "VS-2026-013": {
    "checks": [
-    "dnssec_missing"
+    "hsts_missing"
    ]
   },
   "VS-2026-014": {
    "checks": [
-    "dnssec_missing"
+    "hsts_missing"
    ]
   },
   "VS-2026-015": {
@@ -82,17 +82,17 @@
   },
   "VS-2026-016": {
    "checks": [
-    "hsts_missing"
+    "http_alt_port"
    ]
   },
   "VS-2026-017": {
    "checks": [
-    "hsts_missing"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-018": {
    "checks": [
-    "http_alt_port"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-019": {
@@ -102,52 +102,52 @@
   },
   "VS-2026-020": {
    "checks": [
-    "http_header_disclosure"
+    "http_trace_enabled"
    ]
   },
   "VS-2026-021": {
    "checks": [
-    "http_header_disclosure"
+    "info_disclosure"
    ]
   },
   "VS-2026-022": {
    "checks": [
-    "http_trace_enabled"
+    "info_disclosure"
    ]
   },
   "VS-2026-023": {
    "checks": [
-    "info_disclosure"
+    "legacy_protocols_present"
    ]
   },
   "VS-2026-024": {
    "checks": [
-    "info_disclosure"
+    "login_portal_exposed"
    ]
   },
   "VS-2026-025": {
    "checks": [
-    "legacy_protocols_present"
+    "login_portal_exposed"
    ]
   },
   "VS-2026-026": {
    "checks": [
-    "login_portal_exposed"
+    "mta_sts_missing"
    ]
   },
   "VS-2026-027": {
    "checks": [
-    "login_portal_exposed"
+    "mta_sts_missing"
    ]
   },
   "VS-2026-028": {
    "checks": [
-    "mta_sts_missing"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-029": {
    "checks": [
-    "mta_sts_missing"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-030": {
@@ -157,57 +157,57 @@
   },
   "VS-2026-031": {
    "checks": [
-    "security_headers_incomplete"
+    "service_banner_version"
    ]
   },
   "VS-2026-032": {
    "checks": [
-    "security_headers_incomplete"
+    "spf_softfail"
    ]
   },
   "VS-2026-033": {
    "checks": [
-    "service_banner_version"
+    "spf_softfail"
    ]
   },
   "VS-2026-034": {
    "checks": [
-    "service_banner_version"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-035": {
    "checks": [
-    "spf_softfail"
+    "tls_no_fallback_scsv"
    ]
   },
   "VS-2026-036": {
    "checks": [
-    "spf_softfail"
+    "tls_rpt_missing"
    ]
   },
   "VS-2026-037": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_rpt_missing"
    ]
   },
   "VS-2026-038": {
    "checks": [
-    "tls_no_fallback_scsv"
+    "tls_weakness"
    ]
   },
   "VS-2026-039": {
    "checks": [
-    "tls_rpt_missing"
+    "tls_weakness_reported"
    ]
   },
   "VS-2026-040": {
    "checks": [
-    "tls_rpt_missing"
+    "tls_weakness_reported"
    ]
   },
   "VS-2026-041": {
    "checks": [
-    "tls_weakness"
+    "tls_weakness_reported"
    ]
   }
  },

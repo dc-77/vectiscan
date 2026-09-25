@@ -8,7 +8,7 @@
  "expect": {
   "status": "fail",
   "group_key": "10.0.0.1",
-  "affected": ["10.0.0.1:80 (TRACE aktiv)"],
+  "affected": ["10.0.0.1:80 (TRACE in der Antwort auf OPTIONS genannt)"],
   "positive": false
  }
 }

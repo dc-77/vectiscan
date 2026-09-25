@@ -1,25 +1,30 @@
 {
- "source": "report-prototype/spec/06-katalog-simulation.md Abschnitt 3",
+ "source": "report-prototype/spec/06-katalog-simulation.md Abschnitt 3; Scan-Runde 23.09.2026 aus report-prototype/spec/09-gegenlesen-scanrunde.md (S6b-2)",
+ "hinweis_scanrunde": "Die Muster NEG-S6B2-* stammen aus den Version-1-Berichten der sieben Auftraege der Scan-Runde (Engine catalog) und sind gegen die Golden-Fakten desselben Auftrags belegt. `pruefung` ist die maschinelle Fassung des Verbots fuer den neu erzeugten Bericht; tests/v3/test_negative_scanrunde.py wendet sie an.",
+ "hinweis_soll": {
+  "NEG-MARIADB-55": "spec/06 nennt 5 Befunde in 5 Kunden. Der Lauf a6df9d9d (junkerwerk.hu) traegt dasselbe Banner und denselben Datenbankbefund, sein Text nennt die Zahl 5.5 nur nicht; 57b3ac85 und 860d0d5a kamen nach S0c in den Snapshot.",
+  "NEG-MAIL-PLAINTEXT": "S6b-2 (spec/08 Punkt 4): securess (ae8d1d70) und bergersysteme (b9759695) bieten die Anmeldung vor STARTTLS an (POP3 USER und SASL(PLAIN LOGIN ...), IMAP AUTH=PLAIN ohne LOGINDISABLED). Die Klartextaussage ist dort belegt und kein Falschbefund; gezaehlt wird nur, wo die Anmeldung vor TLS gesperrt ist."
+ },
  "hinweis": "Jeder Eintrag verbietet eine Aussage: kein Check des Pruefkatalogs darf fuer diesen Auftrag die unter verbotene_aussage genannte Behauptung erzeugen. `titel` ist der Titel des ausgelieferten Befundes, an dem der Defekt haengt. Ein Befund kann auf mehrere Muster passen, deshalb ist die Zahl der Eintraege groesser als die Zahl der betroffenen Befunde.",
  "hinweis_mariadb": "Bei NEG-MARIADB-55 sitzt der Defekt in der Versionsableitung (eol_detector, tech_table_builder, spec/02 Ursache 1), nicht im Befundtext: die Texte dieser Laeufe zitieren das Banner korrekt. Nicht gelistet ist trunk-immobilien.de (45bb234c), dessen Banner MySQL 5.5.68-MariaDB kein Kompatibilitaetspraefix traegt, also tatsaechlich MariaDB 5.5.68 meldet.",
- "count": 36,
- "count_distinct_findings": 31,
+ "count": 98,
+ "count_distinct_findings": 87,
  "patterns": [
   {
    "id": "NEG-SPF-MISSING",
-   "muster": "SPF-Record fehlt, SPF ist vorhanden",
-   "soll_befunde": 7,
-   "soll_kunden": 7,
-   "ist_befunde": 7,
-   "ist_kunden": 7
+   "muster": "SPF-Record fehlt, SPF ist vorhanden (spec/06: 7/7)",
+   "soll_befunde": 8,
+   "soll_kunden": 8,
+   "ist_befunde": 8,
+   "ist_kunden": 8
   },
   {
    "id": "NEG-MARIADB-55",
-   "muster": "MySQL/MariaDB 5.5, real MariaDB 10.x, HIGH",
-   "soll_befunde": 5,
-   "soll_kunden": 5,
-   "ist_befunde": 6,
-   "ist_kunden": 6
+   "muster": "MySQL/MariaDB 5.5, real MariaDB 10.x, HIGH (spec/06: 5/5)",
+   "soll_befunde": 8,
+   "soll_kunden": 7,
+   "ist_befunde": 8,
+   "ist_kunden": 7
   },
   {
    "id": "NEG-URLHAUS-POLICY",
@@ -31,19 +36,19 @@
   },
   {
    "id": "NEG-MAIL-PLAINTEXT",
-   "muster": "POP3/IMAP Klartext, STARTTLS vorhanden",
-   "soll_befunde": 4,
-   "soll_kunden": 4,
-   "ist_befunde": 4,
-   "ist_kunden": 4
+   "muster": "POP3/IMAP Klartext, Anmeldung erst nach STARTTLS (spec/06: 4/4)",
+   "soll_befunde": 2,
+   "soll_kunden": 2,
+   "ist_befunde": 2,
+   "ist_kunden": 2
   },
   {
    "id": "NEG-FTP-PLAINTEXT",
-   "muster": "FTP Klartext, TLS erzwungen, einmal CRITICAL",
-   "soll_befunde": 2,
-   "soll_kunden": 1,
-   "ist_befunde": 2,
-   "ist_kunden": 1
+   "muster": "FTP Klartext, TLS erzwungen, einmal CRITICAL (spec/06: 2/1)",
+   "soll_befunde": 3,
+   "soll_kunden": 2,
+   "ist_befunde": 3,
+   "ist_kunden": 2
   },
   {
    "id": "NEG-WEBSERVER-EOL",
@@ -63,10 +68,10 @@
   },
   {
    "id": "NEG-TITLE-PLACEHOLDER",
-   "muster": "Platzhalter {host} oder [Hinweis: ...] im Titel",
-   "soll_befunde": 5,
+   "muster": "Platzhalter {host} oder [Hinweis: ...] im Titel (spec/06: 5/3)",
+   "soll_befunde": 6,
    "soll_kunden": 3,
-   "ist_befunde": 5,
+   "ist_befunde": 6,
    "ist_kunden": 3
   },
   {
@@ -76,17 +81,177 @@
    "soll_kunden": 1,
    "ist_befunde": 2,
    "ist_kunden": 1
-  }
- ],
- "abweichungen": [
+  },
   {
-   "pattern": "NEG-MARIADB-55",
-   "soll": "5 Befunde / 5 Kunden",
-   "ist": "6 Befunde / 6 Kunden",
-   "geprueft": true,
-   "begruendung": "spec/06 nennt 5 Befunde in 5 Kunden. Die faktenbasierte Erkennung findet 6: der Lauf a6df9d9d (junkerwerk.hu) traegt dasselbe Banner und denselben Datenbankbefund, sein Befundtext nennt die Zahl 5.5 nur nicht. Der zusaetzliche Eintrag ist belegt und bleibt drin."
+   "id": "NEG-S6B2-DANE-FREMDZONE",
+   "muster": "Q4: dane_missing bei MX in fremder, unsignierter Zone (alle sieben)",
+   "soll_befunde": 8,
+   "soll_kunden": 7,
+   "ist_befunde": 8,
+   "ist_kunden": 7
+  },
+  {
+   "id": "NEG-S6B2-DMARC-MELDEADRESSE",
+   "muster": "Q4: Meldeadresse fehlt, obwohl rua gesetzt ist (DB, BS, CA, HL)",
+   "soll_befunde": 4,
+   "soll_kunden": 4,
+   "ist_befunde": 4,
+   "ist_kunden": 4
+  },
+  {
+   "id": "NEG-S6B2-DMARC-FEHLT-TITEL",
+   "muster": "Q4: nicht durchsetzend bei fehlendem DMARC (LW, JW)",
+   "soll_befunde": 3,
+   "soll_kunden": 2,
+   "ist_befunde": 3,
+   "ist_kunden": 2
+  },
+  {
+   "id": "NEG-S6B2-TLS-VERALTET",
+   "muster": "Q4: veraltete Protokolle bei TLS 1.2/1.3 (DB, BS, CA, HL)",
+   "soll_befunde": 5,
+   "soll_kunden": 4,
+   "ist_befunde": 5,
+   "ist_kunden": 4
+  },
+  {
+   "id": "NEG-S6B2-CAA-VORHANDEN",
+   "muster": "Q4: CAA fehlt, obwohl vorhanden (CA)",
+   "soll_befunde": 1,
+   "soll_kunden": 1,
+   "ist_befunde": 1,
+   "ist_kunden": 1
+  },
+  {
+   "id": "NEG-S6B2-ZERTIFIKATSKETTE",
+   "muster": "Q4: Kette unvollstaendig bei Chain of trust Ok (HE, derselbe Buendeltext bei CA)",
+   "soll_befunde": 2,
+   "soll_kunden": 2,
+   "ist_befunde": 2,
+   "ist_kunden": 2
+  },
+  {
+   "id": "NEG-S6B2-AUSLIEFERUNGSSEITE",
+   "muster": "Q4: Auslieferungsseite ohne Titel-Fakt (HE, CA, HL)",
+   "soll_befunde": 4,
+   "soll_kunden": 3,
+   "ist_befunde": 4,
+   "ist_kunden": 3
+  },
+  {
+   "id": "NEG-S6B2-BREACH",
+   "muster": "Q4: BREACH als Befund, bei CA mit CVE (DB, BS, CA)",
+   "soll_befunde": 4,
+   "soll_kunden": 3,
+   "ist_befunde": 4,
+   "ist_kunden": 3
+  },
+  {
+   "id": "NEG-S6B2-TRACE",
+   "muster": "Q4: TRACE aktiv nur aus OPTIONS (JW)",
+   "soll_befunde": 1,
+   "soll_kunden": 1,
+   "ist_befunde": 1,
+   "ist_kunden": 1
+  },
+  {
+   "id": "NEG-S6B2-BANNER-PROTOKOLL",
+   "muster": "Q4: SSH-Banner, MariaDB-Handshake, PostgreSQL unbekannt (DB, LW, JW, BS, HL)",
+   "soll_befunde": 5,
+   "soll_kunden": 5,
+   "ist_befunde": 5,
+   "ist_kunden": 5
+  },
+  {
+   "id": "NEG-S6B2-WAF-OHNE-PRODUKT",
+   "muster": "Q12: WAF aus Generic-Heuristik oder Weiterleitungsziel (HE, CA, BS)",
+   "soll_befunde": 3,
+   "soll_kunden": 3,
+   "ist_befunde": 3,
+   "ist_kunden": 3
+  },
+  {
+   "id": "NEG-S6B2-REPUTATION-MELDUNGEN",
+   "muster": "Q12: keine Eintraege bei 26 AbuseIPDB-Meldungen (HL)",
+   "soll_befunde": 1,
+   "soll_kunden": 1,
+   "ist_befunde": 1,
+   "ist_kunden": 1
+  },
+  {
+   "id": "NEG-S6B2-VERWAIST-ENTFAELLT",
+   "muster": "Q12: keine verwaisten Eintraege, Pruefung entfaellt (DB, LW)",
+   "soll_befunde": 2,
+   "soll_kunden": 2,
+   "ist_befunde": 2,
+   "ist_kunden": 2
+  },
+  {
+   "id": "NEG-S6B2-VERWALTUNG-OHNE-KENNUNG",
+   "muster": "Q13: Verwaltungsoberflaeche ohne Fingerabdruck (HL 4433, BS Cloudflare)",
+   "soll_befunde": 2,
+   "soll_kunden": 2,
+   "ist_befunde": 2,
+   "ist_kunden": 2
+  },
+  {
+   "id": "NEG-S6B2-WEBMIN-ERHOEHT",
+   "muster": "Q13, E1: Webmin mit Anmeldung als erhoeht (DB)",
+   "soll_befunde": 1,
+   "soll_kunden": 1,
+   "ist_befunde": 1,
+   "ist_kunden": 1
+  },
+  {
+   "id": "NEG-S6B2-VERWALTUNG-HYGIENE",
+   "muster": "Q13: Verwaltungsoberflaeche mit Kennung als Hygiene hoch (JW, CA)",
+   "soll_befunde": 2,
+   "soll_kunden": 2,
+   "ist_befunde": 2,
+   "ist_kunden": 2
+  },
+  {
+   "id": "NEG-S6B2-ZAP-UNTER-HIGH",
+   "muster": "Q14: ZAP-Meldung unter Konfidenz High als Befund (DB, CA, HL)",
+   "soll_befunde": 4,
+   "soll_kunden": 3,
+   "ist_befunde": 4,
+   "ist_kunden": 3
+  },
+  {
+   "id": "NEG-S6B2-WORDPRESS-KERN",
+   "muster": "Q18: WordPress 6.5.12 veraltet und ohne Pflege (DB)",
+   "soll_befunde": 2,
+   "soll_kunden": 1,
+   "ist_befunde": 2,
+   "ist_kunden": 1
+  },
+  {
+   "id": "NEG-S6B2-ZERTIFIKAT-FRIST",
+   "muster": "Q18, E2: Dringlichkeit nach Restlaufzeit (CA 1 Tag, HE 17 Tage)",
+   "soll_befunde": 2,
+   "soll_kunden": 2,
+   "ist_befunde": 2,
+   "ist_kunden": 2
+  },
+  {
+   "id": "NEG-S6B2-EXCHANGE-SE-PFLEGE",
+   "muster": "Teil 2 CA: laufende Herstellerpflege nur aus der Produktlinie",
+   "soll_befunde": 1,
+   "soll_kunden": 1,
+   "ist_befunde": 1,
+   "ist_kunden": 1
+  },
+  {
+   "id": "NEG-S6B2-POSTGRESQL-RATEANGRIFF",
+   "muster": "Teil 2 LW, JW: Rateangriffe bei PostgreSQL mit Abweisung",
+   "soll_befunde": 2,
+   "soll_kunden": 2,
+   "ist_befunde": 2,
+   "ist_kunden": 2
   }
  ],
+ "abweichungen": [],
  "entries": [
   {
    "pattern": "NEG-EXCHANGE-2016",
@@ -102,6 +267,22 @@
     "fakt": "software.build",
     "wert": "15.2.2562; X-FEServer mail.junkerwerk.de: EXCHANGE-SE; outlook.junkerwerk.de: EXCHANGE-SE; autodiscover.junkerwerk.de: EXCHANGE-SE",
     "quelle": "results.json toolName=nmap und header_check X-FEServer"
+   }
+  },
+  {
+   "pattern": "NEG-FTP-PLAINTEXT",
+   "order": "57b3ac85-a1da-47e9-b783-d28ad9a9fa35",
+   "domain": "lumbeck-wolter.de",
+   "finding_id": "VS-2026-002",
+   "titel": "ProFTPD (Port 21) mit Klartext-FTP öffentlich erreichbar auf 116.202.77.64",
+   "severity": "MEDIUM",
+   "policy_id": "SP-FALLBACK",
+   "verbotene_aussage": "FTP uebertraegt Zugangsdaten im Klartext",
+   "grund": "nmap meldet requires SSL: der Dienst erzwingt TLS vor der Anmeldung, es gibt keine Klartext-Anmeldung",
+   "widerlegt_durch": {
+    "fakt": "service.tls_required",
+    "wert": "21/tcp   open  ftp        syn-ack ProFTPD (requires SSL)",
+    "quelle": "results.json toolName=nmap, Port 21"
    }
   },
   {
@@ -169,38 +350,6 @@
    }
   },
   {
-   "pattern": "NEG-MAIL-PLAINTEXT",
-   "order": "ae8d1d70-7925-4e3c-84de-3113f3e57b60",
-   "domain": "securess.de",
-   "finding_id": "VS-2026-002",
-   "titel": "Übermäßige Port-Exposition auf Partnerportal 212.227.60.78 (12 offene Ports, u.a. FTP, POP3/IMAP im Klartext, Plesk-Admin)",
-   "severity": "MEDIUM",
-   "policy_id": "SP-FALLBACK",
-   "verbotene_aussage": "POP3/IMAP uebertraegt im Klartext",
-   "grund": "nmap-Capabilities nicht ausgewertet: STLS bzw. STARTTLS wird angeboten, die Anmeldung ohne TLS ist gesperrt",
-   "widerlegt_durch": {
-    "fakt": "service.starttls",
-    "wert": "|_pop3-capabilities: TOP AUTH-RESP-CODE USER CAPA RESP-CODES PIPELINING UIDL SASL(PLAIN LOGIN CRAM-MD5) STLS APOP | |_imap-capabilities: STARTTLS OK LOGIN-REFERRALS have LITERAL+ AUTH=CRAM-MD5A0001 more listed IMAP4rev1 SASL-IR AUTH=LOGIN post-login capabilities IDLE ENABLE ID Pre-login AUTH=PLAIN",
-    "quelle": "results.json toolName=nmap, pop3-capabilities / imap-capabilities"
-   }
-  },
-  {
-   "pattern": "NEG-MAIL-PLAINTEXT",
-   "order": "b9759695-b031-4e1c-bac0-778abe9dfc77",
-   "domain": "bergersysteme.com",
-   "finding_id": "VS-2026-001",
-   "titel": "Unverschlüsselte Klartext-Maildienste POP3/IMAP auf bergersysteme.com",
-   "severity": "MEDIUM",
-   "policy_id": "SP-FALLBACK",
-   "verbotene_aussage": "POP3/IMAP uebertraegt im Klartext",
-   "grund": "nmap-Capabilities nicht ausgewertet: STLS bzw. STARTTLS wird angeboten, die Anmeldung ohne TLS ist gesperrt",
-   "widerlegt_durch": {
-    "fakt": "service.starttls",
-    "wert": "|_pop3-capabilities: STLS APOP UIDL USER SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) TOP AUTH-RESP-CODE CAPA PIPELINING RESP-CODES | |_imap-capabilities: ID IDLE AUTH=LOGIN SASL-IR ENABLE AUTH=DIGEST-MD5 AUTH=PLAIN listed STARTTLS capabilities more have IMAP4rev1 AUTH=CRAM-MD5A0001 Pre-login OK LOGIN-REFERRALS post-login LITERAL+",
-    "quelle": "results.json toolName=nmap, pop3-capabilities / imap-capabilities"
-   }
-  },
-  {
    "pattern": "NEG-MARIADB-55",
    "order": "0bf16342-ed96-4b0e-a596-05aee3a62cb5",
    "domain": "multi-target (2)",
@@ -234,10 +383,42 @@
   },
   {
    "pattern": "NEG-MARIADB-55",
+   "order": "57b3ac85-a1da-47e9-b783-d28ad9a9fa35",
+   "domain": "lumbeck-wolter.de",
+   "finding_id": "VS-2026-001",
+   "titel": "Datenbank-Port 5432 oeffentlich erreichbar auf 116.202.77.64",
+   "severity": "HIGH",
+   "policy_id": "SP-DB-001",
+   "verbotene_aussage": "MySQL 5.5 als Produkt oder EOL-Befund fuer 3306 (real MariaDB 10.11)",
+   "grund": "Banner 5.5.5-<version>-MariaDB ohne Praefix-Strip: 5.5.5 ist die Protokoll-Kompatibilitaetsangabe, die Produktversion steht dahinter. Der Befundtext dieses Laufs zitiert das Banner korrekt; falsch wird es in Tech-Tabelle und EOL-Ableitung",
+   "widerlegt_durch": {
+    "fakt": "service.version_raw",
+    "wert": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+    "quelle": "results.json toolName=nmap, Port 3306"
+   }
+  },
+  {
+   "pattern": "NEG-MARIADB-55",
    "order": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87",
    "domain": "multi-target (3)",
    "finding_id": "VS-2026-002",
    "titel": "Datenbank-Port 3306 oeffentlich erreichbar auf lumbeck-wolter.de",
+   "severity": "HIGH",
+   "policy_id": "SP-DB-001",
+   "verbotene_aussage": "MySQL 5.5 als Produkt oder EOL-Befund fuer 3306 (real MariaDB 10.11)",
+   "grund": "Banner 5.5.5-<version>-MariaDB ohne Praefix-Strip: 5.5.5 ist die Protokoll-Kompatibilitaetsangabe, die Produktversion steht dahinter. Der Befundtext dieses Laufs zitiert das Banner korrekt; falsch wird es in Tech-Tabelle und EOL-Ableitung",
+   "widerlegt_durch": {
+    "fakt": "service.version_raw",
+    "wert": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+    "quelle": "results.json toolName=nmap, Port 3306"
+   }
+  },
+  {
+   "pattern": "NEG-MARIADB-55",
+   "order": "860d0d5a-1086-4958-a9ac-4650423095f2",
+   "domain": "multi-target (2)",
+   "finding_id": "VS-2026-003",
+   "titel": "Datenbank-Port 3306 oeffentlich erreichbar auf 188.40.3.130",
    "severity": "HIGH",
    "policy_id": "SP-DB-001",
    "verbotene_aussage": "MySQL 5.5 als Produkt oder EOL-Befund fuer 3306 (real MariaDB 10.11)",
@@ -294,6 +475,1457 @@
     "fakt": "service.version_raw",
     "wert": "5.5.5-10.11.14-MariaDB-0ubuntu0.24.04.1-log",
     "quelle": "results.json toolName=nmap, Port 3306"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-AUSLIEFERUNGSSEITE",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-2026-012",
+   "titel": "Unveränderte Auslieferungsseite und zusätzlicher Webport auf 92.205.163.53 (ubb-wiki.castenow.de)",
+   "severity": "LOW",
+   "policy_id": "http_alt_port",
+   "positiv": false,
+   "verbotene_aussage": "unveraenderte Auslieferungsseite des Herstellers",
+   "grund": "Kein Titel- oder Inhaltsfakt belegt eine Auslieferungsseite; getroffen hat nur http_alt_port",
+   "widerlegt_durch": {
+    "fakt": "service.port",
+    "wert": "92.205.163.53:8000 (http-alt), 92.205.163.53:8800 (Icecast)",
+    "quelle": "nmap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Auslieferungsseite|Standard-Startseite",
+    "ausser_regeln": [
+     "default_page_exposed"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-AUSLIEFERUNGSSEITE",
+   "order": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8",
+   "domain": "heuel.com",
+   "kuerzel": "HL",
+   "finding_id": "VS-2026-006",
+   "titel": "Unveränderte Auslieferungsseite und zusätzlicher Webport auf 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com)",
+   "severity": "LOW",
+   "policy_id": "http_alt_port",
+   "positiv": false,
+   "verbotene_aussage": "unveraenderte Auslieferungsseite des Herstellers",
+   "grund": "Kein Titel- oder Inhaltsfakt belegt eine Auslieferungsseite; getroffen hat nur http_alt_port",
+   "widerlegt_durch": {
+    "fakt": "service.port",
+    "wert": "20.79.218.75:8443 (https-alt)",
+    "quelle": "nmap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Auslieferungsseite|Standard-Startseite",
+    "ausser_regeln": [
+     "default_page_exposed"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-AUSLIEFERUNGSSEITE",
+   "order": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7",
+   "domain": "huendgen-entsorgung.de",
+   "kuerzel": "HE",
+   "finding_id": "VS-2026-004",
+   "titel": "Unveränderte Auslieferungsseite und zusätzlicher Webport auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de)",
+   "severity": "LOW",
+   "policy_id": "http_alt_port",
+   "positiv": false,
+   "verbotene_aussage": "unveraenderte Auslieferungsseite des Herstellers",
+   "grund": "Kein Titel- oder Inhaltsfakt belegt eine Auslieferungsseite; getroffen hat nur http_alt_port",
+   "widerlegt_durch": {
+    "fakt": "service.port",
+    "wert": "18.197.248.23:8443 (nginx)",
+    "quelle": "nmap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Auslieferungsseite|Standard-Startseite",
+    "ausser_regeln": [
+     "default_page_exposed"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-AUSLIEFERUNGSSEITE",
+   "order": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7",
+   "domain": "huendgen-entsorgung.de",
+   "kuerzel": "HE",
+   "finding_id": "VS-2026-005",
+   "titel": "Unveränderte Auslieferungsseite und zusätzlicher Webport auf 80.90.145.166 (exchange.huendgen-entsorgung.de)",
+   "severity": "LOW",
+   "policy_id": "http_alt_port",
+   "positiv": false,
+   "verbotene_aussage": "unveraenderte Auslieferungsseite des Herstellers",
+   "grund": "Kein Titel- oder Inhaltsfakt belegt eine Auslieferungsseite; getroffen hat nur http_alt_port",
+   "widerlegt_durch": {
+    "fakt": "service.port",
+    "wert": "80.90.145.166:444 (Apache httpd)",
+    "quelle": "nmap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Auslieferungsseite|Standard-Startseite",
+    "ausser_regeln": [
+     "default_page_exposed"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-BANNER-PROTOKOLL",
+   "order": "1fbc92b9-34ab-414e-8843-a1f1e9f15431",
+   "domain": "dortmund-beach.com",
+   "kuerzel": "DB",
+   "finding_id": "VS-2026-011",
+   "titel": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+   "severity": "LOW",
+   "policy_id": "http_header_disclosure, service_banner_version",
+   "positiv": false,
+   "verbotene_aussage": "Dienst gibt abschaltbare Versionskennung preis (SSH, MariaDB, PostgreSQL)",
+   "grund": "SSH-Banner und MariaDB-Handshake gehoeren zum Protokoll; 'PostgreSQL unbekannt' ist keine Versionsangabe",
+   "widerlegt_durch": {
+    "fakt": "service.version_raw",
+    "wert": "dortmund-beach.com (Server: Apache/2.4.67 (Debian)), 88.99.35.112:30000 (OpenSSH 8.4p1)",
+    "quelle": "nmap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "PostgreSQL|OpenSSH|MariaDB|MySQL|Dropbear",
+    "nur_regeln": [
+     "service_banner_version"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-BANNER-PROTOKOLL",
+   "order": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8",
+   "domain": "heuel.com",
+   "kuerzel": "HL",
+   "finding_id": "VS-2026-010",
+   "titel": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+   "severity": "LOW",
+   "policy_id": "service_banner_version",
+   "positiv": false,
+   "verbotene_aussage": "Dienst gibt abschaltbare Versionskennung preis (SSH, MariaDB, PostgreSQL)",
+   "grund": "SSH-Banner und MariaDB-Handshake gehoeren zum Protokoll; 'PostgreSQL unbekannt' ist keine Versionsangabe",
+   "widerlegt_durch": {
+    "fakt": "service.version_raw",
+    "wert": "213.133.104.51:222 (OpenSSH 9.2p1)",
+    "quelle": "nmap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "PostgreSQL|OpenSSH|MariaDB|MySQL|Dropbear",
+    "nur_regeln": [
+     "service_banner_version"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-BANNER-PROTOKOLL",
+   "order": "31d67a02-b485-4d05-b228-dbdde092cc68",
+   "domain": "multi-target (2)",
+   "kuerzel": "JW",
+   "finding_id": "VS-2026-013",
+   "titel": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+   "severity": "LOW",
+   "policy_id": "http_header_disclosure, http_trace_enabled, service_banner_version",
+   "positiv": false,
+   "verbotene_aussage": "Dienst gibt abschaltbare Versionskennung preis (SSH, MariaDB, PostgreSQL)",
+   "grund": "SSH-Banner und MariaDB-Handshake gehoeren zum Protokoll; 'PostgreSQL unbekannt' ist keine Versionsangabe",
+   "widerlegt_durch": {
+    "fakt": "service.version_raw",
+    "wert": "autodiscover.junkerwerk.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-SE), cloud.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET), outlook.junkerwerk.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-SE), 217.243.248.29:443 (TRACE aktiv), 217.243.248.29:8443 (TRACE aktiv),",
+    "quelle": "nmap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "PostgreSQL|OpenSSH|MariaDB|MySQL|Dropbear",
+    "nur_regeln": [
+     "service_banner_version"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-BANNER-PROTOKOLL",
+   "order": "68d59573-7a93-4efa-89cc-e7b10cc4d140",
+   "domain": "bergersysteme.com",
+   "kuerzel": "BS",
+   "finding_id": "VS-2026-011",
+   "titel": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+   "severity": "LOW",
+   "policy_id": "service_banner_version",
+   "positiv": false,
+   "verbotene_aussage": "Dienst gibt abschaltbare Versionskennung preis (SSH, MariaDB, PostgreSQL)",
+   "grund": "SSH-Banner und MariaDB-Handshake gehoeren zum Protokoll; 'PostgreSQL unbekannt' ist keine Versionsangabe",
+   "widerlegt_durch": {
+    "fakt": "service.version_raw",
+    "wert": "92.205.224.174:22 (OpenSSH 9.9)",
+    "quelle": "nmap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "PostgreSQL|OpenSSH|MariaDB|MySQL|Dropbear",
+    "nur_regeln": [
+     "service_banner_version"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-BANNER-PROTOKOLL",
+   "order": "c3d5724c-bdbf-4da8-982f-4f1a52210e28",
+   "domain": "lumbeck-wolter.de",
+   "kuerzel": "LW",
+   "finding_id": "VS-2026-005",
+   "titel": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+   "severity": "LOW",
+   "policy_id": "service_banner_version",
+   "positiv": false,
+   "verbotene_aussage": "Dienst gibt abschaltbare Versionskennung preis (SSH, MariaDB, PostgreSQL)",
+   "grund": "SSH-Banner und MariaDB-Handshake gehoeren zum Protokoll; 'PostgreSQL unbekannt' ist keine Versionsangabe",
+   "widerlegt_durch": {
+    "fakt": "service.version_raw",
+    "wert": "116.202.77.64:222 (OpenSSH 9.2p1), 116.202.77.64:3306 (MariaDB 10.11.18), 116.202.77.64:5432 (PostgreSQL unbekannt)",
+    "quelle": "nmap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "PostgreSQL|OpenSSH|MariaDB|MySQL|Dropbear",
+    "nur_regeln": [
+     "service_banner_version"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-BREACH",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-2026-014",
+   "titel": "Transportverschlüsselung auf bitwarden.castenow.de mit veralteten Verfahren",
+   "severity": "LOW",
+   "policy_id": "tls_weakness",
+   "positiv": false,
+   "verbotene_aussage": "BREACH als Schwachstelle mit CVE am Befund",
+   "grund": "testssl: BREACH 'Can be ignored for static pages'; die Meldung traegt keinen Befund und keine CVE",
+   "widerlegt_durch": {
+    "fakt": "tls.vulns",
+    "wert": "BREACH potentially VULNERABLE (bedingt)",
+    "quelle": "testssl"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "BREACH|CVE-2013-3587"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-BREACH",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-2026-015",
+   "titel": "Transportverschlüsselung auf umfrage.castenow.de mit veralteten Verfahren",
+   "severity": "LOW",
+   "policy_id": "tls_weakness",
+   "positiv": false,
+   "verbotene_aussage": "BREACH als Schwachstelle mit CVE am Befund",
+   "grund": "testssl: BREACH 'Can be ignored for static pages'; die Meldung traegt keinen Befund und keine CVE",
+   "widerlegt_durch": {
+    "fakt": "tls.vulns",
+    "wert": "BREACH potentially VULNERABLE (bedingt)",
+    "quelle": "testssl"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "BREACH|CVE-2013-3587"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-BREACH",
+   "order": "1fbc92b9-34ab-414e-8843-a1f1e9f15431",
+   "domain": "dortmund-beach.com",
+   "kuerzel": "DB",
+   "finding_id": "VS-2026-009",
+   "titel": "Transportverschlüsselung auf 88.99.35.112 mit veralteten Verfahren",
+   "severity": "LOW",
+   "policy_id": "hsts_short, tls_no_13, tls_weakness",
+   "positiv": false,
+   "verbotene_aussage": "BREACH als Schwachstelle mit CVE am Befund",
+   "grund": "testssl: BREACH 'Can be ignored for static pages'; die Meldung traegt keinen Befund und keine CVE",
+   "widerlegt_durch": {
+    "fakt": "tls.vulns",
+    "wert": "BREACH potentially VULNERABLE (bedingt)",
+    "quelle": "testssl"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "BREACH|CVE-2013-3587"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-BREACH",
+   "order": "68d59573-7a93-4efa-89cc-e7b10cc4d140",
+   "domain": "bergersysteme.com",
+   "kuerzel": "BS",
+   "finding_id": "VS-2026-009",
+   "titel": "Transportverschlüsselung auf www.bergersysteme.com mit veralteten Verfahren",
+   "severity": "LOW",
+   "policy_id": "tls_weakness",
+   "positiv": false,
+   "verbotene_aussage": "BREACH als Schwachstelle mit CVE am Befund",
+   "grund": "testssl: BREACH 'Can be ignored for static pages'; die Meldung traegt keinen Befund und keine CVE",
+   "widerlegt_durch": {
+    "fakt": "tls.vulns",
+    "wert": "BREACH potentially VULNERABLE (bedingt)",
+    "quelle": "testssl"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "BREACH|CVE-2013-3587"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-CAA-VORHANDEN",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-2026-019",
+   "titel": "DNS-Absicherung für castenow.de nicht eingerichtet",
+   "severity": "LOW",
+   "policy_id": "dnssec_missing",
+   "positiv": false,
+   "verbotene_aussage": "Eintraege, die die Ausstellung von Zertifikaten eingrenzen, fehlen",
+   "grund": "CAA ist veroeffentlicht; getroffen hat nur dnssec_missing",
+   "widerlegt_durch": {
+    "fakt": "dns.caa.records",
+    "wert": "castenow.de: 0 issuewild \"sectigo.com\"; 0 issue \"letsencrypt.org\"; 0 issue \"sectigo.com\"; 0 issue \"amazonaws.com\"",
+    "quelle": "dns_security"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "\\bCAA\\b|Ausstellung[^.]*eingrenz",
+    "ausser_regeln": [
+     "caa_missing"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DANE-FREMDZONE",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-2026-013",
+   "titel": "Transportverschlüsselung im Mailversand für castenow.de nicht erzwungen",
+   "severity": "LOW",
+   "policy_id": "dane_missing, mta_sts_missing, tls_rpt_missing",
+   "positiv": false,
+   "verbotene_aussage": "DANE fuer den Mailempfang fehlt",
+   "grund": "Der MX liegt in einer fremden Zone oder die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen",
+   "widerlegt_durch": {
+    "fakt": "dns.mx, dns.dnssec.signed",
+    "wert": "castenow.de: MX mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com, mx04.hornetsecurity.com; DNSSEC signiert False",
+    "quelle": "phase0/dns_records.json, dns_security"
+   },
+   "pruefung": {
+    "art": "regel",
+    "regel": "dane_missing",
+    "betroffen": "castenow.de"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DANE-FREMDZONE",
+   "order": "1fbc92b9-34ab-414e-8843-a1f1e9f15431",
+   "domain": "dortmund-beach.com",
+   "kuerzel": "DB",
+   "finding_id": "VS-2026-008",
+   "titel": "Transportverschlüsselung im Mailversand für dortmund-beach.com nicht erzwungen",
+   "severity": "LOW",
+   "policy_id": "dane_missing, mta_sts_missing, tls_rpt_missing",
+   "positiv": false,
+   "verbotene_aussage": "DANE fuer den Mailempfang fehlt",
+   "grund": "Der MX liegt in einer fremden Zone oder die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen",
+   "widerlegt_durch": {
+    "fakt": "dns.mx, dns.dnssec.signed",
+    "wert": "dortmund-beach.com: MX mail1.spacekoelnsrv1.de; DNSSEC signiert False",
+    "quelle": "phase0/dns_records.json, dns_security"
+   },
+   "pruefung": {
+    "art": "regel",
+    "regel": "dane_missing",
+    "betroffen": "dortmund-beach.com"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DANE-FREMDZONE",
+   "order": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8",
+   "domain": "heuel.com",
+   "kuerzel": "HL",
+   "finding_id": "VS-2026-008",
+   "titel": "Transportverschlüsselung im Mailversand für heuel.com nicht erzwungen",
+   "severity": "LOW",
+   "policy_id": "dane_missing, mta_sts_missing, tls_rpt_missing",
+   "positiv": false,
+   "verbotene_aussage": "DANE fuer den Mailempfang fehlt",
+   "grund": "Der MX liegt in einer fremden Zone oder die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen",
+   "widerlegt_durch": {
+    "fakt": "dns.mx, dns.dnssec.signed",
+    "wert": "heuel.com: MX mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com, mx04.hornetsecurity.com; DNSSEC signiert False",
+    "quelle": "phase0/dns_records.json, dns_security"
+   },
+   "pruefung": {
+    "art": "regel",
+    "regel": "dane_missing",
+    "betroffen": "heuel.com"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DANE-FREMDZONE",
+   "order": "31d67a02-b485-4d05-b228-dbdde092cc68",
+   "domain": "multi-target (2)",
+   "kuerzel": "JW",
+   "finding_id": "VS-2026-011",
+   "titel": "Transportverschlüsselung im Mailversand für junkerwerk.de nicht erzwungen",
+   "severity": "LOW",
+   "policy_id": "dane_missing, mta_sts_missing, tls_rpt_missing",
+   "positiv": false,
+   "verbotene_aussage": "DANE fuer den Mailempfang fehlt",
+   "grund": "Der MX liegt in einer fremden Zone oder die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen",
+   "widerlegt_durch": {
+    "fakt": "dns.mx, dns.dnssec.signed",
+    "wert": "junkerwerk.de: MX mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com, mx04.hornetsecurity.com; DNSSEC signiert False",
+    "quelle": "phase0/dns_records.json, dns_security"
+   },
+   "pruefung": {
+    "art": "regel",
+    "regel": "dane_missing",
+    "betroffen": "junkerwerk.de"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DANE-FREMDZONE",
+   "order": "31d67a02-b485-4d05-b228-dbdde092cc68",
+   "domain": "multi-target (2)",
+   "kuerzel": "JW",
+   "finding_id": "VS-2026-012",
+   "titel": "Transportverschlüsselung im Mailversand für junkerwerk.hu nicht erzwungen",
+   "severity": "LOW",
+   "policy_id": "dane_missing, mta_sts_missing, tls_rpt_missing",
+   "positiv": false,
+   "verbotene_aussage": "DANE fuer den Mailempfang fehlt",
+   "grund": "Der MX liegt in einer fremden Zone oder die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen",
+   "widerlegt_durch": {
+    "fakt": "dns.mx, dns.dnssec.signed",
+    "wert": "junkerwerk.hu: MX mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com, mx04.hornetsecurity.com; DNSSEC signiert False",
+    "quelle": "phase0/dns_records.json, dns_security"
+   },
+   "pruefung": {
+    "art": "regel",
+    "regel": "dane_missing",
+    "betroffen": "junkerwerk.hu"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DANE-FREMDZONE",
+   "order": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7",
+   "domain": "huendgen-entsorgung.de",
+   "kuerzel": "HE",
+   "finding_id": "VS-2026-007",
+   "titel": "Transportverschlüsselung im Mailversand für huendgen-entsorgung.de nicht erzwungen",
+   "severity": "LOW",
+   "policy_id": "dane_missing, mta_sts_missing, tls_rpt_missing",
+   "positiv": false,
+   "verbotene_aussage": "DANE fuer den Mailempfang fehlt",
+   "grund": "Der MX liegt in einer fremden Zone oder die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen",
+   "widerlegt_durch": {
+    "fakt": "dns.mx, dns.dnssec.signed",
+    "wert": "huendgen-entsorgung.de: MX mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com, mx04.hornetsecurity.com; DNSSEC signiert False",
+    "quelle": "phase0/dns_records.json, dns_security"
+   },
+   "pruefung": {
+    "art": "regel",
+    "regel": "dane_missing",
+    "betroffen": "huendgen-entsorgung.de"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DANE-FREMDZONE",
+   "order": "68d59573-7a93-4efa-89cc-e7b10cc4d140",
+   "domain": "bergersysteme.com",
+   "kuerzel": "BS",
+   "finding_id": "VS-2026-008",
+   "titel": "Transportverschlüsselung im Mailversand für bergersysteme.com nicht erzwungen",
+   "severity": "LOW",
+   "policy_id": "dane_missing, mta_sts_missing, tls_rpt_missing",
+   "positiv": false,
+   "verbotene_aussage": "DANE fuer den Mailempfang fehlt",
+   "grund": "Der MX liegt in einer fremden Zone oder die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen",
+   "widerlegt_durch": {
+    "fakt": "dns.mx, dns.dnssec.signed",
+    "wert": "bergersysteme.com: MX mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com, mx04.hornetsecurity.com; DNSSEC signiert False",
+    "quelle": "phase0/dns_records.json, dns_security"
+   },
+   "pruefung": {
+    "art": "regel",
+    "regel": "dane_missing",
+    "betroffen": "bergersysteme.com"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DANE-FREMDZONE",
+   "order": "c3d5724c-bdbf-4da8-982f-4f1a52210e28",
+   "domain": "lumbeck-wolter.de",
+   "kuerzel": "LW",
+   "finding_id": "VS-2026-004",
+   "titel": "Transportverschlüsselung im Mailversand für lumbeck-wolter.de nicht erzwungen",
+   "severity": "LOW",
+   "policy_id": "dane_missing, mta_sts_missing, tls_rpt_missing",
+   "positiv": false,
+   "verbotene_aussage": "DANE fuer den Mailempfang fehlt",
+   "grund": "Der MX liegt in einer fremden Zone oder die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen",
+   "widerlegt_durch": {
+    "fakt": "dns.mx, dns.dnssec.signed",
+    "wert": "lumbeck-wolter.de: MX mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com, mx04.hornetsecurity.com; DNSSEC signiert False",
+    "quelle": "phase0/dns_records.json, dns_security"
+   },
+   "pruefung": {
+    "art": "regel",
+    "regel": "dane_missing",
+    "betroffen": "lumbeck-wolter.de"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DMARC-FEHLT-TITEL",
+   "order": "31d67a02-b485-4d05-b228-dbdde092cc68",
+   "domain": "multi-target (2)",
+   "kuerzel": "JW",
+   "finding_id": "VS-2026-003",
+   "titel": "Richtlinie zur Absender-Authentizität für junkerwerk.de nicht durchsetzend",
+   "severity": "HIGH",
+   "policy_id": "dmarc_missing, spf_softfail",
+   "positiv": false,
+   "verbotene_aussage": "DMARC-Richtlinie nicht durchsetzend",
+   "grund": "Es gibt keinen DMARC-Eintrag; 'nicht durchsetzend' unterstellt eine Richtlinie",
+   "widerlegt_durch": {
+    "fakt": "dns.dmarc.present",
+    "wert": "junkerwerk.de: kein DMARC-Eintrag",
+    "quelle": "phase0/dns_records.json"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "nicht durchsetzend"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DMARC-FEHLT-TITEL",
+   "order": "31d67a02-b485-4d05-b228-dbdde092cc68",
+   "domain": "multi-target (2)",
+   "kuerzel": "JW",
+   "finding_id": "VS-2026-004",
+   "titel": "Richtlinie zur Absender-Authentizität für junkerwerk.hu nicht durchsetzend",
+   "severity": "HIGH",
+   "policy_id": "dmarc_missing, spf_softfail",
+   "positiv": false,
+   "verbotene_aussage": "DMARC-Richtlinie nicht durchsetzend",
+   "grund": "Es gibt keinen DMARC-Eintrag; 'nicht durchsetzend' unterstellt eine Richtlinie",
+   "widerlegt_durch": {
+    "fakt": "dns.dmarc.present",
+    "wert": "junkerwerk.hu: kein DMARC-Eintrag",
+    "quelle": "phase0/dns_records.json"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "nicht durchsetzend"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DMARC-FEHLT-TITEL",
+   "order": "c3d5724c-bdbf-4da8-982f-4f1a52210e28",
+   "domain": "lumbeck-wolter.de",
+   "kuerzel": "LW",
+   "finding_id": "VS-2026-002",
+   "titel": "Richtlinie zur Absender-Authentizität für lumbeck-wolter.de nicht durchsetzend",
+   "severity": "HIGH",
+   "policy_id": "dmarc_missing, spf_softfail",
+   "positiv": false,
+   "verbotene_aussage": "DMARC-Richtlinie nicht durchsetzend",
+   "grund": "Es gibt keinen DMARC-Eintrag; 'nicht durchsetzend' unterstellt eine Richtlinie",
+   "widerlegt_durch": {
+    "fakt": "dns.dmarc.present",
+    "wert": "lumbeck-wolter.de: kein DMARC-Eintrag",
+    "quelle": "phase0/dns_records.json"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "nicht durchsetzend"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DMARC-MELDEADRESSE",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-2026-006",
+   "titel": "Richtlinie zur Absender-Authentizität für castenow.de nicht durchsetzend",
+   "severity": "MEDIUM",
+   "policy_id": "dmarc_none, spf_softfail",
+   "positiv": false,
+   "verbotene_aussage": "Rueckmeldungen erreichen Sie nicht, Meldeadresse ergaenzen",
+   "grund": "Der DMARC-Eintrag nennt eine Meldeadresse (rua); Rueckmeldungen gehen also ein",
+   "widerlegt_durch": {
+    "fakt": "dns.dmarc.rua",
+    "wert": "castenow.de: v=DMARC1; p=none; rua=mailto:dmarc@castenow.de",
+    "quelle": "phase0/dns_records.json"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Rückmeldungen erreichen Sie nicht|mit (einer )?Meldeadresse|Meldeadresse (ergänzen|hinterlegen)|ohne Meldeadresse",
+    "nur_regeln": [
+     "dmarc_none",
+     "dmarc_quarantine",
+     "dmarc_missing"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DMARC-MELDEADRESSE",
+   "order": "1fbc92b9-34ab-414e-8843-a1f1e9f15431",
+   "domain": "dortmund-beach.com",
+   "kuerzel": "DB",
+   "finding_id": "VS-2026-006",
+   "titel": "Richtlinie zur Absender-Authentizität für dortmund-beach.com nicht durchsetzend",
+   "severity": "MEDIUM",
+   "policy_id": "dmarc_none, spf_softfail",
+   "positiv": false,
+   "verbotene_aussage": "Rueckmeldungen erreichen Sie nicht, Meldeadresse ergaenzen",
+   "grund": "Der DMARC-Eintrag nennt eine Meldeadresse (rua); Rueckmeldungen gehen also ein",
+   "widerlegt_durch": {
+    "fakt": "dns.dmarc.rua",
+    "wert": "dortmund-beach.com: v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de;",
+    "quelle": "phase0/dns_records.json"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Rückmeldungen erreichen Sie nicht|mit (einer )?Meldeadresse|Meldeadresse (ergänzen|hinterlegen)|ohne Meldeadresse",
+    "nur_regeln": [
+     "dmarc_none",
+     "dmarc_quarantine",
+     "dmarc_missing"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DMARC-MELDEADRESSE",
+   "order": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8",
+   "domain": "heuel.com",
+   "kuerzel": "HL",
+   "finding_id": "VS-2026-007",
+   "titel": "Richtlinie zur Absender-Authentizität für heuel.com nicht durchsetzend",
+   "severity": "LOW",
+   "policy_id": "dmarc_quarantine, spf_softfail",
+   "positiv": false,
+   "verbotene_aussage": "Rueckmeldungen erreichen Sie nicht, Meldeadresse ergaenzen",
+   "grund": "Der DMARC-Eintrag nennt eine Meldeadresse (rua); Rueckmeldungen gehen also ein",
+   "widerlegt_durch": {
+    "fakt": "dns.dmarc.rua",
+    "wert": "heuel.com: v=DMARC1;p=quarantine;pct=100;rua=mailto:dmarcrua@heuel.com",
+    "quelle": "phase0/dns_records.json"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Rückmeldungen erreichen Sie nicht|mit (einer )?Meldeadresse|Meldeadresse (ergänzen|hinterlegen)|ohne Meldeadresse",
+    "nur_regeln": [
+     "dmarc_none",
+     "dmarc_quarantine",
+     "dmarc_missing"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-DMARC-MELDEADRESSE",
+   "order": "68d59573-7a93-4efa-89cc-e7b10cc4d140",
+   "domain": "bergersysteme.com",
+   "kuerzel": "BS",
+   "finding_id": "VS-2026-005",
+   "titel": "Richtlinie zur Absender-Authentizität für bergersysteme.com nicht durchsetzend",
+   "severity": "MEDIUM",
+   "policy_id": "dmarc_none",
+   "positiv": false,
+   "verbotene_aussage": "Rueckmeldungen erreichen Sie nicht, Meldeadresse ergaenzen",
+   "grund": "Der DMARC-Eintrag nennt eine Meldeadresse (rua); Rueckmeldungen gehen also ein",
+   "widerlegt_durch": {
+    "fakt": "dns.dmarc.rua",
+    "wert": "bergersysteme.com: v=DMARC1; p=none; pct=100; rua=mailto:a.jg23hj7j@reports.hornetdmarc.com,mailto:dmarc@bergersysteme.com",
+    "quelle": "phase0/dns_records.json"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Rückmeldungen erreichen Sie nicht|mit (einer )?Meldeadresse|Meldeadresse (ergänzen|hinterlegen)|ohne Meldeadresse",
+    "nur_regeln": [
+     "dmarc_none",
+     "dmarc_quarantine",
+     "dmarc_missing"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-EXCHANGE-SE-PFLEGE",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-P04",
+   "titel": "Serversoftware mit laufender Herstellerpflege",
+   "severity": null,
+   "policy_id": null,
+   "positiv": true,
+   "verbotene_aussage": "laufende Herstellerpflege fuer Exchange SE",
+   "grund": "Belegt ist nur die Produktlinie Exchange SE aus dem OWA-Pfad, nicht der Patchstand",
+   "widerlegt_durch": {
+    "fakt": "software.edition",
+    "wert": "195.50.179.4: Microsoft Exchange SE (Build 15.2.2562)",
+    "quelle": "tests/golden/facts, nmap und header_check X-FEServer"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "positive",
+    "muster": "195\\.50\\.179\\.4(?:(?!\\. [A-ZÄÖÜ]).)*gepflegten Version"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-POSTGRESQL-RATEANGRIFF",
+   "order": "31d67a02-b485-4d05-b228-dbdde092cc68",
+   "domain": "multi-target (2)",
+   "kuerzel": "JW",
+   "finding_id": "VS-2026-001",
+   "titel": "Datenbankdienst aus dem Internet erreichbar",
+   "severity": "CRITICAL",
+   "policy_id": "db_exposed",
+   "positiv": false,
+   "verbotene_aussage": "Passwort-Rateangriffe rund um die Uhr auf PostgreSQL",
+   "grund": "PostgreSQL weist fremde Quellen vor der Anmeldung ab (no pg_hba.conf entry)",
+   "widerlegt_durch": {
+    "fakt": "service.rejects_before_auth",
+    "wert": "188.40.3.130:5432 weist vor der Anmeldung ab",
+    "quelle": "phase0a/shodan.json"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "(?s)Rateangriffe[^.]*5432|^(?=.*Rateangriff)(?!.*vor der Anmeldung ab)",
+    "nur_regeln": [
+     "db_exposed"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-POSTGRESQL-RATEANGRIFF",
+   "order": "c3d5724c-bdbf-4da8-982f-4f1a52210e28",
+   "domain": "lumbeck-wolter.de",
+   "kuerzel": "LW",
+   "finding_id": "VS-2026-001",
+   "titel": "Datenbankdienst aus dem Internet erreichbar",
+   "severity": "CRITICAL",
+   "policy_id": "db_exposed",
+   "positiv": false,
+   "verbotene_aussage": "Passwort-Rateangriffe rund um die Uhr auf PostgreSQL",
+   "grund": "PostgreSQL weist fremde Quellen vor der Anmeldung ab (no pg_hba.conf entry)",
+   "widerlegt_durch": {
+    "fakt": "service.rejects_before_auth",
+    "wert": "116.202.77.64:5432 weist vor der Anmeldung ab",
+    "quelle": "phase0a/shodan.json"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "(?s)Rateangriffe[^.]*5432|^(?=.*Rateangriff)(?!.*vor der Anmeldung ab)",
+    "nur_regeln": [
+     "db_exposed"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-REPUTATION-MELDUNGEN",
+   "order": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8",
+   "domain": "heuel.com",
+   "kuerzel": "HL",
+   "finding_id": "VS-P06",
+   "titel": "Keine Einträge in Reputationsquellen",
+   "severity": null,
+   "policy_id": null,
+   "positiv": true,
+   "verbotene_aussage": "keine Eintraege in Reputationsquellen fuer 216.150.1.65",
+   "grund": "AbuseIPDB fuehrt Meldungen zu dieser Adresse; Score 0 kommt nur aus der Whitelist",
+   "widerlegt_durch": {
+    "fakt": "host.reputation",
+    "wert": "216.150.1.65: totalReports 26, isWhitelisted True, lastReportedAt 2026-09-21T02:20:43Z",
+    "quelle": "phase0a/abuseipdb.json"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "positive",
+    "muster": "216\\.150\\.1\\.65(?:(?!\\. [A-ZÄÖÜ]).){0,300}keine Meldungen|Zu den geprüften Adressen(?:(?!\\. [A-ZÄÖÜ]).)*kein Eintrag"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-TLS-VERALTET",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-2026-014",
+   "titel": "Transportverschlüsselung auf bitwarden.castenow.de mit veralteten Verfahren",
+   "severity": "LOW",
+   "policy_id": "tls_weakness",
+   "positiv": false,
+   "verbotene_aussage": "laesst veraltete Protokolle und Verfahren zu",
+   "grund": "testssl meldet nur TLS 1.2 und TLS 1.3 und keine schwachen Verfahren; getroffen hat tls_no_13, BREACH oder LUCKY13",
+   "widerlegt_durch": {
+    "fakt": "tls.protocols",
+    "wert": "bitwarden.castenow.de:443 TLS1.2, TLS1.3",
+    "quelle": "testssl"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "veraltete(n)? (Protokolle|Verfahren|Protokollversionen)|schwächere Verbindung",
+    "ausser_regeln": [
+     "tls_legacy_protocols",
+     "tls_weak_ciphers"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-TLS-VERALTET",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-2026-015",
+   "titel": "Transportverschlüsselung auf umfrage.castenow.de mit veralteten Verfahren",
+   "severity": "LOW",
+   "policy_id": "tls_weakness",
+   "positiv": false,
+   "verbotene_aussage": "laesst veraltete Protokolle und Verfahren zu",
+   "grund": "testssl meldet nur TLS 1.2 und TLS 1.3 und keine schwachen Verfahren; getroffen hat tls_no_13, BREACH oder LUCKY13",
+   "widerlegt_durch": {
+    "fakt": "tls.protocols",
+    "wert": "umfrage.castenow.de:443 TLS1.2, TLS1.3",
+    "quelle": "testssl"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "veraltete(n)? (Protokolle|Verfahren|Protokollversionen)|schwächere Verbindung",
+    "ausser_regeln": [
+     "tls_legacy_protocols",
+     "tls_weak_ciphers"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-TLS-VERALTET",
+   "order": "1fbc92b9-34ab-414e-8843-a1f1e9f15431",
+   "domain": "dortmund-beach.com",
+   "kuerzel": "DB",
+   "finding_id": "VS-2026-009",
+   "titel": "Transportverschlüsselung auf 88.99.35.112 mit veralteten Verfahren",
+   "severity": "LOW",
+   "policy_id": "hsts_short, tls_no_13, tls_weakness",
+   "positiv": false,
+   "verbotene_aussage": "laesst veraltete Protokolle und Verfahren zu",
+   "grund": "testssl meldet nur TLS 1.2 und TLS 1.3 und keine schwachen Verfahren; getroffen hat tls_no_13, BREACH oder LUCKY13",
+   "widerlegt_durch": {
+    "fakt": "tls.protocols",
+    "wert": "dortmund-beach.com:443 TLS1.2",
+    "quelle": "testssl"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "veraltete(n)? (Protokolle|Verfahren|Protokollversionen)|schwächere Verbindung",
+    "ausser_regeln": [
+     "tls_legacy_protocols",
+     "tls_weak_ciphers"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-TLS-VERALTET",
+   "order": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8",
+   "domain": "heuel.com",
+   "kuerzel": "HL",
+   "finding_id": "VS-2026-009",
+   "titel": "Transportverschlüsselung auf edi.heuel.com (+mail.heuel.com) mit veralteten Verfahren",
+   "severity": "LOW",
+   "policy_id": "tls_no_13",
+   "positiv": false,
+   "verbotene_aussage": "laesst veraltete Protokolle und Verfahren zu",
+   "grund": "testssl meldet nur TLS 1.2 und TLS 1.3 und keine schwachen Verfahren; getroffen hat tls_no_13, BREACH oder LUCKY13",
+   "widerlegt_durch": {
+    "fakt": "tls.protocols",
+    "wert": "edi.heuel.com:443 TLS1.2",
+    "quelle": "testssl"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "veraltete(n)? (Protokolle|Verfahren|Protokollversionen)|schwächere Verbindung",
+    "ausser_regeln": [
+     "tls_legacy_protocols",
+     "tls_weak_ciphers"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-TLS-VERALTET",
+   "order": "68d59573-7a93-4efa-89cc-e7b10cc4d140",
+   "domain": "bergersysteme.com",
+   "kuerzel": "BS",
+   "finding_id": "VS-2026-009",
+   "titel": "Transportverschlüsselung auf www.bergersysteme.com mit veralteten Verfahren",
+   "severity": "LOW",
+   "policy_id": "tls_weakness",
+   "positiv": false,
+   "verbotene_aussage": "laesst veraltete Protokolle und Verfahren zu",
+   "grund": "testssl meldet nur TLS 1.2 und TLS 1.3 und keine schwachen Verfahren; getroffen hat tls_no_13, BREACH oder LUCKY13",
+   "widerlegt_durch": {
+    "fakt": "tls.protocols",
+    "wert": "www.bergersysteme.com:443 TLS1.2, TLS1.3",
+    "quelle": "testssl"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "veraltete(n)? (Protokolle|Verfahren|Protokollversionen)|schwächere Verbindung",
+    "ausser_regeln": [
+     "tls_legacy_protocols",
+     "tls_weak_ciphers"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-TRACE",
+   "order": "31d67a02-b485-4d05-b228-dbdde092cc68",
+   "domain": "multi-target (2)",
+   "kuerzel": "JW",
+   "finding_id": "VS-2026-013",
+   "titel": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+   "severity": "LOW",
+   "policy_id": "http_header_disclosure, http_trace_enabled, service_banner_version",
+   "positiv": false,
+   "verbotene_aussage": "TRACE aktiv, der Server spiegelt Anfragen",
+   "grund": "nmap http-methods liest die Methodenliste aus der OPTIONS-Antwort; eine TRACE-Anfrage ist nicht belegt",
+   "widerlegt_durch": {
+    "fakt": "service.capabilities",
+    "wert": "METHOD:TRACE aus http-methods (OPTIONS)",
+    "quelle": "nmap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "alles",
+    "muster": "TRACE aktiv|akzeptiert die HTTP-Methode TRACE|spiegelt"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-VERWAIST-ENTFAELLT",
+   "order": "1fbc92b9-34ab-414e-8843-a1f1e9f15431",
+   "domain": "dortmund-beach.com",
+   "kuerzel": "DB",
+   "finding_id": "VS-P03",
+   "titel": "Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge",
+   "severity": null,
+   "policy_id": null,
+   "positiv": true,
+   "verbotene_aussage": "kein Eintrag zeigt auf ein aufgegebenes Ziel",
+   "grund": "Ohne CNAME-Eintrag entfaellt die Pruefung auf verwaiste Eintraege (Posture 'entfaellt'); entfallen zaehlt nicht als bestanden",
+   "widerlegt_durch": {
+    "fakt": "dns.dangling_cnames",
+    "wert": "keine CNAME-Eintraege in den Fakten",
+    "quelle": "tests/golden/facts, dnsx"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "positive",
+    "muster": "verwaist"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-VERWAIST-ENTFAELLT",
+   "order": "c3d5724c-bdbf-4da8-982f-4f1a52210e28",
+   "domain": "lumbeck-wolter.de",
+   "kuerzel": "LW",
+   "finding_id": "VS-P03",
+   "titel": "Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge",
+   "severity": null,
+   "policy_id": null,
+   "positiv": true,
+   "verbotene_aussage": "kein Eintrag zeigt auf ein aufgegebenes Ziel",
+   "grund": "Ohne CNAME-Eintrag entfaellt die Pruefung auf verwaiste Eintraege (Posture 'entfaellt'); entfallen zaehlt nicht als bestanden",
+   "widerlegt_durch": {
+    "fakt": "dns.dangling_cnames",
+    "wert": "keine CNAME-Eintraege in den Fakten",
+    "quelle": "tests/golden/facts, dnsx"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "positive",
+    "muster": "verwaist"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-VERWALTUNG-HYGIENE",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-2026-003",
+   "titel": "Verwaltungsoberfläche laut Passivquelle erreichbar",
+   "severity": "HIGH",
+   "policy_id": "admin_service_exposed_passive",
+   "positiv": false,
+   "verbotene_aussage": "Verwaltungsoberflaeche auf 92.205.163.53:8880 als Hygiene hoch",
+   "grund": "A.2 und E1: eine Verwaltungsoberflaeche mit Kennung ist eine Exposition, keine Hygiene",
+   "widerlegt_durch": {
+    "fakt": "passive.product",
+    "wert": "92.205.163.53:8880: HTTP/1.1 200 OK Server: sw-cp-server Date: Thu, 17 Sep 2026 10:52:04 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-a...",
+    "quelle": "phase0a/shodan.json"
+   },
+   "pruefung": {
+    "art": "skala",
+    "betroffen": "92.205.163.53:8880",
+    "erlaubt": [
+     "exposure"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-VERWALTUNG-HYGIENE",
+   "order": "31d67a02-b485-4d05-b228-dbdde092cc68",
+   "domain": "multi-target (2)",
+   "kuerzel": "JW",
+   "finding_id": "VS-2026-002",
+   "titel": "Verwaltungsoberfläche laut Passivquelle erreichbar",
+   "severity": "HIGH",
+   "policy_id": "admin_service_exposed_passive",
+   "positiv": false,
+   "verbotene_aussage": "Verwaltungsoberflaeche auf 217.243.248.28:4433 als Hygiene hoch",
+   "grund": "A.2 und E1: eine Verwaltungsoberflaeche mit Kennung ist eine Exposition, keine Hygiene",
+   "widerlegt_durch": {
+    "fakt": "passive.product",
+    "wert": "217.243.248.28:4433: SonicWall",
+    "quelle": "phase0a/shodan.json"
+   },
+   "pruefung": {
+    "art": "skala",
+    "betroffen": "217.243.248.28:4433",
+    "erlaubt": [
+     "exposure"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-VERWALTUNG-OHNE-KENNUNG",
+   "order": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8",
+   "domain": "heuel.com",
+   "kuerzel": "HL",
+   "finding_id": "VS-2026-001",
+   "titel": "Verwaltungsoberfläche laut Passivquelle erreichbar",
+   "severity": "HIGH",
+   "policy_id": "admin_service_exposed_passive",
+   "positiv": false,
+   "verbotene_aussage": "Verwaltungsoberflaeche auf 20.79.218.75:4433",
+   "grund": "Die Passivquelle nennt keinen Fingerabdruck einer Verwaltungssoftware",
+   "widerlegt_durch": {
+    "fakt": "passive.banner_excerpt",
+    "wert": "20.79.218.75:4433: HTTP/1.1 200 OK Date: Fri, 11 Sep 2026 17:52:16 GMT Server: xxxx X-Frame-Options: SAMEORIGIN Strict-Transport-Security: max-age=31536000 X-Content-Type-Optio...",
+    "quelle": "phase0a/shodan.json"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "20\\.79\\.218\\.75:4433\\b"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-VERWALTUNG-OHNE-KENNUNG",
+   "order": "68d59573-7a93-4efa-89cc-e7b10cc4d140",
+   "domain": "bergersysteme.com",
+   "kuerzel": "BS",
+   "finding_id": "VS-2026-003",
+   "titel": "Verwaltungsoberfläche laut Passivquelle erreichbar",
+   "severity": "HIGH",
+   "policy_id": "admin_service_exposed_passive",
+   "positiv": false,
+   "verbotene_aussage": "Verwaltungsoberflaeche auf 198.202.211.1:2083",
+   "grund": "Die Passivquelle nennt keinen Fingerabdruck einer Verwaltungssoftware",
+   "widerlegt_durch": {
+    "fakt": "passive.banner_excerpt",
+    "wert": "198.202.211.1:2083: HTTP/1.1 400 Bad Request Server: cloudflare Date: Wed, 23 Sep 2026 12:52:31 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -",
+    "quelle": "phase0a/shodan.json"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "198\\.202\\.211\\.1:2083\\b"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-WAF-OHNE-PRODUKT",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-P08",
+   "titel": "Web Application Firewall vorhanden",
+   "severity": null,
+   "policy_id": null,
+   "positiv": true,
+   "verbotene_aussage": "Web Application Firewall filtert Angriffe vor dem Webdienst",
+   "grund": "wafw00f meldet nur die Generic-Heuristik oder die Antwort des Weiterleitungsziels; ein Schutz vor dem eigenen Webdienst ist nicht belegt",
+   "widerlegt_durch": {
+    "fakt": "fqdn.waf",
+    "wert": "ubb-wiki.castenow.de: name=Generic, final_url=https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F",
+    "quelle": "tests/golden/facts, wafw00f und web_probe"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "positive",
+    "muster": "Vor ubb\\-wiki\\.castenow\\.de(?:(?!\\. [A-ZÄÖÜ]).)*Web Application Firewall"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-WAF-OHNE-PRODUKT",
+   "order": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7",
+   "domain": "huendgen-entsorgung.de",
+   "kuerzel": "HE",
+   "finding_id": "VS-P06",
+   "titel": "Web Application Firewall vorhanden",
+   "severity": null,
+   "policy_id": null,
+   "positiv": true,
+   "verbotene_aussage": "Web Application Firewall filtert Angriffe vor dem Webdienst",
+   "grund": "wafw00f meldet nur die Generic-Heuristik oder die Antwort des Weiterleitungsziels; ein Schutz vor dem eigenen Webdienst ist nicht belegt",
+   "widerlegt_durch": {
+    "fakt": "fqdn.waf",
+    "wert": "www.huendgen-entsorgung.de: name=Generic, final_url=https://www.huendgen-entsorgung.de",
+    "quelle": "tests/golden/facts, wafw00f und web_probe"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "positive",
+    "muster": "Vor www\\.huendgen\\-entsorgung\\.de(?:(?!\\. [A-ZÄÖÜ]).)*Web Application Firewall"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-WAF-OHNE-PRODUKT",
+   "order": "68d59573-7a93-4efa-89cc-e7b10cc4d140",
+   "domain": "bergersysteme.com",
+   "kuerzel": "BS",
+   "finding_id": "VS-P04",
+   "titel": "Web Application Firewall vorhanden",
+   "severity": null,
+   "policy_id": null,
+   "positiv": true,
+   "verbotene_aussage": "Web Application Firewall filtert Angriffe vor dem Webdienst",
+   "grund": "wafw00f meldet nur die Generic-Heuristik oder die Antwort des Weiterleitungsziels; ein Schutz vor dem eigenen Webdienst ist nicht belegt",
+   "widerlegt_durch": {
+    "fakt": "fqdn.waf",
+    "wert": "bergersysteme.com: name=Cloudflare, final_url=https://www.bergersysteme.com/",
+    "quelle": "tests/golden/facts, wafw00f und web_probe"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "positive",
+    "muster": "Vor bergersysteme\\.com(?:(?!\\. [A-ZÄÖÜ]).)*Web Application Firewall"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-WEBMIN-ERHOEHT",
+   "order": "1fbc92b9-34ab-414e-8843-a1f1e9f15431",
+   "domain": "dortmund-beach.com",
+   "kuerzel": "DB",
+   "finding_id": "VS-2026-001",
+   "titel": "Verwaltungsoberfläche aus dem Internet erreichbar",
+   "severity": "HIGH",
+   "policy_id": "admin_service_exposed",
+   "positiv": false,
+   "verbotene_aussage": "Verwaltungsoberflaeche auf 88.99.35.112:10000 nur erhoeht",
+   "grund": "Webmin mit Anmeldung ohne vorgelagerten Schutz auf einem System des Kunden ist nach E1 Exposition kritisch",
+   "widerlegt_durch": {
+    "fakt": "service.fp_server, service.fp_login",
+    "wert": "88.99.35.112:10000: Server MiniServ, Anmeldung belegt",
+    "quelle": "nmap servicefp"
+   },
+   "pruefung": {
+    "art": "dringlichkeit",
+    "betroffen": "88.99.35.112:10000",
+    "erlaubt": [
+     "Unverzüglich"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-WORDPRESS-KERN",
+   "order": "1fbc92b9-34ab-414e-8843-a1f1e9f15431",
+   "domain": "dortmund-beach.com",
+   "kuerzel": "DB",
+   "finding_id": "VS-2026-003",
+   "titel": "WordPress-Kernversion veraltet oder unsicher",
+   "severity": "HIGH",
+   "policy_id": "wordpress_core_outdated",
+   "positiv": false,
+   "verbotene_aussage": "WordPress veraltet und unsicher, ohne Herstellerpflege",
+   "grund": "wpscan meldet WordPress 6.5.12 mit release_date 2026-09-22 und ohne Kern-Schwachstelle",
+   "widerlegt_durch": {
+    "fakt": "http.wordpress",
+    "wert": "6.5.12 (2026-09-22), Kern-Schwachstellen 0",
+    "quelle": "wpscan"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "WordPress-Kernversion veraltet|WordPress[^,;]{0,80}(ohne Herstellerpflege|Support beendet)"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-WORDPRESS-KERN",
+   "order": "1fbc92b9-34ab-414e-8843-a1f1e9f15431",
+   "domain": "dortmund-beach.com",
+   "kuerzel": "DB",
+   "finding_id": "VS-2026-005",
+   "titel": "Anwendungsnahe Software ohne Herstellerpflege",
+   "severity": "MEDIUM",
+   "policy_id": "software_eol_runtime",
+   "positiv": false,
+   "verbotene_aussage": "WordPress veraltet und unsicher, ohne Herstellerpflege",
+   "grund": "wpscan meldet WordPress 6.5.12 mit release_date 2026-09-22 und ohne Kern-Schwachstelle",
+   "widerlegt_durch": {
+    "fakt": "http.wordpress",
+    "wert": "6.5.12 (2026-09-22), Kern-Schwachstellen 0",
+    "quelle": "wpscan"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "WordPress-Kernversion veraltet|WordPress[^,;]{0,80}(ohne Herstellerpflege|Support beendet)"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-ZAP-UNTER-HIGH",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-2026-017",
+   "titel": "Sicherheits-Header und Formularschutz auf 92.205.163.53 unvollständig",
+   "severity": "LOW",
+   "policy_id": "csp_missing, csrf_token_missing, security_headers_incomplete",
+   "positiv": false,
+   "verbotene_aussage": "fehlender Formularschutz oder CORS-Fehlkonfiguration als Befund",
+   "grund": "Die ZAP-Meldung hat Konfidenz Low oder Medium; darunter traegt sie keinen Befund",
+   "widerlegt_durch": {
+    "fakt": "http.alerts.confidence",
+    "wert": "ubb-wiki.castenow.de 10202 Low",
+    "quelle": "zap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Anti-CSRF|Formularschutz|Cross-Domain|\\bCORS\\b"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-ZAP-UNTER-HIGH",
+   "order": "1fbc92b9-34ab-414e-8843-a1f1e9f15431",
+   "domain": "dortmund-beach.com",
+   "kuerzel": "DB",
+   "finding_id": "VS-2026-010",
+   "titel": "Sicherheits-Header und Formularschutz auf 88.99.35.112 unvollständig",
+   "severity": "LOW",
+   "policy_id": "csp_missing, csrf_token_missing, security_headers_incomplete",
+   "positiv": false,
+   "verbotene_aussage": "fehlender Formularschutz oder CORS-Fehlkonfiguration als Befund",
+   "grund": "Die ZAP-Meldung hat Konfidenz Low oder Medium; darunter traegt sie keinen Befund",
+   "widerlegt_durch": {
+    "fakt": "http.alerts.confidence",
+    "wert": "dortmund-beach.com 10202 Low",
+    "quelle": "zap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Anti-CSRF|Formularschutz|Cross-Domain|\\bCORS\\b"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-ZAP-UNTER-HIGH",
+   "order": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8",
+   "domain": "heuel.com",
+   "kuerzel": "HL",
+   "finding_id": "VS-2026-002",
+   "titel": "Sicherheits-Header und Formularschutz auf 20.79.218.75 unvollständig",
+   "severity": "MEDIUM",
+   "policy_id": "cors_misconfiguration, csp_missing, csrf_token_missing, hsts_missing, security_headers_incomplete",
+   "positiv": false,
+   "verbotene_aussage": "fehlender Formularschutz oder CORS-Fehlkonfiguration als Befund",
+   "grund": "Die ZAP-Meldung hat Konfidenz Low oder Medium; darunter traegt sie keinen Befund",
+   "widerlegt_durch": {
+    "fakt": "http.alerts.confidence",
+    "wert": "ose.heuel.com 10098 Medium; ose.heuel.com 10202 Low; www.heuel.com 10202 Low",
+    "quelle": "zap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Anti-CSRF|Formularschutz|Cross-Domain|\\bCORS\\b"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-ZAP-UNTER-HIGH",
+   "order": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8",
+   "domain": "heuel.com",
+   "kuerzel": "HL",
+   "finding_id": "VS-2026-004",
+   "titel": "Sicherheits-Header und Formularschutz auf 217.72.203.132 unvollständig",
+   "severity": "MEDIUM",
+   "policy_id": "csp_weak, csrf_token_missing, sri_missing",
+   "positiv": false,
+   "verbotene_aussage": "fehlender Formularschutz oder CORS-Fehlkonfiguration als Befund",
+   "grund": "Die ZAP-Meldung hat Konfidenz Low oder Medium; darunter traegt sie keinen Befund",
+   "widerlegt_durch": {
+    "fakt": "http.alerts.confidence",
+    "wert": "ose.heuel.com 10098 Medium; ose.heuel.com 10202 Low; www.heuel.com 10202 Low",
+    "quelle": "zap"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Anti-CSRF|Formularschutz|Cross-Domain|\\bCORS\\b"
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-ZERTIFIKAT-FRIST",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-2026-004",
+   "titel": "Zertifikate auf mailstore.castenow.de mit Beanstandungen",
+   "severity": "HIGH",
+   "policy_id": "cert_expiring",
+   "positiv": false,
+   "verbotene_aussage": "Zertifikat mit 1 Tagen Restlaufzeit In Kürze",
+   "grund": "E2: bis sieben Tage Unverzueglich, acht bis 14 Tage In Kuerze, darueber mittelfristig",
+   "widerlegt_durch": {
+    "fakt": "tls.cert.days_left",
+    "wert": "mailstore.castenow.de:443: 1 Tage bis 2026-09-24T23:59:59Z",
+    "quelle": "testssl"
+   },
+   "pruefung": {
+    "art": "dringlichkeit",
+    "betroffen": "mailstore.castenow.de:443",
+    "erlaubt": [
+     "Unverzüglich"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-ZERTIFIKAT-FRIST",
+   "order": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7",
+   "domain": "huendgen-entsorgung.de",
+   "kuerzel": "HE",
+   "finding_id": "VS-2026-001",
+   "titel": "Zertifikate auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de) mit Beanstandungen",
+   "severity": "HIGH",
+   "policy_id": "cert_expiring",
+   "positiv": false,
+   "verbotene_aussage": "Zertifikat mit 17 Tagen Restlaufzeit In Kürze",
+   "grund": "E2: bis sieben Tage Unverzueglich, acht bis 14 Tage In Kuerze, darueber mittelfristig",
+   "widerlegt_durch": {
+    "fakt": "tls.cert.days_left",
+    "wert": "huendgen-entsorgung.de:443: 17 Tage bis 2026-10-11T03:14:00Z",
+    "quelle": "testssl"
+   },
+   "pruefung": {
+    "art": "dringlichkeit",
+    "betroffen": "huendgen-entsorgung.de:443",
+    "erlaubt": [
+     "Mittelfristig"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-ZERTIFIKATSKETTE",
+   "order": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52",
+   "domain": "castenow.de",
+   "kuerzel": "CA",
+   "finding_id": "VS-2026-004",
+   "titel": "Zertifikate auf mailstore.castenow.de mit Beanstandungen",
+   "severity": "HIGH",
+   "policy_id": "cert_expiring",
+   "positiv": false,
+   "verbotene_aussage": "abgelaufene Zertifikate erneuern und die Vertrauenskette hinterlegen",
+   "grund": "testssl meldet Chain of trust Ok; einziger Fakt ist die Restlaufzeit",
+   "widerlegt_durch": {
+    "fakt": "tls.cert.chain_complete",
+    "wert": "mailstore.castenow.de:443: Kette vollstaendig, 1 Tage",
+    "quelle": "testssl"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Vertrauenskette|abgelaufene Zertifikate",
+    "ausser_regeln": [
+     "cert_chain_incomplete",
+     "cert_expired"
+    ]
+   }
+  },
+  {
+   "pattern": "NEG-S6B2-ZERTIFIKATSKETTE",
+   "order": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7",
+   "domain": "huendgen-entsorgung.de",
+   "kuerzel": "HE",
+   "finding_id": "VS-2026-001",
+   "titel": "Zertifikate auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de) mit Beanstandungen",
+   "severity": "HIGH",
+   "policy_id": "cert_expiring",
+   "positiv": false,
+   "verbotene_aussage": "abgelaufene Zertifikate erneuern und die Vertrauenskette hinterlegen",
+   "grund": "testssl meldet Chain of trust Ok; einziger Fakt ist die Restlaufzeit",
+   "widerlegt_durch": {
+    "fakt": "tls.cert.chain_complete",
+    "wert": "huendgen-entsorgung.de:443: Kette vollstaendig, 17 Tage",
+    "quelle": "testssl"
+   },
+   "pruefung": {
+    "art": "text",
+    "bereich": "befunde",
+    "muster": "Vertrauenskette|abgelaufene Zertifikate",
+    "ausser_regeln": [
+     "cert_chain_incomplete",
+     "cert_expired"
+    ]
    }
   },
   {
@@ -357,6 +1989,22 @@
    "widerlegt_durch": {
     "fakt": "dns.spf",
     "wert": "v=spf1 mx -all",
+    "quelle": "order.json data.progress.discoveredHosts.dns_findings.spf"
+   }
+  },
+  {
+   "pattern": "NEG-SPF-MISSING",
+   "order": "57b3ac85-a1da-47e9-b783-d28ad9a9fa35",
+   "domain": "lumbeck-wolter.de",
+   "finding_id": "VS-2026-004",
+   "titel": "SPF-Record fehlt fuer lumbeck-wolter.de",
+   "severity": "MEDIUM",
+   "policy_id": "SP-DNS-004",
+   "verbotene_aussage": "SPF-Record fehlt",
+   "grund": "Titel-Template SP-DNS-004 ueber DKIM-Inhalt; dns_findings.spf wird nicht geprueft",
+   "widerlegt_durch": {
+    "fakt": "dns.spf",
+    "wert": "v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all",
     "quelle": "order.json data.progress.discoveredHosts.dns_findings.spf"
    }
   },
@@ -437,6 +2085,22 @@
    "widerlegt_durch": {
     "fakt": "finding.title_vars",
     "wert": "{\"host\": \"smtp.lumbeck-wolter.de\", \"tech\": \"Apache\", \"version\": \"2.4.41\"}",
+    "quelle": "findings.json title_vars gegen title"
+   }
+  },
+  {
+   "pattern": "NEG-TITLE-PLACEHOLDER",
+   "order": "860d0d5a-1086-4958-a9ac-4650423095f2",
+   "domain": "multi-target (2)",
+   "finding_id": "VS-2026-001",
+   "titel": "Microsoft Exchange 15.2.2562 ist End-of-Life auf outlook.junkerwerk.de [Hinweis: microsoft exchange wird laut Scan-Inventar als aktuell gefuehrt; die Einstufung als veraltet/EOL ist nicht belegt.]",
+   "severity": "HIGH",
+   "policy_id": "SP-EOL-001",
+   "verbotene_aussage": "Titel mit Platzhalter oder internem Hinweis",
+   "grund": "Template-Variable nicht ersetzt oder interner Prompt-Hinweis durchgereicht; der Text geht so in den Kundenreport",
+   "widerlegt_durch": {
+    "fakt": "finding.title_vars",
+    "wert": "{\"host\": \"outlook.junkerwerk.de\", \"tech\": \"Microsoft Exchange\", \"version\": \"15.2.2562\"}",
     "quelle": "findings.json title_vars gegen title"
    }
   },

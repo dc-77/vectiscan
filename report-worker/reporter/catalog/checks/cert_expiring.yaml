@@ -7,7 +7,9 @@ level: hoch
 group_by: fqdn
 scope: tls
 applicable_when: null
-when: tls.cert is not None and tls.cert.expired is not True and tls.cert.days_left <= CERT_EXPIRING_DAYS
+when: tls.cert is not None and tls.cert.expired is not True and tls.cert.days_left <= CERT_SOON_DAYS
+# S6b-2 (E2): bis sieben Tage Restlaufzeit rot und Unverzueglich (levels.URGENT_EXCEPTIONS).
+urgent_when: tls.cert.days_left <= CERT_URGENT_DAYS
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
@@ -29,10 +31,16 @@ policy:
   deviation: >-
     SP-TLS-005 bewertet ein bald ablaufendes Zertifikat mit LOW. Abweichend fuehrt die
     Katalogsimulation (R-CERT-EXPIRING) den Befund als Hygiene hoch, weil der bevorstehende Ablauf
-    den Dienst fuer alle Nutzer stoppt, sobald er eintritt; diese Einstufung wird uebernommen.
+    den Dienst fuer alle Nutzer stoppt, sobald er eintritt. Entscheidung DC E2 (S6b-2): bis 14
+    Tage Hygiene hoch, bis sieben Tage als Ausnahme Unverzueglich, 15 bis 30 Tage
+    cert_expiring_later.
 texts:
+  short: "Zertifikat läuft in Kürze ab"
+  plan:
+    lever: "Zertifikate vor dem Ablauf erneuern"
+    effect: "Verhindert den Ausfall des Dienstes zum Ablaufdatum des Zertifikats"
   observation: >-
-    Für den Dienst {group} läuft das eingesetzte TLS-Zertifikat in Kürze ab: {affected}. Ohne
+    Für {n:den Dienst|die Dienste} {group} läuft das eingesetzte TLS-Zertifikat in Kürze ab: {affected}. Ohne
     rechtzeitige Erneuerung entsteht die gleiche Wirkung wie bei einem bereits abgelaufenen
     Zertifikat.
   meaning: >-
@@ -50,4 +58,5 @@ texts:
         dem Ablauf einrichten.
   verify: >-
     Verbindung zum Dienst mit einem TLS-Client aufbauen und das Ablaufdatum des präsentierten
-    Zertifikats prüfen; erwartet wird ein Vorlauf von mehr als 30 Tagen bis zum Ablauf.
+    Zertifikats prüfen; erwartet wird ein neues Zertifikat mit ausreichendem Vorlauf bis zum
+    Ablauf.

@@ -32,6 +32,9 @@ policy:
     verbindlichen Pruefschritt, nicht als bestaetigten Fund mit der vollen Einstufung aus
     SP-DISC-007/008.
 texts:
+  plan:
+    lever: "Sensible Dateien vom Webserver entfernen"
+    effect: "Verhindert den Abruf von Konfiguration und Sicherungen"
   observation: >-
     Auf {group} liefert der Webserver für einen potenziell sensiblen Pfad den Statuscode 200,
     ohne dass der Inhalt geprüft wurde: {affected}.

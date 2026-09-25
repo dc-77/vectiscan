@@ -1,0 +1,74 @@
+{
+ "check": "dmarc_none",
+ "cases": [
+  {
+   "name": "p=none mit Meldeadresse",
+   "facts": {
+    "dns": [
+     {
+      "domain": "example.test",
+      "mx": [
+       "mx.example.test"
+      ],
+      "dmarc": {
+       "present": true,
+       "p": "none",
+       "raw": "v=DMARC1; p=none; rua=mailto:d@example.test",
+       "rua": [
+        "mailto:d@example.test"
+       ]
+      }
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "example.test": [
+      "meaning[1]",
+      "recommendation[0]"
+     ]
+    },
+    "not_holds": {
+     "example.test": [
+      "meaning[2]",
+      "recommendation[1]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  },
+  {
+   "name": "p=none ohne Meldeadresse",
+   "facts": {
+    "dns": [
+     {
+      "domain": "example.test",
+      "mx": [
+       "mx.example.test"
+      ],
+      "dmarc": {
+       "present": true,
+       "p": "none",
+       "raw": "v=DMARC1; p=none"
+      }
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "example.test": [
+      "meaning[2]",
+      "recommendation[1]"
+     ]
+    },
+    "not_holds": {
+     "example.test": [
+      "meaning[1]",
+      "recommendation[0]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  }
+ ]
+}

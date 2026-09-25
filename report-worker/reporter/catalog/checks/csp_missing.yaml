@@ -34,6 +34,10 @@ policy:
     Simulation (catalog_sim) fuehrt die Familie als Hygiene mittel. Diese Umsetzung folgt der
     niedrigeren SP-Einstufung und setzt Hygiene niedrig an.
 texts:
+  short: "Inhaltsrichtlinie fehlt"
+  plan:
+    lever: "Inhaltsrichtlinie für die Webseiten einführen"
+    effect: "Begrenzt die Wirkung eingeschleuster Skripte im Browser"
   observation: >-
     Auf {group} ist keine Content-Security-Policy gesetzt: {affected}.
   meaning: >-

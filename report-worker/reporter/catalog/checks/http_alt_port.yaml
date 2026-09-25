@@ -28,6 +28,10 @@ policy:
   start_level: niedrig
   deviation: null
 texts:
+  short: "zusätzlicher Webport"
+  plan:
+    lever: "Zweck zusätzlicher Webports klären"
+    effect: "Verkleinert die Angriffsfläche um nicht benötigte Webdienste"
   observation: >-
     {n:Der Host|Die Hosts} {group} {n:beantwortet|beantworten} Anfragen an einen Webdienst auf einem Port außerhalb der
     üblichen Web- und Verwaltungsports: {affected}. Der Zweck dieses Dienstes ist von außen

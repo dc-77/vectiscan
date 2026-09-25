@@ -223,8 +223,10 @@ def test_negative_fixtures_belegen_sich_selbst():
     for entry in data["entries"]:
         order_dir = SNAPSHOT / entry["order"]
         assert order_dir.is_dir(), f"Auftrag {entry['order']} fehlt im Snapshot"
-        findings = load(order_dir / "findings.json")["data"]["findings"]
-        titles = {f["id"]: f["title"] for f in findings}
+        daten = load(order_dir / "findings.json")["data"]
+        # S6b-2: Muster der Scan-Runde koennen an einem Positivbefund haengen (spec/09 Q12).
+        liste = (daten.get("positive_findings") or []) if entry.get("positiv") else daten["findings"]
+        titles = {f["id"]: f["title"] for f in liste}
         assert entry["finding_id"] in titles, (
             f"{entry['order']}: Befund {entry['finding_id']} nicht im Snapshot"
         )

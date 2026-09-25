@@ -9,17 +9,16 @@ from __future__ import annotations
 
 import pytest
 
-from tests.catalog.conftest import FIXTURES, fixture_kinds, get_catalog, run_fixture
+from tests.catalog.conftest import FIXTURES, fixture_kinds, get_catalog, run_fixture, split_fixture
 
 
 def _all_fixtures() -> list[tuple[str, str]]:
+    ids = set(get_catalog().by_id)
     out: list[tuple[str, str]] = []
     for p in sorted(FIXTURES.glob("*_*.json")):
-        stem = p.stem
-        for kind in ("pass", "fail", "nt", "na"):
-            if stem.endswith("_" + kind):
-                out.append((stem[: -len(kind) - 1], kind))
-                break
+        treffer = split_fixture(p.stem, ids)
+        if treffer is not None:
+            out.append(treffer)
     return out
 
 
@@ -43,6 +42,7 @@ def test_jede_pruefung_hat_fixtures(catalog):
 
 
 def test_keine_verwaisten_fixtures(catalog):
-    ids = {c for c, _ in _all_fixtures()}
-    verwaist = sorted(i for i in ids if i not in catalog.by_id)
-    assert not verwaist, f"Fixtures ohne Pruefung: {verwaist}"
+    """Jede Datei gehoert zu einer Pruefung und traegt eine bekannte Art (S6b-2)."""
+    ids = set(catalog.by_id)
+    verwaist = sorted(p.name for p in FIXTURES.glob("*.json") if split_fixture(p.stem, ids) is None)
+    assert not verwaist, f"Fixtures ohne Pruefung oder Art: {verwaist}"

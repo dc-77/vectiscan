@@ -28,7 +28,7 @@ from reporter.facts.testssl_parse import (
     VULN_SEVERITIES as TESTSSL_VULN_SEVERITIES, TestsslResult, parse_testssl,
 )
 from reporter.facts.tool_coverage import WEB_PORTS, HostSignals, build_coverage, derive_blocked
-from reporter.facts.versions import Normalized, lookup_eol, normalize, split_name_version
+from reporter.facts.versions import Normalized, debian_eol, debian_release, lookup_eol, normalize, split_name_version
 
 GENERATOR_NAME = "reporter.facts"
 GENERATOR_VERSION = "1.0.0"
@@ -211,6 +211,7 @@ def build_from_bundle(bundle: ScanBundle) -> S.Facts:
     _software_from_profiles(ctx, all_ips)
     software = _finish_software(ctx)
     passive = _build_passive(ctx, all_ips, inv_by_ip, primary_domain)
+    _mark_rejects_before_auth(services, passive)
     coverage = build_coverage(b, signals, blocked, ctx.finished, primary_domain, extra_domains)
     threats = _build_threats(ctx, software, services)
     _unprocessed_from_bundle(ctx)
@@ -460,6 +461,9 @@ def _build_hosts(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> tuple
         gn = greynoise.get(ip) if isinstance(greynoise, dict) else None
         rep = S.Reputation(
             abuseipdb_score=_int_or_none(pi.get("abuseipdb_score", (a or {}).get("abuseConfidenceScore"))),
+            abuseipdb_total_reports=_int_or_none((a or {}).get("totalReports")),
+            abuseipdb_whitelisted=_bool_or_none((a or {}).get("isWhitelisted")),
+            abuseipdb_last_reported_at=iso_utc((a or {}).get("lastReportedAt")) if (a or {}).get("lastReportedAt") else None,
             is_tor=_bool_or_none(pi.get("is_tor", (a or {}).get("isTor"))),
             otx_pulse_count=_int_or_none(pi.get("otx_pulse_count")),
             urlhaus_compromised=_bool_or_none(pi.get("urlhaus_compromised")),
@@ -629,6 +633,7 @@ def _build_services(ctx: _Ctx, ips: list[str]) -> list[S.ServiceFact]:
                 login_disabled=flags.login_disabled, auth_required=flags.auth_required,
                 auth_mechanisms=flags.auth_mechanisms, capabilities=[excerpt(c, 80) for c in flags.capabilities][:40],
                 cert=cert, nmap_conf=p.conf, method=p.method,
+                fp_server=flags.fp_server, fp_title=flags.fp_title, fp_login=flags.fp_login,
             ))
             if p.product or p.version:
                 _add_software(ctx, ip, None, p.product, p.version, "nmap", ref or "", line, conf,
@@ -647,7 +652,9 @@ def _build_services(ctx: _Ctx, ips: list[str]) -> list[S.ServiceFact]:
 def _add_software(ctx: _Ctx, ip: str, fqdn: Optional[str], product_raw: Optional[str], version_raw: Optional[str],
                   tool: str, ref: str, evidence_text: str, confidence: float, *, kind: Optional[str] = None,
                   vuln_count: Optional[int] = None, hints: Optional[list[str]] = None,
-                  mode: str = "active", context: Optional[str] = None) -> Optional[S.SoftwareFact]:
+                  mode: str = "active", context: Optional[str] = None,
+                  release_date: Optional[str] = None,
+                  vulns: Optional[list[S.VulnRef]] = None) -> Optional[S.SoftwareFact]:
     if not product_raw and not version_raw:
         return None
     norm = normalize(product_raw, version_raw, hints=hints, context=context)
@@ -657,13 +664,17 @@ def _add_software(ctx: _Ctx, ip: str, fqdn: Optional[str], product_raw: Optional
         return None
     family = norm.family
     version = norm.version
+    if norm.distro == "debian" and not fqdn:
+        release = debian_release(version_raw, product_raw, context)
+        if release:
+            _add_debian(ctx, ip, release, tool, ref, evidence_text, confidence)
     key_version = "" if family == "exchange" else (version or "")
     key = (ip, fqdn or "", family, key_version)
     conf = min(confidence, norm.confidence)
     ev = S.Evidence(tool=tool, ref=ref, excerpt=excerpt(evidence_text, 200))
     existing = ctx.software.get(key)
     if existing is None:
-        eol = lookup_eol(norm, ctx.scan_date)
+        eol = released_after_eol(lookup_eol(norm, ctx.scan_date), release_date)
         fact = S.SoftwareFact(
             id=f"sw:{ip_token(ip)}:{fqdn or '-'}:{family}:{version or 'unknown'}", source=tool, mode=mode,
             observed_at=ctx.run_time(tool, ip, fqdn) or ctx.finished, confidence=conf, evidence=[ev],
@@ -671,6 +682,7 @@ def _add_software(ctx: _Ctx, ip: str, fqdn: Optional[str], product_raw: Optional
             version_raw=version_raw or (product_raw if version else None), version_norm=version,
             build=norm.build, distro=norm.distro, edition=norm.edition, hints=list(norm.hints), eol=eol,
             note=norm.note, detection_sources=[tool], vulnerabilities_count=vuln_count,
+            release_date=release_date, vulnerabilities=list(vulns or []),
         )
         ctx.software[key] = fact
         return fact
@@ -698,6 +710,11 @@ def _add_software(ctx: _Ctx, ip: str, fqdn: Optional[str], product_raw: Optional
         existing.note = norm.note
     if vuln_count is not None:
         existing.vulnerabilities_count = max(existing.vulnerabilities_count or 0, vuln_count)
+    if vulns and not existing.vulnerabilities:
+        existing.vulnerabilities = list(vulns)
+    if release_date and not existing.release_date:
+        existing.release_date = release_date
+        existing.eol = released_after_eol(existing.eol, release_date)
     if kind and existing.kind == "component":
         existing.kind = kind
     return existing
@@ -919,6 +936,62 @@ def _software_from_profiles(ctx: _Ctx, ips: list[str]) -> None:
         _software_from_wpscan(ctx, ip, h)
 
 
+def _add_debian(ctx: _Ctx, ip: str, release: str, tool: str, ref: str, evidence_text: str,
+                confidence: float) -> None:
+    """Betriebssystem aus dem Paketsuffix eines Dienstes (spec/09 Q18, dortmund-beach).
+
+    ``OpenSSH 8.4p1 Debian 5+deb11u7`` belegt Debian 11 auf diesem Host: das Paketsuffix
+    ``deb11`` steht fuer genau dieses Release, die Konfidenz ist die der Quelle.
+    Lebenszyklus aus dem Ende von Debian LTS.
+    """
+    key = (ip, "", "debian", release)
+    ev = S.Evidence(tool=tool, ref=ref, excerpt=excerpt(evidence_text, 200))
+    existing = ctx.software.get(key)
+    if existing is not None:
+        if tool not in existing.detection_sources:
+            existing.detection_sources.append(tool)
+        if len(existing.evidence) < MAX_EVIDENCE and ev.excerpt not in {e.excerpt for e in existing.evidence}:
+            existing.evidence.append(ev)
+        return
+    ctx.software[key] = S.SoftwareFact(
+        id=f"sw:{ip_token(ip)}:-:debian:{release}", source=tool, mode="active",
+        observed_at=ctx.run_time(tool, ip, None) or ctx.finished,
+        confidence=confidence, evidence=[ev], host_ip=ip, fqdn=None,
+        product="Debian GNU/Linux", family="debian", kind="os", version_raw=f"deb{release}",
+        version_norm=release, eol=debian_eol(release, ctx.scan_date),
+        note="Release aus dem Paketsuffix eines Dienstes abgeleitet", detection_sources=[tool],
+    )
+
+
+def _wp_vulns(raw: Any) -> list[S.VulnRef]:
+    """wpscan-Schwachstellen als Kennungen (spec/08 Punkt 20, Issue #16)."""
+    out: list[S.VulnRef] = []
+    for v in raw or []:
+        if not isinstance(v, dict) or not v.get("title"):
+            continue
+        refs = v.get("references") if isinstance(v.get("references"), dict) else {}
+        cves = [f"CVE-{c}" if not str(c).upper().startswith("CVE-") else str(c).upper()
+                for c in (refs.get("cve") or [])]
+        out.append(S.VulnRef(title=str(v["title"])[:200], cves=sorted(set(cves)),
+                             fixed_in=str(v["fixed_in"]) if v.get("fixed_in") else None))
+    return out
+
+
+def _wp_users_found_by(users: Any) -> list[str]:
+    """Adressen, ueber die wpscan Benutzernamen fand (spec/09 Teil 2 DB und CA)."""
+    out: list[str] = []
+    if not isinstance(users, dict):
+        return out
+    for entry in users.values():
+        if not isinstance(entry, dict):
+            continue
+        for url in entry.get("interesting_entries") or []:
+            u = str(url).split("?")[0]
+            if u.startswith("http") and u not in out:
+                out.append(u)
+    return sorted(out)
+
+
 def _software_from_wpscan(ctx: _Ctx, ip: str, h) -> None:
     w = h.wpscan
     if not isinstance(w, dict):
@@ -930,14 +1003,17 @@ def _software_from_wpscan(ctx: _Ctx, ip: str, h) -> None:
     if ver and ver.get("number"):
         _add_software(ctx, ip, fqdn, "WordPress", str(ver["number"]), "wpscan", ref,
                       f"version: {ver['number']} status={ver.get('status')}", S.CONFIDENCE_TOOL,
-                      kind="cms_core", vuln_count=len(ver.get("vulnerabilities") or []))
+                      kind="cms_core", vuln_count=len(ver.get("vulnerabilities") or []),
+                      release_date=str(ver.get("release_date")) if ver.get("release_date") else None,
+                      vulns=_wp_vulns(ver.get("vulnerabilities")))
     for slug, pl in (w.get("plugins") or {}).items():
         if not isinstance(pl, dict):
             continue
         pv = (pl.get("version") or {}).get("number") if isinstance(pl.get("version"), dict) else None
         _add_software(ctx, ip, fqdn, str(slug), str(pv) if pv else None, "wpscan", ref,
                       f"plugin {slug} {pv or ''}", S.CONFIDENCE_TOOL, kind="plugin",
-                      vuln_count=len(pl.get("vulnerabilities") or []))
+                      vuln_count=len(pl.get("vulnerabilities") or []),
+                      vulns=_wp_vulns(pl.get("vulnerabilities")))
     themes = dict(w.get("themes") or {})
     mt = w.get("main_theme")
     if isinstance(mt, dict) and mt.get("slug"):
@@ -948,7 +1024,8 @@ def _software_from_wpscan(ctx: _Ctx, ip: str, h) -> None:
         tv = (th.get("version") or {}).get("number") if isinstance(th.get("version"), dict) else None
         _add_software(ctx, ip, fqdn, str(slug), str(tv) if tv else None, "wpscan", ref,
                       f"theme {slug} {tv or ''}", S.CONFIDENCE_TOOL, kind="theme",
-                      vuln_count=len(th.get("vulnerabilities") or []))
+                      vuln_count=len(th.get("vulnerabilities") or []),
+                      vulns=_wp_vulns(th.get("vulnerabilities")))
 
 
 def _finish_software(ctx: _Ctx) -> list[S.SoftwareFact]:
@@ -1301,7 +1378,12 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
             if wp and wp_host == vh:
                 users = sorted((wp.get("users") or {}).keys()) if isinstance(wp.get("users"), dict) else []
                 ver = wp.get("version") if isinstance(wp.get("version"), dict) else {}
-                wordpress = S.WordPressInfo(users=[str(u) for u in users], version_status=ver.get("status") if ver else None)
+                wordpress = S.WordPressInfo(
+                    users=[str(u) for u in users], version_status=ver.get("status") if ver else None,
+                    version=str(ver.get("number")) if ver and ver.get("number") else None,
+                    release_date=str(ver.get("release_date")) if ver and ver.get("release_date") else None,
+                    core_vulnerabilities=len(ver.get("vulnerabilities") or []) if ver else None,
+                    users_found_by=_wp_users_found_by(wp.get("users")))
             status_code = _int_or_none((line or {}).get("status_code")) if line else None
             if status_code is None and rd:
                 status_code = _int_or_none(rd.get("status_code"))
@@ -1360,10 +1442,17 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
 
 
 def _split_httpx_tech(t: str) -> tuple[str, Optional[str]]:
+    """httpx meldet Technik als "Name:Version" oder "Name:Variante".
+
+    S6b-2 (Entscheidung DC 25.09.): ein Suffix ohne Ziffer ist keine Version, sondern eine
+    Variante des Produkts ("Neos Flow:neos"); der Produktname ist der Teil davor.
+    """
     if ":" in t:
         name, ver = t.rsplit(":", 1)
         if re.match(r"^\d", ver):
             return name.strip(), ver.strip()
+        if name.strip():
+            return name.strip(), None
     return t.strip(), None
 
 
@@ -1409,6 +1498,7 @@ def _zap_alerts_by_host(ctx: _Ctx, h) -> dict[str, list[S.WebAlert]]:
     if truncated:
         ctx.warn(f"ZAP {h.ip}: nur top_alerts aus dem Snapshot, Alertliste gekuerzt")
     urls: dict[tuple[str, str], set[str]] = defaultdict(set)
+    rank: dict[tuple[str, str], int] = {}
     for a in raw_alerts:
         if not isinstance(a, dict):
             continue
@@ -1423,6 +1513,18 @@ def _zap_alerts_by_host(ctx: _Ctx, h) -> dict[str, list[S.WebAlert]]:
             ctx.add_unprocessed("zap_alert_without_plugin_id", name, host_ip=h.ip, fqdn=host or None,
                                 source="zap", ref=ctx.run_ref("zap", h.ip), excerpt_text=f"{name} {url}")
         key = (host, plugin or f"name:{name}")
+        conf = str(a.get("confidence")) if a.get("confidence") not in (None, "") else None
+        rang = _ZAP_CONFIDENCE_RANK.get((conf or "").lower(), 0)
+        # S6b-2 (spec/09 Q14): die Meldung eines Typs traegt die hoechste Konfidenz ihrer
+        # Einzelmeldungen, Adressen und Beleg kommen aus Meldungen dieser Konfidenz. Vorher
+        # entschied die erste Rohmeldung, und eine Low-Meldung trug eine Katalogregel.
+        bisher = rank.get(key)
+        if bisher is not None and rang < bisher:
+            continue
+        if bisher is not None and rang > bisher:
+            urls[key] = set()
+            grouped.pop(key, None)
+        rank[key] = rang
         if url:
             urls[key].add(url)
         if key in grouped:
@@ -1430,9 +1532,10 @@ def _zap_alerts_by_host(ctx: _Ctx, h) -> dict[str, list[S.WebAlert]]:
         cwe = a.get("cweid")
         grouped[key] = S.WebAlert(
             plugin_id=plugin, name=name, risk=str(a.get("risk") or a.get("riskcode") or "unknown"),
-            confidence=str(a.get("confidence")) if a.get("confidence") not in (None, "") else None,
+            confidence=conf,
             url=None, cwe=f"CWE-{cwe}" if cwe not in (None, "", "-1", "0") else None,
             evidence=excerpt(a.get("evidence"), 200) or None, count=0,
+            run=_ZAP_RUN.get(str(a.get("sourceid") or "")),
         )
     for key, alert in grouped.items():
         host = key[0]
@@ -1718,6 +1821,7 @@ def _build_passive(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict], domain
                     product=s.get("product") or None,
                     version=str(s.get("version")) if s.get("version") else None,
                     banner_excerpt=excerpt(s.get("banner"), 160) or None, seen_at=seen,
+                    service_seen_at=_banner_date(s.get("banner")),
                     verified=(port in open_ports) if open_ports is not None else None, hostnames=hostnames,
                 ))
     otx = b.passive.get("otx")
@@ -2022,3 +2126,63 @@ def _run_ref(self: _Ctx, tool: str, ip: Optional[str], fqdn: Optional[str] = Non
 
 
 _Ctx.run_ref = _run_ref  # type: ignore[attr-defined]
+
+
+# ------------------------------------------------------------------ S6b-2 Hilfen
+
+# ZAP-Konfidenz, aufsteigend (ZAP: 0 False Positive, 1 Low, 2 Medium, 3 High, 4 Confirmed).
+_ZAP_CONFIDENCE_RANK = {"false positive": 0, "low": 1, "medium": 2, "high": 3, "confirmed": 4}
+# ZAP ``sourceid``: 1 aktive Pruefung, 3 Passivscanner.
+_ZAP_RUN = {"1": "active", "3": "passive"}
+_BANNER_DATE_RE = re.compile(r"^Date:\s*(.+?)\s*$", re.M | re.I)
+
+
+def _banner_date(banner: Any) -> Optional[str]:
+    """Zeitstempel des Dienstes aus dem HTTP-Kopf ``Date`` eines Shodan-Banners."""
+    if not banner:
+        return None
+    m = _BANNER_DATE_RE.search(str(banner).replace("\r\n", "\n"))
+    if not m:
+        return None
+    from email.utils import parsedate_to_datetime
+    try:
+        dt = parsedate_to_datetime(m.group(1))
+    except (TypeError, ValueError):
+        return None
+    if dt is None:
+        return None
+    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def released_after_eol(eol: S.Eol, release_date: Optional[str]) -> S.Eol:
+    """Kein EOL, wenn die Version nach dem Supportende ihres Zweigs erschienen ist.
+
+    S6b-2 (spec/09 Q18): WordPress 6.5.12 erschien am 22.09.2026, der Zweig 6.5 steht bei
+    endoflife.date mit Supportende 16.07.2024. Ein Release nach dem Supportende ist ein
+    Sicherheitsupdate des Zweigs; "ohne Herstellerpflege" waere widerlegbar.
+    """
+    if eol.status != "eol" or not release_date or not eol.date:
+        return eol
+    if str(release_date)[:10] > str(eol.date)[:10]:
+        return eol.model_copy(update={"status": "supported", "upstream_eol_date": eol.date, "date": None})
+    return eol
+
+
+# Banner, mit denen ein Datenbankdienst fremde Quellen vor jeder Anmeldung abweist.
+_REJECT_BEFORE_AUTH_RE = re.compile(
+    r"no pg_hba\.conf entry|is not allowed to connect to this (?:MySQL|MariaDB) server", re.I)
+
+
+def _mark_rejects_before_auth(services: list[S.ServiceFact], passive: list[S.PassiveFact]) -> None:
+    """``rejects_before_auth`` aus dem Passivbanner desselben IP:Port (spec/09 Teil 2 LW, JW).
+
+    Shodan zeigt fuer PostgreSQL auf 5432 ``FATAL: no pg_hba.conf entry for host``: fremde
+    Quellen werden vor der Anmeldung abgewiesen, ein Passwort-Rateangriff ist von dort nicht
+    moeglich. Der Portscan selbst sieht das nicht.
+    """
+    abweisend = {(p.host_ip, p.port) for p in passive
+                 if p.source == "shodan" and p.host_ip and p.port
+                 and _REJECT_BEFORE_AUTH_RE.search(p.banner_excerpt or "")}
+    for svc in services:
+        if (svc.host_ip, svc.port) in abweisend:
+            svc.rejects_before_auth = True

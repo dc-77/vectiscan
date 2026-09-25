@@ -102,8 +102,13 @@ TOOL_CAUSES: dict[str, str] = {
 
 # Werkzeuge, deren leeres Ergebnis keine Einschraenkung ist: ein Webauftritt ohne
 # erkennbare Technologie oder ohne vorgelagerte Schutzsysteme ist ein Ergebnis.
-NO_LIMITATION_TOOLS = frozenset({"webtech", "wafw00f"})
-NO_LIMITATION_CODES = frozenset({"no_tech_signals"})
+NO_LIMITATION_TOOLS = frozenset({"webtech", "wafw00f", "whois"})
+NO_LIMITATION_CODES = frozenset({"no_tech_signals", "whois_unavailable"})
+# S6b-2 (spec/08 Punkt 21): whois lieferte in keinem der 21 Golden-Auftraege Daten (der
+# Scanner meldet "ok" mit "no_data"). Solange das Werkzeug nicht repariert ist (Scanner,
+# S6c), nimmt der Bericht die Registrierungsdaten ganz heraus: keine Einschraenkungszeile,
+# kein Befund zur Laufzeit der Domain.
+REPORT_SUPPRESSED_CHECKS = frozenset({"domain_expiring"})
 ZAP_TOOLS = ("zap", "zap_spider", "zap_ajax_spider", "zap_active")
 WEB_SERVICES = frozenset({"http", "https", "http-alt", "https-alt", "http-proxy", "ssl/http", "ssl/https"})
 E5_CAUSE = "SMTP auf Port 25 vom Prüfstand aus nicht prüfbar"
@@ -309,7 +314,8 @@ class _Row:
 
 def _host_label(facts: FS.Facts, ip: str) -> str:
     host = next((h for h in facts.hosts if h.ip == ip), None)
-    names = sorted(host.fqdns, key=sort_key) if host else []
+    # S6b-2: ein Wildcard-Eintrag ist kein Hostname (spec/09 Teil 2 DB).
+    names = sorted((n for n in host.fqdns if not n.startswith("*.")), key=sort_key) if host else []
     return kurz_label(f"{ip} ({', '.join(names)})") if names else ip
 
 
@@ -380,6 +386,8 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
     checks = {ci.id: ci for ci in output.checks}
     for res in output.results:
         if res.status != "not_testable" or not res.reason_code:
+            continue
+        if res.check_id in REPORT_SUPPRESSED_CHECKS:
             continue
         code = res.reason_code.split(":", 1)[-1]
         status, text = CT.COVERAGE_REASONS.get(code, ("not_testable", ""))

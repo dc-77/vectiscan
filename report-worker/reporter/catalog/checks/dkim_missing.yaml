@@ -42,6 +42,10 @@ policy:
     ein, weil DKIM neben SPF die zweite Saeule der Absender-Authentizitaet ist und ohne sie
     Weiterleitungen die SPF-Pruefung beim Empfaenger regelmaessig scheitern lassen.
 texts:
+  short: "DKIM-Signatur fehlt"
+  plan:
+    lever: "DKIM-Signatur für ausgehende E-Mails einrichten"
+    effect: "Macht ausgehende E-Mails für Empfänger überprüfbar"
   observation: >-
     Für {affected} ist im DNS keine DKIM-Signatur nachweisbar. Für ausgehende E-Mails der
     Domain {domain} fehlt damit ein Selektor, über den Empfängersysteme die Signatur prüfen

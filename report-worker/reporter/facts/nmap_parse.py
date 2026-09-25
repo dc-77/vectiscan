@@ -294,6 +294,10 @@ class ServiceFlags:
     cert_san: list[str] = field(default_factory=list)
     cert_not_after: Optional[str] = None
     egress_ip: Optional[str] = None
+    # S6b-2 (spec/09 Q13): Fingerabdruck aus der Antwort des Dienstes.
+    fp_server: Optional[str] = None
+    fp_title: Optional[str] = None
+    fp_login: Optional[bool] = None
 
 
 def _tokens(text: str) -> list[str]:
@@ -331,6 +335,13 @@ def derive_service_flags(port: NmapPort) -> ServiceFlags:
                     f.auth_mechanisms.append(re.sub(r"A\d{4}$", "", up[5:]))
                 elif up.startswith("SASL(") and up.endswith(")"):
                     f.auth_mechanisms.extend(x for x in up[5:-1].split(",") if x)
+            # S6b-2 (spec/08 Punkt 4): POP3 kennt kein LOGINDISABLED. Bietet der Dienst vor
+            # STLS die Anmeldung per USER oder ein SASL-Verfahren an, nimmt er sie ohne
+            # Transportverschluesselung entgegen ("SASL(PLAIN LOGIN) USER ... STLS").
+            if sid == "pop3-capabilities" and f.starttls:
+                sasl = any(t.upper().startswith("SASL(") for t in toks)
+                if sasl or any(t.upper() == "USER" for t in toks):
+                    f.login_disabled = False
     smtp = port.script("smtp-commands")
     if smtp is not None:
         caps_text = smtp
@@ -383,5 +394,52 @@ def derive_service_flags(port: NmapPort) -> ServiceFlags:
         m = re.search(r"Not valid after:\s*(\S+)", cert)
         if m:
             f.cert_not_after = iso_utc(m.group(1))
+    fp = _fingerprint(port)
+    f.fp_server, f.fp_title, f.fp_login = fp
     _ = caps_text
     return f
+
+
+def _fp_text(servicefp: Optional[str]) -> str:
+    """nmap-Fingerprint lesbar machen (``\\x20`` zu Leerzeichen, ``\\r\\n`` zu Zeilen)."""
+    if not servicefp:
+        return ""
+    text = servicefp.replace("\\r\\n", "\n").replace("\\n", "\n")
+    text = re.sub(r"\\x([0-9a-fA-F]{2})", lambda m: chr(int(m.group(1), 16)), text)
+    return text.replace('\\"', '"')
+
+
+_FP_SERVER_RE = re.compile(r"^Server:\s*([^\n]{1,120})", re.M | re.I)
+_FP_TITLE_RE = re.compile(r"<title>\s*([^<]{1,160}?)\s*</title>", re.I)
+_FP_LOGIN_RE = re.compile(
+    r"auth-required=1|session_login|type=\W?password|WWW-Authenticate|name=\W?(?:pass|password|passwd)\b|"
+    r"\blog ?in\b|anmeld", re.I)
+
+
+def _fingerprint(port: NmapPort) -> tuple[Optional[str], Optional[str], Optional[bool]]:
+    """(Server-Kennung, Seitentitel, Anmeldung belegt) aus Skripten und Fingerprint.
+
+    Webmin auf 10000 erkennt nmap nicht als Produkt ("snet-sensor-mgmt?"), der Fingerprint
+    zeigt aber ``Server: MiniServ`` und ``session_login`` (spec/09 Q13, dortmund-beach).
+    ``fp_login`` ist True nur mit Beleg, sonst None; ein fehlender Beleg ist kein Nein.
+    """
+    fp = _fp_text(port.servicefp)
+    server = (port.script("http-server-header") or "").splitlines()[0].strip() if port.script("http-server-header") else ""
+    if not server:
+        m = _FP_SERVER_RE.search(fp)
+        server = m.group(1).strip() if m else ""
+    title = (port.script("http-title") or "").splitlines()[0].strip() if port.script("http-title") else ""
+    if title.lower().startswith(("did not follow redirect", "site doesn't have a title")):
+        # nmap meldet eine Weiterleitung als Titel; das ist keine Seite des Dienstes.
+        title = ""
+    if not title:
+        m = _FP_TITLE_RE.search(fp)
+        title = m.group(1).strip() if m else ""
+    if title:
+        # nmap gibt HTML-Entitaeten roh aus und kuerzt lange Titel mit drei Punkten.
+        import html as _html
+        title = _html.unescape(title)
+        if title.endswith("..."):
+            title = title[:-3].rstrip() + " (Auszug)"
+    login = bool(_FP_LOGIN_RE.search(fp) or (title and _FP_LOGIN_RE.search(title)))
+    return (server or None), (title or None), (True if login else None)

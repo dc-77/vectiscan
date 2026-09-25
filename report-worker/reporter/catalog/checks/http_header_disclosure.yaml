@@ -28,8 +28,12 @@ policy:
   start_level: LOW
   deviation: null
 texts:
+  short: "Versionsangabe im HTTP-Header"
+  plan:
+    lever: "Versionsangaben aus den Antwort-Headern entfernen"
+    effect: "Erschwert die gezielte Suche nach passenden Schwachstellen"
   observation: >-
-    Die Webantwort von {group} nennt in ihren Antwortheadern die Version der eingesetzten
+    {n:Die Webantwort|Die Webantworten} von {group} {n:nennt|nennen} in ihren Antwortheadern die Version der eingesetzten
     Serversoftware: {affected}.
   meaning: >-
     Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten

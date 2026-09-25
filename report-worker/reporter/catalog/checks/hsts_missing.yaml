@@ -35,8 +35,12 @@ policy:
     Downgrade-Schutz betrifft jeden Aufruf des Hosts ueber HTTP gleichermassen, daher fuehrt die
     Simulation die Pruefung als Hygiene mittel (catalog_sim, S2-Auftrag).
 texts:
+  short: "HSTS fehlt"
+  plan:
+    lever: "HTTP Strict Transport Security setzen"
+    effect: "Verhindert unverschlüsselte Aufrufe der Webseite"
   observation: >-
-    Der Dienst {group} liefert seine Antworten ohne den HTTP Strict Transport Security Header, der
+    {n:Der Dienst|Die Dienste} {group} {n:liefert seine|liefern ihre} Antworten ohne den HTTP Strict Transport Security Header, der
     Browser dauerhaft auf die verschlüsselte Verbindung festlegt: {affected}.
   meaning: >-
     Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine
@@ -52,5 +56,5 @@ texts:
   positive:
     title: HTTP Strict Transport Security gesetzt
     text: >-
-      Der Dienst {group} setzt den Header Strict-Transport-Security und legt Browser damit auf die
+      {n:Der Dienst|Die Dienste} {group} {n:setzt|setzen} den Header Strict-Transport-Security und legt Browser damit auf die
       verschlüsselte Verbindung fest.

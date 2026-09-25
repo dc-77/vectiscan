@@ -1,0 +1,37 @@
+{
+ "_note": "E1: Plesk des Hosters auf einem geteilten System (castenow, bergersysteme).",
+ "facts": {
+  "hosts": [
+   {
+    "ip": "10.0.0.9",
+    "shared": {
+     "kind": "hoster",
+     "operator": "Hoster AG",
+     "signals": [
+      "fremde_namen_zertifikat"
+     ]
+    }
+   }
+  ],
+  "services": [
+   {
+    "host_ip": "10.0.0.9",
+    "port": 8443,
+    "service": "https-alt",
+    "product": "sw-cp-server",
+    "tunnel_ssl": true,
+    "fp_title": "Plesk Obsidian 18.0.80",
+    "fp_login": true
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.9",
+  "affected": [
+   "10.0.0.9:8443 (Plesk)"
+  ],
+  "positive": false
+ }
+}

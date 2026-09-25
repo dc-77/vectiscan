@@ -55,6 +55,7 @@ const MIGRATION_045_PATH = path.join(__dirname, '..', 'migrations', '045_custome
 const MIGRATION_046_PATH = path.join(__dirname, '..', 'migrations', '046_report_defects.sql');
 const MIGRATION_047_PATH = path.join(__dirname, '..', 'migrations', '047_report_number.sql');
 const MIGRATION_048_PATH = path.join(__dirname, '..', 'migrations', '048_customer_context_kurzname.sql');
+const MIGRATION_049_PATH = path.join(__dirname, '..', 'migrations', '049_delivery_version_finding_key.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -797,6 +798,31 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 048 FAILED (continuing without it):', err);
+  }
+
+  // Migration 049 (S6b-2, Sep 2026): Auslieferungsversion auf dem Deckblatt
+  // (reports.delivery_version) und stabiler Befundschluessel fuer Ausschluesse
+  // (finding_exclusions.finding_key, Issue #28). Additiv und nullable; ohne die
+  // Spalten schreibt der report-worker weiter, die Ausschluesse gehen dann ueber
+  // die Befundnummer.
+  try {
+    const delivery049Check = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns
+        WHERE table_name = 'reports' AND column_name = 'delivery_version'
+      ) AND EXISTS (
+        SELECT FROM information_schema.columns
+        WHERE table_name = 'finding_exclusions' AND column_name = 'finding_key'
+      ) AS exists
+    `);
+    if (!delivery049Check.rows[0].exists) {
+      console.log('[initDb] Applying Migration 049: reports.delivery_version, finding_exclusions.finding_key');
+      const migrationSql = fs.readFileSync(MIGRATION_049_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 049 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 049 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created

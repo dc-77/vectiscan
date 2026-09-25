@@ -1,0 +1,54 @@
+id: cert_expiring_later
+title: TLS-Zertifikat läuft in den nächsten Wochen ab
+family: cert_expiring
+category: D
+scale: hygiene
+level: mittel
+group_by: fqdn
+scope: tls
+applicable_when: null
+# S6b-2 (E2): 15 bis 30 Tage Restlaufzeit sind mittelfristig; bis 14 Tage gilt cert_expiring.
+when: tls.cert is not None and tls.cert.expired is not True and tls.cert.days_left > CERT_SOON_DAYS and tls.cert.days_left <= CERT_EXPIRING_DAYS
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [testssl]
+kind: check
+bundle: cert_health
+affected_template: "{target} ({days_left_text})"
+evidence: [tls]
+references: [CWE-298]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: Entscheidung DC E2 (spec/09 Teil 7)
+  start_level: mittel
+  deviation: >-
+    Restlaufzeit von 15 bis 30 Tagen: Hygiene mittel und mittelfristig; bis 14 Tage Hygiene
+    hoch (cert_expiring), bis sieben Tage Unverzueglich.
+texts:
+  short: "Zertifikat läuft in den nächsten Wochen ab"
+  plan:
+    lever: "Erneuerung der Zertifikate einplanen"
+    effect: "Verhindert den Ausfall des Dienstes zum Ablaufdatum des Zertifikats"
+  observation: >-
+    Für {n:den Dienst|die Dienste} {group} läuft das eingesetzte TLS-Zertifikat in den nächsten Wochen ab:
+    {affected}.
+  meaning: >-
+    Läuft das Zertifikat ab, ohne dass eine Erneuerung vorbereitet ist, sehen alle Nutzer eine
+    Vertrauenswarnung oder einen Verbindungsabbruch. Mit dem verbleibenden Vorlauf lässt sich die
+    Erneuerung planmäßig erledigen.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Die Erneuerung des Zertifikats vor dem Ablaufdatum einplanen und durchführen.
+    - stage: strategisch
+      text: >-
+        Eine automatisierte Erneuerung mit ausreichendem zeitlichem Vorlauf einrichten.
+  verify: >-
+    Verbindung zum Dienst mit einem TLS-Client aufbauen und das Ablaufdatum des präsentierten
+    Zertifikats prüfen; erwartet wird ein neues Zertifikat mit ausreichendem Vorlauf.

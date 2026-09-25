@@ -31,6 +31,10 @@ policy:
     Umsetzung fehlende Cookie-Attribute einheitlich als Hygiene niedrig, unabhaengig vom
     vermuteten Zweck des Cookies.
 texts:
+  short: "Cookies ohne Sicherheitsattribute"
+  plan:
+    lever: "Sicherheitsattribute für Cookies setzen"
+    effect: "Erschwert das Abgreifen von Sitzungen über unverschlüsselte Aufrufe und Skripte"
   observation: >-
     Auf {group} setzen Cookies nicht alle Sicherheits-Attribute: {affected}.
   meaning: >-

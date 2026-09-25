@@ -70,9 +70,9 @@
   "VS-2026-008": {
    "checks": [
     "mta_sts_missing",
-    "tls_rpt_missing",
-    "dane_missing"
-   ]
+    "tls_rpt_missing"
+   ],
+   "s6b2": "dane_missing entfaellt (spec/09 Q4): der MX liegt in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
   },
   "VS-2026-009": {
    "checks": [
@@ -99,12 +99,12 @@
   "VS-2026-011": {
    "checks": [
     "csp_weak",
-    "header_duplicate",
-    "csrf_token_missing"
+    "header_duplicate"
    ],
    "hosts": [
     "217.243.248.30"
-   ]
+   ],
+   "s6b2": "csrf_token_missing entfaellt als Befund (spec/09 Q14): ZAP meldet Absence of Anti-CSRF Tokens unter Konfidenz High, die Meldung steht als Werkzeugmeldung (web_vulnerability_reported) im Anhang."
   },
   "VS-2026-012": {
    "checks": [
@@ -160,7 +160,8 @@
    "checks": [
     "software_eol"
    ],
-   "group_contains": "217.243.248.28"
+   "group_contains": "188.40.3.130",
+   "s6b2": "Exchange SE auf 217.243.248.28 ist gepflegt, belegt ist aber nur die Produktlinie, nicht der Patchstand; kein Positivbefund (spec/09 Teil 2 castenow). Der Katalog-Positivbefund bleibt fuer 188.40.3.130."
   },
   "VS-2026-P04": {
    "checks": [
@@ -199,7 +200,9 @@
   "cookie_flags": "Cookie-Attribute sind im Prototyp Teil der Header-Hygiene (VS-011, VS-013).",
   "js_library_outdated": "Veraltete JavaScript-Bibliotheken stehen im Prototyp im Anhang Werkzeugbefunde.",
   "spf_softfail": "Teil von VS-007.",
-  "tls_weakness": "BEAST (cloud) und BREACH/SWEET32 (openotp) sind Teil von VS-009 und VS-012."
+  "tls_weakness": "BEAST (cloud) und BREACH/SWEET32 (openotp) sind Teil von VS-009 und VS-012.",
+  "tls_weakness_reported": "BREACH und LUCKY13 als Hinweis der TLS-Analyse ohne eigene Einstufung im Anhang (S6b-2, spec/09 Q4).",
+  "web_vulnerability_reported": "ZAP-Meldungen unter Konfidenz High als Werkzeugmeldung im Anhang (S6b-2, spec/09 Q14)."
  },
  "expected_coverage_differences": [
   {
@@ -386,6 +389,11 @@
    "check_prefix": "",
    "reason_code": "unreachable_from_scanner",
    "note": "S6b-1 (spec/09 Q9, E4): IPv6-Host im Rescan ohne offenen Port, Shodan meldet dort Dienste"
+  },
+  {
+   "check_prefix": "web_vulnerability_reported",
+   "reason_code": "zap_no_alerts",
+   "note": "S6b-2: seit Q14 liest die Pruefung auch die passiven ZAP-Meldungen (requires zap); Lauf 2 hat zap ok mit null Alerts"
   }
  ],
  "expected_member_differences": [

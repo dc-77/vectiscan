@@ -1,5 +1,5 @@
 id: dns_integrity
-title: DNS-Einträge von {group} mit Übernahmerisiko
+title: "DNS-Einträge von {group}: {rules}"
 category: C
 merge_by: domain
 members: [dns_zone_transfer, dns_dangling_cname]
@@ -10,27 +10,4 @@ frameworks:
   nis2: []
   iso27001: []
   tr03116: []
-texts:
-  observation: >-
-    Die DNS-Einträge von {group} lassen sich von außen im Ganzen abrufen oder zeigen auf nicht
-    mehr vorhandene Ziele: {affected}.
-  meaning: >-
-    Ein vollständig abrufbarer Zonenbestand verrät alle hinterlegten Namen auf einmal und erspart
-    einem Angreifer die Suche. Ein Eintrag, der auf ein aufgegebenes Ziel zeigt, lässt sich von
-    Dritten übernehmen und für Betrug im Namen des Unternehmens nutzen.
-  recommendation:
-    - stage: unverzueglich
-      text: >-
-        Den Abruf der gesamten Zone auf die eigenen Nameserver beschränken und Einträge ohne Ziel
-        löschen.
-    - stage: mittelfristig
-      text: >-
-        Den Bestand der Einträge regelmäßig gegen die tatsächlich genutzten Ziele abgleichen.
-  verify: >-
-    Den Abruf der gesamten Zone von außen versuchen und die genannten Einträge auflösen; erwartet
-    wird eine Ablehnung und ein vorhandenes Ziel.
-  positive:
-    title: Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge
-    text: >-
-      Für {group} lehnen die Nameserver den Abruf der gesamten Zone ab, und kein Eintrag zeigt auf
-      ein aufgegebenes Ziel.
+positive_title: Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge

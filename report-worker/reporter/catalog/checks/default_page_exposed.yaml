@@ -31,8 +31,12 @@ policy:
     Fernwartungszugang als mittel ein; ohne diesen Zusammenhang bleibt die reine Standardseite
     eine Hygieneabweichung niedrig (catalog_sim R-DEFAULT-PAGE).
 texts:
+  short: "Standard-Startseite des Webservers"
+  plan:
+    lever: "Standardseiten ersetzen oder abschalten"
+    effect: "Verbirgt die eingesetzte Software und entfernt ungenutzte Einstiege"
   observation: >-
-    Die Webseite {group} liefert noch die Standard-Startseite des Webservers oder der
+    {n:Die Webseite|Die Webseiten} {group} {n:liefert|liefern} noch die Standard-Startseite des Webservers oder der
     Verwaltungssoftware aus, ohne eigenen Inhalt: {affected}.
   meaning: >-
     Eine unveränderte Standardseite zeigt, dass die Installation nicht abgeschlossen oder nicht

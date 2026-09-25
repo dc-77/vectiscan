@@ -1,0 +1,24 @@
+{
+ "_note": "Werkzeugmeldung im Anhang statt Befund (spec/09 Q13, heuel).",
+ "facts": {
+  "passive": [
+   {
+    "host_ip": "10.0.0.1",
+    "port": 4433,
+    "source": "shodan",
+    "banner_excerpt": "HTTP/1.1 200 OK Server: xxxx",
+    "verified": false,
+    "confidence": 0.5
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.1",
+  "affected": [
+   "10.0.0.1:4433 laut Passivquelle, ohne Kennung der Software"
+  ],
+  "positive": false
+ }
+}

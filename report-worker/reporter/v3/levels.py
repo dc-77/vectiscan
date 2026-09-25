@@ -85,6 +85,14 @@ TRIAGE_BY_LEVEL: dict[tuple[str, str], Triage] = {
 # unabhaengig von seiner Einstufung.
 TRIAGE_ACTIVE_PROOF = Triage("rot", ("unverzueglich",), "CRITICAL")
 
+# S6b-2 (E2): benannte Ausnahmen der Tabelle. Eine Pruefung mit ``urgent_when`` wird bei
+# Treffer rot mit Unverzueglich, obwohl ihre Einstufung Hygiene ist. Jede Ausnahme steht
+# hier mit dem Satz, den Anhang A.1 dazu nennt; ein Test haelt Katalog und Tabelle gleich.
+TRIAGE_URGENT = Triage("rot", ("unverzueglich",), "CRITICAL")
+URGENT_EXCEPTIONS: dict[str, str] = {
+    "cert_expiring": "ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen",
+}
+
 # Rueckfall fuer eine Einstufung, die das Schema nicht kennt. Der Selbstcheck
 # meldet sie ohnehin als Defekt; hier wird nur nichts erfunden.
 TRIAGE_UNKNOWN = Triage("blau", ("mittelfristig",), "LOW")
@@ -126,23 +134,25 @@ def worst(pairs: list[tuple[str, str]]) -> tuple[str, str]:
     return min(pairs, key=lambda p: severity_key(*p))
 
 
-def triage_for(scale: str, level: str, active_proof: bool = False) -> Triage:
+def triage_for(scale: str, level: str, active_proof: bool = False, urgent: bool = False) -> Triage:
     if active_proof:
         return TRIAGE_ACTIVE_PROOF
+    if urgent:
+        return TRIAGE_URGENT
     return TRIAGE_BY_LEVEL.get((scale, level), TRIAGE_UNKNOWN)
 
 
-def status_for(scale: str, level: str, active_proof: bool = False) -> str:
-    return triage_for(scale, level, active_proof).status
+def status_for(scale: str, level: str, active_proof: bool = False, urgent: bool = False) -> str:
+    return triage_for(scale, level, active_proof, urgent).status
 
 
-def severity_for(scale: str, level: str, active_proof: bool = False) -> str:
+def severity_for(scale: str, level: str, active_proof: bool = False, urgent: bool = False) -> str:
     """Stufe fuer die Dashboard-Befundliste (reports.findings_data)."""
-    return triage_for(scale, level, active_proof).severity
+    return triage_for(scale, level, active_proof, urgent).severity
 
 
 def stage_for(scale: str, level: str, stages: list[str],
-              active_proof: bool = False) -> str:
+              active_proof: bool = False, urgent: bool = False) -> str:
     """Wirksame Empfehlungsstufe eines Befunds.
 
     Der Katalog schlaegt mit seiner dringlichsten Stufe vor; zugelassen ist sie
@@ -150,7 +160,7 @@ def stage_for(scale: str, level: str, stages: list[str],
     Tabellenwert. Damit kann keine Empfehlung einen gelben Befund als
     unverzueglich ausweisen.
     """
-    tri = triage_for(scale, level, active_proof)
+    tri = triage_for(scale, level, active_proof, urgent)
     if not stages:
         return tri.stage
     top = min(stages, key=lambda s: STAGE_RANK.get(s, 9))
@@ -158,8 +168,25 @@ def stage_for(scale: str, level: str, stages: list[str],
 
 
 def urgency_for(scale: str, level: str, stages: list[str],
-                active_proof: bool = False) -> str:
-    return URGENCY_BY_STAGE[stage_for(scale, level, stages, active_proof)]
+                active_proof: bool = False, urgent: bool = False) -> str:
+    return URGENCY_BY_STAGE[stage_for(scale, level, stages, active_proof, urgent)]
+
+
+def relative_stages(stages: list[str], effective: str) -> list[str]:
+    """Empfehlungsstufen einer Regel, verschoben auf ihre wirksame Dringlichkeit (Q5).
+
+    Die dringlichste Empfehlung einer Regel steht auf der Dringlichkeit, die die
+    Abbildungstabelle ihr gibt; die weiteren behalten ihren Abstand zur ersten und enden
+    spaetestens bei "Strategisch". Vorher begann ein gelber Befund "In Kuerze" mit
+    "Unverzueglich:", weil der Katalog seine Stufen unabhaengig von der Einstufung setzte
+    (spec/09 Q5).
+    """
+    if not stages:
+        return []
+    top = min(STAGE_RANK.get(s, len(STAGE_ORDER) - 1) for s in stages)
+    shift = STAGE_RANK[effective] - top
+    last = len(STAGE_ORDER) - 1
+    return [STAGE_ORDER[max(0, min(last, STAGE_RANK.get(s, last) + shift))] for s in stages]
 
 
 def top_stage(stages: list[str]) -> str:
@@ -182,8 +209,10 @@ def stages_for_status(status: str) -> list[str]:
         for stage in tri.stages:
             if stage not in out:
                 out.append(stage)
-    if status == TRIAGE_ACTIVE_PROOF.status:
-        for stage in TRIAGE_ACTIVE_PROOF.stages:
+    for special in (TRIAGE_ACTIVE_PROOF, TRIAGE_URGENT):
+        if status != special.status:
+            continue
+        for stage in special.stages:
             if stage not in out:
                 out.append(stage)
     return sorted(out, key=lambda s: STAGE_RANK[s])
@@ -198,3 +227,58 @@ def urgency_phrase(status: str) -> str:
     if len(parts) == 1:
         return parts[0]
     return " oder ".join([", ".join(parts[:-1]), parts[-1]])
+
+
+# ---------------------------------------------------------------- Skalen (Anhang A.2)
+# S6b-2 (spec/09 Q13, E1): A.2, diese Tabelle und die Einstufung der Verwaltungspruefungen
+# im Katalog kommen aus einer Quelle. Vorher definierte A.2 "kritisch: ...
+# Verwaltungsoberflaechen", waehrend die Regel "erhoeht" vergab. ``ADMIN_EXPOSURE`` nennt je
+# Verwaltungspruefung Skala und Einstufung; ein Test gleicht die YAML-Dateien dagegen ab.
+
+ADMIN_EXPOSURE: dict[str, tuple[str, str, str]] = {
+    # Pruefung: (Skala, Einstufung, Fall fuer A.2)
+    "admin_service_exposed": (
+        "exposure", "kritisch",
+        "Verwaltungsoberfläche mit Anmeldung ohne vorgelagerten Schutz auf einem System "
+        "des Kunden"),
+    # Titel einer Verwaltungsoberflaeche unter einem Hostnamen der Webseite, ohne belegte
+    # Anmeldung: bleibt erhoeht (Entscheidung DC 25.09.: Fingerabdruck ohne Anmeldung).
+    "admin_portal_exposed": (
+        "exposure", "erhoeht",
+        "Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne "
+        "belegte Anmeldung"),
+    "admin_panel_hoster": (
+        "exposure", "erhoeht",
+        "Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an "
+        "den Hoster"),
+    "admin_service_unconfirmed": (
+        "exposure", "erhoeht",
+        "Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer "
+        "Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist"),
+    "admin_service_exposed_passive": (
+        "exposure", "erhoeht",
+        "Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die "
+        "zuerst zu bestätigen ist"),
+}
+
+
+def exposure_scale() -> list[tuple[str, str]]:
+    """Zeilen der Expositionsskala in A.2, Verwaltungsfaelle aus ``ADMIN_EXPOSURE``."""
+    kritisch = sorted({fall for s, lvl, fall in ADMIN_EXPOSURE.values() if lvl == "kritisch"})
+    erhoeht = sorted({fall for s, lvl, fall in ADMIN_EXPOSURE.values() if lvl == "erhoeht"})
+    return [
+        ("kritisch", "Dienst, der nicht an das öffentliche Interface gehört und aus dem "
+                     "Internet erreichbar ist: Datenbanken, Fernwartung, "
+                     + "; ".join(kritisch) + "."),
+        ("erhöht", "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung "
+                   "oder mit ungeklärter Funktion, darunter: " + "; ".join(erhoeht) + "."),
+    ]
+
+
+def urgent_phrase() -> str:
+    """Satz fuer Anhang A.1 zu den benannten Ausnahmen der Tabelle."""
+    if not URGENT_EXCEPTIONS:
+        return ""
+    faelle = sorted(URGENT_EXCEPTIONS.values())
+    return ("Ausnahme: Rot und Unverzüglich gelten auch für "
+            + (" und ".join(faelle)) + ".")

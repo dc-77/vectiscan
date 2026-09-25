@@ -36,6 +36,9 @@ policy:
     bekannter Schwachstellen kommt ausschliesslich aus der Werkzeugausgabe; das Label nennt immer
     Produkt und Version, nie nur eine Zahl.
 texts:
+  plan:
+    lever: "Verwundbare WordPress-Erweiterungen aktualisieren"
+    effect: "Schließt bekannte Lücken in Erweiterungen"
   observation: >-
     Auf {group} ist eine WordPress-Erweiterung mit bekannten Schwachstellen im Einsatz: {affected}.
   meaning: >-

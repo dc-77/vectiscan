@@ -22,105 +22,85 @@
   },
   "VS-2026-004": {
    "checks": [
-    "csrf_token_missing"
+    "dmarc_none"
    ]
   },
   "VS-2026-005": {
    "checks": [
-    "dane_missing"
+    "dnssec_missing"
    ]
   },
   "VS-2026-006": {
    "checks": [
-    "dmarc_none"
+    "hsts_short"
    ]
   },
   "VS-2026-007": {
    "checks": [
-    "dnssec_missing"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-008": {
    "checks": [
-    "ftp_plaintext"
+    "info_disclosure"
    ]
   },
   "VS-2026-009": {
    "checks": [
-    "hsts_short"
+    "legacy_protocols_present"
    ]
   },
   "VS-2026-010": {
    "checks": [
-    "http_header_disclosure"
+    "mail_plaintext"
    ]
   },
   "VS-2026-011": {
    "checks": [
-    "info_disclosure"
+    "mta_sts_missing"
    ]
   },
   "VS-2026-012": {
    "checks": [
-    "legacy_protocols_present"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-013": {
    "checks": [
-    "mta_sts_missing"
+    "software_eol"
    ]
   },
   "VS-2026-014": {
    "checks": [
-    "security_headers_incomplete"
+    "spf_softfail"
    ]
   },
   "VS-2026-015": {
    "checks": [
-    "service_banner_version"
+    "tls_no_13"
    ]
   },
   "VS-2026-016": {
    "checks": [
-    "software_eol_runtime"
+    "tls_rpt_missing"
    ]
   },
   "VS-2026-017": {
    "checks": [
-    "spf_softfail"
+    "tls_weakness_reported"
    ]
   },
   "VS-2026-018": {
    "checks": [
-    "tls_no_13"
+    "web_vulnerability_reported"
    ]
   },
   "VS-2026-019": {
    "checks": [
-    "tls_rpt_missing"
-   ]
-  },
-  "VS-2026-020": {
-   "checks": [
-    "tls_weakness"
-   ]
-  },
-  "VS-2026-021": {
-   "checks": [
-    "web_vulnerability_reported"
-   ]
-  },
-  "VS-2026-022": {
-   "checks": [
-    "wordpress_core_outdated"
-   ]
-  },
-  "VS-2026-023": {
-   "checks": [
     "wordpress_plugin_vulnerable"
    ]
   },
-  "VS-2026-024": {
+  "VS-2026-020": {
    "checks": [
     "wordpress_user_enumeration"
    ]
@@ -179,35 +159,30 @@
   },
   "VS-2026-P11": {
    "checks": [
-    "mail_plaintext"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P12": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P13": {
    "checks": [
-    "smb_exposed"
+    "spf_missing"
    ]
   },
   "VS-2026-P14": {
    "checks": [
-    "spf_missing"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P15": {
    "checks": [
-    "tls_legacy_protocols"
-   ]
-  },
-  "VS-2026-P16": {
-   "checks": [
     "tls_weak_ciphers"
    ]
   },
-  "VS-2026-P17": {
+  "VS-2026-P16": {
    "checks": [
     "urlhaus_compromise"
    ]

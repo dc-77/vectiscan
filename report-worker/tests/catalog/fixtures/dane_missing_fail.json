@@ -1,16 +1,32 @@
 {
  "facts": {
   "dns": [
-   {"domain": "example.test", "mx": ["mx1.example.test"],
-    "spf": {"raw": "v=spf1 mx -all", "all_qualifier": "-all"},
-    "dane": {"smtp": false, "https": false}}
+   {
+    "domain": "example.test",
+    "mx": [
+     "mx1.example.test"
+    ],
+    "spf": {
+     "raw": "v=spf1 mx -all",
+     "all_qualifier": "-all"
+    },
+    "dane": {
+     "smtp": false,
+     "https": false
+    },
+    "dnssec": {
+     "signed": true
+    }
+   }
   ]
  },
  "coverage_default": "ok",
  "expect": {
   "status": "fail",
   "group_key": "example.test",
-  "affected": ["example.test"],
+  "affected": [
+   "example.test"
+  ],
   "positive": false
  }
 }

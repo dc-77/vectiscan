@@ -32,6 +32,9 @@ policy:
   start_level: CRITICAL
   deviation: null
 texts:
+  plan:
+    lever: "Aktiv ausgenutzte Schwachstellen schließen"
+    effect: "Schließt eine Lücke, die Angreifer nachweislich ausnutzen"
   observation: >-
     Für {group} listet eine externe Bedrohungsdatenbank eine Schwachstelle als aktiv ausgenutzt:
     {affected}. Der Eintrag stammt aus dem Verzeichnis bekannt ausgenutzter Schwachstellen einer

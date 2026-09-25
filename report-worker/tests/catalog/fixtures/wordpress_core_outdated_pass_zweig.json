@@ -1,0 +1,27 @@
+{
+ "_note": "Zweig mit aktuellem Sicherheitsstand, keine Kern-Schwachstelle (dortmund-beach, spec/09 Q18).",
+ "facts": {
+  "http": [
+   {
+    "host_ip": "10.0.0.1",
+    "fqdn": "www.example.test",
+    "reachable": true,
+    "status_code": 200,
+    "wordpress": {
+     "users": [],
+     "version_status": "outdated",
+     "version": "6.5.12",
+     "release_date": "2026-09-22",
+     "core_vulnerabilities": 0
+    }
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "www.example.test@10.0.0.1",
+  "affected": [],
+  "positive": false
+ }
+}

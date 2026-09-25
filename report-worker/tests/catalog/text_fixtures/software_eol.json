@@ -1,0 +1,125 @@
+{
+ "check": "software_eol",
+ "cases": [
+  {
+   "name": "Debian aus dem Paketsuffix und nginx ohne Pflege",
+   "facts": {
+    "software": [
+     {
+      "id": "sw:10_0_0_6:-:debian:11",
+      "host_ip": "10.0.0.6",
+      "product": "Debian GNU/Linux",
+      "family": "debian",
+      "kind": "os",
+      "version_norm": "11",
+      "eol": {
+       "status": "eol",
+       "date": "2026-08-31",
+       "source": "Debian LTS"
+      }
+     },
+     {
+      "id": "sw:10_0_0_6:-:nginx:1.18",
+      "host_ip": "10.0.0.6",
+      "product": "nginx",
+      "family": "nginx",
+      "kind": "webserver",
+      "version_norm": "1.18",
+      "eol": {
+       "status": "eol",
+       "date": "2021-04-20",
+       "source": "endoflife_date"
+      }
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "sw:10_0_0_6:-:debian:11": [
+      "meaning[2]"
+     ],
+     "sw:10_0_0_6:-:nginx:1.18": [
+      "meaning[1]"
+     ]
+    },
+    "not_holds": {
+     "sw:10_0_0_6:-:debian:11": [
+      "meaning[1]",
+      "recommendation[0]"
+     ],
+     "sw:10_0_0_6:-:nginx:1.18": [
+      "meaning[2]",
+      "recommendation[1]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  },
+  {
+   "name": "nur Debian: Empfehlung fuer das Betriebssystem",
+   "facts": {
+    "software": [
+     {
+      "id": "sw:10_0_0_6:-:debian:11",
+      "host_ip": "10.0.0.6",
+      "product": "Debian GNU/Linux",
+      "family": "debian",
+      "kind": "os",
+      "version_norm": "11",
+      "eol": {
+       "status": "eol",
+       "date": "2026-08-31",
+       "source": "Debian LTS"
+      }
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "sw:10_0_0_6:-:debian:11": [
+      "recommendation[1]"
+     ]
+    },
+    "not_holds": {
+     "sw:10_0_0_6:-:debian:11": [
+      "recommendation[0]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  },
+  {
+   "name": "nur nginx: Empfehlung zu Backports",
+   "facts": {
+    "software": [
+     {
+      "id": "sw:10_0_0_6:-:nginx:1.18",
+      "host_ip": "10.0.0.6",
+      "product": "nginx",
+      "family": "nginx",
+      "kind": "webserver",
+      "version_norm": "1.18",
+      "eol": {
+       "status": "eol",
+       "date": "2021-04-20",
+       "source": "endoflife_date"
+      }
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "sw:10_0_0_6:-:nginx:1.18": [
+      "recommendation[0]"
+     ]
+    },
+    "not_holds": {
+     "sw:10_0_0_6:-:nginx:1.18": [
+      "recommendation[1]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  }
+ ]
+}

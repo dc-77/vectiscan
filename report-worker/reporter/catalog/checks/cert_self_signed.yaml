@@ -33,8 +33,12 @@ policy:
     bestandene Pruefung entfaellt, weil der Parser dieses Feld nur bei einem gefundenen
     selbstsignierten Zertifikat setzt.
 texts:
+  short: "selbstsigniertes Zertifikat"
+  plan:
+    lever: "Selbstsignierte Zertifikate ersetzen"
+    effect: "Ermöglicht Clients, die Echtheit des Dienstes zu prüfen"
   observation: >-
-    Für den Dienst {group} ist ein selbstsigniertes TLS-Zertifikat im Einsatz: {affected}. Das
+    Für {n:den Dienst|die Dienste} {group} ist ein selbstsigniertes TLS-Zertifikat im Einsatz: {affected}. Das
     Zertifikat wurde nicht von einer allgemein anerkannten Vertrauensstelle ausgestellt.
   meaning: >-
     Ohne eine allgemein anerkannte Vertrauensstelle kann ein TLS-Client die Identität des

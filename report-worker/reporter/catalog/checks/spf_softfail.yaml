@@ -6,7 +6,7 @@ scale: hygiene
 level: niedrig
 group_by: domain
 scope: dns
-applicable_when: dns.spf is not None
+applicable_when: len(dns.mx) > 0 and dns.spf is not None
 when: dns.spf.all_qualifier in ["~all", "?all"]
 positive_when: dns.spf.all_qualifier == "-all"
 not_testable_when: []
@@ -28,6 +28,10 @@ policy:
   start_level: LOW
   deviation: null
 texts:
+  short: "SPF nur mit Softfail"
+  plan:
+    lever: "SPF-Eintrag mit harter Fehlbehandlung abschließen"
+    effect: "Lässt Empfänger gefälschte Absender eindeutig ablehnen"
   observation: >-
     Der SPF-Eintrag der Domain {domain} setzt bei nicht autorisierten Versendern nur auf eine
     weiche oder neutrale Fehlbehandlung: {affected}. Empfangende Mailserver dürfen die E-Mail

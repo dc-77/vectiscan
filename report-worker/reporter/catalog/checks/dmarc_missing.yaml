@@ -6,7 +6,8 @@ scale: hygiene
 level: hoch
 group_by: domain
 scope: dns
-applicable_when: null
+# S6b-2 (spec/08 Punkt 6): Domains ohne MX bewertet mail_spoofing_unprotected.
+applicable_when: len(dns.mx) > 0
 when: dns.dmarc is None or dns.dmarc.present is False
 positive_when: dns.dmarc.present is True
 not_testable_when: []
@@ -30,6 +31,10 @@ policy:
     Fehlendes DMARC hat direkten Bezug zur Absender-Authentizitaet und damit zu Betrugsszenarien;
     der Prototyp (VS-007) stuft es als Hygiene hoch ein.
 texts:
+  short: "kein DMARC-Eintrag"
+  plan:
+    lever: "DMARC-Richtlinie veröffentlichen"
+    effect: "Schützt die Authentizität der eigenen E-Mail"
   observation: >-
     Für die Domain {domain} existiert kein DMARC-Eintrag. Ohne DMARC bleibt es dem Empfänger
     überlassen, was mit E-Mails geschieht, die SPF oder DKIM nicht bestehen.

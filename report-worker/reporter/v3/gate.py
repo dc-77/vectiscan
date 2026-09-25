@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Gate für die vier Prosa-Felder.
+"""Gate für die Prosa-Felder.
 
 Die KI bekommt fertige Befunde und Fakten als JSON und schreibt daraus vier Absätze.
 Sie darf dabei nichts behaupten, was nicht in ihrer Eingabe steht. Dieses Modul prüft
@@ -46,6 +46,37 @@ ALWAYS_ALLOWED_NUMBERS = frozenset({"33", "72"})
 HOSTLIKE_ALLOWLIST = frozenset({"z.b", "u.a", "ggf.b", "bzw.b"})
 
 
+# S6b-2 (Nachtrag S6b-1, spec/09 Teil 3): Zahlen mit Zaehleinheit. Die Einheit ist das
+# System (Kapitel 2.1); Adressen und Hostnamen stehen mit ihrer eigenen Zahl daneben,
+# "Host" ist keine Zaehleinheit mehr. "ein System" ist oft keine Gesamtzahl ("auf einem
+# System laeuft ...") und wird deshalb nicht geprueft.
+_ZAHLWORT = {"zwei": 2, "drei": 3, "vier": 4, "fünf": 5, "sechs": 6, "sieben": 7, "acht": 8,
+             "neun": 9, "zehn": 10, "elf": 11, "zwölf": 12}
+COUNT_PHRASE = re.compile(
+    r"\b(\d+|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn|elf|zwölf)\s+"
+    r"(Systemen|Systeme|System|Hosts|Host|IP-Adressen|IP-Adresse|Adressen|Adresse|Hostnamen|Hostname)\b",
+    re.I)
+_EINHEIT = {"system": "systeme", "ip-adress": "ip_adressen", "adress": "ip_adressen",
+            "hostname": "hostnamen"}
+
+
+def count_mismatches(text: str, counts: dict[str, int]) -> list[str]:
+    """Zahlen mit Einheit, die der Zaehlung in Kapitel 2.1 widersprechen."""
+    out: list[str] = []
+    for m in COUNT_PHRASE.finditer(text or ""):
+        wort, einheit = m.group(1).lower(), m.group(2).lower()
+        zahl = int(wort) if wort.isdigit() else _ZAHLWORT[wort]
+        if einheit.startswith("host") and not einheit.startswith("hostname"):
+            out.append(f"Zählung in Hosts statt Systemen: {m.group(0)}")
+            continue
+        key = next((v for k, v in _EINHEIT.items() if einheit.startswith(k)), None)
+        if key is None or key not in counts:
+            continue
+        if zahl != counts[key]:
+            out.append(f"{m.group(0)} widerspricht der Zählung in 2.1 ({counts[key]})")
+    return out
+
+
 @dataclass
 class Verdict:
     ok: bool
@@ -62,7 +93,7 @@ def _unknown(values: Iterable[str], haystack: str) -> list[str]:
 
 
 def check_field(name: str, text: str, haystack: str, *, role_keys=None,
-                reference: str = "") -> Verdict:
+                reference: str = "", counts: dict[str, int] | None = None) -> Verdict:
     """Prueft einen einzelnen Prosa-Text gegen die Eingabedaten.
 
     S6b-1 (spec/09 Q2): mit ``role_keys`` faellt ein Text durch, der einem System eine
@@ -111,6 +142,8 @@ def check_field(name: str, text: str, haystack: str, *, role_keys=None,
     umlauts = find_transliterations(text, haystack)
     if umlauts:
         reasons.append(f"Umschrift statt Umlaut: {sorted(set(umlauts))}")
+    if counts is not None:
+        reasons.extend(count_mismatches(text, counts))
     if role_keys is not None:
         from reporter.v3.roles import role_words_without_fact
 

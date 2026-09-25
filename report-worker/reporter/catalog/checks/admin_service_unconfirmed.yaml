@@ -1,0 +1,69 @@
+id: admin_service_unconfirmed
+title: Dienst auf einem Verwaltungsport aus dem Internet erreichbar
+family: admin_service_exposed
+category: A
+scale: exposure
+level: erhoeht
+group_by: host
+scope: service
+applicable_when: null
+# S6b-2 (spec/09 Q13, Entscheidung DC 25.09.): Verwaltungsport ohne Fingerabdruck oder
+# Verwaltungssoftware ohne belegte Anmeldung. Kritisch ist nur admin_service_exposed (mit
+# belegter Anmeldung auf einem System des Kunden), auf geteilten Systemen des Hosters gilt
+# admin_panel_hoster.
+when: (service.port in ADMIN_PORTS or admin_fp(service)) and not is_cdn(host, services) and not (admin_fp(service) and host is not None and host.shared is not None and host.shared.kind == "hoster") and not (admin_fp(service) and service.fp_login is True and (host is None or host.shared is None))
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [nmap]
+kind: check
+bundle: admin_access
+affected_template: "{host_ip}:{port} ({admin_label})"
+evidence: [service]
+references: [CWE-284]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: Entscheidung DC 25.09.2026 (S6b-2, Q13)
+  start_level: erhoeht
+  deviation: >-
+    spec/08 Punkt 14: ohne Banner- oder Titeltreffer steht der Dienst als "Dienst auf Port N,
+    üblicherweise eine Verwaltungsoberfläche", nicht als nachgewiesene Verwaltungsoberfläche.
+texts:
+  short: "Dienst auf einem Verwaltungsport"
+  plan:
+    lever: "Zweck der Dienste auf Verwaltungsports klären"
+    effect: "Klärt, ob eine Verwaltungsoberfläche offen im Internet steht, und schließt sie"
+  observation:
+    - when: admin_fp(service)
+      quantor: eines
+      text: >-
+        {n:Der Host|Die Hosts} {group} {n:bietet|bieten} einen Dienst an, der sich als Verwaltungssoftware zu
+        erkennen gibt: {affected}. Eine Anmeldemaske war in der Antwort des Dienstes nicht
+        festzustellen.
+    - when: not admin_fp(service)
+      quantor: eines
+      text: >-
+        {n:Der Host|Die Hosts} {group} {n:beantwortet|beantworten} Verbindungen auf einem Port, der üblicherweise für eine
+        Verwaltungsoberfläche genutzt wird: {affected}. Welche Software dort antwortet, war von
+        außen nicht erkennbar.
+  meaning: >-
+    Steht hinter dem Port eine Verwaltungsoberfläche, ist sie ein hochwertiges Ziel: eine
+    Übernahme beträfe den gesamten Anschluss und die dahinter liegenden Systeme. Ob das hier
+    der Fall ist, lässt sich erst mit Kenntnis des Dienstes beurteilen.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Klären, welcher Dienst auf dem Port antwortet und ob ein Zugriff aus dem gesamten
+        Internet dafür nötig ist.
+    - stage: mittelfristig
+      text: >-
+        Nicht benötigte Dienste abschalten und benötigte Verwaltungszugänge auf feste
+        Quellnetze beschränken.
+  verify: >-
+    Portscan des Hosts von einer externen Adresse wiederholen; erwartet wird, dass der Port nur
+    noch für berechtigte Quellnetze erreichbar oder geschlossen ist.

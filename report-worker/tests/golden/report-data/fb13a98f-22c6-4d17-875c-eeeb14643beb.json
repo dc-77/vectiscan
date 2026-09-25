@@ -69,14 +69,14 @@
   "exposure_scale": [
    {
     "l": "kritisch",
-    "t": "Dienst, der nicht an das öffentliche Interface gehört (Datenbanken, Verwaltungsoberflächen, Fernwartung) und aus dem Internet erreichbar ist."
+    "t": "Dienst, der nicht an das öffentliche Interface gehört und aus dem Internet erreichbar ist: Datenbanken, Fernwartung, Verwaltungsoberfläche mit Anmeldung ohne vorgelagerten Schutz auf einem System des Kunden."
    },
    {
     "l": "erhöht",
-    "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
+    "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 37 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (11 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 14 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 31 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (7 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 13 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -95,7 +95,7 @@
    {
     "host": "37.114.55.171",
     "port": "22",
-    "ref": "VS-2026-012",
+    "ref": "",
     "svc": "OpenSSH 10.0p2"
    },
    {
@@ -125,13 +125,13 @@
    {
     "host": "37.114.55.171",
     "port": "443",
-    "ref": "VS-2026-005, VS-2026-010",
+    "ref": "VS-2026-003, VS-2026-005, VS-2026-010",
     "svc": "nginx, TLS erzwungen"
    },
    {
     "host": "37.114.55.171",
     "port": "987",
-    "ref": "VS-2026-012",
+    "ref": "",
     "svc": "OpenSSH 10.0p2"
    },
    {
@@ -143,13 +143,13 @@
    {
     "host": "85.13.167.158",
     "port": "21",
-    "ref": "VS-2026-004, VS-2026-007",
+    "ref": "VS-2026-007",
     "svc": "Nagios NSCA"
    },
    {
     "host": "85.13.167.158",
     "port": "22",
-    "ref": "VS-2026-012",
+    "ref": "",
     "svc": "OpenSSH 9.6p1"
    },
    {
@@ -167,7 +167,7 @@
    {
     "host": "85.13.167.158",
     "port": "110",
-    "ref": "VS-2026-007",
+    "ref": "VS-2026-004",
     "svc": "Dovecot pop3d, STARTTLS"
    },
    {
@@ -179,7 +179,7 @@
    {
     "host": "85.13.167.158",
     "port": "143",
-    "ref": "VS-2026-007",
+    "ref": "VS-2026-004",
     "svc": "Dovecot imapd, STARTTLS"
    },
    {
@@ -221,7 +221,7 @@
    {
     "host": "85.13.167.158",
     "port": "3306",
-    "ref": "VS-2026-001, VS-2026-012",
+    "ref": "VS-2026-001",
     "svc": "MySQL 10.11.14"
    },
    {
@@ -239,7 +239,7 @@
    {
     "host": "87.79.190.79",
     "port": "987",
-    "ref": "VS-2026-013",
+    "ref": "",
     "svc": "OpenSSH 10.0p2"
    },
    {
@@ -254,7 +254,28 @@
    "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
    "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall."
   ],
-  "tool_findings": [],
+  "tool_findings": [
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: Jitsi",
+    "where": "37.114.55.171"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: PHP",
+    "where": "85.13.167.158"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: Nextcloud",
+    "where": "nextcloud.krause-computer.de"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: PHP",
+    "where": "nextcloud.krause-computer.de"
+   }
+  ],
   "tools": [
    {
     "c": "hoch (Dienste), mittel (Versionen)",
@@ -281,7 +302,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen."
    },
    {
     "l": "Gelb",
@@ -301,7 +322,7 @@
   ]
  },
  "architecture": {
-  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 3 Hosts mit folgenden Aufgaben: Dateiaustausch, Datenbankdienst, E-Mail-Server, Fernzugang und Verwaltung und Kollaboration. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 3 Systeme mit folgenden Aufgaben: Dateiaustausch, Datenbankdienst, E-Mail-Server, Fernzugang und Verwaltung und Kollaboration. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
    "2 Beobachtungen der Werkzeuge haben keine Regel des Prüfkatalogs getroffen. Sie erscheinen nicht als Befund; wir prüfen sie und nehmen wiederkehrende Fälle in den Katalog auf."
   ],
@@ -411,7 +432,7 @@
     "short": "Sicherheits-Header"
    }
   ],
-  "reputation": "Reputation: keine Einträge zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus.",
+  "reputation": "Reputation: keine Meldungen zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus. Nicht bewertet sind Adressen von Plattformen und Inhaltsnetzen, die auch andere Kunden nutzen: 87.79.190.79.",
   "screens": [
    {
     "also": [],
@@ -493,7 +514,7 @@
      {
       "p": "22",
       "s": "OpenSSH",
-      "st": "blau"
+      "st": "gruen"
      },
      {
       "p": "25",
@@ -523,7 +544,7 @@
      {
       "p": "987",
       "s": "OpenSSH",
-      "st": "blau"
+      "st": "gruen"
      },
      {
       "p": "3128",
@@ -544,12 +565,12 @@
      {
       "p": "21",
       "s": "Nagios NSCA",
-      "st": "gelb"
+      "st": "blau"
      },
      {
       "p": "22",
       "s": "OpenSSH",
-      "st": "blau"
+      "st": "gruen"
      },
      {
       "p": "25",
@@ -564,7 +585,7 @@
      {
       "p": "110",
       "s": "Dovecot pop3d",
-      "st": "blau"
+      "st": "gelb"
      },
      {
       "p": "139",
@@ -574,7 +595,7 @@
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "blau"
+      "st": "gelb"
      },
      {
       "p": "443",
@@ -630,7 +651,7 @@
      {
       "p": "987",
       "s": "OpenSSH",
-      "st": "blau"
+      "st": "gruen"
      }
     ]
    }
@@ -640,15 +661,6 @@
    {
     "host": "37.114.55.171 (mx.krause-computer.de)",
     "rows": [
-     {
-      "c": "Jitsi",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
      {
       "c": "Proxmox Virtual Environment REST API",
       "conf": "hoch",
@@ -666,6 +678,15 @@
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
+     },
+     {
+      "c": "Debian GNU/Linux",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "13"
      },
      {
       "c": "OpenSSH",
@@ -727,15 +748,6 @@
       "v": "10.11.14 (ubuntu)"
      },
      {
-      "c": "PHP",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
       "c": "Dovecot",
       "conf": "hoch",
       "note": "",
@@ -777,22 +789,13 @@
     "host": "87.79.190.79 (xdsl-87-79-190-79.nc.de)",
     "rows": [
      {
-      "c": "Nextcloud",
-      "conf": "mittel",
+      "c": "Debian GNU/Linux",
+      "conf": "hoch",
       "note": "",
-      "src": "httpx",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "PHP",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
+      "v": "13"
      },
      {
       "c": "OpenSSH",
@@ -866,15 +869,94 @@
   {
    "affected": "85.13.167.158:3306 (MariaDB)",
    "cat": "A",
-   "evidence": "nmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:3306/tcp Dienst=mysql Produkt=MySQL Version=5.5.5-10.11.14-MariaDB-0ubuntu0.24.04.1-log Zustand=open Verfahren=mysql_native_password\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.5-10.11.14-MariaDB-0ubuntu0.24.04.1-log Thread ID: 3224590 Capabilities flags: 65534 Some Capabilities: InteractiveClient, SwitchToSSLAfterHandshake, IgnoreSigpipes, Support41Auth, SupportsTransactio...",
+   "evidence": "nmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:3306/tcp · Dienst: mysql · Produkt: MySQL · Version: 5.5.5-10.11.14-MariaDB-0ubuntu0.24.04.1-log · Anmeldeverfahren: mysql_native_password · mysql-info: Protocol: 10 Version: 5.5.5-10.11.14-MariaDB-0ubuntu0.24.04.1-log Thread ID: 3224590 Capabilities flags: 65534 Some Capabilities: InteractiveClient, SwitchToSSLAfterHandshake, IgnoreSigpipes, Support41Auth, SupportsTransactio (Auszug)",
    "found": "Der Host 85.13.167.158 (krause-computer.de, www.krause-computer.de) beantwortet Verbindungen auf Datenbankports aus dem gesamten Internet: 85.13.167.158:3306 (MariaDB). Ein Datenbankdienst gehört nicht an das öffentliche Interface.",
    "id": "VS-2026-001",
-   "impact": "Ein von außen erreichbarer Datenbankdienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar. Betroffen wären die gespeicherten Inhalte, typischerweise Seiteninhalte, Formulareingaben und Kontaktdaten.",
+   "impact": "Ein von außen erreichbarer Datenbankdienst macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar. Wo der Dienst eine Anmeldung von außen entgegennimmt, sind Passwort-Rateangriffe rund um die Uhr möglich: 85.13.167.158:3306 (MariaDB).",
+   "key": "db_exposed/scan/kunde",
    "level": "kritisch",
    "level_label": "kritisch",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken.",
+   "plan_effect": "Entzieht Angreifern den direkten Zugriff auf die Datenbanken",
+   "plan_lever": "Datenbankdienste vom Internet trennen",
+   "plan_stage": "unverzueglich",
    "policy": "db_exposed",
+   "provenance": [
+    {
+     "check": "db_exposed",
+     "field": "title",
+     "members": [
+      "85.13.167.158|85.13.167.158:3306"
+     ],
+     "statement": "title",
+     "text": "Datenbankdienst aus dem Internet erreichbar"
+    },
+    {
+     "check": "db_exposed",
+     "field": "observation",
+     "members": [
+      "85.13.167.158|85.13.167.158:3306"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Host 85.13.167.158 (krause-computer.de, www.krause-computer.de) beantwortet Verbindungen auf Datenbankports aus dem gesamten Internet: 85.13.167.158:3306 (MariaDB). Ein Datenbankdienst gehört nicht an das öffentliche Interface."
+    },
+    {
+     "check": "db_exposed",
+     "field": "meaning",
+     "members": [
+      "85.13.167.158|85.13.167.158:3306"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ein von außen erreichbarer Datenbankdienst macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar."
+    },
+    {
+     "check": "db_exposed",
+     "field": "meaning",
+     "members": [
+      "85.13.167.158|85.13.167.158:3306"
+     ],
+     "statement": "meaning[1]",
+     "text": "Wo der Dienst eine Anmeldung von außen entgegennimmt, sind Passwort-Rateangriffe rund um die Uhr möglich: 85.13.167.158:3306 (MariaDB)."
+    },
+    {
+     "check": "db_exposed",
+     "field": "verify",
+     "members": [
+      "85.13.167.158|85.13.167.158:3306"
+     ],
+     "statement": "verify[0]",
+     "text": "Portscan der betroffenen Datenbankports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen."
+    },
+    {
+     "check": "db_exposed",
+     "field": "recommendation",
+     "members": [
+      "85.13.167.158|85.13.167.158:3306"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken."
+    },
+    {
+     "check": "db_exposed",
+     "field": "recommendation",
+     "members": [
+      "85.13.167.158|85.13.167.158:3306"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Datenbank-Zugangsdaten rotieren und die Zugriffsprotokolle der letzten Monate auf fremde Anmeldeversuche prüfen."
+    },
+    {
+     "check": "db_exposed",
+     "field": "recommendation",
+     "members": [
+      "85.13.167.158|85.13.167.158:3306"
+     ],
+     "statement": "recommendation[2]",
+     "text": "Administrativen Datenbankzugriff ausschließlich über einen SSH-Tunnel oder ein VPN zulassen."
+    }
+   ],
    "recommendation": [
     [
      "Unverzüglich",
@@ -900,184 +982,666 @@
   {
    "affected": "85.13.167.158:139 (netbios-ssn), 85.13.167.158:445 (netbios-ssn)",
    "cat": "A",
-   "evidence": "nmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:139/tcp Dienst=netbios-ssn Produkt=Samba smbd Version=4.6.2 Zustand=open\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:445/tcp Dienst=netbios-ssn Produkt=Samba smbd Version=4.6.2 Zustand=open",
-   "found": "Aus dem Internet sind Dienste für Fernwartung oder für Dateifreigaben erreichbar: 85.13.167.158:139 (netbios-ssn), 85.13.167.158:445 (netbios-ssn).",
+   "evidence": "nmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:139/tcp · Dienst: netbios-ssn · Produkt: Samba smbd · Version: 4.6.2\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:445/tcp · Dienst: netbios-ssn · Produkt: Samba smbd · Version: 4.6.2",
+   "found": "Der Host 85.13.167.158 (krause-computer.de, www.krause-computer.de) beantwortet Verbindungen auf SMB-Freigabeports aus dem gesamten Internet: 85.13.167.158:139 (netbios-ssn), 85.13.167.158:445 (netbios-ssn). Ein Datei- und Freigabedienst gehört nicht an das öffentliche Interface.",
    "id": "VS-2026-002",
-   "impact": "Fernwartung und Dateifreigaben gehören nicht an das öffentliche Interface. Beide Protokolle sind die häufigsten Einstiegspunkte für Erpressungsangriffe, weil sie Zugangsdaten entgegen nehmen und in der Vergangenheit schwere Schwachstellen hatten.",
+   "impact": "Ein von außen erreichbarer SMB-Dienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht bekannte Schwachstellen der Dateifreigabe sofort ausnutzbar. Betroffen wären die auf den Freigaben abgelegten Dateien und, bei erfolgreichem Zugriff, angebundene Systeme im internen Netz.",
+   "key": "remote_admin_closed/scan/kunde",
    "level": "kritisch",
    "level_label": "kritisch",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Den externen Zugriff auf die SMB-Ports in der Firewall oder in der Verwaltung des Hosters deaktivieren. Dateifreigaben ausschließlich innerhalb des internen Netzes anbieten.",
+   "plan_effect": "Schließt einen der häufigsten Einstiegspunkte für Erpressungsangriffe",
+   "plan_lever": "Dateifreigaben vom Internet trennen",
+   "plan_stage": "unverzueglich",
    "policy": "smb_exposed",
+   "provenance": [
+    {
+     "check": "smb_exposed",
+     "field": "title",
+     "members": [
+      "85.13.167.158|85.13.167.158:139",
+      "85.13.167.158|85.13.167.158:445"
+     ],
+     "statement": "short",
+     "text": "Dateifreigabe (SMB) erreichbar"
+    },
+    {
+     "check": "smb_exposed",
+     "field": "observation",
+     "members": [
+      "85.13.167.158|85.13.167.158:139",
+      "85.13.167.158|85.13.167.158:445"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Host 85.13.167.158 (krause-computer.de, www.krause-computer.de) beantwortet Verbindungen auf SMB-Freigabeports aus dem gesamten Internet: 85.13.167.158:139 (netbios-ssn), 85.13.167.158:445 (netbios-ssn). Ein Datei- und Freigabedienst gehört nicht an das öffentliche Interface."
+    },
+    {
+     "check": "smb_exposed",
+     "field": "meaning",
+     "members": [
+      "85.13.167.158|85.13.167.158:139",
+      "85.13.167.158|85.13.167.158:445"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ein von außen erreichbarer SMB-Dienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht bekannte Schwachstellen der Dateifreigabe sofort ausnutzbar. Betroffen wären die auf den Freigaben abgelegten Dateien und, bei erfolgreichem Zugriff, angebundene Systeme im internen Netz."
+    },
+    {
+     "check": "smb_exposed",
+     "field": "verify",
+     "members": [
+      "85.13.167.158|85.13.167.158:139",
+      "85.13.167.158|85.13.167.158:445"
+     ],
+     "statement": "verify[0]",
+     "text": "Portscan der Ports 139 und 445 von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen."
+    },
+    {
+     "check": "smb_exposed",
+     "field": "recommendation",
+     "members": [
+      "85.13.167.158|85.13.167.158:139",
+      "85.13.167.158|85.13.167.158:445"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Den externen Zugriff auf die SMB-Ports in der Firewall oder in der Verwaltung des Hosters deaktivieren. Dateifreigaben ausschließlich innerhalb des internen Netzes anbieten."
+    },
+    {
+     "check": "smb_exposed",
+     "field": "recommendation",
+     "members": [
+      "85.13.167.158|85.13.167.158:139",
+      "85.13.167.158|85.13.167.158:445"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Zugriffsprotokolle der Freigabe auf fremde Anmeldeversuche prüfen und betroffene Zugangsdaten vorsorglich ändern."
+    },
+    {
+     "check": "smb_exposed",
+     "field": "recommendation",
+     "members": [
+      "85.13.167.158|85.13.167.158:139",
+      "85.13.167.158|85.13.167.158:445"
+     ],
+     "statement": "recommendation[2]",
+     "text": "Fernzugriff auf Dateifreigaben ausschließlich über ein VPN zulassen."
+    }
+   ],
    "recommendation": [
     [
      "Unverzüglich",
-     "Den Zugriff aus dem Internet sperren und Fernwartung nur über ein VPN zulassen."
+     "Den externen Zugriff auf die SMB-Ports in der Firewall oder in der Verwaltung des Hosters deaktivieren. Dateifreigaben ausschließlich innerhalb des internen Netzes anbieten."
     ],
     [
      "In Kürze",
-     "Zugangsdaten rotieren und die Anmeldeprotokolle der letzten Monate auf fremde Versuche prüfen."
+     "Zugriffsprotokolle der Freigabe auf fremde Anmeldeversuche prüfen und betroffene Zugangsdaten vorsorglich ändern."
     ],
     [
      "Mittelfristig",
-     "Eine zweite Anmeldestufe für den Fernzugang einführen."
+     "Fernzugriff auf Dateifreigaben ausschließlich über ein VPN zulassen."
     ]
    ],
    "scale": "exposure",
    "source": "aktiv (nmap)",
    "status": "rot",
    "threat": null,
-   "title": "Fernwartung oder Dateifreigabe aus dem Internet erreichbar",
+   "title": "Fernwartung und Dateifreigabe aus dem Internet erreichbar: Dateifreigabe (SMB) erreichbar",
    "urgency": "Unverzüglich",
-   "verify": "Portscan der betroffenen Ports von einer externen Adresse wiederholen; erwartet wird der Zustand gefiltert oder geschlossen."
+   "verify": "Portscan der Ports 139 und 445 von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen."
   },
   {
-   "affected": "37.114.55.171:111 (rpcbind), 37.114.55.171:3128 (Proxmox Virtual Environment REST API)",
+   "affected": "37.114.55.171:111 (rpcbind), 37.114.55.171:3128 (Proxmox), 37.114.55.171:443 (nginx)",
    "cat": "A",
-   "evidence": "nmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:111/tcp Dienst=rpcbind Version=2-4 Zustand=open\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n111/tcp open rpcbind 2-4 (RPC #100000)\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:3128/tcp Dienst=http Produkt=Proxmox Virtual Environment REST API Version=3.0 Zustand=open",
-   "found": "Der Host 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de) bietet eine Verwaltungs- oder Firewall-Oberfläche an, die aus dem gesamten Internet erreichbar ist: 37.114.55.171:111 (rpcbind), 37.114.55.171:3128 (Proxmox Virtual Environment REST API). Eine Zugriffsbeschränkung auf bestimmte Quellnetze ist von außen nicht erkennbar.",
+   "evidence": "nmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:111/tcp · Dienst: rpcbind · Version: 2-4 · 111/tcp open rpcbind 2-4 (RPC #100000)\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:443/tcp · Dienst: http · Produkt: nginx · Seitentitel: Jitsi Meet · TLS erzwungen: ja\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:3128/tcp · Dienst: http · Produkt: Proxmox Virtual Environment REST API · Version: 3.0 · Server-Kennung: pve-api-daemon/3.0",
+   "found": "Der Host 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de) bietet einen Dienst an, der sich als Verwaltungssoftware zu erkennen gibt: 37.114.55.171:443 (nginx), 37.114.55.171:3128 (Proxmox). Eine Anmeldemaske war in der Antwort des Dienstes nicht festzustellen. Der Host 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de) beantwortet Verbindungen auf einem Port, der üblicherweise für eine Verwaltungsoberfläche genutzt wird: 37.114.55.171:111 (rpcbind). Welche Software dort antwortet, war von außen nicht erkennbar.",
    "id": "VS-2026-003",
-   "impact": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen.",
+   "impact": "Steht hinter dem Port eine Verwaltungsoberfläche, ist sie ein hochwertiges Ziel: eine Übernahme beträfe den gesamten Anschluss und die dahinter liegenden Systeme. Ob das hier der Fall ist, lässt sich erst mit Kenntnis des Dienstes beurteilen.",
+   "key": "admin_access/37.114.55.171/kunde",
    "level": "erhoeht",
    "level_label": "erhöht",
    "operator": "",
    "operator_note": "",
-   "policy": "admin_service_exposed",
+   "plan_action": "Klären, welcher Dienst auf dem Port antwortet und ob ein Zugriff aus dem gesamten Internet dafür nötig ist.",
+   "plan_effect": "Klärt, ob eine Verwaltungsoberfläche offen im Internet steht, und schließt sie",
+   "plan_lever": "Zweck der Dienste auf Verwaltungsports klären",
+   "plan_stage": "in_kuerze",
+   "policy": "admin_service_unconfirmed",
+   "provenance": [
+    {
+     "check": "admin_service_unconfirmed",
+     "field": "title",
+     "members": [
+      "37.114.55.171|37.114.55.171:111",
+      "37.114.55.171|37.114.55.171:443",
+      "37.114.55.171|37.114.55.171:3128"
+     ],
+     "statement": "short",
+     "text": "Dienst auf einem Verwaltungsport"
+    },
+    {
+     "check": "admin_service_unconfirmed",
+     "field": "observation",
+     "members": [
+      "37.114.55.171|37.114.55.171:443",
+      "37.114.55.171|37.114.55.171:3128"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Host 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de) bietet einen Dienst an, der sich als Verwaltungssoftware zu erkennen gibt: 37.114.55.171:443 (nginx), 37.114.55.171:3128 (Proxmox). Eine Anmeldemaske war in der Antwort des Dienstes nicht festzustellen."
+    },
+    {
+     "check": "admin_service_unconfirmed",
+     "field": "observation",
+     "members": [
+      "37.114.55.171|37.114.55.171:111"
+     ],
+     "statement": "observation[1]",
+     "text": "Der Host 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de) beantwortet Verbindungen auf einem Port, der üblicherweise für eine Verwaltungsoberfläche genutzt wird: 37.114.55.171:111 (rpcbind). Welche Software dort antwortet, war von außen nicht erkennbar."
+    },
+    {
+     "check": "admin_service_unconfirmed",
+     "field": "meaning",
+     "members": [
+      "37.114.55.171|37.114.55.171:111",
+      "37.114.55.171|37.114.55.171:443",
+      "37.114.55.171|37.114.55.171:3128"
+     ],
+     "statement": "meaning[0]",
+     "text": "Steht hinter dem Port eine Verwaltungsoberfläche, ist sie ein hochwertiges Ziel: eine Übernahme beträfe den gesamten Anschluss und die dahinter liegenden Systeme. Ob das hier der Fall ist, lässt sich erst mit Kenntnis des Dienstes beurteilen."
+    },
+    {
+     "check": "admin_service_unconfirmed",
+     "field": "verify",
+     "members": [
+      "37.114.55.171|37.114.55.171:111",
+      "37.114.55.171|37.114.55.171:443",
+      "37.114.55.171|37.114.55.171:3128"
+     ],
+     "statement": "verify[0]",
+     "text": "Portscan des Hosts von einer externen Adresse wiederholen; erwartet wird, dass der Port nur noch für berechtigte Quellnetze erreichbar oder geschlossen ist."
+    },
+    {
+     "check": "admin_service_unconfirmed",
+     "field": "recommendation",
+     "members": [
+      "37.114.55.171|37.114.55.171:111",
+      "37.114.55.171|37.114.55.171:443",
+      "37.114.55.171|37.114.55.171:3128"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Klären, welcher Dienst auf dem Port antwortet und ob ein Zugriff aus dem gesamten Internet dafür nötig ist."
+    },
+    {
+     "check": "admin_service_unconfirmed",
+     "field": "recommendation",
+     "members": [
+      "37.114.55.171|37.114.55.171:111",
+      "37.114.55.171|37.114.55.171:443",
+      "37.114.55.171|37.114.55.171:3128"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Nicht benötigte Dienste abschalten und benötigte Verwaltungszugänge auf feste Quellnetze beschränken."
+    }
+   ],
    "recommendation": [
     [
-     "Unverzüglich",
-     "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst."
-    ],
-    [
      "In Kürze",
-     "Mehrfaktor-Anmeldung für die Verwaltungsoberfläche aktivieren und Standardkonten deaktivieren oder umbenennen."
+     "Klären, welcher Dienst auf dem Port antwortet und ob ein Zugriff aus dem gesamten Internet dafür nötig ist."
     ],
     [
      "Mittelfristig",
-     "Softwarestand der Verwaltungsoberfläche gegen die Sicherheitshinweise des Herstellers abgleichen und Anmeldeversuche überwachen."
+     "Nicht benötigte Dienste abschalten und benötigte Verwaltungszugänge auf feste Quellnetze beschränken."
     ]
    ],
    "scale": "exposure",
    "source": "aktiv (nmap)",
    "status": "gelb",
    "threat": null,
-   "title": "Verwaltungsoberfläche aus dem Internet erreichbar",
+   "title": "Verwaltungszugänge auf 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de): Dienst auf einem Verwaltungsport",
    "urgency": "In Kürze",
-   "verify": "Verbindungsversuch auf den betroffenen Port von einer externen Adresse außerhalb der freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung."
+   "verify": "Portscan des Hosts von einer externen Adresse wiederholen; erwartet wird, dass der Port nur noch für berechtigte Quellnetze erreichbar oder geschlossen ist."
   },
   {
-   "affected": "85.13.167.158:21 (FTP ohne TLS-Zwang)",
+   "affected": "85.13.167.158:110 (POP3 mit Anmeldung vor STARTTLS), 85.13.167.158:143 (IMAP mit Anmeldung vor STARTTLS)",
    "cat": "A",
-   "evidence": "nmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:21/tcp Dienst=nagios-nsca Produkt=Nagios NSCA Zustand=open",
-   "found": "Auf 85.13.167.158 (krause-computer.de, www.krause-computer.de) nehmen Datei- oder Mailzugänge eine Anmeldung entgegen, ohne eine Transportverschlüsselung zu erzwingen: 85.13.167.158:21 (FTP ohne TLS-Zwang).",
+   "evidence": "nmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:110/tcp · Dienst: pop3 · Produkt: Dovecot pop3d · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · pop3-capabilities: USER PIPELINING UIDL STLS TOP SASL(PLAIN LOGIN) RESP-CODES AUTH-RESP-CODE CAPA\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:143/tcp · Dienst: imap · Produkt: Dovecot imapd · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · Anmeldeverfahren: LOGIN, PLAIN · imap-capabilities: AUTH=LOGINA0001 capabilities STARTTLS ID IMAP4rev1 AUTH=PLAIN post-login OK ENABLE XLIST LOGIN-REFERRALS more IDLE have listed LITERAL+ Pre-login SASL-IR",
+   "found": "Auf 85.13.167.158 (krause-computer.de, www.krause-computer.de) bietet der Mailabrufdienst zwar STARTTLS an, nimmt eine Anmeldung aber schon vor dem Aufbau der Verschlüsselung entgegen: 85.13.167.158:110 (POP3 mit Anmeldung vor STARTTLS), 85.13.167.158:143 (IMAP mit Anmeldung vor STARTTLS).",
    "id": "VS-2026-004",
-   "impact": "Ohne erzwungene Transportverschlüsselung gehen Anmeldedaten und Inhalte im Klartext über das Netz. Jeder Mitleser auf dem Übertragungsweg kann sie abgreifen und für weitere Zugriffe auf den Dienst oder auf wiederverwendete Konten nutzen.",
+   "impact": "Ohne STARTTLS oder eine gleichwertige Verschlüsselungspflicht übertragen POP3 und IMAP Anmeldedaten und Nachrichteninhalte im Klartext über das Netz. Jeder Mitleser auf dem Übertragungsweg kann Postfach-Zugangsdaten abgreifen und für weitere Zugriffe nutzen.",
+   "key": "plaintext_services/85.13.167.158/kunde",
    "level": "erhoeht",
    "level_label": "erhöht",
    "operator": "",
    "operator_note": "",
-   "policy": "ftp_plaintext",
+   "plan_action": "Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten.",
+   "plan_effect": "Schützt Zugangsdaten und Nachrichten auf dem Übertragungsweg",
+   "plan_lever": "TLS für POP3 und IMAP erzwingen",
+   "plan_stage": "in_kuerze",
+   "policy": "mail_plaintext",
+   "provenance": [
+    {
+     "check": "mail_plaintext",
+     "field": "title",
+     "members": [
+      "85.13.167.158|85.13.167.158:110",
+      "85.13.167.158|85.13.167.158:143"
+     ],
+     "statement": "short",
+     "text": "POP3 oder IMAP ohne TLS-Zwang"
+    },
+    {
+     "check": "mail_plaintext",
+     "field": "observation",
+     "members": [
+      "85.13.167.158|85.13.167.158:110",
+      "85.13.167.158|85.13.167.158:143"
+     ],
+     "statement": "observation[1]",
+     "text": "Auf 85.13.167.158 (krause-computer.de, www.krause-computer.de) bietet der Mailabrufdienst zwar STARTTLS an, nimmt eine Anmeldung aber schon vor dem Aufbau der Verschlüsselung entgegen: 85.13.167.158:110 (POP3 mit Anmeldung vor STARTTLS), 85.13.167.158:143 (IMAP mit Anmeldung vor STARTTLS)."
+    },
+    {
+     "check": "mail_plaintext",
+     "field": "meaning",
+     "members": [
+      "85.13.167.158|85.13.167.158:110",
+      "85.13.167.158|85.13.167.158:143"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne STARTTLS oder eine gleichwertige Verschlüsselungspflicht übertragen POP3 und IMAP Anmeldedaten und Nachrichteninhalte im Klartext über das Netz. Jeder Mitleser auf dem Übertragungsweg kann Postfach-Zugangsdaten abgreifen und für weitere Zugriffe nutzen."
+    },
+    {
+     "check": "mail_plaintext",
+     "field": "verify",
+     "members": [
+      "85.13.167.158|85.13.167.158:110",
+      "85.13.167.158|85.13.167.158:143"
+     ],
+     "statement": "verify[0]",
+     "text": "Verbindung zum Mailabrufdienst von außen aufbauen, bevor STARTTLS angefordert wird; erwartet wird die Ablehnung dieser unverschlüsselten Anmeldung."
+    },
+    {
+     "check": "mail_plaintext",
+     "field": "recommendation",
+     "members": [
+      "85.13.167.158|85.13.167.158:110",
+      "85.13.167.158|85.13.167.158:143"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten."
+    },
+    {
+     "check": "mail_plaintext",
+     "field": "recommendation",
+     "members": [
+      "85.13.167.158|85.13.167.158:110",
+      "85.13.167.158|85.13.167.158:143"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Postfach-Zugangsdaten rotieren und die Zugriffsprotokolle auf unverschlüsselte Anmeldeversuche prüfen."
+    },
+    {
+     "check": "mail_plaintext",
+     "field": "recommendation",
+     "members": [
+      "85.13.167.158|85.13.167.158:110",
+      "85.13.167.158|85.13.167.158:143"
+     ],
+     "statement": "recommendation[2]",
+     "text": "Mail-Clients auf die verschlüsselten Abrufwege umstellen und die Klartextports anschließend schließen."
+    }
+   ],
    "recommendation": [
     [
-     "Unverzüglich",
-     "Auf den betroffenen Diensten die Transportverschlüsselung erzwingen, sodass eine Anmeldung ohne aufgebautes TLS abgelehnt wird."
-    ],
-    [
      "In Kürze",
-     "Zugangsdaten rotieren und die Zugriffsprotokolle auf unverschlüsselte Anmeldeversuche prüfen."
+     "Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten."
     ],
     [
      "Mittelfristig",
-     "Prüfen, ob die Klartextzugänge abgeschaltet werden können, und den Zugang danach auf Protokolle mit eingebauter Verschlüsselung beschränken."
+     "Postfach-Zugangsdaten rotieren und die Zugriffsprotokolle auf unverschlüsselte Anmeldeversuche prüfen."
+    ],
+    [
+     "Strategisch",
+     "Mail-Clients auf die verschlüsselten Abrufwege umstellen und die Klartextports anschließend schließen."
     ]
    ],
    "scale": "exposure",
    "source": "aktiv (nmap)",
    "status": "gelb",
    "threat": null,
-   "title": "Datei- und Mailzugänge auf 85.13.167.158 (krause-computer.de, www.krause-computer.de) ohne erzwungene Transportverschlüsselung",
+   "title": "Datei- und Mailzugänge auf 85.13.167.158 (krause-computer.de, www.krause-computer.de): POP3 oder IMAP ohne TLS-Zwang",
    "urgency": "In Kürze",
-   "verify": "Anmeldung an den genannten Diensten versuchen, bevor eine Transportverschlüsselung aufgebaut ist; erwartet wird die Ablehnung dieser Anmeldung."
+   "verify": "Verbindung zum Mailabrufdienst von außen aufbauen, bevor STARTTLS angefordert wird; erwartet wird die Ablehnung dieser unverschlüsselten Anmeldung."
   },
   {
    "affected": "mx.krause-computer.de:443 (Zertifikat für jitsi.krause-computer.de)",
    "cat": "D",
-   "evidence": "httpx · hosts/37.114.55.171/phase2/httpx.json\nmx.krause-computer.de:443 CN=jitsi.krause-computer.de SAN=jitsi.krause-computer.de Aussteller=E8 gueltig_bis=2026-08-11T12:53:40Z abgelaufen=nein Resttage=77 Namensabweichung=ja Protokolle=TLS1.3\n\nhttpx · hosts/37.114.55.171/phase2/httpx.json\nmx.krause-computer.de:443 tls=tls13 cn=jitsi.krause-computer.de gueltig_bis=2026-08-11T12:53:40Z namensabweichung=ja",
-   "found": "Die Zertifikate auf mx.krause-computer.de sind abgelaufen, laufen in Kürze ab, werden unvollständig ausgeliefert oder passen nicht zum aufgerufenen Namen: mx.krause-computer.de:443 (Zertifikat für jitsi.krause-computer.de).",
+   "evidence": "httpx · hosts/37.114.55.171/phase2/httpx.json\nmx.krause-computer.de:443 · Zertifikat für: jitsi.krause-computer.de · weitere Namen: jitsi.krause-computer.de · Aussteller: E8 · gültig bis: 2026-08-11 · Name passt nicht: ja",
+   "found": "Für den Dienst mx.krause-computer.de passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen Hostnamen: mx.krause-computer.de:443 (Zertifikat für jitsi.krause-computer.de).",
    "id": "VS-2026-005",
-   "impact": "Ein Zertifikat mit Beanstandung führt im Browser zu einer Vertrauenswarnung. Nutzer gewöhnen sich daran, solche Warnungen wegzuklicken, und übersehen dann auch eine echte Täuschung.",
+   "impact": "Ein TLS-Client kann die Identität des Dienstes nicht anhand des Zertifikats bestätigen und muss die Sicherheitswarnung entweder ablehnen oder ignorieren. Werden solche Warnungen ignoriert, fällt ein echter Man-in-the-Middle-Angriff mit einem passend gefälschten Zertifikat nicht mehr auf.",
+   "key": "cert_health/37.114.55.171/kunde",
    "level": "hoch",
    "level_label": "hoch",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält.",
+   "plan_effect": "Beendet die Namenswarnung beim Aufruf des Dienstes",
+   "plan_lever": "Zertifikate auf alle aufgerufenen Namen ausstellen",
+   "plan_stage": "in_kuerze",
    "policy": "cert_hostname_mismatch",
+   "provenance": [
+    {
+     "check": "cert_hostname_mismatch",
+     "field": "title",
+     "members": [
+      "mx.krause-computer.de@37.114.55.171|mx.krause-computer.de:443@37.114.55.171"
+     ],
+     "statement": "short",
+     "text": "Zertifikat passt nicht zum Namen"
+    },
+    {
+     "check": "cert_hostname_mismatch",
+     "field": "observation",
+     "members": [
+      "mx.krause-computer.de@37.114.55.171|mx.krause-computer.de:443@37.114.55.171"
+     ],
+     "statement": "observation[0]",
+     "text": "Für den Dienst mx.krause-computer.de passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen Hostnamen: mx.krause-computer.de:443 (Zertifikat für jitsi.krause-computer.de)."
+    },
+    {
+     "check": "cert_hostname_mismatch",
+     "field": "meaning",
+     "members": [
+      "mx.krause-computer.de@37.114.55.171|mx.krause-computer.de:443@37.114.55.171"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ein TLS-Client kann die Identität des Dienstes nicht anhand des Zertifikats bestätigen und muss die Sicherheitswarnung entweder ablehnen oder ignorieren. Werden solche Warnungen ignoriert, fällt ein echter Man-in-the-Middle-Angriff mit einem passend gefälschten Zertifikat nicht mehr auf."
+    },
+    {
+     "check": "cert_hostname_mismatch",
+     "field": "verify",
+     "members": [
+      "mx.krause-computer.de@37.114.55.171|mx.krause-computer.de:443@37.114.55.171"
+     ],
+     "statement": "verify[0]",
+     "text": "Verbindung zum Dienst unter dem öffentlichen Hostnamen mit einem TLS-Client aufbauen und das Zertifikat prüfen; erwartet wird ein gemeinsamer Name oder ein alternativer Antragstellername, der zu diesem Hostnamen passt."
+    },
+    {
+     "check": "cert_hostname_mismatch",
+     "field": "recommendation",
+     "members": [
+      "mx.krause-computer.de@37.114.55.171|mx.krause-computer.de:443@37.114.55.171"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält."
+    },
+    {
+     "check": "cert_hostname_mismatch",
+     "field": "recommendation",
+     "members": [
+      "mx.krause-computer.de@37.114.55.171|mx.krause-computer.de:443@37.114.55.171"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Die Zuordnung von Hostnamen zu Zertifikaten in die Auslieferung neuer virtueller Hosts aufnehmen, damit dieser Zustand nicht erneut entsteht."
+    }
+   ],
    "recommendation": [
     [
-     "Unverzüglich",
-     "Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen."
+     "In Kürze",
+     "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält."
     ],
     [
-     "Mittelfristig",
-     "Alle Namen, unter denen ein Dienst aufgerufen wird, in das Zertifikat aufnehmen und die Erneuerung automatisieren."
+     "Strategisch",
+     "Die Zuordnung von Hostnamen zu Zertifikaten in die Auslieferung neuer virtueller Hosts aufnehmen, damit dieser Zustand nicht erneut entsteht."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (httpx)",
    "status": "gelb",
    "threat": null,
-   "title": "Zertifikate auf mx.krause-computer.de mit Beanstandungen",
+   "title": "Zertifikate auf mx.krause-computer.de: Zertifikat passt nicht zum Namen",
    "urgency": "In Kürze",
-   "verify": "Eine verschlüsselte Verbindung zu den genannten Diensten aufbauen; erwartet wird ein gültiges Zertifikat mit vollständiger Kette und passendem Namen."
+   "verify": "Verbindung zum Dienst unter dem öffentlichen Hostnamen mit einem TLS-Client aufbauen und das Zertifikat prüfen; erwartet wird ein gemeinsamer Name oder ein alternativer Antragstellername, der zu diesem Hostnamen passt."
   },
   {
    "affected": "nextcloud.krause-computer.de (unsafe-inline, Wildcard), filebrowser.krause-computer.de (fehlend: x-frame-options, referrer-policy, permissions-policy), navidrome.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), youtube.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:87.79.190.79\nnextcloud.krause-computer.de: URL=https://nextcloud.krause-computer.de gesetzte Header=content-security-policy: default-src 'self'; script-src 'self' 'nonce-4/PkloggYHvRSAzt+2IB9Os6vo1pNJ6SDq9y3W8LwkQ='; style-src 'self' 'unsafe-inline';...\n\nheader_check · scan_results:header_check:87.79.190.79\nfilebrowser.krause-computer.de: URL=https://filebrowser.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-frame-options, x-xss-protection gesetzte Header=x-conte...\n\nheader_check · scan_results:header_check:87.79.190.79\nnavidrome.krause-computer.de: URL=https://navidrome.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Ser...\n\nheader_check · scan_results:header_check:87.79.190.79\nyoutube.krause-computer.de: URL=https://youtube.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=...",
-   "found": "Die Webdienste auf 87.79.190.79 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: nextcloud.krause-computer.de (unsafe-inline, Wildcard), filebrowser.krause-computer.de (fehlend: x-frame-options, referrer-policy, permissions-policy), navidrome.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), youtube.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
+   "evidence": "header_check\nnextcloud.krause-computer.de · Adresse: https://nextcloud.krause-computer.de · Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-4/PkloggYHvRSAzt+2IB9Os6vo1pNJ6SDq9y3W8LwkQ='; style-src 'self' 'unsafe-inline'; frame-src *; img-src * data: blob:; font-src 'self' data:; media-src *; connect-src *; object-src 'none'; base-uri 'self';\n\nheader_check\nfilebrowser.krause-computer.de · Adresse: https://filebrowser.krause-computer.de · fehlende Header: content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-frame-options, x-xss-protection\n\nheader_check\nnavidrome.krause-computer.de · Adresse: https://navidrome.krause-computer.de · fehlende Header: content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection\n\nheader_check\nyoutube.krause-computer.de · Adresse: https://youtube.krause-computer.de · fehlende Header: content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection",
+   "found": "Auf nextcloud.krause-computer.de ist eine Content-Security-Policy gesetzt, die einzelne Direktiven wieder lockert: nextcloud.krause-computer.de (unsafe-inline, Wildcard). Auf 87.79.190.79 fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: filebrowser.krause-computer.de (fehlend: x-frame-options, referrer-policy, permissions-policy), navidrome.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), youtube.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-006",
-   "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
+   "impact": "Die Direktiven unsafe-inline und unsafe-eval erlauben eingebettete oder zur Laufzeit erzeugte Skripte, eine Wildcard-Quelle erlaubt Inhalte von beliebigen Ursprüngen. Jede dieser Lockerungen hebt genau den Schutz auf, den die Content-Security-Policy gegen eingeschleuste Skripte bieten soll. Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar.",
+   "key": "web_header_hygiene/87.79.190.79/platform:skclient.de",
    "level": "mittel",
    "level_label": "mittel",
    "operator": "beim Plattformbetreiber skclient.de",
    "operator_note": "Dieser Sachverhalt liegt beim Plattformbetreiber skclient.de: der Hostname zeigt auf dessen Plattform, Server und Grundkonfiguration betreibt er. Die Empfehlung richtet sich an ihn; Sie können sie über den Vertrag oder die Einstellungen der Plattform einfordern.",
+   "plan_action": "Die Direktiven unsafe-inline und unsafe-eval aus der Content-Security-Policy entfernen und stattdessen Nonces oder Hashes für eingebettete Skripte verwenden.",
+   "plan_effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+   "plan_lever": "Unsichere Freigaben aus der Inhaltsrichtlinie entfernen",
+   "plan_stage": "mittelfristig",
    "policy": "csp_weak, security_headers_incomplete",
+   "provenance": [
+    {
+     "check": "csp_weak",
+     "field": "title",
+     "members": [
+      "nextcloud.krause-computer.de@87.79.190.79|nextcloud.krause-computer.de@87.79.190.79"
+     ],
+     "statement": "short",
+     "text": "Inhaltsrichtlinie mit unsicheren Freigaben"
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "title",
+     "members": [
+      "filebrowser.krause-computer.de@87.79.190.79|filebrowser.krause-computer.de@87.79.190.79",
+      "navidrome.krause-computer.de@87.79.190.79|navidrome.krause-computer.de@87.79.190.79",
+      "youtube.krause-computer.de@87.79.190.79|youtube.krause-computer.de@87.79.190.79"
+     ],
+     "statement": "short",
+     "text": "Sicherheits-Header unvollständig"
+    },
+    {
+     "check": "csp_weak",
+     "field": "observation",
+     "members": [
+      "nextcloud.krause-computer.de@87.79.190.79|nextcloud.krause-computer.de@87.79.190.79"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf nextcloud.krause-computer.de ist eine Content-Security-Policy gesetzt, die einzelne Direktiven wieder lockert: nextcloud.krause-computer.de (unsafe-inline, Wildcard)."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "observation",
+     "members": [
+      "filebrowser.krause-computer.de@87.79.190.79|filebrowser.krause-computer.de@87.79.190.79",
+      "navidrome.krause-computer.de@87.79.190.79|navidrome.krause-computer.de@87.79.190.79",
+      "youtube.krause-computer.de@87.79.190.79|youtube.krause-computer.de@87.79.190.79"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf 87.79.190.79 fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: filebrowser.krause-computer.de (fehlend: x-frame-options, referrer-policy, permissions-policy), navidrome.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), youtube.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)."
+    },
+    {
+     "check": "csp_weak",
+     "field": "meaning",
+     "members": [
+      "nextcloud.krause-computer.de@87.79.190.79|nextcloud.krause-computer.de@87.79.190.79"
+     ],
+     "statement": "meaning[0]",
+     "text": "Die Direktiven unsafe-inline und unsafe-eval erlauben eingebettete oder zur Laufzeit erzeugte Skripte, eine Wildcard-Quelle erlaubt Inhalte von beliebigen Ursprüngen. Jede dieser Lockerungen hebt genau den Schutz auf, den die Content-Security-Policy gegen eingeschleuste Skripte bieten soll."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "filebrowser.krause-computer.de@87.79.190.79|filebrowser.krause-computer.de@87.79.190.79",
+      "navidrome.krause-computer.de@87.79.190.79|navidrome.krause-computer.de@87.79.190.79",
+      "youtube.krause-computer.de@87.79.190.79|youtube.krause-computer.de@87.79.190.79"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar."
+    },
+    {
+     "check": "csp_weak",
+     "field": "verify",
+     "members": [
+      "nextcloud.krause-computer.de@87.79.190.79|nextcloud.krause-computer.de@87.79.190.79"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird eine Content-Security-Policy ohne unsafe-inline, ohne unsafe-eval und ohne Wildcard-Quelle."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "filebrowser.krause-computer.de@87.79.190.79|filebrowser.krause-computer.de@87.79.190.79",
+      "navidrome.krause-computer.de@87.79.190.79|navidrome.krause-computer.de@87.79.190.79",
+      "youtube.krause-computer.de@87.79.190.79|youtube.krause-computer.de@87.79.190.79"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
+    },
+    {
+     "check": "csp_weak",
+     "field": "recommendation",
+     "members": [
+      "nextcloud.krause-computer.de@87.79.190.79|nextcloud.krause-computer.de@87.79.190.79"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Direktiven unsafe-inline und unsafe-eval aus der Content-Security-Policy entfernen und stattdessen Nonces oder Hashes für eingebettete Skripte verwenden."
+    },
+    {
+     "check": "csp_weak",
+     "field": "recommendation",
+     "members": [
+      "nextcloud.krause-computer.de@87.79.190.79|nextcloud.krause-computer.de@87.79.190.79"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Wildcard-Quellen durch eine Liste der tatsächlich benötigten Ursprünge ersetzen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "filebrowser.krause-computer.de@87.79.190.79|filebrowser.krause-computer.de@87.79.190.79",
+      "navidrome.krause-computer.de@87.79.190.79|navidrome.krause-computer.de@87.79.190.79",
+      "youtube.krause-computer.de@87.79.190.79|youtube.krause-computer.de@87.79.190.79"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
+    }
+   ],
    "recommendation": [
     [
      "Mittelfristig",
-     "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren."
+     "Die Direktiven unsafe-inline und unsafe-eval aus der Content-Security-Policy entfernen und stattdessen Nonces oder Hashes für eingebettete Skripte verwenden."
     ],
     [
-     "Strategisch",
-     "Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen."
+     "Mittelfristig",
+     "Wildcard-Quellen durch eine Liste der tatsächlich benötigten Ursprünge ersetzen."
+    ],
+    [
+     "Mittelfristig",
+     "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (header_check)",
    "status": "gelb",
    "threat": null,
-   "title": "Sicherheits-Header und Formularschutz auf 87.79.190.79 unvollständig (beim Plattformbetreiber skclient.de)",
+   "title": "Absicherung der Webdienste auf 87.79.190.79: Inhaltsrichtlinie mit unsicheren Freigaben und Sicherheits-Header unvollständig (beim Plattformbetreiber skclient.de)",
    "urgency": "Mittelfristig",
-   "verify": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird eine Content-Security-Policy ohne unsafe-inline, ohne unsafe-eval und ohne Wildcard-Quelle. HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
   },
   {
-   "affected": "85.13.167.158:110 (POP3), 85.13.167.158:143 (IMAP), 85.13.167.158:21 (FTP)",
+   "affected": "85.13.167.158:21 (FTP)",
    "cat": "A",
-   "evidence": "nmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:21/tcp Dienst=nagios-nsca Produkt=Nagios NSCA Zustand=open\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:110/tcp Dienst=pop3 Produkt=Dovecot pop3d Zustand=open STARTTLS=ja Capabilities=USER, PIPELINING, UIDL, STLS\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\npop3-capabilities: USER PIPELINING UIDL STLS TOP SASL(PLAIN LOGIN) RESP-CODES AUTH-RESP-CODE CAPA\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:143/tcp Dienst=imap Produkt=Dovecot imapd Zustand=open TLS erzwungen=nein STARTTLS=ja Anmeldung gesperrt=nein Verfahren=LOGIN, PLAIN Capabilities=AUTH=LOGINA0001, capabilities, STARTTLS, ID\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\nimap-capabilities: AUTH=LOGINA0001 capabilities STARTTLS ID IMAP4rev1 AUTH=PLAIN post-login OK ENABLE XLIST LOGIN-REFERRALS more IDLE have listed LITERAL+ Pre-login SASL-IR",
-   "found": "Der Host 85.13.167.158 (krause-computer.de, www.krause-computer.de) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 85.13.167.158:110 (POP3), 85.13.167.158:143 (IMAP), 85.13.167.158:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
+   "evidence": "nmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:21/tcp · Dienst: nagios-nsca · Produkt: Nagios NSCA",
+   "found": "Der Host 85.13.167.158 (krause-computer.de, www.krause-computer.de) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 85.13.167.158:21 (FTP). Ob dort eine Anmeldung ohne Transportverschlüsselung abgelehnt wird, ließ sich von außen nicht feststellen: 85.13.167.158:21 (FTP).",
    "id": "VS-2026-007",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
+   "key": "legacy_protocols_present/scan/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
+   "plan_effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
+   "plan_lever": "Nicht benötigte Altprotokolle abschalten",
+   "plan_stage": "mittelfristig",
    "policy": "legacy_protocols_present",
+   "provenance": [
+    {
+     "check": "legacy_protocols_present",
+     "field": "title",
+     "members": [
+      "85.13.167.158|85.13.167.158:21"
+     ],
+     "statement": "title",
+     "text": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
+    },
+    {
+     "check": "legacy_protocols_present",
+     "field": "observation",
+     "members": [
+      "85.13.167.158|85.13.167.158:21"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Host 85.13.167.158 (krause-computer.de, www.krause-computer.de) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 85.13.167.158:21 (FTP)."
+    },
+    {
+     "check": "legacy_protocols_present",
+     "field": "observation",
+     "members": [
+      "85.13.167.158|85.13.167.158:21"
+     ],
+     "statement": "observation[2]",
+     "text": "Ob dort eine Anmeldung ohne Transportverschlüsselung abgelehnt wird, ließ sich von außen nicht feststellen: 85.13.167.158:21 (FTP)."
+    },
+    {
+     "check": "legacy_protocols_present",
+     "field": "meaning",
+     "members": [
+      "85.13.167.158|85.13.167.158:21"
+     ],
+     "statement": "meaning[0]",
+     "text": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit."
+    },
+    {
+     "check": "legacy_protocols_present",
+     "field": "verify",
+     "members": [
+      "85.13.167.158|85.13.167.158:21"
+     ],
+     "statement": "verify[0]",
+     "text": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
+    },
+    {
+     "check": "legacy_protocols_present",
+     "field": "recommendation",
+     "members": [
+      "85.13.167.158|85.13.167.158:21"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren."
+    },
+    {
+     "check": "legacy_protocols_present",
+     "field": "recommendation",
+     "members": [
+      "85.13.167.158|85.13.167.158:21"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Falls der Dienst benötigt wird, den Zugriff auf feste Quelladressen beschränken und eine erzwungene Verschlüsselung sicherstellen."
+    }
+   ],
    "recommendation": [
     [
-     "In Kürze",
+     "Mittelfristig",
      "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren."
     ],
     [
-     "Mittelfristig",
+     "Strategisch",
      "Falls der Dienst benötigt wird, den Zugriff auf feste Quelladressen beschränken und eine erzwungene Verschlüsselung sicherstellen."
     ]
    ],
@@ -1092,208 +1656,618 @@
   {
    "affected": "krause-computer.de",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nkrause-computer.de: SPF=v=spf1 mx include:mx.krause-computer.de include:w020687e.kasserver.com -all DMARC=v=DMARC1; p=reject; adkim=r; aspf=r DKIM-Selektoren=keiner bekannt MX=krause.skclient.de, mail.krause-computer.de, mx.krause-comput...",
-   "found": "Für krause-computer.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: krause-computer.de.",
+   "evidence": "dns_records · phase0/dns_records.json\nkrause-computer.de · MX-Einträge: krause.skclient.de, mail.krause-computer.de, mx.krause-computer.de und 2 weitere\n\ndns_security · phase0a/dns_security.json\nkrause-computer.de · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
+   "found": "Für krause-computer.de ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain krause-computer.de fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten. Für krause-computer.de ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain krause-computer.de fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können.",
    "id": "VS-2026-008",
-   "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
+   "impact": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen. Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.",
+   "key": "mail_transport_enforcement/krause-computer.de/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
-   "policy": "dane_missing, mta_sts_missing, tls_rpt_missing",
+   "plan_action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
+   "plan_effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
+   "plan_lever": "MTA-STS für die Domain veröffentlichen",
+   "plan_stage": "strategisch",
+   "policy": "mta_sts_missing, tls_rpt_missing",
+   "provenance": [
+    {
+     "check": "mta_sts_missing",
+     "field": "title",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "short",
+     "text": "kein MTA-STS"
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "title",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "short",
+     "text": "kein TLS-RPT"
+    },
+    {
+     "check": "mta_sts_missing",
+     "field": "observation",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "observation[0]",
+     "text": "Für krause-computer.de ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain krause-computer.de fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten."
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "observation",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "observation[0]",
+     "text": "Für krause-computer.de ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain krause-computer.de fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können."
+    },
+    {
+     "check": "mta_sts_missing",
+     "field": "meaning",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen."
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "meaning",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten."
+    },
+    {
+     "check": "mta_sts_missing",
+     "field": "verify",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des TXT-Eintrags _mta-sts.krause-computer.de sowie Abruf der Richtliniendatei unter der zugehörigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine Richtliniendatei mit mode enforce."
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "verify",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des TXT-Eintrags _smtp._tls.krause-computer.de; erwartet wird ein Eintrag, der mit v=TLSRPTv1 beginnt und eine Meldeadresse (rua) nennt."
+    },
+    {
+     "check": "mta_sts_missing",
+     "field": "recommendation",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden."
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "recommendation",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten."
+    }
+   ],
    "recommendation": [
     [
      "Strategisch",
-     "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain."
+     "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden."
+    ],
+    [
+     "Strategisch",
+     "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten."
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records)",
+   "source": "aktiv (dns_records, dns_security)",
    "status": "blau",
    "threat": null,
-   "title": "Transportverschlüsselung im Mailversand für krause-computer.de nicht erzwungen",
+   "title": "Verschlüsselte Zustellung von E-Mails für krause-computer.de: kein MTA-STS und kein TLS-RPT",
    "urgency": "Strategisch",
-   "verify": "DNS-Abfrage der genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
+   "verify": "DNS-Abfrage des TXT-Eintrags _mta-sts.krause-computer.de sowie Abruf der Richtliniendatei unter der zugehörigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine Richtliniendatei mit mode enforce. DNS-Abfrage des TXT-Eintrags _smtp._tls.krause-computer.de; erwartet wird ein Eintrag, der mit v=TLSRPTv1 beginnt und eine Meldeadresse (rua) nennt."
   },
   {
    "affected": "krause-computer.de (max-age 600000), www.krause-computer.de (max-age 600000)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:85.13.167.158\nkrause-computer.de: URL=https://krause-computer.de fehlende Header=content-security-policy, permissions-policy, x-xss-protection gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=600000,...\n\nheader_check · scan_results:header_check:85.13.167.158\nwww.krause-computer.de: URL=https://www.krause-computer.de fehlende Header=content-security-policy, permissions-policy, x-xss-protection gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age...",
-   "found": "Die Transportverschlüsselung auf 85.13.167.158 lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: krause-computer.de (max-age 600000), www.krause-computer.de (max-age 600000).",
+   "evidence": "header_check\nkrause-computer.de · Adresse: https://krause-computer.de · Strict-Transport-Security: max-age=600000\n\nheader_check\nwww.krause-computer.de · Adresse: https://www.krause-computer.de · Strict-Transport-Security: max-age=600000",
+   "found": "Der Dienst 85.13.167.158 setzt den HTTP Strict Transport Security Header mit einer Gültigkeitsdauer, die unter dem empfohlenen Richtwert liegt: krause-computer.de (max-age 600000), www.krause-computer.de (max-age 600000).",
    "id": "VS-2026-009",
-   "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
+   "impact": "Eine kurze Gültigkeitsdauer lässt den Schutz vor Downgrade-Angriffen bereits nach kurzer Zeit ohne erneuten Seitenaufruf ablaufen; wiederkehrende Besucher sind dann für einen Zeitraum wieder ungeschützt.",
+   "key": "tls_hardening/85.13.167.158/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Die Gültigkeitsdauer des Strict-Transport-Security-Headers auf mindestens sechs Monate anheben.",
+   "plan_effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+   "plan_lever": "Gültigkeitsdauer von HSTS verlängern",
+   "plan_stage": "mittelfristig",
    "policy": "hsts_short",
+   "provenance": [
+    {
+     "check": "hsts_short",
+     "field": "title",
+     "members": [
+      "krause-computer.de@85.13.167.158|krause-computer.de@85.13.167.158",
+      "www.krause-computer.de@85.13.167.158|www.krause-computer.de@85.13.167.158"
+     ],
+     "statement": "short",
+     "text": "HSTS mit kurzer Gültigkeit"
+    },
+    {
+     "check": "hsts_short",
+     "field": "observation",
+     "members": [
+      "krause-computer.de@85.13.167.158|krause-computer.de@85.13.167.158",
+      "www.krause-computer.de@85.13.167.158|www.krause-computer.de@85.13.167.158"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Dienst 85.13.167.158 setzt den HTTP Strict Transport Security Header mit einer Gültigkeitsdauer, die unter dem empfohlenen Richtwert liegt: krause-computer.de (max-age 600000), www.krause-computer.de (max-age 600000)."
+    },
+    {
+     "check": "hsts_short",
+     "field": "meaning",
+     "members": [
+      "krause-computer.de@85.13.167.158|krause-computer.de@85.13.167.158",
+      "www.krause-computer.de@85.13.167.158|www.krause-computer.de@85.13.167.158"
+     ],
+     "statement": "meaning[0]",
+     "text": "Eine kurze Gültigkeitsdauer lässt den Schutz vor Downgrade-Angriffen bereits nach kurzer Zeit ohne erneuten Seitenaufruf ablaufen; wiederkehrende Besucher sind dann für einen Zeitraum wieder ungeschützt."
+    },
+    {
+     "check": "hsts_short",
+     "field": "verify",
+     "members": [
+      "krause-computer.de@85.13.167.158|krause-computer.de@85.13.167.158",
+      "www.krause-computer.de@85.13.167.158|www.krause-computer.de@85.13.167.158"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein gesetzter Strict-Transport-Security-Header mit einer Gültigkeitsdauer von mindestens sechs Monaten."
+    },
+    {
+     "check": "hsts_short",
+     "field": "recommendation",
+     "members": [
+      "krause-computer.de@85.13.167.158|krause-computer.de@85.13.167.158",
+      "www.krause-computer.de@85.13.167.158|www.krause-computer.de@85.13.167.158"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Gültigkeitsdauer des Strict-Transport-Security-Headers auf mindestens sechs Monate anheben."
+    }
+   ],
    "recommendation": [
     [
-     "In Kürze",
-     "Veraltete Protokolle und schwache Verfahren am Dienst abschalten."
-    ],
-    [
      "Mittelfristig",
-     "Das aktuelle Protokoll aktivieren, den Schutz gegen eine erzwungene Rückstufung einschalten und die Gültigkeitsdauer der Transportsicherheits-Vorgabe auf mindestens ein Jahr setzen."
-    ],
-    [
-     "Strategisch",
-     "Die Konfiguration aller verschlüsselten Dienste an einer gemeinsamen Vorgabe ausrichten und regelmäßig prüfen."
+     "Die Gültigkeitsdauer des Strict-Transport-Security-Headers auf mindestens sechs Monate anheben."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
-   "title": "Transportverschlüsselung auf 85.13.167.158 mit veralteten Verfahren",
+   "title": "Transportverschlüsselung auf 85.13.167.158: HSTS mit kurzer Gültigkeit",
    "urgency": "Mittelfristig",
-   "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
+   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein gesetzter Strict-Transport-Security-Header mit einer Gültigkeitsdauer von mindestens sechs Monaten."
   },
   {
    "affected": "jitsi.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), mx.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), nospamproxy.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), rustdesk.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:37.114.55.171\njitsi.krause-computer.de: URL=https://jitsi.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-secur...\n\nheader_check · scan_results:header_check:37.114.55.171\nmx.krause-computer.de: URL=https://mx.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection\n\nheader_check · scan_results:header_check:37.114.55.171\nnospamproxy.krause-computer.de: URL=https://nospamproxy.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection\n\nheader_check · scan_results:header_check:37.114.55.171\nrustdesk.krause-computer.de: URL=https://rustdesk.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection",
-   "found": "Die Webdienste auf 37.114.55.171 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: jitsi.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), mx.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), nospamproxy.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), rustdesk.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
+   "evidence": "header_check\njitsi.krause-computer.de · Adresse: https://jitsi.krause-computer.de · fehlende Header: content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection\n\nheader_check\nmx.krause-computer.de · Adresse: https://mx.krause-computer.de · fehlende Header: content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection\n\nheader_check\nnospamproxy.krause-computer.de · Adresse: https://nospamproxy.krause-computer.de · fehlende Header: content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection\n\nheader_check\nrustdesk.krause-computer.de · Adresse: https://rustdesk.krause-computer.de · fehlende Header: content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection",
+   "found": "Auf 37.114.55.171 fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: jitsi.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), mx.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), nospamproxy.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), rustdesk.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-010",
-   "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
+   "impact": "Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar.",
+   "key": "web_header_hygiene/37.114.55.171/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen.",
+   "plan_effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
+   "plan_lever": "Fehlende Sicherheits-Header ergänzen",
+   "plan_stage": "mittelfristig",
    "policy": "security_headers_incomplete",
+   "provenance": [
+    {
+     "check": "security_headers_incomplete",
+     "field": "title",
+     "members": [
+      "jitsi.krause-computer.de@37.114.55.171|jitsi.krause-computer.de@37.114.55.171",
+      "mx.krause-computer.de@37.114.55.171|mx.krause-computer.de@37.114.55.171",
+      "nospamproxy.krause-computer.de@37.114.55.171|nospamproxy.krause-computer.de@37.114.55.171",
+      "rustdesk.krause-computer.de@37.114.55.171|rustdesk.krause-computer.de@37.114.55.171"
+     ],
+     "statement": "short",
+     "text": "Sicherheits-Header unvollständig"
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "observation",
+     "members": [
+      "jitsi.krause-computer.de@37.114.55.171|jitsi.krause-computer.de@37.114.55.171",
+      "mx.krause-computer.de@37.114.55.171|mx.krause-computer.de@37.114.55.171",
+      "nospamproxy.krause-computer.de@37.114.55.171|nospamproxy.krause-computer.de@37.114.55.171",
+      "rustdesk.krause-computer.de@37.114.55.171|rustdesk.krause-computer.de@37.114.55.171"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf 37.114.55.171 fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: jitsi.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), mx.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), nospamproxy.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), rustdesk.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "jitsi.krause-computer.de@37.114.55.171|jitsi.krause-computer.de@37.114.55.171",
+      "mx.krause-computer.de@37.114.55.171|mx.krause-computer.de@37.114.55.171",
+      "nospamproxy.krause-computer.de@37.114.55.171|nospamproxy.krause-computer.de@37.114.55.171",
+      "rustdesk.krause-computer.de@37.114.55.171|rustdesk.krause-computer.de@37.114.55.171"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "jitsi.krause-computer.de@37.114.55.171|jitsi.krause-computer.de@37.114.55.171",
+      "mx.krause-computer.de@37.114.55.171|mx.krause-computer.de@37.114.55.171",
+      "nospamproxy.krause-computer.de@37.114.55.171|nospamproxy.krause-computer.de@37.114.55.171",
+      "rustdesk.krause-computer.de@37.114.55.171|rustdesk.krause-computer.de@37.114.55.171"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "jitsi.krause-computer.de@37.114.55.171|jitsi.krause-computer.de@37.114.55.171",
+      "mx.krause-computer.de@37.114.55.171|mx.krause-computer.de@37.114.55.171",
+      "nospamproxy.krause-computer.de@37.114.55.171|nospamproxy.krause-computer.de@37.114.55.171",
+      "rustdesk.krause-computer.de@37.114.55.171|rustdesk.krause-computer.de@37.114.55.171"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
+    }
+   ],
    "recommendation": [
     [
      "Mittelfristig",
-     "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren."
-    ],
-    [
-     "Strategisch",
-     "Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen."
+     "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
-   "title": "Sicherheits-Header und Formularschutz auf 37.114.55.171 unvollständig",
+   "title": "Absicherung der Webdienste auf 37.114.55.171: Sicherheits-Header unvollständig",
    "urgency": "Mittelfristig",
-   "verify": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
   },
   {
    "affected": "krause-computer.de (fehlend: permissions-policy), www.krause-computer.de (fehlend: permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:85.13.167.158\nkrause-computer.de: URL=https://krause-computer.de fehlende Header=content-security-policy, permissions-policy, x-xss-protection gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=600000,...\n\nheader_check · scan_results:header_check:85.13.167.158\nwww.krause-computer.de: URL=https://www.krause-computer.de fehlende Header=content-security-policy, permissions-policy, x-xss-protection gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age...",
-   "found": "Die Webdienste auf 85.13.167.158 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: krause-computer.de (fehlend: permissions-policy), www.krause-computer.de (fehlend: permissions-policy).",
+   "evidence": "header_check\nkrause-computer.de · Adresse: https://krause-computer.de · fehlende Header: content-security-policy, permissions-policy, x-xss-protection\n\nheader_check\nwww.krause-computer.de · Adresse: https://www.krause-computer.de · fehlende Header: content-security-policy, permissions-policy, x-xss-protection",
+   "found": "Auf 85.13.167.158 fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: krause-computer.de (fehlend: permissions-policy), www.krause-computer.de (fehlend: permissions-policy).",
    "id": "VS-2026-011",
-   "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
+   "impact": "Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar.",
+   "key": "web_header_hygiene/85.13.167.158/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen.",
+   "plan_effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
+   "plan_lever": "Fehlende Sicherheits-Header ergänzen",
+   "plan_stage": "mittelfristig",
    "policy": "security_headers_incomplete",
+   "provenance": [
+    {
+     "check": "security_headers_incomplete",
+     "field": "title",
+     "members": [
+      "krause-computer.de@85.13.167.158|krause-computer.de@85.13.167.158",
+      "www.krause-computer.de@85.13.167.158|www.krause-computer.de@85.13.167.158"
+     ],
+     "statement": "short",
+     "text": "Sicherheits-Header unvollständig"
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "observation",
+     "members": [
+      "krause-computer.de@85.13.167.158|krause-computer.de@85.13.167.158",
+      "www.krause-computer.de@85.13.167.158|www.krause-computer.de@85.13.167.158"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf 85.13.167.158 fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: krause-computer.de (fehlend: permissions-policy), www.krause-computer.de (fehlend: permissions-policy)."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "krause-computer.de@85.13.167.158|krause-computer.de@85.13.167.158",
+      "www.krause-computer.de@85.13.167.158|www.krause-computer.de@85.13.167.158"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "krause-computer.de@85.13.167.158|krause-computer.de@85.13.167.158",
+      "www.krause-computer.de@85.13.167.158|www.krause-computer.de@85.13.167.158"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "krause-computer.de@85.13.167.158|krause-computer.de@85.13.167.158",
+      "www.krause-computer.de@85.13.167.158|www.krause-computer.de@85.13.167.158"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
+    }
+   ],
    "recommendation": [
     [
      "Mittelfristig",
-     "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren."
-    ],
-    [
-     "Strategisch",
-     "Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen."
+     "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
-   "title": "Sicherheits-Header und Formularschutz auf 85.13.167.158 unvollständig",
+   "title": "Absicherung der Webdienste auf 85.13.167.158: Sicherheits-Header unvollständig",
    "urgency": "Mittelfristig",
-   "verify": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
   },
   {
-   "affected": "37.114.55.171:22 (OpenSSH 10.0p2), 37.114.55.171:3128 (Proxmox Virtual Environment REST API 3.0), 37.114.55.171:987 (OpenSSH 10.0p2), 85.13.167.158:139 (Samba smbd 4.6.2), 85.13.167.158:22 (OpenSSH 9.6p1), 85.13.167.158:3306 (MariaDB 10.11.14), 85.13.167.158:445 (Samba smbd 4.6.2)",
+   "affected": "37.114.55.171:3128 (Proxmox Virtual Environment REST API 3.0), 85.13.167.158:139 (Samba smbd 4.6.2), 85.13.167.158:445 (Samba smbd 4.6.2)",
    "cat": "E",
-   "evidence": "nmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:22/tcp Dienst=ssh Produkt=OpenSSH Version=10.0p2 Debian 7+deb13u4 Zustand=open\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n22/tcp open ssh OpenSSH 10.0p2 Debian 7+deb13u4 (protocol 2.0)\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:987/tcp Dienst=ssh Produkt=OpenSSH Version=10.0p2 Debian 7+deb13u2 Zustand=open\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n987/tcp open ssh OpenSSH 10.0p2 Debian 7+deb13u2 (protocol 2.0)\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:3128/tcp Dienst=http Produkt=Proxmox Virtual Environment REST API Version=3.0 Zustand=open\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:22/tcp Dienst=ssh Produkt=OpenSSH Version=9.6p1 Ubuntu 3ubuntu13.16 Zustand=open\n\nund 5 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
-   "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 37.114.55.171:22 (OpenSSH 10.0p2), 37.114.55.171:3128 (Proxmox Virtual Environment REST API 3.0), 37.114.55.171:987 (OpenSSH 10.0p2), 85.13.167.158:139 (Samba smbd 4.6.2), 85.13.167.158:22 (OpenSSH 9.6p1), 85.13.167.158:3306 (MariaDB 10.11.14), 85.13.167.158:445 (Samba smbd 4.6.2).",
+   "evidence": "nmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:3128/tcp · Dienst: http · Produkt: Proxmox Virtual Environment REST API · Version: 3.0 · Server-Kennung: pve-api-daemon/3.0\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:139/tcp · Dienst: netbios-ssn · Produkt: Samba smbd · Version: 4.6.2\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:445/tcp · Dienst: netbios-ssn · Produkt: Samba smbd · Version: 4.6.2",
+   "found": "Der Dienst auf 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de) und 85.13.167.158 (krause-computer.de, www.krause-computer.de) gibt beim Verbindungsaufbau seine Produkt- und Versionskennung preis: 37.114.55.171:3128 (Proxmox Virtual Environment REST API 3.0), 85.13.167.158:139 (Samba smbd 4.6.2), 85.13.167.158:445 (Samba smbd 4.6.2).",
    "id": "VS-2026-012",
-   "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
+   "impact": "Eine sichtbare Versionskennung erleichtert die gezielte Suche nach bekannten Schwachstellen für genau diese Version und beschleunigt damit die Vorbereitung eines Angriffs.",
+   "key": "banner_disclosure/scan/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Die Versionsausgabe des Dienstes in der Konfiguration unterdrücken oder, sofern der Dienst dies unterstützt, auf eine allgemeine Kennung ohne Versionsnummer umstellen.",
+   "plan_effect": "Erschwert die gezielte Suche nach passenden Schwachstellen",
+   "plan_lever": "Versionsangaben aus den Dienstbannern entfernen",
+   "plan_stage": "mittelfristig",
    "policy": "service_banner_version",
+   "provenance": [
+    {
+     "check": "service_banner_version",
+     "field": "title",
+     "members": [
+      "37.114.55.171|37.114.55.171:3128",
+      "85.13.167.158|85.13.167.158:139",
+      "85.13.167.158|85.13.167.158:445"
+     ],
+     "statement": "short",
+     "text": "Versionsangabe im Dienstbanner"
+    },
+    {
+     "check": "service_banner_version",
+     "field": "observation",
+     "members": [
+      "37.114.55.171|37.114.55.171:3128",
+      "85.13.167.158|85.13.167.158:139",
+      "85.13.167.158|85.13.167.158:445"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Dienst auf 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de) und 85.13.167.158 (krause-computer.de, www.krause-computer.de) gibt beim Verbindungsaufbau seine Produkt- und Versionskennung preis: 37.114.55.171:3128 (Proxmox Virtual Environment REST API 3.0), 85.13.167.158:139 (Samba smbd 4.6.2), 85.13.167.158:445 (Samba smbd 4.6.2)."
+    },
+    {
+     "check": "service_banner_version",
+     "field": "meaning",
+     "members": [
+      "37.114.55.171|37.114.55.171:3128",
+      "85.13.167.158|85.13.167.158:139",
+      "85.13.167.158|85.13.167.158:445"
+     ],
+     "statement": "meaning[0]",
+     "text": "Eine sichtbare Versionskennung erleichtert die gezielte Suche nach bekannten Schwachstellen für genau diese Version und beschleunigt damit die Vorbereitung eines Angriffs."
+    },
+    {
+     "check": "service_banner_version",
+     "field": "verify",
+     "members": [
+      "37.114.55.171|37.114.55.171:3128",
+      "85.13.167.158|85.13.167.158:139",
+      "85.13.167.158|85.13.167.158:445"
+     ],
+     "statement": "verify[0]",
+     "text": "Verbindungsaufbau zum Dienst von außen wiederholen und die zurückgegebene Kennung mit der internen Versionsübersicht abgleichen."
+    },
+    {
+     "check": "service_banner_version",
+     "field": "recommendation",
+     "members": [
+      "37.114.55.171|37.114.55.171:3128",
+      "85.13.167.158|85.13.167.158:139",
+      "85.13.167.158|85.13.167.158:445"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Versionsausgabe des Dienstes in der Konfiguration unterdrücken oder, sofern der Dienst dies unterstützt, auf eine allgemeine Kennung ohne Versionsnummer umstellen."
+    },
+    {
+     "check": "service_banner_version",
+     "field": "recommendation",
+     "members": [
+      "37.114.55.171|37.114.55.171:3128",
+      "85.13.167.158|85.13.167.158:139",
+      "85.13.167.158|85.13.167.158:445"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Den Dienst unabhängig von der sichtbaren Kennung regelmäßig auf verfügbare Aktualisierungen prüfen."
+    }
+   ],
    "recommendation": [
     [
      "Mittelfristig",
-     "Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten."
+     "Die Versionsausgabe des Dienstes in der Konfiguration unterdrücken oder, sofern der Dienst dies unterstützt, auf eine allgemeine Kennung ohne Versionsnummer umstellen."
     ],
     [
      "Strategisch",
-     "Die Vorgabe für Antwort-Header und erlaubte Methoden an einer Stelle pflegen."
+     "Den Dienst unabhängig von der sichtbaren Kennung regelmäßig auf verfügbare Aktualisierungen prüfen."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (nmap)",
    "status": "blau",
    "threat": null,
-   "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+   "title": "Versionsangaben in den Antworten der Dienste: Versionsangabe im Dienstbanner",
    "urgency": "Mittelfristig",
-   "verify": "Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue Versionsangabe und ohne die zusätzlichen Methoden."
-  },
-  {
-   "affected": "87.79.190.79:987 (OpenSSH 10.0p2)",
-   "cat": "E",
-   "evidence": "nmap · hosts/87.79.190.79/phase1/nmap.xml\n87.79.190.79:987/tcp Dienst=ssh Produkt=OpenSSH Version=10.0p2 Debian 7+deb13u4 Zustand=open\n\nnmap · hosts/87.79.190.79/phase1/nmap.xml\n987/tcp open ssh OpenSSH 10.0p2 Debian 7+deb13u4 (protocol 2.0)",
-   "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 87.79.190.79:987 (OpenSSH 10.0p2).",
-   "id": "VS-2026-013",
-   "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
-   "level": "niedrig",
-   "level_label": "niedrig",
-   "operator": "beim Plattformbetreiber skclient.de",
-   "operator_note": "Dieser Sachverhalt liegt beim Plattformbetreiber skclient.de: der Hostname zeigt auf dessen Plattform, Server und Grundkonfiguration betreibt er. Die Empfehlung richtet sich an ihn; Sie können sie über den Vertrag oder die Einstellungen der Plattform einfordern.",
-   "policy": "service_banner_version",
-   "recommendation": [
-    [
-     "Mittelfristig",
-     "Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten."
-    ],
-    [
-     "Strategisch",
-     "Die Vorgabe für Antwort-Header und erlaubte Methoden an einer Stelle pflegen."
-    ]
-   ],
-   "scale": "hygiene",
-   "source": "aktiv (nmap)",
-   "status": "blau",
-   "threat": null,
-   "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste (beim Plattformbetreiber skclient.de)",
-   "urgency": "Mittelfristig",
-   "verify": "Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue Versionsangabe und ohne die zusätzlichen Methoden."
+   "verify": "Verbindungsaufbau zum Dienst von außen wiederholen und die zurückgegebene Kennung mit der internen Versionsübersicht abgleichen."
   },
   {
    "affected": "krause-computer.de",
    "cat": "E",
-   "evidence": "dns_records · phase0/dns_records.json\nkrause-computer.de: SPF=v=spf1 mx include:mx.krause-computer.de include:w020687e.kasserver.com -all DMARC=v=DMARC1; p=reject; adkim=r; aspf=r DKIM-Selektoren=keiner bekannt MX=krause.skclient.de, mail.krause-computer.de, mx.krause-comput...",
-   "found": "Für krause-computer.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: krause-computer.de.",
-   "id": "VS-2026-014",
-   "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
+   "evidence": "dns_security · phase0a/dns_security.json\nkrause-computer.de · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
+   "found": "Für krause-computer.de ist kein CAA-Eintrag veröffentlicht. Für die Domain krause-computer.de legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen. Für krause-computer.de ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain krause-computer.de lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
+   "id": "VS-2026-013",
+   "impact": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf. Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
+   "key": "dns_hygiene/krause-computer.de/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
+   "plan_effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+   "plan_lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+   "plan_stage": "mittelfristig",
    "policy": "caa_missing, dnssec_missing",
+   "provenance": [
+    {
+     "check": "caa_missing",
+     "field": "title",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "short",
+     "text": "kein CAA-Eintrag"
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "title",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "short",
+     "text": "keine DNSSEC-Signatur"
+    },
+    {
+     "check": "caa_missing",
+     "field": "observation",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "observation[0]",
+     "text": "Für krause-computer.de ist kein CAA-Eintrag veröffentlicht. Für die Domain krause-computer.de legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "observation",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "observation[0]",
+     "text": "Für krause-computer.de ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain krause-computer.de lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen."
+    },
+    {
+     "check": "caa_missing",
+     "field": "meaning",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "meaning",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen."
+    },
+    {
+     "check": "caa_missing",
+     "field": "verify",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des CAA-Eintrags für die Domain krause-computer.de; erwartet wird mindestens ein issue-Eintrag mit der genutzten Zertifizierungsstelle."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "verify",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage der SOA mit aktivierter DNSSEC-Option für die Domain krause-computer.de; erwartet wird ein RRSIG-Eintrag in der Antwort."
+    },
+    {
+     "check": "caa_missing",
+     "field": "recommendation",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "recommendation",
+     "members": [
+      "krause-computer.de|krause-computer.de"
+     ],
+     "statement": "recommendation[0]",
+     "text": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist."
+    }
+   ],
    "recommendation": [
     [
+     "Mittelfristig",
+     "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt."
+    ],
+    [
      "Strategisch",
-     "Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen."
+     "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist."
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records)",
+   "source": "aktiv (dns_security)",
    "status": "blau",
    "threat": null,
-   "title": "DNS-Absicherung für krause-computer.de nicht eingerichtet",
-   "urgency": "Strategisch",
-   "verify": "DNS-Abfrage der Signatur und der Ausstellungseingrenzung wiederholen; erwartet wird je ein gültiger Eintrag."
+   "title": "DNS-Absicherung für krause-computer.de: kein CAA-Eintrag und keine DNSSEC-Signatur",
+   "urgency": "Mittelfristig",
+   "verify": "DNS-Abfrage des CAA-Eintrags für die Domain krause-computer.de; erwartet wird mindestens ein issue-Eintrag mit der genutzten Zertifizierungsstelle. DNS-Abfrage der SOA mit aktivierter DNSSEC-Option für die Domain krause-computer.de; erwartet wird ein RRSIG-Eintrag in der Antwort."
   }
  ],
  "glance": {
@@ -1302,7 +2276,7 @@
     "key": "A",
     "level": 4,
     "name": "Perimeter-Exposition",
-    "note": "Datenbankdienst aus dem Internet erreichbar; Fernwartung oder Dateifreigabe aus dem Internet erreichbar",
+    "note": "Datenbankdienst aus dem Internet erreichbar; Fernwartung und Dateifreigabe aus dem Internet erreichbar: Dateifreigabe (SMB) erreichbar",
     "status": "rot"
    },
    {
@@ -1316,21 +2290,21 @@
     "key": "C",
     "level": 1,
     "name": "E-Mail-Authentizität",
-    "note": "Transportverschlüsselung im Mailversand für krause-computer.de nicht erzwungen",
+    "note": "Verschlüsselte Zustellung von E-Mails für krause-computer.de: kein MTA-STS und kein TLS-RPT",
     "status": "blau"
    },
    {
     "key": "D",
     "level": 2,
     "name": "Web- und Transport-Hygiene",
-    "note": "Zertifikate auf mx.krause-computer.de mit Beanstandungen; Sicherheits-Header und Formularschutz auf 87.79.190.79 unvollständig (beim Plattformbetreiber skclient.de)",
+    "note": "Zertifikate auf mx.krause-computer.de: Zertifikat passt nicht zum Namen; Absicherung der Webdienste auf 87.79.190.79: Inhaltsrichtlinie mit unsicheren Freigaben und Sicherheits-Header unvollständig (beim Plattformbetreiber skclient.de)",
     "status": "gelb"
    },
    {
     "key": "E",
     "level": 1,
     "name": "Konfiguration und Informations-Hygiene",
-    "note": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste; Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste (beim Plattformbetreiber skclient.de)",
+    "note": "Versionsangaben in den Antworten der Dienste: Versionsangabe im Dienstbanner; DNS-Absicherung für krause-computer.de: kein CAA-Eintrag und keine DNSSEC-Signatur",
     "status": "blau"
    }
   ],
@@ -1338,50 +2312,51 @@
   "coverage_warning": "Für 3 Systeme (37.114.55.171, 85.13.167.158 und 87.79.190.79) liegt nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
-    "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
+    "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugriff auf die Datenbanken",
     "n": 1,
     "refs": [
-     "VS-2026-001",
-     "VS-2026-002"
+     "VS-2026-001"
     ],
-    "title": "Datenbankdienst aus dem Internet erreichbar"
+    "title": "Datenbankdienste vom Internet trennen"
    },
    {
-    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+    "effect": "Schließt einen der häufigsten Einstiegspunkte für Erpressungsangriffe",
     "n": 2,
     "refs": [
-     "VS-2026-004"
+     "VS-2026-002"
     ],
-    "title": "Datei- und Mailzugänge auf 85.13.167.158 (krause-computer.de, www.krause-computer.de) ohne erzwungene Transportverschlüsselung"
+    "title": "Dateifreigaben vom Internet trennen"
    },
    {
-    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+    "effect": "Klärt, ob eine Verwaltungsoberfläche offen im Internet steht, und schließt sie",
     "n": 3,
     "refs": [
      "VS-2026-003"
     ],
-    "title": "Verwaltungsoberfläche aus dem Internet erreichbar"
+    "title": "Zweck der Dienste auf Verwaltungsports klären"
    }
   ],
   "overall": "HOCH",
   "overall_status": "rot",
   "overall_text": "2 Befunde erfordern unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
- "landscape_lead": "14 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "13 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 26,
-  "catalog_digest": "dcd629946febcc08a9c28922053c58d8d6eb044355d63056decc79caff8a905b",
-  "catalog_version": "2026-09-25.1",
+  "after_fp": 24,
+  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
+  "catalog_version": "2026-09-25.2",
   "classification": "Vertraulich",
-  "consolidated": 14,
+  "consolidated": 13,
   "context_sources": {},
   "customer": "Auftraggeber",
   "customer_short": "Auftraggeber",
   "domains": [
    "krause-computer.de"
   ],
-  "facts_schema_version": "1.0.6",
+  "excluded_ids": [],
+  "facts_schema_version": "1.0.7",
   "fqdns_total": 11,
+  "generation": null,
   "hosts_ipv4": 3,
   "hosts_ipv6": 0,
   "hosts_total": 3,
@@ -1393,45 +2368,48 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-25.1",
-  "positives": 4,
+  "policy_version": "2026-09-25.2",
+  "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
   "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
   "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
-  "raw_findings": 37,
+  "raw_findings": 31,
   "report_date": "19.09.2026",
   "report_id": "VS-2026-0526-fb13",
-  "report_version": "1.0",
+  "report_version": "1",
   "scan_date": "26.05.2026",
   "scan_window": "26.05.2026, 14:21 bis 14:37 Uhr (CEST)",
+  "systems_total": 3,
   "tool_runs": 47
  },
  "plan": [
   {
-   "action": "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken. Den Zugriff aus dem Internet sperren und Fernwartung nur über ein VPN zulassen.",
-   "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
+   "action": "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken.",
+   "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugriff auf die Datenbanken",
+   "lever": "Datenbankdienste vom Internet trennen",
    "prio": "Unverzüglich",
    "refs": [
-    "VS-2026-001",
+    "VS-2026-001"
+   ],
+   "st": "rot"
+  },
+  {
+   "action": "Den externen Zugriff auf die SMB-Ports in der Firewall oder in der Verwaltung des Hosters deaktivieren. Dateifreigaben ausschließlich innerhalb des internen Netzes anbieten.",
+   "effect": "Schließt einen der häufigsten Einstiegspunkte für Erpressungsangriffe",
+   "lever": "Dateifreigaben vom Internet trennen",
+   "prio": "Unverzüglich",
+   "refs": [
     "VS-2026-002"
    ],
    "st": "rot"
   },
   {
-   "action": "Auf den betroffenen Diensten die Transportverschlüsselung erzwingen, sodass eine Anmeldung ohne aufgebautes TLS abgelehnt wird.",
-   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
-   "prio": "In Kürze",
-   "refs": [
-    "VS-2026-004"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.",
-   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+   "action": "Klären, welcher Dienst auf dem Port antwortet und ob ein Zugriff aus dem gesamten Internet dafür nötig ist.",
+   "effect": "Klärt, ob eine Verwaltungsoberfläche offen im Internet steht, und schließt sie",
+   "lever": "Zweck der Dienste auf Verwaltungsports klären",
    "prio": "In Kürze",
    "refs": [
     "VS-2026-003"
@@ -1439,8 +2417,19 @@
    "st": "gelb"
   },
   {
-   "action": "Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "action": "Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten.",
+   "effect": "Schützt Zugangsdaten und Nachrichten auf dem Übertragungsweg",
+   "lever": "TLS für POP3 und IMAP erzwingen",
+   "prio": "In Kürze",
+   "refs": [
+    "VS-2026-004"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält.",
+   "effect": "Beendet die Namenswarnung beim Aufruf des Dienstes",
+   "lever": "Zertifikate auf alle aufgerufenen Namen ausstellen",
    "prio": "In Kürze",
    "refs": [
     "VS-2026-005"
@@ -1448,8 +2437,9 @@
    "st": "gelb"
   },
   {
-   "action": "Beim Plattformbetreiber einfordern: Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "action": "Beim Plattformbetreiber einfordern: Die Direktiven unsafe-inline und unsafe-eval aus der Content-Security-Policy entfernen und stattdessen Nonces oder Hashes für eingebettete Skripte verwenden.",
+   "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+   "lever": "Unsichere Freigaben aus der Inhaltsrichtlinie entfernen",
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-006"
@@ -1457,37 +2447,50 @@
    "st": "gelb"
   },
   {
-   "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
-   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+   "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
+   "effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
+   "lever": "Nicht benötigte Altprotokolle abschalten",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-007",
-    "VS-2026-012"
+    "VS-2026-007"
    ],
    "st": "blau"
   },
   {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "action": "Die Gültigkeitsdauer des Strict-Transport-Security-Headers auf mindestens sechs Monate anheben.",
+   "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+   "lever": "Gültigkeitsdauer von HSTS verlängern",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-010"
+    "VS-2026-009"
    ],
    "st": "blau"
   },
   {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "action": "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen.",
+   "effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
+   "lever": "Fehlende Sicherheits-Header ergänzen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-009",
+    "VS-2026-010",
     "VS-2026-011"
    ],
    "st": "blau"
   },
   {
-   "action": "Beim Plattformbetreiber einfordern: Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
-   "effect": "Nimmt Angreifern Vorbereitungswissen",
+   "action": "Die Versionsausgabe des Dienstes in der Konfiguration unterdrücken oder, sofern der Dienst dies unterstützt, auf eine allgemeine Kennung ohne Versionsnummer umstellen.",
+   "effect": "Erschwert die gezielte Suche nach passenden Schwachstellen",
+   "lever": "Versionsangaben aus den Dienstbannern entfernen",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-012"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
+   "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+   "lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-013"
@@ -1495,12 +2498,12 @@
    "st": "blau"
   },
   {
-   "action": "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain. Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
-   "effect": "Schützt die Authentizität der eigenen E-Mail",
+   "action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
+   "effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
+   "lever": "MTA-STS für die Domain veröffentlichen",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-008",
-    "VS-2026-014"
+    "VS-2026-008"
    ],
    "st": "blau"
   }
@@ -1508,23 +2511,154 @@
  "positives": [
   {
    "cat": "A",
+   "provenance": [
+    {
+     "check": "http_no_tls",
+     "field": "positive",
+     "members": [
+      "37.114.55.171",
+      "85.13.167.158",
+      "87.79.190.79"
+     ],
+     "statement": "positive.title",
+     "text": "Webdienst mit Transportverschlüsselung"
+    },
+    {
+     "check": "http_no_tls",
+     "field": "positive",
+     "members": [
+      "37.114.55.171",
+      "85.13.167.158",
+      "87.79.190.79"
+     ],
+     "statement": "positive.text",
+     "text": "Die Hosts 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de) und 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und weitere) bieten ihre Webdienste über HTTPS an."
+    }
+   ],
    "text": "Die Hosts 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de) und 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und weitere) bieten ihre Webdienste über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
    "cat": "C",
-   "text": "Für krause-computer.de lehnen die Nameserver den Abruf der gesamten Zone ab, und kein Eintrag zeigt auf ein aufgegebenes Ziel.",
-   "title": "Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge"
+   "provenance": [
+    {
+     "check": "dns_zone_transfer",
+     "field": "positive",
+     "members": [
+      "krause-computer.de"
+     ],
+     "statement": "positive.title",
+     "text": "Zonentransfer abgewiesen"
+    },
+    {
+     "check": "dns_zone_transfer",
+     "field": "positive",
+     "members": [
+      "krause-computer.de"
+     ],
+     "statement": "positive.text",
+     "text": "Für die Domain krause-computer.de weisen die Nameserver einen vollständigen Zonentransfer ab."
+    }
+   ],
+   "text": "Für die Domain krause-computer.de weisen die Nameserver einen vollständigen Zonentransfer ab.",
+   "title": "Zonentransfer abgewiesen"
   },
   {
    "cat": "C",
-   "text": "Für krause-computer.de ist die Richtlinie zur Absender-Authentizität durchsetzend gesetzt.",
+   "provenance": [
+    {
+     "check": "dmarc_missing,dmarc_quarantine,spf_softfail",
+     "field": "positive",
+     "members": [
+      "krause-computer.de",
+      "krause-computer.de",
+      "krause-computer.de"
+     ],
+     "statement": "positive.title",
+     "text": "Richtlinie zur Absender-Authentizität weist gefälschte Nachrichten ab"
+    },
+    {
+     "check": "dmarc_missing",
+     "field": "positive",
+     "members": [
+      "krause-computer.de"
+     ],
+     "statement": "positive.text",
+     "text": "Für die Domain krause-computer.de ist ein DMARC-Eintrag veröffentlicht."
+    },
+    {
+     "check": "dmarc_quarantine",
+     "field": "positive",
+     "members": [
+      "krause-computer.de"
+     ],
+     "statement": "positive.text",
+     "text": "Die DMARC-Richtlinie der Domain krause-computer.de weist E-Mails, die SPF oder DKIM nicht bestehen, zurück."
+    },
+    {
+     "check": "spf_softfail",
+     "field": "positive",
+     "members": [
+      "krause-computer.de"
+     ],
+     "statement": "positive.text",
+     "text": "Der SPF-Eintrag der Domain krause-computer.de weist nicht autorisierte Versender mit harter Fehlbehandlung ab."
+    }
+   ],
+   "text": "Für die Domain krause-computer.de ist ein DMARC-Eintrag veröffentlicht. Die DMARC-Richtlinie der Domain krause-computer.de weist E-Mails, die SPF oder DKIM nicht bestehen, zurück. Der SPF-Eintrag der Domain krause-computer.de weist nicht autorisierte Versender mit harter Fehlbehandlung ab.",
    "title": "Richtlinie zur Absender-Authentizität weist gefälschte Nachrichten ab"
   },
   {
+   "cat": "C",
+   "provenance": [
+    {
+     "check": "spf_missing",
+     "field": "positive",
+     "members": [
+      "krause-computer.de"
+     ],
+     "statement": "positive.title",
+     "text": "SPF-Eintrag vorhanden"
+    },
+    {
+     "check": "spf_missing",
+     "field": "positive",
+     "members": [
+      "krause-computer.de"
+     ],
+     "statement": "positive.text",
+     "text": "Für die Domain krause-computer.de ist ein SPF-Eintrag veröffentlicht."
+    }
+   ],
+   "text": "Für die Domain krause-computer.de ist ein SPF-Eintrag veröffentlicht.",
+   "title": "SPF-Eintrag vorhanden"
+  },
+  {
    "cat": "D",
-   "text": "Vor krause-computer.de und www.krause-computer.de ist eine Web Application Firewall aktiv, die Angriffe auf Anwendungsebene filtert, bevor sie den Webdienst erreichen.",
-   "title": "Web Application Firewall vorhanden"
+   "provenance": [
+    {
+     "check": "hsts_short",
+     "field": "positive",
+     "members": [
+      "jitsi.krause-computer.de@37.114.55.171",
+      "nextcloud.krause-computer.de@87.79.190.79"
+     ],
+     "statement": "positive.title",
+     "text": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
+    },
+    {
+     "check": "hsts_short",
+     "field": "positive",
+     "members": [
+      "jitsi.krause-computer.de@37.114.55.171",
+      "nextcloud.krause-computer.de@87.79.190.79"
+     ],
+     "statement": "positive.text",
+     "text": "Die Dienste jitsi.krause-computer.de und nextcloud.krause-computer.de setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer."
+    }
+   ],
+   "text": "Die Dienste jitsi.krause-computer.de und nextcloud.krause-computer.de setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer.",
+   "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   }
  ],
  "scope": {
@@ -1598,7 +2732,6 @@
      "Gültigkeit der Zertifikate",
      "Integrität eingebundener Skripte",
      "JavaScript-Bibliotheken",
-     "Laufzeit der Domain",
      "Meldungen der Webanalyse",
      "Namen im Zertifikat",
      "Preisgegebene Angaben",
@@ -1614,8 +2747,15 @@
      "Verzeichnisauflistung",
      "Zertifikatskette"
     ],
-    "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de), 85.13.167.158 (krause-computer.de, www.krause-computer.de), 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de, transmission.krause-computer.de, youtube.krause-computer.de), krause-computer.de, krause-computer.de.",
+    "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de), 85.13.167.158 (krause-computer.de, www.krause-computer.de), krause-computer.de, transmission.krause-computer.de.",
     "what": "Lauf der Prüfung nicht belegt"
+   },
+   {
+    "checks": [
+     "FTP-Dienste"
+    ],
+    "detail": "Betroffen: 85.13.167.158 (krause-computer.de, www.krause-computer.de).",
+    "what": "Ob der FTP-Dienst eine Anmeldung ohne Transportverschlüsselung ablehnt, zeigt der Portscan nicht"
    },
    {
     "checks": [
@@ -1677,7 +2817,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 14 Befunde und 4 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 13 Befunde und 5 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -1691,11 +2831,11 @@
    },
    {
     "l": "Einzelbeobachtungen",
-    "v": "37"
+    "v": "31"
    },
    {
     "l": "Befunde im Bericht",
-    "v": "14"
+    "v": "13"
    }
   ],
   "out_of_scope": [

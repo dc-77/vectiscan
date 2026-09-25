@@ -1,0 +1,27 @@
+{
+ "_note": "Plattformadressen werden nicht bewertet, Kapitel 3 nennt sie.",
+ "facts": {
+  "hosts": [
+   {
+    "ip": "10.0.0.1",
+    "shared": {
+     "kind": "platform",
+     "operator": "vercel.app",
+     "signals": [
+      "cname_fremd"
+     ]
+    },
+    "reputation": {
+     "abuseipdb_score": 0,
+     "abuseipdb_total_reports": 0
+    }
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "not_applicable",
+  "group_key": "10.0.0.1",
+  "positive": false
+ }
+}

@@ -1,0 +1,16 @@
+# S6b-2 (spec/09 Q13, E1): alle Verwaltungszugaenge eines Hosts sind ein Befund;
+# dieselbe Software auf zwei Ports (Plesk auf 8443 und laut Passivquelle auf
+# 8880) steht damit einmal da. Die Einstufung der Mitglieder steht in
+# reporter/v3/levels.py::ADMIN_EXPOSURE, aus der auch Anhang A.2 entsteht.
+id: admin_access
+title: "Verwaltungszugänge auf {group}: {rules}"
+category: A
+merge_by: host
+members: [admin_service_exposed, admin_panel_hoster, admin_service_unconfirmed, admin_portal_exposed, admin_service_exposed_passive]
+target: findings
+references: [CWE-284, CISA-KEV]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []

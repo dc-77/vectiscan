@@ -1,5 +1,5 @@
 id: http_trace_enabled
-title: HTTP-Methode TRACE aktiviert
+title: HTTP-Methode TRACE in der Methodenliste des Webservers
 family: http_trace_enabled
 category: E
 scale: hygiene
@@ -14,8 +14,11 @@ undetermined: not_testable
 requires:
   tools: [nmap]
 kind: check
-bundle: banner_disclosure
-affected_template: "{host_ip}:{port} (TRACE aktiv)"
+# S6b-2 (spec/09 Q4 JW): nmap http-methods liest die Liste aus der Antwort auf OPTIONS; eine
+# TRACE-Anfrage selbst ist nicht belegt. Deshalb Werkzeugmeldung im Anhang, und kein Text
+# behauptet, dass der Server TRACE ausfuehrt oder Anfragen zurueckspiegelt.
+bundle: tool_findings_unrated
+affected_template: "{host_ip}:{port} (TRACE in der Antwort auf OPTIONS genannt)"
 evidence: [service]
 references: [CWE-16, OWASP2025-A05]
 frameworks:
@@ -26,20 +29,20 @@ frameworks:
 policy:
   source: Prototyp VS-014
   start_level: niedrig
-  deviation: null
+  deviation: "Anhang statt Befund: die Methodenliste aus OPTIONS belegt keine TRACE-Antwort (spec/09 Q4)."
 texts:
   observation: >-
-    Der Webdienst auf {group} akzeptiert die HTTP-Methode TRACE: {affected}. Der Server
-    spiegelt dabei die gesendete Anfrage in der Antwort zurück.
+    Der Webdienst auf {group} nennt TRACE unter den erlaubten Methoden, die er auf eine
+    OPTIONS-Anfrage zurückgibt: {affected}. Eine TRACE-Anfrage selbst wurde nicht gesendet.
   meaning: >-
-    Eine aktivierte TRACE-Methode kann zusammen mit anderen Schwachstellen im Browser genutzt
-    werden, um Inhalte auszulesen, die per Skript eigentlich nicht zugänglich sein sollten, etwa
-    Cookies oder Autorisierungs-Header.
+    Ob der Server TRACE tatsächlich ausführt, zeigt diese Meldung nicht. Führt er die Methode
+    aus, kann sie zusammen mit anderen Schwachstellen im Browser genutzt werden, um Inhalte
+    auszulesen, die per Skript eigentlich nicht zugänglich sein sollten.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Die HTTP-Methode TRACE auf dem Webserver deaktivieren; für den normalen Betrieb einer
-        Website wird sie nicht benötigt.
+        Prüfen, ob der Webserver TRACE ausführt, und die Methode in diesem Fall deaktivieren;
+        für den normalen Betrieb einer Website wird sie nicht benötigt.
   verify: >-
     Eine HTTP-Anfrage mit der Methode TRACE an den Dienst senden; erwartet wird eine Ablehnung
     mit dem Status 405 oder 501.

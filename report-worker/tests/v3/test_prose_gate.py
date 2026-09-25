@@ -90,12 +90,15 @@ def test_erfundene_cve_faellt_auf_den_katalogtext_zurueck(data):
 def test_saubere_felder_werden_uebernommen(data):
     kopie = data.model_copy(deep=True)
     erster = kopie.findings[0]
+    katalog = erster.impact
     rejected = apply_prose(kopie, {
         "overall_text": GUT,
         "impact": {erster.id: "Der Zugriff von außen macht jede spätere Lücke sofort nutzbar."},
     })
     assert kopie.glance.overall_text == GUT
-    assert kopie.findings[0].impact.startswith("Der Zugriff von außen")
+    # S6b-2 (spec/09 Q4): die Bedeutung eines Befunds ist die Katalogaussage seiner Regeln
+    # mit Fakten-Bedingung; ein KI-Feinschliff ersetzt sie nicht mehr.
+    assert kopie.findings[0].impact == katalog
     assert rejected == []
 
 ZITAT = ("Der Webauftritt huendgen-entsorgung.de ist aus dem Internet erreichbar "

@@ -161,3 +161,21 @@ def test_markierungen_q3_und_q9_sind_aufgeloest(name):
         for eid, entry in mapping[liste].items():
             marks = {m.strip() for m in entry.get("spec09", "").split(",") if m.strip()}
             assert not marks & {"Q3", "Q9"}, f"{name} {eid}: {entry['spec09']}"
+
+
+# ---------------------------------------------------------------- S6b-2
+
+def test_nach_s6b2_bleiben_nur_die_q8_markierungen():
+    """S6b-2 loest Q4, Q12, Q13, Q14, Q18 und die Exchange-Markierung castenow (Teil 2) auf;
+    die 18 Q8-Markierungen (Header an Weiterleitung, Fehler- oder Challenge-Seite) bleiben
+    fuer die Scanner-Session S6c. Vorher standen 60 Markierungen."""
+    marks = []
+    for name in NAMES:
+        mapping = _map(name)
+        assert mapping.get("hinweis_s6b2"), f"{name}: hinweis_s6b2 fehlt"
+        for liste in ("findings", "positives"):
+            for eid, entry in mapping[liste].items():
+                if "spec09" in entry:
+                    marks.append((name, eid, entry["spec09"]))
+    assert {m for _, _, m in marks} == {"Q8"}, marks
+    assert len(marks) == 18

@@ -1,0 +1,64 @@
+id: mail_spoofing_unprotected
+title: Domain ohne Mailbetrieb nicht gegen Absenderfälschung geschützt
+family: mail_spoofing_unprotected
+category: C
+scale: hygiene
+level: mittel
+group_by: domain
+scope: dns
+# S6b-2 (spec/08 Punkt 6): Eine Domain ohne MX-Eintrag nimmt keine E-Mails an, kann aber als
+# Absender gefaelscht werden. Schutz ist ein SPF-Eintrag "v=spf1 -all" und DMARC mit
+# Zurueckweisung. Die Einstufung ist nicht "hoch" wie bei einer Domain mit Mailbetrieb.
+applicable_when: len(dns.mx) == 0
+when: dns.spf is None or dns.spf.all_qualifier != "-all" or dns.dmarc is None or dns.dmarc.present is False or dns.dmarc.p != "reject"
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [dns_records]
+kind: check
+bundle: mail_records
+affected_template: "{domain}"
+evidence: [dns]
+references: [CWE-290, RFC-7208, RFC-7489]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: spec/08 Punkt 6 (S6b-2)
+  start_level: mittel
+  deviation: null
+texts:
+  short: "Domain ohne Mailbetrieb ohne Fälschungsschutz"
+  plan:
+    lever: "Domains ohne Mailbetrieb gegen Absenderfälschung sperren"
+    effect: "Lässt Empfänger gefälschte E-Mails mit dieser Domain als Absender ablehnen"
+  observation:
+    - text: >-
+        Die Domain {domain} hat keinen MX-Eintrag und nimmt damit keine E-Mails an.
+    - when: dns.spf is None
+      text: >-
+        Ein SPF-Eintrag fehlt.
+    - when: dns.spf is not None and dns.spf.all_qualifier != "-all"
+      text: >-
+        Der SPF-Eintrag schließt nicht mit einer harten Ablehnung aller Absender.
+    - when: dns.dmarc is None or dns.dmarc.present is False
+      text: >-
+        Ein DMARC-Eintrag fehlt.
+    - when: dns.dmarc is not None and dns.dmarc.present is True and dns.dmarc.p != "reject"
+      text: >-
+        Die DMARC-Richtlinie weist gefälschte Nachrichten nicht zurück.
+  meaning: >-
+    Auch eine Domain ohne Mailbetrieb lässt sich als Absender fälschen. Ohne ausdrückliche
+    Sperre können Empfangssysteme gefälschte Nachrichten im Namen dieser Domain nicht zuverlässig
+    ablehnen.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Für die Domain den SPF-Eintrag v=spf1 -all und einen DMARC-Eintrag mit p=reject
+        veröffentlichen.
+  verify: >-
+    DNS-Abfrage der TXT-Einträge der Domain und von _dmarc.{domain}; erwartet werden v=spf1 -all
+    und eine DMARC-Richtlinie mit p=reject.

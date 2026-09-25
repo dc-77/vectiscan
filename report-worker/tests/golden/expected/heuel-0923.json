@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-25.1 auf tests/golden/facts/2e56abe1-c1a6-442e-b36a-dc9f83c81da8.json",
+ "source": "reporter.catalog 2026-09-25.2 auf tests/golden/facts/2e56abe1-c1a6-442e-b36a-dc9f83c81da8.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -12,16 +12,16 @@
  "findings": [
   {
    "id": "VS-2026-001",
-   "check": "admin_service_exposed_passive",
+   "check": "admin_port_passive_unidentified",
    "family": "admin_service_exposed",
    "cat": "A",
    "scale": "hygiene",
-   "level": "hoch",
+   "level": "niedrig",
    "group": "20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com)",
    "affected": [
-    "20.79.218.75:4433 (unbekannt, laut Passivquelle)"
+    "20.79.218.75:4433 laut Passivquelle, ohne Kennung der Software"
    ],
-   "title": "Verwaltungsoberfläche laut Passivquelle erreichbar"
+   "title": "Verwaltungsport laut Passivquelle ohne Kennung"
   },
   {
    "id": "VS-2026-002",
@@ -38,19 +38,6 @@
   },
   {
    "id": "VS-2026-003",
-   "check": "cors_misconfiguration",
-   "family": "cors_misconfiguration",
-   "cat": "D",
-   "scale": "hygiene",
-   "level": "mittel",
-   "group": "ose.heuel.com",
-   "affected": [
-    "ose.heuel.com (Cross-Domain Misconfiguration)"
-   ],
-   "title": "Fehlerhafte CORS-Konfiguration"
-  },
-  {
-   "id": "VS-2026-004",
    "check": "csp_missing",
    "family": "csp_missing",
    "cat": "D",
@@ -63,7 +50,7 @@
    "title": "Content-Security-Policy fehlt"
   },
   {
-   "id": "VS-2026-005",
+   "id": "VS-2026-004",
    "check": "csp_missing",
    "family": "csp_missing",
    "cat": "D",
@@ -77,7 +64,7 @@
    "zustaendig": "platform"
   },
   {
-   "id": "VS-2026-006",
+   "id": "VS-2026-005",
    "check": "csp_missing",
    "family": "csp_missing",
    "cat": "D",
@@ -90,7 +77,7 @@
    "title": "Content-Security-Policy fehlt"
   },
   {
-   "id": "VS-2026-007",
+   "id": "VS-2026-006",
    "check": "csp_weak",
    "family": "csp_weak",
    "cat": "D",
@@ -103,46 +90,7 @@
    "title": "Content-Security-Policy mit unsicheren Direktiven"
   },
   {
-   "id": "VS-2026-008",
-   "check": "csrf_token_missing",
-   "family": "csrf_token_missing",
-   "cat": "D",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "ose.heuel.com",
-   "affected": [
-    "ose.heuel.com (/webmodule-ee/login.seam)"
-   ],
-   "title": "Formular ohne Anti-CSRF-Token"
-  },
-  {
-   "id": "VS-2026-009",
-   "check": "csrf_token_missing",
-   "family": "csrf_token_missing",
-   "cat": "D",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "www.heuel.com (+heuel.com, jobs.heuel.com)",
-   "affected": [
-    "www.heuel.com (/en/kontakt-heuel-logistics.html)"
-   ],
-   "title": "Formular ohne Anti-CSRF-Token"
-  },
-  {
-   "id": "VS-2026-010",
-   "check": "dane_missing",
-   "family": "dane_missing",
-   "cat": "C",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "heuel.com",
-   "affected": [
-    "heuel.com"
-   ],
-   "title": "DANE für SMTP nicht eingerichtet"
-  },
-  {
-   "id": "VS-2026-011",
+   "id": "VS-2026-007",
    "check": "dmarc_quarantine",
    "family": "dmarc_quarantine",
    "cat": "C",
@@ -155,7 +103,7 @@
    "title": "DMARC-Richtlinie unterhalb von Zurückweisung"
   },
   {
-   "id": "VS-2026-012",
+   "id": "VS-2026-008",
    "check": "dnssec_missing",
    "family": "dnssec_missing",
    "cat": "E",
@@ -168,7 +116,7 @@
    "title": "DNS-Zone ohne DNSSEC-Signatur"
   },
   {
-   "id": "VS-2026-013",
+   "id": "VS-2026-009",
    "check": "hsts_missing",
    "family": "hsts_missing",
    "cat": "D",
@@ -181,7 +129,7 @@
    "title": "HTTP Strict Transport Security nicht gesetzt"
   },
   {
-   "id": "VS-2026-014",
+   "id": "VS-2026-010",
    "check": "hsts_missing",
    "family": "hsts_missing",
    "cat": "D",
@@ -195,7 +143,7 @@
    "zustaendig": "platform"
   },
   {
-   "id": "VS-2026-015",
+   "id": "VS-2026-011",
    "check": "hsts_missing",
    "family": "hsts_missing",
    "cat": "D",
@@ -208,7 +156,7 @@
    "title": "HTTP Strict Transport Security nicht gesetzt"
   },
   {
-   "id": "VS-2026-016",
+   "id": "VS-2026-012",
    "check": "http_alt_port",
    "family": "http_alt_port",
    "cat": "A",
@@ -221,7 +169,7 @@
    "title": "Webdienst auf unüblichem Port erreichbar"
   },
   {
-   "id": "VS-2026-017",
+   "id": "VS-2026-013",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -235,7 +183,7 @@
    "zustaendig": "platform"
   },
   {
-   "id": "VS-2026-018",
+   "id": "VS-2026-014",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -249,7 +197,7 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-019",
+   "id": "VS-2026-015",
    "check": "legacy_protocols_present",
    "family": "legacy_protocols_present",
    "cat": "A",
@@ -262,7 +210,7 @@
    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-020",
+   "id": "VS-2026-016",
    "check": "legacy_protocols_present",
    "family": "legacy_protocols_present",
    "cat": "A",
@@ -278,7 +226,7 @@
    "zustaendig": "hoster"
   },
   {
-   "id": "VS-2026-021",
+   "id": "VS-2026-017",
    "check": "mta_sts_missing",
    "family": "mta_sts_missing",
    "cat": "C",
@@ -291,7 +239,7 @@
    "title": "MTA-STS nicht wirksam veröffentlicht"
   },
   {
-   "id": "VS-2026-022",
+   "id": "VS-2026-018",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -304,7 +252,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-023",
+   "id": "VS-2026-019",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -318,7 +266,7 @@
    "zustaendig": "platform"
   },
   {
-   "id": "VS-2026-024",
+   "id": "VS-2026-020",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -331,21 +279,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-025",
-   "check": "service_banner_version",
-   "family": "banner_version_disclosure",
-   "cat": "E",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "213.133.104.51 (dl.heuel.com, webportal.heuel.com)",
-   "affected": [
-    "213.133.104.51:222 (OpenSSH 9.2p1)"
-   ],
-   "title": "Dienst gibt Versionskennung preis",
-   "zustaendig": "hoster"
-  },
-  {
-   "id": "VS-2026-026",
+   "id": "VS-2026-021",
    "check": "spf_softfail",
    "family": "spf_softfail",
    "cat": "C",
@@ -358,7 +292,7 @@
    "title": "SPF-Eintrag ohne konsequente Durchsetzung"
   },
   {
-   "id": "VS-2026-027",
+   "id": "VS-2026-022",
    "check": "sri_missing",
    "family": "sri_missing",
    "cat": "D",
@@ -371,7 +305,7 @@
    "title": "Fehlende Integritätsprüfung eingebundener Ressourcen"
   },
   {
-   "id": "VS-2026-028",
+   "id": "VS-2026-023",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -384,7 +318,7 @@
    "title": "TLS 1.3 nicht verfügbar"
   },
   {
-   "id": "VS-2026-029",
+   "id": "VS-2026-024",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -397,7 +331,7 @@
    "title": "TLS 1.3 nicht verfügbar"
   },
   {
-   "id": "VS-2026-030",
+   "id": "VS-2026-025",
    "check": "tls_rpt_missing",
    "family": "tls_rpt_missing",
    "cat": "C",
@@ -408,6 +342,63 @@
     "heuel.com"
    ],
    "title": "TLS-RPT nicht eingerichtet"
+  },
+  {
+   "id": "VS-2026-026",
+   "check": "tls_weakness_reported",
+   "family": "tls_weakness",
+   "cat": "D",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "edi.heuel.com (+mail.heuel.com)",
+   "affected": [
+    "edi.heuel.com:443: LUCKY13 (Hinweis der TLS-Analyse)"
+   ],
+   "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
+  },
+  {
+   "id": "VS-2026-027",
+   "check": "tls_weakness_reported",
+   "family": "tls_weakness",
+   "cat": "D",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "ose.heuel.com",
+   "affected": [
+    "ose.heuel.com:443: LUCKY13 (Hinweis der TLS-Analyse)"
+   ],
+   "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
+  },
+  {
+   "id": "VS-2026-028",
+   "check": "web_vulnerability_reported",
+   "family": "web_vulnerability_reported",
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "ose.heuel.com",
+   "affected": [
+    "Absence of Anti-CSRF Tokens auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz niedrig, passiv gemeldet von ZAP)",
+    "Cookie No HttpOnly Flag auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz mittel, passiv gemeldet von ZAP)",
+    "Cookie Without Secure Flag auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz mittel, passiv gemeldet von ZAP)",
+    "Cookie without SameSite Attribute auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz mittel, passiv gemeldet von ZAP)",
+    "Cross-Domain Misconfiguration auf ose.heuel.com/webmodule-ee/ (Konfidenz mittel, passiv gemeldet von ZAP)"
+   ],
+   "title": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung"
+  },
+  {
+   "id": "VS-2026-029",
+   "check": "web_vulnerability_reported",
+   "family": "web_vulnerability_reported",
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "www.heuel.com (+heuel.com, jobs.heuel.com)",
+   "affected": [
+    "Absence of Anti-CSRF Tokens auf www.heuel.com/en/kontakt-heuel-logistics.html (Konfidenz niedrig, passiv gemeldet von ZAP)",
+    "Cookie Without Secure Flag auf www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fahrplan%20Landverkehre%20Jahreswechsel%2025-26.pdf (Konfidenz mittel, passiv gemeldet von ZAP)"
+   ],
+   "title": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung"
   }
  ],
  "positives": [
@@ -640,7 +631,7 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "216.150.1.65 (online.heuel.com)",
+   "group": "217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
@@ -648,19 +639,11 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com)",
-   "title": "Keine Einträge in Reputationsquellen"
-  },
-  {
-   "id": "VS-2026-P31",
-   "check": "ip_reputation",
-   "family": "ip_reputation",
-   "cat": "E",
    "group": "2a01:4f8:d0a:2757::2 (webportal.heuel.com)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
-   "id": "VS-2026-P32",
+   "id": "VS-2026-P31",
    "check": "mail_plaintext",
    "family": "mail_plaintext",
    "cat": "A",
@@ -668,11 +651,19 @@
    "title": "POP3 und IMAP erzwingen TLS vor der Anmeldung"
   },
   {
-   "id": "VS-2026-P33",
+   "id": "VS-2026-P32",
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
    "group": "20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com)",
+   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
+  },
+  {
+   "id": "VS-2026-P33",
+   "check": "rdp_exposed",
+   "family": "rdp_exposed",
+   "cat": "A",
+   "group": "213.133.104.51 (dl.heuel.com, webportal.heuel.com)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
@@ -680,7 +671,7 @@
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "213.133.104.51 (dl.heuel.com, webportal.heuel.com)",
+   "group": "216.150.1.65 (online.heuel.com)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
@@ -688,19 +679,11 @@
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "216.150.1.65 (online.heuel.com)",
-   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P36",
-   "check": "rdp_exposed",
-   "family": "rdp_exposed",
-   "cat": "A",
    "group": "217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P37",
+   "id": "VS-2026-P36",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -708,7 +691,7 @@
    "title": "Sicherheits-Header vollständig"
   },
   {
-   "id": "VS-2026-P38",
+   "id": "VS-2026-P37",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -716,7 +699,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P39",
+   "id": "VS-2026-P38",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -724,7 +707,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P40",
+   "id": "VS-2026-P39",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -732,7 +715,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P41",
+   "id": "VS-2026-P40",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -740,7 +723,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P42",
+   "id": "VS-2026-P41",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
@@ -748,11 +731,19 @@
    "title": "SPF-Eintrag vorhanden"
   },
   {
-   "id": "VS-2026-P43",
+   "id": "VS-2026-P42",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
    "group": "edi.heuel.com (+mail.heuel.com)",
+   "title": "Nur aktuelle TLS-Protokolle"
+  },
+  {
+   "id": "VS-2026-P43",
+   "check": "tls_legacy_protocols",
+   "family": "tls_legacy_protocols",
+   "cat": "D",
+   "group": "online.heuel.com",
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
@@ -760,19 +751,11 @@
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
-   "group": "online.heuel.com",
-   "title": "Nur aktuelle TLS-Protokolle"
-  },
-  {
-   "id": "VS-2026-P45",
-   "check": "tls_legacy_protocols",
-   "family": "tls_legacy_protocols",
-   "cat": "D",
    "group": "ose.heuel.com",
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
-   "id": "VS-2026-P46",
+   "id": "VS-2026-P45",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -780,7 +763,7 @@
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P47",
+   "id": "VS-2026-P46",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -788,7 +771,7 @@
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P48",
+   "id": "VS-2026-P47",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -796,7 +779,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P49",
+   "id": "VS-2026-P48",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -804,7 +787,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P50",
+   "id": "VS-2026-P49",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -812,7 +795,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P51",
+   "id": "VS-2026-P50",
    "check": "urlhaus_compromise",
    "family": "urlhaus_compromise",
    "cat": "A",
@@ -820,7 +803,7 @@
    "title": "Keine Einträge in Malware-Feeds"
   },
   {
-   "id": "VS-2026-P52",
+   "id": "VS-2026-P51",
    "check": "waf_present",
    "family": "waf_present",
    "cat": "D",

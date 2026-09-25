@@ -1,11 +1,32 @@
 {
  "facts": {
   "services": [
-   {"host_ip": "10.0.0.1", "port": 443, "service": "http", "product": "Apache httpd", "tls_required": true, "tunnel_ssl": true}
+   {
+    "host_ip": "10.0.0.1",
+    "port": 443,
+    "service": "http",
+    "product": "Apache httpd",
+    "tls_required": true,
+    "tunnel_ssl": true
+   }
   ],
   "passive": [
-   {"host_ip": "10.0.0.1", "port": 443, "source": "shodan", "product": "Apache httpd", "verified": true, "confidence": 0.8},
-   {"host_ip": "10.0.0.1", "port": 25, "source": "shodan", "product": null, "verified": false, "confidence": 0.5}
+   {
+    "host_ip": "10.0.0.1",
+    "port": 443,
+    "source": "shodan",
+    "product": "Apache httpd",
+    "verified": true,
+    "confidence": 0.8
+   },
+   {
+    "host_ip": "10.0.0.1",
+    "port": 25,
+    "source": "shodan",
+    "product": null,
+    "verified": false,
+    "confidence": 0.5
+   }
   ]
  },
  "coverage_default": "ok",

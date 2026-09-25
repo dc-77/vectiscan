@@ -223,9 +223,10 @@ class TestCreateReportRecordExpiry:
     def _mock_conn(self) -> MagicMock:
         conn = MagicMock()
         cur = conn.cursor.return_value.__enter__.return_value
-        # 1. fetchone(): Spalten-Check validation_warnings, report_number -> existieren.
+        # 1. fetchone(): Spalten-Check validation_warnings, report_number,
+        #    delivery_version (Migration 049, S6b-2) -> existieren.
         # 2. fetchone(): RETURNING id des INSERT.
-        cur.fetchone.side_effect = [(True, True), ("report-id-xyz",)]
+        cur.fetchone.side_effect = [(True, True, True), ("report-id-xyz",)]
         return conn
 
     def _insert_params(self, conn: MagicMock) -> tuple:
@@ -267,15 +268,37 @@ class TestCreateReportRecordExpiry:
         sql, params = next(c.args for c in cur.execute.call_args_list
                            if "INSERT INTO reports" in c.args[0])
         cols = sql.split("(", 1)[1].split(")", 1)[0].split(", ")
-        assert cols[-1] == "report_number" and params[-1] == "VS-2026-0918-1427"
-        assert cols[-2] == "validation_warnings"
+        assert cols[-2] == "report_number" and params[-2] == "VS-2026-0918-1427"
+        assert cols[-3] == "validation_warnings"
+        assert cols[-1] == "delivery_version" and params[-1] is None
         assert sql.count("%s") == len(params) == len(cols)
+
+    def test_auslieferungsversion_landet_in_der_spalte(self) -> None:
+        # S6b-2: das Deckblatt zeigt die Auslieferungsversion (Migration 049).
+        from reporter.worker import _create_report_record
+        conn = self._mock_conn()
+        _create_report_record(conn, "o", "scan-reports/r.pdf", 1, delivery_version=2)
+        cur = conn.cursor.return_value.__enter__.return_value
+        sql, params = next(c.args for c in cur.execute.call_args_list
+                           if "INSERT INTO reports" in c.args[0])
+        cols = sql.split("(", 1)[1].split(")", 1)[0].split(", ")
+        assert cols[-1] == "delivery_version" and params[-1] == 2
+
+    def test_ohne_migration_049_bleibt_die_auslieferungsversion_weg(self) -> None:
+        from reporter.worker import _create_report_record
+        conn = MagicMock()
+        cur = conn.cursor.return_value.__enter__.return_value
+        cur.fetchone.side_effect = [(True, True, False), ("rid",)]
+        _create_report_record(conn, "o", "scan-reports/r.pdf", 1, delivery_version=2)
+        sql = next(c.args[0] for c in cur.execute.call_args_list
+                   if "INSERT INTO reports" in c.args[0])
+        assert "delivery_version" not in sql and "report_number" in sql
 
     def test_ohne_migration_047_bleibt_die_spalte_weg(self) -> None:
         from reporter.worker import _create_report_record
         conn = MagicMock()
         cur = conn.cursor.return_value.__enter__.return_value
-        cur.fetchone.side_effect = [(True, False), ("rid",)]
+        cur.fetchone.side_effect = [(True, False, False), ("rid",)]
         _create_report_record(conn, "o", "scan-reports/r.pdf", 1,
                               report_number="VS-2026-0918-1427")
         sql = next(c.args[0] for c in cur.execute.call_args_list
@@ -343,3 +366,43 @@ class TestBuildFindingsDataGuardStats:
         assert "Ã" not in desc
         assert "erhöhtem" in data["overall_description"]
         assert "Ã" not in data["positive_findings"][0]["description"]
+
+
+class TestAuslieferungUndAusschluesse:
+    """S6b-2: Auslieferungsversion (Migration 049) und Ausschluesse ueber den stabilen
+    Schluessel (Issue #28)."""
+
+    def test_erste_freigabe_ist_version_eins(self) -> None:
+        from reporter.worker import _next_delivery_version
+        conn = MagicMock()
+        conn.cursor.return_value.__enter__.return_value.fetchone.return_value = (0,)
+        assert _next_delivery_version(conn, "o") == 1
+
+    def test_weitere_freigabe_zaehlt_hoch(self) -> None:
+        from reporter.worker import _next_delivery_version
+        conn = MagicMock()
+        conn.cursor.return_value.__enter__.return_value.fetchone.return_value = (2,)
+        assert _next_delivery_version(conn, "o") == 3
+
+    def test_ohne_migration_049_bleibt_es_bei_eins(self) -> None:
+        from reporter.worker import _next_delivery_version
+        conn = MagicMock()
+        conn.cursor.return_value.__enter__.return_value.execute.side_effect = RuntimeError("42703")
+        assert _next_delivery_version(conn, "o") == 1
+        conn.rollback.assert_called_once()
+
+    def test_schluessel_aus_dem_eintrag(self) -> None:
+        from reporter.worker import _exclusion_keys
+        conn = MagicMock()
+        raw = [{"finding_id": "VS-2026-003", "finding_key": "dmarc_none/example.test/kunde"}]
+        assert _exclusion_keys(conn, "o", raw) == {"dmarc_none/example.test/kunde"}
+        conn.cursor.assert_not_called()
+
+    def test_alter_eintrag_ueber_findings_data(self) -> None:
+        from reporter.worker import _exclusion_keys
+        conn = MagicMock()
+        findings_data = {"findings": [{"id": "VS-2026-002", "key": "admin_access/10.0.0.1/kunde"},
+                                      {"id": "VS-2026-004", "key": "tls_hardening/scan/kunde"}]}
+        conn.cursor.return_value.__enter__.return_value.fetchone.return_value = (findings_data,)
+        keys = _exclusion_keys(conn, "o", ["VS-2026-002", {"finding_id": "VS-2026-009"}])
+        assert keys == {"admin_access/10.0.0.1/kunde"}

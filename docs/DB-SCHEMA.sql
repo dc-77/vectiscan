@@ -266,6 +266,12 @@ CREATE INDEX idx_reports_order_version ON reports(order_id, version DESC);
 --       Fusszeile, VS-<Jahr>-<MMTT>-<erste vier Zeichen der Order-ID>. Gleich
 --       fuer alle Versionen eines Auftrags; nur im Katalogweg gesetzt.
 
+-- S6b-2 (Sep 2026), Migration 049 — additiv, nullable:
+--   reports.delivery_version  INTEGER  Auslieferungsversion auf dem Deckblatt:
+--       1 bei der ersten Freigabe, danach je Freigabe hochgezaehlt; NULL fuer
+--       Entwuerfe. Die Erzeugungsnummer reports.version steht nur am Ende der
+--       Fusszeile ("Erzeugung 7").
+
 -- ============================================================
 -- Manuelle Finding-Ausschlüsse (Admin-Review) — 011
 -- ============================================================
@@ -279,6 +285,13 @@ CREATE TABLE finding_exclusions (
 );
 CREATE UNIQUE INDEX idx_exclusions_order_finding
     ON finding_exclusions(order_id, finding_id);
+
+-- S6b-2 (Sep 2026), Migration 049 — additiv, nullable (Issue #28):
+--   finding_exclusions.finding_key  TEXT  stabiler Schluessel des Sachverhalts
+--       <Regel oder Buendel>/<Gruppe>/<Zustaendigkeit> aus
+--       reports.findings_data.findings[].key. Der Katalogweg schliesst ueber ihn
+--       aus; die uebrigen Befunde behalten ihre Nummer. Eintraege ohne Schluessel
+--       bildet der report-worker ueber die Befundnummer des letzten Berichts ab.
 
 -- ============================================================
 -- Threat-Intelligence-Cache (NVD/EPSS/KEV/ExploitDB) — 009

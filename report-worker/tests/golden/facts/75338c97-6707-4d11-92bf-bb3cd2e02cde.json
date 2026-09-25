@@ -3401,7 +3401,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": null,
+    "abuseipdb_total_reports": null,
+    "abuseipdb_whitelisted": null,
     "greynoise_classification": null,
     "is_tor": null,
     "otx_pulse_count": 0,
@@ -3456,7 +3459,10 @@
    },
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": null,
+    "abuseipdb_total_reports": null,
+    "abuseipdb_whitelisted": null,
     "greynoise_classification": null,
     "is_tor": null,
     "otx_pulse_count": 0,
@@ -4043,6 +4049,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -4071,6 +4078,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "urlhaus",
    "transport": null,
    "verified": null,
@@ -4155,7 +4163,7 @@
    }
   ]
  },
- "schema_version": "1.0.6",
+ "schema_version": "1.0.7",
  "services": [
   {
    "auth_mechanisms": [],
@@ -4171,6 +4179,9 @@
     }
    ],
    "family": "golang_net_http_server",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "62.217.52.165",
    "id": "svc:62.217.52.165:80/tcp",
    "login_disabled": null,
@@ -4181,6 +4192,7 @@
    "port": 80,
    "product": "Golang net/http server",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -4210,6 +4222,9 @@
     }
    ],
    "family": "golang_net_http_server",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "62.217.52.165",
    "id": "svc:62.217.52.165:443/tcp",
    "login_disabled": null,
@@ -4220,6 +4235,7 @@
    "port": 443,
    "product": "Golang net/http server",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -4278,9 +4294,11 @@
    "note": null,
    "observed_at": "2026-09-20T09:08:29Z",
    "product": "Golang net/http server",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4315,9 +4333,11 @@
    "note": null,
    "observed_at": "2026-09-20T09:08:50Z",
    "product": "Nuxt.js",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4352,9 +4372,11 @@
    "note": null,
    "observed_at": "2026-09-20T09:08:50Z",
    "product": "React",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4389,9 +4411,11 @@
    "note": null,
    "observed_at": "2026-09-20T09:09:51Z",
    "product": "Node.js",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4426,9 +4450,11 @@
    "note": null,
    "observed_at": "2026-09-20T09:09:51Z",
    "product": "Nuxt.js",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4463,9 +4489,11 @@
    "note": null,
    "observed_at": "2026-09-20T09:09:51Z",
    "product": "Vue.js",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   }
  ],

@@ -4370,7 +4370,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4452,7 +4455,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4509,7 +4515,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4564,7 +4573,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4618,7 +4630,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4672,7 +4687,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4726,7 +4744,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4780,7 +4801,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4848,7 +4872,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": 0,
@@ -4998,6 +5025,7 @@
      "name": "Vulnerable JS Library",
      "plugin_id": "10003",
      "risk": "High",
+     "run": "passive",
      "url": "https://bitwarden.castenow.de/app/vendor.d6b23dcb0aa4bf26665f.js",
      "urls_sample": [
       "https://bitwarden.castenow.de/app/vendor.d6b23dcb0aa4bf26665f.js"
@@ -5011,6 +5039,7 @@
      "name": "Re-examine Cache-control Directives",
      "plugin_id": "10015",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://bitwarden.castenow.de",
      "urls_sample": [
       "https://bitwarden.castenow.de",
@@ -5026,6 +5055,7 @@
      "name": "Strict-Transport-Security Header Not Set",
      "plugin_id": "10035",
      "risk": "Low",
+     "run": "passive",
      "url": "https://bitwarden.castenow.de/robots.txt",
      "urls_sample": [
       "https://bitwarden.castenow.de/robots.txt",
@@ -5040,6 +5070,7 @@
      "name": "CSP: Failure to Define Directive with No Fallback",
      "plugin_id": "10055",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://bitwarden.castenow.de",
      "urls_sample": [
       "https://bitwarden.castenow.de",
@@ -5054,6 +5085,7 @@
      "name": "Timestamp Disclosure - Unix",
      "plugin_id": "10096",
      "risk": "Low",
+     "run": "passive",
      "url": "https://bitwarden.castenow.de/app/vendor.d6b23dcb0aa4bf26665f.js",
      "urls_sample": [
       "https://bitwarden.castenow.de/app/vendor.d6b23dcb0aa4bf26665f.js"
@@ -5067,6 +5099,7 @@
      "name": "Modern Web Application",
      "plugin_id": "10109",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://bitwarden.castenow.de",
      "urls_sample": [
       "https://bitwarden.castenow.de",
@@ -5353,6 +5386,7 @@
      "name": "Re-examine Cache-control Directives",
      "plugin_id": "10015",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://mailstore.castenow.de/core/img/manifest.json",
      "urls_sample": [
       "https://mailstore.castenow.de/core/img/manifest.json",
@@ -5367,6 +5401,7 @@
      "name": "CSP: Failure to Define Directive with No Fallback",
      "plugin_id": "10055",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://mailstore.castenow.de",
      "urls_sample": [
       "https://mailstore.castenow.de",
@@ -5382,6 +5417,7 @@
      "name": "Timestamp Disclosure - Unix",
      "plugin_id": "10096",
      "risk": "Low",
+     "run": "passive",
      "url": "https://mailstore.castenow.de",
      "urls_sample": [
       "https://mailstore.castenow.de",
@@ -5397,6 +5433,7 @@
      "name": "Modern Web Application",
      "plugin_id": "10109",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://mailstore.castenow.de",
      "urls_sample": [
       "https://mailstore.castenow.de",
@@ -5412,6 +5449,7 @@
      "name": "Session Management Response Identified",
      "plugin_id": "10112",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://mailstore.castenow.de",
      "urls_sample": [
       "https://mailstore.castenow.de",
@@ -5677,6 +5715,7 @@
      "name": "Vulnerable JS Library",
      "plugin_id": "10003",
      "risk": "High",
+     "run": "passive",
      "url": "https://nextcloud.castenow.de/dist/core-common.js?v=4f19527a-20",
      "urls_sample": [
       "https://nextcloud.castenow.de/dist/core-common.js?v=4f19527a-20"
@@ -5690,6 +5729,7 @@
      "name": "Re-examine Cache-control Directives",
      "plugin_id": "10015",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://nextcloud.castenow.de/apps/theming/manifest?v=e684f0c8",
      "urls_sample": [
       "https://nextcloud.castenow.de/apps/theming/manifest?v=e684f0c8",
@@ -5704,6 +5744,7 @@
      "name": "Information Disclosure - Suspicious Comments",
      "plugin_id": "10027",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://nextcloud.castenow.de/apps/theming/js/theming.js?v=4f19527a-20",
      "urls_sample": [
       "https://nextcloud.castenow.de/apps/theming/js/theming.js?v=4f19527a-20"
@@ -5717,6 +5758,7 @@
      "name": "CSP: Failure to Define Directive with No Fallback",
      "plugin_id": "10055",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://nextcloud.castenow.de",
      "urls_sample": [
       "https://nextcloud.castenow.de",
@@ -5734,6 +5776,7 @@
      "name": "Timestamp Disclosure - Unix",
      "plugin_id": "10096",
      "risk": "Low",
+     "run": "passive",
      "url": "https://nextcloud.castenow.de/apps/calendar/js/calendar-contacts-menu.js?v=4f19527a-20",
      "urls_sample": [
       "https://nextcloud.castenow.de/apps/calendar/js/calendar-contacts-menu.js?v=4f19527a-20",
@@ -5750,6 +5793,7 @@
      "name": "Modern Web Application",
      "plugin_id": "10109",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://nextcloud.castenow.de/apps",
      "urls_sample": [
       "https://nextcloud.castenow.de/apps",
@@ -5767,6 +5811,7 @@
      "name": "Session Management Response Identified",
      "plugin_id": "10112",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://nextcloud.castenow.de",
      "urls_sample": [
       "https://nextcloud.castenow.de",
@@ -6106,6 +6151,7 @@
      "name": "Re-examine Cache-control Directives",
      "plugin_id": "10015",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
       "https://rdgw.castenow.de"
@@ -6119,6 +6165,7 @@
      "name": "Missing Anti-clickjacking Header",
      "plugin_id": "10020",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
       "https://rdgw.castenow.de"
@@ -6132,6 +6179,7 @@
      "name": "X-Content-Type-Options Header Missing",
      "plugin_id": "10021",
      "risk": "Low",
+     "run": "passive",
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
       "https://rdgw.castenow.de",
@@ -6146,6 +6194,7 @@
      "name": "Strict-Transport-Security Header Not Set",
      "plugin_id": "10035",
      "risk": "Low",
+     "run": "passive",
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
       "https://rdgw.castenow.de",
@@ -6162,6 +6211,7 @@
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
      "plugin_id": "10036",
      "risk": "Low",
+     "run": "passive",
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
       "https://rdgw.castenow.de",
@@ -6178,6 +6228,7 @@
      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
      "plugin_id": "10037",
      "risk": "Low",
+     "run": "passive",
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
       "https://rdgw.castenow.de",
@@ -6194,6 +6245,7 @@
      "name": "Content Security Policy (CSP) Header Not Set",
      "plugin_id": "10038",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
       "https://rdgw.castenow.de",
@@ -6313,6 +6365,7 @@
      "name": "Re-examine Cache-control Directives",
      "plugin_id": "10015",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://ubb-wiki.castenow.de/login/",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/login/",
@@ -6330,6 +6383,7 @@
      "name": "X-Content-Type-Options Header Missing",
      "plugin_id": "10021",
      "risk": "Low",
+     "run": "passive",
      "url": "https://ubb-wiki.castenow.de/error_docs/styles.css",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/error_docs/styles.css",
@@ -6347,6 +6401,7 @@
      "name": "Information Disclosure - Suspicious Comments",
      "plugin_id": "10027",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://ubb-wiki.castenow.de/wp-login.php",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/wp-login.php",
@@ -6361,6 +6416,7 @@
      "name": "Cookie Poisoning",
      "plugin_id": "10029",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://ubb-wiki.castenow.de/wp-login.php?action=lostpassword&wp_lang=de_DE",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/wp-login.php?action=lostpassword&wp_lang=de_DE",
@@ -6375,6 +6431,7 @@
      "name": "User Controllable HTML Element Attribute (Potential XSS)",
      "plugin_id": "10031",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F",
@@ -6392,6 +6449,7 @@
      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
      "plugin_id": "10037",
      "risk": "Low",
+     "run": "passive",
      "url": "https://ubb-wiki.castenow.de",
      "urls_sample": [
       "https://ubb-wiki.castenow.de",
@@ -6409,6 +6467,7 @@
      "name": "Content Security Policy (CSP) Header Not Set",
      "plugin_id": "10038",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://ubb-wiki.castenow.de/wp-json/wp/v2/users/4",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/wp-json/wp/v2/users/4",
@@ -6424,6 +6483,7 @@
      "name": "Cookie without SameSite Attribute",
      "plugin_id": "10054",
      "risk": "Low",
+     "run": "passive",
      "url": "https://ubb-wiki.castenow.de/wp-login.php",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/wp-login.php",
@@ -6440,6 +6500,7 @@
      "name": "CSP: Failure to Define Directive with No Fallback",
      "plugin_id": "10055",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://ubb-wiki.castenow.de/login/",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/login/",
@@ -6457,6 +6518,7 @@
      "name": "Timestamp Disclosure - Unix",
      "plugin_id": "10096",
      "risk": "Low",
+     "run": "passive",
      "url": "https://ubb-wiki.castenow.de/wp-includes/css/dist/base-styles/admin-schemes.min.css?ver=7.0.2",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/wp-includes/css/dist/base-styles/admin-schemes.min.css?ver=7.0.2"
@@ -6470,6 +6532,7 @@
      "name": "Session Management Response Identified",
      "plugin_id": "10112",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://ubb-wiki.castenow.de/wp-login.php",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/wp-login.php",
@@ -6486,6 +6549,7 @@
      "name": "Absence of Anti-CSRF Tokens",
      "plugin_id": "10202",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://ubb-wiki.castenow.de/login/",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/login/",
@@ -6503,6 +6567,7 @@
      "name": "Charset Mismatch",
      "plugin_id": "90011",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://ubb-wiki.castenow.de/wp-json/oembed/1.0/embed?format=xml&url=https%3A%2F%2Fubb-wiki.castenow.de%2Flogin%2F",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/wp-json/oembed/1.0/embed?format=xml&url=https%3A%2F%2Fubb-wiki.castenow.de%2Flogin%2F"
@@ -6636,9 +6701,15 @@
    ],
    "url": "https://ubb-wiki.castenow.de",
    "wordpress": {
+    "core_vulnerabilities": 0,
+    "release_date": "2026-07-17",
     "users": [
      "florian-endriss"
     ],
+    "users_found_by": [
+     "https://ubb-wiki.castenow.de/wp-json/oembed/1.0/embed"
+    ],
+    "version": "7.0.2",
     "version_status": "latest"
    },
    "x_feserver": null
@@ -6653,6 +6724,7 @@
      "name": "Re-examine Cache-control Directives",
      "plugin_id": "10015",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://umfrage.castenow.de/robots.txt",
      "urls_sample": [
       "https://umfrage.castenow.de/robots.txt"
@@ -6666,6 +6738,7 @@
      "name": "X-Content-Type-Options Header Missing",
      "plugin_id": "10021",
      "risk": "Low",
+     "run": "passive",
      "url": "https://umfrage.castenow.de/robots.txt",
      "urls_sample": [
       "https://umfrage.castenow.de/robots.txt"
@@ -6679,6 +6752,7 @@
      "name": "Strict-Transport-Security Header Not Set",
      "plugin_id": "10035",
      "risk": "Low",
+     "run": "passive",
      "url": "https://umfrage.castenow.de/robots.txt",
      "urls_sample": [
       "https://umfrage.castenow.de/robots.txt"
@@ -6692,6 +6766,7 @@
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
      "plugin_id": "10036",
      "risk": "Low",
+     "run": "passive",
      "url": "https://umfrage.castenow.de",
      "urls_sample": [
       "https://umfrage.castenow.de",
@@ -6709,6 +6784,7 @@
      "name": "Session Management Response Identified",
      "plugin_id": "10112",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://umfrage.castenow.de",
      "urls_sample": [
       "https://umfrage.castenow.de",
@@ -6843,6 +6919,7 @@
      "name": "Re-examine Cache-control Directives",
      "plugin_id": "10015",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://vpn.castenow.de",
      "urls_sample": [
       "https://vpn.castenow.de"
@@ -6856,6 +6933,7 @@
      "name": "Information Disclosure - Suspicious Comments",
      "plugin_id": "10027",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://vpn.castenow.de",
      "urls_sample": [
       "https://vpn.castenow.de",
@@ -6871,6 +6949,7 @@
      "name": "Strict-Transport-Security Header Not Set",
      "plugin_id": "10035",
      "risk": "Low",
+     "run": "passive",
      "url": "https://vpn.castenow.de/VirtualOffice.gif",
      "urls_sample": [
       "https://vpn.castenow.de/VirtualOffice.gif",
@@ -6888,6 +6967,7 @@
      "name": "Content Security Policy (CSP) Header Not Set",
      "plugin_id": "10038",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://vpn.castenow.de/robots.txt",
      "urls_sample": [
       "https://vpn.castenow.de/robots.txt",
@@ -6902,6 +6982,7 @@
      "name": "CSP: Failure to Define Directive with No Fallback",
      "plugin_id": "10055",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://vpn.castenow.de",
      "urls_sample": [
       "https://vpn.castenow.de"
@@ -6915,6 +6996,7 @@
      "name": "Timestamp Disclosure - Unix",
      "plugin_id": "10096",
      "risk": "Low",
+     "run": "passive",
      "url": "https://vpn.castenow.de",
      "urls_sample": [
       "https://vpn.castenow.de",
@@ -6929,6 +7011,7 @@
      "name": "Modern Web Application",
      "plugin_id": "10109",
      "risk": "Informational",
+     "run": "passive",
      "url": "https://vpn.castenow.de",
      "urls_sample": [
       "https://vpn.castenow.de"
@@ -6942,6 +7025,7 @@
      "name": "Absence of Anti-CSRF Tokens",
      "plugin_id": "10202",
      "risk": "Medium",
+     "run": "passive",
      "url": "https://vpn.castenow.de",
      "urls_sample": [
       "https://vpn.castenow.de"
@@ -7181,6 +7265,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -7230,6 +7315,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "securitytrails",
    "transport": null,
    "verified": null,
@@ -7260,6 +7346,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-07-19T20:47:23Z",
    "service": "http",
+   "service_seen_at": "2026-07-19T04:32:52Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7290,6 +7377,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-07-19T20:47:23Z",
    "service": "https",
+   "service_seen_at": "2026-07-19T20:47:23Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7316,6 +7404,7 @@
    "product": null,
    "seen_at": "2026-07-19T10:25:40Z",
    "service": "https",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7342,6 +7431,7 @@
    "product": null,
    "seen_at": "2026-07-19T22:13:27Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7368,6 +7458,7 @@
    "product": null,
    "seen_at": "2026-07-19T22:13:27Z",
    "service": "https",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7394,6 +7485,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-07-18T17:48:01Z",
    "service": "https",
+   "service_seen_at": "2026-07-18T17:50:16Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7420,6 +7512,7 @@
    "product": null,
    "seen_at": "2026-07-18T07:40:46Z",
    "service": "https",
+   "service_seen_at": "2026-07-18T07:40:46Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7446,6 +7539,7 @@
    "product": null,
    "seen_at": "2026-07-19T07:34:23Z",
    "service": "https",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7472,6 +7566,7 @@
    "product": "Apache httpd",
    "seen_at": "2026-07-19T10:01:57Z",
    "service": "https",
+   "service_seen_at": "2026-07-19T10:01:57Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7501,6 +7596,7 @@
    "product": null,
    "seen_at": "2026-07-18T14:15:23Z",
    "service": "http",
+   "service_seen_at": "2026-07-18T14:15:22Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7530,6 +7626,7 @@
    "product": null,
    "seen_at": "2026-07-18T14:15:23Z",
    "service": "https",
+   "service_seen_at": "2026-07-15T21:03:16Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7563,6 +7660,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "ftp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7596,6 +7694,7 @@
    "product": "Postfix smtpd",
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7629,6 +7728,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "dns-udp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "udp",
    "verified": true,
@@ -7662,6 +7762,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "http",
+   "service_seen_at": "2026-07-19T00:37:20Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7695,6 +7796,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "auto",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7728,6 +7830,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "pop3",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7761,6 +7864,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "imap",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7794,6 +7898,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "https",
+   "service_seen_at": "2026-07-19T21:24:42Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7827,6 +7932,7 @@
    "product": "Postfix smtpd",
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "smtps",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7860,6 +7966,7 @@
    "product": "Postfix smtpd",
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7893,6 +8000,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "imap-ssl",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7926,6 +8034,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "pop3-ssl",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7959,6 +8068,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "http-simple-new",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7992,6 +8102,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "http-simple-new",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -8025,6 +8136,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "https",
+   "service_seen_at": "2026-07-18T20:42:05Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -8058,6 +8170,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "http-simple-new",
+   "service_seen_at": "2026-07-19T05:01:03Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -8091,6 +8204,7 @@
    "product": null,
    "seen_at": "2026-07-19T21:24:42Z",
    "service": "https-simple-new",
+   "service_seen_at": "2026-07-17T16:58:26Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -8174,7 +8288,7 @@
    }
   ]
  },
- "schema_version": "1.0.6",
+ "schema_version": "1.0.7",
  "services": [
   {
    "auth_mechanisms": [],
@@ -8190,6 +8304,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": "Apache",
+   "fp_title": null,
    "host_ip": "159.69.143.80",
    "id": "svc:159.69.143.80:80/tcp",
    "login_disabled": null,
@@ -8200,6 +8317,7 @@
    "port": 80,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -8230,6 +8348,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": "Apache",
+   "fp_title": "yak",
    "host_ip": "159.69.143.80",
    "id": "svc:159.69.143.80:443/tcp",
    "login_disabled": null,
@@ -8240,6 +8361,7 @@
    "port": 443,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -8270,6 +8392,9 @@
     }
    ],
    "family": "web_server",
+   "fp_login": null,
+   "fp_server": "Web Server",
+   "fp_title": "Bad Request",
    "host_ip": "195.50.179.2",
    "id": "svc:195.50.179.2:443/tcp",
    "login_disabled": null,
@@ -8280,6 +8405,7 @@
    "port": 443,
    "product": "Web Server",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "https",
    "source": "nmap",
    "starttls": null,
@@ -8324,6 +8450,9 @@
     }
    ],
    "family": "postfix",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "195.50.179.4",
    "id": "svc:195.50.179.4:25/tcp",
    "login_disabled": true,
@@ -8334,6 +8463,7 @@
    "port": 25,
    "product": "Postfix smtpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": true,
@@ -8364,6 +8494,9 @@
     }
    ],
    "family": "iis",
+   "fp_login": null,
+   "fp_server": "Microsoft-IIS/10.0",
+   "fp_title": "Outlook",
    "host_ip": "195.50.179.4",
    "id": "svc:195.50.179.4:443/tcp",
    "login_disabled": null,
@@ -8374,6 +8507,7 @@
    "port": 443,
    "product": "Microsoft IIS httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -8404,6 +8538,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": "Apache",
+   "fp_title": "Nextcloud",
    "host_ip": "195.50.179.5",
    "id": "svc:195.50.179.5:443/tcp",
    "login_disabled": null,
@@ -8414,6 +8551,7 @@
    "port": 443,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -8444,6 +8582,9 @@
     }
    ],
    "family": "nginx",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "Bitwarden Web vault",
    "host_ip": "195.50.179.6",
    "id": "svc:195.50.179.6:443/tcp",
    "login_disabled": null,
@@ -8454,6 +8595,7 @@
    "port": 443,
    "product": "nginx",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -8491,6 +8633,9 @@
     }
    ],
    "family": "iis",
+   "fp_login": null,
+   "fp_server": "Microsoft-IIS/10.0",
+   "fp_title": "IIS Windows Server",
    "host_ip": "195.50.179.7",
    "id": "svc:195.50.179.7:443/tcp",
    "login_disabled": null,
@@ -8501,6 +8646,7 @@
    "port": 443,
    "product": "Microsoft IIS httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -8531,6 +8677,9 @@
     }
    ],
    "family": "apache",
+   "fp_login": null,
+   "fp_server": "Apache",
+   "fp_title": "403 Forbidden",
    "host_ip": "195.50.179.9",
    "id": "svc:195.50.179.9:443/tcp",
    "login_disabled": null,
@@ -8541,6 +8690,7 @@
    "port": 443,
    "product": "Apache httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -8564,6 +8714,9 @@
     }
    ],
    "family": "amazon_cloudfront_httpd",
+   "fp_login": null,
+   "fp_server": "CloudFront",
+   "fp_title": "ERROR: The request could not be satisfied",
    "host_ip": "3.174.46.10",
    "id": "svc:3.174.46.10:80/tcp",
    "login_disabled": null,
@@ -8574,6 +8727,7 @@
    "port": 80,
    "product": "Amazon CloudFront httpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -8597,6 +8751,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "3.174.46.10",
    "id": "svc:3.174.46.10:443/tcp",
    "login_disabled": null,
@@ -8607,6 +8764,7 @@
    "port": 443,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "https",
    "source": "nmap",
    "starttls": null,
@@ -8639,6 +8797,9 @@
     }
    ],
    "family": "proftpd",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:21/tcp",
    "login_disabled": null,
@@ -8649,6 +8810,7 @@
    "port": 21,
    "product": "ProFTPD",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ftp",
    "source": "nmap",
    "starttls": null,
@@ -8702,6 +8864,9 @@
     }
    ],
    "family": "postfix",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:25/tcp",
    "login_disabled": null,
@@ -8712,6 +8877,7 @@
    "port": 25,
    "product": "Postfix smtpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": true,
@@ -8735,6 +8901,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:53/tcp",
    "login_disabled": null,
@@ -8745,6 +8914,7 @@
    "port": 53,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "domain",
    "source": "nmap",
    "starttls": null,
@@ -8768,6 +8938,9 @@
     }
    ],
    "family": "nginx",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:80/tcp",
    "login_disabled": null,
@@ -8778,6 +8951,7 @@
    "port": 80,
    "product": "nginx",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -8801,6 +8975,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:106/tcp",
    "login_disabled": null,
@@ -8811,6 +8988,7 @@
    "port": 106,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "tcpwrapped",
    "source": "nmap",
    "starttls": null,
@@ -8862,9 +9040,12 @@
     }
    ],
    "family": "dovecot",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:110/tcp",
-   "login_disabled": null,
+   "login_disabled": false,
    "method": "probed",
    "mode": "active",
    "nmap_conf": 10,
@@ -8872,11 +9053,12 @@
    "port": 110,
    "product": "Dovecot pop3d",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "pop3",
    "source": "nmap",
    "starttls": true,
    "state": "open",
-   "tls_required": null,
+   "tls_required": false,
    "tunnel_ssl": false,
    "version_norm": null,
    "version_raw": null
@@ -8934,6 +9116,9 @@
     }
    ],
    "family": "dovecot",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:143/tcp",
    "login_disabled": false,
@@ -8944,6 +9129,7 @@
    "port": 143,
    "product": "Dovecot imapd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "imap",
    "source": "nmap",
    "starttls": true,
@@ -8973,6 +9159,9 @@
     }
    ],
    "family": "nginx",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:443/tcp",
    "login_disabled": null,
@@ -8983,6 +9172,7 @@
    "port": 443,
    "product": "nginx",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -9035,6 +9225,9 @@
     }
    ],
    "family": "postfix",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:465/tcp",
    "login_disabled": null,
@@ -9045,6 +9238,7 @@
    "port": 465,
    "product": "Postfix smtpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": false,
@@ -9092,6 +9286,9 @@
     }
    ],
    "family": "postfix",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:587/tcp",
    "login_disabled": true,
@@ -9102,6 +9299,7 @@
    "port": 587,
    "product": "Postfix smtpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": true,
@@ -9163,6 +9361,9 @@
     }
    ],
    "family": "dovecot",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:993/tcp",
    "login_disabled": false,
@@ -9173,6 +9374,7 @@
    "port": 993,
    "product": "Dovecot imapd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "imap",
    "source": "nmap",
    "starttls": false,
@@ -9223,6 +9425,9 @@
     }
    ],
    "family": "dovecot",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:995/tcp",
    "login_disabled": null,
@@ -9233,6 +9438,7 @@
    "port": 995,
    "product": "Dovecot pop3d",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "pop3",
    "source": "nmap",
    "starttls": false,
@@ -9256,6 +9462,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:8000/tcp",
    "login_disabled": null,
@@ -9266,6 +9475,7 @@
    "port": 8000,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http-alt",
    "source": "nmap",
    "starttls": null,
@@ -9289,6 +9499,9 @@
     }
    ],
    "family": null,
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:8001/tcp",
    "login_disabled": null,
@@ -9299,6 +9512,7 @@
    "port": 8001,
    "product": null,
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "vcom-tunnel",
    "source": "nmap",
    "starttls": null,
@@ -9331,6 +9545,9 @@
     }
    ],
    "family": "plesk",
+   "fp_login": true,
+   "fp_server": "sw-cp-server",
+   "fp_title": "Plesk Obsidian 18.0.79",
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:8443/tcp",
    "login_disabled": null,
@@ -9341,6 +9558,7 @@
    "port": 8443,
    "product": "sw-cp-server",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "https-alt",
    "source": "nmap",
    "starttls": null,
@@ -9364,6 +9582,9 @@
     }
    ],
    "family": "icecast",
+   "fp_login": null,
+   "fp_server": "Icecast 2.4.4",
+   "fp_title": "Icecast Streaming Media Server",
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:8800/tcp",
    "login_disabled": null,
@@ -9374,6 +9595,7 @@
    "port": 8800,
    "product": "Icecast streaming media server",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -9439,9 +9661,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:44:56Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9482,9 +9706,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:45:09Z",
    "product": "Drupal",
+   "release_date": null,
    "source": "webtech",
    "version_norm": "11",
    "version_raw": "11",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9519,9 +9745,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:59:04Z",
    "product": "jQuery",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9556,9 +9784,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:59:04Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9599,9 +9829,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:59:04Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9636,9 +9868,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:59:04Z",
    "product": "Drupal",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "11",
    "version_raw": "11",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9673,9 +9907,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:59:04Z",
    "product": "jQuery",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9710,9 +9946,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:59:04Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9747,9 +9985,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:05:16Z",
    "product": "jQuery",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9784,9 +10024,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:47:58Z",
    "product": "Web Server",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9821,9 +10063,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:05:16Z",
    "product": "jQuery",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9858,9 +10102,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:05:15Z",
    "product": "Web Server",
+   "release_date": null,
    "source": "header_check",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9901,9 +10147,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "4.0.30319",
    "version_raw": "4.0.30319",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -9919,7 +10167,7 @@
    "eol": {
     "date": "2025-10-14",
     "latest_patch": null,
-    "source": "manual",
+    "source": "Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2016",
     "status": "eol",
     "upstream_eol_date": null
    },
@@ -9966,9 +10214,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:25:49Z",
    "product": "Microsoft Exchange",
+   "release_date": null,
    "source": "cms_fingerprint",
    "version_norm": "2016",
    "version_raw": "15.1.2507",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10025,9 +10275,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:45:10Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10067,9 +10319,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:45:10Z",
    "product": "Postfix",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10104,9 +10358,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10141,9 +10397,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "4.0.30319",
    "version_raw": "4.0.30319",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10157,7 +10415,7 @@
    "eol": {
     "date": "2025-10-14",
     "latest_patch": null,
-    "source": "manual",
+    "source": "Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2016",
     "status": "eol",
     "upstream_eol_date": null
    },
@@ -10183,9 +10441,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "Microsoft Exchange",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "2016",
    "version_raw": "15.1.2507",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10226,9 +10486,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10263,9 +10525,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10300,9 +10564,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "4.0.30319",
    "version_raw": "4.0.30319",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10316,7 +10582,7 @@
    "eol": {
     "date": "2025-10-14",
     "latest_patch": null,
-    "source": "manual",
+    "source": "Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2016",
     "status": "eol",
     "upstream_eol_date": null
    },
@@ -10342,9 +10608,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "Microsoft Exchange",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "2016",
    "version_raw": "15.1.2507",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10385,9 +10653,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10422,9 +10692,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10459,9 +10731,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10475,7 +10749,7 @@
    "eol": {
     "date": "2025-10-14",
     "latest_patch": null,
-    "source": "manual",
+    "source": "Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2016",
     "status": "eol",
     "upstream_eol_date": null
    },
@@ -10501,9 +10775,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "Microsoft Exchange",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "2016",
    "version_raw": "15.1.2507",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10544,9 +10820,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10581,9 +10859,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10618,9 +10898,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "4.0.30319",
    "version_raw": "4.0.30319",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10634,7 +10916,7 @@
    "eol": {
     "date": "2025-10-14",
     "latest_patch": null,
-    "source": "manual",
+    "source": "Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2016",
     "status": "eol",
     "upstream_eol_date": null
    },
@@ -10660,9 +10942,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "Microsoft Exchange",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "2016",
    "version_raw": "15.1.2507",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10703,9 +10987,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10740,9 +11026,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:00:14Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10799,9 +11087,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:44:56Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10836,9 +11126,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:25:49Z",
    "product": "Nextcloud",
+   "release_date": null,
    "source": "cms_fingerprint",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10873,9 +11165,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:01:09Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10916,9 +11210,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:01:09Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10953,9 +11249,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:01:09Z",
    "product": "Nextcloud",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -10990,9 +11288,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:01:09Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11033,9 +11333,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:01:09Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11070,9 +11372,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:01:09Z",
    "product": "Nextcloud",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11107,9 +11411,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:01:09Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11154,9 +11460,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:46:35Z",
    "product": "nginx",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11196,9 +11504,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:07:01Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11239,9 +11549,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:47:53Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11298,9 +11610,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:47:47Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11335,9 +11649,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:09:08Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11378,9 +11694,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:09:08Z",
    "product": "ASP.NET",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11421,9 +11739,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:09:08Z",
    "product": "Microsoft IIS",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "10.0",
    "version_raw": "10.0",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11458,9 +11778,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:09:08Z",
    "product": "Windows Server",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11517,9 +11839,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:48:56Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11560,9 +11884,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:21:52Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11607,9 +11933,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:49:53Z",
    "product": "Amazon CloudFront httpd",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11644,9 +11972,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:50:04Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "webtech",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11681,9 +12011,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:23:21Z",
    "product": "Apache httpd",
+   "release_date": null,
    "source": "header_check",
    "version_norm": "2.4.68",
    "version_raw": "Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.5",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11738,9 +12070,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:49:49Z",
    "product": "Dovecot",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11780,9 +12114,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:49:49Z",
    "product": "Icecast",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "2.4.4",
    "version_raw": "2.4.4",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11817,9 +12153,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:13:17Z",
    "product": "jQuery",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11854,9 +12192,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:13:17Z",
    "product": "jQuery Migrate",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "3.4.1",
    "version_raw": "3.4.1",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11891,9 +12231,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:13:17Z",
    "product": "MySQL",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11943,9 +12285,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:49:49Z",
    "product": "nginx",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -11985,9 +12329,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:49:56Z",
    "product": "PHP",
+   "release_date": null,
    "source": "webtech",
    "version_norm": "8.4.23",
    "version_raw": "PHP/8.4.23\nPleskLin",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -12038,9 +12384,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:49:49Z",
    "product": "Plesk",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "18.0.79",
    "version_raw": "18.0.79",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -12090,9 +12438,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:49:49Z",
    "product": "Postfix",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -12132,9 +12482,11 @@
    "note": null,
    "observed_at": "2026-07-19T23:49:49Z",
    "product": "ProFTPD",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -12169,9 +12521,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:13:17Z",
    "product": "Underscore.js",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "1.13.8",
    "version_raw": "1.13.8",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -12212,9 +12566,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:25:49Z",
    "product": "WordPress",
+   "release_date": null,
    "source": "cms_fingerprint",
    "version_norm": "7.0.2",
    "version_raw": "7.0.2",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -12249,9 +12605,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:13:17Z",
    "product": "jQuery",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -12286,9 +12644,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:13:17Z",
    "product": "jQuery Migrate",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "3.4.1",
    "version_raw": "3.4.1",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -12323,9 +12683,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:21:50Z",
    "product": "myknowledgebase",
+   "release_date": null,
    "source": "wpscan",
    "version_norm": "8.7",
    "version_raw": "8.7",
+   "vulnerabilities": [],
    "vulnerabilities_count": 0
   },
   {
@@ -12360,9 +12722,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:13:17Z",
    "product": "MySQL",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -12403,9 +12767,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:13:17Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -12440,9 +12806,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:13:17Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "8.4.23",
    "version_raw": "8.4.23",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -12477,9 +12845,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:13:15Z",
    "product": "Plesk",
+   "release_date": null,
    "source": "header_check",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -12514,9 +12884,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:13:17Z",
    "product": "Underscore.js",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "1.13.8",
    "version_raw": "1.13.8",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -12557,9 +12929,11 @@
    "note": null,
    "observed_at": "2026-07-20T00:13:17Z",
    "product": "WordPress",
+   "release_date": "2026-07-17",
    "source": "httpx",
    "version_norm": "7.0.2",
    "version_raw": "7.0.2",
+   "vulnerabilities": [],
    "vulnerabilities_count": 0
   }
  ],

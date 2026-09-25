@@ -205,6 +205,42 @@ def classify(name: str | None) -> tuple[Optional[str], str, Optional[str], Optio
     return _generic(name, low)
 
 
+# S6b-2 (spec/09 Q18): Lebenszyklus mit Quelle. Exchange 2016 und 2019 haben seit dem
+# 14.10.2025 keinen Herstellersupport mehr; die Zuordnung laeuft ueber die Edition aus dem
+# Build (``exchange_edition``), nie ueber den Praefix 15.2, den auch Exchange SE traegt.
+EXCHANGE_LIFECYCLE: dict[str, tuple[str, str]] = {
+    "2016": ("2025-10-14", "Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2016"),
+    "2019": ("2025-10-14", "Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2019"),
+}
+
+# S6b-2 (spec/09 Q18): Debian-Release aus dem Paketsuffix ("5+deb11u7" ist Debian 11).
+# Massgeblich ist das Ende von Debian LTS, nicht das Ende der regulaeren
+# Sicherheitsunterstuetzung: bis dahin liefert das Debian-Projekt Sicherheitsupdates.
+_DEBIAN_RELEASE_RE = re.compile(r"deb(\d{1,2})u\d+", re.I)
+DEBIAN_LTS_END: dict[str, str] = {"9": "2022-06-30", "10": "2024-06-30", "11": "2026-08-31",
+                                  "12": "2028-06-30"}
+DEBIAN_LTS_SOURCE = "Debian LTS, https://wiki.debian.org/LTS"
+
+
+def debian_release(*texts: str | None) -> Optional[str]:
+    """Debian-Release aus einem Paketsuffix (``deb11u7`` ergibt ``11``), sonst None."""
+    for text in texts:
+        m = _DEBIAN_RELEASE_RE.search(text or "")
+        if m:
+            return m.group(1)
+    return None
+
+
+def debian_eol(release: str, scan_date: str | None) -> Eol:
+    date = DEBIAN_LTS_END.get(release)
+    if not date:
+        return Eol(status="unknown")
+    if not scan_date:
+        return Eol(status="unknown", date=date, source=DEBIAN_LTS_SOURCE)
+    status = "eol" if date <= str(scan_date)[:10] else "supported"
+    return Eol(status=status, date=date, source=DEBIAN_LTS_SOURCE)
+
+
 def detect_distro(text: str | None) -> Optional[str]:
     if not text:
         return None
@@ -318,6 +354,10 @@ def lookup_eol(norm: Normalized, scan_date: str | None, eol_data: dict[tuple[str
         eol_data = EOL_DATA
     if not norm.eol_key or not norm.version:
         return Eol(status="unknown")
+    if norm.family == "exchange" and norm.edition in EXCHANGE_LIFECYCLE and scan_date:
+        date, quelle = EXCHANGE_LIFECYCLE[norm.edition]
+        status = "eol" if date <= str(scan_date)[:10] else "supported"
+        return Eol(status=status, date=date, source=quelle)
     vendor, product = norm.eol_key
     lookup_version = norm.build if norm.family == "exchange" and norm.build else norm.version
     vt = _version_tuple(lookup_version)

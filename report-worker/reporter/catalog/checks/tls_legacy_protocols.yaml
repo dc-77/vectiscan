@@ -37,8 +37,12 @@ policy:
     Ausnutzung ist das eine Hygieneabweichung mit Bezug zu Zugangswegen, daher Hygiene hoch, kein 9.1
     (spec/02 Ursache 5, S2-Auftrag).
 texts:
+  short: "veraltete Protokollversionen"
+  plan:
+    lever: "Veraltete TLS-Versionen abschalten"
+    effect: "Schützt Verbindungen gegen bekannte Angriffe auf alte Protokolle"
   observation: >-
-    Der Dienst {group} bietet neben aktuellen Versionen auch veraltete TLS-Protokolle an, die seit
+    {n:Der Dienst|Die Dienste} {group} {n:bietet|bieten} neben aktuellen Versionen auch veraltete TLS-Protokolle an, die seit
     RFC 8996 als unsicher gelten: {affected}.
   meaning: >-
     Verbindungen älterer Clients können auf schwache Protokolle heruntergestuft werden. Unter
@@ -58,4 +62,4 @@ texts:
   positive:
     title: Nur aktuelle TLS-Protokolle
     text: >-
-      Der Dienst {group} bietet ausschließlich TLS 1.2 oder höher an.
+      {n:Der Dienst|Die Dienste} {group} {n:bietet|bieten} ausschließlich TLS 1.2 oder höher an.

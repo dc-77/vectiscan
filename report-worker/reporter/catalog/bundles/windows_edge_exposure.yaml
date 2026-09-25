@@ -1,5 +1,5 @@
 id: windows_edge_exposure
-title: Unveränderte Auslieferungsseite und zusätzlicher Webport auf {group}
+title: "Webdienste auf {group}: {rules}"
 category: A
 merge_by: host
 members: [default_page_exposed, http_alt_port]
@@ -10,27 +10,3 @@ frameworks:
   nis2: []
   iso27001: []
   tr03116: []
-texts:
-  observation: >-
-    Auf {group} beantwortet ein Webdienst Anfragen mit der unveränderten Auslieferungsseite des
-    Herstellers, teils auf einem zusätzlichen Port: {affected}.
-  meaning: >-
-    Eine unveränderte Auslieferungsseite verrät, dass hier ein Webserver ohne eigene Anwendung
-    antwortet, und lädt zum Ausprobieren bekannter Pfade ein. Ein zusätzlicher Webport vergrößert
-    die Angriffsfläche, ohne dass sein Zweck von außen erkennbar ist.
-  recommendation:
-    - stage: in_kuerze
-      text: >-
-        Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen.
-    - stage: mittelfristig
-      text: >-
-        Die Auslieferungsseite durch eine leere Antwort oder eine gezielte Weiterleitung ersetzen,
-        damit der Dienst keinen Rückschluss auf das eingesetzte Produkt zulässt.
-  verify: >-
-    Die genannten Adressen von außen erneut aufrufen; erwartet wird keine Auslieferungsseite des
-    Herstellers und kein zusätzlicher Webport.
-  positive:
-    title: Keine unveränderten Auslieferungsseiten und keine zusätzlichen Webports
-    text: >-
-      Auf {group} antwortet kein Webdienst mit der unveränderten Auslieferungsseite des Herstellers,
-      und es ist kein zusätzlicher Webport erreichbar.

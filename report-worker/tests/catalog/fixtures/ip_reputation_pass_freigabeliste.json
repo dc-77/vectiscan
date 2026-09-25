@@ -1,0 +1,22 @@
+{
+ "_note": "Score 0 wegen Freigabeliste, aber 26 Meldungen: kein Positivbefund (heuel, spec/09 Q12).",
+ "facts": {
+  "hosts": [
+   {
+    "ip": "10.0.0.1",
+    "reputation": {
+     "abuseipdb_score": 0,
+     "abuseipdb_total_reports": 26,
+     "abuseipdb_whitelisted": true,
+     "otx_pulse_count": 0
+    }
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.1",
+  "positive": false
+ }
+}

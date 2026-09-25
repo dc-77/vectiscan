@@ -34,8 +34,12 @@ policy:
   start_level: niedrig
   deviation: null
 texts:
+  short: "kein TLS 1.3"
+  plan:
+    lever: "TLS 1.3 aktivieren"
+    effect: "Nutzt das aktuelle Protokoll mit kleinerer Angriffsfläche"
   observation: >-
-    Der Dienst {group} bietet TLS 1.2 an, jedoch keine Unterstützung für TLS 1.3: {affected}.
+    {n:Der Dienst|Die Dienste} {group} {n:bietet|bieten} TLS 1.2 an, jedoch keine Unterstützung für TLS 1.3: {affected}.
   meaning: >-
     TLS 1.3 vereinfacht den Verbindungsaufbau, entfernt veraltete Verschlüsselungsoptionen und
     verkleinert die Angriffsfläche gegenüber älteren Protokollversionen. Ohne TLS 1.3 bleibt
@@ -51,4 +55,4 @@ texts:
   positive:
     title: TLS 1.3 verfügbar
     text: >-
-      Der Dienst {group} unterstützt TLS 1.3.
+      {n:Der Dienst|Die Dienste} {group} {n:unterstützt|unterstützen} TLS 1.3.

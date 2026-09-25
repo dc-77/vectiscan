@@ -6,7 +6,7 @@ scale: hygiene
 level: hoch
 group_by: domain
 scope: dns
-applicable_when: dns.spf is not None
+applicable_when: len(dns.mx) > 0 and dns.spf is not None
 when: dns.spf.all_qualifier == "+all"
 positive_when: never
 not_testable_when: []
@@ -28,6 +28,10 @@ policy:
   start_level: hoch
   deviation: null
 texts:
+  short: "SPF erlaubt jeden Absender"
+  plan:
+    lever: "SPF-Eintrag auf die eigenen Versandquellen beschränken"
+    effect: "Schützt die Authentizität der eigenen E-Mail"
   observation: >-
     Der SPF-Eintrag der Domain {domain} erlaubt mit seinem Qualifizierer den Versand durch
     einen beliebigen Server im Namen der Domain: {affected}. Die SPF-Prüfung ist damit

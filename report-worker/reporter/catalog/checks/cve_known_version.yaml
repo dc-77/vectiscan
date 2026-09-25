@@ -36,6 +36,9 @@ policy:
     Ausnutzungswahrscheinlichkeit; eine allein aus der Versionsnummer abgeleitete Vermutung reicht
     nicht.
 texts:
+  plan:
+    lever: "Bekannte Schwachstellen der erkannten Versionen schließen"
+    effect: "Schließt Lücken mit hoher externer Bewertung"
   observation: >-
     Für {group} listet eine externe Bedrohungsdatenbank eine Schwachstelle mit hoher
     Risikobewertung in eingesetzter Software: {affected}. Die Bewertung stammt aus dem

@@ -1260,7 +1260,10 @@
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
+    "abuseipdb_total_reports": 0,
+    "abuseipdb_whitelisted": false,
     "greynoise_classification": null,
     "is_tor": false,
     "otx_pulse_count": null,
@@ -1610,7 +1613,11 @@
    ],
    "url": "https://trunk-immobilien.de",
    "wordpress": {
+    "core_vulnerabilities": null,
+    "release_date": null,
     "users": [],
+    "users_found_by": [],
+    "version": null,
     "version_status": null
    },
    "x_feserver": null
@@ -1830,6 +1837,7 @@
    "product": null,
    "seen_at": null,
    "service": null,
+   "service_seen_at": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -1860,6 +1868,7 @@
    "product": null,
    "seen_at": "2026-05-10T06:31:37Z",
    "service": "ftp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1890,6 +1899,7 @@
    "product": "OpenSSH",
    "seen_at": "2026-05-10T06:31:37Z",
    "service": "ssh",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1920,6 +1930,7 @@
    "product": "Postfix smtpd",
    "seen_at": "2026-05-10T06:31:37Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1950,6 +1961,7 @@
    "product": "nginx",
    "seen_at": "2026-05-10T06:31:37Z",
    "service": "http",
+   "service_seen_at": "2026-05-07T09:09:42Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -1980,6 +1992,7 @@
    "product": null,
    "seen_at": "2026-05-10T06:31:37Z",
    "service": "pop3",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2010,6 +2023,7 @@
    "product": null,
    "seen_at": "2026-05-10T06:31:37Z",
    "service": "imap",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2040,6 +2054,7 @@
    "product": "nginx",
    "seen_at": "2026-05-10T06:31:37Z",
    "service": "https",
+   "service_seen_at": "2026-05-10T06:31:35Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2070,6 +2085,7 @@
    "product": "Postfix smtpd",
    "seen_at": "2026-05-10T06:31:37Z",
    "service": "smtps",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2100,6 +2116,7 @@
    "product": "Postfix smtpd",
    "seen_at": "2026-05-10T06:31:37Z",
    "service": "smtp",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2130,6 +2147,7 @@
    "product": "MariaDB",
    "seen_at": "2026-05-10T06:31:37Z",
    "service": "mysql",
+   "service_seen_at": null,
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2160,6 +2178,7 @@
    "product": null,
    "seen_at": "2026-05-10T06:31:37Z",
    "service": "https",
+   "service_seen_at": "2026-05-03T02:44:20Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -2190,6 +2209,7 @@
    "product": null,
    "seen_at": "2026-05-10T06:31:37Z",
    "service": "https-simple-new",
+   "service_seen_at": "2026-04-18T15:21:29Z",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -2273,7 +2293,7 @@
    }
   ]
  },
- "schema_version": "1.0.6",
+ "schema_version": "1.0.7",
  "services": [
   {
    "auth_mechanisms": [],
@@ -2295,6 +2315,9 @@
     }
    ],
    "family": "proftpd",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:21/tcp",
    "login_disabled": null,
@@ -2305,6 +2328,7 @@
    "port": 21,
    "product": "ProFTPD",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ftp",
    "source": "nmap",
    "starttls": null,
@@ -2328,6 +2352,9 @@
     }
    ],
    "family": "openssh",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:22/tcp",
    "login_disabled": null,
@@ -2338,6 +2365,7 @@
    "port": 22,
    "product": "OpenSSH",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "ssh",
    "source": "nmap",
    "starttls": null,
@@ -2388,6 +2416,9 @@
     }
    ],
    "family": "postfix",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:25/tcp",
    "login_disabled": null,
@@ -2398,6 +2429,7 @@
    "port": 25,
    "product": "Postfix smtpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": true,
@@ -2421,6 +2453,9 @@
     }
    ],
    "family": "nginx",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "Default Parallels Plesk Page",
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:80/tcp",
    "login_disabled": null,
@@ -2431,6 +2466,7 @@
    "port": 80,
    "product": "nginx",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -2479,9 +2515,12 @@
     }
    ],
    "family": "dovecot",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:110/tcp",
-   "login_disabled": null,
+   "login_disabled": false,
    "method": "probed",
    "mode": "active",
    "nmap_conf": 10,
@@ -2489,11 +2528,12 @@
    "port": 110,
    "product": "Dovecot pop3d",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "pop3",
    "source": "nmap",
    "starttls": true,
    "state": "open",
-   "tls_required": null,
+   "tls_required": false,
    "tunnel_ssl": false,
    "version_norm": null,
    "version_raw": null
@@ -2548,6 +2588,9 @@
     }
    ],
    "family": "dovecot",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:143/tcp",
    "login_disabled": false,
@@ -2558,6 +2601,7 @@
    "port": 143,
    "product": "Dovecot imapd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "imap",
    "source": "nmap",
    "starttls": true,
@@ -2587,6 +2631,9 @@
     }
    ],
    "family": "nginx",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": "Default Parallels Plesk Page",
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:443/tcp",
    "login_disabled": null,
@@ -2597,6 +2644,7 @@
    "port": 443,
    "product": "nginx",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "http",
    "source": "nmap",
    "starttls": null,
@@ -2646,6 +2694,9 @@
     }
    ],
    "family": "postfix",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:465/tcp",
    "login_disabled": null,
@@ -2656,6 +2707,7 @@
    "port": 465,
    "product": "Postfix smtpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": false,
@@ -2700,6 +2752,9 @@
     }
    ],
    "family": "postfix",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:587/tcp",
    "login_disabled": true,
@@ -2710,6 +2765,7 @@
    "port": 587,
    "product": "Postfix smtpd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "smtp",
    "source": "nmap",
    "starttls": true,
@@ -2768,6 +2824,9 @@
     }
    ],
    "family": "dovecot",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:993/tcp",
    "login_disabled": false,
@@ -2778,6 +2837,7 @@
    "port": 993,
    "product": "Dovecot imapd",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "imap",
    "source": "nmap",
    "starttls": false,
@@ -2825,6 +2885,9 @@
     }
    ],
    "family": "dovecot",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:995/tcp",
    "login_disabled": null,
@@ -2835,6 +2898,7 @@
    "port": 995,
    "product": "Dovecot pop3d",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "pop3",
    "source": "nmap",
    "starttls": false,
@@ -2865,6 +2929,9 @@
     }
    ],
    "family": "mariadb",
+   "fp_login": null,
+   "fp_server": null,
+   "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:3306/tcp",
    "login_disabled": null,
@@ -2875,6 +2942,7 @@
    "port": 3306,
    "product": "MySQL",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "mysql",
    "source": "nmap",
    "starttls": null,
@@ -2904,6 +2972,9 @@
     }
    ],
    "family": "plesk",
+   "fp_login": true,
+   "fp_server": "sw-cp-server",
+   "fp_title": "publishsoft LINUX Kundenserver",
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:8443/tcp",
    "login_disabled": null,
@@ -2914,6 +2985,7 @@
    "port": 8443,
    "product": "sw-cp-server",
    "proto": "tcp",
+   "rejects_before_auth": null,
    "service": "https-alt",
    "source": "nmap",
    "starttls": null,
@@ -2977,9 +3049,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:30:04Z",
    "product": "Dovecot",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3019,9 +3093,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:30:04Z",
    "product": "MariaDB",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "5.5.68",
    "version_raw": "5.5.68-MariaDB",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3071,9 +3147,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:30:04Z",
    "product": "nginx",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3113,9 +3191,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:30:04Z",
    "product": "OpenSSH",
+   "release_date": null,
    "source": "nmap",
    "version_norm": "7.4",
    "version_raw": "7.4",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3150,9 +3230,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:30:56Z",
    "product": "PHP",
+   "release_date": null,
    "source": "webtech",
    "version_norm": "8.2.30",
    "version_raw": "PHP/8.2.30\nPleskLin",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3198,9 +3280,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:30:04Z",
    "product": "Plesk",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3250,9 +3334,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:30:04Z",
    "product": "Postfix",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3292,9 +3378,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:30:04Z",
    "product": "ProFTPD",
+   "release_date": null,
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3335,9 +3423,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:38Z",
    "product": "WordPress",
+   "release_date": null,
    "source": "cms_fingerprint",
    "version_norm": "6.4.2",
    "version_raw": "6.4.2",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3372,9 +3462,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "BeTheme",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "27.2.11",
    "version_raw": "27.2.11",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3409,9 +3501,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "Complianz",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3446,9 +3540,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "jQuery",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3483,9 +3579,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "jQuery Migrate",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "3.4.1",
    "version_raw": "3.4.1",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3520,9 +3618,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "MySQL",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3563,9 +3663,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3600,9 +3702,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3643,9 +3747,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "Plesk",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3680,9 +3786,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "WordPress",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "6.4.2",
    "version_raw": "6.4.2",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3717,9 +3825,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "WP Fastest Cache",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3759,9 +3869,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3796,9 +3908,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "BeTheme",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "28.2.1",
    "version_raw": "28.2.1",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3833,9 +3947,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "Complianz",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3870,9 +3986,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "jQuery",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3907,9 +4025,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "jQuery Migrate",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "3.4.1",
    "version_raw": "3.4.1",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3944,9 +4064,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "MySQL",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -3987,9 +4109,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4024,9 +4148,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "8.2.30",
    "version_raw": "8.2.30",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4061,9 +4187,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "WordPress",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4098,9 +4226,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "WP Fastest Cache",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4140,9 +4270,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4177,9 +4309,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "BeTheme",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "28.2.1",
    "version_raw": "28.2.1",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4214,9 +4348,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "Complianz",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4251,9 +4387,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "jQuery",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4288,9 +4426,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "jQuery Migrate",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "3.4.1",
    "version_raw": "3.4.1",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4325,9 +4465,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "MySQL",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4368,9 +4510,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "nginx",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4405,9 +4549,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "PHP",
+   "release_date": null,
    "source": "httpx",
    "version_norm": "8.2.30",
    "version_raw": "8.2.30",
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4442,9 +4588,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:34:55Z",
    "product": "Plesk",
+   "release_date": null,
    "source": "header_check",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4479,9 +4627,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "WordPress",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   },
   {
@@ -4516,9 +4666,11 @@
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "WP Fastest Cache",
+   "release_date": null,
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
+   "vulnerabilities": [],
    "vulnerabilities_count": null
   }
  ],

@@ -115,7 +115,8 @@ def test_prosa_systemsatz_nur_mit_eigener_rolle():
 def test_prosa_payload_nur_systeme_mit_rolle_und_netzbetreiber():
     payload = build_payload(data_for(BS))
     assert all(s["belege"] for s in payload["systeme"])
-    assert all("netzbetreiber" in h and "betreiber" not in h for h in payload["hosts"])
+    # S6b-2: die Zeilen aus 2.1 heissen "systeme_2_1", eine Zeile je System.
+    assert all("netzbetreiber" in h and "betreiber" not in h for h in payload["systeme_2_1"])
 
 
 @pytest.mark.parametrize("order", RUNDE)

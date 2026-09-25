@@ -1,5 +1,5 @@
 id: remote_admin_closed
-title: Fernwartung oder Dateifreigabe aus dem Internet erreichbar
+title: "Fernwartung und Dateifreigabe aus dem Internet erreichbar: {rules}"
 category: A
 merge_by: global
 members: [rdp_exposed, smb_exposed]
@@ -10,40 +10,15 @@ frameworks:
   nis2: []
   iso27001: []
   tr03116: []
-texts:
-  observation: >-
-    Aus dem Internet sind Dienste für Fernwartung oder für Dateifreigaben erreichbar: {affected}.
-  meaning: >-
-    Fernwartung und Dateifreigaben gehören nicht an das öffentliche Interface. Beide Protokolle
-    sind die häufigsten Einstiegspunkte für Erpressungsangriffe, weil sie Zugangsdaten entgegen
-    nehmen und in der Vergangenheit schwere Schwachstellen hatten.
-  recommendation:
-    - stage: unverzueglich
-      text: >-
-        Den Zugriff aus dem Internet sperren und Fernwartung nur über ein VPN zulassen.
-    - stage: in_kuerze
-      text: >-
-        Zugangsdaten rotieren und die Anmeldeprotokolle der letzten Monate auf fremde Versuche
-        prüfen.
-    - stage: mittelfristig
-      text: >-
-        Eine zweite Anmeldestufe für den Fernzugang einführen.
-  verify: >-
-    Portscan der betroffenen Ports von einer externen Adresse wiederholen; erwartet wird der
-    Zustand gefiltert oder geschlossen.
-  positive:
-    title: Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet erreichbar
-    text: >-
-      Auf {group} antwortet weder die Windows-Fernwartung (RDP) noch die Windows-Dateifreigabe
-      (SMB) auf Verbindungen von außen. Andere Zugänge wie FTP, SSH oder Verwaltungsoberflächen
-      umfasst diese Aussage nicht.
+positive_title: Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet erreichbar
 # S6a (Issue #30): Der Positivbefund prueft nur RDP und SMB. Steht auf einem Host FTP,
 # ein SSH-Dienst ausserhalb Port 22 mit Befund oder eine Verwaltungsoberflaeche als
 # Befund, faellt dieser Host aus dem Positivbefund heraus; ohne verbleibenden Host
 # entfaellt er. Regressionssperre: Huendgen 62c1e866 (FTP auf 21),
-# tests/v3/test_bundles.py.
+# tests/v3/test_bundles.py. S6b-2: die Verwaltungspruefungen des Buendels admin_access.
 positive_conflicts:
   - checks: [ftp_plaintext, legacy_protocols_present]
     ports: [21]
-  - checks: [admin_service_exposed, admin_portal_exposed, admin_service_exposed_passive]
+  - checks: [admin_service_exposed, admin_panel_hoster, admin_service_unconfirmed, admin_portal_exposed,
+             admin_service_exposed_passive]
   - noted_by: ssh_alt_port

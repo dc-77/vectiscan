@@ -1,0 +1,44 @@
+{
+ "check": "legacy_protocols_present",
+ "cases": [
+  {
+   "name": "FTP mit erzwungenem TLS und FTP ohne Beleg",
+   "facts": {
+    "services": [
+     {
+      "host_ip": "10.0.0.3",
+      "port": 21,
+      "service": "ftp",
+      "product": "ProFTPD",
+      "tls_required": true
+     },
+     {
+      "host_ip": "10.0.0.4",
+      "port": 21,
+      "service": "ftp",
+      "product": "Pure-FTPd"
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "10.0.0.3:21": [
+      "observation[1]"
+     ],
+     "10.0.0.4:21": [
+      "observation[2]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.3:21": [
+      "observation[2]"
+     ],
+     "10.0.0.4:21": [
+      "observation[1]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  }
+ ]
+}

@@ -31,6 +31,10 @@ policy:
   start_level: LOW
   deviation: null
 texts:
+  short: "keine DNSSEC-Signatur"
+  plan:
+    lever: "DNS-Zone mit DNSSEC signieren"
+    effect: "Schützt DNS-Antworten gegen Verfälschung auf dem Übertragungsweg"
   observation: >-
     Für {affected} ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain
     {domain} lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit

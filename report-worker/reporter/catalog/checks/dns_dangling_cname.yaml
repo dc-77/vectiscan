@@ -28,6 +28,10 @@ policy:
   start_level: mittel
   deviation: null
 texts:
+  short: "verwaister CNAME-Eintrag"
+  plan:
+    lever: "Verwaiste DNS-Einträge löschen"
+    effect: "Verhindert, dass Dritte Namen der Domain übernehmen"
   observation: >-
     Für die Domain {domain} liegt mindestens ein CNAME-Eintrag vor, dessen Ziel nicht mehr
     unter eigener Kontrolle liegt oder nicht mehr antwortet: {affected}.

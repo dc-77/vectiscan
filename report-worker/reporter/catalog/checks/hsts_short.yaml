@@ -32,8 +32,12 @@ policy:
   start_level: INFO
   deviation: null
 texts:
+  short: "HSTS mit kurzer Gültigkeit"
+  plan:
+    lever: "Gültigkeitsdauer von HSTS verlängern"
+    effect: "Verhindert unverschlüsselte Aufrufe der Webseite"
   observation: >-
-    Der Dienst {group} setzt den HTTP Strict Transport Security Header mit einer
+    {n:Der Dienst|Die Dienste} {group} {n:setzt|setzen} den HTTP Strict Transport Security Header mit einer
     Gültigkeitsdauer, die unter dem empfohlenen Richtwert liegt: {affected}.
   meaning: >-
     Eine kurze Gültigkeitsdauer lässt den Schutz vor Downgrade-Angriffen bereits nach kurzer
@@ -50,5 +54,5 @@ texts:
   positive:
     title: HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer
     text: >-
-      Der Dienst {group} setzt den Header Strict-Transport-Security mit einer ausreichenden
+      {n:Der Dienst|Die Dienste} {group} {n:setzt|setzen} den Header Strict-Transport-Security mit einer ausreichenden
       Gültigkeitsdauer.

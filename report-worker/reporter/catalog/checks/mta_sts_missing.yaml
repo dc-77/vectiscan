@@ -34,6 +34,10 @@ policy:
     niedrig uebernommen, da MTA-STS in der Praxis bei fast jedem Auftrag fehlt und erst im
     Zusammenspiel mit TLS-RPT und DANE als Buendel relevant wird.
 texts:
+  short: "kein MTA-STS"
+  plan:
+    lever: "MTA-STS für die Domain veröffentlichen"
+    effect: "Erzwingt die verschlüsselte Zustellung eingehender E-Mails"
   observation: >-
     Für {affected} ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain
     {domain} fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die

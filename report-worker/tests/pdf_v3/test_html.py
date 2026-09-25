@@ -80,12 +80,14 @@ def test_castenow_teilt_auf_und_laesst_nichts_weg():
     html = html_for(CASTENOW)
     assert "Weitere Sachverhalte" in html
     # S6b-1: 31 statt 29, weil Sachverhalte beim Hoster oder Plattformbetreiber eigene
-    # Befunde sind (spec/09 Q3).
-    assert "Dieses Kapitel zeigt die 15 dringendsten der 31 Befunde" in text_of(html)
+    # Befunde sind (spec/09 Q3). S6b-2: 28, weil dane_missing bei fremder MX-Zone,
+    # BREACH und ZAP-Meldungen unter Konfidenz High keinen Befund mehr tragen (Q4, Q14).
+    gesamt = 28
+    assert f"Dieses Kapitel zeigt die 15 dringendsten der {gesamt} Befunde" in text_of(html)
     haupt = _abschnitt(html, "Befunde im Detail", "Weitere Sachverhalte")
     anhang = _abschnitt(html, "Weitere Sachverhalte", "ANHÄNGE")
     assert haupt.count('<span class="id">') == TOP_N_HAUPTTEIL
-    assert anhang.count('<span class="id">') == 31 - TOP_N_HAUPTTEIL
+    assert anhang.count('<span class="id">') == gesamt - TOP_N_HAUPTTEIL
 
 
 def test_junkerwerk_braucht_keinen_anhang_zu_kapitel_6():

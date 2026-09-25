@@ -1,18 +1,36 @@
 {
  "facts": {
   "http": [
-   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "url": "https://www.example.test/", "reachable": true,
+   {
+    "host_ip": "10.0.0.1",
+    "fqdn": "www.example.test",
+    "url": "https://www.example.test/",
+    "reachable": true,
     "alerts": [
-     {"plugin_id": "10098", "name": "Cross-Domain Misconfiguration", "risk": "Medium", "url": "https://www.example.test/api"},
-     {"plugin_id": "10109", "name": "Modern Web Application", "risk": "Informational", "url": "https://www.example.test/"}
-    ]}
+     {
+      "plugin_id": "10098",
+      "name": "Cross-Domain Misconfiguration",
+      "risk": "Medium",
+      "url": "https://www.example.test/api",
+      "confidence": "High"
+     },
+     {
+      "plugin_id": "10109",
+      "name": "Modern Web Application",
+      "risk": "Informational",
+      "url": "https://www.example.test/"
+     }
+    ]
+   }
   ]
  },
  "coverage_default": "ok",
  "expect": {
   "status": "fail",
   "group_key": "www.example.test@10.0.0.1",
-  "affected": ["www.example.test (Cross-Domain Misconfiguration)"],
+  "affected": [
+   "www.example.test (Cross-Domain Misconfiguration)"
+  ],
   "positive": false
  }
 }

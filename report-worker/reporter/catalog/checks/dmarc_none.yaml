@@ -6,7 +6,7 @@ scale: hygiene
 level: mittel
 group_by: domain
 scope: dns
-applicable_when: dns.dmarc is not None and dns.dmarc.present is True
+applicable_when: len(dns.mx) > 0 and dns.dmarc is not None and dns.dmarc.present is True
 when: dns.dmarc.p == "none"
 positive_when: never
 not_testable_when: []
@@ -31,19 +31,36 @@ policy:
     weil sie zwar Auswertung ueber Berichte ermoeglicht, aber keine Zustellentscheidung
     erzwingt.
 texts:
+  short: "DMARC ohne Durchsetzung"
+  plan:
+    lever: "DMARC-Richtlinie durchsetzen"
+    effect: "Weist gefälschte E-Mails im Namen der Domain ab"
   observation: >-
     Die DMARC-Richtlinie der Domain {domain} ist auf reine Beobachtung gesetzt: {affected}.
     E-Mails, die SPF oder DKIM nicht bestehen, werden dadurch nicht zurückgewiesen oder
     unter Quarantäne gestellt.
-  meaning: >-
-    Eine DMARC-Richtlinie ohne Durchsetzung sammelt zwar Berichte über fehlgeschlagene
-    Prüfungen, verändert aber die Zustellung nicht. Gefälschte E-Mails im Namen der Domain
-    kommen weiterhin beim Empfänger an.
+  meaning:
+    - text: >-
+        Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte
+        E-Mails im Namen der Domain kommen weiterhin beim Empfänger an.
+    - when: len(dns.dmarc.rua) > 0
+      text: >-
+        Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse.
+    - when: len(dns.dmarc.rua) == 0
+      text: >-
+        Eine Meldeadresse ist nicht hinterlegt; Berichte über fehlgeschlagene Prüfungen
+        erreichen Sie deshalb nicht.
   recommendation:
     - stage: in_kuerze
+      when: len(dns.dmarc.rua) > 0
       text: >-
         Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der
         Domain bestätigen.
+    - stage: in_kuerze
+      when: len(dns.dmarc.rua) == 0
+      text: >-
+        Eine Meldeadresse (rua) in den DMARC-Eintrag aufnehmen, die Berichte auswerten und alle
+        legitimen Versandquellen der Domain bestätigen.
     - stage: mittelfristig
       text: >-
         Die Richtlinie auf Quarantäne und danach auf Zurückweisung anheben, sobald alle

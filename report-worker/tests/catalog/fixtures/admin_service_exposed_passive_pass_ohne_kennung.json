@@ -1,0 +1,22 @@
+{
+ "_note": "Nur Port, ohne Kennung: kein Befund (heuel 4433, spec/09 Q13).",
+ "facts": {
+  "passive": [
+   {
+    "host_ip": "10.0.0.1",
+    "port": 4433,
+    "source": "shodan",
+    "banner_excerpt": "HTTP/1.1 200 OK Server: xxxx",
+    "verified": false,
+    "confidence": 0.5
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.1",
+  "affected": [],
+  "positive": false
+ }
+}

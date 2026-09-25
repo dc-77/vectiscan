@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
-"""Ein KI-Aufruf für vier Prosa-Felder, mit Gate und Katalog-Fallback.
+"""Ein KI-Aufruf für drei Prosa-Felder, mit Gate und Katalog-Fallback.
 
 Eingabe sind fertige Befunde und aggregierte Fakten als JSON, nie Rohdaten und nie
-Werkzeugausgaben. Ausgabe sind vier Felder:
+Werkzeugausgaben. Ausgabe sind drei Felder:
 
 * ``overall_text``   Zusammenfassung auf Seite 1 (``glance.overall_text``)
 * ``implication``    Kontextabsatz "Was das für Sie bedeutet" (``business.implication``)
 * ``observed``       ein Beobachtungssatz je System (``business.observed[].meaning``)
-* ``impact``         Feinschliff der Bedeutungstexte je Befund (``findings[].impact``)
+
+S6b-2 (spec/09 Q4): der Feinschliff der Bedeutungstexte je Befund (``impact``) entfaellt.
+Jede Aussage eines Befunds traegt im Katalog ihre Fakten-Bedingung, und das Gate prueft
+sie gegen den Katalogtext; ein umformulierter Satz haette keine Bedingung mehr. Zaehlungen
+stehen in Systemen wie in Kapitel 2.1 (``scan.systeme``).
 
 Jedes Feld läuft einzeln durch ``gate.check_field``. Fällt eines durch, bleibt der
 deterministische Text stehen; die anderen dürfen trotzdem übernommen werden.
@@ -69,17 +73,19 @@ Harte Regeln:
   keine Aufgabe (E-Mail, Kalender, Datenbank, Fernzugang, Passwortverwaltung,
   Zusammenarbeit, Webmail, Anmeldung), die dort nicht steht.
 - "netzbetreiber" ist der Betreiber des Netzes laut Reputationsquelle, nie der Kunde.
+- Zähle die geprüften Systeme wie unter "scan": "systeme" ist die Zahl der Systeme,
+  "ip_adressen" die Zahl der Adressen, "hostnamen" die Zahl der Namen. Nenne keine andere
+  Zahl von Systemen, Hosts, Adressen oder Namen und verwende "Host" nicht als Zähleinheit.
 
 Antworte ausschließlich mit einem JSON-Objekt dieser Form:
 {"overall_text": "...", "implication": "...",
- "observed": {"<system>": "..."}, "impact": {"<befund-id>": "..."}}
+ "observed": {"<system>": "..."}}
 
 overall_text: höchstens vier Sätze, was der Bericht in der Summe zeigt und was zuerst
 zu tun ist. implication: höchstens vier Sätze, was die Befunde für dieses Unternehmen
 bedeuten; wenn die Eingabe keinen Kundenkontext enthält, bleibe allgemein und sage
 nicht, dass er fehlt. observed: je genanntem System ein bis zwei Sätze, wofür es
-steht. impact: je Befund ein bis drei Sätze Feinschliff des mitgelieferten Textes,
-inhaltlich unverändert."""
+steht."""
 
 
 # ---------------------------------------------------------------- Eingabe
@@ -105,7 +111,10 @@ def build_payload(data: ReportData, customer_context: dict[str, Any] | None = No
             "domains": list(data.meta.domains),
             "paket": data.meta.package,
             "datum": data.meta.scan_date,
-            "hosts": data.meta.hosts_total,
+            # S6b-2 (Nachtrag S6b-1): Zaehlung wie Kapitel 2.1; vorher stand hier nur
+            # "hosts" (IP-Adressen), und die KI schrieb "4 Hosts" bei 3 Systemen.
+            "systeme": data.meta.systems_total,
+            "ip_adressen": data.meta.hosts_total,
             "hostnamen": data.meta.fqdns_total,
             "befunde": data.meta.consolidated,
             "positive": data.meta.positives,
@@ -120,7 +129,7 @@ def build_payload(data: ReportData, customer_context: dict[str, Any] | None = No
         "systeme": [{"system": o.system, "bedeutung": o.meaning, "belege": list(o.evidence)}
                     for o in data.business.observed if o.role_keys],
         # S6b-1 (spec/09 Q15): AbuseIPDB nennt den Netzbetreiber, nie den Kunden.
-        "hosts": [
+        "systeme_2_1": [
             {"ip": h.ip, "hostnamen": h.fqdns, "netzbetreiber": h.operator, "rolle": h.role,
              "abdeckung": h.cov}
             for h in data.scope.hosts
@@ -222,6 +231,12 @@ def _parse(text: str) -> dict[str, Any]:
 
 # ---------------------------------------------------------------- Uebernahme
 
+def counts_of(data: ReportData) -> dict[str, int]:
+    """Zaehlung aus Kapitel 2.1 fuer die Pruefung von Zahlen mit Einheit."""
+    return {"systeme": data.meta.systems_total, "ip_adressen": data.meta.hosts_total,
+            "hostnamen": data.meta.fqdns_total}
+
+
 def apply_prose(data: ReportData, fields: dict[str, Any],
                 payload: dict[str, Any] | None = None) -> list[str]:
     """Uebernimmt die Felder, die das Gate passieren. Liefert die abgelehnten."""
@@ -232,6 +247,8 @@ def apply_prose(data: ReportData, fields: dict[str, Any],
     alle_rollen = {k for o in data.business.observed for k in o.role_keys}
     # Was ein Befund des Berichts selbst nennt ("Datenbankdienst erreichbar"), ist belegt.
     befundtexte = " ".join(f"{f.title} {f.found}" for f in data.findings)
+    # S6b-2: jede Zahl mit Zaehleinheit muss der Zaehlung in Kapitel 2.1 entsprechen.
+    zaehlung = counts_of(data)
 
     def accept(name: str, text: Any, *, rollen: set[str] | None = None,
                bezug: str = "") -> Optional[str]:
@@ -239,7 +256,7 @@ def apply_prose(data: ReportData, fields: dict[str, Any],
             return None
         verdict = gate.check_field(name, text.strip(), haystack,
                                    role_keys=alle_rollen if rollen is None else rollen,
-                                   reference=bezug)
+                                   reference=bezug, counts=zaehlung)
         if verdict.ok:
             return text.strip()
         log.warning("report_prose_rejected", field=name, reasons=verdict.reasons)
@@ -266,14 +283,6 @@ def apply_prose(data: ReportData, fields: dict[str, Any],
                            rollen=set(entry.role_keys), bezug=f"{entry.system} {entry.meaning}")
             if value:
                 entry.meaning = value
-
-    impact = fields.get("impact") or {}
-    if isinstance(impact, dict):
-        for finding in data.findings:
-            value = accept(f"impact[{finding.id}]", impact.get(finding.id),
-                           bezug=f"{finding.title} {finding.found} {finding.impact}")
-            if value:
-                finding.impact = value
 
     data.meta.prose_rejected = rejected
     return rejected

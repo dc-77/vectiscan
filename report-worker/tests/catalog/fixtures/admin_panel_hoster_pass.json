@@ -1,0 +1,22 @@
+{
+ "_note": "Kein geteiltes System: admin_service_exposed greift, nicht diese Pruefung.",
+ "facts": {
+  "services": [
+   {
+    "host_ip": "10.0.0.9",
+    "port": 8443,
+    "service": "https-alt",
+    "product": "sw-cp-server",
+    "tunnel_ssl": true,
+    "fp_login": true
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.9",
+  "affected": [],
+  "positive": false
+ }
+}

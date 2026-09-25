@@ -8,13 +8,15 @@ group_by: fqdn
 scope: http
 applicable_when: http is not None and http.wordpress is not None
 item_when: http.wordpress is not None
-when: 'http.wordpress.version_status in ["insecure", "outdated"]'
+# S6b-2 (spec/09 Q18): veraltet heisst hier: der Kern hat eine bekannte Schwachstelle.
+# Ein Zweig mit aktuellem Sicherheitsstand (6.5.12 vom 22.09.2026) ist kein Befund.
+when: 'http.wordpress.version_status in ["insecure", "outdated"] and http.wordpress.core_vulnerabilities is not None and http.wordpress.core_vulnerabilities > 0'
 positive_when: http.wordpress.version_status == "latest"
 not_testable_when:
   - when: http.wordpress.version_status is None
     reason_code: wordpress_unknown
     context: item
-undetermined: not_testable
+undetermined: pass_silent
 requires:
   tools: [wpscan]
 kind: check
@@ -32,9 +34,12 @@ policy:
   start_level: erhoeht
   deviation: null
 texts:
+  plan:
+    lever: "WordPress-Kern aktualisieren"
+    effect: "Schließt bekannte Lücken im WordPress-Kern"
   observation: >-
-    Auf {group} ist eine WordPress-Kernversion im Einsatz, die die Versionsprüfung als veraltet
-    oder unsicher einstuft: {affected}.
+    Auf {group} ist eine WordPress-Kernversion im Einsatz, zu der die Versionsprüfung bekannte
+    Schwachstellen des Kerns meldet: {affected}.
   meaning: >-
     Eine veraltete WordPress-Kernversion enthält Schwachstellen, die in neueren Versionen bereits
     behoben und öffentlich dokumentiert sind. Die Versionsangabe ist von außen sichtbar, sodass

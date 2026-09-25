@@ -34,6 +34,9 @@ policy:
   start_level: hoch
   deviation: null
 texts:
+  plan:
+    lever: "Domain-Registrierung verlängern"
+    effect: "Verhindert den Verlust der Domain zum Ablaufdatum"
   observation: >-
     Für {affected} läuft die Registrierung der Domain {domain} innerhalb der nächsten 30
     Tage ab.

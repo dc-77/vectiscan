@@ -69,14 +69,14 @@
   "exposure_scale": [
    {
     "l": "kritisch",
-    "t": "Dienst, der nicht an das öffentliche Interface gehört (Datenbanken, Verwaltungsoberflächen, Fernwartung) und aus dem Internet erreichbar ist."
+    "t": "Dienst, der nicht an das öffentliche Interface gehört und aus dem Internet erreichbar ist: Datenbanken, Fernwartung, Verwaltungsoberfläche mit Anmeldung ohne vorgelagerten Schutz auf einem System des Kunden."
    },
    {
     "l": "erhöht",
-    "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
+    "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 22 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 9 Befunde und 2 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 21 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 8 Befunde und 3 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -101,7 +101,7 @@
    {
     "host": "62.217.52.165",
     "port": "443",
-    "ref": "VS-2026-004, VS-2026-007",
+    "ref": "VS-2026-002, VS-2026-006",
     "svc": "Golang net/http server, TLS erzwungen"
    }
   ],
@@ -109,7 +109,23 @@
    "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
    "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall."
   ],
-  "tool_findings": [],
+  "tool_findings": [
+   {
+    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: React",
+    "where": "62.217.52.165"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: Vue.js",
+    "where": "gutachter.vectigal.tech"
+   },
+   {
+    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
+    "what": "Technik: Node.js",
+    "where": "gutachter.vectigal.tech"
+   }
+  ],
   "tools": [
    {
     "c": "hoch (Dienste), mittel (Versionen)",
@@ -146,7 +162,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen."
    },
    {
     "l": "Gelb",
@@ -166,7 +182,7 @@
   ]
  },
  "architecture": {
-  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 2 Hosts mit folgenden Aufgaben: Website. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 2 Systeme mit folgenden Aufgaben: Website. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [],
   "posture": [
    {
@@ -264,7 +280,7 @@
     "short": "Sicherheits-Header"
    }
   ],
-  "reputation": "Reputation: keine Einträge zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus.",
+  "reputation": "Reputation: keine Meldungen zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus.",
   "screens": [
    {
     "also": [],
@@ -343,33 +359,6 @@
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
-     },
-     {
-      "c": "React",
-      "conf": "mittel",
-      "note": "",
-      "src": "webtech",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "Vue.js",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
-     },
-     {
-      "c": "Node.js",
-      "conf": "mittel",
-      "note": "",
-      "src": "httpx",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
      }
     ]
    }
@@ -401,262 +390,992 @@
  },
  "findings": [
   {
-   "affected": "vectigal.tech",
-   "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nvectigal.tech: DMARC=nicht vorhanden DKIM-Selektoren=keiner bekannt DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
-   "found": "Für vectigal.tech sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: vectigal.tech.",
-   "id": "VS-2026-001",
-   "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
-   "level": "hoch",
-   "level_label": "hoch",
-   "operator": "",
-   "operator_note": "",
-   "policy": "dmarc_missing",
-   "recommendation": [
-    [
-     "In Kürze",
-     "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten."
-    ],
-    [
-     "Mittelfristig",
-     "Die Richtlinie stufenweise auf Zurückweisung stellen, sobald alle Versandquellen erfasst sind, und den Abgleich der Absender scharf schalten."
-    ]
-   ],
-   "scale": "hygiene",
-   "source": "aktiv (dns_records)",
-   "status": "gelb",
-   "threat": null,
-   "title": "Richtlinie zur Absender-Authentizität für vectigal.tech nicht durchsetzend",
-   "urgency": "In Kürze",
-   "verify": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
-  },
-  {
-   "affected": "vectigal.tech",
-   "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nvectigal.tech: DMARC=nicht vorhanden DKIM-Selektoren=keiner bekannt DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
-   "found": "Für vectigal.tech fehlen Einträge, mit denen Empfangssysteme einen Absender prüfen können: vectigal.tech.",
-   "id": "VS-2026-002",
-   "impact": "Ohne diese Einträge kann ein Empfangssystem nicht unterscheiden, ob eine Nachricht wirklich aus Ihrer Domain stammt. Gefälschte Absender im Namen des Unternehmens sind damit ohne besonderen Aufwand möglich.",
-   "level": "hoch",
-   "level_label": "hoch",
-   "operator": "",
-   "operator_note": "",
-   "policy": "spf_missing",
-   "recommendation": [
-    [
-     "In Kürze",
-     "Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden."
-    ],
-    [
-     "Mittelfristig",
-     "Die Einträge nach jeder Änderung an den Versandwegen prüfen und die Signatur der ausgehenden Nachrichten überwachen."
-    ]
-   ],
-   "scale": "hygiene",
-   "source": "aktiv (dns_records)",
-   "status": "gelb",
-   "threat": null,
-   "title": "Grundlegende Einträge zur Absender-Authentizität fehlen für vectigal.tech",
-   "urgency": "In Kürze",
-   "verify": "DNS-Abfrage für die genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
-  },
-  {
    "affected": "vectiscan.de",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de: DMARC=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de DKIM-Selektoren=keiner bekannt MX=mx00.udag.de, mx01.udag.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
-   "found": "Für vectiscan.de fehlen Einträge, mit denen Empfangssysteme einen Absender prüfen können: vectiscan.de.",
-   "id": "VS-2026-003",
-   "impact": "Ohne diese Einträge kann ein Empfangssystem nicht unterscheiden, ob eine Nachricht wirklich aus Ihrer Domain stammt. Gefälschte Absender im Namen des Unternehmens sind damit ohne besonderen Aufwand möglich.",
+   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de · MX-Einträge: mx00.udag.de, mx01.udag.de · kein SPF-Eintrag",
+   "found": "Für die Domain vectiscan.de liegt kein SPF-Eintrag vor: vectiscan.de. Empfangende Mailserver können damit nicht prüfen, welche Server im Namen der Domain versenden dürfen.",
+   "id": "VS-2026-001",
+   "impact": "Ohne SPF akzeptieren viele Empfangssysteme E-Mails im Namen der Domain unabhängig vom tatsächlich sendenden Server. Das erleichtert Absenderfälschung für Phishing- und Betrugsversuche gegenüber Kunden, Lieferanten und Mitarbeitenden.",
+   "key": "mail_records/vectiscan.de/kunde",
    "level": "hoch",
    "level_label": "hoch",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Einen SPF-Eintrag veröffentlichen, der alle legitimen Versandquellen der Domain aufführt, und die Fehlbehandlung zunächst weich einstellen.",
+   "plan_effect": "Schützt die Authentizität der eigenen E-Mail",
+   "plan_lever": "SPF-Eintrag veröffentlichen",
+   "plan_stage": "in_kuerze",
    "policy": "spf_missing",
+   "provenance": [
+    {
+     "check": "spf_missing",
+     "field": "title",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "short",
+     "text": "kein SPF-Eintrag"
+    },
+    {
+     "check": "spf_missing",
+     "field": "observation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "observation[0]",
+     "text": "Für die Domain vectiscan.de liegt kein SPF-Eintrag vor: vectiscan.de. Empfangende Mailserver können damit nicht prüfen, welche Server im Namen der Domain versenden dürfen."
+    },
+    {
+     "check": "spf_missing",
+     "field": "meaning",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne SPF akzeptieren viele Empfangssysteme E-Mails im Namen der Domain unabhängig vom tatsächlich sendenden Server. Das erleichtert Absenderfälschung für Phishing- und Betrugsversuche gegenüber Kunden, Lieferanten und Mitarbeitenden."
+    },
+    {
+     "check": "spf_missing",
+     "field": "verify",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des TXT-Eintrags der Domain vectiscan.de; erwartet wird ein Eintrag, der mit v=spf1 beginnt."
+    },
+    {
+     "check": "spf_missing",
+     "field": "recommendation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Einen SPF-Eintrag veröffentlichen, der alle legitimen Versandquellen der Domain aufführt, und die Fehlbehandlung zunächst weich einstellen."
+    },
+    {
+     "check": "spf_missing",
+     "field": "recommendation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Die Versandquellen regelmäßig prüfen und den SPF-Eintrag bei Änderungen der Mailinfrastruktur nachziehen."
+    }
+   ],
    "recommendation": [
     [
      "In Kürze",
-     "Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden."
+     "Einen SPF-Eintrag veröffentlichen, der alle legitimen Versandquellen der Domain aufführt, und die Fehlbehandlung zunächst weich einstellen."
     ],
     [
      "Mittelfristig",
-     "Die Einträge nach jeder Änderung an den Versandwegen prüfen und die Signatur der ausgehenden Nachrichten überwachen."
+     "Die Versandquellen regelmäßig prüfen und den SPF-Eintrag bei Änderungen der Mailinfrastruktur nachziehen."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (dns_records)",
    "status": "gelb",
    "threat": null,
-   "title": "Grundlegende Einträge zur Absender-Authentizität fehlen für vectiscan.de",
+   "title": "Einträge zur Absender-Authentizität für vectiscan.de: kein SPF-Eintrag",
    "urgency": "In Kürze",
-   "verify": "DNS-Abfrage für die genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
+   "verify": "DNS-Abfrage des TXT-Eintrags der Domain vectiscan.de; erwartet wird ein Eintrag, der mit v=spf1 beginnt."
   },
   {
    "affected": "vectigal.tech:443 (Zertifikat für TRAEFIK DEFAULT CERT)",
    "cat": "D",
-   "evidence": "testssl · scan_results:testssl:62.217.52.165\nvectigal.tech:443 CN=TRAEFIK DEFAULT CERT SAN=b7ac570d803b471e8b7b2b0fd41a6112.0cc7297b85e043717ea982a9e9019f1a.traefik.default Aussteller=TRAEFIK DEFAULT CERT gueltig_bis=2027-09-20T09:03:00Z abgelaufen=nein Resttage=364 Namensabweichun...\n\ntestssl · scan_results:testssl:62.217.52.165\nangeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1\n\ntestssl · hosts/62.217.52.165/phase2/testssl.json\nservice=HTTP; pre_128cipher=No 128 cipher limit bug; SSLv2=not offered; SSLv3=not offered; TLS1=not offered; TLS1_1=not offered",
-   "found": "Die Zertifikate auf 62.217.52.165 sind abgelaufen, laufen in Kürze ab, werden unvollständig ausgeliefert oder passen nicht zum aufgerufenen Namen: vectigal.tech:443 (Zertifikat für TRAEFIK DEFAULT CERT).",
-   "id": "VS-2026-004",
-   "impact": "Ein Zertifikat mit Beanstandung führt im Browser zu einer Vertrauenswarnung. Nutzer gewöhnen sich daran, solche Warnungen wegzuklicken, und übersehen dann auch eine echte Täuschung.",
+   "evidence": "testssl\nvectigal.tech:443 · Zertifikat für: TRAEFIK DEFAULT CERT · weitere Namen: b7ac570d803b471e8b7b2b0fd41a6112.0cc7297b85e043717ea982a9e9019f1a.traefik.default · Aussteller: TRAEFIK DEFAULT CERT · gültig bis: 2027-09-20 · Vertrauenskette vollständig: nein · Name passt nicht: ja",
+   "found": "Für den Dienst vectigal.tech passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen Hostnamen: vectigal.tech:443 (Zertifikat für TRAEFIK DEFAULT CERT). Für den Dienst vectigal.tech liefert der TLS-Handshake eine unvollständige Zertifikatskette: vectigal.tech:443. Zwischen dem Server-Zertifikat und einer allgemein bekannten Vertrauensstelle fehlt mindestens ein Zwischenzertifikat.",
+   "id": "VS-2026-002",
+   "impact": "Ein TLS-Client kann die Identität des Dienstes nicht anhand des Zertifikats bestätigen und muss die Sicherheitswarnung entweder ablehnen oder ignorieren. Werden solche Warnungen ignoriert, fällt ein echter Man-in-the-Middle-Angriff mit einem passend gefälschten Zertifikat nicht mehr auf. Clients, die die fehlende Zwischenstelle nicht bereits im eigenen Speicher haben, können die Vertrauenskette nicht vollständig nachvollziehen und zeigen eine Warnung oder lehnen die Verbindung ab. Betroffen sind vor allem ältere oder abweichend konfigurierte Clients.",
+   "key": "cert_health/62.217.52.165/kunde",
    "level": "hoch",
    "level_label": "hoch",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält.",
+   "plan_effect": "Beendet die Namenswarnung beim Aufruf des Dienstes",
+   "plan_lever": "Zertifikate auf alle aufgerufenen Namen ausstellen",
+   "plan_stage": "in_kuerze",
    "policy": "cert_chain_incomplete, cert_hostname_mismatch",
+   "provenance": [
+    {
+     "check": "cert_hostname_mismatch",
+     "field": "title",
+     "members": [
+      "vectigal.tech@62.217.52.165|vectigal.tech:443@62.217.52.165"
+     ],
+     "statement": "short",
+     "text": "Zertifikat passt nicht zum Namen"
+    },
+    {
+     "check": "cert_chain_incomplete",
+     "field": "title",
+     "members": [
+      "vectigal.tech@62.217.52.165|vectigal.tech:443@62.217.52.165"
+     ],
+     "statement": "short",
+     "text": "Vertrauenskette unvollständig"
+    },
+    {
+     "check": "cert_hostname_mismatch",
+     "field": "observation",
+     "members": [
+      "vectigal.tech@62.217.52.165|vectigal.tech:443@62.217.52.165"
+     ],
+     "statement": "observation[0]",
+     "text": "Für den Dienst vectigal.tech passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen Hostnamen: vectigal.tech:443 (Zertifikat für TRAEFIK DEFAULT CERT)."
+    },
+    {
+     "check": "cert_chain_incomplete",
+     "field": "observation",
+     "members": [
+      "vectigal.tech@62.217.52.165|vectigal.tech:443@62.217.52.165"
+     ],
+     "statement": "observation[0]",
+     "text": "Für den Dienst vectigal.tech liefert der TLS-Handshake eine unvollständige Zertifikatskette: vectigal.tech:443. Zwischen dem Server-Zertifikat und einer allgemein bekannten Vertrauensstelle fehlt mindestens ein Zwischenzertifikat."
+    },
+    {
+     "check": "cert_hostname_mismatch",
+     "field": "meaning",
+     "members": [
+      "vectigal.tech@62.217.52.165|vectigal.tech:443@62.217.52.165"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ein TLS-Client kann die Identität des Dienstes nicht anhand des Zertifikats bestätigen und muss die Sicherheitswarnung entweder ablehnen oder ignorieren. Werden solche Warnungen ignoriert, fällt ein echter Man-in-the-Middle-Angriff mit einem passend gefälschten Zertifikat nicht mehr auf."
+    },
+    {
+     "check": "cert_chain_incomplete",
+     "field": "meaning",
+     "members": [
+      "vectigal.tech@62.217.52.165|vectigal.tech:443@62.217.52.165"
+     ],
+     "statement": "meaning[0]",
+     "text": "Clients, die die fehlende Zwischenstelle nicht bereits im eigenen Speicher haben, können die Vertrauenskette nicht vollständig nachvollziehen und zeigen eine Warnung oder lehnen die Verbindung ab. Betroffen sind vor allem ältere oder abweichend konfigurierte Clients."
+    },
+    {
+     "check": "cert_hostname_mismatch",
+     "field": "verify",
+     "members": [
+      "vectigal.tech@62.217.52.165|vectigal.tech:443@62.217.52.165"
+     ],
+     "statement": "verify[0]",
+     "text": "Verbindung zum Dienst unter dem öffentlichen Hostnamen mit einem TLS-Client aufbauen und das Zertifikat prüfen; erwartet wird ein gemeinsamer Name oder ein alternativer Antragstellername, der zu diesem Hostnamen passt."
+    },
+    {
+     "check": "cert_chain_incomplete",
+     "field": "verify",
+     "members": [
+      "vectigal.tech@62.217.52.165|vectigal.tech:443@62.217.52.165"
+     ],
+     "statement": "verify[0]",
+     "text": "Verbindung zum Dienst mit einem TLS-Client aufbauen und die übermittelte Zertifikatskette prüfen; erwartet wird eine Kette bis zu einer allgemein bekannten Vertrauensstelle ohne fehlendes Zwischenzertifikat."
+    },
+    {
+     "check": "cert_hostname_mismatch",
+     "field": "recommendation",
+     "members": [
+      "vectigal.tech@62.217.52.165|vectigal.tech:443@62.217.52.165"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält."
+    },
+    {
+     "check": "cert_chain_incomplete",
+     "field": "recommendation",
+     "members": [
+      "vectigal.tech@62.217.52.165|vectigal.tech:443@62.217.52.165"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die vollständige Zertifikatskette einschließlich aller Zwischenzertifikate auf dem Dienst hinterlegen, so wie es die ausstellende Stelle vorgibt."
+    },
+    {
+     "check": "cert_hostname_mismatch",
+     "field": "recommendation",
+     "members": [
+      "vectigal.tech@62.217.52.165|vectigal.tech:443@62.217.52.165"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Die Zuordnung von Hostnamen zu Zertifikaten in die Auslieferung neuer virtueller Hosts aufnehmen, damit dieser Zustand nicht erneut entsteht."
+    },
+    {
+     "check": "cert_chain_incomplete",
+     "field": "recommendation",
+     "members": [
+      "vectigal.tech@62.217.52.165|vectigal.tech:443@62.217.52.165"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Die Auslieferung der Zertifikatskette in die Prüfung neuer oder erneuerter Zertifikate aufnehmen, damit dieser Zustand nicht erneut entsteht."
+    }
+   ],
    "recommendation": [
     [
-     "Unverzüglich",
-     "Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen."
+     "In Kürze",
+     "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält."
     ],
     [
      "Mittelfristig",
-     "Alle Namen, unter denen ein Dienst aufgerufen wird, in das Zertifikat aufnehmen und die Erneuerung automatisieren."
+     "Die vollständige Zertifikatskette einschließlich aller Zwischenzertifikate auf dem Dienst hinterlegen, so wie es die ausstellende Stelle vorgibt."
+    ],
+    [
+     "Strategisch",
+     "Die Zuordnung von Hostnamen zu Zertifikaten in die Auslieferung neuer virtueller Hosts aufnehmen, damit dieser Zustand nicht erneut entsteht."
+    ],
+    [
+     "Strategisch",
+     "Die Auslieferung der Zertifikatskette in die Prüfung neuer oder erneuerter Zertifikate aufnehmen, damit dieser Zustand nicht erneut entsteht."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (testssl)",
    "status": "gelb",
    "threat": null,
-   "title": "Zertifikate auf 62.217.52.165 mit Beanstandungen",
+   "title": "Zertifikate auf 62.217.52.165: Zertifikat passt nicht zum Namen und Vertrauenskette unvollständig",
    "urgency": "In Kürze",
-   "verify": "Eine verschlüsselte Verbindung zu den genannten Diensten aufbauen; erwartet wird ein gültiges Zertifikat mit vollständiger Kette und passendem Namen."
+   "verify": "Verbindung zum Dienst unter dem öffentlichen Hostnamen mit einem TLS-Client aufbauen und das Zertifikat prüfen; erwartet wird ein gemeinsamer Name oder ein alternativer Antragstellername, der zu diesem Hostnamen passt. Verbindung zum Dienst mit einem TLS-Client aufbauen und die übermittelte Zertifikatskette prüfen; erwartet wird eine Kette bis zu einer allgemein bekannten Vertrauensstelle ohne fehlendes Zwischenzertifikat."
   },
   {
    "affected": "vectiscan.de (p=none)",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de: DMARC=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de DKIM-Selektoren=keiner bekannt MX=mx00.udag.de, mx01.udag.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
-   "found": "Für vectiscan.de sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: vectiscan.de (p=none).",
-   "id": "VS-2026-005",
-   "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
+   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de · MX-Einträge: mx00.udag.de, mx01.udag.de · DMARC: v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de",
+   "found": "Die DMARC-Richtlinie der Domain vectiscan.de ist auf reine Beobachtung gesetzt: vectiscan.de (p=none). E-Mails, die SPF oder DKIM nicht bestehen, werden dadurch nicht zurückgewiesen oder unter Quarantäne gestellt.",
+   "id": "VS-2026-003",
+   "impact": "Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte E-Mails im Namen der Domain kommen weiterhin beim Empfänger an. Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse.",
+   "key": "mail_policy/vectiscan.de/kunde",
    "level": "mittel",
    "level_label": "mittel",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen.",
+   "plan_effect": "Weist gefälschte E-Mails im Namen der Domain ab",
+   "plan_lever": "DMARC-Richtlinie durchsetzen",
+   "plan_stage": "mittelfristig",
    "policy": "dmarc_none",
+   "provenance": [
+    {
+     "check": "dmarc_none",
+     "field": "title",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "short",
+     "text": "DMARC ohne Durchsetzung"
+    },
+    {
+     "check": "dmarc_none",
+     "field": "observation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "observation[0]",
+     "text": "Die DMARC-Richtlinie der Domain vectiscan.de ist auf reine Beobachtung gesetzt: vectiscan.de (p=none). E-Mails, die SPF oder DKIM nicht bestehen, werden dadurch nicht zurückgewiesen oder unter Quarantäne gestellt."
+    },
+    {
+     "check": "dmarc_none",
+     "field": "meaning",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "meaning[0]",
+     "text": "Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte E-Mails im Namen der Domain kommen weiterhin beim Empfänger an."
+    },
+    {
+     "check": "dmarc_none",
+     "field": "meaning",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "meaning[1]",
+     "text": "Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse."
+    },
+    {
+     "check": "dmarc_none",
+     "field": "verify",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des TXT-Eintrags _dmarc.vectiscan.de; erwartet wird eine Richtlinie p, die nicht auf reine Beobachtung gesetzt ist."
+    },
+    {
+     "check": "dmarc_none",
+     "field": "recommendation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen."
+    },
+    {
+     "check": "dmarc_none",
+     "field": "recommendation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "recommendation[2]",
+     "text": "Die Richtlinie auf Quarantäne und danach auf Zurückweisung anheben, sobald alle legitimen Versender erfasst sind."
+    }
+   ],
    "recommendation": [
     [
-     "In Kürze",
-     "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten."
+     "Mittelfristig",
+     "Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen."
     ],
     [
-     "Mittelfristig",
-     "Die Richtlinie stufenweise auf Zurückweisung stellen, sobald alle Versandquellen erfasst sind, und den Abgleich der Absender scharf schalten."
+     "Strategisch",
+     "Die Richtlinie auf Quarantäne und danach auf Zurückweisung anheben, sobald alle legitimen Versender erfasst sind."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (dns_records)",
    "status": "gelb",
    "threat": null,
-   "title": "Richtlinie zur Absender-Authentizität für vectiscan.de nicht durchsetzend",
+   "title": "Richtlinien zur Absender-Authentizität für vectiscan.de: DMARC ohne Durchsetzung",
    "urgency": "Mittelfristig",
-   "verify": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
+   "verify": "DNS-Abfrage des TXT-Eintrags _dmarc.vectiscan.de; erwartet wird eine Richtlinie p, die nicht auf reine Beobachtung gesetzt ist."
   },
   {
-   "affected": "vectiscan.de",
+   "affected": "vectigal.tech",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de: DMARC=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de DKIM-Selektoren=keiner bekannt MX=mx00.udag.de, mx01.udag.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
-   "found": "Für vectiscan.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: vectiscan.de.",
-   "id": "VS-2026-006",
-   "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
-   "level": "niedrig",
-   "level_label": "niedrig",
+   "evidence": "dns_records · phase0/dns_records.json\nvectigal.tech · kein MX-Eintrag · kein SPF-Eintrag · kein DMARC-Eintrag",
+   "found": "Die Domain vectigal.tech hat keinen MX-Eintrag und nimmt damit keine E-Mails an. Ein SPF-Eintrag fehlt. Ein DMARC-Eintrag fehlt.",
+   "id": "VS-2026-004",
+   "impact": "Auch eine Domain ohne Mailbetrieb lässt sich als Absender fälschen. Ohne ausdrückliche Sperre können Empfangssysteme gefälschte Nachrichten im Namen dieser Domain nicht zuverlässig ablehnen.",
+   "key": "mail_records/vectigal.tech/kunde",
+   "level": "mittel",
+   "level_label": "mittel",
    "operator": "",
    "operator_note": "",
-   "policy": "mta_sts_missing, tls_rpt_missing",
+   "plan_action": "Für die Domain den SPF-Eintrag v=spf1 -all und einen DMARC-Eintrag mit p=reject veröffentlichen.",
+   "plan_effect": "Lässt Empfänger gefälschte E-Mails mit dieser Domain als Absender ablehnen",
+   "plan_lever": "Domains ohne Mailbetrieb gegen Absenderfälschung sperren",
+   "plan_stage": "mittelfristig",
+   "policy": "mail_spoofing_unprotected",
+   "provenance": [
+    {
+     "check": "mail_spoofing_unprotected",
+     "field": "title",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "short",
+     "text": "Domain ohne Mailbetrieb ohne Fälschungsschutz"
+    },
+    {
+     "check": "mail_spoofing_unprotected",
+     "field": "observation",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "observation[0]",
+     "text": "Die Domain vectigal.tech hat keinen MX-Eintrag und nimmt damit keine E-Mails an."
+    },
+    {
+     "check": "mail_spoofing_unprotected",
+     "field": "observation",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "observation[1]",
+     "text": "Ein SPF-Eintrag fehlt."
+    },
+    {
+     "check": "mail_spoofing_unprotected",
+     "field": "observation",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "observation[3]",
+     "text": "Ein DMARC-Eintrag fehlt."
+    },
+    {
+     "check": "mail_spoofing_unprotected",
+     "field": "meaning",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "meaning[0]",
+     "text": "Auch eine Domain ohne Mailbetrieb lässt sich als Absender fälschen. Ohne ausdrückliche Sperre können Empfangssysteme gefälschte Nachrichten im Namen dieser Domain nicht zuverlässig ablehnen."
+    },
+    {
+     "check": "mail_spoofing_unprotected",
+     "field": "verify",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage der TXT-Einträge der Domain und von _dmarc.vectigal.tech; erwartet werden v=spf1 -all und eine DMARC-Richtlinie mit p=reject."
+    },
+    {
+     "check": "mail_spoofing_unprotected",
+     "field": "recommendation",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Für die Domain den SPF-Eintrag v=spf1 -all und einen DMARC-Eintrag mit p=reject veröffentlichen."
+    }
+   ],
    "recommendation": [
     [
-     "Strategisch",
-     "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain."
+     "Mittelfristig",
+     "Für die Domain den SPF-Eintrag v=spf1 -all und einen DMARC-Eintrag mit p=reject veröffentlichen."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (dns_records)",
-   "status": "blau",
+   "status": "gelb",
    "threat": null,
-   "title": "Transportverschlüsselung im Mailversand für vectiscan.de nicht erzwungen",
-   "urgency": "Strategisch",
-   "verify": "DNS-Abfrage der genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
+   "title": "Einträge zur Absender-Authentizität für vectigal.tech: Domain ohne Mailbetrieb ohne Fälschungsschutz",
+   "urgency": "Mittelfristig",
+   "verify": "DNS-Abfrage der TXT-Einträge der Domain und von _dmarc.vectigal.tech; erwartet werden v=spf1 -all und eine DMARC-Richtlinie mit p=reject."
   },
   {
-   "affected": "10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy)",
-   "cat": "D",
-   "evidence": "header_check · hosts/62.217.52.165/phase2/headers_10finance.vectigal.tech.json\n10finance.vectigal.tech: URL=https://10finance.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; inclu...\n\nheader_check · hosts/62.217.52.165/phase2/headers_board.vectigal.tech.json\nboard.vectigal.tech: URL=https://board.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; includeSubDom...\n\nheader_check · hosts/62.217.52.165/phase2/headers_crm.vectigal.tech.json\ncrm.vectigal.tech: URL=https://crm.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; includeSubDomains...\n\nheader_check · hosts/62.217.52.165/phase2/headers_crmviewer.vectigal.tech.json\ncrmviewer.vectigal.tech: URL=https://crmviewer.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; inclu...\n\nheader_check · hosts/62.217.52.165/phase2/headers_gutachter.vectigal.tech.json\ngutachter.vectigal.tech: URL=https://gutachter.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; inclu...",
-   "found": "Die Webdienste auf 62.217.52.165 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: 10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy).",
-   "id": "VS-2026-007",
-   "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
+   "affected": "vectiscan.de",
+   "cat": "C",
+   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de · MX-Einträge: mx00.udag.de, mx01.udag.de\n\ndns_security · phase0a/dns_security_vectiscan.de.json\nvectiscan.de · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
+   "found": "Für vectiscan.de ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain vectiscan.de fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten. Für vectiscan.de ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain vectiscan.de fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können.",
+   "id": "VS-2026-005",
+   "impact": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen. Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.",
+   "key": "mail_transport_enforcement/vectiscan.de/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
-   "policy": "csp_missing, security_headers_incomplete",
+   "plan_action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
+   "plan_effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
+   "plan_lever": "MTA-STS für die Domain veröffentlichen",
+   "plan_stage": "strategisch",
+   "policy": "mta_sts_missing, tls_rpt_missing",
+   "provenance": [
+    {
+     "check": "mta_sts_missing",
+     "field": "title",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "short",
+     "text": "kein MTA-STS"
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "title",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "short",
+     "text": "kein TLS-RPT"
+    },
+    {
+     "check": "mta_sts_missing",
+     "field": "observation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "observation[0]",
+     "text": "Für vectiscan.de ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain vectiscan.de fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten."
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "observation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "observation[0]",
+     "text": "Für vectiscan.de ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain vectiscan.de fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können."
+    },
+    {
+     "check": "mta_sts_missing",
+     "field": "meaning",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen."
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "meaning",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten."
+    },
+    {
+     "check": "mta_sts_missing",
+     "field": "verify",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des TXT-Eintrags _mta-sts.vectiscan.de sowie Abruf der Richtliniendatei unter der zugehörigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine Richtliniendatei mit mode enforce."
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "verify",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des TXT-Eintrags _smtp._tls.vectiscan.de; erwartet wird ein Eintrag, der mit v=TLSRPTv1 beginnt und eine Meldeadresse (rua) nennt."
+    },
+    {
+     "check": "mta_sts_missing",
+     "field": "recommendation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden."
+    },
+    {
+     "check": "tls_rpt_missing",
+     "field": "recommendation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten."
+    }
+   ],
    "recommendation": [
     [
-     "Mittelfristig",
-     "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren."
+     "Strategisch",
+     "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden."
     ],
     [
      "Strategisch",
-     "Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen."
+     "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (dns_records, dns_security)",
+   "status": "blau",
+   "threat": null,
+   "title": "Verschlüsselte Zustellung von E-Mails für vectiscan.de: kein MTA-STS und kein TLS-RPT",
+   "urgency": "Strategisch",
+   "verify": "DNS-Abfrage des TXT-Eintrags _mta-sts.vectiscan.de sowie Abruf der Richtliniendatei unter der zugehörigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine Richtliniendatei mit mode enforce. DNS-Abfrage des TXT-Eintrags _smtp._tls.vectiscan.de; erwartet wird ein Eintrag, der mit v=TLSRPTv1 beginnt und eine Meldeadresse (rua) nennt."
+  },
+  {
+   "affected": "10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy)",
+   "cat": "D",
+   "evidence": "header_check · hosts/62.217.52.165/phase2/headers_10finance.vectigal.tech.json\n10finance.vectigal.tech · Adresse: https://10finance.vectigal.tech · Content-Security-Policy: nicht gesetzt · fehlende Header: content-security-policy, permissions-policy\n\nheader_check · hosts/62.217.52.165/phase2/headers_board.vectigal.tech.json\nboard.vectigal.tech · Adresse: https://board.vectigal.tech · Content-Security-Policy: nicht gesetzt · fehlende Header: content-security-policy, permissions-policy\n\nheader_check · hosts/62.217.52.165/phase2/headers_crm.vectigal.tech.json\ncrm.vectigal.tech · Adresse: https://crm.vectigal.tech · Content-Security-Policy: nicht gesetzt · fehlende Header: content-security-policy, permissions-policy\n\nheader_check · hosts/62.217.52.165/phase2/headers_crmviewer.vectigal.tech.json\ncrmviewer.vectigal.tech · Adresse: https://crmviewer.vectigal.tech · Content-Security-Policy: nicht gesetzt · fehlende Header: content-security-policy, permissions-policy\n\nheader_check · hosts/62.217.52.165/phase2/headers_gutachter.vectigal.tech.json\ngutachter.vectigal.tech · Adresse: https://gutachter.vectigal.tech · Content-Security-Policy: nicht gesetzt · fehlende Header: content-security-policy, permissions-policy",
+   "found": "Auf 62.217.52.165 ist keine Content-Security-Policy gesetzt: 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech. Auf 62.217.52.165 fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: 10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy).",
+   "id": "VS-2026-006",
+   "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar.",
+   "key": "web_header_hygiene/62.217.52.165/kunde",
+   "level": "niedrig",
+   "level_label": "niedrig",
+   "operator": "",
+   "operator_note": "",
+   "plan_action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
+   "plan_effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+   "plan_lever": "Inhaltsrichtlinie für die Webseiten einführen",
+   "plan_stage": "mittelfristig",
+   "policy": "csp_missing, security_headers_incomplete",
+   "provenance": [
+    {
+     "check": "csp_missing",
+     "field": "title",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "short",
+     "text": "Inhaltsrichtlinie fehlt"
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "title",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "short",
+     "text": "Sicherheits-Header unvollständig"
+    },
+    {
+     "check": "csp_missing",
+     "field": "observation",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf 62.217.52.165 ist keine Content-Security-Policy gesetzt: 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "observation",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf 62.217.52.165 fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: 10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy)."
+    },
+    {
+     "check": "csp_missing",
+     "field": "meaning",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar."
+    },
+    {
+     "check": "csp_missing",
+     "field": "verify",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
+    },
+    {
+     "check": "csp_missing",
+     "field": "recommendation",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
+    }
+   ],
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt."
+    ],
+    [
+     "Mittelfristig",
+     "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
-   "title": "Sicherheits-Header und Formularschutz auf 62.217.52.165 unvollständig",
+   "title": "Absicherung der Webdienste auf 62.217.52.165: Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
    "urgency": "Mittelfristig",
-   "verify": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
   },
   {
    "affected": "vectigal.tech",
    "cat": "E",
-   "evidence": "dns_records · phase0/dns_records.json\nvectigal.tech: DMARC=nicht vorhanden DKIM-Selektoren=keiner bekannt DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
-   "found": "Für vectigal.tech fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: vectigal.tech.",
-   "id": "VS-2026-008",
-   "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
+   "evidence": "dns_security · phase0a/dns_security.json\nvectigal.tech · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
+   "found": "Für vectigal.tech ist kein CAA-Eintrag veröffentlicht. Für die Domain vectigal.tech legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen. Für vectigal.tech ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain vectigal.tech lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
+   "id": "VS-2026-007",
+   "impact": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf. Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
+   "key": "dns_hygiene/vectigal.tech/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
+   "plan_effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+   "plan_lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+   "plan_stage": "mittelfristig",
    "policy": "caa_missing, dnssec_missing",
+   "provenance": [
+    {
+     "check": "caa_missing",
+     "field": "title",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "short",
+     "text": "kein CAA-Eintrag"
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "title",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "short",
+     "text": "keine DNSSEC-Signatur"
+    },
+    {
+     "check": "caa_missing",
+     "field": "observation",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "observation[0]",
+     "text": "Für vectigal.tech ist kein CAA-Eintrag veröffentlicht. Für die Domain vectigal.tech legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "observation",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "observation[0]",
+     "text": "Für vectigal.tech ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain vectigal.tech lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen."
+    },
+    {
+     "check": "caa_missing",
+     "field": "meaning",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "meaning",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen."
+    },
+    {
+     "check": "caa_missing",
+     "field": "verify",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des CAA-Eintrags für die Domain vectigal.tech; erwartet wird mindestens ein issue-Eintrag mit der genutzten Zertifizierungsstelle."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "verify",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage der SOA mit aktivierter DNSSEC-Option für die Domain vectigal.tech; erwartet wird ein RRSIG-Eintrag in der Antwort."
+    },
+    {
+     "check": "caa_missing",
+     "field": "recommendation",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "recommendation",
+     "members": [
+      "vectigal.tech|vectigal.tech"
+     ],
+     "statement": "recommendation[0]",
+     "text": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist."
+    }
+   ],
    "recommendation": [
     [
+     "Mittelfristig",
+     "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt."
+    ],
+    [
      "Strategisch",
-     "Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen."
+     "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist."
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records)",
+   "source": "aktiv (dns_security)",
    "status": "blau",
    "threat": null,
-   "title": "DNS-Absicherung für vectigal.tech nicht eingerichtet",
-   "urgency": "Strategisch",
-   "verify": "DNS-Abfrage der Signatur und der Ausstellungseingrenzung wiederholen; erwartet wird je ein gültiger Eintrag."
+   "title": "DNS-Absicherung für vectigal.tech: kein CAA-Eintrag und keine DNSSEC-Signatur",
+   "urgency": "Mittelfristig",
+   "verify": "DNS-Abfrage des CAA-Eintrags für die Domain vectigal.tech; erwartet wird mindestens ein issue-Eintrag mit der genutzten Zertifizierungsstelle. DNS-Abfrage der SOA mit aktivierter DNSSEC-Option für die Domain vectigal.tech; erwartet wird ein RRSIG-Eintrag in der Antwort."
   },
   {
    "affected": "vectiscan.de",
    "cat": "E",
-   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de: DMARC=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de DKIM-Selektoren=keiner bekannt MX=mx00.udag.de, mx01.udag.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
-   "found": "Für vectiscan.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: vectiscan.de.",
-   "id": "VS-2026-009",
-   "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
+   "evidence": "dns_security · phase0a/dns_security_vectiscan.de.json\nvectiscan.de · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
+   "found": "Für vectiscan.de ist kein CAA-Eintrag veröffentlicht. Für die Domain vectiscan.de legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen. Für vectiscan.de ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain vectiscan.de lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
+   "id": "VS-2026-008",
+   "impact": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf. Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
+   "key": "dns_hygiene/vectiscan.de/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
    "operator": "",
    "operator_note": "",
+   "plan_action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
+   "plan_effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+   "plan_lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+   "plan_stage": "mittelfristig",
    "policy": "caa_missing, dnssec_missing",
+   "provenance": [
+    {
+     "check": "caa_missing",
+     "field": "title",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "short",
+     "text": "kein CAA-Eintrag"
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "title",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "short",
+     "text": "keine DNSSEC-Signatur"
+    },
+    {
+     "check": "caa_missing",
+     "field": "observation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "observation[0]",
+     "text": "Für vectiscan.de ist kein CAA-Eintrag veröffentlicht. Für die Domain vectiscan.de legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "observation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "observation[0]",
+     "text": "Für vectiscan.de ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain vectiscan.de lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen."
+    },
+    {
+     "check": "caa_missing",
+     "field": "meaning",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "meaning",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen."
+    },
+    {
+     "check": "caa_missing",
+     "field": "verify",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage des CAA-Eintrags für die Domain vectiscan.de; erwartet wird mindestens ein issue-Eintrag mit der genutzten Zertifizierungsstelle."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "verify",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "verify[0]",
+     "text": "DNS-Abfrage der SOA mit aktivierter DNSSEC-Option für die Domain vectiscan.de; erwartet wird ein RRSIG-Eintrag in der Antwort."
+    },
+    {
+     "check": "caa_missing",
+     "field": "recommendation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt."
+    },
+    {
+     "check": "dnssec_missing",
+     "field": "recommendation",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "recommendation[0]",
+     "text": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist."
+    }
+   ],
    "recommendation": [
     [
+     "Mittelfristig",
+     "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt."
+    ],
+    [
      "Strategisch",
-     "Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen."
+     "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist."
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records)",
+   "source": "aktiv (dns_security)",
    "status": "blau",
    "threat": null,
-   "title": "DNS-Absicherung für vectiscan.de nicht eingerichtet",
-   "urgency": "Strategisch",
-   "verify": "DNS-Abfrage der Signatur und der Ausstellungseingrenzung wiederholen; erwartet wird je ein gültiger Eintrag."
+   "title": "DNS-Absicherung für vectiscan.de: kein CAA-Eintrag und keine DNSSEC-Signatur",
+   "urgency": "Mittelfristig",
+   "verify": "DNS-Abfrage des CAA-Eintrags für die Domain vectiscan.de; erwartet wird mindestens ein issue-Eintrag mit der genutzten Zertifizierungsstelle. DNS-Abfrage der SOA mit aktivierter DNSSEC-Option für die Domain vectiscan.de; erwartet wird ein RRSIG-Eintrag in der Antwort."
   }
  ],
  "glance": {
@@ -679,21 +1398,21 @@
     "key": "C",
     "level": 2,
     "name": "E-Mail-Authentizität",
-    "note": "Richtlinie zur Absender-Authentizität für vectigal.tech nicht durchsetzend; Grundlegende Einträge zur Absender-Authentizität fehlen für vectigal.tech",
+    "note": "Einträge zur Absender-Authentizität für vectiscan.de: kein SPF-Eintrag; Richtlinien zur Absender-Authentizität für vectiscan.de: DMARC ohne Durchsetzung",
     "status": "gelb"
    },
    {
     "key": "D",
     "level": 2,
     "name": "Web- und Transport-Hygiene",
-    "note": "Zertifikate auf 62.217.52.165 mit Beanstandungen; Sicherheits-Header und Formularschutz auf 62.217.52.165 unvollständig",
+    "note": "Zertifikate auf 62.217.52.165: Zertifikat passt nicht zum Namen und Vertrauenskette unvollständig; Absicherung der Webdienste auf 62.217.52.165: Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
     "status": "gelb"
    },
    {
     "key": "E",
     "level": 1,
     "name": "Konfiguration und Informations-Hygiene",
-    "note": "DNS-Absicherung für vectigal.tech nicht eingerichtet; DNS-Absicherung für vectiscan.de nicht eingerichtet",
+    "note": "DNS-Absicherung für vectigal.tech: kein CAA-Eintrag und keine DNSSEC-Signatur; DNS-Absicherung für vectiscan.de: kein CAA-Eintrag und keine DNSSEC-Signatur",
     "status": "blau"
    }
   ],
@@ -704,39 +1423,38 @@
     "effect": "Schützt die Authentizität der eigenen E-Mail",
     "n": 1,
     "refs": [
-     "VS-2026-001",
-     "VS-2026-002"
+     "VS-2026-001"
     ],
-    "title": "Richtlinie zur Absender-Authentizität für vectigal.tech nicht durchsetzend"
+    "title": "SPF-Eintrag veröffentlichen"
    },
    {
-    "effect": "Schützt die Authentizität der eigenen E-Mail",
+    "effect": "Beendet die Namenswarnung beim Aufruf des Dienstes",
     "n": 2,
+    "refs": [
+     "VS-2026-002"
+    ],
+    "title": "Zertifikate auf alle aufgerufenen Namen ausstellen"
+   },
+   {
+    "effect": "Weist gefälschte E-Mails im Namen der Domain ab",
+    "n": 3,
     "refs": [
      "VS-2026-003"
     ],
-    "title": "Grundlegende Einträge zur Absender-Authentizität fehlen für vectiscan.de"
-   },
-   {
-    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-    "n": 3,
-    "refs": [
-     "VS-2026-004"
-    ],
-    "title": "Zertifikate auf 62.217.52.165 mit Beanstandungen"
+    "title": "DMARC-Richtlinie durchsetzen"
    }
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
   "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
- "landscape_lead": "9 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "8 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 22,
-  "catalog_digest": "dcd629946febcc08a9c28922053c58d8d6eb044355d63056decc79caff8a905b",
-  "catalog_version": "2026-09-25.1",
+  "after_fp": 21,
+  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
+  "catalog_version": "2026-09-25.2",
   "classification": "Vertraulich",
-  "consolidated": 9,
+  "consolidated": 8,
   "context_sources": {},
   "customer": "Auftraggeber",
   "customer_short": "Auftraggeber",
@@ -744,8 +1462,10 @@
    "vectigal.tech",
    "vectiscan.de"
   ],
-  "facts_schema_version": "1.0.6",
+  "excluded_ids": [],
+  "facts_schema_version": "1.0.7",
   "fqdns_total": 31,
+  "generation": null,
   "hosts_ipv4": 2,
   "hosts_ipv6": 0,
   "hosts_total": 2,
@@ -757,85 +1477,92 @@
   ],
   "package": "WebCheck",
   "package_label": "WEBCHECK",
-  "policy_version": "2026-09-25.1",
-  "positives": 2,
+  "policy_version": "2026-09-25.2",
+  "positives": 3,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
   "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
   "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
-  "raw_findings": 22,
+  "raw_findings": 21,
   "report_date": "19.09.2026",
   "report_id": "VS-2026-0920-7533",
-  "report_version": "1.0",
+  "report_version": "1",
   "scan_date": "20.09.2026",
   "scan_window": "20.09.2026, 11:07 bis 11:13 Uhr (CEST)",
+  "systems_total": 2,
   "tool_runs": 70
  },
  "plan": [
   {
-   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten. Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden.",
+   "action": "Einen SPF-Eintrag veröffentlichen, der alle legitimen Versandquellen der Domain aufführt, und die Fehlbehandlung zunächst weich einstellen.",
    "effect": "Schützt die Authentizität der eigenen E-Mail",
+   "lever": "SPF-Eintrag veröffentlichen",
    "prio": "In Kürze",
    "refs": [
-    "VS-2026-001",
+    "VS-2026-001"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält.",
+   "effect": "Beendet die Namenswarnung beim Aufruf des Dienstes",
+   "lever": "Zertifikate auf alle aufgerufenen Namen ausstellen",
+   "prio": "In Kürze",
+   "refs": [
     "VS-2026-002"
    ],
    "st": "gelb"
   },
   {
-   "action": "Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden.",
-   "effect": "Schützt die Authentizität der eigenen E-Mail",
-   "prio": "In Kürze",
+   "action": "Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen.",
+   "effect": "Weist gefälschte E-Mails im Namen der Domain ab",
+   "lever": "DMARC-Richtlinie durchsetzen",
+   "prio": "Mittelfristig",
    "refs": [
     "VS-2026-003"
    ],
    "st": "gelb"
   },
   {
-   "action": "Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "In Kürze",
+   "action": "Für die Domain den SPF-Eintrag v=spf1 -all und einen DMARC-Eintrag mit p=reject veröffentlichen.",
+   "effect": "Lässt Empfänger gefälschte E-Mails mit dieser Domain als Absender ablehnen",
+   "lever": "Domains ohne Mailbetrieb gegen Absenderfälschung sperren",
+   "prio": "Mittelfristig",
    "refs": [
     "VS-2026-004"
    ],
    "st": "gelb"
   },
   {
-   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
-   "effect": "Schützt die Authentizität der eigenen E-Mail",
+   "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
+   "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+   "lever": "Inhaltsrichtlinie für die Webseiten einführen",
    "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-006"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
+   "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+   "lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-007",
+    "VS-2026-008"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
+   "effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
+   "lever": "MTA-STS für die Domain veröffentlichen",
+   "prio": "Strategisch",
    "refs": [
     "VS-2026-005"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-007"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain. Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
-   "effect": "Schützt die Authentizität der eigenen E-Mail",
-   "prio": "Strategisch",
-   "refs": [
-    "VS-2026-006",
-    "VS-2026-009"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
-   "effect": "Nimmt Angreifern Vorbereitungswissen",
-   "prio": "Strategisch",
-   "refs": [
-    "VS-2026-008"
    ],
    "st": "blau"
   }
@@ -843,13 +1570,86 @@
  "positives": [
   {
    "cat": "A",
+   "provenance": [
+    {
+     "check": "http_no_tls",
+     "field": "positive",
+     "members": [
+      "62.217.52.165"
+     ],
+     "statement": "positive.title",
+     "text": "Webdienst mit Transportverschlüsselung"
+    },
+    {
+     "check": "http_no_tls",
+     "field": "positive",
+     "members": [
+      "62.217.52.165"
+     ],
+     "statement": "positive.text",
+     "text": "Der Host 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere) bietet seinen Webdienst über HTTPS an."
+    }
+   ],
    "text": "Der Host 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere) bietet seinen Webdienst über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
-   "cat": "E",
-   "text": "Zu den geprüften Adressen und zur Domain liegt in den abgefragten Reputationsquellen kein Eintrag vor.",
-   "title": "Keine Einträge in Reputationsquellen"
+   "cat": "A",
+   "provenance": [
+    {
+     "check": "urlhaus_compromise",
+     "field": "positive",
+     "members": [
+      "scan"
+     ],
+     "statement": "positive.title",
+     "text": "Keine Einträge in Malware-Feeds"
+    },
+    {
+     "check": "urlhaus_compromise",
+     "field": "positive",
+     "members": [
+      "scan"
+     ],
+     "statement": "positive.text",
+     "text": "Für vectigal.tech, vectiscan.de liegt kein Treffer in öffentlichen Datenbanken zur Schadsoftware-Verteilung vor."
+    }
+   ],
+   "text": "Für vectigal.tech, vectiscan.de liegt kein Treffer in öffentlichen Datenbanken zur Schadsoftware-Verteilung vor.",
+   "title": "Keine Einträge in Malware-Feeds"
+  },
+  {
+   "cat": "D",
+   "provenance": [
+    {
+     "check": "hsts_short",
+     "field": "positive",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "positive.title",
+     "text": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
+    },
+    {
+     "check": "hsts_short",
+     "field": "positive",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "positive.text",
+     "text": "Die Dienste 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech (insgesamt 5 Einträge) setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer."
+    }
+   ],
+   "text": "Die Dienste 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech (insgesamt 5 Einträge) setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer.",
+   "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   }
  ],
  "scope": {
@@ -925,13 +1725,6 @@
    },
    {
     "checks": [
-     "Laufzeit der Domain"
-    ],
-    "detail": "Betroffen: vectigal.tech, vectiscan.de.",
-    "what": "Registrierungsdaten der Domain nicht abrufbar"
-   },
-   {
-    "checks": [
      "TLS-Protokollversionen",
      "Verschlüsselungsverfahren"
     ],
@@ -949,7 +1742,6 @@
     "checks": [
      "Abruf der gesamten DNS-Zone",
      "Content-Security-Policy",
-     "DANE",
      "DMARC-Richtlinie",
      "Gültigkeit der Zertifikate",
      "HSTS",
@@ -991,7 +1783,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 9 Befunde und 2 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 8 Befunde und 3 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -1005,11 +1797,11 @@
    },
    {
     "l": "Einzelbeobachtungen",
-    "v": "22"
+    "v": "21"
    },
    {
     "l": "Befunde im Bericht",
-    "v": "9"
+    "v": "8"
    }
   ],
   "out_of_scope": [
