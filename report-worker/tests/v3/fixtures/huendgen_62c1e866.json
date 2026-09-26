@@ -1,5 +1,5 @@
 {
- "_comment": "Issue #30 (S6a), Regressionssperre: Huendgen 62c1e866, huendgen-entsorgung.de, Scan 17.09.2026. Dienste und FQDNs der drei per nmap geprueften Hosts aus dem API-Snapshot (tests/golden/api-snapshot/62c1e866-.../results.json, gebaut mit reporter.facts.golden.build_snapshot_facts). Im Produktionsbericht stand 'Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar' neben dem FTP-Befund auf 217.160.231.238:21.",
+ "_comment": "Issue #30 (S6a), Regressionssperre: Huendgen 62c1e866, huendgen-entsorgung.de, Scan 17.09.2026. Dienste und FQDNs der drei per nmap geprueften Hosts aus dem API-Snapshot (tests/golden/api-snapshot/62c1e866-.../results.json, gebaut mit reporter.facts.golden.build_snapshot_facts). Im Produktionsbericht stand 'Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar' neben dem FTP-Befund auf 217.160.231.238:21. S6b-3 (Entscheidung DC 26.09., spec/10 R6): die S6a-Konfliktregel ist mit dem Titel aus #30 gegenstandslos; der Positivbefund nennt nur RDP und SMB und gilt fuer alle drei Hosts, der FTP-Befund bleibt daneben stehen.",
  "scan": {
   "order_id": "62c1e866-1eae-451a-8b52-7bff591aad31",
   "domain": "huendgen-entsorgung.de",

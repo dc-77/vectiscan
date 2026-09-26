@@ -83,8 +83,8 @@ def test_eine_planzeile_je_massnahmentext(order):
     data = data_for(order)
     texte = [z.action for z in data.plan]
     assert len(texte) == len(set(texte)), (order, [t for t in texte if texte.count(t) > 1])
-    refs = [r for z in data.plan for r in z.refs]
-    assert sorted(refs) == sorted(f.id for f in data.findings)
+    refs = {r for z in data.plan for r in z.refs}
+    assert refs == {f.id for f in data.findings}
     for z in data.plan:
         assert z.effect, (order, z.action)
 
@@ -219,21 +219,30 @@ def test_froxlor_titel_ueber_die_ip_ist_verwaltungsoberflaeche(order):
 def test_anhang_eine_zeile_je_meldung():
     """Frage 3: castenow-Vorlauf, vorher 46 Zeilen im Anhang."""
     ap = data_for(CASTENOW_VORLAUF).appendix
-    assert len(ap.tool_messages) >= 40 and len(ap.tool_findings) <= 16
-    assert sum(t.count for t in ap.tool_findings) == len(ap.tool_messages)
+    # S6b-3 (spec/10 R15): dazu kommen die ZAP-Meldungen, deren abdeckende Regel am selben
+    # Namen nicht angeschlagen hat (Header an Namen, die nur an einer Weiterleitung gemessen sind).
+    assert len(ap.tool_messages) >= 40 and len(ap.tool_findings) <= 22
+    # S6b-3 (spec/10 R15): die Anzahl ist die Zahl der betroffenen Adressen laut Werkzeug.
+    assert sum(t.count for t in ap.tool_findings) == sum(max(m.count, 1) for m in ap.tool_messages)
     schluessel = [(t.rule, t.message) for t in ap.tool_findings]
     assert len(schluessel) == len(set(schluessel)), "eine Zeile je Meldung"
     for t in ap.tool_findings:
         namen = [n for n in t.where.split(" und ")[0].split(", ") if n]
         assert len(namen) <= 6, t.where
-        if t.count > 1 and len({m.where for m in ap.tool_messages if (m.rule, m.message) == (t.rule, t.message)}) > 6:
+        orte = {m.where for m in ap.tool_messages if (_kennung(m.rule), m.message) == (_kennung(t.rule), t.message)}
+        if len(orte) > 6:
             assert re.search(r" und \d+ weitere$", t.where), t.where
     zap = [t for t in ap.tool_findings if "ZAP-Regel" in t.what]
     assert zap and all(t.what.startswith("„") for t in zap), "Meldungsname als Zitat (Frage 6)"
     assert all(not t.note.startswith("„") for t in ap.tool_findings), "Hinweis ist der deutsche Regeltitel"
 
 
+def _kennung(rule: str) -> str:
+    """Meldungskennung einer Anhangzeile; ZAP-Zeilen heissen zusammengefasst "zap#<id>"."""
+    return rule.split("#", 1)[1] if "#" in rule else rule
+
+
 @pytest.mark.parametrize("order", ORDERS)
 def test_anhang_zeilen_decken_alle_einzelmeldungen(order):
     ap = data_for(order).appendix
-    assert sum(t.count for t in ap.tool_findings) == len(ap.tool_messages)
+    assert sum(t.count for t in ap.tool_findings) == sum(max(m.count, 1) for m in ap.tool_messages)

@@ -101,7 +101,21 @@ def _kunde(data: ReportData, customer_context: dict[str, Any] | None) -> dict[st
     kunde = dict(customer_context or {})
     if kunde.get("kurzname"):
         kunde["kurzname"] = data.meta.customer_short
+    # S6b-3 (spec/10 R13, Entscheidung E9): Mitarbeiterzahl und Branche nur mit Quelle Kunde
+    # oder Admin. Werte der Recherche-KI waren im Nachhinein nicht pruefbar ("45
+    # Mitarbeitenden" bei castenow) und gehen nicht in die Prosa.
+    quellen = dict(data.meta.context_sources or {})
+    roh = kunde.get("sources") if isinstance(kunde.get("sources"), dict) else {}
+    for name, eintrag in roh.items():
+        if isinstance(eintrag, dict) and eintrag.get("source"):
+            quellen.setdefault(name, str(eintrag["source"]))
+    for feld in PROSE_CONTEXT_CHECKED:
+        if feld in kunde and quellen.get(feld) not in ("kunde", "admin"):
+            kunde.pop(feld)
     return kunde
+
+
+PROSE_CONTEXT_CHECKED = ("mitarbeiter", "branche")
 
 
 def build_payload(data: ReportData, customer_context: dict[str, Any] | None = None) -> dict:
@@ -120,6 +134,9 @@ def build_payload(data: ReportData, customer_context: dict[str, Any] | None = No
             "positive": data.meta.positives,
         },
         "kunde": _kunde(data, customer_context),
+        # S6b-3 (spec/10 R13): Betriebsform der eigenen Systeme; "Unternehmensnetz" und
+        # "Anschluss" nur, wenn ein System am Anschluss des Kunden steht (Prosa-Gate).
+        "betriebsformen": list(data.business.betriebsformen),
         "kategorien": [
             {"schluessel": c.key, "name": c.name, "status": c.status, "hinweis": c.note}
             for c in data.glance.categories

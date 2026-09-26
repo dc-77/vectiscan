@@ -7,6 +7,8 @@ ohne Versionsnummer, weil der Gate-Check des Prototyps das verlangt (spec/03 Reg
 """
 from __future__ import annotations
 
+from typing import Optional
+
 from reporter.v3 import levels as _levels
 
 # ---------------------------------------------------------------- Impressum
@@ -82,18 +84,20 @@ TOOL_ROWS: list[tuple[str, str, str, tuple[str, ...]]] = [
      "hoch (Dienste), mittel (Versionen)", ("nmap",)),
     ("testssl.sh", "Protokolle, Verfahren, Zertifikate und bekannte Schwächen der Transportverschlüsselung",
      "hoch", ("testssl",)),
-    ("httpx, header_check", "HTTP-Antworten, Technologien und Sicherheits-Header je virtuellem Host",
-     "hoch", ("httpx", "header_check")),
+    ("httpx, header_check, Webabruf, Weiterleitungsprüfung",
+     "HTTP-Antworten, Technologien und Sicherheits-Header je virtuellem Host",
+     "hoch", ("httpx", "header_check", "web_probe", "redirect_probe")),
     ("OWASP ZAP (passiv, Spider)", "Passive Analyse von Antworten, Formularen und Headern",
      "mittel", ("zap", "zap_spider", "zap_ajax_spider")),
     ("OWASP ZAP (Active Scan)", "Aktive Prüfung der Webanwendung auf gängige Schwachstellenklassen",
      "mittel", ("zap_active",)),
-    ("feroxbuster", "Verzeichnis- und Datei-Enumeration", "mittel", ("feroxbuster",)),
+    ("feroxbuster, ffuf", "Verzeichnis-, Datei- und Parameter-Enumeration", "mittel",
+     ("feroxbuster", "ffuf", "ffuf_param", "ffuf_sensitive")),
     ("wpscan", "Prüfung einer WordPress-Installation auf Kern, Plugins und Nutzer",
      "hoch (Abgleich mit Schwachstellendatenbank)", ("wpscan",)),
-    ("webtech, wafw00f", "Web-Technologien und vorgelagerte Schutzsysteme",
-     "mittel", ("webtech", "wafw00f")),
-    ("dnsx, subfinder, gobuster, Certspotter, SecurityTrails",
+    ("webtech, wafw00f, CMS-Erkennung", "Web-Technologien und vorgelagerte Schutzsysteme",
+     "mittel", ("webtech", "wafw00f", "cms_fingerprint")),
+    ("DNS-Abfragen, dnsx, subfinder, gobuster, crt.sh, Certspotter, SecurityTrails",
      "Ermittlung der Hostnamen, DNS-Auflösung und DNS-Sicherheitseinträge",
      "hoch", ("dns_records", "dnsx", "subfinder", "gobuster_dns", "certspotter", "crtsh",
               "dns_security", "web_probe")),
@@ -108,6 +112,76 @@ TOOL_ROWS: list[tuple[str, str, str, tuple[str, ...]]] = [
 # hat. Der Korrelator laeuft in jedem Auftrag; die Fremdquellen werden nur
 # abgefragt, wenn eine Schwachstellennummer zu pruefen war (S5b).
 ENRICHMENT_TOOLS = ("phase3_correlation",)
+
+# ---------------------------------------------------------------- ZAP-Regeln
+
+# S6b-3 (spec/10 R15): deutscher Titel je ZAP-Regel fuer die Hinweis-Spalte im Anhang
+# "Werkzeugmeldungen ohne eigene Einstufung". Vorher stand dort der Titel der Katalogregel,
+# die die Meldung aufgenommen hat ("Technische Informationen offengelegt" auch bei
+# "Cross-Domain JavaScript Source File Inclusion"). Vollstaendig fuer alle Regeln der 21
+# Golden-Auftraege mit Risiko Low oder hoeher (Test ``test_zap_titel_vollstaendig``).
+# Regeln mit mehreren Meldungen unter einer Kennung stehen zusaetzlich nach Meldungsnamen.
+ZAP_TITLES: dict[str, str] = {
+    "2": "Private IP-Adresse in der Antwort",
+    "3": "Sitzungskennung in der Adresse",
+    "6": "Pfadmanipulation (Path Traversal)",
+    "7": "Einbindung entfernter Dateien",
+    "10003": "JavaScript-Bibliothek mit bekannter Schwachstelle",
+    "10009": "Versionsangabe im Seiteninhalt",
+    "10010": "Cookie ohne HttpOnly",
+    "10011": "Cookie ohne Secure",
+    "10017": "Skript von fremder Domain eingebunden",
+    "10020": "Schutz gegen Einbetten (X-Frame-Options) fehlt",
+    "10021": "X-Content-Type-Options fehlt",
+    "10023": "Fehlersuchmeldung in der Antwort",
+    "10024": "Vertrauliche Angaben in der Adresse",
+    "10025": "Vertrauliche Angaben im Referrer",
+    "10027": "Auffällige Kommentare im Quelltext",
+    "10035": "HSTS nicht gesetzt",
+    "10036": "Serverversion im Server-Header",
+    "10037": "Technikangabe im X-Powered-By-Header",
+    "10038": "Content-Security-Policy fehlt",
+    "10040": "Unverschlüsselte Inhalte in einer HTTPS-Seite",
+    "10044": "Weiterleitung mit ungewöhnlich großem Inhalt",
+    "10054": "Cookie ohne SameSite",
+    "10055": "Content-Security-Policy lückenhaft",
+    "10056": "Fehlersuchkennung in der Antwort",
+    "10061": "Versionsangabe im X-AspNet-Version-Header",
+    "10062": "Personenbezogene Angaben in der Antwort",
+    "10063": "Permissions-Policy fehlt",
+    "10094": "Base64-kodierte Angaben in der Antwort",
+    "10096": "Zeitstempel in der Antwort",
+    "10097": "Prüfsumme in der Antwort",
+    "10098": "Freizügige Freigabe für fremde Ursprünge (CORS)",
+    "10202": "Formular ohne Schutz gegen Anfragefälschung (CSRF)",
+    "40012": "Reflektiertes Cross-Site-Scripting",
+    "40014": "Gespeichertes Cross-Site-Scripting",
+    "40018": "SQL-Injection",
+    "90003": "Fremdskript ohne Integritätsprüfung (SRI)",
+    "90004": "Unzureichende Isolation gegen Spectre",
+    "90019": "Serverseitige Code-Injection",
+    "90022": "Fehlermeldung der Anwendung sichtbar",
+    "90033": "Cookie mit zu weitem Gültigkeitsbereich",
+}
+ZAP_TITLES_BY_NAME: dict[str, str] = {
+    "multiple x-frame-options header entries": "X-Frame-Options mehrfach gesetzt",
+    "strict-transport-security disabled": "HSTS abgeschaltet (max-age=0)",
+    "cookie with samesite attribute none": "Cookie mit abgeschaltetem SameSite-Schutz",
+    "csp: wildcard directive": "Content-Security-Policy mit Wildcard-Quelle",
+    "csp: script-src unsafe-inline": "Content-Security-Policy erlaubt Inline-Skripte",
+    "csp: style-src unsafe-inline": "Content-Security-Policy erlaubt Inline-Stile",
+}
+ZAP_CONFIDENCE: dict[str, str] = {"High": "hoch", "Medium": "mittel", "Low": "niedrig",
+                                  "Confirmed": "bestätigt", "False Positive": "Fehlalarm"}
+
+
+def zap_title(plugin_id: Optional[str], name: Optional[str]) -> Optional[str]:
+    """Deutscher Titel einer ZAP-Meldung oder ``None``, wenn die Tabelle sie nicht kennt."""
+    key = (name or "").strip().lower()
+    if key in ZAP_TITLES_BY_NAME:
+        return ZAP_TITLES_BY_NAME[key]
+    return ZAP_TITLES.get(str(plugin_id or ""))
+
 
 # ---------------------------------------------------------------- testssl-Kennungen
 # S6 (spec/08 Punkt 18 und offener Punkt 2 nach S5b): Anhang A.3 hatte die
@@ -213,7 +287,10 @@ POSTURE_BLOCKS: list[dict[str, object]] = [
             ("DKIM", ("dkim_missing",)),
             ("DMARC", ("dmarc_missing", "dmarc_none", "dmarc_quarantine", "mail_spoofing_unprotected")),
             ("MTA-STS", ("mta_sts_missing",)),
-            ("TLS-RPT, DANE", ("tls_rpt_missing", "dane_missing")),
+            # S6b-3 (spec/10 R8): TLS-RPT und DANE getrennt; DANE mit eigenem Grund
+            # ("entfällt, MX beim Dienstleister").
+            ("TLS-RPT", ("tls_rpt_missing",)),
+            ("DANE", ("dane_missing",)),
         ],
     },
     {
@@ -230,17 +307,18 @@ POSTURE_BLOCKS: list[dict[str, object]] = [
         "name": "Transportverschlüsselung",
         "short": "Transportverschlüsselung",
         "per_host": ("tls_legacy_protocols", "tls_no_13", "tls_weak_ciphers", "tls_weakness",
-                     "tls_no_fallback_scsv", "hsts_short"),
+                     "tls_no_fallback_scsv"),
         "items": [
             ("Zertifikate", ("cert_expired", "cert_expiring", "cert_expiring_later",
-                             "cert_chain_incomplete", "cert_hostname_mismatch", "cert_self_signed")),
+                             "cert_chain_incomplete", "cert_hostname_mismatch", "cert_self_signed",
+                             "service_cert_expired")),
         ],
     },
     {
         "name": "Sicherheits-Header",
         "short": "Sicherheits-Header",
         "per_host": ("security_headers_incomplete", "csp_missing", "csp_weak", "hsts_missing",
-                     "header_duplicate"),
+                     "hsts_short", "header_duplicate"),
         "items": [],
     },
 ]
@@ -350,6 +428,11 @@ FAMILY_CHECKS: dict[str, str] = {
     "legacy_protocols_present": "Ältere Übertragungsprotokolle",
     "login_portal_exposed": "Anmeldeportale",
     "mail_plaintext": "Verschlüsselung der Mailzugänge",
+    "service_unidentified": "Offene Dienste ohne Kennung",
+    "smtp_vrfy": "Befehle der Mailserver",
+    "wordpress_xmlrpc": "XML-RPC-Schnittstelle der Website",
+    "login_over_http": "Anmeldung über unverschlüsselte Verbindungen",
+    "spf_shared_host": "Absenderfreigaben im SPF-Eintrag",
     "mail_spoofing_unprotected": "Fälschungsschutz für Domains ohne Mailbetrieb",
     "mta_sts_missing": "MTA-STS",
     "passive_service_unverified": "Dienste laut Passivquelle",
@@ -430,6 +513,12 @@ ROLE_DEFS: dict[str, tuple[str, str]] = {
         "Anmeldeportal",
         "Zentrale Anmeldung für Anwendungen. Wer hier Zugangsdaten errät oder abgreift, erreicht die "
         "dahinterliegenden Dienste."),
+    # S6b-3 (spec/10 R9): die Anmeldeseite eines Redaktionssystems ist kein zentrales Portal
+    # (castenow ubb-wiki, WordPress).
+    "redaktion": (
+        "Redaktionszugang",
+        "Anmeldeseite des Redaktionssystems der Website. Wer hier Zugangsdaten errät oder abgreift, "
+        "kann die Inhalte der Website ändern."),
     "website": (
         "Website",
         "Außendarstellung des Unternehmens. Betroffen wären vor allem Seiteninhalte und "
@@ -449,7 +538,7 @@ ROLE_DEFS: dict[str, tuple[str, str]] = {
 }
 # Reihenfolge, in der Rollen genannt werden; die spezifischere zuerst.
 ROLE_ORDER: tuple[str, ...] = ("mail_kalender", "mail", "webmail", "passwort", "kollaboration",
-                               "anmeldeportal", "fernzugang", "datenbank", "dateiaustausch", "website",
+                               "anmeldeportal", "redaktion", "fernzugang", "datenbank", "dateiaustausch", "website",
                                "mail_versand")
 ROLE_FALLBACK = "Nicht näher bestimmbar"
 ROLE_FALLBACK_MEANING = ("Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte "
@@ -477,6 +566,7 @@ ROLE_CATEGORIES: dict[str, frozenset[str]] = {
     "passwort": frozenset({"passwort"}),
     "kollaboration": frozenset({"kollaboration"}),
     "anmeldeportal": frozenset({"anmeldeportal"}),
+    "redaktion": frozenset({"anmeldeportal"}),
     "fernzugang": frozenset({"fernzugang"}),
     "datenbank": frozenset({"datenbank"}),
     "dateiaustausch": frozenset(),

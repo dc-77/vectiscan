@@ -60,7 +60,9 @@ def report_bundle_from_source(source: str | Path,
     # S6b-1 (spec/09 Q15): woher Firmenname, Kurzname, Branche und Mitarbeiterzahl
     # stammen, steht in den exportierten Fakten, nicht nur in der Datenbank.
     facts.context = context_from_customer_context(customer_context)
-    output = evaluate(facts)
+    from reporter.v3.chapters import iso_date, today
+    # S6b-3 (spec/10 R18): Fristen im Text beziehen sich auf den Berichtstag.
+    output = evaluate(facts, report_date=iso_date(report_date or today()))
     data = build_report_data(facts, output, order=order,
                              customer_context=customer_context,
                              report_version=report_version, report_date=report_date,

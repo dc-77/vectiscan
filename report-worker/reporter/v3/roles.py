@@ -26,6 +26,7 @@ from __future__ import annotations
 import ipaddress
 import re
 from dataclasses import dataclass
+from typing import Optional
 from urllib.parse import urlsplit
 
 from reporter.facts import schema as FS
@@ -58,6 +59,9 @@ EXCHANGE_PASSIVE = re.compile(r"/owa\b|x-owa-version|x-feserver", re.I)
 class Role:
     key: str
     evidence: tuple[str, ...] = ()
+    # S6b-3 (spec/10 R9): HTTP-Status, wenn der Name nur eine Fehlerseite liefert
+    # (castenow mailstore, Nextcloud mit 400 "Access through untrusted domain").
+    status: Optional[int] = None
 
     @property
     def label(self) -> str:
@@ -65,7 +69,11 @@ class Role:
 
     @property
     def meaning(self) -> str:
-        return T.ROLE_DEFS[self.key][1]
+        text = T.ROLE_DEFS[self.key][1]
+        if self.status and self.status >= 400:
+            text += (f" Unter dem geprüften Namen liefert der Dienst nur eine Fehlerseite "
+                     f"({self.status}).")
+        return text
 
 
 def _customer_names(facts: FS.Facts, host: FS.HostFact) -> list[FS.FqdnFact]:
@@ -130,6 +138,8 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
     if host.third_party is not None:
         return []
     found: dict[str, list[str]] = {}
+    fehlerseite: dict[str, list[int]] = {}
+    wordpress = {h.fqdn for h in facts.http if h.host_ip == host.ip and h.wordpress is not None}
 
     def add(key: str, beleg: str) -> None:
         found.setdefault(key, [])
@@ -150,8 +160,12 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
         if _redirects_away(facts, fq):
             continue
         rolle = next((key for key, rx in TITLE_RULES if title and rx.search(title)), None)
+        if rolle == "anmeldeportal" and fq.name in wordpress:
+            rolle = "redaktion"
         if rolle:
             add(rolle, f"{fq.name}: Titel „{title[:60]}“")
+            status = fq.http_status if isinstance(fq.http_status, int) else None
+            fehlerseite.setdefault(rolle, []).append(status if status and status >= 400 else 0)
             continue
         if fq.http_status == 200 and title and not NOT_WEBSITE.search(title):
             add("website", f"{fq.name}: Seite „{title[:60]}“")
@@ -172,7 +186,13 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
                 add("dateiaustausch", beleg)
     order = {k: i for i, k in enumerate(T.ROLE_ORDER)}
     keys = sorted(found, key=lambda k: order.get(k, len(order)))
-    return [Role(key=k, evidence=tuple(found[k][:3])) for k in keys[:MAX_ROLES]]
+    def status_of(key: str) -> Optional[int]:
+        # Nur wenn jeder Titelbeleg der Rolle eine Fehlerseite ist; die Softwareerkennung liest
+        # dieselbe Seite und aendert daran nichts.
+        werte = fehlerseite.get(key) or []
+        return werte[0] if werte and all(werte) else None
+
+    return [Role(key=k, evidence=tuple(found[k][:3]), status=status_of(k)) for k in keys[:MAX_ROLES]]
 
 
 def role_label(roles: list[Role]) -> str:

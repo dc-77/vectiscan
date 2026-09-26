@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 """Maßnahmenplan und die drei Hebel.
 
-S6b-2 (spec/09 Q6): eine Zeile je Maßnahmentext. Jeder Befund steht mit der Maßnahme
-seiner führenden Regel (der schwersten getroffenen Regel, erste Empfehlung auf deren
-wirksamer Stufe) in genau einer Zeile; Befunde mit demselben Maßnahmentext und derselben
-Zuständigkeit teilen sich die Zeile. Effekt und Hebeltitel kommen aus der Regel
-(``texts.plan``), nicht mehr aus der Kategorie: vorher stand „Schützt die Authentizität
-der eigenen E-Mail" bei DNSSEC und CAA, und ein Hebeltitel nannte Hosts, die er nicht
-vollständig adressierte. Die übrigen Empfehlungen einer Regel stehen im Befund selbst.
+S6b-3 (spec/10 R11, Entscheidung E8): eine Planzeile je getroffener Regel mit deren erster
+Stufe, getrennt nach Zuständigkeit; der Effekt kommt aus derselben Stufe
+(``Recommendation.effect``, sonst ``texts.plan.effect``). Vorher stand nur die führende Regel
+eines gebündelten Befunds im Plan; SPF-Hardfail, TLS-RPT neben MTA-STS, DNSSEC neben CAA und
+die Header neben HSTS fehlten. Regeln mit demselben Maßnahmentext und derselben
+Zuständigkeit teilen sich die Zeile (S6b-2, spec/09 Q6). Die übrigen Stufen einer Regel
+stehen im Befund selbst.
 
 Der Selbstcheck erzwingt, dass jeder Befund im Plan steht (spec/03 Regel 7).
-Die Hebel auf Seite 2 sind die drei gewichtigsten Planzeilen.
+Die Hebel auf Seite 2 sind die drei gewichtigsten Planzeilen mit verschiedenem Titel;
+eine Zeile beim Hoster oder Plattformbetreiber trägt das im Hebeltitel.
 """
 from __future__ import annotations
 
 from reporter.v3 import levels as L
 from reporter.v3 import narrative as N
 from reporter.v3.bundles import Consolidated
-from reporter.v3.models import Finding, Lever, PlanRow
+from reporter.v3.models import Finding, Lever, PlanItem, PlanRow
 from reporter.v3.operators import ASK_AT
 
 MAX_LEVERS = 3
@@ -26,32 +27,49 @@ MAX_LEVERS = 3
 PLAN_EFFECT_SEP = " · "
 
 
+def _items(finding: Finding) -> list[PlanItem]:
+    if finding.plan_items:
+        return finding.plan_items
+    # Reportdaten ohne Planeinträge (ältere Läufe): die Maßnahme der führenden Regel.
+    return [PlanItem(check=finding.checks[0] if finding.checks else "", action=finding.plan_action,
+                     stage=finding.plan_stage, effect=finding.plan_effect, lever=finding.plan_lever)]
+
+
 def build_plan(pairs: list[tuple[Consolidated, Finding]]) -> list[PlanRow]:
-    rows: dict[tuple[str, str], list[tuple[Consolidated, Finding]]] = {}
+    rows: dict[tuple[str, str], list[tuple[Consolidated, Finding, PlanItem]]] = {}
     for item, finding in pairs:
         op_key = item.operator.key if item.operator else ""
-        action = " ".join((finding.plan_action or "").split())
-        rows.setdefault((action, op_key), []).append((item, finding))
+        for plan_item in _items(finding):
+            action = " ".join((plan_item.action or "").split())
+            rows.setdefault((action, op_key), []).append((item, finding, plan_item))
 
     out: list[tuple[tuple, PlanRow, list[str]]] = []
     for (action, _op_key), members in rows.items():
-        members.sort(key=lambda p: (L.STAGE_RANK.get(p[1].plan_stage, 9),
+        members.sort(key=lambda p: (L.STAGE_RANK.get(p[2].stage, 9),
                                     L.STATUS_RANK.get(p[1].status, 9),
                                     L.severity_key(p[0].scale, p[0].level), p[1].id))
-        lead_item, lead = members[0]
-        stage = lead.plan_stage or "mittelfristig"
+        lead_item, lead, lead_plan = members[0]
+        stage = lead_plan.stage or "mittelfristig"
         text = action
         if lead_item.operator is not None:
             text = f"{ASK_AT[lead_item.operator.kind]} einfordern: {action}"
         effects: list[str] = []
-        for _, f in members:
-            if f.plan_effect and f.plan_effect not in effects:
-                effects.append(f.plan_effect)
+        refs: list[str] = []
+        sources: list[str] = []
+        for _, f, pi in members:
+            if pi.effect and pi.effect not in effects:
+                effects.append(pi.effect)
+            if f.id not in refs:
+                refs.append(f.id)
+            if f"{f.id}:{pi.check}" not in sources:
+                sources.append(f"{f.id}:{pi.check}")
         out.append((
             (L.STAGE_RANK.get(stage, 9), L.STATUS_RANK.get(lead.status, 9),
-             L.severity_key(lead_item.scale, lead_item.level), lead.cat, lead.id),
+             L.severity_key(lead_item.scale, lead_item.level), lead.cat, lead.id, action),
             PlanRow(prio=L.URGENCY_BY_STAGE.get(stage, stage), st=lead.status, action=text,
-                    refs=[f.id for _, f in members], effect="", lever=lead.plan_lever),
+                    refs=refs, effect="", lever=lead_plan.lever,
+                    operator=lead_item.operator.kind if lead_item.operator else "",
+                    sources=sources),
             effects,
         ))
     out.sort(key=lambda t: t[0])
@@ -67,16 +85,25 @@ def build_plan(pairs: list[tuple[Consolidated, Finding]]) -> list[PlanRow]:
 
 
 def build_levers(plan: list[PlanRow], findings: list[Finding]) -> list[Lever]:
-    """Die drei gewichtigsten Planzeilen als Hebel, Titel aus der führenden Regel."""
+    """Die drei gewichtigsten Planzeilen als Hebel, nach Titel entdoppelt (spec/10 R11)."""
     by_id = {f.id: f for f in findings}
     levers: list[Lever] = []
-    for row in plan[:MAX_LEVERS]:
+    titel: set[str] = set()
+    for row in plan:
+        if len(levers) >= MAX_LEVERS:
+            break
         lead = by_id.get(row.refs[0]) if row.refs else None
         if lead is None:
             continue
+        title = row.lever or lead.title
+        if row.operator:
+            title = f"{ASK_AT[row.operator]} einfordern: {title}"
+        if title in titel:
+            continue
+        titel.add(title)
         levers.append(Lever(
             n=len(levers) + 1,
-            title=row.lever or lead.title,
+            title=title,
             effect=row.effect,
             refs=list(row.refs),
         ))

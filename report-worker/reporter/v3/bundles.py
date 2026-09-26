@@ -76,6 +76,8 @@ class Consolidated:
     # Positivbefunden deren Positivtexte (Vorlagen) je Pruefung.
     rules: list[str] = field(default_factory=list)
     positive_texts: dict[str, PositiveText] = field(default_factory=dict)
+    # S6b-3 (spec/10 R6): Gruppe -> "beim Hoster X" fuer Positivbefunde auf geteilten Systemen.
+    operator_labels: dict[str, str] = field(default_factory=dict)
 
     @property
     def sort_key(self) -> tuple:
@@ -149,15 +151,15 @@ def tls_untested_hosts(facts: FS.Facts | None) -> set[str]:
     """
     if facts is None:
         return set()
-    geprueft = {(t.host_ip, t.port) for t in facts.tls}
+    # S6b-3 (spec/10 R3): geprueft heisst testssl (oder dessen Ergebnis fuer denselben
+    # IP:Port), nicht die eine ausgehandelte Verbindung von httpx; ein Dienst mit TLS ist
+    # auch einer mit Zertifikat im Portscan oder auf einem impliziten TLS-Port.
+    from reporter.v3.coverage import tls_service_ports, tls_tested
     out: set[str] = set()
-    for svc in facts.services:
-        if svc.state != "open":
-            continue
-        if not (svc.tunnel_ssl or svc.starttls is True):
-            continue
-        if (svc.host_ip, svc.port) not in geprueft:
-            out.add(svc.host_ip)
+    for h in facts.hosts:
+        geprueft = tls_tested(facts, h.ip)
+        if any(p not in geprueft for p in tls_service_ports(facts, h.ip)):
+            out.add(h.ip)
     return out
 
 
@@ -189,6 +191,31 @@ def rule_order(results: Iterable[CheckResult]) -> list[str]:
         if r.check_id not in beste or key < beste[r.check_id]:
             beste[r.check_id] = key
     return [cid for cid, _ in sorted(beste.items(), key=lambda kv: kv[1])]
+
+
+POSITIVE_ALL_OR_NOTHING = frozenset({"ip_reputation"})
+
+# S6b-3 (Entscheidung DC 3): HSTS steht in einem Positivbefund. Wo die Gueltigkeitsdauer
+# ausreicht, ist der Header auch gesetzt; "gesetzt" entfaellt fuer diese Dienste.
+POSITIVE_SUBSUMED: dict[str, str] = {"hsts_missing": "hsts_short"}
+
+
+def reputation_reported(facts: FS.Facts | None) -> bool:
+    """Liegt zu irgendeiner eigenen Adresse eine Reputationsmeldung vor (spec/10 R6)?
+
+    Plattform- und CDN-Adressen zaehlen mit: ip_reputation bewertet sie nicht als Befund
+    (S6b-2, Q12), aber "keine Meldungen" darf nicht stehen, wenn eine davon Meldungen hat
+    (heuel 216.150.1.65 mit 26 Meldungen trotz Freigabeliste)."""
+    if facts is None:
+        return False
+    for h in facts.hosts:
+        rep = h.reputation
+        if h.third_party is not None or rep is None:
+            continue
+        if (rep.abuseipdb_total_reports or 0) > 0 or (rep.otx_pulse_count or 0) > 0 \
+                or rep.urlhaus_compromised:
+            return True
+    return False
 
 
 def consolidate(output: CatalogOutput,
@@ -257,12 +284,21 @@ def consolidate(output: CatalogOutput,
         if bundle.positive_conflicts}
     ausgeschlossen: dict[str, set[str]] = {}
     je_regel: dict[str, list[CheckResult]] = {}
+    # S6b-3 (spec/10 R6): Reputation ist nur positiv, wenn jede gemessene Adresse ohne Meldung
+    # ist, Plattform- und CDN-Adressen eingeschlossen; sonst entfaellt der Positivbefund ganz.
+    unvollstaendig = {r.check_id for r in output.results
+                      if r.check_id in POSITIVE_ALL_OR_NOTHING and r.kind == "check"
+                      and r.status in ("pass", "fail") and not r.positive}
+    if reputation_reported(facts):
+        unvollstaendig.add("ip_reputation")
     for (owner, merge_key), results in passes.items():
         if (owner, merge_key) in failed_groups:
             continue
         for result in results:
             info = by_check[result.check_id]
             if result.check_id in unpruefbar or info.texts.positive is None:
+                continue
+            if result.check_id in unvollstaendig:
                 continue
             if not passed(result, info):
                 continue
@@ -274,19 +310,34 @@ def consolidate(output: CatalogOutput,
                 continue
             je_regel.setdefault(result.check_id, []).append(result)
 
+    for cid, durch in POSITIVE_SUBSUMED.items():
+        if cid in je_regel and durch in je_regel:
+            abgedeckt = {r.group_key for r in je_regel[durch]}
+            rest = [r for r in je_regel[cid] if r.group_key not in abgedeckt]
+            if rest:
+                je_regel[cid] = rest
+            else:
+                del je_regel[cid]
+
     positives: list[Consolidated] = []
 
     def _positive(key: str, is_bundle: bool, category: str, title: str, rules: list[str],
                   owner: str) -> None:
         results = [r for cid in rules for r in je_regel[cid]]
         results.sort(key=lambda r: sort_key(r.check_id, r.group_key))
+        labels: dict[str, str] = {}
+        for r in results:
+            op = operator_for(r, by_check[r.check_id].scope, hosts) if hosts else None
+            if op is not None:
+                labels[r.group_key] = f"{op.label} {op.name}".strip()
         positives.append(Consolidated(
             key=key, is_bundle=is_bundle, merge_key=GLOBAL_KEY, category=category,
             scale="hygiene", level="niedrig", title=title, target="findings", positive=True,
             results=results, rules=rules,
             positive_texts={cid: by_check[cid].texts.positive for cid in rules
                             if by_check[cid].texts.positive is not None},
-            excluded_hosts=sorted(ausgeschlossen.get(owner, ()), key=sort_key)))
+            excluded_hosts=sorted(ausgeschlossen.get(owner, ()), key=sort_key),
+            operator_labels=labels))
 
     for bid, bundle in bundles.items():
         if bundle.target != "findings":
@@ -295,7 +346,11 @@ def consolidate(output: CatalogOutput,
         bestanden = [m for m in mitglieder if m in je_regel]
         if not bestanden:
             continue
-        if bundle.positive_title and bestanden == mitglieder:
+        # S6b-3 (spec/10 R6): der Sammeltitel nur, wenn jede Regel fuer dieselben Hosts
+        # bestanden hat. Bei castenow bestanden Protokolle auf 195.50.179.4, die Verfahren
+        # dort nicht (Obsoleted CBC ciphers offered); "ohne veraltete Verfahren" galt nicht.
+        gleich = len({frozenset(_host_of(r) for r in je_regel[m]) for m in bestanden}) == 1
+        if bundle.positive_title and bestanden == mitglieder and gleich:
             _positive(bid, True, bundle.category, bundle.positive_title, bestanden, bid)
             continue
         for cid in bestanden:

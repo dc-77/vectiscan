@@ -104,8 +104,10 @@ def test_nachweis_nennt_die_fehlenden_header(daten):
     assert treffer, "Header-Befund fehlt im Fixture"
     # S6b-2 (spec/09 Q7): je Fakt "Bezeichnung: Wert", keine Rohschreibweise "Feld=".
     assert "fehlende Header: " in treffer[0].evidence
-    assert "content-security-policy" in treffer[0].evidence
-    assert "=" not in treffer[0].evidence.replace("://", "")
+    # S6b-3 (spec/10 R14): Header in Anzeigeschreibweise ("Content-Security-Policy").
+    assert "content-security-policy" in treffer[0].evidence.lower()
+    # S6b-3 (Entscheidung DC 3): der HSTS-Wert "max-age=0" steht woertlich im Nachweis.
+    assert "=" not in re.sub(r"max-age=\d+", "", treffer[0].evidence.replace("://", ""))
 
 
 def test_nachweis_nennt_die_rest_adresse(daten):

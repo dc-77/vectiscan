@@ -72,6 +72,9 @@ class Meta(Base):
     prose_rejected: list[str] = Field(default_factory=list)
     # S6b-1 (spec/09 Q15): Herkunft je Feld des Kundenkontexts (kunde, recherche, admin).
     context_sources: dict[str, str] = Field(default_factory=dict)
+    # S6b-3 (spec/10 R13): Kundenkontext mit Wert und Quelle je Feld fuer den Export
+    # (findings_data.customer_context), damit das Gegenlesen die Quelle sieht. Nicht gerendert.
+    context_fields: list[dict[str, str]] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------- Schicht 1
@@ -114,6 +117,8 @@ class Business(Base):
     lead: str = ""
     observed: list[ObservedSystem] = Field(default_factory=list)
     implication: str = ""
+    # S6b-3 (spec/10 R13): Betriebsformen der eigenen Systeme (nicht gerendert, Prosa-Gate).
+    betriebsformen: list[str] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------- Schicht 2
@@ -134,6 +139,12 @@ class Limitation(Base):
     detail: str
     # S6b-1 (spec/09 Q10): Pruefungen in Kundensprache, die diese Ursache betrifft.
     checks: list[str] = Field(default_factory=list)
+    # S6b-3 (spec/10 R4, R5, R10): nicht gerendert, fuer das Gate. ``code``: Grund der Zeile
+    # (e5, discovered, Katalog- oder Werkzeuggrund), ``refs``: "Pruefung|Gruppe" der
+    # zugrunde liegenden Katalogergebnisse, ``subjects``: betroffene Adressen und Namen.
+    code: str = ""
+    refs: list[str] = Field(default_factory=list)
+    subjects: list[str] = Field(default_factory=list)
 
 
 class DomainScope(Base):
@@ -202,6 +213,10 @@ class PostureItem(Base):
     l: str
     ok: Optional[bool] = None
     v: str = ""
+    # S6b-3 (spec/10 R8): nicht gerendert, fuer das Gate. Pruefungen des Eintrags und das
+    # Subjekt (Host oder Domain), auf das er sich bezieht.
+    checks: list[str] = Field(default_factory=list)
+    subjects: list[str] = Field(default_factory=list)
 
 
 class PostureBlock(Base):
@@ -258,6 +273,10 @@ class Positive(Base):
     title: str
     text: str
     provenance: list[Provenance] = Field(default_factory=list)
+    # S6b-3 (spec/10 R7): Pruefungen und Orte (Host:Port oder Name), fuer das Gate
+    # "Positivbefund gegen Befund am selben Port".
+    checks: list[str] = Field(default_factory=list)
+    subjects: list[str] = Field(default_factory=list)
 
 
 class PlanRow(Base):
@@ -267,6 +286,19 @@ class PlanRow(Base):
     refs: list[str] = Field(default_factory=list)
     effect: str = ""
     # S6b-2 (Q6): Hebeltitel der fuehrenden Regel dieser Zeile, ohne Hostnamen.
+    lever: str = ""
+    # S6b-3 (spec/10 R11): Zustaendigkeit ("hoster", "platform" oder leer) und die Regeln
+    # der Zeile als "VS-...:pruefung" (nicht gerendert).
+    operator: str = ""
+    sources: list[str] = Field(default_factory=list)
+
+
+class PlanItem(Base):
+    """Erste Stufe einer getroffenen Regel eines Befunds (S6b-3, spec/10 R11, Entscheidung E8)."""
+    check: str
+    action: str
+    stage: str
+    effect: str = ""
     lever: str = ""
 
 
@@ -312,6 +344,13 @@ class Finding(Base):
     plan_stage: str = ""
     plan_effect: str = ""
     plan_lever: str = ""
+    # S6b-3 (spec/10 R11): eine Planzeile je getroffener Regel mit ihrer ersten Stufe.
+    plan_items: list[PlanItem] = Field(default_factory=list)
+    # S6b-3 (spec/10 R2, R7): nicht gerendert, fuer das Gate. Getroffene Regeln, die Orte der
+    # Mitglieder (Host:Port oder Name) und die fehlenden Header je Befund.
+    checks: list[str] = Field(default_factory=list)
+    subjects: list[str] = Field(default_factory=list)
+    missing_headers: list[str] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------- Anhang

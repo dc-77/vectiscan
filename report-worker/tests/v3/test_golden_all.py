@@ -41,10 +41,17 @@ def test_keine_drift_gegen_die_eingecheckten_reportdaten(order_id):
 
 @pytest.mark.parametrize("order_id", ORDERS)
 def test_jeder_befund_steht_genau_einmal_im_plan(order_id):
+    """S6b-3 (spec/10 R11, E8): jede getroffene Regel eines Befunds genau einmal im Plan.
+
+    Ein Befund aus mehreren Regeln steht mit jeder Regel in einer Zeile; eine Regel steht
+    nie in zwei Zeilen."""
     data = data_for(order_id)
-    refs = [r for row in data.plan for r in row.refs]
-    assert sorted(refs) == sorted(f.id for f in data.findings)
-    assert len(refs) == len(set(refs)), "ein Befund darf nur eine Massnahme tragen"
+    refs = {r for row in data.plan for r in row.refs}
+    assert refs == {f.id for f in data.findings}
+    quellen = [q for row in data.plan for q in row.sources]
+    assert len(quellen) == len(set(quellen)), "eine Regel eines Befunds steht zweimal im Plan"
+    erwartet = {f"{f.id}:{p.check}" for f in data.findings for p in f.plan_items}
+    assert set(quellen) == erwartet
 
 
 @pytest.mark.parametrize("order_id", ORDERS)

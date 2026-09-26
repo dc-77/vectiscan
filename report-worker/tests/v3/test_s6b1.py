@@ -277,9 +277,10 @@ def test_folgezeilen_eines_hosts_mit_wurzelursache_entfallen():
     # Bergersysteme: die drei nicht erreichbaren Hosts stehen nur in ihrer eigenen Zeile.
     data = data_for(BS)
     for l in data.scope.limitations:
-        if l.what == "Vom Prüfstand aus nicht erreichbar":
+        # S6b-3 (spec/10 R5): "Gefunden, nicht geprüft" nennt je Name dessen Adresse.
+        if l.what in ("Vom Prüfstand aus nicht erreichbar", "Gefunden, nicht geprüft"):
             continue
-        assert "62.217.52.16" not in l.detail and "62.217.52.171" not in l.detail, l.what
+        assert not re.search(r"62\.217\.52\.(?:162|166|171)(?!\d)", l.detail), l.what
 
 
 def test_keine_fremdbewertung_ohne_cvss_wort():
@@ -288,13 +289,15 @@ def test_keine_fremdbewertung_ohne_cvss_wort():
             assert "CVSS" not in f"{l.what} {l.detail}"
 
 
-def test_tls_teilweise_ueber_httpx_belegt():
-    # Heuel und Bergersysteme: der Dienst wurde nur ueber die ausgehandelte Verbindung
-    # gesehen; die Zeile nennt Protokolle und Verfahren als betroffene Pruefungen.
+def test_tls_teilweise_nur_fuer_ungepruefte_ports():
+    """S6b-3 (spec/10 R3, R4): testssl gilt je Adresse und Port fuer alle virtuellen Hosts;
+    die Zeile "nur über die ausgehandelte Verbindung" entfaellt bei Heuel und Bergersysteme.
+    Teilweise geprueft ist, was an TLS-Ports ohne testssl-Lauf bleibt, mit den Ports."""
     for order in (HL, BS):
-        rows = [l for l in data_for(order).scope.limitations
-                if l.what.startswith("Transportverschlüsselung nur über")]
-        assert rows and set(rows[0].checks) == {"TLS-Protokollversionen", "Verschlüsselungsverfahren"}
+        rows = {l.what: l for l in data_for(order).scope.limitations}
+        assert not [w for w in rows if w.startswith("Transportverschlüsselung nur über")]
+        teil = rows["Transportverschlüsselung nur für einen Teil der TLS-Dienste geprüft"]
+        assert "(Port " in teil.detail
 
 
 # ---------------------------------------------------------------- Q16 Umfang
@@ -468,12 +471,14 @@ def test_technik_ohne_schreibvarianten():
 
 def test_kapitel2_einheit_system_jw():
     data = data_for(JW)
+    # S6b-3 (spec/10 R3): 217.243.248.29 ist teilweise geprueft (TLS-Port 8443 ohne testssl,
+    # aktive Webanalyse nur an der IIS-Standardseite von cloud.junkerwerk.de).
     assert data.scope.lead.startswith(
-        "Der Scan hat 3 Systeme mit 4 IP-Adressen und 7 Hostnamen erfasst. Für 1 System "
-        "(2 Adressen) war die aktive Prüfung nur teilweise möglich; diese Lücke ist unten benannt")
+        "Der Scan hat 3 Systeme mit 4 IP-Adressen und 7 Hostnamen erfasst. Für 2 Systeme "
+        "(3 Adressen) war die aktive Prüfung nur teilweise möglich; diese Lücken sind unten benannt")
     assert data.glance.coverage_warning.startswith(
-        "Für 1 System (188.40.3.130 mit 2a01:4f8:d0a:3124::2) liegt nur eine teilweise "
-        "aktive Prüfung vor.")
+        "Für 2 Systeme (188.40.3.130 mit 2a01:4f8:d0a:3124::2 und 217.243.248.29) liegt nur "
+        "eine teilweise aktive Prüfung vor.")
     assert len([h for h in data.scope.hosts if h.cov != "extern"]) == 3
 
 

@@ -32,6 +32,8 @@ class Counts:
     fqdns_total: int = 0
     runs: int = 1
     tool_runs: int = 0
+    # S6b-3 (spec/10 R14): aus der Bilanz der Phase-3-Korrelation (``total_findings`` und die
+    # Dedup-Gruende); ohne Bilanz 0, und die Zahl steht nicht im Bericht.
     raw_findings: int = 0
     findings: int = 0
     positives: int = 0
@@ -41,6 +43,11 @@ class Counts:
     coverage_none: int = 0
     duplicates: int = 0
     not_testable: int = 0
+    # S6b-3 (spec/10 R5): ermittelte Namen (Inventar und Hostsuche mit Adresse) und davon geprueft.
+    names_found: int = 0
+    names_checked: int = 0
+    # S6b-3 (spec/10 R13): Betriebsformen der eigenen Systeme (rechenzentrum, anschluss, plattform).
+    betriebsformen: list[str] = field(default_factory=list)
 
 
 def _join(names: list[str]) -> str:
@@ -110,6 +117,21 @@ BUSINESS_IMPLICATION_GENERIC = (
     "72 Stunden."
 )
 
+# S6b-3 (spec/10 R13, Entscheidung E9): "Unternehmensnetz" nur, wenn ein System am eigenen
+# Anschluss steht; bei gemieteten Servern im Rechenzentrum und Plattformen sind es die
+# Zugangswege zu den Servern und Diensten.
+BUSINESS_IMPLICATION_SERVER = (
+    "Die Befunde dieses Berichts sind danach geordnet, wie nah sie an den Zugangswegen zu den "
+    "betriebenen Servern und Diensten liegen. Ein Dienst, über den sich jemand anmelden kann, "
+    "wiegt schwerer als eine Abweichung an einer reinen Auslieferungsseite. Bei einem Vorfall "
+    "mit personenbezogenen Daten gilt die Meldepflicht nach Art. 33 DSGVO innerhalb von "
+    "72 Stunden."
+)
+
+
+def business_implication(betriebsformen: list[str]) -> str:
+    return BUSINESS_IMPLICATION_GENERIC if "anschluss" in betriebsformen else BUSINESS_IMPLICATION_SERVER
+
 
 # ---------------------------------------------------------------- Kapitel 2
 
@@ -175,7 +197,8 @@ def method_phases(c: Counts) -> list[tuple[str, str, str]]:
          "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, "
          f"Reputationsdienste. Ergebnis: {c.fqdns_total} "
          f"{_plural(c.fqdns_total, 'Hostname', 'Hostnamen')} auf {c.hosts_total} "
-         f"{_plural(c.hosts_total, 'IP-Adresse', 'IP-Adressen')}."),
+         f"{_plural(c.hosts_total, 'IP-Adresse', 'IP-Adressen')}."
+         + names_sentence(c)),
         ("1", "Technologie-Erkennung",
          "Portscan der häufigsten TCP-Ports mit Versionserkennung, Erkennung der "
          "Web-Technologien und vorgelagerter Schutzsysteme."),
@@ -191,14 +214,24 @@ def method_phases(c: Counts) -> list[tuple[str, str, str]]:
     ]
 
 
+def names_sentence(c: Counts) -> str:
+    """S6b-3 (spec/10 R5): "n von m ermittelten Namen geprüft", solange die Hostsuche Namen verliert."""
+    if c.names_found <= c.names_checked:
+        return ""
+    return (f" Geprüft wurden {c.names_checked} von {c.names_found} ermittelten Namen; die übrigen "
+            "stehen in Kapitel 2 unter den Einschränkungen.")
+
+
 def numbers(c: Counts) -> list[tuple[str, str]]:
-    return [
+    out = [
         (str(c.runs), _plural(c.runs, "Scandurchgang", "Scandurchgänge")),
         (str(c.tool_runs), _plural(c.tool_runs, "Werkzeuglauf", "Werkzeugläufe")),
-        (str(c.raw_findings), _plural(c.raw_findings, "Einzelbeobachtung",
-                                      "Einzelbeobachtungen")),
-        (str(c.findings), _plural(c.findings, "Befund im Bericht", "Befunde im Bericht")),
     ]
+    if c.raw_findings:
+        out.append((str(c.raw_findings), _plural(c.raw_findings, "Einzelmeldung",
+                                                 "Einzelmeldungen")))
+    out.append((str(c.findings), _plural(c.findings, "Befund im Bericht", "Befunde im Bericht")))
+    return out
 
 
 # ---------------------------------------------------------------- Kapitel 3
@@ -231,19 +264,33 @@ SERVICES_NOTE = (
 SCREENS_LEAD = "Sichtprüfung der erreichbaren Web-Oberflächen der geprüften Hosts."
 
 
-def reputation_line(clean: bool, sources: list[str], not_rated: list[str] | None = None) -> str:
+def reputation_line(clean: bool, sources: list[str], not_rated: list[str] | None = None,
+                    reported: list[tuple[str, int]] | None = None) -> str:
+    """S6b-3 (spec/10 R6): "keine Meldungen" nur, wenn alle gemessenen Adressen einschließlich
+    der Plattform- und CDN-Adressen ohne Meldung sind; Adressen mit Meldungen stehen mit Zahl da.
+
+    ``not_rated``: Adressen von Plattformen und Inhaltsnetzen (S6b-2, spec/09 Q12), die der
+    Kunde mit anderen teilt; ``reported``: (Adresse, Zahl der AbuseIPDB-Meldungen)."""
     if not sources:
         return "Reputationsquellen wurden für diesen Auftrag nicht abgefragt."
     src = _join(sources)
+    fremd = list(not_rated or [])
     if clean:
         text = f"Reputation: keine Meldungen zu den geprüften Adressen in {src}."
+        if fremd:
+            text += (" Das gilt auch für die Adressen von Plattformen und Inhaltsnetzen, die auch "
+                     f"andere Kunden nutzen: {_join(fremd)}.")
+        return text
+    if reported:
+        namen = _join([f"{ip} ({n} {_plural(n, 'Meldung', 'Meldungen')})" for ip, n in reported])
+        text = f"Reputation: in AbuseIPDB liegen Meldungen zu {namen} vor."
     else:
         text = f"Reputation: zu mindestens einer der geprüften Adressen liegt in {src} eine Meldung vor."
-    if not_rated:
-        # S6b-2 (spec/09 Q12): Adressen von Plattformen und Inhaltsnetzen teilt der Kunde mit
-        # vielen anderen; ihre Meldungen sind ihm nicht zuzurechnen.
-        text += (" Nicht bewertet sind Adressen von Plattformen und Inhaltsnetzen, die auch "
-                 f"andere Kunden nutzen: {_join(not_rated)}.")
+    geteilt = [ip for ip, _ in (reported or []) if ip in fremd]
+    if geteilt:
+        text += (f" {_join(geteilt)} {_plural(len(geteilt), 'gehört', 'gehören')} zu einer Plattform "
+                 "oder einem Inhaltsnetz, das auch andere Kunden nutzen; die Meldungen stammen nicht "
+                 "zwingend aus Ihren Diensten.")
     return text
 
 
@@ -268,17 +315,21 @@ PLAN_EFFECT_TOP = "Beseitigt das dringlichste Risiko dieses Berichts"
 # ---------------------------------------------------------------- Anhang
 
 def filtering(c: Counts) -> str:
-    dup = (f" Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge "
-           f"({c.duplicates} {_plural(c.duplicates, 'Doppelmeldung', 'Doppelmeldungen')})"
-           if c.duplicates else " Nach Zusammenführung gleicher Meldungen")
+    """Anhang D. S6b-3 (spec/10 R12, R14): Zahlen nur aus der Korrelationsbilanz, keine Zusage."""
+    bilanz = ""
+    if c.raw_findings:
+        bilanz = (f"Die Korrelation hat {c.raw_findings} "
+                  f"{_plural(c.raw_findings, 'Einzelmeldung', 'Einzelmeldungen')} der Werkzeuge erfasst"
+                  + (f", davon {c.duplicates} "
+                     f"{_plural(c.duplicates, 'Doppelmeldung', 'Doppelmeldungen')} mehrerer "
+                     "Werkzeuge und Durchgänge" if c.duplicates else "")
+                  + ". ")
     return (
-        f"Die Werkzeuge haben in diesem Auftrag {c.raw_findings} Einzelbeobachtungen "
-        f"erzeugt.{dup} und Bündelung nach Sachverhalt verbleiben {c.findings} "
-        f"{_plural(c.findings, 'Befund', 'Befunde')} und {c.positives} positive "
-        f"{_plural(c.positives, 'Feststellung', 'Feststellungen')}. Beobachtungen ohne "
-        "Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen "
-        "Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf "
-        "Anfrage bereitgestellt."
+        f"{bilanz}Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt "
+        f"verbleiben {c.findings} {_plural(c.findings, 'Befund', 'Befunde')} und {c.positives} "
+        f"positive {_plural(c.positives, 'Feststellung', 'Feststellungen')}. Beobachtungen ohne "
+        "Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen "
+        "Werkzeugausgaben."
     )
 
 

@@ -38,8 +38,10 @@ def build_inventory(facts: FS.Facts,
     for svc in sorted(facts.services, key=lambda s: (s.host_ip, s.port)):
         if svc.state != "open" or svc.host_ip in fremd:
             continue
-        name = svc.product or (svc.service or "").upper() or UNKNOWN
-        if svc.version_norm:
+        # S6b-3 (spec/10 R14): derselbe Name wie auf der Service-Karte (MariaDB, Kennung,
+        # "nicht identifiziert" statt eines geratenen nmap-Namens mit "?").
+        name = C.service_display(svc)
+        if svc.version_norm and svc.version_norm not in name:
             name = f"{name} {svc.version_norm}"
         if svc.tls_required:
             name = f"{name}, TLS erzwungen"

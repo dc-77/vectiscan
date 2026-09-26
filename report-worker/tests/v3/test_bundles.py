@@ -39,7 +39,10 @@ TLS_ZWEI_HOSTS = {
                        "TLS1.2": True, "TLS1.3": False}},
         {"host_ip": "10.0.0.2", "fqdn": "b.example.test", "port": 443, "source": "testssl",
          "protocols": {"SSLv2": False, "SSLv3": False, "TLS1.0": False, "TLS1.1": False,
-                       "TLS1.2": True, "TLS1.3": True}},
+                       "TLS1.2": True, "TLS1.3": True},
+         # S6b-3 (spec/10 R6): die Positivaussage zu den Verfahren braucht den Fakt
+         # "Obsoleted CBC ciphers not offered".
+         "cbc_obsoleted_offered": False},
     ],
 }
 
@@ -92,17 +95,22 @@ def test_positivbefund_nur_ohne_fehlschlag_in_derselben_gruppe():
     """Host 2 besteht die TLS-Pruefungen mit Daten und liefert Positivbefunde je Regel.
 
     S6b-2 (spec/09 Q12): der Sammeltitel des Buendels steht nur, wenn jedes Mitglied mit
-    Positivtext bestanden hat. Hier fehlen Daten fuer Fallback-SCSV und HSTS, deshalb
-    nennt jeder Positivbefund genau die Regel, die bestanden hat.
+    Positivtext bestanden hat. S6b-3 (Entscheidung DC 3): hsts_short gehoert zum Header-
+    Buendel; im TLS-Buendel haben nur Protokolle, TLS 1.3 und Verfahren einen Positivtext,
+    und alle drei bestehen auf Host 2. Ohne CBC-Fakt entfiele der Sammeltitel (siehe unten).
     """
     _, positives = _run(TLS_ZWEI_HOSTS)
+    (item,) = _by_key(positives, "tls_hardening")
+    assert item.rules == ["tls_legacy_protocols", "tls_no_13", "tls_weak_ciphers"]
+    assert item.merge_key == GLOBAL_KEY
+    assert all(r.status == "pass" for r in item.results)
+    assert "10.0.0.1" not in {str(r.vars.get("host_ip")) for r in item.results}
+
+    ohne_cbc = copy.deepcopy(TLS_ZWEI_HOSTS)
+    ohne_cbc["tls"][1].pop("cbc_obsoleted_offered")
+    _, positives = _run(ohne_cbc)
     assert not _by_key(positives, "tls_hardening")
-    tls = [p for p in positives if p.key in ("tls_legacy_protocols", "tls_no_13", "tls_weak_ciphers")]
-    assert {p.key for p in tls} == {"tls_legacy_protocols", "tls_no_13", "tls_weak_ciphers"}
-    for item in tls:
-        assert item.merge_key == GLOBAL_KEY
-        assert all(r.status == "pass" for r in item.results)
-        assert "10.0.0.1" not in {str(r.vars.get("host_ip")) for r in item.results}
+    assert {p.key for p in positives if p.key.startswith("tls_")} == {"tls_legacy_protocols", "tls_no_13"}
 
 
 def test_pruefung_ohne_buendel_bleibt_ein_eigener_sachverhalt():
@@ -145,10 +153,13 @@ def test_jedes_buendel_hat_sammeltitel_und_mitglieder(bundle_id):
         assert bundle.positive_title, "Buendel mit Positivtexten braucht einen Positivtitel"
 
 
-# ---------------------------------------------------------------- Issue #30 (S6a)
-# Der Positivbefund des Buendels remote_admin_closed prueft nur RDP und SMB. Neben FTP,
-# einer Verwaltungsoberflaeche oder SSH ausserhalb Port 22 mit Befund las er sich wie
-# eine Entwarnung fuer den ganzen Host. Der betroffene Host faellt heraus.
+# ---------------------------------------------------------------- Issue #30 (S6a), S6b-3
+# Der Positivbefund des Buendels remote_admin_closed nennt seit #30 nur RDP und SMB. S6a nahm
+# zusaetzlich Hosts mit FTP, Verwaltungsoberflaeche oder SSH ausserhalb Port 22 heraus
+# ("außer 92.205.163.53" bei castenow ohne RDP- oder SMB-Fakt, spec/10 R6). Entscheidung DC
+# 26.09. (S6b-3): diese S6a-Konfliktregel ist mit dem Titel aus #30 gegenstandslos. Nur ein
+# RDP- oder SMB-Port-Fakt widerspricht dem Positivbefund, und der ist ein Befund desselben
+# Buendels; dann entfaellt der Positivbefund. Die Huendgen-Sperre prueft die neue Lesart.
 
 HUENDGEN = json.loads((Path(__file__).parent / "fixtures" / "huendgen_62c1e866.json")
                       .read_text(encoding="utf-8"))
@@ -173,25 +184,22 @@ def _hosts(item) -> set[str]:
     return {str(r.vars.get("host_ip")) for r in item.results}
 
 
-def test_huendgen_ftp_host_faellt_aus_dem_positivbefund():
-    """Regressionssperre #30: FTP auf 217.160.231.238:21 steht als Befund.
-
-    S6b-2 (spec/08 Punkt 4): ohne Beleg fuer fehlenden TLS-Zwang meldet nicht mehr
-    ``ftp_plaintext`` den Port, sondern ``legacy_protocols_present``.
-    """
+def test_huendgen_ftp_host_bleibt_im_positivbefund():
+    """Regressionssperre #30 in der Lesart S6b-3: der FTP-Befund bleibt, der Positivbefund
+    nennt nur RDP und SMB und gilt fuer alle drei Hosts; kein "außer"."""
     findings, positives = _run(_huendgen())
     assert any(m.key == f"{HUENDGEN_FTP_HOST}:21" and m.status == "fail"
                for i in findings for r in i.results if r.check_id == "legacy_protocols_present"
                for m in r.members), "der FTP-Befund selbst muss bleiben"
     item = _fernwartung(positives)
-    assert item is not None, "die zwei Hosts ohne Konflikt behalten den Positivbefund"
+    assert item is not None
     assert item.title == NEUER_TITEL
-    assert _hosts(item) == {"18.197.248.23", "80.90.145.166"}
-    assert item.excluded_hosts == [HUENDGEN_FTP_HOST]
+    assert _hosts(item) == {"18.197.248.23", "80.90.145.166", HUENDGEN_FTP_HOST}
+    assert item.excluded_hosts == []
     (positiv,) = build_positives([item])
     assert positiv.title == NEUER_TITEL
-    assert HUENDGEN_FTP_HOST not in positiv.text
-    assert "18.197.248.23" in positiv.text and "80.90.145.166" in positiv.text
+    assert "außer" not in positiv.text
+    assert "FTP" not in positiv.title + positiv.text
 
 
 def test_huendgen_ohne_ftp_behaelt_der_host_den_positivbefund():
@@ -203,67 +211,60 @@ def test_huendgen_ohne_ftp_behaelt_der_host_den_positivbefund():
     assert item.excluded_hosts == []
 
 
-def test_ein_host_mit_ftp_ohne_rest_kein_positivbefund():
-    """Wie dortmund-beach: ein einziger Host, FTP darauf, kein Positivbefund."""
+def test_ein_host_mit_ftp_behaelt_den_positivbefund():
+    """Wie dortmund-beach: ein einziger Host mit FTP. FTP ist weder RDP noch SMB."""
     partial = {"services": [
         {"host_ip": "10.0.0.1", "port": 21, "service": "ftp", "product": "Pure-FTPd"},
         {"host_ip": "10.0.0.1", "port": 443, "service": "https", "tls_required": True},
     ]}
     _, positives = _run(partial)
-    assert _fernwartung(positives) is None
+    assert _hosts(_fernwartung(positives)) == {"10.0.0.1"}
 
 
-def test_verwaltungsoberflaeche_als_befund_nimmt_den_host_heraus():
+def test_verwaltungsoberflaeche_nimmt_den_host_nicht_heraus():
     partial = {"services": [
         {"host_ip": "10.0.0.1", "port": 10000, "service": "snet-sensor-mgmt", "tunnel_ssl": True},
         {"host_ip": "10.0.0.2", "port": 443, "service": "https", "tls_required": True},
     ]}
     findings, positives = _run(partial)
     # S6b-2 (Q13): Port 10000 ohne Fingerabdruck ist "Zweck klaeren", nicht Webmin.
-    assert any(r.check_id == "admin_service_unconfirmed" and r.status == "fail"
+    assert any(r.check_id in ("admin_service_unconfirmed", "service_unidentified") and r.status == "fail"
                for i in findings for r in i.results)
     item = _fernwartung(positives)
-    assert _hosts(item) == {"10.0.0.2"}
-    assert item.excluded_hosts == ["10.0.0.1"]
+    assert _hosts(item) == {"10.0.0.1", "10.0.0.2"}
+    assert item.excluded_hosts == []
 
 
-def test_ssh_ausserhalb_22_nur_mit_befund():
+def test_ssh_ausserhalb_22_nimmt_den_host_nicht_heraus():
     mit_banner = {"host_ip": "10.0.0.1", "port": 30000, "service": "ssh", "product": "OpenSSH",
                   "version_raw": "8.4p1", "version_norm": "8.4p1", "family": "openssh"}
-    ohne_befund = {"host_ip": "10.0.0.1", "port": 30000, "service": "ssh"}
     https = {"host_ip": "10.0.0.1", "port": 443, "service": "https", "tls_required": True}
-
-    # S6b-2 (spec/09 Q4): das SSH-Banner gehoert zum Protokoll und ist kein Befund mehr;
-    # ohne Befund auf dem Port behaelt der Host den Positivbefund.
-    findings, positives = _run({"services": [mit_banner, https]})
-    assert not any(r.check_id == "service_banner_version" and r.status == "fail"
-                   for i in findings for r in i.results)
-    assert _hosts(_fernwartung(positives)) == {"10.0.0.1"}
-
-    # Ein Befund auf dem SSH-Port (hier ein Verwaltungsport) nimmt den Host heraus.
-    auf_verwaltungsport = dict(mit_banner, port=10000)
-    findings, positives = _run({"services": [auf_verwaltungsport, https]})
-    assert any(r.check_id == "admin_service_unconfirmed" and r.status == "fail"
-               for i in findings for r in i.results)
-    assert _fernwartung(positives) is None
-
-    findings, positives = _run({"services": [ohne_befund, https]})
-    fails_30000 = [m for i in findings for r in i.results for m in r.members
-                   if m.status == "fail" and m.port == 30000]
-    assert not fails_30000, "Vorbedingung: SSH auf 30000 ohne eigenen Befund"
-    assert _hosts(_fernwartung(positives)) == {"10.0.0.1"}
+    for ssh in (mit_banner, dict(mit_banner, port=10000)):
+        _, positives = _run({"services": [ssh, https]})
+        assert _hosts(_fernwartung(positives)) == {"10.0.0.1"}
 
 
-def test_viele_hosts_nennen_den_herausgenommenen():
-    """Ab vier Hosts steht die Sammelbezeichnung; sie darf den FTP-Host nicht mitmeinen."""
+def test_rdp_port_fakt_nimmt_den_positivbefund_weg():
+    """Nur ein RDP- oder SMB-Port-Fakt widerspricht; dann steht der Befund, nicht "außer"."""
     services = [{"host_ip": f"10.0.0.{n}", "port": 443, "service": "https", "tls_required": True}
                 for n in range(1, 6)]
+    services.append({"host_ip": "10.0.0.3", "port": 3389, "service": "ms-wbt-server"})
+    findings, positives = _run({"services": services})
+    assert any(r.check_id == "rdp_exposed" and r.status == "fail" for i in findings for r in i.results)
+    assert _fernwartung(positives) is None
+
+
+def test_viele_hosts_ohne_rdp_und_smb_ohne_ausser():
+    services = [{"host_ip": f"10.0.0.{n}", "port": 443, "service": "https", "tls_required": True}
+                for n in range(1, 8)]
     services.append({"host_ip": "10.0.0.3", "port": 21, "service": "ftp", "product": "vsftpd"})
     _, positives = _run({"services": services})
     item = _fernwartung(positives)
-    assert item.excluded_hosts == ["10.0.0.3"]
+    assert item.excluded_hosts == []
     (positiv,) = build_positives([item])
-    assert "außer 10.0.0.3" in positiv.text
+    assert "außer" not in positiv.text
+    # S6b-3 (spec/10 R6): sechs Namen und "und n weitere", Zahl und Namen aus derselben Liste.
+    assert "und 1 weitere" in positiv.text
 
 
 def test_positive_conflicts_greifen_nur_beim_eigenen_buendel():

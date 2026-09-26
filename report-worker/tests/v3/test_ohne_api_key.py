@@ -42,8 +42,13 @@ def test_eingabe_der_ki_traegt_keine_rohdaten(ohne_key):
     data = junkerwerk_data()
     payload = prose.build_payload(data, {"branche": "Maschinenbau"})
     assert set(payload) == {"scan", "kunde", "kategorien", "systeme", "systeme_2_1", "befunde",
-                            "positive", "plan"}
-    assert payload["kunde"] == {"branche": "Maschinenbau"}
+                            "positive", "plan", "betriebsformen"}
+    # S6b-3 (spec/10 R13, E9): Branche und Mitarbeiterzahl nur mit Quelle Kunde oder Admin.
+    assert payload["kunde"] == {}
+    belegt = {"branche": "Maschinenbau", "mitarbeiter": "40",
+              "sources": {"branche": {"source": "kunde"}, "mitarbeiter": {"source": "recherche"}}}
+    assert prose.build_payload(data, belegt)["kunde"] == {
+        "branche": "Maschinenbau", "sources": belegt["sources"]}
     for befund in payload["befunde"]:
         assert set(befund) == {"id", "kategorie", "titel", "betroffen", "quelle",
                                "beobachtung", "bedeutung", "dringlichkeit", "fremdreferenzen"}

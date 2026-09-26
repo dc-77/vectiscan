@@ -82,6 +82,16 @@ def format_window(started: Optional[str], finished: Optional[str]) -> str:
     return f"{dt:%d.%m.%Y, %H:%M} Uhr ({zone})"
 
 
+def iso_date(value: Optional[str]) -> Optional[str]:
+    """Berichtsdatum TT.MM.JJJJ als JJJJ-MM-TT fuer die Katalogauswertung (spec/10 R18)."""
+    if not value:
+        return None
+    m = re.fullmatch(r"(\d{2})\.(\d{2})\.(\d{4})", value.strip())
+    if m:
+        return f"{m.group(3)}-{m.group(2)}-{m.group(1)}"
+    return value[:10] if re.match(r"\d{4}-\d{2}-\d{2}", value) else None
+
+
 def today() -> str:
     override = os.environ.get("VECTISCAN_REPORT_DATE")
     if override:
@@ -247,8 +257,20 @@ _kurz = kurz_label
 
 # ---------------------------------------------------------------- Kapitel 1
 
+def patch_bewertbar(facts: FS.Facts | None) -> bool:
+    """Liegt zu mindestens einer erkannten Software eine Version mit Lebenszyklusquelle vor?
+
+    S6b-3 (spec/10 R6): ohne eine solche Angabe ist Kategorie B nicht bewertbar (grau), nicht
+    "GRÜN, keine Befunde"; ein unbekannter Patchstand ist kein guter Patchstand."""
+    if facts is None:
+        return True
+    eigene = {h.ip for h in facts.hosts if h.third_party is None}
+    return any(sw.host_ip in eigene and sw.eol.status in ("eol", "supported") and sw.eol.source
+               for sw in facts.software)
+
+
 def build_glance(items: list[Consolidated], findings: list[Finding], counts: N.Counts,
-                 gap_systems: list[list[str]]) -> Glance:
+                 gap_systems: list[list[str]], facts: FS.Facts | None = None) -> Glance:
     by_cat: dict[str, list[Finding]] = {}
     for f in findings:
         by_cat.setdefault(f.cat, []).append(f)
@@ -257,6 +279,10 @@ def build_glance(items: list[Consolidated], findings: list[Finding], counts: N.C
         group = sorted(by_cat.get(key, []), key=lambda f: L.STATUS_RANK[f.status])
         status = group[0].status if group else "gruen"
         note = "; ".join(f.title for f in group[:2]) if group else "Keine Befunde in dieser Kategorie"
+        if key == "B" and not group and not patch_bewertbar(facts):
+            status = "grau"
+            note = ("Nicht bewertbar: zu keiner erkannten Serversoftware liegt eine Version mit "
+                    "Lebenszyklusangabe vor")
         categories.append(GlanceCategory(
             key=key, name=CATEGORY_NAMES[key], status=status,
             level=L.BAR_BY_STATUS[status], note=note))
@@ -323,8 +349,9 @@ def overall_text(findings: list[Finding]) -> str:
 
 
 def build_business(facts: FS.Facts, observed: list[ObservedSystem]) -> Business:
+    formen = sorted({h.betriebsform for h in facts.hosts if h.third_party is None and h.betriebsform})
     return Business(lead=N.BUSINESS_LEAD, observed=observed,
-                    implication=N.BUSINESS_IMPLICATION_GENERIC)
+                    implication=N.business_implication(formen), betriebsformen=formen)
 
 
 # ---------------------------------------------------------------- Rollen und Systeme
@@ -415,6 +442,14 @@ def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
             ip=host.ip, fqdns=", ".join(sorted((n for n in host.fqdns if not n.startswith("*.")),
                                                key=sort_key)) or UNKNOWN,
             operator=operator, role="Drittanbieter", coverage=model.hosts[host.ip].text, cov="extern"))
+    # S6b-3 (spec/10 R5): gefundene Namen eines Drittanbieters (Microsoft 365 Autodiscover),
+    # die nicht ins Inventar kamen, stehen als "Drittanbieter, nicht geprüft".
+    for target in facts.targets:
+        for d in target.discovered:
+            if d.third_party and d.ips:
+                hosts.append(ScopeHost(ip=d.ips[0], more_ips=[], fqdns=d.fqdn, operator=d.third_party,
+                                       role="Drittanbieter", coverage="Drittanbieter, nicht geprüft",
+                                       cov="extern"))
     out_of_scope = list(N.OUT_OF_SCOPE_BASE)
     extra = sorted(_unbeauftragt(facts, output))
     if extra:
@@ -532,6 +567,8 @@ def tech_lines(facts: FS.Facts, *, unconfirmed: list[TechLine] | None = None) ->
         # "unbekannt" da (Plesk 18.0.81 aus dem nmap-Titel, Plesk ohne Version aus dem
         # Header eines VHosts).
         mit_version = {s.family for s in entries if s.version_norm}
+        exponiert = {svc.product for svc in facts.services
+                     if svc.host_ip == host.ip and svc.product and "http" not in (svc.service or "")}
         # Derselbe Name in anderer Schreibweise ist dieselbe Komponente ("cloudflare"
         # aus nmap, "Cloudflare" aus httpx): eine Zeile, Quellen zusammengefuehrt.
         gruppen: dict[tuple[str, str], list[FS.SoftwareFact]] = {}
@@ -546,13 +583,24 @@ def tech_lines(facts: FS.Facts, *, unconfirmed: list[TechLine] | None = None) ->
             quellen = sorted({q for s in gruppe for q in s.detection_sources}) or [sw.source]
             note = T.tech_note(sw.note)
             if sw.eol.status == "eol" and sw.eol.date:
-                note = f"Herstellerpflege endete am {sw.eol.date}"
+                note = f"Herstellerpflege endete am {_datum_de(sw.eol.date)}"
             elif sw.eol.upstream_eol_date:
-                note = f"Lifecycle prüfen, Hersteller nennt {sw.eol.upstream_eol_date}"
+                note = f"Lifecycle prüfen, Hersteller nennt {_datum_de(sw.eol.upstream_eol_date)}"
+            elif (not sw.version_norm and sw.kind in VERSION_AT_OPERATOR_KINDS
+                  and "nmap" in sw.detection_sources and sw.product in exponiert):
+                # S6b-3 (spec/10 R19, E14): Herstellerprodukt ohne Version an einem
+                # Nicht-Web-Port (heuel Wing FTP 20.79.218.75:21).
+                note = "Version beim Betreiber prüfen"
+            conf = sw.confidence
+            conflicts = [c for s in gruppe for c in s.conflicts]
+            if conflicts:
+                # S6b-3 (spec/10 R19): eine Passivquelle nennt am selben Port ein anderes Produkt.
+                conf = min(conf, 0.7)
+                note = (note + "; " if note else "") + "Passivquelle widerspricht: " + conflicts[0]
             line = TechLine(
                 software=sw, product=sw.product, version=version, eol_status=sw.eol.status,
                 eol_date=sw.eol.date, note=note, sources=", ".join(quellen),
-                confidence=sw.confidence, conf_label=_confidence_label(sw.confidence))
+                confidence=conf, conf_label=_confidence_label(conf))
             if not bestaetigt:
                 if unconfirmed is not None:
                     unconfirmed.append(line)
@@ -579,6 +627,35 @@ def tech_tool_findings(facts: FS.Facts) -> list["ToolFinding"]:
                   "Technologietabelle."),
             rule="technik", message=was))
     return out
+
+
+# Produkte ohne eigene Softwarefamilie (Herstellerprodukte); Open-Source-Daemons (Dovecot,
+# Postfix, ProFTPD) ohne Version bekommen den Satz nicht, sie stehen fast nur beim Hoster.
+VERSION_AT_OPERATOR_KINDS = frozenset({"component", "control_panel"})
+
+
+def _datum_de(iso: Optional[str]) -> str:
+    """Deutsches Datum im Kundentext (spec/10 R14)."""
+    if not iso or len(iso) < 10 or iso[4] != "-":
+        return iso or ""
+    return f"{iso[8:10]}.{iso[5:7]}.{iso[:4]}"
+
+
+def service_display(svc: FS.ServiceFact) -> str:
+    """Name eines Dienstes in Service-Karte und Anhang B (spec/10 R9, R14): MariaDB statt
+    "MySQL" beim Kompatibilitaetsbanner, die Kennung statt eines geratenen nmap-Portnamens,
+    "nicht identifiziert (Port n)" ohne Kennung."""
+    if svc.family == "mariadb":
+        return f"MariaDB {svc.version_norm}".strip() if svc.version_norm else "MariaDB"
+    if svc.unidentified:
+        return f"nicht identifiziert (Port {svc.port})"
+    if svc.product:
+        return svc.product
+    if svc.kennung:
+        return svc.kennung
+    if (svc.method or "") == "table":
+        return f"nicht identifiziert (Port {svc.port})"
+    return (svc.service or "").upper() or UNKNOWN
 
 
 def _tech_version(sw: FS.SoftwareFact) -> str:
@@ -662,9 +739,12 @@ def build_services(facts: FS.Facts, items: list[Consolidated],
         ports: list[ServicePort] = []
         for svc in sorted((s for s in facts.services if s.host_ip == host.ip and s.state == "open"),
                           key=lambda s: s.port):
-            label = svc.product or (svc.service or "").upper() or UNKNOWN
+            label = service_display(svc)
             befunde = refs.get((host.ip, svc.port), [])
             colour = min((f.status for f in befunde), key=lambda s: L.STATUS_RANK[s]) if befunde else "gruen"
+            if svc.unidentified:
+                # S6b-3 (spec/10 R9): ein Dienst ohne Kennung ist nicht "unauffällig".
+                colour = "grau"
             ports.append(ServicePort(p=str(svc.port), s=label, st=colour))
         seen = {p.p for p in ports}
         for pv in sorted((p for p in facts.passive if p.host_ip == host.ip and p.port),
@@ -679,6 +759,13 @@ def build_services(facts: FS.Facts, items: list[Consolidated],
     return cards
 
 
+# S6b-3 (spec/10 R8): nicht anwendbar mit eigenem Grund steht als "entfällt (Grund)".
+POSTURE_NA_TEXT: dict[str, str] = {
+    "mx_external": "entfällt (MX beim Dienstleister)",
+    "zone_unsigned": "entfällt (Zone nicht signiert)",
+}
+
+
 def _result_state(results: list[CheckResult],
                   primary: list[CheckResult] | None = None) -> tuple[Optional[bool], str]:
     """Status eines Posture-Items.
@@ -686,13 +773,25 @@ def _result_state(results: list[CheckResult],
     Ein Fehlschlag irgendeiner beteiligten Pruefung zieht das Item auf
     "Handlungsbedarf". Zwischen "unauffaellig" und "nicht pruefbar" entscheidet die
     leitende Pruefung; ein bestandener Nebencheck ohne gesehene Items sagt nichts aus.
+    S6b-3 (spec/10 R8): dieselben Regelergebnisse wie Befund und Positivbefund; eine durch
+    eine Messung derselben Familie ueberholte "nicht pruefbar"-Zeile zaehlt nicht, und
+    bestanden neben nicht pruefbar ist "teilweise geprüft".
     """
     if not results:
         return None, "nicht geprüft"
+    from reporter.catalog import families as FAM
+    gemessen = FAM.measured(results)
+    results = [r for r in results if not FAM.suppressed(r, gemessen)]
+    lead = [r for r in (primary if primary else results) if not FAM.suppressed(r, gemessen)] or results
     if any(r.status == "fail" for r in results):
         return False, "Handlungsbedarf"
-    lead = primary if primary else results
-    if any(r.status == "pass" and r.items_seen > 0 for r in lead):
+    for r in lead:
+        if r.status == "not_applicable" and r.reason_code in POSTURE_NA_TEXT:
+            return None, POSTURE_NA_TEXT[r.reason_code]
+    bestanden = any(r.status == "pass" and r.items_seen > 0 for r in lead)
+    if bestanden and any(r.status == "not_testable" for r in lead):
+        return None, "teilweise geprüft"
+    if bestanden:
         return True, "unauffällig"
     if any(r.status == "not_testable" for r in lead):
         return None, "nicht prüfbar"
@@ -740,10 +839,15 @@ def build_posture(output: CatalogOutput, model: COV.Model | None = None,
                         lead_by_host.setdefault(host, []).append(r)
             for host in sorted(set(by_host) | set(ohne_messung), key=sort_key):
                 if host in ohne_messung:
-                    items.append(PostureItem(l=host, ok=None, v="nicht prüfbar"))
+                    items.append(PostureItem(l=host, ok=None, v="nicht prüfbar", checks=list(per_host),
+                                             subjects=[host]))
                     continue
                 ok, text = _result_state(by_host[host], lead_by_host.get(host))
-                items.append(PostureItem(l=host, ok=ok, v=text))
+                # S6b-3 (spec/10 R3): "unauffaellig" nur, wenn alle TLS-Dienste des Hosts
+                # geprueft sind (Plesk-Mailports bei bergersysteme, acht Dienste bei dortmund-beach).
+                if spec["name"] == "Transportverschlüsselung" and ok is True and host in tls_offen:
+                    ok, text = None, "teilweise geprüft"
+                items.append(PostureItem(l=host, ok=ok, v=text, checks=list(per_host), subjects=[host]))
         for label, checks in spec["items"]:  # type: ignore[index]
             results = [r for cid in checks for r in by_check.get(cid, [])]
             ok, text = _result_state(results, by_check.get(checks[0], []))
@@ -754,7 +858,8 @@ def build_posture(output: CatalogOutput, model: COV.Model | None = None,
                     ok, text = None, weich[1]
             if label in POSTURE_TLS_ITEMS and ok is True and tls_offen:
                 ok, text = None, "nur teilweise geprüft"
-            items.append(PostureItem(l=label, ok=ok, v=text))
+            items.append(PostureItem(l=label, ok=ok, v=text, checks=list(checks),
+                                     subjects=sorted({r.group_key for r in results}, key=sort_key)))
         if items:
             blocks.append(PostureBlock(name=str(spec["name"]), short=str(spec["short"]),
                                        items=items))
@@ -819,6 +924,61 @@ def build_screens(facts: FS.Facts) -> list[Screenshot]:
 REPUTATION_SOURCES = ["AbuseIPDB", "OTX", "URLhaus"]
 
 
+def reputation_sources(facts: FS.Facts) -> list[str]:
+    """Quellen mit ausdruecklichem Ergebnis (spec/10 R6): URLhaus ohne Daten ist ein Ausfall."""
+    out: list[str] = []
+    if any(h.reputation is not None and h.reputation.abuseipdb_total_reports is not None for h in facts.hosts):
+        out.append("AbuseIPDB")
+    if any(p.source == "otx" and p.details.get("pulse_count") is not None for p in facts.passive):
+        out.append("OTX")
+    if any(p.source == "urlhaus" and p.details.get("compromised") is not None for p in facts.passive):
+        out.append("URLhaus")
+    return out
+
+
+# S6b-3 (spec/10 R12, R19): Beobachtungen ohne Regeltreffer in Kundensprache. Werkzeuginterne
+# Eintraege (unlesbare Datei, Werkzeug ohne Parser) sind keine Beobachtung am Kunden.
+_BEOBACHTUNG_FAKTEN = {
+    "smtp_auth_before_starttls": "Anmeldung vor STARTTLS angeboten",
+    "wpscan_readme": "readme.html der WordPress-Installation abrufbar",
+    "wpscan_wp_cron": "wp-cron.php der WordPress-Installation von außen aufrufbar",
+    "resource_version": "Bibliotheksversion in einer Ressourcenadresse",
+}
+
+
+def unprocessed_notes(facts: FS.Facts, output: CatalogOutput) -> list[str]:
+    out: list[str] = []
+
+    def add(text: str) -> None:
+        if text not in out:
+            out.append(text)
+
+    for u in output.unprocessed:
+        if u.kind == "service_unknown_port":
+            port = str(u.what).split("/")[0].strip()
+            add(f"Port {port} auf {u.host_ip} ohne Regel" if u.host_ip else f"Port {port} ohne Regel")
+        elif u.kind == "passive_port_unverified":
+            add(f"{u.what} laut Passivquelle, vom Portscan nicht bestätigt")
+        else:
+            add(f"Werkzeugmeldung {u.what}")
+    for u in facts.unprocessed:
+        was = _BEOBACHTUNG_FAKTEN.get(u.kind) or (
+            "Hinweis der Webanalyse ohne Regel" if u.kind.startswith("wpscan_") else None)
+        if not was:
+            continue
+        what = str(u.what)
+        if u.kind == "smtp_auth_before_starttls":
+            ort = what.split(" ")[0] + (", laut Passivquelle" if "Passivquelle" in what else "")
+        elif u.kind == "resource_version":
+            ort_, _, rest = what.partition(": ")
+            was = f"Bibliotheksversion {rest.split(' in Ressourcen-URL')[0]} in einer Ressourcenadresse"
+            ort = ort_
+        else:
+            ort = u.fqdn or u.host_ip or ""
+        add(f"{was} ({ort})" if ort else was)
+    return out
+
+
 def build_architecture(facts: FS.Facts, output: CatalogOutput, items: list[Consolidated],
                        findings: list[Finding], model: COV.Model | None = None) -> Architecture:
     model = model or COV.build_model(facts)
@@ -828,27 +988,22 @@ def build_architecture(facts: FS.Facts, output: CatalogOutput, items: list[Conso
     # sondern benannt. Score 0 heisst nicht "keine Meldungen": eine Adresse auf der
     # Freigabeliste von AbuseIPDB hat Score 0 trotz Meldungen (Vercel bei heuel, 26).
     fremd = [h for h in eigene if h.cdn_provider or (h.shared is not None and h.shared.kind == "platform")]
-    bewertet = [h for h in eigene if h not in fremd]
-    clean = not any(
-        (h.reputation and (
-            (h.reputation.abuseipdb_score or 0) >= CT.ABUSEIPDB_FAIL_SCORE
-            or (h.reputation.abuseipdb_total_reports or 0) > 0
-            or (h.reputation.otx_pulse_count or 0) > 0
-            or h.reputation.urlhaus_compromised))
-        for h in bewertet)
+    # S6b-3 (spec/10 R6): "keine Meldungen" nur, wenn alle gemessenen Adressen null Meldungen
+    # haben, Plattform- und CDN-Adressen eingeschlossen (heuel 216.150.1.65 mit 26 Meldungen
+    # trotz Freigabeliste); sonst steht die Aussage nicht da.
+    gemessen = [h for h in eigene if h.reputation is not None and h.reputation.abuseipdb_total_reports is not None]
+    clean = bool(gemessen) and not any(
+        (h.reputation.abuseipdb_score or 0) >= CT.ABUSEIPDB_FAIL_SCORE
+        or (h.reputation.abuseipdb_total_reports or 0) > 0
+        or (h.reputation.otx_pulse_count or 0) > 0
+        or h.reputation.urlhaus_compromised
+        for h in gemessen)
     notes: list[str] = []
-    counter = Counter(u.kind for u in output.unprocessed)
-    if counter:
-        total = sum(u.count for u in output.unprocessed)
-        # S6 (spec/08 Punkte 11 und 19): Singular bei 1, und der Satz sagt in
-        # Kundensprache, was mit der Beobachtung geschieht, statt "intern zur
-        # Nachbearbeitung vorgemerkt".
-        wort = "Beobachtung" if total == 1 else "Beobachtungen"
-        hat = "hat" if total == 1 else "haben"
-        notes.append(
-            f"{total} {wort} der Werkzeuge {hat} keine Regel des Prüfkatalogs "
-            "getroffen. Sie erscheinen nicht als Befund; wir prüfen sie und nehmen "
-            "wiederkehrende Fälle in den Katalog auf.")
+    beobachtungen = unprocessed_notes(facts, output)
+    if beobachtungen:
+        # S6b-3 (spec/10 R12): keine Zusage ("wir prüfen sie"), sondern die Beobachtungen selbst.
+        wort = "Beobachtung" if len(beobachtungen) == 1 else "Beobachtungen"
+        notes.append(f"{wort} ohne Regeltreffer, nicht als Befund bewertet: " + "; ".join(beobachtungen) + ".")
     for wert in sorted(_unbeauftragt(facts, output)):
         notes.append(f"Sichtbar, aber nicht beauftragt: {wert}.")
     # facts.warnings sind Hinweise des Faktenbauers an den Betreiber, keine Kundentexte.
@@ -862,8 +1017,11 @@ def build_architecture(facts: FS.Facts, output: CatalogOutput, items: list[Conso
         posture=build_posture(output, model, facts),
         screens_lead=N.SCREENS_LEAD,
         screens=build_screens(facts),
-        reputation=N.reputation_line(clean, REPUTATION_SOURCES,
-                                     sorted((h.ip for h in fremd), key=sort_key)),
+        reputation=N.reputation_line(
+            clean, reputation_sources(facts), sorted((h.ip for h in fremd), key=sort_key),
+            reported=[(h.ip, int(h.reputation.abuseipdb_total_reports or 0))
+                      for h in sorted(gemessen, key=lambda x: sort_key(x.ip))
+                      if (h.reputation.abuseipdb_total_reports or 0) > 0]),
         notes=notes,
     )
 
