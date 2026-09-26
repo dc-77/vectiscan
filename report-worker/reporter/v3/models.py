@@ -353,6 +353,11 @@ class ToolFinding(Base):
     what: str
     where: str = ""
     note: str = ""
+    # Nachtrag S6b-2 (Entscheidung DC 26.09.): Zusammenfassung je Meldung. Einzelzeilen
+    # tragen Regel und Meldungsname, die Anhangzeile die Anzahl der Einzelmeldungen.
+    rule: str = ""
+    message: Optional[str] = None
+    count: int = 1
 
 
 class Appendix(Base):
@@ -363,6 +368,8 @@ class Appendix(Base):
     inventory: list[InventoryRow] = Field(default_factory=list)
     tools: list[ToolRow] = Field(default_factory=list)
     tool_findings: list[ToolFinding] = Field(default_factory=list)
+    # Einzelmeldungen hinter ``tool_findings`` fuer den Export (S7), im PDF nicht gerendert.
+    tool_messages: list[ToolFinding] = Field(default_factory=list)
     # S6a (#15 Teil 2): abgefragte DKIM-Selektoren, nur wenn DKIM nicht pruefbar war.
     dkim_selectors: list[str] = Field(default_factory=list)
     filtering: str = ""

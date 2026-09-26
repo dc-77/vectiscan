@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-25.2 auf tests/golden/facts/1fbc92b9-34ab-414e-8843-a1f1e9f15431.json",
+ "source": "reporter.catalog 2026-09-26.1 auf tests/golden/facts/1fbc92b9-34ab-414e-8843-a1f1e9f15431.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -19,7 +19,8 @@
    "level": "kritisch",
    "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
    "affected": [
-    "88.99.35.112:10000 (Webmin)"
+    "88.99.35.112:10000 (Webmin)",
+    "88.99.35.112:443 (froxlor)"
    ],
    "title": "Verwaltungsoberfläche aus dem Internet erreichbar"
   },

@@ -198,3 +198,42 @@ def test_positivbefund_nur_aus_bestandenen_regeln(order):
                 continue
             for gruppe in prov.members:
                 assert (prov.check, gruppe) in bestanden, (order, p.title, prov.check, gruppe)
+
+
+# ---------------------------------------------------------------- Nachtrag 2 (Entscheidungen DC 26.09.)
+
+CASTENOW_VORLAUF = "4e6b6883-a6c8-4204-8b13-b37f907322ca"
+
+
+@pytest.mark.parametrize("order", [DORTMUND, "14272c00-1145-4675-9b4c-19ce2ead403b"])
+def test_froxlor_titel_ueber_die_ip_ist_verwaltungsoberflaeche(order):
+    """Frage 1: der Titel eines Hosting-Panels auf der Standardseite (IP:443) ist ein
+    Fingerabdruck nach Q13; auf einem System des Kunden Exposition kritisch (E1)."""
+    (f,) = [f for f in data_for(order).findings if "88.99.35.112:443 (froxlor)" in f.affected]
+    assert (f.status, f.scale, f.level) == ("rot", "exposure", "kritisch")
+    assert "88.99.35.112:10000 (Webmin)" in f.affected, "ein Befund je Host (admin_access)"
+    assert "beim Aufruf über die IP-Adresse" in f.found
+    assert any("Standardseite des Webservers" in text for _, text in f.recommendation)
+
+
+def test_anhang_eine_zeile_je_meldung():
+    """Frage 3: castenow-Vorlauf, vorher 46 Zeilen im Anhang."""
+    ap = data_for(CASTENOW_VORLAUF).appendix
+    assert len(ap.tool_messages) >= 40 and len(ap.tool_findings) <= 16
+    assert sum(t.count for t in ap.tool_findings) == len(ap.tool_messages)
+    schluessel = [(t.rule, t.message) for t in ap.tool_findings]
+    assert len(schluessel) == len(set(schluessel)), "eine Zeile je Meldung"
+    for t in ap.tool_findings:
+        namen = [n for n in t.where.split(" und ")[0].split(", ") if n]
+        assert len(namen) <= 6, t.where
+        if t.count > 1 and len({m.where for m in ap.tool_messages if (m.rule, m.message) == (t.rule, t.message)}) > 6:
+            assert re.search(r" und \d+ weitere$", t.where), t.where
+    zap = [t for t in ap.tool_findings if "ZAP-Regel" in t.what]
+    assert zap and all(t.what.startswith("„") for t in zap), "Meldungsname als Zitat (Frage 6)"
+    assert all(not t.note.startswith("„") for t in ap.tool_findings), "Hinweis ist der deutsche Regeltitel"
+
+
+@pytest.mark.parametrize("order", ORDERS)
+def test_anhang_zeilen_decken_alle_einzelmeldungen(order):
+    ap = data_for(order).appendix
+    assert sum(t.count for t in ap.tool_findings) == len(ap.tool_messages)

@@ -151,7 +151,7 @@ Positivtext bestanden hat, sonst einen Positivbefund je bestandener Regel.
 | `plan`, `glance.levers` | erste Empfehlung der fuehrenden Regel je Befund, Effekt und Hebeltitel aus `texts.plan` |
 | `appendix.inventory` | `facts.services` und `facts.passive` |
 | `appendix.tools` | Werkzeuge, die laut `facts.coverage` gelaufen sind, ohne Versionsnummer |
-| `appendix.tool_findings` | Buendel mit `target: appendix` (je Meldung eine Zeile mit eigener Gruppe) und Technikzeilen unter der Schwelle (Konfidenz hoch oder zwei Quellen) |
+| `appendix.tool_findings` | eine Zeile je Werkzeugmeldung (ZAP-Regel, testssl-Hinweis, Technik) mit Anzahl und hoechstens sechs Betroffenen, aus den Buendeln mit `target: appendix` und den Technikzeilen ohne Version aus nur einer Quelle (Entscheidung DC 26.09.); Einzelmeldungen in `appendix.tool_messages` |
 
 ## Anhang A.3: zwei Faelle, benannt (S5b)
 

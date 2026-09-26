@@ -288,14 +288,27 @@ def _source_mode(modes: list[str]) -> str:
 
 
 def _member(item: Item, label: str, status: str, *, reason_code: str | None = None,
-            holds: list[str] | None = None, urgent: bool = False) -> Member:
+            holds: list[str] | None = None, urgent: bool = False,
+            message: tuple[str | None, str | None] = (None, None)) -> Member:
     reason = None
     if reason_code:
         _, _, reason = _reason(reason_code)
     return Member(key=item.key, host_ip=item.host_ip, fqdn=item.fqdn, port=item.port, label=label, status=status,
                   reason_code=reason_code, reason=reason, fact_ids=[item.fact.id], source_mode=item.source_mode,
                   verified=item.verified, via_cdn=item.via_cdn, alias_of=item.alias_of,
-                  holds=list(holds or []), urgent=urgent)
+                  holds=list(holds or []), urgent=urgent, message=message[0], message_id=message[1])
+
+
+# Bereiche, deren Items eine benannte Werkzeugmeldung sind (ZAP-Regel, testssl-Test).
+MESSAGE_SCOPES = frozenset({"http.alerts", "tls.vulns"})
+
+
+def _message_of(scope: str, ivars: dict[str, Any]) -> tuple[str | None, str | None]:
+    if scope not in MESSAGE_SCOPES:
+        return None, None
+    name = ivars.get("name")
+    pid = ivars.get("plugin_id")
+    return (str(name) if name else None), (str(pid) if pid else None)
 
 
 class _Eval:
@@ -336,8 +349,8 @@ class _Eval:
             ictx = {**gctx, **item.ctx}
             if self.cc.item_filter is not None and not self.cc.item_filter.test(ictx):
                 continue
-            label = render.format_strict(spec.affected_template, render.item_vars(spec.scope, item, g, self.index),
-                                         f"check {spec.id} affected_template")
+            ivars = render.item_vars(spec.scope, item, g, self.index)
+            label = render.format_strict(spec.affected_template, ivars, f"check {spec.id} affected_template")
             if self.cc.when is not None and self.cc.when.test(ictx):
                 self.claimed.add(item.claim_id)
                 if spec.kind == "note":
@@ -346,7 +359,8 @@ class _Eval:
                 else:
                     holds = [sid for sid, cond in self.cc.statements if cond is None or cond.test(ictx)]
                     dringend = self.cc.urgent is not None and self.cc.urgent.test(ictx)
-                    members.append(_member(item, label, "fail", holds=holds, urgent=dringend))
+                    members.append(_member(item, label, "fail", holds=holds, urgent=dringend,
+                                           message=_message_of(spec.scope, ivars)))
                     evidence.extend(self.evidence(item, ictx))
                     # S6: aktiver Nachweis. Trifft der Ausdruck fuer ein
                     # fehlgeschlagenes Mitglied, ist der ganze Sachverhalt

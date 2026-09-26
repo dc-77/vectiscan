@@ -370,6 +370,10 @@ class Member(Base):
     # stehen immer darin. Das Gate prueft jede Aussage des Berichts gegen diese Liste.
     holds: list[str] = Field(default_factory=list)
     urgent: bool = False
+    # Nachtrag S6b-2 (Entscheidung DC 26.09.): Name und Kennung der Werkzeugmeldung (ZAP-Regel,
+    # testssl-Test), damit der Anhang eine Zeile je Meldung zusammenfassen kann.
+    message: Optional[str] = None
+    message_id: Optional[str] = None
 
 
 class RenderedTexts(Base):

@@ -84,28 +84,85 @@
   ],
   "tool_findings": [
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
+    "what": "„LUCKY13“",
+    "where": "exchange.huendgen-entsorgung.de"
+   },
+   {
+    "count": 1,
+    "message": "Etracker",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Etracker“",
+    "where": "18.197.248.23"
+   },
+   {
+    "count": 1,
+    "message": "jQuery Migrate",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery Migrate“",
+    "where": "18.197.248.23"
+   },
+   {
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
+    "where": "18.197.248.23"
+   },
+   {
+    "count": 1,
+    "message": "Windows Server",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Windows Server“",
+    "where": "80.90.145.166"
+   }
+  ],
+  "tool_messages": [
+   {
+    "count": 1,
+    "message": "LUCKY13",
+    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "exchange.huendgen-entsorgung.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "exchange.huendgen-entsorgung.de"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Etracker",
+    "count": 1,
+    "message": "Etracker",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Etracker“",
     "where": "18.197.248.23"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery Migrate",
+    "count": 1,
+    "message": "jQuery Migrate",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery Migrate“",
     "where": "18.197.248.23"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery",
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
     "where": "18.197.248.23"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Windows Server",
+    "count": 1,
+    "message": "Windows Server",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Windows Server“",
     "where": "80.90.145.166"
    }
   ],
@@ -1697,8 +1754,8 @@
  "landscape_lead": "11 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 16,
-  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
-  "catalog_version": "2026-09-25.2",
+  "catalog_digest": "3def4b8b695693f10cdc3c448b9600bfc7e6ba365814cf1aef184ec7b573b6fd",
+  "catalog_version": "2026-09-26.1",
   "classification": "Vertraulich",
   "consolidated": 11,
   "context_sources": {},
@@ -1722,7 +1779,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-25.2",
+  "policy_version": "2026-09-26.1",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",

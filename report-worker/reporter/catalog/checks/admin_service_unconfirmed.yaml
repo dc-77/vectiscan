@@ -11,7 +11,7 @@ applicable_when: null
 # Verwaltungssoftware ohne belegte Anmeldung. Kritisch ist nur admin_service_exposed (mit
 # belegter Anmeldung auf einem System des Kunden), auf geteilten Systemen des Hosters gilt
 # admin_panel_hoster.
-when: (service.port in ADMIN_PORTS or admin_fp(service)) and not is_cdn(host, services) and not (admin_fp(service) and host is not None and host.shared is not None and host.shared.kind == "hoster") and not (admin_fp(service) and service.fp_login is True and (host is None or host.shared is None))
+when: (service.port in ADMIN_PORTS or admin_fp(service)) and not is_cdn(host, services) and not (admin_fp(service) and host is not None and host.shared is not None and host.shared.kind == "hoster") and not (admin_fp(service) and (service.fp_login is True or panel_title(service)) and (host is None or host.shared is None))
 positive_when: never
 not_testable_when: []
 undetermined: not_testable

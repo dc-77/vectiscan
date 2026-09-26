@@ -125,6 +125,7 @@ _BANNER_PRODUCTS: tuple[tuple[str, str], ...] = (
     ("sw-cp-server", "Plesk"), ("miniserv", "Webmin"), ("webmin", "Webmin"), ("plesk", "Plesk"),
     ("sonicwall", "SonicWall"), ("fortigate", "FortiGate"), ("fortinet", "Fortinet"),
     ("cpanel", "cPanel"), ("portainer", "Portainer"), ("proxmox", "Proxmox"),
+    ("froxlor", "froxlor"), ("directadmin", "DirectAdmin"), ("ispconfig", "ISPConfig"),
 )
 
 

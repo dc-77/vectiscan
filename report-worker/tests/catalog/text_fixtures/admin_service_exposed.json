@@ -1,0 +1,52 @@
+{
+ "check": "admin_service_exposed",
+ "cases": [
+  {
+   "name": "Webmin mit belegter Anmeldung und froxlor-Titel ueber die IP (dortmund-beach 1fbc92b9)",
+   "facts": {
+    "services": [
+     {
+      "host_ip": "10.0.0.7",
+      "port": 10000,
+      "service": "snet-sensor-mgmt",
+      "tunnel_ssl": true,
+      "fp_server": "MiniServ",
+      "fp_login": true
+     },
+     {
+      "host_ip": "10.0.0.7",
+      "port": 443,
+      "service": "https",
+      "product": "Apache httpd",
+      "tunnel_ssl": true,
+      "fp_server": "Apache/2.4.67 (Debian)",
+      "fp_title": "froxlor"
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "10.0.0.7:10000": [
+      "observation[1]"
+     ],
+     "10.0.0.7:443": [
+      "observation[2]",
+      "observation[3]",
+      "recommendation[1]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.7:10000": [
+      "observation[2]",
+      "observation[3]",
+      "recommendation[1]"
+     ],
+     "10.0.0.7:443": [
+      "observation[1]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  }
+ ]
+}

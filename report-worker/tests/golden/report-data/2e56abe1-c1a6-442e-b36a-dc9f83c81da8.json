@@ -181,108 +181,293 @@
   ],
   "tool_findings": [
    {
+    "count": 1,
+    "message": null,
+    "note": "Werkzeugmeldung ohne eigene Einstufung.",
+    "rule": "admin_port_passive_unidentified",
+    "what": "Verwaltungsport laut Passivquelle ohne Kennung",
+    "where": "20.79.218.75:4433"
+   },
+   {
+    "count": 1,
+    "message": "Cross-Domain JavaScript Source File Inclusion",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10017",
+    "what": "„Cross-Domain JavaScript Source File Inclusion“ (ZAP-Regel 10017)",
+    "where": "www.heuel.com"
+   },
+   {
+    "count": 2,
+    "message": "Timestamp Disclosure - Unix",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
+    "what": "„Timestamp Disclosure - Unix“ (ZAP-Regel 10096), 2 Meldungen",
+    "where": "online.heuel.com, www.heuel.com"
+   },
+   {
+    "count": 2,
+    "message": "LUCKY13",
+    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
+    "what": "„LUCKY13“, 2 Meldungen",
+    "where": "edi.heuel.com, ose.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Cookie No HttpOnly Flag",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10010",
+    "what": "„Cookie No HttpOnly Flag“ (ZAP-Regel 10010)",
+    "where": "ose.heuel.com"
+   },
+   {
+    "count": 2,
+    "message": "Cookie Without Secure Flag",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10011",
+    "what": "„Cookie Without Secure Flag“ (ZAP-Regel 10011), 2 Meldungen",
+    "where": "ose.heuel.com, www.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Cookie without SameSite Attribute",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10054",
+    "what": "„Cookie without SameSite Attribute“ (ZAP-Regel 10054)",
+    "where": "ose.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Cross-Domain Misconfiguration",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10098",
+    "what": "„Cross-Domain Misconfiguration“ (ZAP-Regel 10098)",
+    "where": "ose.heuel.com"
+   },
+   {
+    "count": 2,
+    "message": "Absence of Anti-CSRF Tokens",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10202",
+    "what": "„Absence of Anti-CSRF Tokens“ (ZAP-Regel 10202), 2 Meldungen",
+    "where": "ose.heuel.com, www.heuel.com"
+   },
+   {
+    "count": 2,
+    "message": "Java/Servlet",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Java/Servlet“, 2 Meldungen",
+    "where": "20.79.218.75, 213.133.104.51"
+   },
+   {
+    "count": 1,
+    "message": "Facebook Pixel",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Facebook Pixel“",
+    "where": "216.150.1.65"
+   },
+   {
+    "count": 2,
+    "message": "Google Tag Manager",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Google Tag Manager“, 2 Meldungen",
+    "where": "216.150.1.65, 217.72.203.132"
+   },
+   {
+    "count": 1,
+    "message": "Neos CMS",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Neos CMS“",
+    "where": "217.72.203.132"
+   },
+   {
+    "count": 1,
+    "message": "Neos Flow",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Neos Flow“",
+    "where": "217.72.203.132"
+   },
+   {
+    "count": 1,
+    "message": "PHP",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „PHP“",
+    "where": "217.72.203.132"
+   }
+  ],
+  "tool_messages": [
+   {
+    "count": 1,
+    "message": null,
     "note": "Verwaltungsport laut Passivquelle ohne Kennung.",
+    "rule": "admin_port_passive_unidentified",
     "what": "20.79.218.75:4433 laut Passivquelle, ohne Kennung der Software",
-    "where": "20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com)"
+    "where": "20.79.218.75:4433"
    },
    {
+    "count": 1,
+    "message": "Cross-Domain JavaScript Source File Inclusion",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10017",
     "what": "www.heuel.com (Cross-Domain JavaScript Source File Inclusion)",
-    "where": "www.heuel.com (+heuel.com, jobs.heuel.com)"
+    "where": "www.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
     "what": "www.heuel.com (Timestamp Disclosure - Unix)",
-    "where": "www.heuel.com (+heuel.com, jobs.heuel.com)"
+    "where": "www.heuel.com"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "edi.heuel.com:443: LUCKY13 (Hinweis der TLS-Analyse)",
-    "where": "edi.heuel.com (+mail.heuel.com)"
+    "where": "edi.heuel.com"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "ose.heuel.com:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Cookie No HttpOnly Flag",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
-    "what": "Absence of Anti-CSRF Tokens auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz niedrig, passiv gemeldet von ZAP)",
-    "where": "ose.heuel.com"
-   },
-   {
-    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10010",
     "what": "Cookie No HttpOnly Flag auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz mittel, passiv gemeldet von ZAP)",
     "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Cookie Without Secure Flag",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10011",
     "what": "Cookie Without Secure Flag auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz mittel, passiv gemeldet von ZAP)",
     "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Cookie without SameSite Attribute",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10054",
     "what": "Cookie without SameSite Attribute auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz mittel, passiv gemeldet von ZAP)",
     "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Cross-Domain Misconfiguration",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10098",
     "what": "Cross-Domain Misconfiguration auf ose.heuel.com/webmodule-ee/ (Konfidenz mittel, passiv gemeldet von ZAP)",
     "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Absence of Anti-CSRF Tokens",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
-    "what": "Absence of Anti-CSRF Tokens auf www.heuel.com/en/kontakt-heuel-logistics.html (Konfidenz niedrig, passiv gemeldet von ZAP)",
-    "where": "www.heuel.com (+heuel.com, jobs.heuel.com)"
+    "rule": "web_vulnerability_reported#10202",
+    "what": "Absence of Anti-CSRF Tokens auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz niedrig, passiv gemeldet von ZAP)",
+    "where": "ose.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Cookie Without Secure Flag",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10011",
     "what": "Cookie Without Secure Flag auf www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fahrplan%20Landverkehre%20Jahreswechsel%2025-26.pdf (Konfidenz mittel, passiv gemeldet von ZAP)",
-    "where": "www.heuel.com (+heuel.com, jobs.heuel.com)"
+    "where": "www.heuel.com"
    },
    {
+    "count": 1,
+    "message": "Absence of Anti-CSRF Tokens",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10202",
+    "what": "Absence of Anti-CSRF Tokens auf www.heuel.com/en/kontakt-heuel-logistics.html (Konfidenz niedrig, passiv gemeldet von ZAP)",
+    "where": "www.heuel.com"
+   },
+   {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
     "what": "online.heuel.com (Timestamp Disclosure - Unix)",
     "where": "online.heuel.com"
    },
    {
-    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Java/Servlet",
+    "count": 1,
+    "message": "Java/Servlet",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Java/Servlet“",
     "where": "20.79.218.75"
    },
    {
-    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Java/Servlet",
+    "count": 1,
+    "message": "Java/Servlet",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Java/Servlet“",
     "where": "213.133.104.51"
    },
    {
-    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Facebook Pixel",
+    "count": 1,
+    "message": "Facebook Pixel",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Facebook Pixel“",
     "where": "216.150.1.65"
    },
    {
-    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Google Tag Manager",
+    "count": 1,
+    "message": "Google Tag Manager",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Google Tag Manager“",
     "where": "216.150.1.65"
    },
    {
-    "note": "Nur laut webtech mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Google Tag Manager",
+    "count": 1,
+    "message": "Google Tag Manager",
+    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Google Tag Manager“",
     "where": "217.72.203.132"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Neos CMS",
+    "count": 1,
+    "message": "Neos CMS",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Neos CMS“",
     "where": "217.72.203.132"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Neos Flow",
+    "count": 1,
+    "message": "Neos Flow",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Neos Flow“",
     "where": "217.72.203.132"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: PHP",
+    "count": 1,
+    "message": "PHP",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „PHP“",
     "where": "217.72.203.132"
    }
   ],
@@ -2218,8 +2403,8 @@
  "landscape_lead": "10 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 29,
-  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
-  "catalog_version": "2026-09-25.2",
+  "catalog_digest": "3def4b8b695693f10cdc3c448b9600bfc7e6ba365814cf1aef184ec7b573b6fd",
+  "catalog_version": "2026-09-26.1",
   "classification": "Vertraulich",
   "consolidated": 10,
   "context_sources": {},
@@ -2243,7 +2428,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-25.2",
+  "policy_version": "2026-09-26.1",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",

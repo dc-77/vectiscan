@@ -391,7 +391,8 @@ geschaerfte Positivbefund von `remote_admin_closed` (S6a, Issue #30), `2026-09-2
 `dkim_missing` ohne gefundenen Selektor nicht pruefbar (S6a, #15 Teil 2), `2026-09-25.1`
 Abdeckung ohne offenen Port, TLS teilweise, Drittanbieter, Numerus (S6b-1), `2026-09-25.2`
 Texte je Regel mit Fakten-Bedingung, Sammeltitel, `urgent_when`, Verwaltungsoberflaechen
-nach E1, ZAP nur ab Konfidenz High, Lebenszyklus nach Q18 (S6b-2).
+nach E1, ZAP nur ab Konfidenz High, Lebenszyklus nach Q18 (S6b-2), `2026-09-26.1` Titel eines
+Hosting-Panels als Fingerabdruck mit Anmeldeseite, Meldungsname am Mitglied (Nachtrag S6b-2).
 
 ## Texte
 

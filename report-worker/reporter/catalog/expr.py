@@ -210,7 +210,21 @@ def f_admin_fp(obj: Any) -> bool:
     for attr in ("product", "fp_server", "banner_excerpt"):
         if ADMIN_PRODUCTS.search(str(getattr(obj, attr, "") or "")):
             return True
-    return bool(ADMIN_TITLES.search(str(getattr(obj, "fp_title", "") or "")))
+    return bool(ADMIN_TITLES.search(str(getattr(obj, "fp_title", "") or "")) or f_panel_title(obj))
+
+
+def f_panel_title(obj: Any) -> bool:
+    """Nennt der Seitentitel des Dienstes ein Hosting-Panel (froxlor, Plesk, cPanel ...)?
+
+    Entscheidung DC 26.09. (Nachtrag S6b-2): der Titel eines Hosting-Panels ist ein
+    Fingerabdruck nach Q13, und die Startseite eines Hosting-Panels ist seine Anmeldung.
+    dortmund-beach zeigt ueber die IP auf Port 443 den Titel "froxlor" (Standard-VHost).
+    Ein Produkt allein (nmap "sw-cp-server" ohne Titel) belegt keine Anmeldung.
+    """
+    from reporter.catalog.tables import HOSTING_PANELS
+    if obj is None:
+        return False
+    return bool(HOSTING_PANELS.search(str(getattr(obj, "fp_title", "") or "")))
 
 
 def f_hosting_panel(obj: Any) -> bool:
@@ -249,7 +263,7 @@ def f_redirects_elsewhere(fqdn: Any) -> bool:
 
 
 FUNCS: dict[str, Callable[..., Any]] = {
-    "admin_fp": f_admin_fp, "hosting_panel": f_hosting_panel, "mx_in_own_zone": f_mx_in_own_zone,
+    "admin_fp": f_admin_fp, "hosting_panel": f_hosting_panel, "panel_title": f_panel_title, "mx_in_own_zone": f_mx_in_own_zone,
     "redirects_elsewhere": f_redirects_elsewhere,
     "has_enrichment": f_has_enrichment,
     "len": f_len, "count": f_count, "any_in": f_any_in, "matches": f_matches, "any_match": f_any_match, "startswith": f_startswith,

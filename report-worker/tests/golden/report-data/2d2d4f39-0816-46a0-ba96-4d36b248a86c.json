@@ -213,188 +213,397 @@
   ],
   "tool_findings": [
    {
-    "note": "HTTP-Methode TRACE in der Methodenliste des Webservers.",
-    "what": "195.50.179.7:443 (TRACE in der Antwort auf OPTIONS genannt)",
-    "where": "195.50.179.7 (rdgw.castenow.de)"
+    "count": 1,
+    "message": null,
+    "note": "Werkzeugmeldung ohne eigene Einstufung.",
+    "rule": "http_trace_enabled",
+    "what": "HTTP-Methode TRACE in der Methodenliste des Webservers",
+    "where": "195.50.179.7:443"
    },
    {
+    "count": 5,
+    "message": "Information Disclosure - Suspicious Comments",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10027",
+    "what": "„Information Disclosure - Suspicious Comments“ (ZAP-Regel 10027), 5 Meldungen",
+    "where": "autodiscover.castenow.de, nextcloud.castenow.de, owa.castenow.de, ubb-wiki.castenow.de, vpn.castenow.de"
+   },
+   {
+    "count": 2,
+    "message": "X-AspNet-Version Response Header",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10061",
+    "what": "„X-AspNet-Version Response Header“ (ZAP-Regel 10061), 2 Meldungen",
+    "where": "autodiscover.castenow.de, owa.castenow.de"
+   },
+   {
+    "count": 5,
+    "message": "Timestamp Disclosure - Unix",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
+    "what": "„Timestamp Disclosure - Unix“ (ZAP-Regel 10096), 5 Meldungen",
+    "where": "bitwarden.castenow.de, mailstore.castenow.de, nextcloud.castenow.de, ubb-wiki.castenow.de, vpn.castenow.de"
+   },
+   {
+    "count": 1,
+    "message": "Application Error Disclosure",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#90022",
+    "what": "„Application Error Disclosure“ (ZAP-Regel 90022)",
+    "where": "owa.castenow.de"
+   },
+   {
+    "count": 2,
+    "message": "Vulnerable JS Library",
+    "note": "Veraltete JavaScript-Bibliothek eingebunden.",
+    "rule": "js_library_outdated#10003",
+    "what": "„Vulnerable JS Library“ (ZAP-Regel 10003), 2 Meldungen",
+    "where": "bitwarden.castenow.de, nextcloud.castenow.de"
+   },
+   {
+    "count": 5,
+    "message": "LUCKY13",
+    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
+    "what": "„LUCKY13“, 5 Meldungen",
+    "where": "autodiscover.castenow.de, mail2.castenow.de, openotp.castenow.de, rdgw.castenow.de, vpn.castenow.de"
+   },
+   {
+    "count": 3,
+    "message": "BREACH",
+    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
+    "what": "„BREACH“, 3 Meldungen",
+    "where": "bitwarden.castenow.de, openotp.castenow.de, umfrage.castenow.de"
+   },
+   {
+    "count": 1,
+    "message": "Cookie without SameSite Attribute",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10054",
+    "what": "„Cookie without SameSite Attribute“ (ZAP-Regel 10054)",
+    "where": "ubb-wiki.castenow.de"
+   },
+   {
+    "count": 2,
+    "message": "Absence of Anti-CSRF Tokens",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10202",
+    "what": "„Absence of Anti-CSRF Tokens“ (ZAP-Regel 10202), 2 Meldungen",
+    "where": "ubb-wiki.castenow.de, vpn.castenow.de"
+   },
+   {
+    "count": 2,
+    "message": "PHP",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „PHP“, 2 Meldungen",
+    "where": "159.69.143.80, 195.50.179.5"
+   },
+   {
+    "count": 3,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“, 3 Meldungen",
+    "where": "159.69.143.80, 195.50.179.2, 92.205.163.53"
+   },
+   {
+    "count": 2,
+    "message": "Windows Server",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Windows Server“, 2 Meldungen",
+    "where": "195.50.179.4, 195.50.179.7"
+   },
+   {
+    "count": 1,
+    "message": "MySQL",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „MySQL“",
+    "where": "92.205.163.53"
+   }
+  ],
+  "tool_messages": [
+   {
+    "count": 1,
+    "message": null,
+    "note": "HTTP-Methode TRACE in der Methodenliste des Webservers.",
+    "rule": "http_trace_enabled",
+    "what": "195.50.179.7:443 (TRACE in der Antwort auf OPTIONS genannt)",
+    "where": "195.50.179.7:443"
+   },
+   {
+    "count": 1,
+    "message": "Information Disclosure - Suspicious Comments",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10027",
     "what": "autodiscover.castenow.de (Information Disclosure - Suspicious Comments)",
     "where": "autodiscover.castenow.de"
    },
    {
+    "count": 1,
+    "message": "X-AspNet-Version Response Header",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10061",
     "what": "autodiscover.castenow.de (X-AspNet-Version Response Header)",
     "where": "autodiscover.castenow.de"
    },
    {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
     "what": "bitwarden.castenow.de (Timestamp Disclosure - Unix)",
     "where": "bitwarden.castenow.de"
    },
    {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
     "what": "mailstore.castenow.de (Timestamp Disclosure - Unix)",
     "where": "mailstore.castenow.de"
    },
    {
+    "count": 1,
+    "message": "Information Disclosure - Suspicious Comments",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10027",
     "what": "nextcloud.castenow.de (Information Disclosure - Suspicious Comments)",
     "where": "nextcloud.castenow.de"
    },
    {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
     "what": "nextcloud.castenow.de (Timestamp Disclosure - Unix)",
     "where": "nextcloud.castenow.de"
    },
    {
+    "count": 1,
+    "message": "Information Disclosure - Suspicious Comments",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
-    "what": "owa.castenow.de (Application Error Disclosure)",
-    "where": "owa.castenow.de"
-   },
-   {
-    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10027",
     "what": "owa.castenow.de (Information Disclosure - Suspicious Comments)",
     "where": "owa.castenow.de"
    },
    {
+    "count": 1,
+    "message": "X-AspNet-Version Response Header",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10061",
     "what": "owa.castenow.de (X-AspNet-Version Response Header)",
     "where": "owa.castenow.de"
    },
    {
+    "count": 1,
+    "message": "Application Error Disclosure",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#90022",
+    "what": "owa.castenow.de (Application Error Disclosure)",
+    "where": "owa.castenow.de"
+   },
+   {
+    "count": 1,
+    "message": "Information Disclosure - Suspicious Comments",
+    "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10027",
     "what": "ubb-wiki.castenow.de (Information Disclosure - Suspicious Comments)",
     "where": "ubb-wiki.castenow.de"
    },
    {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
     "what": "ubb-wiki.castenow.de (Timestamp Disclosure - Unix)",
     "where": "ubb-wiki.castenow.de"
    },
    {
+    "count": 1,
+    "message": "Information Disclosure - Suspicious Comments",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10027",
     "what": "vpn.castenow.de (Information Disclosure - Suspicious Comments)",
     "where": "vpn.castenow.de"
    },
    {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
     "note": "Technische Informationen aus der Webanwendung offengelegt.",
+    "rule": "info_disclosure#10096",
     "what": "vpn.castenow.de (Timestamp Disclosure - Unix)",
     "where": "vpn.castenow.de"
    },
    {
+    "count": 1,
+    "message": "Vulnerable JS Library",
     "note": "Veraltete JavaScript-Bibliothek eingebunden.",
+    "rule": "js_library_outdated#10003",
     "what": "bitwarden.castenow.de (Vulnerable JS Library, High)",
     "where": "bitwarden.castenow.de"
    },
    {
+    "count": 1,
+    "message": "Vulnerable JS Library",
     "note": "Veraltete JavaScript-Bibliothek eingebunden.",
+    "rule": "js_library_outdated#10003",
     "what": "nextcloud.castenow.de (Vulnerable JS Library, High)",
     "where": "nextcloud.castenow.de"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "autodiscover.castenow.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "autodiscover.castenow.de"
    },
    {
+    "count": 1,
+    "message": "BREACH",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "bitwarden.castenow.de:443: BREACH (Hinweis der TLS-Analyse)",
     "where": "bitwarden.castenow.de"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "mail2.castenow.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "mail2.castenow.de"
    },
    {
+    "count": 1,
+    "message": "BREACH",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "openotp.castenow.de:443: BREACH (Hinweis der TLS-Analyse)",
     "where": "openotp.castenow.de"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "openotp.castenow.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "openotp.castenow.de"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "rdgw.castenow.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "rdgw.castenow.de"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "vpn.castenow.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "vpn.castenow.de"
    },
    {
+    "count": 1,
+    "message": "Cookie without SameSite Attribute",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
-    "what": "Absence of Anti-CSRF Tokens auf ubb-wiki.castenow.de/login/ (Konfidenz niedrig, passiv gemeldet von ZAP)",
-    "where": "ubb-wiki.castenow.de"
-   },
-   {
-    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10054",
     "what": "Cookie without SameSite Attribute auf ubb-wiki.castenow.de/wp-login.php (Konfidenz mittel, passiv gemeldet von ZAP)",
     "where": "ubb-wiki.castenow.de"
    },
    {
+    "count": 1,
+    "message": "Absence of Anti-CSRF Tokens",
     "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10202",
+    "what": "Absence of Anti-CSRF Tokens auf ubb-wiki.castenow.de/login/ (Konfidenz niedrig, passiv gemeldet von ZAP)",
+    "where": "ubb-wiki.castenow.de"
+   },
+   {
+    "count": 1,
+    "message": "Absence of Anti-CSRF Tokens",
+    "note": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung.",
+    "rule": "web_vulnerability_reported#10202",
     "what": "Absence of Anti-CSRF Tokens auf vpn.castenow.de/ (Konfidenz niedrig, passiv gemeldet von ZAP)",
     "where": "vpn.castenow.de"
    },
    {
+    "count": 1,
+    "message": "BREACH",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "umfrage.castenow.de:443: BREACH (Hinweis der TLS-Analyse)",
     "where": "umfrage.castenow.de"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: PHP",
+    "count": 1,
+    "message": "PHP",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „PHP“",
     "where": "159.69.143.80"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery",
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
     "where": "159.69.143.80"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery",
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
     "where": "195.50.179.2"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Windows Server",
+    "count": 1,
+    "message": "Windows Server",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Windows Server“",
     "where": "195.50.179.4"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: PHP",
+    "count": 1,
+    "message": "PHP",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „PHP“",
     "where": "195.50.179.5"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Windows Server",
+    "count": 1,
+    "message": "Windows Server",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Windows Server“",
     "where": "195.50.179.7"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Underscore.js 1.13.8",
+    "count": 1,
+    "message": "MySQL",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „MySQL“",
     "where": "92.205.163.53"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery Migrate 3.4.1",
-    "where": "92.205.163.53"
-   },
-   {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: MySQL",
-    "where": "92.205.163.53"
-   },
-   {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery",
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
     "where": "92.205.163.53"
    }
   ],
@@ -1125,6 +1334,24 @@
       "v": "7.0.2"
      },
      {
+      "c": "Underscore.js",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "1.13.8"
+     },
+     {
+      "c": "jQuery Migrate",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "3.4.1"
+     },
+     {
       "c": "Plesk",
       "conf": "hoch",
       "note": "",
@@ -1330,7 +1557,16 @@
       "92.205.163.53|92.205.163.53:8443"
      ],
      "statement": "observation[0]",
-     "text": "Auf dem geteilten Server 92.205.163.53 (ubb-wiki.castenow.de) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 92.205.163.53:8443 (Plesk). Der Server gehört dem Hoster und trägt auch Namen anderer Kunden; die Verwaltung betreibt der Hoster."
+     "text": "Auf dem geteilten Server 92.205.163.53 (ubb-wiki.castenow.de) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 92.205.163.53:8443 (Plesk)."
+    },
+    {
+     "check": "admin_panel_hoster",
+     "field": "observation",
+     "members": [
+      "92.205.163.53|92.205.163.53:8443"
+     ],
+     "statement": "observation[2]",
+     "text": "Der Server gehört dem Hoster und trägt auch Namen anderer Kunden; die Verwaltung betreibt der Hoster."
     },
     {
      "check": "admin_service_exposed_passive",
@@ -4931,8 +5167,8 @@
  "landscape_lead": "27 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 80,
-  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
-  "catalog_version": "2026-09-25.2",
+  "catalog_digest": "3def4b8b695693f10cdc3c448b9600bfc7e6ba365814cf1aef184ec7b573b6fd",
+  "catalog_version": "2026-09-26.1",
   "classification": "Vertraulich",
   "consolidated": 27,
   "context_sources": {},
@@ -4956,7 +5192,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-25.2",
+  "policy_version": "2026-09-26.1",
   "positives": 6,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",

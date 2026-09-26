@@ -223,158 +223,325 @@
   ],
   "tool_findings": [
    {
+    "count": 5,
+    "message": "BREACH",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
+    "what": "„BREACH“, 5 Meldungen",
+    "where": "connect.securess.de, eset.securess.de, mailcleaner.securess.de, mx1.securess.de, openotp.securess.de"
+   },
+   {
+    "count": 8,
+    "message": "LUCKY13",
+    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
+    "what": "„LUCKY13“, 8 Meldungen",
+    "where": "eset.securess.de, ftp.securess.de, login-kundenportal.securess.de, mailcleaner.securess.de, mx1.securess.de, openotp.securess.de und 2 weitere"
+   },
+   {
+    "count": 1,
+    "message": "DataTables",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „DataTables“",
+    "where": "connect.securess.de"
+   },
+   {
+    "count": 3,
+    "message": "Bootstrap",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Bootstrap“, 3 Meldungen",
+    "where": "51.116.154.224, 85.22.47.39, connect.securess.de"
+   },
+   {
+    "count": 4,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“, 4 Meldungen",
+    "where": "51.116.154.224, 85.22.47.39, 85.22.47.41, connect.securess.de"
+   },
+   {
+    "count": 1,
+    "message": "Blazor",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Blazor“",
+    "where": "51.116.154.224"
+   },
+   {
+    "count": 1,
+    "message": "ASP.NET",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „ASP.NET“",
+    "where": "51.116.154.224"
+   },
+   {
+    "count": 1,
+    "message": "jQuery UI",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery UI“",
+    "where": "85.22.47.39"
+   },
+   {
+    "count": 1,
+    "message": "Swiper",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Swiper“",
+    "where": "85.22.47.41"
+   },
+   {
+    "count": 1,
+    "message": "MySQL",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „MySQL“",
+    "where": "85.22.47.41"
+   },
+   {
+    "count": 1,
+    "message": "PHP",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „PHP“",
+    "where": "85.22.47.41"
+   },
+   {
+    "count": 1,
+    "message": "WP Rocket",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „WP Rocket“",
+    "where": "85.22.47.41"
+   }
+  ],
+  "tool_messages": [
+   {
+    "count": 1,
+    "message": "BREACH",
+    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "connect.securess.de:443: BREACH (Hinweis der TLS-Analyse)",
     "where": "connect.securess.de"
    },
    {
+    "count": 1,
+    "message": "BREACH",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "eset.securess.de:443: BREACH (Hinweis der TLS-Analyse)",
     "where": "eset.securess.de"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "eset.securess.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "eset.securess.de"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "ftp.securess.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "ftp.securess.de"
    },
    {
+    "count": 1,
+    "message": "BREACH",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "mailcleaner.securess.de:443: BREACH (Hinweis der TLS-Analyse)",
     "where": "mailcleaner.securess.de"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "mailcleaner.securess.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "mailcleaner.securess.de"
    },
    {
+    "count": 1,
+    "message": "BREACH",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "mx1.securess.de:443: BREACH (Hinweis der TLS-Analyse)",
     "where": "mx1.securess.de"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "mx1.securess.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "mx1.securess.de"
    },
    {
+    "count": 1,
+    "message": "BREACH",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "openotp.securess.de:443: BREACH (Hinweis der TLS-Analyse)",
     "where": "openotp.securess.de"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "openotp.securess.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "openotp.securess.de"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "rdgw.securess.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "rdgw.securess.de"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "securess.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "securess.de"
    },
    {
+    "count": 1,
+    "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
+    "rule": "tls_weakness_reported",
     "what": "login-kundenportal.securess.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "login-kundenportal.securess.de"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: DataTables",
+    "count": 1,
+    "message": "DataTables",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „DataTables“",
     "where": "connect.securess.de"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Bootstrap 1771057841",
+    "count": 1,
+    "message": "Bootstrap",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Bootstrap“",
     "where": "connect.securess.de"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery",
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
     "where": "connect.securess.de"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Blazor",
+    "count": 1,
+    "message": "Blazor",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Blazor“",
     "where": "51.116.154.224"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: ASP.NET",
+    "count": 1,
+    "message": "ASP.NET",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „ASP.NET“",
     "where": "51.116.154.224"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Bootstrap",
+    "count": 1,
+    "message": "Bootstrap",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Bootstrap“",
     "where": "51.116.154.224"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery",
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
     "where": "51.116.154.224"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery UI",
+    "count": 1,
+    "message": "jQuery UI",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery UI“",
     "where": "85.22.47.39"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Bootstrap",
+    "count": 1,
+    "message": "Bootstrap",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Bootstrap“",
     "where": "85.22.47.39"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery",
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
     "where": "85.22.47.39"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Swiper",
+    "count": 1,
+    "message": "Swiper",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „Swiper“",
     "where": "85.22.47.41"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery Migrate 3.4.1",
+    "count": 1,
+    "message": "MySQL",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „MySQL“",
     "where": "85.22.47.41"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: MySQL",
+    "count": 1,
+    "message": "PHP",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „PHP“",
     "where": "85.22.47.41"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: PHP",
+    "count": 1,
+    "message": "jQuery",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „jQuery“",
     "where": "85.22.47.41"
    },
    {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: jQuery",
-    "where": "85.22.47.41"
-   },
-   {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Elementor 4.1.3",
-    "where": "85.22.47.41"
-   },
-   {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: WP Rocket",
-    "where": "85.22.47.41"
-   },
-   {
-    "note": "Nur laut httpx mit Konfidenz mittel; ohne zweite Quelle nicht in der Technologietabelle.",
-    "what": "Technik: Yoast SEO 28.0",
+    "count": 1,
+    "message": "WP Rocket",
+    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "rule": "technik",
+    "what": "Technik „WP Rocket“",
     "where": "85.22.47.41"
    }
   ],
@@ -1085,6 +1252,15 @@
       "v": "7.0.2"
      },
      {
+      "c": "jQuery Migrate",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "3.4.1"
+     },
+     {
       "c": "Debian GNU/Linux",
       "conf": "hoch",
       "note": "",
@@ -1092,6 +1268,24 @@
       "st": "gruen",
       "status": "aktuell",
       "v": "12"
+     },
+     {
+      "c": "Elementor",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "4.1.3"
+     },
+     {
+      "c": "Yoast SEO",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "28.0"
      },
      {
       "c": "OpenSSH",
@@ -1229,7 +1423,7 @@
    "affected": "212.227.60.78:8443 (Plesk), 212.227.60.78:8880 (Plesk, laut Passivquelle)",
    "cat": "A",
    "evidence": "nmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:8443/tcp · Dienst: https-alt · Produkt: sw-cp-server · Server-Kennung: sw-cp-server · Seitentitel: Plesk Obsidian 18.0.78 · Anmeldung verlangt: ja · TLS erzwungen: ja\n\nshodan · phase0a/shodan_hosts.json\nQuelle: shodan · 212.227.60.78:8880 · Dienst gesehen am: 2026-07-03 · Banner (Auszug): HTTP/1.1 303 See Other Server: sw-cp-server Date: Fri, 03 Jul 2026 05:08:45 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection:",
-   "found": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 212.227.60.78:8443 (Plesk). Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung; eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar. Eine Passivquelle meldet für 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 212.227.60.78:8880 (Plesk, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
+   "found": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 212.227.60.78:8443 (Plesk). Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung: 212.227.60.78:8443 (Plesk). Eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar. Eine Passivquelle meldet für 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 212.227.60.78:8880 (Plesk, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
    "id": "VS-2026-001",
    "impact": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen. Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Ob es sich um ein Anmeldeportal oder die Administrationsoberfläche handelt, ist von außen nicht erkennbar.",
    "key": "admin_access/212.227.60.78/kunde",
@@ -1268,7 +1462,25 @@
       "212.227.60.78|212.227.60.78:8443"
      ],
      "statement": "observation[0]",
-     "text": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 212.227.60.78:8443 (Plesk). Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung; eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar."
+     "text": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 212.227.60.78:8443 (Plesk)."
+    },
+    {
+     "check": "admin_service_exposed",
+     "field": "observation",
+     "members": [
+      "212.227.60.78|212.227.60.78:8443"
+     ],
+     "statement": "observation[1]",
+     "text": "Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung: 212.227.60.78:8443 (Plesk)."
+    },
+    {
+     "check": "admin_service_exposed",
+     "field": "observation",
+     "members": [
+      "212.227.60.78|212.227.60.78:8443"
+     ],
+     "statement": "observation[4]",
+     "text": "Eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar."
     },
     {
      "check": "admin_service_exposed_passive",
@@ -1330,7 +1542,7 @@
      "members": [
       "212.227.60.78|212.227.60.78:8443"
      ],
-     "statement": "recommendation[1]",
+     "statement": "recommendation[2]",
      "text": "Mehrfaktor-Anmeldung für die Verwaltungsoberfläche aktivieren und Standardkonten deaktivieren oder umbenennen."
     },
     {
@@ -1357,7 +1569,7 @@
      "members": [
       "212.227.60.78|212.227.60.78:8443"
      ],
-     "statement": "recommendation[2]",
+     "statement": "recommendation[3]",
      "text": "Softwarestand der Verwaltungsoberfläche gegen die Sicherheitshinweise des Herstellers abgleichen und Anmeldeversuche überwachen."
     },
     {
@@ -3641,8 +3853,8 @@
  "landscape_lead": "19 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 60,
-  "catalog_digest": "a86041fd4540b94da56131fbe1ada4edf252f4a54c4c6f4d1346d370019f2796",
-  "catalog_version": "2026-09-25.2",
+  "catalog_digest": "3def4b8b695693f10cdc3c448b9600bfc7e6ba365814cf1aef184ec7b573b6fd",
+  "catalog_version": "2026-09-26.1",
   "classification": "Vertraulich",
   "consolidated": 19,
   "context_sources": {},
@@ -3666,7 +3878,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-25.2",
+  "policy_version": "2026-09-26.1",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
