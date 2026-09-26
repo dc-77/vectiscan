@@ -1,5 +1,6 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/junkerwerk-rescan.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
+ "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Positivaussagen: tls_weak_ciphers autodiscover.junkerwerk.de (R6 (CBC-Verfahren angeboten)); tls_weak_ciphers cloud.junkerwerk.de (+team.junkerwerk.de) (R6 (CBC-Verfahren angeboten)); tls_weak_ciphers outlook.junkerwerk.de (R6 (CBC-Verfahren angeboten)); urlhaus_compromise junkerwerk.de, junkerwerk.hu (R6 (URLhaus no_data ist kein Negativergebnis)).",
  "strict": false,
  "orders": {
   "main": "860d0d5a-1086-4958-a9ac-4650423095f2"
@@ -162,8 +163,10 @@
   },
   "VS-2026-032": {
    "checks": [
-    "spf_softfail"
-   ]
+    "spf_authorizes_shared_host"
+   ],
+   "spec10": "R19",
+   "warum": "SPF gibt einen Server frei, den der Hoster auch für andere Kunden betreibt; neue Prüfung."
   },
   "VS-2026-033": {
    "checks": [
@@ -172,17 +175,17 @@
   },
   "VS-2026-034": {
    "checks": [
-    "tls_legacy_protocols"
+    "spf_softfail"
    ]
   },
   "VS-2026-035": {
    "checks": [
-    "tls_no_fallback_scsv"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-036": {
    "checks": [
-    "tls_rpt_missing"
+    "tls_no_fallback_scsv"
    ]
   },
   "VS-2026-037": {
@@ -192,12 +195,12 @@
   },
   "VS-2026-038": {
    "checks": [
-    "tls_weakness"
+    "tls_rpt_missing"
    ]
   },
   "VS-2026-039": {
    "checks": [
-    "tls_weakness_reported"
+    "tls_weakness"
    ]
   },
   "VS-2026-040": {
@@ -209,13 +212,20 @@
    "checks": [
     "tls_weakness_reported"
    ]
+  },
+  "VS-2026-042": {
+   "checks": [
+    "tls_weakness_reported"
+   ]
   }
  },
  "positives": {
   "VS-2026-P01": {
    "checks": [
     "cert_chain_incomplete"
-   ]
+   ],
+   "spec10": "R4",
+   "warum": "Zertifikat über Fingerabdruck oder Namensabdeckung dem Namen zugeordnet."
   },
   "VS-2026-P02": {
    "checks": [
@@ -224,7 +234,7 @@
   },
   "VS-2026-P03": {
    "checks": [
-    "cert_expired"
+    "cert_chain_incomplete"
    ]
   },
   "VS-2026-P04": {
@@ -239,82 +249,86 @@
   },
   "VS-2026-P06": {
    "checks": [
-    "cert_hostname_mismatch"
+    "cert_expired"
    ]
   },
   "VS-2026-P07": {
    "checks": [
     "cert_hostname_mismatch"
-   ]
+   ],
+   "spec10": "R4",
+   "warum": "Zertifikat über Fingerabdruck oder Namensabdeckung dem Namen zugeordnet."
   },
   "VS-2026-P08": {
    "checks": [
-    "db_exposed"
+    "cert_hostname_mismatch"
    ]
   },
   "VS-2026-P09": {
    "checks": [
-    "db_exposed"
+    "cert_hostname_mismatch"
    ]
   },
   "VS-2026-P10": {
    "checks": [
-    "dkim_missing"
+    "db_exposed"
    ]
   },
   "VS-2026-P11": {
    "checks": [
-    "dkim_missing"
+    "db_exposed"
    ]
   },
   "VS-2026-P12": {
    "checks": [
-    "dns_dangling_cname"
+    "dkim_missing"
    ]
   },
   "VS-2026-P13": {
    "checks": [
-    "dns_dangling_cname"
+    "dkim_missing"
    ]
   },
   "VS-2026-P14": {
    "checks": [
-    "dns_zone_transfer"
+    "dns_dangling_cname"
    ]
   },
   "VS-2026-P15": {
    "checks": [
-    "ftp_plaintext"
+    "dns_dangling_cname"
    ]
   },
   "VS-2026-P16": {
    "checks": [
-    "http_no_tls"
+    "dns_zone_transfer"
    ]
   },
   "VS-2026-P17": {
    "checks": [
-    "http_no_tls"
-   ]
+    "dns_zone_transfer"
+   ],
+   "spec10": "R6",
+   "warum": "Zonentransfer je Domain; für junkerwerk.hu belegt zone_transfer_junkerwerk.hu.txt die Abweisung."
   },
   "VS-2026-P18": {
    "checks": [
-    "http_no_tls"
+    "ftp_plaintext"
    ]
   },
   "VS-2026-P19": {
    "checks": [
-    "ip_reputation"
+    "http_no_tls"
    ]
   },
   "VS-2026-P20": {
    "checks": [
-    "ip_reputation"
+    "http_no_tls"
    ]
   },
   "VS-2026-P21": {
    "checks": [
-    "ip_reputation"
+    "http_no_tls"
    ]
   },
   "VS-2026-P22": {
@@ -324,97 +338,92 @@
   },
   "VS-2026-P23": {
    "checks": [
-    "mail_plaintext"
+    "ip_reputation"
    ]
   },
   "VS-2026-P24": {
    "checks": [
-    "rdp_exposed"
+    "ip_reputation"
    ]
   },
   "VS-2026-P25": {
    "checks": [
-    "rdp_exposed"
+    "ip_reputation"
    ]
   },
   "VS-2026-P26": {
    "checks": [
-    "rdp_exposed"
+    "mail_plaintext"
    ]
   },
   "VS-2026-P27": {
    "checks": [
-    "smb_exposed"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P28": {
    "checks": [
-    "smb_exposed"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P29": {
    "checks": [
-    "smb_exposed"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P30": {
    "checks": [
-    "software_eol"
+    "smb_exposed"
    ]
   },
   "VS-2026-P31": {
    "checks": [
-    "spf_missing"
+    "smb_exposed"
    ]
   },
   "VS-2026-P32": {
    "checks": [
-    "spf_missing"
+    "smb_exposed"
    ]
   },
   "VS-2026-P33": {
    "checks": [
-    "tls_legacy_protocols"
+    "software_eol"
    ]
   },
   "VS-2026-P34": {
    "checks": [
-    "tls_legacy_protocols"
+    "spf_missing"
    ]
   },
   "VS-2026-P35": {
    "checks": [
-    "tls_no_13"
+    "spf_missing"
    ]
   },
   "VS-2026-P36": {
    "checks": [
-    "tls_no_13"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P37": {
    "checks": [
-    "tls_no_13"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P38": {
    "checks": [
-    "tls_weak_ciphers"
+    "tls_no_13"
    ]
   },
   "VS-2026-P39": {
    "checks": [
-    "tls_weak_ciphers"
+    "tls_no_13"
    ]
   },
   "VS-2026-P40": {
    "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P41": {
-   "checks": [
-    "urlhaus_compromise"
+    "tls_no_13"
    ]
   }
  },

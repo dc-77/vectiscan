@@ -189,9 +189,10 @@
   },
   "VS-2026-P08": {
    "checks": [
-    "ip_reputation",
-    "urlhaus_compromise"
-   ]
+    "ip_reputation"
+   ],
+   "spec10": "R6",
+   "warum": "urlhaus_compromise faellt heraus: URLhaus meldet fuer die Adressen nur no_data, das ist kein ausdrueckliches Negativergebnis (S6b-3)."
   }
  },
  "subsumed": {
@@ -202,7 +203,8 @@
   "spf_softfail": "Teil von VS-007.",
   "tls_weakness": "BEAST (cloud) und BREACH/SWEET32 (openotp) sind Teil von VS-009 und VS-012.",
   "tls_weakness_reported": "BREACH und LUCKY13 als Hinweis der TLS-Analyse ohne eigene Einstufung im Anhang (S6b-2, spec/09 Q4).",
-  "web_vulnerability_reported": "ZAP-Meldungen unter Konfidenz High als Werkzeugmeldung im Anhang (S6b-2, spec/09 Q14)."
+  "web_vulnerability_reported": "ZAP-Meldungen unter Konfidenz High als Werkzeugmeldung im Anhang (S6b-2, spec/09 Q14).",
+  "spf_authorizes_shared_host": "S6b-3 (spec/10 R19): neue Pruefung. Der SPF-Eintrag von junkerwerk.de gibt 188.40.3.130 frei, einen Server, den der Hoster auch fuer andere Kunden betreibt. Die Prototyp-Soll-Liste kennt den Sachverhalt nicht; im Bericht steht er als eigener Befund."
  },
  "expected_coverage_differences": [
   {
@@ -394,6 +396,51 @@
    "check_prefix": "web_vulnerability_reported",
    "reason_code": "zap_no_alerts",
    "note": "S6b-2: seit Q14 liest die Pruefung auch die passiven ZAP-Meldungen (requires zap); Lauf 2 hat zap ok mit null Alerts"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "no_response",
+   "note": "S6b-3 (spec/10 R3): Host ohne nmap-Hostbericht ist ohne Antwort, nicht ohne offenen Port; 217.243.248.27 je Lauf"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "cert_chain_unknown",
+   "note": "S6b-3 (spec/10 R4): Laufzeit bekannt, Kette und Namensabgleich ohne testssl-Lauf nicht pruefbar"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "mx_external",
+   "note": "S6b-3 (spec/10 R8): DANE entfaellt, MX beim Dienstleister"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "zone_unsigned",
+   "note": "S6b-3 (spec/10 R8): DANE entfaellt ohne signierte Zone"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "headers_redirect_only",
+   "note": "S6b-3 (spec/10 R1): Header nur an einer Weiterleitung gemessen"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "headers_error_only",
+   "note": "S6b-3 (spec/10 R1): Header nur an einer Fehlerseite gemessen"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "headers_challenge_only",
+   "note": "S6b-3 (spec/10 R1): Header nur an einer Sicherheitsabfrage der Plattform gemessen"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "parked_name",
+   "note": "S6b-3 (spec/10 R3): nicht eingerichteter Name ohne Web- und Header-Analyse"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "mail_tls_unknown",
+   "note": "S6b-3 (spec/10 R7): STARTTLS ohne Beleg, ob die Anmeldung davor abgelehnt wird"
   }
  ],
  "expected_member_differences": [
@@ -406,6 +453,16 @@
    "check": "db_exposed",
    "member": "188.40.3.130:443",
    "note": "Port 443 nur in Lauf 1 offen gesehen"
+  },
+  {
+   "check": "http_header_disclosure",
+   "member": "outlook.junkerwerk.de@217.243.248.28",
+   "note": "S6b-3 (spec/10 R1): Messbasis der Header je Lauf verschieden. Multi-Lauf und de-Lauf ohne redirect_probe an outlook (Teilbeleg aus ZAP beziehungsweise nur die Weiterleitung), der Rescan misst die Endseite /owa/auth/logon.aspx vollstaendig."
+  },
+  {
+   "check": "security_headers_incomplete",
+   "member": "outlook.junkerwerk.de@217.243.248.28",
+   "note": "S6b-3 (spec/10 R1): Messbasis der Header je Lauf verschieden. Multi-Lauf und de-Lauf ohne redirect_probe an outlook (Teilbeleg aus ZAP beziehungsweise nur die Weiterleitung), der Rescan misst die Endseite /owa/auth/logon.aspx vollstaendig."
   }
  ],
  "hinweis_positive_unterdrueckt": "S6, spec/08 Punkt 7 (Entscheidung DC): Ein Positivbefund entsteht nur, wenn die Pruefung fuer alle betroffenen Hosts bestanden ist; nicht pruefbar zaehlt nicht als bestanden. Diese Positivaussagen des Prototyps entfallen deshalb an den Junkerwerk-Daten. Jeder Eintrag nennt den Grund; verschwindet der Grund aus den Fakten, muss der Positivbefund wieder erscheinen, und der Test faellt.",
@@ -441,11 +498,11 @@
   "VS-2026-P06": {
    "bundle": "cert_health",
    "reason_codes": [
-    "cert_unknown",
+    "cert_chain_unknown",
     "insufficient_facts",
     "web_unreachable_after_portscan"
    ],
-   "warum": "Fuer mehrere virtuelle Hosts fehlen die Zertifikatsdaten; 'alle Zertifikate in Ordnung' waere unbelegt."
+   "warum": "Fuer mehrere virtuelle Hosts fehlen die Zertifikatsdaten; 'alle Zertifikate in Ordnung' waere unbelegt. S6b-3 (spec/10 R4): bei bekannter Laufzeit ohne testssl-Lauf heisst der Grund cert_chain_unknown (Kette und Namensabgleich nicht geprueft)."
   },
   "VS-2026-P07": {
    "bundle": "tls_hardening",

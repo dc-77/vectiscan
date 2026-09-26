@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-26.1 auf tests/golden/facts/14272c00-1145-4675-9b4c-19ce2ead403b.json",
+ "source": "reporter.catalog 2026-09-26.2 auf tests/golden/facts/14272c00-1145-4675-9b4c-19ce2ead403b.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -78,16 +78,16 @@
   },
   {
    "id": "VS-2026-006",
-   "check": "hsts_short",
-   "family": "hsts_short",
+   "check": "hsts_missing",
+   "family": "hsts_missing",
    "cat": "D",
    "scale": "hygiene",
-   "level": "niedrig",
+   "level": "mittel",
    "group": "dortmund-beach.com (+www.dortmund-beach.com)",
    "affected": [
-    "dortmund-beach.com (max-age 0)"
+    "dortmund-beach.com"
    ],
-   "title": "HTTP Strict Transport Security mit zu kurzer Gültigkeitsdauer"
+   "title": "HTTP Strict Transport Security nicht gesetzt"
   },
   {
    "id": "VS-2026-007",
@@ -100,7 +100,7 @@
    "affected": [
     "dortmund-beach.com (Server: Apache/2.4.67 (Debian))"
    ],
-   "title": "Webdienst gibt Versionskennung preis"
+   "title": "Webdienst gibt Versionskennung oder internen Servernamen preis"
   },
   {
    "id": "VS-2026-008",
@@ -167,12 +167,39 @@
    "level": "niedrig",
    "group": "dortmund-beach.com (+www.dortmund-beach.com)",
    "affected": [
-    "dortmund-beach.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)"
+    "dortmund-beach.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)"
    ],
    "title": "Sicherheits-Header unvollständig"
   },
   {
    "id": "VS-2026-013",
+   "check": "smtp_vrfy_enabled",
+   "family": "smtp_vrfy",
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "affected": [
+    "88.99.35.112:465 (SMTPS)",
+    "88.99.35.112:587 (Submission)"
+   ],
+   "title": "Mailserver beantwortet den Befehl VRFY"
+  },
+  {
+   "id": "VS-2026-014",
+   "check": "smtp_vrfy_enabled_passive",
+   "family": "smtp_vrfy",
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "affected": [
+    "88.99.35.112:25 (laut Passivquelle, gesehen am 17.09.2026)"
+   ],
+   "title": "Mailserver beantwortet den Befehl VRFY laut Passivquelle"
+  },
+  {
+   "id": "VS-2026-015",
    "check": "software_eol",
    "family": "software_eol",
    "cat": "B",
@@ -180,12 +207,12 @@
    "level": "erhoeht",
    "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
    "affected": [
-    "88.99.35.112: Debian GNU/Linux 11 (Support beendet 2026-08-31)"
+    "88.99.35.112: Debian GNU/Linux 11 (Herstellerpflege beendet 31.08.2026 laut Debian LTS)"
    ],
    "title": "Serversoftware ohne Herstellerpflege"
   },
   {
-   "id": "VS-2026-014",
+   "id": "VS-2026-016",
    "check": "spf_softfail",
    "family": "spf_softfail",
    "cat": "C",
@@ -198,7 +225,7 @@
    "title": "SPF-Eintrag ohne konsequente Durchsetzung"
   },
   {
-   "id": "VS-2026-015",
+   "id": "VS-2026-017",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -211,7 +238,7 @@
    "title": "TLS 1.3 nicht verfügbar"
   },
   {
-   "id": "VS-2026-016",
+   "id": "VS-2026-018",
    "check": "tls_rpt_missing",
    "family": "tls_rpt_missing",
    "cat": "C",
@@ -224,7 +251,7 @@
    "title": "TLS-RPT nicht eingerichtet"
   },
   {
-   "id": "VS-2026-017",
+   "id": "VS-2026-019",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -238,7 +265,7 @@
    "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-018",
+   "id": "VS-2026-020",
    "check": "web_vulnerability_reported",
    "family": "web_vulnerability_reported",
    "cat": "E",
@@ -254,7 +281,7 @@
    "title": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-019",
+   "id": "VS-2026-021",
    "check": "wordpress_plugin_vulnerable",
    "family": "wordpress_plugin_vulnerable",
    "cat": "B",
@@ -270,7 +297,7 @@
    "title": "WordPress-Erweiterung mit bekannten Schwachstellen"
   },
   {
-   "id": "VS-2026-020",
+   "id": "VS-2026-022",
    "check": "wordpress_user_enumeration",
    "family": "user_enumeration",
    "cat": "E",
@@ -281,6 +308,19 @@
     "dortmund-beach.com (badmin)"
    ],
    "title": "WordPress-Benutzernamen von außen ermittelbar"
+  },
+  {
+   "id": "VS-2026-023",
+   "check": "wordpress_xmlrpc_enabled",
+   "family": "wordpress_xmlrpc",
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "dortmund-beach.com (+www.dortmund-beach.com)",
+   "affected": [
+    "dortmund-beach.com"
+   ],
+   "title": "XML-RPC-Schnittstelle von WordPress erreichbar"
   }
  ],
  "positives": [
@@ -342,14 +382,6 @@
   },
   {
    "id": "VS-2026-P08",
-   "check": "hsts_missing",
-   "family": "hsts_missing",
-   "cat": "D",
-   "group": "dortmund-beach.com (+www.dortmund-beach.com)",
-   "title": "HTTP Strict Transport Security gesetzt"
-  },
-  {
-   "id": "VS-2026-P09",
    "check": "http_no_tls",
    "family": "http_no_tls",
    "cat": "A",
@@ -357,7 +389,7 @@
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
-   "id": "VS-2026-P10",
+   "id": "VS-2026-P09",
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
@@ -365,7 +397,7 @@
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
-   "id": "VS-2026-P11",
+   "id": "VS-2026-P10",
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
@@ -373,7 +405,7 @@
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P12",
+   "id": "VS-2026-P11",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -381,7 +413,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P13",
+   "id": "VS-2026-P12",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
@@ -389,28 +421,12 @@
    "title": "SPF-Eintrag vorhanden"
   },
   {
-   "id": "VS-2026-P14",
+   "id": "VS-2026-P13",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
    "group": "dortmund-beach.com (+www.dortmund-beach.com)",
    "title": "Nur aktuelle TLS-Protokolle"
-  },
-  {
-   "id": "VS-2026-P15",
-   "check": "tls_weak_ciphers",
-   "family": "tls_weak_ciphers",
-   "cat": "D",
-   "group": "dortmund-beach.com (+www.dortmund-beach.com)",
-   "title": "Keine schwachen TLS-Cipher"
-  },
-  {
-   "id": "VS-2026-P16",
-   "check": "urlhaus_compromise",
-   "family": "urlhaus_compromise",
-   "cat": "A",
-   "group": "dortmund-beach.com",
-   "title": "Keine Einträge in Malware-Feeds"
   }
  ]
 }

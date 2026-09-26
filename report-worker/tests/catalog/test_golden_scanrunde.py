@@ -165,17 +165,24 @@ def test_markierungen_q3_und_q9_sind_aufgeloest(name):
 
 # ---------------------------------------------------------------- S6b-2
 
-def test_nach_s6b2_bleiben_nur_die_q8_markierungen():
-    """S6b-2 loest Q4, Q12, Q13, Q14, Q18 und die Exchange-Markierung castenow (Teil 2) auf;
-    die 18 Q8-Markierungen (Header an Weiterleitung, Fehler- oder Challenge-Seite) bleiben
-    fuer die Scanner-Session S6c. Vorher standen 60 Markierungen."""
+def test_nach_s6b3_bleiben_drei_q8_markierungen():
+    """S6b-2 liess 18 Q8-Markierungen (Header an Weiterleitung, Fehler- oder Challenge-Seite)
+    fuer S6c stehen. S6b-3 (spec/10 R1, Entscheidung DC 1) loest 15 davon auf: die Header-
+    Regeln sind dort nicht pruefbar oder messen die Endseite. Es bleiben die drei
+    hsts_missing-Eintraege (bergersysteme ftp, heuel edi und online), weil HSTS an jeder
+    Antwort gilt; die Messbasis aendert sich dort erst, wenn header_check in S6c der
+    Weiterleitung folgt."""
     marks = []
     for name in NAMES:
         mapping = _map(name)
         assert mapping.get("hinweis_s6b2"), f"{name}: hinweis_s6b2 fehlt"
+        assert mapping.get("hinweis_s6b3"), f"{name}: hinweis_s6b3 fehlt"
         for liste in ("findings", "positives"):
             for eid, entry in mapping[liste].items():
                 if "spec09" in entry:
                     marks.append((name, eid, entry["spec09"]))
     assert {m for _, _, m in marks} == {"Q8"}, marks
-    assert len(marks) == 18
+    assert len(marks) == 3
+    expected = {name: {e["id"]: e for e in _expected(name)["findings"]} for name in NAMES}
+    assert {(n, expected[n][eid]["check"]) for n, eid, _ in marks} == {
+        ("bergersysteme-0923", "hsts_missing"), ("heuel-0923", "hsts_missing")}

@@ -3,6 +3,7 @@
  "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
  "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben.",
  "hinweis_s6b2": "S6b-2 hat neun Markierungen aufgeloest: Q13 Plesk auf dem Sammelserver als admin_panel_hoster beim Hoster (erhoeht), Cloudflare-Ports 2083/2087/8880 ohne Fingerabdruck entfallen; Q4 dane_missing (MX in fremder Zone) und SSH-Banner entfallen; Q12 die vier Zertifikats-Positivbefunde stehen im Bericht nicht mehr, weil die Mail-TLS-Dienste des Hosts nie geprueft wurden (bundles.tls_untested_hosts; die Katalogergebnisse bleiben bestanden), waf_present entfaellt (Antwort des Weiterleitungsziels). Es bleiben fuenf Q8-Markierungen (S6c).",
+ "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Befunde: csp_missing bergersysteme.com (+cdn.bergersysteme.com) (R1); csp_missing ftp.bergersysteme.com (R1); security_headers_incomplete bergersysteme.com (+cdn.bergersysteme.com) (R1); security_headers_incomplete ftp.bergersysteme.com (R1); entfallene Positivaussagen: urlhaus_compromise bergersysteme.com (R6 (URLhaus no_data ist kein Negativergebnis)). Q8 nach Entscheidung DC 1 aufgelöst (R1, Messung an der Endseite oder nicht prüfbar): csp_missing bergersysteme.com (+cdn.bergersysteme.com); csp_missing ftp.bergersysteme.com; security_headers_incomplete bergersysteme.com (+cdn.bergersysteme.com); security_headers_incomplete ftp.bergersysteme.com. Als Q8 für S6c bleiben (hsts_missing gilt an jeder Antwort): VS-2026-008 hsts_missing ftp.bergersysteme.com.",
  "strict": false,
  "orders": {
   "main": "68d59573-7a93-4efa-89cc-e7b10cc4d140"
@@ -26,89 +27,82 @@
   "VS-2026-004": {
    "checks": [
     "csp_missing"
-   ],
-   "spec09": "Q8",
-   "warum": "Gemessen an der Weiterleitung auf www.bergersysteme.com, nicht an einer Webseite."
-  },
-  "VS-2026-005": {
-   "checks": [
-    "csp_missing"
-   ],
-   "spec09": "Q8",
-   "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
-  },
-  "VS-2026-006": {
-   "checks": [
-    "csp_missing"
    ]
   },
-  "VS-2026-007": {
+  "VS-2026-005": {
    "checks": [
     "dmarc_none"
    ]
   },
-  "VS-2026-008": {
+  "VS-2026-006": {
    "checks": [
     "dnssec_missing"
    ]
   },
-  "VS-2026-009": {
+  "VS-2026-007": {
    "checks": [
     "hsts_missing"
    ]
   },
-  "VS-2026-010": {
+  "VS-2026-008": {
    "checks": [
     "hsts_missing"
    ],
    "spec09": "Q8",
    "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
   },
-  "VS-2026-011": {
+  "VS-2026-009": {
    "checks": [
     "legacy_protocols_present"
    ]
   },
-  "VS-2026-012": {
+  "VS-2026-010": {
+   "checks": [
+    "login_over_http_passive"
+   ],
+   "spec10": "R19",
+   "warum": "Anmeldeseite über HTTP laut Shodan (/bstasks/login.cfm); neue Prüfung."
+  },
+  "VS-2026-011": {
    "checks": [
     "mail_plaintext"
    ]
   },
-  "VS-2026-013": {
+  "VS-2026-012": {
    "checks": [
     "mta_sts_missing"
    ]
   },
-  "VS-2026-014": {
+  "VS-2026-013": {
    "checks": [
     "passive_service_version_unverified"
    ]
   },
-  "VS-2026-015": {
-   "checks": [
-    "security_headers_incomplete"
-   ],
-   "spec09": "Q8",
-   "warum": "Gemessen an der Weiterleitung auf www.bergersysteme.com, nicht an einer Webseite."
-  },
-  "VS-2026-016": {
-   "checks": [
-    "security_headers_incomplete"
-   ],
-   "spec09": "Q8",
-   "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
-  },
-  "VS-2026-017": {
+  "VS-2026-014": {
    "checks": [
     "security_headers_incomplete"
    ]
   },
-  "VS-2026-018": {
+  "VS-2026-015": {
+   "checks": [
+    "service_cert_expired"
+   ],
+   "spec10": "R3",
+   "warum": "Mail- und Dateiports mit abgelaufenem Zertifikat aus nmap ssl-cert; neue Prüfung."
+  },
+  "VS-2026-016": {
+   "checks": [
+    "smtp_vrfy_enabled_passive"
+   ],
+   "spec10": "R19",
+   "warum": "VRFY im SMTP-Banner laut Shodan; neue Prüfung."
+  },
+  "VS-2026-017": {
    "checks": [
     "tls_rpt_missing"
    ]
   },
-  "VS-2026-019": {
+  "VS-2026-018": {
    "checks": [
     "tls_weakness_reported"
    ]
@@ -148,11 +142,13 @@
   "VS-2026-P07": {
    "checks": [
     "cert_hostname_mismatch"
-   ]
+   ],
+   "spec10": "R4",
+   "warum": "Zertifikat über Fingerabdruck oder Namensabdeckung dem Namen zugeordnet."
   },
   "VS-2026-P08": {
    "checks": [
-    "db_exposed"
+    "cert_hostname_mismatch"
    ]
   },
   "VS-2026-P09": {
@@ -162,37 +158,37 @@
   },
   "VS-2026-P10": {
    "checks": [
-    "dkim_missing"
+    "db_exposed"
    ]
   },
   "VS-2026-P11": {
    "checks": [
-    "dmarc_missing"
+    "dkim_missing"
    ]
   },
   "VS-2026-P12": {
    "checks": [
-    "dns_dangling_cname"
+    "dmarc_missing"
    ]
   },
   "VS-2026-P13": {
    "checks": [
-    "dns_zone_transfer"
+    "dns_dangling_cname"
    ]
   },
   "VS-2026-P14": {
    "checks": [
-    "hsts_missing"
+    "dns_zone_transfer"
    ]
   },
   "VS-2026-P15": {
    "checks": [
-    "hsts_short"
+    "hsts_missing"
    ]
   },
   "VS-2026-P16": {
    "checks": [
-    "http_no_tls"
+    "hsts_short"
    ]
   },
   "VS-2026-P17": {
@@ -202,7 +198,7 @@
   },
   "VS-2026-P18": {
    "checks": [
-    "ip_reputation"
+    "http_no_tls"
    ]
   },
   "VS-2026-P19": {
@@ -227,7 +223,7 @@
   },
   "VS-2026-P23": {
    "checks": [
-    "rdp_exposed"
+    "ip_reputation"
    ]
   },
   "VS-2026-P24": {
@@ -237,7 +233,7 @@
   },
   "VS-2026-P25": {
    "checks": [
-    "smb_exposed"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P26": {
@@ -247,12 +243,12 @@
   },
   "VS-2026-P27": {
    "checks": [
-    "spf_missing"
+    "smb_exposed"
    ]
   },
   "VS-2026-P28": {
    "checks": [
-    "tls_legacy_protocols"
+    "spf_missing"
    ]
   },
   "VS-2026-P29": {
@@ -262,12 +258,14 @@
   },
   "VS-2026-P30": {
    "checks": [
-    "tls_no_13"
-   ]
+    "tls_legacy_protocols"
+   ],
+   "spec10": "R4",
+   "warum": "testssl-Ergebnis gilt je Adresse und Port für alle virtuellen Hosts."
   },
   "VS-2026-P31": {
    "checks": [
-    "tls_no_13"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P32": {
@@ -277,20 +275,32 @@
   },
   "VS-2026-P33": {
    "checks": [
-    "tls_weak_ciphers"
+    "tls_no_13"
    ]
   },
   "VS-2026-P34": {
    "checks": [
-    "tls_weak_ciphers"
+    "tls_no_13"
    ]
   },
   "VS-2026-P35": {
    "checks": [
-    "urlhaus_compromise"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P36": {
+   "checks": [
+    "tls_weak_ciphers"
+   ],
+   "spec10": "R4",
+   "warum": "testssl-Ergebnis gilt je Adresse und Port für alle virtuellen Hosts; ohne angebotene CBC-Verfahren."
+  },
+  "VS-2026-P37": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P38": {
    "checks": [
     "waf_present"
    ]

@@ -3,6 +3,7 @@
  "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
  "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben.",
  "hinweis_s6b2": "S6b-2 hat sechs Markierungen aufgeloest: Q13 Webmin (Server MiniServ, session_login) als admin_service_exposed kritisch; Q14 csrf_token_missing als Werkzeugmeldung; Q4 dane_missing entfaellt; Q18 WordPress 6.5.12 ohne Kern-Schwachstelle weder veraltet noch ohne Herstellerpflege (Release nach dem EOL-Datum des Zweigs); Q12 der Positivbefund zu verwaisten CNAME-Eintraegen steht im Bericht nicht mehr (entfaellt zaehlt nicht als bestanden).",
+ "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Befunde: hsts_short dortmund-beach.com (+www.dortmund-beach.com) (R9 (Entscheidung DC 3)); entfallene Positivaussagen: hsts_missing dortmund-beach.com (+www.dortmund-beach.com) (R9 (Entscheidung DC 3)); tls_weak_ciphers dortmund-beach.com (+www.dortmund-beach.com) (R6 (CBC-Verfahren angeboten)); urlhaus_compromise dortmund-beach.com (R6 (URLhaus no_data ist kein Negativergebnis)).",
  "strict": false,
  "orders": {
   "main": "1fbc92b9-34ab-414e-8843-a1f1e9f15431"
@@ -35,8 +36,10 @@
   },
   "VS-2026-006": {
    "checks": [
-    "hsts_short"
-   ]
+    "hsts_missing"
+   ],
+   "spec10": "R9",
+   "warum": "max-age=0 steht als „HSTS abgeschaltet“ unter hsts_missing statt unter hsts_short (Entscheidung DC 3)."
   },
   "VS-2026-007": {
    "checks": [
@@ -70,43 +73,64 @@
   },
   "VS-2026-013": {
    "checks": [
-    "software_eol"
-   ]
+    "smtp_vrfy_enabled"
+   ],
+   "spec10": "R19",
+   "warum": "VRFY in smtp-commands auf 465 und 587; neue Prüfung."
   },
   "VS-2026-014": {
    "checks": [
-    "spf_softfail"
-   ]
+    "smtp_vrfy_enabled_passive"
+   ],
+   "spec10": "R19",
+   "warum": "VRFY im SMTP-Banner laut Shodan; neue Prüfung."
   },
   "VS-2026-015": {
    "checks": [
-    "tls_no_13"
+    "software_eol"
    ]
   },
   "VS-2026-016": {
    "checks": [
-    "tls_rpt_missing"
+    "spf_softfail"
    ]
   },
   "VS-2026-017": {
    "checks": [
-    "tls_weakness_reported"
+    "tls_no_13"
    ]
   },
   "VS-2026-018": {
    "checks": [
-    "web_vulnerability_reported"
+    "tls_rpt_missing"
    ]
   },
   "VS-2026-019": {
    "checks": [
-    "wordpress_plugin_vulnerable"
+    "tls_weakness_reported"
    ]
   },
   "VS-2026-020": {
    "checks": [
+    "web_vulnerability_reported"
+   ]
+  },
+  "VS-2026-021": {
+   "checks": [
+    "wordpress_plugin_vulnerable"
+   ]
+  },
+  "VS-2026-022": {
+   "checks": [
     "wordpress_user_enumeration"
    ]
+  },
+  "VS-2026-023": {
+   "checks": [
+    "wordpress_xmlrpc_enabled"
+   ],
+   "spec10": "R19",
+   "warum": "XML-RPC laut wpscan aktiv; neue Prüfung."
   }
  },
  "positives": {
@@ -147,47 +171,32 @@
   },
   "VS-2026-P08": {
    "checks": [
-    "hsts_missing"
+    "http_no_tls"
    ]
   },
   "VS-2026-P09": {
    "checks": [
-    "http_no_tls"
+    "ip_reputation"
    ]
   },
   "VS-2026-P10": {
    "checks": [
-    "ip_reputation"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P11": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P12": {
    "checks": [
-    "smb_exposed"
+    "spf_missing"
    ]
   },
   "VS-2026-P13": {
    "checks": [
-    "spf_missing"
-   ]
-  },
-  "VS-2026-P14": {
-   "checks": [
     "tls_legacy_protocols"
-   ]
-  },
-  "VS-2026-P15": {
-   "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P16": {
-   "checks": [
-    "urlhaus_compromise"
    ]
   }
  },

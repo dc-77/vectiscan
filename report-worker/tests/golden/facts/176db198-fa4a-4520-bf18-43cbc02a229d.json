@@ -24,6 +24,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "certspotter"
   },
   {
@@ -49,6 +50,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "crtsh"
   },
   {
@@ -74,6 +76,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dns_records"
   },
   {
@@ -99,6 +102,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dnsx"
   },
   {
@@ -124,6 +128,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "failed",
+   "target": null,
    "tool": "gobuster_dns"
   },
   {
@@ -149,6 +154,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "subfinder"
   },
   {
@@ -174,6 +180,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "web_probe"
   },
   {
@@ -199,6 +206,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "nmap"
   },
   {
@@ -224,6 +232,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "nmap"
   },
   {
@@ -249,6 +258,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "nmap"
   },
   {
@@ -274,6 +284,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -299,6 +310,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -324,6 +336,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -349,6 +362,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -374,6 +388,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "webtech"
   },
   {
@@ -399,6 +414,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "webtech"
   },
   {
@@ -424,6 +440,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "webtech"
   },
   {
@@ -449,6 +466,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "feroxbuster"
   },
   {
@@ -474,6 +492,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "feroxbuster"
   },
   {
@@ -499,6 +518,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "feroxbuster"
   },
   {
@@ -524,6 +544,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "ffuf_param"
   },
   {
@@ -549,6 +570,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -574,6 +596,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -599,6 +622,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -624,6 +648,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -649,6 +674,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -674,6 +700,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -699,6 +726,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -724,6 +752,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -749,6 +778,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "zap"
   },
   {
@@ -774,6 +804,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "zap"
   },
   {
@@ -799,6 +830,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "zap"
   },
   {
@@ -824,6 +856,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "zap_spider"
   },
   {
@@ -849,6 +882,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "zap_spider"
   },
   {
@@ -874,6 +908,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "zap_spider"
   },
   {
@@ -899,6 +934,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "phase3_correlation"
   }
  ],
@@ -1598,61 +1634,73 @@
     "all_qualifier": "~all",
     "mechanisms": [
      {
+      "ips": [],
       "kind": "ip4",
       "qualifier": "+",
       "value": "20.52.130.35"
      },
      {
+      "ips": [],
       "kind": "ip4",
       "qualifier": "+",
       "value": "168.245.40.44"
      },
      {
+      "ips": [],
       "kind": "ip4",
       "qualifier": "+",
       "value": "167.89.99.179"
      },
      {
+      "ips": [],
       "kind": "ip4",
       "qualifier": "+",
       "value": "149.72.147.186"
      },
      {
+      "ips": [],
       "kind": "ip4",
       "qualifier": "+",
       "value": "167.89.101.239"
      },
      {
+      "ips": [],
       "kind": "ip4",
       "qualifier": "+",
       "value": "88.99.138.97"
      },
      {
+      "ips": [],
       "kind": "ip6",
       "qualifier": "+",
       "value": "2a01:4f8:10a:22a2::2"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "spf.protection.outlook.com"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "spf.hornetsecurity.com"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "spf.crsend.com"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "_spf.samanage.com"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "spf-de.emailsignatures365.com"
@@ -1695,7 +1743,9 @@
    "mode": "active",
    "name": "dl.heuel.com",
    "observed_at": "2026-05-21T23:54:22Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": null,
@@ -1728,7 +1778,9 @@
    "mode": "active",
    "name": "edi.heuel.com",
    "observed_at": "2026-05-21T23:54:22Z",
+   "real_content": false,
    "screenshot_key": "176db198-fa4a-4520-bf18-43cbc02a229d/20.79.218.75__edi.heuel.com.png",
+   "skipped": null,
    "source": "web_probe",
    "title": "403 Forbidden",
    "waf": {
@@ -1759,7 +1811,9 @@
    "mode": "active",
    "name": "heuel.com",
    "observed_at": "2026-05-21T23:54:22Z",
+   "real_content": null,
    "screenshot_key": "176db198-fa4a-4520-bf18-43cbc02a229d/217.72.203.132__www.heuel.com.png",
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": null,
@@ -1786,7 +1840,9 @@
    "mode": "active",
    "name": "jobs.heuel.com",
    "observed_at": "2026-05-21T23:54:22Z",
+   "real_content": null,
    "screenshot_key": "176db198-fa4a-4520-bf18-43cbc02a229d/217.72.203.132__www.heuel.com.png",
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": null,
@@ -1813,7 +1869,9 @@
    "mode": "active",
    "name": "mail.heuel.com",
    "observed_at": "2026-05-21T23:54:22Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": null,
@@ -1840,7 +1898,9 @@
    "mode": "active",
    "name": "mails.heuel.com",
    "observed_at": "2026-05-21T23:54:22Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": null,
@@ -1869,7 +1929,9 @@
    "mode": "active",
    "name": "online.heuel.com",
    "observed_at": "2026-05-21T23:54:22Z",
+   "real_content": false,
    "screenshot_key": "176db198-fa4a-4520-bf18-43cbc02a229d/104.16.10.6__online.heuel.com.png",
+   "skipped": null,
    "source": "web_probe",
    "title": "Just a moment...",
    "waf": {
@@ -1900,7 +1962,9 @@
    "mode": "active",
    "name": "ose.heuel.com",
    "observed_at": "2026-05-21T23:54:22Z",
+   "real_content": true,
    "screenshot_key": "176db198-fa4a-4520-bf18-43cbc02a229d/20.79.218.75__ose.heuel.com.png",
+   "skipped": null,
    "source": "web_probe",
    "title": "Redirector",
    "waf": {
@@ -1931,7 +1995,9 @@
    "mode": "active",
    "name": "smtp.heuel.com",
    "observed_at": "2026-05-21T23:54:22Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": null,
@@ -1958,7 +2024,9 @@
    "mode": "active",
    "name": "webportal.heuel.com",
    "observed_at": "2026-05-21T23:54:22Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": null,
@@ -1985,7 +2053,9 @@
    "mode": "active",
    "name": "webportal.heuel.com",
    "observed_at": "2026-05-21T23:54:22Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": null,
@@ -2023,7 +2093,9 @@
    "mode": "active",
    "name": "www.heuel.com",
    "observed_at": "2026-05-21T23:54:22Z",
+   "real_content": true,
    "screenshot_key": "176db198-fa4a-4520-bf18-43cbc02a229d/217.72.203.132__www.heuel.com.png",
+   "skipped": null,
    "source": "web_probe",
    "title": "Spedition für Stückguttransporte,  LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS",
    "waf": {
@@ -2058,6 +2130,7 @@
  },
  "hosts": [
   {
+   "betriebsform": "plattform",
    "blocked": {
     "detected": false,
     "reason": null,
@@ -2085,6 +2158,7 @@
    "id": "host:104.16.10.6",
    "ip": "104.16.10.6",
    "mode": "active",
+   "nmap_host_report": true,
    "nmap_state": "up",
    "observed_at": "2026-05-21T23:55:59Z",
    "ports_summary": {
@@ -2094,12 +2168,14 @@
    },
    "provider": {
     "country": "US",
+    "domain": "cloudflare.com",
     "isp": "Cloudflare, Inc.",
     "usage_type": "Content Delivery Network"
    },
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -2110,6 +2186,8 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
+   "serves_customer_mail": false,
+   "serves_customer_web": false,
    "shared": {
     "evidence": [
      {
@@ -2129,6 +2207,7 @@
    "third_party": null
   },
   {
+   "betriebsform": "rechenzentrum",
    "blocked": {
     "detected": false,
     "reason": null,
@@ -2152,6 +2231,7 @@
    "id": "host:195.225.241.75",
    "ip": "195.225.241.75",
    "mode": "active",
+   "nmap_host_report": null,
    "nmap_state": null,
    "observed_at": "2026-05-22T00:11:37Z",
    "ports_summary": {
@@ -2161,12 +2241,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "comtrance.net",
     "isp": "comtrance service GmbH",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
    "reach": null,
    "reachable": null,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -2177,11 +2259,14 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
+   "serves_customer_mail": false,
+   "serves_customer_web": false,
    "shared": null,
    "source": "host_inventory",
    "third_party": null
   },
   {
+   "betriebsform": "rechenzentrum",
    "blocked": {
     "detected": false,
     "reason": null,
@@ -2211,6 +2296,7 @@
    "id": "host:20.79.218.75",
    "ip": "20.79.218.75",
    "mode": "active",
+   "nmap_host_report": true,
    "nmap_state": "up",
    "observed_at": "2026-05-21T23:56:12Z",
    "ports_summary": {
@@ -2220,12 +2306,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "microsoft.com",
     "isp": "Microsoft Corporation",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -2236,11 +2324,14 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
+   "serves_customer_mail": false,
+   "serves_customer_web": true,
    "shared": null,
    "source": "nmap",
    "third_party": null
   },
   {
+   "betriebsform": "rechenzentrum",
    "blocked": {
     "detected": false,
     "reason": null,
@@ -2264,6 +2355,7 @@
    "id": "host:213.133.104.51",
    "ip": "213.133.104.51",
    "mode": "active",
+   "nmap_host_report": null,
    "nmap_state": null,
    "observed_at": "2026-05-22T00:11:37Z",
    "ports_summary": {
@@ -2273,12 +2365,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "hetzner.com",
     "isp": "Hetzner Online AG",
     "usage_type": "Content Delivery Network"
    },
    "reach": null,
    "reachable": null,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -2289,11 +2383,14 @@
     "urlhaus_compromised": null
    },
    "reverse": "www51.your-server.de",
+   "serves_customer_mail": false,
+   "serves_customer_web": false,
    "shared": null,
    "source": "host_inventory",
    "third_party": null
   },
   {
+   "betriebsform": "rechenzentrum",
    "blocked": {
     "detected": false,
     "reason": null,
@@ -2323,6 +2420,7 @@
    "id": "host:217.72.203.132",
    "ip": "217.72.203.132",
    "mode": "active",
+   "nmap_host_report": true,
    "nmap_state": "up",
    "observed_at": "2026-05-21T23:55:44Z",
    "ports_summary": {
@@ -2332,12 +2430,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "ionos.com",
     "isp": "IONOS SE",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -2348,11 +2448,14 @@
     "urlhaus_compromised": null
    },
    "reverse": "ip217-72-203-132.pbiaas.com",
+   "serves_customer_mail": false,
+   "serves_customer_web": true,
    "shared": null,
    "source": "nmap",
    "third_party": null
   },
   {
+   "betriebsform": "rechenzentrum",
    "blocked": {
     "detected": false,
     "reason": null,
@@ -2375,6 +2478,7 @@
    "id": "host:[2a01:4f8:d0a:2757::2]",
    "ip": "2a01:4f8:d0a:2757::2",
    "mode": "active",
+   "nmap_host_report": null,
    "nmap_state": null,
    "observed_at": "2026-05-22T00:11:37Z",
    "ports_summary": {
@@ -2384,12 +2488,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "hetzner.com",
     "isp": "Hetzner Online GmbH",
     "usage_type": "Content Delivery Network"
    },
    "reach": null,
    "reachable": null,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -2400,6 +2506,8 @@
     "urlhaus_compromised": null
    },
    "reverse": "www51.your-server.de",
+   "serves_customer_mail": false,
+   "serves_customer_web": false,
    "shared": null,
    "source": "host_inventory",
    "third_party": null
@@ -2414,6 +2522,7 @@
      "cwe": "CWE-319",
      "evidence": null,
      "name": "Strict-Transport-Security Header Not Set",
+     "param": null,
      "plugin_id": "10035",
      "risk": "Low",
      "run": "passive",
@@ -2430,6 +2539,7 @@
      "cwe": "CWE-693",
      "evidence": null,
      "name": "Content Security Policy (CSP) Header Not Set",
+     "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
      "run": "passive",
@@ -2441,13 +2551,14 @@
      ]
     }
    ],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": null,
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "edi.heuel.com: score=0/7 server=Apache",
+     "excerpt": "edi.heuel.com: status=403 score=0/7 server=Apache",
      "ref": "scan_results:header_check:20.79.218.75",
      "tool": "header_check"
     },
@@ -2459,6 +2570,24 @@
    ],
    "forms": [],
    "fqdn": "edi.heuel.com",
+   "header_eval": {
+    "basis": "client_error",
+    "complete": false,
+    "evaluated": null,
+    "first": {
+     "challenge": null,
+     "content_type": "text/html; charset=iso-8859-1",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 403,
+     "tool": "header_check",
+     "url": "https://edi.heuel.com"
+    },
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {
     "content-type": "text/html; charset=iso-8859-1",
     "date": "Fri, 22 May 2026 00:10:00 GMT",
@@ -2474,36 +2603,7 @@
    "powered_by": null,
    "reachable": true,
    "score": "0/7",
-   "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
-    "permissions-policy": {
-     "present": false,
-     "value": null
-    },
-    "referrer-policy": {
-     "present": false,
-     "value": null
-    },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
-    "x-content-type-options": {
-     "present": false,
-     "value": null
-    },
-    "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
-    }
-   },
+   "security_headers": {},
    "server_header": "Apache",
    "source": "header_check",
    "spider_url_count": 3,
@@ -2526,6 +2626,7 @@
      "cwe": "CWE-525",
      "evidence": "public, max-age=43200",
      "name": "Re-examine Cache-control Directives",
+     "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
      "run": "passive",
@@ -2540,6 +2641,7 @@
      "cwe": "CWE-693",
      "evidence": null,
      "name": "X-Content-Type-Options Header Missing",
+     "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
      "run": "passive",
@@ -2554,6 +2656,7 @@
      "cwe": "CWE-319",
      "evidence": null,
      "name": "Strict-Transport-Security Header Not Set",
+     "param": null,
      "plugin_id": "10035",
      "risk": "Low",
      "run": "passive",
@@ -2570,6 +2673,7 @@
      "cwe": "CWE-525",
      "evidence": "Age: 43067",
      "name": "Retrieved from Cache",
+     "param": null,
      "plugin_id": "10050",
      "risk": "Informational",
      "run": "passive",
@@ -2584,6 +2688,7 @@
      "cwe": "CWE-1275",
      "evidence": "set-cookie: __cf_bm",
      "name": "Cookie with SameSite Attribute None",
+     "param": "__cf_bm",
      "plugin_id": "10054",
      "risk": "Low",
      "run": "passive",
@@ -2600,6 +2705,7 @@
      "cwe": "CWE-693",
      "evidence": "default-src 'none'; script-src 'nonce-athM6Hve1VcI1tB4VNDqXj' 'unsafe-eval' https://challenges.cloudflare.com; script-src-attr 'none'; style-src 'unsafe-inline'; img-src 'self' https://challenges.c...",
      "name": "CSP: Failure to Define Directive with No Fallback",
+     "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
      "run": "passive",
@@ -2615,6 +2721,7 @@
      "cwe": "CWE-497",
      "evidence": "1779394869",
      "name": "Timestamp Disclosure - Unix",
+     "param": "set-cookie",
      "plugin_id": "10096",
      "risk": "Low",
      "run": "passive",
@@ -2631,6 +2738,7 @@
      "cwe": null,
      "evidence": "<script nonce=\"athM6Hve1VcI1tB4VNDqXj\">(function(){window._cf_chl_opt = {cFPWv: 'b',cH: 'xlqZusuFnlhZIewYAn6_KtTxk20uzsIyPgxpA83ATRE-1779394869-1.2.1.1-JiRF6IgvOSWthd1pm1TKWXsYjkRdWD83Seixpf.hqKAuR...",
      "name": "Modern Web Application",
+     "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
      "run": "passive",
@@ -2646,6 +2754,7 @@
      "cwe": null,
      "evidence": "__cf_bm",
      "name": "Session Management Response Identified",
+     "param": "__cf_bm",
      "plugin_id": "10112",
      "risk": "Informational",
      "run": "passive",
@@ -2657,6 +2766,7 @@
      ]
     }
    ],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [
     {
@@ -2666,17 +2776,11 @@
      "secure": true
     }
    ],
-   "csp": {
-    "present": true,
-    "unsafe_eval": true,
-    "unsafe_inline": true,
-    "value": "default-src 'none'; script-src 'nonce-f4Mv3YeitaR7BDgV2z3LIV' 'unsafe-eval' https://challenges.cloudflare.com; script-src-attr 'none'; style-src 'unsafe-inline'; img-src 'self' https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com blob:; child-src 'self' https://challenges.cloudflare.com blob:; worker-src blob:; form-action http: https:; base-uri 'self'",
-    "wildcard": false
-   },
+   "csp": null,
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "online.heuel.com: score=5/7 server=cloudflare",
+     "excerpt": "online.heuel.com: status=403 score=5/7 server=cloudflare",
      "ref": "scan_results:header_check:104.16.10.6",
      "tool": "header_check"
     },
@@ -2688,6 +2792,24 @@
    ],
    "forms": [],
    "fqdn": "online.heuel.com",
+   "header_eval": {
+    "basis": "challenge",
+    "complete": false,
+    "evaluated": null,
+    "first": {
+     "challenge": "cf-mitigated: challenge",
+     "content_type": "text/html; charset=UTF-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 403,
+     "tool": "header_check",
+     "url": "https://online.heuel.com"
+    },
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {
     "accept-ch": "Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA",
     "cf-mitigated": "challenge",
@@ -2719,36 +2841,7 @@
    "powered_by": null,
    "reachable": true,
    "score": "5/7",
-   "security_headers": {
-    "content-security-policy": {
-     "present": true,
-     "value": "default-src 'none'; script-src 'nonce-f4Mv3YeitaR7BDgV2z3LIV' 'unsafe-eval' https://challenges.cloudflare.com; script-src-attr 'none'; style-src 'unsafe-inline'; img-src 'self' https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com blob:; child-src 'self' https://challenges.cloudflare.com blob:; worker-src blob:; form-action http: https:; base-uri 'self'"
-    },
-    "permissions-policy": {
-     "present": true,
-     "value": "accelerometer=(),browsing-topics=(),camera=(),clipboard-read=(),clipboard-write=(),geolocation=(),gyroscope=(),hid=(),interest-cohort=(),magnetometer=(),microphone=(),payment=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),xr-spatial-tracking=(self)"
-    },
-    "referrer-policy": {
-     "present": true,
-     "value": "same-origin"
-    },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
-    "x-content-type-options": {
-     "present": true,
-     "value": "nosniff"
-    },
-    "x-frame-options": {
-     "present": true,
-     "value": "SAMEORIGIN"
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
-    }
-   },
+   "security_headers": {},
    "server_header": "cloudflare",
    "source": "header_check",
    "spider_url_count": 3,
@@ -2775,6 +2868,7 @@
      "cwe": "CWE-1395",
      "evidence": "/*! jQuery UI - v1.13.0",
      "name": "Vulnerable JS Library",
+     "param": null,
      "plugin_id": "10003",
      "risk": "Medium",
      "run": "passive",
@@ -2793,6 +2887,7 @@
      "cwe": "CWE-497",
      "evidence": "Apache/2.4.67",
      "name": "In Page Banner Information Leak",
+     "param": null,
      "plugin_id": "10009",
      "risk": "Low",
      "run": "passive",
@@ -2808,6 +2903,7 @@
      "cwe": "CWE-1004",
      "evidence": "Set-Cookie: JSESSIONID",
      "name": "Cookie No HttpOnly Flag",
+     "param": "JSESSIONID",
      "plugin_id": "10010",
      "risk": "Low",
      "run": "passive",
@@ -2822,6 +2918,7 @@
      "cwe": "CWE-614",
      "evidence": "Set-Cookie: JSESSIONID",
      "name": "Cookie Without Secure Flag",
+     "param": "JSESSIONID",
      "plugin_id": "10011",
      "risk": "Low",
      "run": "passive",
@@ -2836,6 +2933,7 @@
      "cwe": "CWE-525",
      "evidence": null,
      "name": "Re-examine Cache-control Directives",
+     "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
      "run": "passive",
@@ -2854,6 +2952,7 @@
      "cwe": "CWE-1021",
      "evidence": null,
      "name": "Missing Anti-clickjacking Header",
+     "param": "x-frame-options",
      "plugin_id": "10020",
      "risk": "Medium",
      "run": "passive",
@@ -2872,6 +2971,7 @@
      "cwe": "CWE-693",
      "evidence": null,
      "name": "X-Content-Type-Options Header Missing",
+     "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
      "run": "passive",
@@ -2890,6 +2990,7 @@
      "cwe": "CWE-20",
      "evidence": null,
      "name": "User Controllable HTML Element Attribute (Potential XSS)",
+     "param": "selectLanguage_input",
      "plugin_id": "10031",
      "risk": "Informational",
      "run": "passive",
@@ -2908,6 +3009,7 @@
      "cwe": "CWE-319",
      "evidence": null,
      "name": "Strict-Transport-Security Header Not Set",
+     "param": null,
      "plugin_id": "10035",
      "risk": "Low",
      "run": "passive",
@@ -2926,6 +3028,7 @@
      "cwe": "CWE-693",
      "evidence": null,
      "name": "Content Security Policy (CSP) Header Not Set",
+     "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
      "run": "passive",
@@ -2944,6 +3047,7 @@
      "cwe": "CWE-201",
      "evidence": null,
      "name": "Big Redirect Detected (Potential Sensitive Information Leak)",
+     "param": null,
      "plugin_id": "10044",
      "risk": "Low",
      "run": "passive",
@@ -2958,6 +3062,7 @@
      "cwe": "CWE-1275",
      "evidence": "Set-Cookie: JSESSIONID",
      "name": "Cookie without SameSite Attribute",
+     "param": "JSESSIONID",
      "plugin_id": "10054",
      "risk": "Low",
      "run": "passive",
@@ -2972,6 +3077,7 @@
      "cwe": "CWE-264",
      "evidence": "Access-Control-Allow-Origin: *",
      "name": "Cross-Domain Misconfiguration",
+     "param": null,
      "plugin_id": "10098",
      "risk": "Medium",
      "run": "passive",
@@ -2990,6 +3096,7 @@
      "cwe": null,
      "evidence": "<script type=\"text/javascript\" src=\"/webmodule-ee/javax.faces.resource/jquery/jquery.js.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01?ln=primefaces&amp;v=11.0.1-SNAPSHOT&amp;e=11.0...",
      "name": "Modern Web Application",
+     "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
      "run": "passive",
@@ -3008,6 +3115,7 @@
      "cwe": null,
      "evidence": "password",
      "name": "Authentication Request Identified",
+     "param": "username",
      "plugin_id": "10111",
      "risk": "Informational",
      "run": "passive",
@@ -3026,6 +3134,7 @@
      "cwe": null,
      "evidence": "JSESSIONID",
      "name": "Session Management Response Identified",
+     "param": "JSESSIONID",
      "plugin_id": "10112",
      "risk": "Informational",
      "run": "passive",
@@ -3040,6 +3149,7 @@
      "cwe": "CWE-352",
      "evidence": "<form id=\"gridForm\" name=\"gridForm\" method=\"post\" action=\"/webmodule-ee/login.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01\" enctype=\"application/x-www-form-urlencoded\">",
      "name": "Absence of Anti-CSRF Tokens",
+     "param": null,
      "plugin_id": "10202",
      "risk": "Medium",
      "run": "passive",
@@ -3058,6 +3168,7 @@
      "cwe": "CWE-497",
      "evidence": "10.3.2.4",
      "name": "Private IP Disclosure",
+     "param": null,
      "plugin_id": "2",
      "risk": "Low",
      "run": "passive",
@@ -3074,6 +3185,7 @@
      "cwe": "CWE-598",
      "evidence": "jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x",
      "name": "Session ID in URL Rewrite",
+     "param": null,
      "plugin_id": "3",
      "risk": "Medium",
      "run": "passive",
@@ -3092,6 +3204,7 @@
      "cwe": "CWE-436",
      "evidence": null,
      "name": "Charset Mismatch (Header Versus Meta Content-Type Charset)",
+     "param": null,
      "plugin_id": "90011",
      "risk": "Informational",
      "run": "passive",
@@ -3105,15 +3218,34 @@
      ]
     }
    ],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
-   "csp": null,
+   "csp": {
+    "directives": {},
+    "frame_ancestors": null,
+    "nonce_or_hash": null,
+    "present": false,
+    "script_unsafe_eval": null,
+    "script_unsafe_inline": null,
+    "style_unsafe_inline": null,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null,
+    "wildcard_directives": []
+   },
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "ose.heuel.com: score=0/7 server=Apache",
+     "excerpt": "ose.heuel.com: status=200 location=https://ose.heuel.com/webmodule-ee/login.seam score=0/7 server=Apache",
      "ref": "scan_results:header_check:20.79.218.75",
      "tool": "header_check"
+    },
+    {
+     "excerpt": "ose.heuel.com: endseite=https://ose.heuel.com/webmodule-ee/login.seam status=200 fehlend=x-frame-options, x-content-type-options, referrer-policy, permissions-policy, content-security-policy",
+     "ref": "hosts/20.79.218.75/phase1/tech_profile.json",
+     "tool": "redirect_probe"
     },
     {
      "excerpt": "ose.heuel.com: status=200 titel=Redirector webserver=Apache tech=Apache HTTP Server",
@@ -3123,6 +3255,69 @@
    ],
    "forms": [],
    "fqdn": "ose.heuel.com",
+   "header_eval": {
+    "basis": "final",
+    "complete": true,
+    "evaluated": {
+     "challenge": null,
+     "content_type": "text/html; charset=ISO-8859-1",
+     "location": null,
+     "status_basis": "claimed",
+     "status_code": 200,
+     "tool": "redirect_probe",
+     "url": "https://ose.heuel.com/webmodule-ee/login.seam"
+    },
+    "first": {
+     "challenge": null,
+     "content_type": "text/html; charset=ISO-8859-1",
+     "location": "https://ose.heuel.com/webmodule-ee/login.seam",
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://ose.heuel.com"
+    },
+    "framing_protected": false,
+    "headers": {
+     "content-security-policy": {
+      "present": false,
+      "tool": "redirect_probe",
+      "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+      "value": null
+     },
+     "permissions-policy": {
+      "present": false,
+      "tool": "redirect_probe",
+      "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+      "value": null
+     },
+     "referrer-policy": {
+      "present": false,
+      "tool": "redirect_probe",
+      "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+      "value": null
+     },
+     "x-content-type-options": {
+      "present": false,
+      "tool": "redirect_probe",
+      "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+      "value": null
+     },
+     "x-frame-options": {
+      "present": false,
+      "tool": "redirect_probe",
+      "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+      "value": null
+     }
+    },
+    "missing": [
+     "x-frame-options",
+     "x-content-type-options",
+     "referrer-policy",
+     "permissions-policy",
+     "content-security-policy"
+    ],
+    "unknown": []
+   },
    "headers": {
     "accept-ranges": "bytes",
     "content-length": "151",
@@ -3144,10 +3339,6 @@
    "reachable": true,
    "score": "0/7",
    "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
     "permissions-policy": {
      "present": false,
      "value": null
@@ -3156,19 +3347,11 @@
      "present": false,
      "value": null
     },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
     "x-content-type-options": {
      "present": false,
      "value": null
     },
     "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
      "present": false,
      "value": null
     }
@@ -3195,6 +3378,7 @@
      "cwe": "CWE-614",
      "evidence": "Set-Cookie: Neos_Session",
      "name": "Cookie Without Secure Flag",
+     "param": "Neos_Session",
      "plugin_id": "10011",
      "risk": "Low",
      "run": "passive",
@@ -3213,6 +3397,7 @@
      "cwe": "CWE-525",
      "evidence": null,
      "name": "Re-examine Cache-control Directives",
+     "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
      "run": "passive",
@@ -3231,6 +3416,7 @@
      "cwe": "CWE-829",
      "evidence": "<script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js'></script>",
      "name": "Cross-Domain JavaScript Source File Inclusion",
+     "param": "https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js",
      "plugin_id": "10017",
      "risk": "Low",
      "run": "passive",
@@ -3249,6 +3435,7 @@
      "cwe": "CWE-20",
      "evidence": null,
      "name": "User Controllable HTML Element Attribute (Potential XSS)",
+     "param": "search",
      "plugin_id": "10031",
      "risk": "Informational",
      "run": "passive",
@@ -3267,6 +3454,7 @@
      "cwe": "CWE-693",
      "evidence": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; f...",
      "name": "CSP: Failure to Define Directive with No Fallback",
+     "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
      "run": "passive",
@@ -3285,6 +3473,7 @@
      "cwe": "CWE-497",
      "evidence": "1764082512",
      "name": "Timestamp Disclosure - Unix",
+     "param": "x-amz-meta-mtime",
      "plugin_id": "10096",
      "risk": "Low",
      "run": "passive",
@@ -3303,6 +3492,7 @@
      "cwe": null,
      "evidence": "<a href=\"#\" class=\"button__link\"><span>Zum Inhalt springen</span><span class=\"icon atom lazyload\" data-iconuri=\"https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Icons/Nebula/caret-...",
      "name": "Modern Web Application",
+     "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
      "run": "passive",
@@ -3321,6 +3511,7 @@
      "cwe": null,
      "evidence": "__authentication[Neos][Flow][Security][Authentication][Token][UsernamePassword][password]",
      "name": "Authentication Request Identified",
+     "param": "__authentication[Neos][Flow][Security][Authentication][Token][UsernamePassword][password]",
      "plugin_id": "10111",
      "risk": "Informational",
      "run": "passive",
@@ -3335,6 +3526,7 @@
      "cwe": null,
      "evidence": "Neos_Session",
      "name": "Session Management Response Identified",
+     "param": "Neos_Session",
      "plugin_id": "10112",
      "risk": "Informational",
      "run": "passive",
@@ -3353,6 +3545,7 @@
      "cwe": "CWE-352",
      "evidence": "<form method=\"post\" enctype=\"multipart/form-data\" id=\"contact\" action=\"https://www.heuel.com/kontakt-heuel-logistics.html#contact\">",
      "name": "Absence of Anti-CSRF Tokens",
+     "param": null,
      "plugin_id": "10202",
      "risk": "Medium",
      "run": "passive",
@@ -3370,6 +3563,7 @@
      "cwe": "CWE-345",
      "evidence": "<script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js'></script>",
      "name": "Sub Resource Integrity Attribute Missing",
+     "param": null,
      "plugin_id": "90003",
      "risk": "Medium",
      "run": "passive",
@@ -3383,19 +3577,70 @@
      ]
     }
    ],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": {
+    "directives": {
+     "connect-src": [
+      "'self'",
+      "webpack:",
+      "https://*"
+     ],
+     "default-src": [
+      "'self'",
+      "https://*"
+     ],
+     "font-src": [
+      "'self'",
+      "data:",
+      "https://*"
+     ],
+     "img-src": [
+      "'self'",
+      "data:",
+      "blob:",
+      "https://*"
+     ],
+     "script-src": [
+      "'self'",
+      "'unsafe-inline'",
+      "'unsafe-eval'",
+      "https://*"
+     ],
+     "style-src": [
+      "'self'",
+      "'unsafe-inline'",
+      "https://*"
+     ],
+     "worker-src": [
+      "'self'",
+      "blob:"
+     ]
+    },
+    "frame_ancestors": null,
+    "nonce_or_hash": false,
     "present": true,
+    "script_unsafe_eval": true,
+    "script_unsafe_inline": true,
+    "style_unsafe_inline": true,
     "unsafe_eval": true,
     "unsafe_inline": true,
     "value": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; font-src 'self' data: https://*; connect-src 'self' webpack: https://*;",
-    "wildcard": false
+    "wildcard": true,
+    "wildcard_directives": [
+     "connect-src",
+     "default-src",
+     "font-src",
+     "img-src",
+     "script-src",
+     "style-src"
+    ]
    },
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "www.heuel.com: score=7/7",
+     "excerpt": "www.heuel.com: status=200 score=7/7",
      "ref": "scan_results:header_check:217.72.203.132",
      "tool": "header_check"
     },
@@ -3407,6 +3652,63 @@
    ],
    "forms": [],
    "fqdn": "www.heuel.com",
+   "header_eval": {
+    "basis": "final",
+    "complete": true,
+    "evaluated": {
+     "challenge": null,
+     "content_type": "text/html;charset=UTF-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://www.heuel.com"
+    },
+    "first": {
+     "challenge": null,
+     "content_type": "text/html;charset=UTF-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://www.heuel.com"
+    },
+    "framing_protected": true,
+    "headers": {
+     "content-security-policy": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://www.heuel.com",
+      "value": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; font-src 'self' data: https://*; connect-src 'self' webpack: https://*;"
+     },
+     "permissions-policy": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://www.heuel.com",
+      "value": "accelerometer=(self), ambient-light-sensor=(self), autoplay=(self), battery=(self), camera=(self), cross-origin-isolated=(self), display-capture=(self), document-domain=(self), encrypted-media=(self), execution-while-not-rendered=(self), execution-while-out-of-viewport=(self), fullscreen=(self), geo"
+     },
+     "referrer-policy": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://www.heuel.com",
+      "value": "no-referrer-when-downgrade"
+     },
+     "x-content-type-options": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://www.heuel.com",
+      "value": "nosniff"
+     },
+     "x-frame-options": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://www.heuel.com",
+      "value": "SAMEORIGIN"
+     }
+    },
+    "missing": [],
+    "unknown": []
+   },
    "headers": {
     "content-length": "187755",
     "content-security-policy": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; font-src 'self' data: https://*; connect-src 'self' webpack: https://*;",
@@ -3438,21 +3740,13 @@
    "reachable": true,
    "score": "7/7",
    "security_headers": {
-    "content-security-policy": {
-     "present": true,
-     "value": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; font-src 'self' data: https://*; connect-src 'self' webpack: https://*;"
-    },
     "permissions-policy": {
      "present": true,
-     "value": "accelerometer=(self), ambient-light-sensor=(self), autoplay=(self), battery=(self), camera=(self), cross-origin-isolated=(self), display-capture=(self), document-domain=(self), encrypted-media=(self), execution-while-not-rendered=(self), execution-while-out-of-viewport=(self), fullscreen=(self), geolocation=(self), gyroscope=(self), keyboard-map=(self), magnetometer=(self), microphone=(self), midi=(self), navigation-override=(self), payment=(self), picture-in-picture=(self), publickey-credentials-get=(self), screen-wake-lock=(self), sync-xhr=(self), usb=(self), web-share=(self), xr-spatial-tracking=(self)"
+     "value": "accelerometer=(self), ambient-light-sensor=(self), autoplay=(self), battery=(self), camera=(self), cross-origin-isolated=(self), display-capture=(self), document-domain=(self), encrypted-media=(self), execution-while-not-rendered=(self), execution-while-out-of-viewport=(self), fullscreen=(self), geo"
     },
     "referrer-policy": {
      "present": true,
      "value": "no-referrer-when-downgrade"
-    },
-    "strict-transport-security": {
-     "present": true,
-     "value": "max-age=31536000;"
     },
     "x-content-type-options": {
      "present": true,
@@ -3461,10 +3755,6 @@
     "x-frame-options": {
      "present": true,
      "value": "SAMEORIGIN"
-    },
-    "x-xss-protection": {
-     "present": true,
-     "value": "1"
     }
    },
    "server_header": null,
@@ -4079,7 +4369,9 @@
   {
    "banner_excerpt": "SSH-2.0-mod_sftp Key type: ssh-ed25519 Key: AAAAC3NzaC1lZDI1NTE5AAAAIOt4sVSHnRSmtSKCFzy6xD/KQUJa77JAkdOYWkUo9Sce Fingerprint: 27:50:8d:df:37:cf:cb:4e:e8:c1:d...",
    "confidence": 0.5,
-   "details": {},
+   "details": {
+    "ssh_software": "mod_sftp"
+   },
    "domain": null,
    "evidence": [
     {
@@ -4109,7 +4401,9 @@
   {
    "banner_excerpt": "220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello 224.194.174.161 [224.194.174.161] 250-SIZE 104857600 250-8BITMIME 250-ETRN 2...",
    "confidence": 0.5,
-   "details": {},
+   "details": {
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -4259,7 +4553,9 @@
   {
    "banner_excerpt": "220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello oki38c1unrwmsj.net [224.56.21.82] 250-SIZE 104857600 250-8BITMIME 250-ETRN 2...",
    "confidence": 0.5,
-   "details": {},
+   "details": {
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -4289,7 +4585,9 @@
   {
    "banner_excerpt": "220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello iic9vjkeug3hw.net [224.197.126.208] 250-SIZE 104857600 250-8BITMIME 250-ETRN...",
    "confidence": 0.5,
-   "details": {},
+   "details": {
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -4572,9 +4870,10 @@
    }
   ]
  },
- "schema_version": "1.0.7",
+ "schema_version": "1.1.0",
  "services": [
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4593,6 +4892,7 @@
    "fp_title": null,
    "host_ip": "104.16.10.6",
    "id": "svc:104.16.10.6:80/tcp",
+   "kennung": "Cloudflare http proxy",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4603,25 +4903,34 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "funnelcockpit.com",
+    "days_left": 47,
+    "expired": false,
+    "fingerprint_sha1": "df3c860b5b7980edd526022103693f852377301b",
+    "issuer": "WE1",
     "not_after": "2026-07-08T13:02:04Z",
+    "not_before": "2026-04-09T12:02:06Z",
     "san": [
      "*.funnelcockpit.com",
      "funnelcockpit.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -4637,6 +4946,7 @@
    "fp_title": "403 Forbidden",
    "host_ip": "104.16.10.6",
    "id": "svc:104.16.10.6:443/tcp",
+   "kennung": "Cloudflare http proxy",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4647,15 +4957,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4674,6 +4987,7 @@
    "fp_title": null,
    "host_ip": "104.16.10.6",
    "id": "svc:104.16.10.6:8080/tcp",
+   "kennung": "Cloudflare http proxy",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4684,25 +4998,34 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "funnelcockpit.com",
+    "days_left": 47,
+    "expired": false,
+    "fingerprint_sha1": "df3c860b5b7980edd526022103693f852377301b",
+    "issuer": "WE1",
     "not_after": "2026-07-08T13:02:04Z",
+    "not_before": "2026-04-09T12:02:06Z",
     "san": [
      "*.funnelcockpit.com",
      "funnelcockpit.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -4718,6 +5041,7 @@
    "fp_title": "403 Forbidden",
    "host_ip": "104.16.10.6",
    "id": "svc:104.16.10.6:8443/tcp",
+   "kennung": "Cloudflare http proxy",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4728,25 +5052,34 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "*.heuel.com",
+    "days_left": 327,
+    "expired": false,
+    "fingerprint_sha1": "6e385e7f1d825688a1ea5f0680c1b1b42a383750",
+    "issuer": "GlobalSign GCC R6 AlphaSSL CA 2025",
     "not_after": "2027-04-14T14:45:26Z",
+    "not_before": "2026-03-13T14:45:27Z",
     "san": [
      "*.heuel.com",
      "heuel.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 0.3,
    "evidence": [
@@ -4762,6 +5095,7 @@
    "fp_title": null,
    "host_ip": "20.79.218.75",
    "id": "svc:20.79.218.75:21/tcp",
+   "kennung": "TLS-Dienst, Zertifikat *.heuel.com",
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -4772,15 +5106,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ftp",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4799,6 +5136,7 @@
    "fp_title": null,
    "host_ip": "20.79.218.75",
    "id": "svc:20.79.218.75:22/tcp",
+   "kennung": "FortiSSH",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4809,15 +5147,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ssh",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4836,6 +5177,7 @@
    "fp_title": "403 Forbidden",
    "host_ip": "20.79.218.75",
    "id": "svc:20.79.218.75:80/tcp",
+   "kennung": "Apache httpd",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4846,25 +5188,34 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "*.heuel.com",
+    "days_left": 327,
+    "expired": false,
+    "fingerprint_sha1": "6e385e7f1d825688a1ea5f0680c1b1b42a383750",
+    "issuer": "GlobalSign GCC R6 AlphaSSL CA 2025",
     "not_after": "2027-04-14T14:45:26Z",
+    "not_before": "2026-03-13T14:45:27Z",
     "san": [
      "*.heuel.com",
      "heuel.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -4880,6 +5231,7 @@
    "fp_title": "403 Forbidden",
    "host_ip": "20.79.218.75",
    "id": "svc:20.79.218.75:443/tcp",
+   "kennung": "Apache httpd",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4890,15 +5242,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4917,6 +5272,7 @@
    "fp_title": null,
    "host_ip": "20.79.218.75",
    "id": "svc:20.79.218.75:8443/tcp",
+   "kennung": null,
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -4927,15 +5283,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "https-alt",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": true,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4954,6 +5313,7 @@
    "fp_title": "404 Not Found",
    "host_ip": "217.72.203.132",
    "id": "svc:217.72.203.132:80/tcp",
+   "kennung": "nginx",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4964,24 +5324,33 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "Kubernetes Ingress Controller Fake Certificate",
+    "days_left": 360,
+    "expired": false,
+    "fingerprint_sha1": "6a82973cee7f87a63bd83f021a838a4521e127f6",
+    "issuer": "Kubernetes Ingress Controller Fake Certificate",
     "not_after": "2027-05-18T00:06:03Z",
+    "not_before": "2026-05-18T00:06:03Z",
     "san": [
      "ingress.local"
-    ]
+    ],
+    "self_signed": true
    },
    "confidence": 1.0,
    "evidence": [
@@ -4997,6 +5366,7 @@
    "fp_title": "404 Not Found",
    "host_ip": "217.72.203.132",
    "id": "svc:217.72.203.132:443/tcp",
+   "kennung": "nginx",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -5007,11 +5377,13 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   }
@@ -5020,6 +5392,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "header_check"
    ],
@@ -5059,6 +5432,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5098,6 +5472,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "webtech"
    ],
@@ -5137,6 +5512,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -5196,6 +5572,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -5241,6 +5618,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5280,6 +5658,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "httpx",
     "nmap",
@@ -5341,6 +5720,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -5385,6 +5765,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "webtech"
    ],
@@ -5424,6 +5805,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -5469,6 +5851,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -5514,6 +5897,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "webtech"
    ],
@@ -5553,6 +5937,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "webtech"
    ],
@@ -5592,6 +5977,7 @@
   {
    "build": null,
    "confidence": 0.95,
+   "conflicts": [],
    "detection_sources": [
     "cms_fingerprint"
    ],
@@ -5636,6 +6022,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5675,6 +6062,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5716,6 +6104,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -5770,6 +6159,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5809,6 +6199,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5848,6 +6239,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5887,6 +6279,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5927,6 +6320,38 @@
  "targets": [
   {
    "confidence": 1.0,
+   "discovered": [
+    {
+     "fqdn": "as2.heuel.com",
+     "ips": [
+      "194.25.29.98"
+     ],
+     "source": "gobuster_dns",
+     "third_party": null
+    },
+    {
+     "fqdn": "autodiscover.heuel.com",
+     "ips": [
+      "40.99.149.168",
+      "52.98.253.184",
+      "52.98.253.88",
+      "2603:1026:c0d:1001::8",
+      "2603:1026:c0d:1023::8",
+      "2603:1026:c0d:77::8"
+     ],
+     "source": "gobuster_dns",
+     "third_party": "Microsoft 365"
+    },
+    {
+     "fqdn": "control.heuel.com",
+     "ips": [
+      "213.133.104.51"
+     ],
+     "source": "gobuster_dns",
+     "third_party": null
+    }
+   ],
+   "discovered_total": null,
    "discovery_health": {
     "ct_sources_empty": false,
     "discovery_added_count": 3,
@@ -5966,21 +6391,33 @@
  "tls": [
   {
    "assigned_from": null,
+   "cbc_obsoleted_offered": null,
    "cert": {
     "chain_ok": null,
     "cn": "online.heuel.com",
     "days_left": 78,
     "expired": false,
+    "fingerprint_sha256": "946b4bc410ee21b52d7207b3f8124051101fc2b1babcafe62dd2931f37644aa9",
     "issuer": "WE1",
-    "mismatch": null,
+    "mismatch": false,
     "not_after": "2026-08-08T03:15:32Z",
     "not_before": "2026-05-10T02:15:35Z",
+    "renewal": {
+     "certificates": 33,
+     "interval_days": 59,
+     "last_not_after": "2026-06-10T01:42:45Z",
+     "last_not_before": "2026-03-12T00:42:52Z",
+     "lead_days": 30,
+     "name": "online.heuel.com",
+     "source": "crtsh"
+    },
     "san": [
      "online.heuel.com"
     ],
     "self_signed": null,
     "wildcard": false
    },
+   "cert_assigned_from": null,
    "ciphers_weak": [],
    "confidence": 1.0,
    "entries": [],
@@ -6014,15 +6451,26 @@
   },
   {
    "assigned_from": null,
+   "cbc_obsoleted_offered": null,
    "cert": {
     "chain_ok": null,
     "cn": "*.heuel.com",
     "days_left": 327,
     "expired": false,
+    "fingerprint_sha256": "5e005fb0d00e26988394e47c14882b37546ed533e9ca7954be32ebceba514a05",
     "issuer": "GlobalSign GCC R6 AlphaSSL CA 2025",
-    "mismatch": null,
+    "mismatch": false,
     "not_after": "2027-04-14T14:45:26Z",
     "not_before": "2026-03-13T14:45:27Z",
+    "renewal": {
+     "certificates": 4,
+     "interval_days": 367,
+     "last_not_after": "2025-03-12T23:59:59Z",
+     "last_not_before": "2024-03-11T00:00:00Z",
+     "lead_days": 2,
+     "name": "edi.heuel.com",
+     "source": "crtsh"
+    },
     "san": [
      "*.heuel.com",
      "heuel.com"
@@ -6030,6 +6478,7 @@
     "self_signed": null,
     "wildcard": true
    },
+   "cert_assigned_from": null,
    "ciphers_weak": [],
    "confidence": 1.0,
    "entries": [],
@@ -6063,21 +6512,33 @@
   },
   {
    "assigned_from": null,
+   "cbc_obsoleted_offered": null,
    "cert": {
     "chain_ok": null,
     "cn": "www.heuel.com",
     "days_left": 56,
     "expired": false,
+    "fingerprint_sha256": "a61e11a87aeecbd8c0e930f76f9716ad5cf284dbfff225e62fbb8d9fba92124e",
     "issuer": "R12",
-    "mismatch": null,
+    "mismatch": false,
     "not_after": "2026-07-17T05:21:39Z",
     "not_before": "2026-04-18T05:21:40Z",
+    "renewal": {
+     "certificates": 32,
+     "interval_days": 60,
+     "last_not_after": "2026-07-17T05:21:39Z",
+     "last_not_before": "2026-04-18T05:21:40Z",
+     "lead_days": 30,
+     "name": "www.heuel.com",
+     "source": "crtsh"
+    },
     "san": [
      "www.heuel.com"
     ],
     "self_signed": null,
     "wildcard": false
    },
+   "cert_assigned_from": null,
    "ciphers_weak": [],
    "confidence": 1.0,
    "entries": [],
@@ -6110,6 +6571,45 @@
    "vulns": []
   }
  ],
- "unprocessed": [],
+ "unprocessed": [
+  {
+   "confidence": 0.8,
+   "count": 1,
+   "evidence": [
+    {
+     "excerpt": "https://ose.heuel.com/webmodule-ee/javax.faces.resource/components.css.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01?e=11.0.4&ln=primefaces&v=11.0.1-SNAPSHOT",
+     "ref": "hosts/20.79.218.75/phase1/tech_profile.json",
+     "tool": "redirect_probe"
+    }
+   ],
+   "fqdn": "ose.heuel.com",
+   "host_ip": "20.79.218.75",
+   "id": "unp:resource_version:a017a655",
+   "kind": "resource_version",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:11:37Z",
+   "source": "redirect_probe",
+   "what": "ose.heuel.com: primefaces 11.0.1-SNAPSHOT in Ressourcen-URL"
+  },
+  {
+   "confidence": 0.8,
+   "count": 1,
+   "evidence": [
+    {
+     "excerpt": "https://ose.heuel.com/webmodule-ee/javax.faces.resource/theme.css.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01?e=11.0.4&ln=primefaces-casablanca&v=11.0.1-SNAPSHOT",
+     "ref": "hosts/20.79.218.75/phase1/tech_profile.json",
+     "tool": "redirect_probe"
+    }
+   ],
+   "fqdn": "ose.heuel.com",
+   "host_ip": "20.79.218.75",
+   "id": "unp:resource_version:b6d17a69",
+   "kind": "resource_version",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:11:37Z",
+   "source": "redirect_probe",
+   "what": "ose.heuel.com: primefaces-casablanca 11.0.1-SNAPSHOT in Ressourcen-URL"
+  }
+ ],
  "warnings": []
 }

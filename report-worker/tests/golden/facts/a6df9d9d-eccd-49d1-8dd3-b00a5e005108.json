@@ -24,6 +24,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "abuseipdb"
   },
   {
@@ -49,6 +50,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "abuseipdb"
   },
   {
@@ -74,6 +76,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "certspotter"
   },
   {
@@ -99,6 +102,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "crtsh"
   },
   {
@@ -124,6 +128,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "crtsh"
   },
   {
@@ -149,6 +154,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "crtsh"
   },
   {
@@ -174,6 +180,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dns_records"
   },
   {
@@ -199,6 +206,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dns_security"
   },
   {
@@ -224,6 +232,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dns_security"
   },
   {
@@ -249,6 +258,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dnsx"
   },
   {
@@ -274,6 +284,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "failed",
+   "target": null,
    "tool": "gobuster_dns"
   },
   {
@@ -299,6 +310,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "greynoise"
   },
   {
@@ -324,6 +336,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "greynoise"
   },
   {
@@ -349,6 +362,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "otx"
   },
   {
@@ -374,6 +388,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "otx"
   },
   {
@@ -399,6 +414,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "securitytrails"
   },
   {
@@ -424,6 +440,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "securitytrails"
   },
   {
@@ -449,6 +466,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "shodan"
   },
   {
@@ -474,6 +492,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "shodan"
   },
   {
@@ -499,6 +518,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "subfinder"
   },
   {
@@ -524,6 +544,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "urlhaus"
   },
   {
@@ -549,6 +570,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "urlhaus"
   },
   {
@@ -574,6 +596,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "virustotal"
   },
   {
@@ -599,6 +622,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "virustotal"
   },
   {
@@ -624,6 +648,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "web_probe"
   },
   {
@@ -649,6 +674,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "whois"
   },
   {
@@ -674,6 +700,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "whois"
   },
   {
@@ -699,6 +726,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "nmap"
   },
   {
@@ -724,6 +752,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "nmap"
   },
   {
@@ -749,6 +778,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -774,6 +804,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -799,6 +830,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -824,6 +856,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
+   "target": null,
    "tool": "webtech"
   },
   {
@@ -849,6 +882,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "webtech"
   },
   {
@@ -874,6 +908,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "feroxbuster"
   },
   {
@@ -899,6 +934,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "feroxbuster"
   },
   {
@@ -924,6 +960,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "ffuf_param"
   },
   {
@@ -949,6 +986,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "ffuf_param"
   },
   {
@@ -974,6 +1012,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "ffuf_sensitive"
   },
   {
@@ -999,6 +1038,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "ffuf_sensitive"
   },
   {
@@ -1024,6 +1064,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "blocked",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -1049,6 +1090,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "blocked",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -1074,6 +1116,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "empty",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -1099,6 +1142,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -1124,6 +1168,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -1149,6 +1194,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -1174,6 +1220,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "testssl"
   },
   {
@@ -1199,6 +1246,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "testssl"
   },
   {
@@ -1224,6 +1272,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "wpscan"
   },
   {
@@ -1249,6 +1298,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "wpscan"
   },
   {
@@ -1274,6 +1324,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "zap"
   },
   {
@@ -1299,6 +1350,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "zap"
   },
   {
@@ -1324,6 +1376,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "zap_active"
   },
   {
@@ -1349,6 +1402,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "failed",
+   "target": null,
    "tool": "zap_active"
   },
   {
@@ -1374,6 +1428,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "zap_spider"
   },
   {
@@ -1399,6 +1454,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "zap_spider"
   },
   {
@@ -1424,6 +1480,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "phase3_correlation"
   }
  ],
@@ -1820,26 +1877,33 @@
     "all_qualifier": "~all",
     "mechanisms": [
      {
+      "ips": [
+       "188.40.3.130"
+      ],
       "kind": "a",
       "qualifier": "+",
       "value": null
      },
      {
+      "ips": [],
       "kind": "mx",
       "qualifier": "+",
       "value": null
      },
      {
+      "ips": [],
       "kind": "ip4",
       "qualifier": "+",
       "value": "217.243.248.28"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "spf.protection.outlook.com"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "spf.hornetsecurity.com"
@@ -1882,7 +1946,9 @@
    "mode": "active",
    "name": "junkerwerk.hu",
    "observed_at": "2026-08-31T14:31:03Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": null,
@@ -1909,7 +1975,9 @@
    "mode": "active",
    "name": "openotp.junkerwerk.hu",
    "observed_at": "2026-08-31T14:31:03Z",
+   "real_content": true,
    "screenshot_key": "a6df9d9d-eccd-49d1-8dd3-b00a5e005108/217.243.248.30__openotp.junkerwerk.hu.png",
+   "skipped": null,
    "source": "web_probe",
    "title": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal",
    "waf": {
@@ -1940,7 +2008,9 @@
    "mode": "active",
    "name": "www.junkerwerk.hu",
    "observed_at": "2026-08-31T14:31:03Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": null,
@@ -1971,6 +2041,7 @@
  },
  "hosts": [
   {
+   "betriebsform": "rechenzentrum",
    "blocked": {
     "detected": true,
     "reason": "web_unreachable_after_portscan",
@@ -1999,6 +2070,7 @@
    "id": "host:188.40.3.130",
    "ip": "188.40.3.130",
    "mode": "active",
+   "nmap_host_report": true,
    "nmap_state": "up",
    "observed_at": "2026-08-31T14:32:40Z",
    "ports_summary": {
@@ -2008,12 +2080,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "hetzner.com",
     "isp": "Hetzner Online AG - Rechenzentrum Haustechnik",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -2024,6 +2098,8 @@
     "urlhaus_compromised": null
    },
    "reverse": "dedi2230.your-server.de",
+   "serves_customer_mail": true,
+   "serves_customer_web": false,
    "shared": {
     "evidence": [
      {
@@ -2064,6 +2140,7 @@
    "third_party": null
   },
   {
+   "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
     "reason": null,
@@ -2091,6 +2168,7 @@
    "id": "host:217.243.248.30",
    "ip": "217.243.248.30",
    "mode": "active",
+   "nmap_host_report": true,
    "nmap_state": "up",
    "observed_at": "2026-08-31T14:32:12Z",
    "ports_summary": {
@@ -2100,12 +2178,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "junkerwerk.de",
     "isp": "Junkerwerk Linder GmbH & Co.",
     "usage_type": "Fixed Line ISP"
    },
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -2116,6 +2196,8 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
+   "serves_customer_mail": false,
+   "serves_customer_web": true,
    "shared": null,
    "source": "nmap",
    "third_party": null
@@ -2124,6 +2206,7 @@
  "http": [
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": null,
@@ -2137,6 +2220,16 @@
    ],
    "forms": [],
    "fqdn": "junkerwerk.hu",
+   "header_eval": {
+    "basis": "unreachable",
+    "complete": false,
+    "evaluated": null,
+    "first": null,
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {},
    "host_ip": "188.40.3.130",
    "hsts": null,
@@ -2166,6 +2259,7 @@
      "cwe": "CWE-525",
      "evidence": null,
      "name": "Re-examine Cache-control Directives",
+     "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
      "run": "passive",
@@ -2180,6 +2274,7 @@
      "cwe": "CWE-1021",
      "evidence": null,
      "name": "Multiple X-Frame-Options Header Entries",
+     "param": "x-frame-options",
      "plugin_id": "10020",
      "risk": "Medium",
      "run": "passive",
@@ -2198,6 +2293,7 @@
      "cwe": "CWE-693",
      "evidence": null,
      "name": "X-Content-Type-Options Header Missing",
+     "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
      "run": "passive",
@@ -2213,6 +2309,7 @@
      "cwe": "CWE-615",
      "evidence": "// when user clicks on anchor li",
      "name": "Information Disclosure - Suspicious Comments",
+     "param": null,
      "plugin_id": "10027",
      "risk": "Informational",
      "run": "passive",
@@ -2227,6 +2324,7 @@
      "cwe": "CWE-319",
      "evidence": null,
      "name": "Strict-Transport-Security Header Not Set",
+     "param": null,
      "plugin_id": "10035",
      "risk": "Low",
      "run": "passive",
@@ -2245,6 +2343,7 @@
      "cwe": "CWE-693",
      "evidence": null,
      "name": "Content Security Policy (CSP) Header Not Set",
+     "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
      "run": "passive",
@@ -2263,6 +2362,7 @@
      "cwe": "CWE-693",
      "evidence": "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: www.google.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com maps.googleapis.com maps.gstatic.com",
      "name": "CSP: Failure to Define Directive with No Fallback",
+     "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
      "run": "passive",
@@ -2281,6 +2381,7 @@
      "cwe": null,
      "evidence": "<a class=\"locale_lang\" onclick=\"jslang.menu();\"><img width=20 src=\"../images/countries/en.svg\"></a>",
      "name": "Modern Web Application",
+     "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
      "run": "passive",
@@ -2298,6 +2399,7 @@
      "cwe": null,
      "evidence": "password",
      "name": "Authentication Request Identified",
+     "param": "login",
      "plugin_id": "10111",
      "risk": "Informational",
      "run": "passive",
@@ -2312,6 +2414,7 @@
      "cwe": "CWE-352",
      "evidence": "<form name=\"form\" method=\"POST\" autocomplete=\"OFF\">",
      "name": "Absence of Anti-CSRF Tokens",
+     "param": null,
      "plugin_id": "10202",
      "risk": "Medium",
      "run": "passive",
@@ -2321,6 +2424,7 @@
      ]
     }
    ],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": null,
@@ -2342,6 +2446,16 @@
    ],
    "forms": [],
    "fqdn": "openotp.junkerwerk.hu",
+   "header_eval": {
+    "basis": "unreachable",
+    "complete": false,
+    "evaluated": null,
+    "first": null,
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {},
    "host_ip": "217.243.248.30",
    "hsts": null,
@@ -2374,6 +2488,7 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": null,
@@ -2387,6 +2502,16 @@
    ],
    "forms": [],
    "fqdn": "www.junkerwerk.hu",
+   "header_eval": {
+    "basis": "unreachable",
+    "complete": false,
+    "evaluated": null,
+    "first": null,
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {},
    "host_ip": "188.40.3.130",
    "hsts": null,
@@ -2648,7 +2773,9 @@
   {
    "banner_excerpt": "220 dedi2230.your-server.de Exim ESMTP Service ready 250-dedi2230.your-server.de Hello 224.243.243.95 [224.243.243.95] 250-SIZE 104857600 250-8BITMIME 250-ET...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -2808,7 +2935,9 @@
   {
    "banner_excerpt": "220 archiv.junkerwerk.de ESMTP Exim 4.96 Sun, 30 Aug 2026 14:48:52 +0200 250-archiv.junkerwerk.de Hello wsf6og5mfz.net [224.55.142.174] 250-SIZE 52428800 250...",
    "confidence": 0.5,
-   "details": {},
+   "details": {
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -2867,7 +2996,7 @@
    "banner_excerpt": null,
    "confidence": 0.5,
    "details": {
-    "compromised": false
+    "compromised": null
    },
    "domain": "junkerwerk.hu",
    "evidence": [
@@ -2970,19 +3099,26 @@
    }
   ]
  },
- "schema_version": "1.0.7",
+ "schema_version": "1.1.0",
  "services": [
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 63,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2998,6 +3134,7 @@
    "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:21/tcp",
+   "kennung": "ProFTPD",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -3008,15 +3145,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ftp",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -3035,6 +3175,7 @@
    "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:22/tcp",
+   "kennung": "ProFTPD mod_sftp",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -3045,15 +3186,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ssh",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [
@@ -3068,11 +3212,17 @@
    ],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 63,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -3093,7 +3243,8 @@
    "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:110/tcp",
-   "login_disabled": null,
+   "kennung": "Courier pop3d",
+   "login_disabled": true,
    "method": "probed",
    "mode": "active",
    "nmap_conf": 10,
@@ -3103,42 +3254,44 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "pop3",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": true,
    "state": "open",
-   "tls_required": null,
+   "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [
-    "capabilities",
     "IDLE",
     "IMAP4rev1",
-    "listed",
-    "have",
     "ENABLE",
-    "Pre-login",
     "LOGIN-REFERRALS",
-    "LOGINDISABLEDA0001",
-    "post-login",
-    "more",
+    "LOGINDISABLED",
     "STARTTLS",
     "ID",
-    "OK",
     "LITERAL+",
     "SASL-IR"
    ],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 63,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -3159,6 +3312,7 @@
    "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:143/tcp",
+   "kennung": "Dovecot imapd",
    "login_disabled": true,
    "method": "probed",
    "mode": "active",
@@ -3169,15 +3323,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "imap",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -3196,6 +3353,7 @@
    "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:222/tcp",
+   "kennung": "OpenSSH 9.2p1",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -3206,15 +3364,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ssh",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "9.2p1",
    "version_raw": "9.2p1"
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "LOGIN",
     "PLAIN"
@@ -3233,11 +3394,17 @@
    ],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 63,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -3258,6 +3425,7 @@
    "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:465/tcp",
+   "kennung": null,
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -3268,15 +3436,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_vrfy": false,
    "source": "nmap",
    "starttls": false,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": null,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": false,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [
@@ -3292,11 +3463,17 @@
    ],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 63,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -3317,6 +3494,7 @@
    "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:587/tcp",
+   "kennung": null,
    "login_disabled": true,
    "method": "probed",
    "mode": "active",
@@ -3327,15 +3505,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_vrfy": false,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": null,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "PLAIN"
    ],
@@ -3343,27 +3524,26 @@
    "capabilities": [
     "IDLE",
     "IMAP4rev1",
-    "listed",
-    "capabilities",
     "ENABLE",
-    "Pre-login",
     "LOGIN-REFERRALS",
-    "have",
-    "post-login",
-    "more",
-    "OK",
     "ID",
-    "AUTH=PLAINA0001",
+    "AUTH=PLAIN",
     "LITERAL+",
     "SASL-IR"
    ],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 63,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 0.3,
    "evidence": [
@@ -3384,6 +3564,7 @@
    "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:993/tcp",
+   "kennung": null,
    "login_disabled": false,
    "method": "table",
    "mode": "active",
@@ -3394,15 +3575,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "imaps",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": false,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": null,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "PLAIN"
    ],
@@ -3419,11 +3603,17 @@
    ],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 63,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 0.3,
    "evidence": [
@@ -3444,6 +3634,7 @@
    "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:995/tcp",
+   "kennung": null,
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -3454,15 +3645,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "pop3s",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": false,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": null,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "mysql_native_password"
    ],
@@ -3470,11 +3664,17 @@
    "capabilities": [],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 1259,
+    "expired": false,
+    "fingerprint_sha1": "3635167b839556a0221a5cf4ef08c69addb819b8",
+    "issuer": "sql.your-server.de",
     "not_after": "2030-02-10T15:03:07Z",
+    "not_before": "2025-02-11T15:03:07Z",
     "san": [
      "*.your-database.de",
      "*.your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -3495,6 +3695,7 @@
    "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:3306/tcp",
+   "kennung": "MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -3505,25 +3706,34 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "mysql",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "10.11.18",
    "version_raw": "5.5.5-10.11.18-MariaDB-0+deb12u1"
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 1259,
+    "expired": false,
+    "fingerprint_sha1": "24854a14222a35f1839fb4df58b90bfd5e325fda",
+    "issuer": "sql.your-server.de",
     "not_after": "2030-02-10T15:08:59Z",
+    "not_before": "2025-02-11T15:08:59Z",
     "san": [
      "*.your-database.de",
      "*.your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -3539,6 +3749,7 @@
    "fp_title": null,
    "host_ip": "188.40.3.130",
    "id": "svc:188.40.3.130:5432/tcp",
+   "kennung": "PostgreSQL DB 9.6.0 or later",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -3549,25 +3760,34 @@
    "proto": "tcp",
    "rejects_before_auth": true,
    "service": "postgresql",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": "9.6.0 or later"
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "*.junkerwerk.de",
+    "days_left": 102,
+    "expired": false,
+    "fingerprint_sha1": "24ecacfda47054c51095feb0fe6acc9d865d43aa",
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
     "not_after": "2026-12-11T23:59:59Z",
+    "not_before": "2025-11-11T00:00:00Z",
     "san": [
      "*.junkerwerk.de",
      "junkerwerk.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -3583,6 +3803,7 @@
    "fp_title": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal",
    "host_ip": "217.243.248.30",
    "id": "svc:217.243.248.30:443/tcp",
+   "kennung": "Apache httpd, Titel „Junkerwerk Linder GmbH & Co.KG Web Applications Portal“",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -3593,11 +3814,13 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   }
@@ -3606,6 +3829,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3650,6 +3874,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3694,6 +3919,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3738,6 +3964,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3782,6 +4009,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3826,6 +4054,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3872,6 +4101,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3916,6 +4146,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3960,6 +4191,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "httpx",
     "nmap",
@@ -4021,6 +4253,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4066,6 +4299,8 @@
  "targets": [
   {
    "confidence": 1.0,
+   "discovered": [],
+   "discovered_total": null,
    "discovery_health": {
     "ct_sources_empty": false,
     "discovery_added_count": 3,
@@ -4131,15 +4366,18 @@
  "tls": [
   {
    "assigned_from": null,
+   "cbc_obsoleted_offered": true,
    "cert": {
     "chain_ok": true,
     "cn": "*.junkerwerk.de",
     "days_left": 102,
     "expired": false,
+    "fingerprint_sha256": "f812127f2e2bd9533470df2e404042ff5f581f693767b0e99fcbb978c2e59df1",
     "issuer": "Sectigo Public Server Authentication CA DV R36",
     "mismatch": true,
     "not_after": "2026-12-11T23:59:59Z",
     "not_before": "2025-11-11T00:00:00Z",
+    "renewal": null,
     "san": [
      "*.junkerwerk.de",
      "junkerwerk.de"
@@ -4147,6 +4385,7 @@
     "self_signed": null,
     "wildcard": true
    },
+   "cert_assigned_from": null,
    "ciphers_weak": [
     "3des",
     "cbc"

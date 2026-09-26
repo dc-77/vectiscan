@@ -24,6 +24,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "abuseipdb"
   },
   {
@@ -49,6 +50,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "abuseipdb"
   },
   {
@@ -74,6 +76,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "certspotter"
   },
   {
@@ -99,6 +102,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "crtsh"
   },
   {
@@ -124,6 +128,7 @@
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dns_records"
   },
   {
@@ -149,6 +154,7 @@
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dns_security"
   },
   {
@@ -174,6 +180,7 @@
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dns_security"
   },
   {
@@ -199,6 +206,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dnsx"
   },
   {
@@ -224,6 +232,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "failed",
+   "target": null,
    "tool": "gobuster_dns"
   },
   {
@@ -249,6 +258,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "greynoise"
   },
   {
@@ -274,6 +284,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "greynoise"
   },
   {
@@ -299,6 +310,7 @@
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "otx"
   },
   {
@@ -324,6 +336,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "otx"
   },
   {
@@ -349,6 +362,7 @@
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "securitytrails"
   },
   {
@@ -374,6 +388,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "securitytrails"
   },
   {
@@ -399,6 +414,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "shodan"
   },
   {
@@ -424,6 +440,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "shodan"
   },
   {
@@ -449,6 +466,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "subfinder"
   },
   {
@@ -474,6 +492,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "urlhaus"
   },
   {
@@ -499,6 +518,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "urlhaus"
   },
   {
@@ -524,6 +544,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "virustotal"
   },
   {
@@ -549,6 +570,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "virustotal"
   },
   {
@@ -574,6 +596,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "web_probe"
   },
   {
@@ -599,6 +622,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "whois"
   },
   {
@@ -624,6 +648,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "whois"
   },
   {
@@ -649,6 +674,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "nmap"
   },
   {
@@ -674,6 +700,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -699,6 +726,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
+   "target": null,
    "tool": "webtech"
   },
   {
@@ -724,6 +752,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "feroxbuster"
   },
   {
@@ -749,6 +778,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "ffuf_param"
   },
   {
@@ -774,6 +804,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
+   "target": null,
    "tool": "ffuf_sensitive"
   },
   {
@@ -799,6 +830,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "blocked",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -824,6 +856,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -849,6 +882,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
+   "target": null,
    "tool": "testssl"
   },
   {
@@ -874,6 +908,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "wpscan"
   },
   {
@@ -899,6 +934,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
+   "target": null,
    "tool": "zap"
   },
   {
@@ -924,6 +960,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
+   "target": "https://www.lumbeck-wolter.de",
    "tool": "zap_active"
   },
   {
@@ -949,6 +986,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "zap_spider"
   },
   {
@@ -974,6 +1012,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "phase3_correlation"
   }
  ],
@@ -1270,46 +1309,55 @@
     "all_qualifier": "~all",
     "mechanisms": [
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "spf.mailjet.com"
      },
      {
+      "ips": [],
       "kind": "mx",
       "qualifier": "+",
       "value": null
      },
      {
+      "ips": [],
       "kind": "ip4",
       "qualifier": "+",
       "value": "194.36.62.220"
      },
      {
+      "ips": [],
       "kind": "ip4",
       "qualifier": "+",
       "value": "85.22.176.0/24"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "_spf-eu.ionos.com"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "spf.mailout.iprs.de"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "spf.protection.outlook.com"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "spf-de.emailsignatures365.com"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "spf.hornetsecurity.com"
@@ -1353,7 +1401,9 @@
    "mode": "active",
    "name": "lumbeck-wolter.de",
    "observed_at": "2026-09-20T10:47:33Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": null,
@@ -1386,7 +1436,9 @@
    "mode": "active",
    "name": "www.lumbeck-wolter.de",
    "observed_at": "2026-09-20T10:47:33Z",
+   "real_content": true,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": "Schneidwerkzeuge für Fleischwölfe | Lumbeck & Wolter",
    "waf": null,
@@ -1417,6 +1469,7 @@
  },
  "hosts": [
   {
+   "betriebsform": "rechenzentrum",
    "blocked": {
     "detected": true,
     "reason": "web_unreachable_after_portscan",
@@ -1445,6 +1498,7 @@
    "id": "host:116.202.77.64",
    "ip": "116.202.77.64",
    "mode": "active",
+   "nmap_host_report": true,
    "nmap_state": "up",
    "observed_at": "2026-09-20T10:49:44Z",
    "ports_summary": {
@@ -1454,12 +1508,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "hetzner.com",
     "isp": "Hetzner Online GmbH",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -1470,6 +1526,8 @@
     "urlhaus_compromised": null
    },
    "reverse": "dedi5705.your-server.de",
+   "serves_customer_mail": false,
+   "serves_customer_web": true,
    "shared": {
     "evidence": [
      {
@@ -1513,6 +1571,7 @@
  "http": [
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": null,
@@ -1526,6 +1585,16 @@
    ],
    "forms": [],
    "fqdn": "www.lumbeck-wolter.de",
+   "header_eval": {
+    "basis": "unreachable",
+    "complete": false,
+    "evaluated": null,
+    "first": null,
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {},
    "host_ip": "116.202.77.64",
    "hsts": null,
@@ -1613,7 +1682,9 @@
   {
    "banner_excerpt": "SSH-2.0-mod_sftp Key type: ssh-ed25519 Key: AAAAC3NzaC1lZDI1NTE5AAAAIGFu5Fjuml/0rtF1KTmimKw1xoNLSG5hrr7401SzTajO Fingerprint: c0:d6:f0:fd:f1:96:ad:51:24:c9:3...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "ssh_software": "mod_sftp"
+   },
    "domain": null,
    "evidence": [
     {
@@ -1645,7 +1716,9 @@
   {
    "banner_excerpt": "220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.2.110.187 [224.2.110.187] 250-SIZE 104857600 250-8BITMIME 250-ETRN...",
    "confidence": 0.5,
-   "details": {},
+   "details": {
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -1805,7 +1878,9 @@
   {
    "banner_excerpt": "220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.124.255.102 [224.124.255.102] 250-SIZE 104857600 250-8BITMIME 250-...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -1837,7 +1912,9 @@
   {
    "banner_excerpt": "220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.129.54.193 [224.129.54.193] 250-SIZE 104857600 250-8BITMIME 250-ET...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -2030,7 +2107,7 @@
    "banner_excerpt": null,
    "confidence": 0.5,
    "details": {
-    "compromised": false
+    "compromised": null
    },
    "domain": "lumbeck-wolter.de",
    "evidence": [
@@ -2133,19 +2210,26 @@
    }
   ]
  },
- "schema_version": "1.0.7",
+ "schema_version": "1.1.0",
  "services": [
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 43,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2161,6 +2245,7 @@
    "fp_title": null,
    "host_ip": "116.202.77.64",
    "id": "svc:116.202.77.64:21/tcp",
+   "kennung": "ProFTPD",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2171,15 +2256,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ftp",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -2198,6 +2286,7 @@
    "fp_title": null,
    "host_ip": "116.202.77.64",
    "id": "svc:116.202.77.64:22/tcp",
+   "kennung": "ProFTPD mod_sftp",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2208,15 +2297,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ssh",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -2235,6 +2327,7 @@
    "fp_title": "404 Not Found",
    "host_ip": "116.202.77.64",
    "id": "svc:116.202.77.64:80/tcp",
+   "kennung": "Apache httpd",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2245,15 +2338,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [
@@ -2268,11 +2364,17 @@
    ],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 43,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2293,7 +2395,8 @@
    "fp_title": null,
    "host_ip": "116.202.77.64",
    "id": "svc:116.202.77.64:110/tcp",
-   "login_disabled": null,
+   "kennung": "Courier pop3d",
+   "login_disabled": true,
    "method": "probed",
    "mode": "active",
    "nmap_conf": 10,
@@ -2303,42 +2406,44 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "pop3",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": true,
    "state": "open",
-   "tls_required": null,
+   "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [
     "LOGIN-REFERRALS",
-    "LOGINDISABLEDA0001",
+    "LOGINDISABLED",
     "LITERAL+",
-    "post-login",
-    "listed",
-    "OK",
-    "Pre-login",
     "ID",
     "SASL-IR",
     "IMAP4rev1",
-    "more",
     "ENABLE",
     "IDLE",
-    "STARTTLS",
-    "capabilities",
-    "have"
+    "STARTTLS"
    ],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 43,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2359,6 +2464,7 @@
    "fp_title": null,
    "host_ip": "116.202.77.64",
    "id": "svc:116.202.77.64:143/tcp",
+   "kennung": "Dovecot imapd",
    "login_disabled": true,
    "method": "probed",
    "mode": "active",
@@ -2369,15 +2475,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "imap",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -2396,6 +2505,7 @@
    "fp_title": null,
    "host_ip": "116.202.77.64",
    "id": "svc:116.202.77.64:222/tcp",
+   "kennung": "OpenSSH 9.2p1",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2406,25 +2516,34 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ssh",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "9.2p1",
    "version_raw": "9.2p1"
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 43,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2440,6 +2559,7 @@
    "fp_title": "404 Not Found",
    "host_ip": "116.202.77.64",
    "id": "svc:116.202.77.64:443/tcp",
+   "kennung": "Apache httpd",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2450,15 +2570,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "LOGIN",
     "PLAIN"
@@ -2477,11 +2600,17 @@
    ],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 43,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2502,6 +2631,7 @@
    "fp_title": null,
    "host_ip": "116.202.77.64",
    "id": "svc:116.202.77.64:465/tcp",
+   "kennung": null,
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2512,15 +2642,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_vrfy": false,
    "source": "nmap",
    "starttls": false,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": null,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": false,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [
@@ -2536,11 +2669,17 @@
    ],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 43,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2561,6 +2700,7 @@
    "fp_title": null,
    "host_ip": "116.202.77.64",
    "id": "svc:116.202.77.64:587/tcp",
+   "kennung": null,
    "login_disabled": true,
    "method": "probed",
    "mode": "active",
@@ -2571,15 +2711,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_vrfy": false,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": null,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "PLAIN"
    ],
@@ -2587,27 +2730,26 @@
    "capabilities": [
     "LOGIN-REFERRALS",
     "LITERAL+",
-    "have",
-    "post-login",
-    "OK",
-    "Pre-login",
-    "listed",
     "SASL-IR",
     "IMAP4rev1",
-    "more",
     "ENABLE",
     "IDLE",
     "ID",
-    "capabilities",
-    "AUTH=PLAINA0001"
+    "AUTH=PLAIN"
    ],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 43,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 0.3,
    "evidence": [
@@ -2628,6 +2770,7 @@
    "fp_title": null,
    "host_ip": "116.202.77.64",
    "id": "svc:116.202.77.64:993/tcp",
+   "kennung": null,
    "login_disabled": false,
    "method": "table",
    "mode": "active",
@@ -2638,15 +2781,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "imaps",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": false,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": null,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "PLAIN"
    ],
@@ -2663,11 +2809,17 @@
    ],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 43,
+    "expired": false,
+    "fingerprint_sha1": "2409aae2deb39facc2d7a23f8a01627922a0e608",
+    "issuer": "Thawte TLS RSA CA G1",
     "not_after": "2026-11-02T23:59:59Z",
+    "not_before": "2025-10-10T00:00:00Z",
     "san": [
      "*.your-server.de",
      "your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 0.3,
    "evidence": [
@@ -2688,6 +2840,7 @@
    "fp_title": null,
    "host_ip": "116.202.77.64",
    "id": "svc:116.202.77.64:995/tcp",
+   "kennung": null,
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -2698,15 +2851,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "pop3s",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": false,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": null,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "mysql_native_password"
    ],
@@ -2714,11 +2870,17 @@
    "capabilities": [],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 1239,
+    "expired": false,
+    "fingerprint_sha1": "3635167b839556a0221a5cf4ef08c69addb819b8",
+    "issuer": "sql.your-server.de",
     "not_after": "2030-02-10T15:03:07Z",
+    "not_before": "2025-02-11T15:03:07Z",
     "san": [
      "*.your-database.de",
      "*.your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2739,6 +2901,7 @@
    "fp_title": null,
    "host_ip": "116.202.77.64",
    "id": "svc:116.202.77.64:3306/tcp",
+   "kennung": "MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2749,25 +2912,34 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "mysql",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "10.11.18",
    "version_raw": "5.5.5-10.11.18-MariaDB-0+deb12u1"
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "*.your-server.de",
+    "days_left": 1239,
+    "expired": false,
+    "fingerprint_sha1": "24854a14222a35f1839fb4df58b90bfd5e325fda",
+    "issuer": "sql.your-server.de",
     "not_after": "2030-02-10T15:08:59Z",
+    "not_before": "2025-02-11T15:08:59Z",
     "san": [
      "*.your-database.de",
      "*.your-server.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2783,6 +2955,7 @@
    "fp_title": null,
    "host_ip": "116.202.77.64",
    "id": "svc:116.202.77.64:5432/tcp",
+   "kennung": "PostgreSQL DB 9.6.0 or later",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2793,11 +2966,13 @@
    "proto": "tcp",
    "rejects_before_auth": true,
    "service": "postgresql",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": "9.6.0 or later"
   }
@@ -2806,6 +2981,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -2860,6 +3036,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -2904,6 +3081,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -2948,6 +3126,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -2992,6 +3171,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3036,6 +3216,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3080,6 +3261,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3126,6 +3308,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3170,6 +3353,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3215,6 +3399,38 @@
  "targets": [
   {
    "confidence": 1.0,
+   "discovered": [
+    {
+     "fqdn": "autodiscover.lumbeck-wolter.de",
+     "ips": [
+      "40.99.149.168",
+      "52.98.179.136",
+      "52.98.252.88",
+      "2603:1026:c0d:1010::8",
+      "2603:1026:c0d:1023::8",
+      "2603:1026:c0d:1027::8"
+     ],
+     "source": "gobuster_dns",
+     "third_party": "Microsoft 365"
+    },
+    {
+     "fqdn": "eset.lumbeck-wolter.de",
+     "ips": [
+      "85.22.176.108"
+     ],
+     "source": "gobuster_dns",
+     "third_party": null
+    },
+    {
+     "fqdn": "ftp.lumbeck-wolter.de",
+     "ips": [
+      "217.160.231.158"
+     ],
+     "source": "gobuster_dns",
+     "third_party": null
+    }
+   ],
+   "discovered_total": null,
    "discovery_health": {
     "ct_sources_empty": false,
     "discovery_added_count": 5,

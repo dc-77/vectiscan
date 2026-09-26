@@ -24,6 +24,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "certspotter"
   },
   {
@@ -49,6 +50,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "crtsh"
   },
   {
@@ -74,6 +76,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "crtsh"
   },
   {
@@ -99,6 +102,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "failed",
+   "target": null,
    "tool": "crtsh"
   },
   {
@@ -124,6 +128,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dns_records"
   },
   {
@@ -149,6 +154,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dnsx"
   },
   {
@@ -174,6 +180,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "failed",
+   "target": null,
    "tool": "gobuster_dns"
   },
   {
@@ -199,6 +206,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "subfinder"
   },
   {
@@ -224,6 +232,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "web_probe"
   },
   {
@@ -249,6 +258,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "nmap"
   },
   {
@@ -274,6 +284,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "nmap"
   },
   {
@@ -299,6 +310,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "nmap"
   },
   {
@@ -324,6 +336,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -349,6 +362,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -374,6 +388,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -399,6 +414,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -424,6 +440,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -449,6 +466,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -474,6 +492,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -499,6 +518,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -524,6 +544,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -549,6 +570,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -574,6 +596,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -599,6 +622,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "webtech"
   },
   {
@@ -624,6 +648,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "webtech"
   },
   {
@@ -649,6 +674,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "webtech"
   },
   {
@@ -674,6 +700,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -699,6 +726,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -724,6 +752,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -749,6 +778,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -774,6 +804,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -799,6 +830,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -824,6 +856,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -849,6 +882,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -874,6 +908,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -899,6 +934,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -924,6 +960,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -949,6 +986,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -974,6 +1012,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -999,6 +1038,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -1024,6 +1064,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -1049,6 +1090,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -1074,6 +1116,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -1099,6 +1142,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -1124,6 +1168,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -1149,6 +1194,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -1174,6 +1220,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "phase3_correlation"
   }
  ],
@@ -1920,16 +1967,21 @@
     "all_qualifier": "-all",
     "mechanisms": [
      {
+      "ips": [
+       "37.114.55.171"
+      ],
       "kind": "mx",
       "qualifier": "+",
       "value": null
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "mx.krause-computer.de"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "w020687e.kasserver.com"
@@ -1973,7 +2025,9 @@
    "mode": "active",
    "name": "filebrowser.krause-computer.de",
    "observed_at": "2026-05-26T12:25:23Z",
+   "real_content": true,
    "screenshot_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__filebrowser.krause-computer.de.png",
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -2006,7 +2060,9 @@
    "mode": "active",
    "name": "jitsi.krause-computer.de",
    "observed_at": "2026-05-26T12:25:23Z",
+   "real_content": true,
    "screenshot_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__jitsi.krause-computer.de.png",
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -2037,7 +2093,9 @@
    "mode": "active",
    "name": "krause-computer.de",
    "observed_at": "2026-05-26T12:25:23Z",
+   "real_content": true,
    "screenshot_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/85.13.167.158__krause-computer.de.png",
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -2068,7 +2126,9 @@
    "mode": "active",
    "name": "mx.krause-computer.de",
    "observed_at": "2026-05-26T12:25:23Z",
+   "real_content": true,
    "screenshot_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__mx.krause-computer.de.png",
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -2101,7 +2161,9 @@
    "mode": "active",
    "name": "navidrome.krause-computer.de",
    "observed_at": "2026-05-26T12:25:23Z",
+   "real_content": true,
    "screenshot_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__navidrome.krause-computer.de.png",
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -2134,7 +2196,9 @@
    "mode": "active",
    "name": "nextcloud.krause-computer.de",
    "observed_at": "2026-05-26T12:25:23Z",
+   "real_content": true,
    "screenshot_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__nextcloud.krause-computer.de.png",
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -2165,7 +2229,9 @@
    "mode": "active",
    "name": "nospamproxy.krause-computer.de",
    "observed_at": "2026-05-26T12:25:23Z",
+   "real_content": true,
    "screenshot_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__nospamproxy.krause-computer.de.png",
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -2198,7 +2264,9 @@
    "mode": "active",
    "name": "rustdesk.krause-computer.de",
    "observed_at": "2026-05-26T12:25:23Z",
+   "real_content": true,
    "screenshot_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__rustdesk.krause-computer.de.png",
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -2231,7 +2299,9 @@
    "mode": "active",
    "name": "transmission.krause-computer.de",
    "observed_at": "2026-05-26T12:25:23Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": null,
@@ -2258,7 +2328,9 @@
    "mode": "active",
    "name": "www.krause-computer.de",
    "observed_at": "2026-05-26T12:25:23Z",
+   "real_content": true,
    "screenshot_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/85.13.167.158__www.krause-computer.de.png",
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -2291,7 +2363,9 @@
    "mode": "active",
    "name": "youtube.krause-computer.de",
    "observed_at": "2026-05-26T12:25:23Z",
+   "real_content": true,
    "screenshot_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__youtube.krause-computer.de.png",
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -2326,6 +2400,7 @@
  },
  "hosts": [
   {
+   "betriebsform": "rechenzentrum",
    "blocked": {
     "detected": false,
     "reason": null,
@@ -2356,6 +2431,7 @@
    "id": "host:37.114.55.171",
    "ip": "37.114.55.171",
    "mode": "active",
+   "nmap_host_report": true,
    "nmap_state": "up",
    "observed_at": "2026-05-26T12:26:47Z",
    "ports_summary": {
@@ -2365,12 +2441,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "prohosting24.de",
     "isp": "intercolo GmbH",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -2381,11 +2459,14 @@
     "urlhaus_compromised": null
    },
    "reverse": "mx.krause-computer.de",
+   "serves_customer_mail": true,
+   "serves_customer_web": true,
    "shared": null,
    "source": "nmap",
    "third_party": null
   },
   {
+   "betriebsform": "rechenzentrum",
    "blocked": {
     "detected": false,
     "reason": null,
@@ -2414,6 +2495,7 @@
    "id": "host:85.13.167.158",
    "ip": "85.13.167.158",
    "mode": "active",
+   "nmap_host_report": true,
    "nmap_state": "up",
    "observed_at": "2026-05-26T12:27:49Z",
    "ports_summary": {
@@ -2423,12 +2505,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "all-inkl.com",
     "isp": "Neue Medien Muennich GmbH",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -2439,11 +2523,14 @@
     "urlhaus_compromised": null
    },
    "reverse": "dd55420.kasserver.com",
+   "serves_customer_mail": false,
+   "serves_customer_web": true,
    "shared": null,
    "source": "nmap",
    "third_party": null
   },
   {
+   "betriebsform": "plattform",
    "blocked": {
     "detected": false,
     "reason": null,
@@ -2475,6 +2562,7 @@
    "id": "host:87.79.190.79",
    "ip": "87.79.190.79",
    "mode": "active",
+   "nmap_host_report": true,
    "nmap_state": "up",
    "observed_at": "2026-05-26T12:26:45Z",
    "ports_summary": {
@@ -2484,12 +2572,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "netcologne.de",
     "isp": "NetCologne Gesellschaft fur Telekommunikation mbH",
     "usage_type": "Fixed Line ISP"
    },
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -2500,6 +2590,8 @@
     "urlhaus_compromised": null
    },
    "reverse": "xdsl-87-79-190-79.nc.de",
+   "serves_customer_mail": false,
+   "serves_customer_web": true,
    "shared": {
     "evidence": [
      {
@@ -2522,13 +2614,14 @@
  "http": [
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": null,
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "filebrowser.krause-computer.de: score=1/7 server=nginx",
+     "excerpt": "filebrowser.krause-computer.de: status=200 score=1/7 server=nginx",
      "ref": "scan_results:header_check:87.79.190.79",
      "tool": "header_check"
     },
@@ -2540,6 +2633,24 @@
    ],
    "forms": [],
    "fqdn": "filebrowser.krause-computer.de",
+   "header_eval": {
+    "basis": "non_html",
+    "complete": false,
+    "evaluated": null,
+    "first": {
+     "challenge": null,
+     "content_type": "text/plain; charset=utf-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://filebrowser.krause-computer.de"
+    },
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {
     "cache-control": "no-cache, no-store, must-revalidate",
     "connection": "keep-alive",
@@ -2559,36 +2670,7 @@
    "powered_by": null,
    "reachable": true,
    "score": "1/7",
-   "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
-    "permissions-policy": {
-     "present": false,
-     "value": null
-    },
-    "referrer-policy": {
-     "present": false,
-     "value": null
-    },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
-    "x-content-type-options": {
-     "present": true,
-     "value": "nosniff"
-    },
-    "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
-    }
-   },
+   "security_headers": {},
    "server_header": "nginx",
    "source": "header_check",
    "spider_url_count": null,
@@ -2605,13 +2687,27 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
-   "csp": null,
+   "csp": {
+    "directives": {},
+    "frame_ancestors": null,
+    "nonce_or_hash": null,
+    "present": false,
+    "script_unsafe_eval": null,
+    "script_unsafe_inline": null,
+    "style_unsafe_inline": null,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null,
+    "wildcard_directives": []
+   },
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "jitsi.krause-computer.de: score=1/7 server=nginx",
+     "excerpt": "jitsi.krause-computer.de: status=200 score=1/7 server=nginx",
      "ref": "scan_results:header_check:37.114.55.171",
      "tool": "header_check"
     },
@@ -2623,6 +2719,69 @@
    ],
    "forms": [],
    "fqdn": "jitsi.krause-computer.de",
+   "header_eval": {
+    "basis": "final",
+    "complete": true,
+    "evaluated": {
+     "challenge": null,
+     "content_type": "text/html",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://jitsi.krause-computer.de"
+    },
+    "first": {
+     "challenge": null,
+     "content_type": "text/html",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://jitsi.krause-computer.de"
+    },
+    "framing_protected": false,
+    "headers": {
+     "content-security-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://jitsi.krause-computer.de",
+      "value": null
+     },
+     "permissions-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://jitsi.krause-computer.de",
+      "value": null
+     },
+     "referrer-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://jitsi.krause-computer.de",
+      "value": null
+     },
+     "x-content-type-options": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://jitsi.krause-computer.de",
+      "value": null
+     },
+     "x-frame-options": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://jitsi.krause-computer.de",
+      "value": null
+     }
+    },
+    "missing": [
+     "x-frame-options",
+     "x-content-type-options",
+     "referrer-policy",
+     "permissions-policy",
+     "content-security-policy"
+    ],
+    "unknown": []
+   },
    "headers": {
     "content-type": "text/html",
     "date": "Tue, 26 May 2026 12:36:39 GMT",
@@ -2647,10 +2806,6 @@
    "reachable": true,
    "score": "1/7",
    "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
     "permissions-policy": {
      "present": false,
      "value": null
@@ -2659,19 +2814,11 @@
      "present": false,
      "value": null
     },
-    "strict-transport-security": {
-     "present": true,
-     "value": "max-age=63072000"
-    },
     "x-content-type-options": {
      "present": false,
      "value": null
     },
     "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
      "present": false,
      "value": null
     }
@@ -2700,6 +2847,7 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [
     {
@@ -2709,11 +2857,24 @@
      "secure": true
     }
    ],
-   "csp": null,
+   "csp": {
+    "directives": {},
+    "frame_ancestors": null,
+    "nonce_or_hash": null,
+    "present": false,
+    "script_unsafe_eval": null,
+    "script_unsafe_inline": null,
+    "style_unsafe_inline": null,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null,
+    "wildcard_directives": []
+   },
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "krause-computer.de: score=4/7 server=Apache",
+     "excerpt": "krause-computer.de: status=200 score=4/7 server=Apache",
      "ref": "scan_results:header_check:85.13.167.158",
      "tool": "header_check"
     },
@@ -2725,6 +2886,66 @@
    ],
    "forms": [],
    "fqdn": "krause-computer.de",
+   "header_eval": {
+    "basis": "final",
+    "complete": true,
+    "evaluated": {
+     "challenge": null,
+     "content_type": "text/html; charset=utf-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://krause-computer.de"
+    },
+    "first": {
+     "challenge": null,
+     "content_type": "text/html; charset=utf-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://krause-computer.de"
+    },
+    "framing_protected": true,
+    "headers": {
+     "content-security-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://krause-computer.de",
+      "value": null
+     },
+     "permissions-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://krause-computer.de",
+      "value": null
+     },
+     "referrer-policy": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://krause-computer.de",
+      "value": "strict-origin-when-cross-origin"
+     },
+     "x-content-type-options": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://krause-computer.de",
+      "value": "nosniff"
+     },
+     "x-frame-options": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://krause-computer.de",
+      "value": "SAMEORIGIN"
+     }
+    },
+    "missing": [
+     "permissions-policy",
+     "content-security-policy"
+    ],
+    "unknown": []
+   },
    "headers": {
     "cache-control": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
     "content-type": "text/html; charset=utf-8",
@@ -2758,10 +2979,6 @@
    "reachable": true,
    "score": "4/7",
    "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
     "permissions-policy": {
      "present": false,
      "value": null
@@ -2770,10 +2987,6 @@
      "present": true,
      "value": "strict-origin-when-cross-origin"
     },
-    "strict-transport-security": {
-     "present": true,
-     "value": "max-age=600000"
-    },
     "x-content-type-options": {
      "present": true,
      "value": "nosniff"
@@ -2781,10 +2994,6 @@
     "x-frame-options": {
      "present": true,
      "value": "SAMEORIGIN"
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
     }
    },
    "server_header": "Apache",
@@ -2815,6 +3024,7 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": null,
@@ -2833,6 +3043,16 @@
    ],
    "forms": [],
    "fqdn": "mx.krause-computer.de",
+   "header_eval": {
+    "basis": "unreachable",
+    "complete": false,
+    "evaluated": null,
+    "first": null,
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {},
    "host_ip": "37.114.55.171",
    "hsts": null,
@@ -2844,36 +3064,7 @@
    "powered_by": null,
    "reachable": true,
    "score": "0/7",
-   "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
-    "permissions-policy": {
-     "present": false,
-     "value": null
-    },
-    "referrer-policy": {
-     "present": false,
-     "value": null
-    },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
-    "x-content-type-options": {
-     "present": false,
-     "value": null
-    },
-    "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
-    }
-   },
+   "security_headers": {},
    "server_header": null,
    "source": "header_check",
    "spider_url_count": null,
@@ -2898,13 +3089,14 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": null,
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "navidrome.krause-computer.de: score=0/7 server=nginx",
+     "excerpt": "navidrome.krause-computer.de: status=302 score=0/7 server=nginx",
      "ref": "scan_results:header_check:87.79.190.79",
      "tool": "header_check"
     },
@@ -2916,6 +3108,24 @@
    ],
    "forms": [],
    "fqdn": "navidrome.krause-computer.de",
+   "header_eval": {
+    "basis": "redirect",
+    "complete": false,
+    "evaluated": null,
+    "first": {
+     "challenge": null,
+     "content_type": null,
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 302,
+     "tool": "header_check",
+     "url": "https://navidrome.krause-computer.de"
+    },
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {
     "allow": "GET",
     "connection": "keep-alive",
@@ -2932,36 +3142,7 @@
    "powered_by": null,
    "reachable": true,
    "score": "0/7",
-   "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
-    "permissions-policy": {
-     "present": false,
-     "value": null
-    },
-    "referrer-policy": {
-     "present": false,
-     "value": null
-    },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
-    "x-content-type-options": {
-     "present": false,
-     "value": null
-    },
-    "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
-    }
-   },
+   "security_headers": {},
    "server_header": "nginx",
    "source": "header_check",
    "spider_url_count": null,
@@ -2978,6 +3159,7 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [
     {
@@ -2987,17 +3169,11 @@
      "secure": true
     }
    ],
-   "csp": {
-    "present": true,
-    "unsafe_eval": false,
-    "unsafe_inline": true,
-    "value": "default-src 'self'; script-src 'self' 'nonce-4/PkloggYHvRSAzt+2IB9Os6vo1pNJ6SDq9y3W8LwkQ='; style-src 'self' 'unsafe-inline'; frame-src *; img-src * data: blob:; font-src 'self' data:; media-src *; connect-src *; object-src 'none'; base-uri 'self';",
-    "wildcard": true
-   },
+   "csp": null,
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "nextcloud.krause-computer.de: score=7/7 server=nginx",
+     "excerpt": "nextcloud.krause-computer.de: status=302 location=https://nextcloud.krause-computer.de/login score=7/7 server=nginx",
      "ref": "scan_results:header_check:87.79.190.79",
      "tool": "header_check"
     },
@@ -3009,6 +3185,24 @@
    ],
    "forms": [],
    "fqdn": "nextcloud.krause-computer.de",
+   "header_eval": {
+    "basis": "redirect",
+    "complete": false,
+    "evaluated": null,
+    "first": {
+     "challenge": null,
+     "content_type": "text/html; charset=UTF-8",
+     "location": "https://nextcloud.krause-computer.de/login",
+     "status_basis": "httpx_chain",
+     "status_code": 302,
+     "tool": "header_check",
+     "url": "https://nextcloud.krause-computer.de"
+    },
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {
     "connection": "keep-alive",
     "content-security-policy": "default-src 'self'; script-src 'self' 'nonce-4/PkloggYHvRSAzt+2IB9Os6vo1pNJ6SDq9y3W8LwkQ='; style-src 'self' 'unsafe-inline'; frame-src *; img-src * data: blob:; font-src 'self' data:; media-src *; connect-src *; object-src 'none'; base-uri 'self';",
@@ -3043,36 +3237,7 @@
    "powered_by": null,
    "reachable": true,
    "score": "7/7",
-   "security_headers": {
-    "content-security-policy": {
-     "present": true,
-     "value": "default-src 'self'; script-src 'self' 'nonce-4/PkloggYHvRSAzt+2IB9Os6vo1pNJ6SDq9y3W8LwkQ='; style-src 'self' 'unsafe-inline'; frame-src *; img-src * data: blob:; font-src 'self' data:; media-src *; connect-src *; object-src 'none'; base-uri 'self';"
-    },
-    "permissions-policy": {
-     "present": true,
-     "value": "interest-cohort=()"
-    },
-    "referrer-policy": {
-     "present": true,
-     "value": "no-referrer"
-    },
-    "strict-transport-security": {
-     "present": true,
-     "value": "max-age=63072000; includeSubdomains; preload;"
-    },
-    "x-content-type-options": {
-     "present": true,
-     "value": "nosniff"
-    },
-    "x-frame-options": {
-     "present": true,
-     "value": "SAMEORIGIN"
-    },
-    "x-xss-protection": {
-     "present": true,
-     "value": "1; mode=block"
-    }
-   },
+   "security_headers": {},
    "server_header": "nginx",
    "source": "header_check",
    "spider_url_count": null,
@@ -3101,6 +3266,7 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": null,
@@ -3119,6 +3285,16 @@
    ],
    "forms": [],
    "fqdn": "nospamproxy.krause-computer.de",
+   "header_eval": {
+    "basis": "unreachable",
+    "complete": false,
+    "evaluated": null,
+    "first": null,
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {},
    "host_ip": "37.114.55.171",
    "hsts": null,
@@ -3130,36 +3306,7 @@
    "powered_by": null,
    "reachable": true,
    "score": "0/7",
-   "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
-    "permissions-policy": {
-     "present": false,
-     "value": null
-    },
-    "referrer-policy": {
-     "present": false,
-     "value": null
-    },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
-    "x-content-type-options": {
-     "present": false,
-     "value": null
-    },
-    "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
-    }
-   },
+   "security_headers": {},
    "server_header": null,
    "source": "header_check",
    "spider_url_count": null,
@@ -3184,6 +3331,7 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": null,
@@ -3202,6 +3350,16 @@
    ],
    "forms": [],
    "fqdn": "rustdesk.krause-computer.de",
+   "header_eval": {
+    "basis": "unreachable",
+    "complete": false,
+    "evaluated": null,
+    "first": null,
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {},
    "host_ip": "37.114.55.171",
    "hsts": null,
@@ -3213,36 +3371,7 @@
    "powered_by": null,
    "reachable": true,
    "score": "0/7",
-   "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
-    "permissions-policy": {
-     "present": false,
-     "value": null
-    },
-    "referrer-policy": {
-     "present": false,
-     "value": null
-    },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
-    "x-content-type-options": {
-     "present": false,
-     "value": null
-    },
-    "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
-    }
-   },
+   "security_headers": {},
    "server_header": null,
    "source": "header_check",
    "spider_url_count": null,
@@ -3267,6 +3396,7 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [
     {
@@ -3276,11 +3406,24 @@
      "secure": true
     }
    ],
-   "csp": null,
+   "csp": {
+    "directives": {},
+    "frame_ancestors": null,
+    "nonce_or_hash": null,
+    "present": false,
+    "script_unsafe_eval": null,
+    "script_unsafe_inline": null,
+    "style_unsafe_inline": null,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null,
+    "wildcard_directives": []
+   },
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "www.krause-computer.de: score=4/7 server=Apache",
+     "excerpt": "www.krause-computer.de: status=200 score=4/7 server=Apache",
      "ref": "scan_results:header_check:85.13.167.158",
      "tool": "header_check"
     },
@@ -3292,6 +3435,66 @@
    ],
    "forms": [],
    "fqdn": "www.krause-computer.de",
+   "header_eval": {
+    "basis": "final",
+    "complete": true,
+    "evaluated": {
+     "challenge": null,
+     "content_type": "text/html; charset=utf-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://www.krause-computer.de"
+    },
+    "first": {
+     "challenge": null,
+     "content_type": "text/html; charset=utf-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://www.krause-computer.de"
+    },
+    "framing_protected": true,
+    "headers": {
+     "content-security-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://www.krause-computer.de",
+      "value": null
+     },
+     "permissions-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://www.krause-computer.de",
+      "value": null
+     },
+     "referrer-policy": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://www.krause-computer.de",
+      "value": "strict-origin-when-cross-origin"
+     },
+     "x-content-type-options": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://www.krause-computer.de",
+      "value": "nosniff"
+     },
+     "x-frame-options": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://www.krause-computer.de",
+      "value": "SAMEORIGIN"
+     }
+    },
+    "missing": [
+     "permissions-policy",
+     "content-security-policy"
+    ],
+    "unknown": []
+   },
    "headers": {
     "cache-control": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
     "content-type": "text/html; charset=utf-8",
@@ -3325,10 +3528,6 @@
    "reachable": true,
    "score": "4/7",
    "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
     "permissions-policy": {
      "present": false,
      "value": null
@@ -3337,10 +3536,6 @@
      "present": true,
      "value": "strict-origin-when-cross-origin"
     },
-    "strict-transport-security": {
-     "present": true,
-     "value": "max-age=600000"
-    },
     "x-content-type-options": {
      "present": true,
      "value": "nosniff"
@@ -3348,10 +3543,6 @@
     "x-frame-options": {
      "present": true,
      "value": "SAMEORIGIN"
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
     }
    },
    "server_header": "Apache",
@@ -3382,13 +3573,27 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
-   "csp": null,
+   "csp": {
+    "directives": {},
+    "frame_ancestors": null,
+    "nonce_or_hash": null,
+    "present": false,
+    "script_unsafe_eval": null,
+    "script_unsafe_inline": null,
+    "style_unsafe_inline": null,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null,
+    "wildcard_directives": []
+   },
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "youtube.krause-computer.de: score=0/7 server=nginx",
+     "excerpt": "youtube.krause-computer.de: status=200 score=0/7 server=nginx",
      "ref": "scan_results:header_check:87.79.190.79",
      "tool": "header_check"
     },
@@ -3400,6 +3605,69 @@
    ],
    "forms": [],
    "fqdn": "youtube.krause-computer.de",
+   "header_eval": {
+    "basis": "final",
+    "complete": true,
+    "evaluated": {
+     "challenge": null,
+     "content_type": "text/html; charset=utf-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://youtube.krause-computer.de"
+    },
+    "first": {
+     "challenge": null,
+     "content_type": "text/html; charset=utf-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://youtube.krause-computer.de"
+    },
+    "framing_protected": false,
+    "headers": {
+     "content-security-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://youtube.krause-computer.de",
+      "value": null
+     },
+     "permissions-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://youtube.krause-computer.de",
+      "value": null
+     },
+     "referrer-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://youtube.krause-computer.de",
+      "value": null
+     },
+     "x-content-type-options": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://youtube.krause-computer.de",
+      "value": null
+     },
+     "x-frame-options": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://youtube.krause-computer.de",
+      "value": null
+     }
+    },
+    "missing": [
+     "x-frame-options",
+     "x-content-type-options",
+     "referrer-policy",
+     "permissions-policy",
+     "content-security-policy"
+    ],
+    "unknown": []
+   },
    "headers": {
     "accept-ranges": "bytes",
     "connection": "keep-alive",
@@ -3420,10 +3688,6 @@
    "reachable": true,
    "score": "0/7",
    "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
     "permissions-policy": {
      "present": false,
      "value": null
@@ -3432,19 +3696,11 @@
      "present": false,
      "value": null
     },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
     "x-content-type-options": {
      "present": false,
      "value": null
     },
     "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
      "present": false,
      "value": null
     }
@@ -3497,7 +3753,9 @@
   {
    "banner_excerpt": "SSH-2.0-OpenSSH_10.0p2 Debian-7+deb13u2 Key type: ecdsa-sha2-nistp256 Key: AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBISzk6SJWphj+iHbrPHYQTpk tR+Q5...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "ssh_software": "OpenSSH_10.0p2 Debian-7+deb13u2"
+   },
    "domain": null,
    "evidence": [
     {
@@ -3527,7 +3785,10 @@
   {
    "banner_excerpt": "220-mx.krause-computer.de ESMTP Proxmox 250-mx.krause-computer.de 250-SIZE 104857600 250-VRFY 250-ETRN 250-STARTTLS 250-ENHANCEDSTATUSCODES 250-8BITMIME 250-...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "smtp_auth_before_starttls": false,
+    "smtp_vrfy": true
+   },
    "domain": null,
    "evidence": [
     {
@@ -3737,7 +3998,9 @@
   {
    "banner_excerpt": "SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.16 Key type: ecdsa-sha2-nistp256 Key: AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBIIlzdS0Qw37XB/wq0hjzv4A P6m...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "ssh_software": "OpenSSH_9.6p1 Ubuntu-3ubuntu13.16"
+   },
    "domain": null,
    "evidence": [
     {
@@ -3767,7 +4030,10 @@
   {
    "banner_excerpt": "220 dd55420.kasserver.com ESMTP 250-dd55420.kasserver.com 250-PIPELINING 250-SIZE 153600000 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN 250-AUTH=PLAIN LOGIN 2...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "smtp_auth_before_starttls": true,
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -3887,7 +4153,9 @@
   {
    "banner_excerpt": "220 dd55420.kasserver.com ESMTP 250-dd55420.kasserver.com 250-PIPELINING 250-SIZE 153600000 250-ETRN 250-AUTH PLAIN LOGIN 250-AUTH=PLAIN LOGIN 250-ENHANCEDST...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -3917,7 +4185,10 @@
   {
    "banner_excerpt": "220 dd55420.kasserver.com ESMTP 250-dd55420.kasserver.com 250-PIPELINING 250-SIZE 153600000 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN 250-AUTH=PLAIN LOGIN 2...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "smtp_auth_before_starttls": true,
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -4117,9 +4388,10 @@
    }
   ]
  },
- "schema_version": "1.0.7",
+ "schema_version": "1.1.0",
  "services": [
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4138,6 +4410,7 @@
    "fp_title": null,
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:22/tcp",
+   "kennung": "OpenSSH 10.0p2 Debian 7+deb13u4",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4148,15 +4421,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ssh",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "10.0p2",
    "version_raw": "10.0p2 Debian 7+deb13u4"
   },
   {
+   "auth_before_starttls": false,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [
@@ -4173,8 +4449,14 @@
    ],
    "cert": {
     "cn": "*.krause-computer.de",
+    "days_left": 3475,
+    "expired": false,
+    "fingerprint_sha1": "916325c1783cf8d88f0327346b2268bbdf758edf",
+    "issuer": "*.krause-computer.de",
     "not_after": "2035-12-01T05:05:10Z",
-    "san": []
+    "not_before": "2025-12-03T05:05:10Z",
+    "san": [],
+    "self_signed": true
    },
    "confidence": 1.0,
    "evidence": [
@@ -4195,6 +4477,7 @@
    "fp_title": null,
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:25/tcp",
+   "kennung": "Postfix smtpd",
    "login_disabled": true,
    "method": "probed",
    "mode": "active",
@@ -4205,15 +4488,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_vrfy": true,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": false,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [
@@ -4231,8 +4517,14 @@
    ],
    "cert": {
     "cn": "*.krause-computer.de",
+    "days_left": 3475,
+    "expired": false,
+    "fingerprint_sha1": "916325c1783cf8d88f0327346b2268bbdf758edf",
+    "issuer": "*.krause-computer.de",
     "not_after": "2035-12-01T05:05:10Z",
-    "san": []
+    "not_before": "2025-12-03T05:05:10Z",
+    "san": [],
+    "self_signed": true
    },
    "confidence": 1.0,
    "evidence": [
@@ -4253,6 +4545,7 @@
    "fp_title": null,
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:26/tcp",
+   "kennung": null,
    "login_disabled": true,
    "method": "probed",
    "mode": "active",
@@ -4263,15 +4556,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_vrfy": true,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": null,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4290,6 +4586,7 @@
    "fp_title": "Welcome to nginx!",
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:80/tcp",
+   "kennung": "nginx, Titel „Welcome to nginx!“",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4300,15 +4597,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4327,6 +4627,7 @@
    "fp_title": null,
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:111/tcp",
+   "kennung": null,
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4337,24 +4638,33 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "rpcbind",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": null,
    "version_norm": null,
    "version_raw": "2-4"
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "jitsi.krause-computer.de",
+    "days_left": 77,
+    "expired": false,
+    "fingerprint_sha1": "ea68eeaf2be0e4cc13b049582e49addc669098e9",
+    "issuer": "E8",
     "not_after": "2026-08-11T12:53:40Z",
+    "not_before": "2026-05-13T12:53:41Z",
     "san": [
      "jitsi.krause-computer.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -4370,6 +4680,7 @@
    "fp_title": "Jitsi Meet",
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:443/tcp",
+   "kennung": "nginx, Titel „Jitsi Meet“",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4380,15 +4691,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4407,6 +4721,7 @@
    "fp_title": null,
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:987/tcp",
+   "kennung": "OpenSSH 10.0p2 Debian 7+deb13u2",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4417,15 +4732,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ssh",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "10.0p2",
    "version_raw": "10.0p2 Debian 7+deb13u2"
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4444,6 +4762,7 @@
    "fp_title": null,
    "host_ip": "37.114.55.171",
    "id": "svc:37.114.55.171:3128/tcp",
+   "kennung": "Proxmox Virtual Environment REST API 3.0",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4454,25 +4773,34 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "3.0",
    "version_raw": "3.0"
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "*.kasserver.com",
+    "days_left": 223,
+    "expired": false,
+    "fingerprint_sha1": "20b933213a2fa939b9d8ca1aac07b319715cb2ac",
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
     "not_after": "2027-01-04T23:59:59Z",
+    "not_before": "2025-12-04T00:00:00Z",
     "san": [
      "*.kasserver.com",
      "kasserver.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -4488,6 +4816,7 @@
    "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:21/tcp",
+   "kennung": "Nagios NSCA",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4498,15 +4827,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "nagios-nsca",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4525,6 +4857,7 @@
    "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:22/tcp",
+   "kennung": "OpenSSH 9.6p1 Ubuntu 3ubuntu13.16",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4535,15 +4868,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ssh",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "9.6p1",
    "version_raw": "9.6p1 Ubuntu 3ubuntu13.16"
   },
   {
+   "auth_before_starttls": true,
    "auth_mechanisms": [
     "LOGIN",
     "PLAIN"
@@ -4564,11 +4900,17 @@
    ],
    "cert": {
     "cn": "*.kasserver.com",
+    "days_left": 223,
+    "expired": false,
+    "fingerprint_sha1": "20b933213a2fa939b9d8ca1aac07b319715cb2ac",
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
     "not_after": "2027-01-04T23:59:59Z",
+    "not_before": "2025-12-04T00:00:00Z",
     "san": [
      "*.kasserver.com",
      "kasserver.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -4589,6 +4931,7 @@
    "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:25/tcp",
+   "kennung": "Postfix smtpd",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4599,15 +4942,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_vrfy": false,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4626,6 +4972,7 @@
    "fp_title": "503 Service Temporarily Unavailable",
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:80/tcp",
+   "kennung": "Apache httpd",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4636,36 +4983,47 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
-   "auth_mechanisms": [],
-   "auth_required": null,
+   "auth_before_starttls": null,
+   "auth_mechanisms": [
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
    "capabilities": [
     "USER",
     "PIPELINING",
     "UIDL",
     "STLS",
     "TOP",
-    "SASL(PLAIN",
-    "LOGIN)",
+    "SASL(PLAIN,LOGIN)",
     "RESP-CODES",
     "AUTH-RESP-CODE",
     "CAPA"
    ],
    "cert": {
     "cn": "*.kasserver.com",
+    "days_left": 223,
+    "expired": false,
+    "fingerprint_sha1": "20b933213a2fa939b9d8ca1aac07b319715cb2ac",
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
     "not_after": "2027-01-04T23:59:59Z",
+    "not_before": "2025-12-04T00:00:00Z",
     "san": [
      "*.kasserver.com",
      "kasserver.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -4686,6 +5044,7 @@
    "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:110/tcp",
+   "kennung": "Dovecot pop3d",
    "login_disabled": false,
    "method": "probed",
    "mode": "active",
@@ -4696,15 +5055,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "pop3",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": false,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4723,6 +5085,7 @@
    "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:139/tcp",
+   "kennung": "Samba smbd 4.6.2",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4733,47 +5096,49 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "netbios-ssn",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "4.6.2",
    "version_raw": "4.6.2"
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "LOGIN",
     "PLAIN"
    ],
    "auth_required": true,
    "capabilities": [
-    "AUTH=LOGINA0001",
-    "capabilities",
+    "AUTH=LOGIN",
     "STARTTLS",
     "ID",
     "IMAP4rev1",
     "AUTH=PLAIN",
-    "post-login",
-    "OK",
     "ENABLE",
     "XLIST",
     "LOGIN-REFERRALS",
-    "more",
     "IDLE",
-    "have",
-    "listed",
     "LITERAL+",
-    "Pre-login",
     "SASL-IR"
    ],
    "cert": {
     "cn": "*.kasserver.com",
+    "days_left": 223,
+    "expired": false,
+    "fingerprint_sha1": "20b933213a2fa939b9d8ca1aac07b319715cb2ac",
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
     "not_after": "2027-01-04T23:59:59Z",
+    "not_before": "2025-12-04T00:00:00Z",
     "san": [
      "*.kasserver.com",
      "kasserver.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -4794,6 +5159,7 @@
    "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:143/tcp",
+   "kennung": "Dovecot imapd",
    "login_disabled": false,
    "method": "probed",
    "mode": "active",
@@ -4804,25 +5170,34 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "imap",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": false,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "*.kasserver.com",
+    "days_left": 223,
+    "expired": false,
+    "fingerprint_sha1": "20b933213a2fa939b9d8ca1aac07b319715cb2ac",
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
     "not_after": "2027-01-04T23:59:59Z",
+    "not_before": "2025-12-04T00:00:00Z",
     "san": [
      "*.kasserver.com",
      "kasserver.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -4838,6 +5213,7 @@
    "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:443/tcp",
+   "kennung": "Apache httpd",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4848,15 +5224,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -4875,6 +5254,7 @@
    "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:445/tcp",
+   "kennung": "Samba smbd 4.6.2",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4885,15 +5265,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "netbios-ssn",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "4.6.2",
    "version_raw": "4.6.2"
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "LOGIN",
     "PLAIN"
@@ -4913,11 +5296,17 @@
    ],
    "cert": {
     "cn": "*.kasserver.com",
+    "days_left": 223,
+    "expired": false,
+    "fingerprint_sha1": "20b933213a2fa939b9d8ca1aac07b319715cb2ac",
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
     "not_after": "2027-01-04T23:59:59Z",
+    "not_before": "2025-12-04T00:00:00Z",
     "san": [
      "*.kasserver.com",
      "kasserver.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -4938,6 +5327,7 @@
    "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:465/tcp",
+   "kennung": "Postfix smtpd",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4948,15 +5338,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_vrfy": false,
    "source": "nmap",
    "starttls": false,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": true,
    "auth_mechanisms": [
     "LOGIN",
     "PLAIN"
@@ -4977,11 +5370,17 @@
    ],
    "cert": {
     "cn": "*.kasserver.com",
+    "days_left": 223,
+    "expired": false,
+    "fingerprint_sha1": "20b933213a2fa939b9d8ca1aac07b319715cb2ac",
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
     "not_after": "2027-01-04T23:59:59Z",
+    "not_before": "2025-12-04T00:00:00Z",
     "san": [
      "*.kasserver.com",
      "kasserver.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -5002,6 +5401,7 @@
    "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:587/tcp",
+   "kennung": "Postfix smtpd",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -5012,46 +5412,48 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_vrfy": false,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "LOGIN",
     "PLAIN"
    ],
    "auth_required": true,
    "capabilities": [
-    "AUTH=LOGINA0001",
-    "capabilities",
+    "AUTH=LOGIN",
     "IDLE",
     "ID",
     "IMAP4rev1",
     "AUTH=PLAIN",
-    "post-login",
-    "OK",
     "ENABLE",
     "XLIST",
     "LOGIN-REFERRALS",
-    "more",
-    "have",
-    "listed",
     "LITERAL+",
-    "Pre-login",
     "SASL-IR"
    ],
    "cert": {
     "cn": "*.kasserver.com",
+    "days_left": 223,
+    "expired": false,
+    "fingerprint_sha1": "20b933213a2fa939b9d8ca1aac07b319715cb2ac",
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
     "not_after": "2027-01-04T23:59:59Z",
+    "not_before": "2025-12-04T00:00:00Z",
     "san": [
      "*.kasserver.com",
      "kasserver.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 0.3,
    "evidence": [
@@ -5072,6 +5474,7 @@
    "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:993/tcp",
+   "kennung": null,
    "login_disabled": false,
    "method": "table",
    "mode": "active",
@@ -5082,20 +5485,25 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "imaps",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": false,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": null,
    "version_norm": null,
    "version_raw": null
   },
   {
-   "auth_mechanisms": [],
-   "auth_required": null,
+   "auth_before_starttls": null,
+   "auth_mechanisms": [
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
    "capabilities": [
-    "SASL(PLAIN",
-    "LOGIN)",
+    "SASL(PLAIN,LOGIN)",
     "TOP",
     "USER",
     "PIPELINING",
@@ -5106,11 +5514,17 @@
    ],
    "cert": {
     "cn": "*.kasserver.com",
+    "days_left": 223,
+    "expired": false,
+    "fingerprint_sha1": "20b933213a2fa939b9d8ca1aac07b319715cb2ac",
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
     "not_after": "2027-01-04T23:59:59Z",
+    "not_before": "2025-12-04T00:00:00Z",
     "san": [
      "*.kasserver.com",
      "kasserver.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 0.3,
    "evidence": [
@@ -5131,6 +5545,7 @@
    "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:995/tcp",
+   "kennung": null,
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -5141,15 +5556,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "pop3s",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": false,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": null,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "mysql_native_password"
    ],
@@ -5157,11 +5575,17 @@
    "capabilities": [],
    "cert": {
     "cn": "*.kasserver.com",
+    "days_left": 223,
+    "expired": false,
+    "fingerprint_sha1": "20b933213a2fa939b9d8ca1aac07b319715cb2ac",
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
     "not_after": "2027-01-04T23:59:59Z",
+    "not_before": "2025-12-04T00:00:00Z",
     "san": [
      "*.kasserver.com",
      "kasserver.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -5182,6 +5606,7 @@
    "fp_title": null,
    "host_ip": "85.13.167.158",
    "id": "svc:85.13.167.158:3306/tcp",
+   "kennung": "MySQL 5.5.5-10.11.14-MariaDB-0ubuntu0.24.04.1-log",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -5192,15 +5617,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "mysql",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "10.11.14",
    "version_raw": "5.5.5-10.11.14-MariaDB-0ubuntu0.24.04.1-log"
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -5219,6 +5647,7 @@
    "fp_title": null,
    "host_ip": "87.79.190.79",
    "id": "svc:87.79.190.79:80/tcp",
+   "kennung": "nginx",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -5229,21 +5658,29 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "jitsi.krause-computer.de",
+    "days_left": 31,
+    "expired": false,
+    "fingerprint_sha1": "ab70e382a93d9bf849dc4004a90fc9abd87cd4b0",
+    "issuer": "E8",
     "not_after": "2026-06-27T02:08:19Z",
+    "not_before": "2026-03-29T02:08:20Z",
     "san": [
      "filebrowser.krause-computer.de",
      "jitsi.krause-computer.de",
@@ -5253,7 +5690,8 @@
      "transmission.krause-computer.de",
      "vergifteteswasser.goto-url.de",
      "youtube.krause-computer.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -5269,6 +5707,7 @@
    "fp_title": "Nextcloud",
    "host_ip": "87.79.190.79",
    "id": "svc:87.79.190.79:443/tcp",
+   "kennung": "nginx, Titel „Nextcloud“",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -5279,15 +5718,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -5306,6 +5748,7 @@
    "fp_title": null,
    "host_ip": "87.79.190.79",
    "id": "svc:87.79.190.79:987/tcp",
+   "kennung": "OpenSSH 10.0p2 Debian 7+deb13u4",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -5316,11 +5759,13 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ssh",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "10.0p2",
    "version_raw": "10.0p2 Debian 7+deb13u4"
   }
@@ -5329,6 +5774,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -5378,6 +5824,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5417,6 +5864,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -5471,6 +5919,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -5520,6 +5969,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -5564,6 +6014,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -5608,6 +6059,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5647,6 +6099,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -5692,6 +6145,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5731,6 +6185,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5775,6 +6230,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5814,6 +6270,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5858,6 +6315,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5897,6 +6355,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -5941,6 +6400,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "httpx",
     "nmap",
@@ -6002,6 +6462,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -6056,6 +6517,7 @@
   {
    "build": null,
    "confidence": 0.9,
+   "conflicts": [],
    "detection_sources": [
     "cms_fingerprint",
     "webtech"
@@ -6106,6 +6568,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -6150,6 +6613,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -6194,6 +6658,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -6238,6 +6703,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -6277,6 +6743,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -6331,6 +6798,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -6380,6 +6848,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -6425,6 +6894,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -6464,6 +6934,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -6503,6 +6974,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -6548,6 +7020,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -6587,6 +7060,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -6626,6 +7100,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -6670,6 +7145,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -6724,6 +7200,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -6768,6 +7245,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -6813,6 +7291,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -6858,6 +7337,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -6897,6 +7377,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -6942,6 +7423,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -6981,6 +7463,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -7027,6 +7510,25 @@
  "targets": [
   {
    "confidence": 1.0,
+   "discovered": [
+    {
+     "fqdn": "autoconfig.krause-computer.de",
+     "ips": [
+      "37.114.55.171"
+     ],
+     "source": "gobuster_dns",
+     "third_party": null
+    },
+    {
+     "fqdn": "autodiscover.krause-computer.de",
+     "ips": [
+      "37.114.55.171"
+     ],
+     "source": "gobuster_dns",
+     "third_party": null
+    }
+   ],
+   "discovered_total": null,
    "discovery_health": {
     "ct_sources_empty": false,
     "discovery_added_count": 15,
@@ -7067,21 +7569,25 @@
  "tls": [
   {
    "assigned_from": null,
+   "cbc_obsoleted_offered": null,
    "cert": {
     "chain_ok": null,
     "cn": "jitsi.krause-computer.de",
     "days_left": 77,
     "expired": false,
+    "fingerprint_sha256": "6650582028b842fe011b357c7316a422499d00551cfdd756eb0d555a8aebbfb5",
     "issuer": "E8",
     "mismatch": true,
     "not_after": "2026-08-11T12:53:40Z",
     "not_before": "2026-05-13T12:53:41Z",
+    "renewal": null,
     "san": [
      "jitsi.krause-computer.de"
     ],
     "self_signed": null,
     "wildcard": false
    },
+   "cert_assigned_from": null,
    "ciphers_weak": [],
    "confidence": 1.0,
    "entries": [],
@@ -7115,15 +7621,18 @@
   },
   {
    "assigned_from": null,
+   "cbc_obsoleted_offered": null,
    "cert": {
     "chain_ok": null,
     "cn": "krause-computer.de",
     "days_left": 60,
     "expired": false,
+    "fingerprint_sha256": "8d14097bf303805148e22456a32acbd408960bb997b2c65ae7a07fe3736c701c",
     "issuer": "E8",
-    "mismatch": null,
+    "mismatch": false,
     "not_after": "2026-07-25T18:35:12Z",
     "not_before": "2026-04-26T18:35:13Z",
+    "renewal": null,
     "san": [
      "krause-computer.de",
      "www.krause-computer.de"
@@ -7131,6 +7640,7 @@
     "self_signed": null,
     "wildcard": false
    },
+   "cert_assigned_from": null,
    "ciphers_weak": [],
    "confidence": 1.0,
    "entries": [],
@@ -7164,15 +7674,18 @@
   },
   {
    "assigned_from": null,
+   "cbc_obsoleted_offered": null,
    "cert": {
     "chain_ok": null,
     "cn": "jitsi.krause-computer.de",
     "days_left": 31,
     "expired": false,
+    "fingerprint_sha256": "da6d5ffe5f37b3632ef4b4cb0581ca29f0861703bd3bbe2c924b4648c8c9fdd8",
     "issuer": "E8",
-    "mismatch": null,
+    "mismatch": false,
     "not_after": "2026-06-27T02:08:19Z",
     "not_before": "2026-03-29T02:08:20Z",
+    "renewal": null,
     "san": [
      "filebrowser.krause-computer.de",
      "jitsi.krause-computer.de",
@@ -7186,6 +7699,7 @@
     "self_signed": null,
     "wildcard": false
    },
+   "cert_assigned_from": null,
    "ciphers_weak": [],
    "confidence": 1.0,
    "entries": [],
@@ -7218,6 +7732,83 @@
    "vulns": []
   }
  ],
- "unprocessed": [],
+ "unprocessed": [
+  {
+   "confidence": 0.8,
+   "count": 1,
+   "evidence": [
+    {
+     "excerpt": "LOGIN, PLAIN",
+     "ref": "hosts/85.13.167.158/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "85.13.167.158",
+   "id": "unp:smtp_auth_before_starttls:2640be8d",
+   "kind": "smtp_auth_before_starttls",
+   "mode": "active",
+   "observed_at": "2026-05-26T12:37:26Z",
+   "source": "nmap",
+   "what": "85.13.167.158:587 AUTH vor STARTTLS"
+  },
+  {
+   "confidence": 0.8,
+   "count": 1,
+   "evidence": [
+    {
+     "excerpt": "LOGIN, PLAIN",
+     "ref": "hosts/85.13.167.158/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "85.13.167.158",
+   "id": "unp:smtp_auth_before_starttls:6bbbb6d0",
+   "kind": "smtp_auth_before_starttls",
+   "mode": "active",
+   "observed_at": "2026-05-26T12:37:26Z",
+   "source": "nmap",
+   "what": "85.13.167.158:25 AUTH vor STARTTLS"
+  },
+  {
+   "confidence": 0.8,
+   "count": 1,
+   "evidence": [
+    {
+     "excerpt": "220 dd55420.kasserver.com ESMTP 250-dd55420.kasserver.com 250-PIPELINING 250-SIZE 153600000 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN 250-AUTH=PLAIN LOGIN 2...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "85.13.167.158",
+   "id": "unp:smtp_auth_before_starttls:c13dc87b",
+   "kind": "smtp_auth_before_starttls",
+   "mode": "active",
+   "observed_at": "2026-05-26T12:37:26Z",
+   "source": "shodan",
+   "what": "85.13.167.158:587 AUTH vor STARTTLS laut Passivquelle"
+  },
+  {
+   "confidence": 0.8,
+   "count": 1,
+   "evidence": [
+    {
+     "excerpt": "220 dd55420.kasserver.com ESMTP 250-dd55420.kasserver.com 250-PIPELINING 250-SIZE 153600000 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN 250-AUTH=PLAIN LOGIN 2...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "85.13.167.158",
+   "id": "unp:smtp_auth_before_starttls:e786b82a",
+   "kind": "smtp_auth_before_starttls",
+   "mode": "active",
+   "observed_at": "2026-05-26T12:37:26Z",
+   "source": "shodan",
+   "what": "85.13.167.158:25 AUTH vor STARTTLS laut Passivquelle"
+  }
+ ],
  "warnings": []
 }
