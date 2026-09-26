@@ -76,7 +76,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 21 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 8 Befunde und 3 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Korrelation hat 6 Einzelmeldungen der Werkzeuge erfasst. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 8 Befunde und 1 positive Feststellung. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -115,7 +115,7 @@
     "message": "React",
     "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
-    "what": "Technik „React“",
+    "what": "Technik „React“, 1 Meldung",
     "where": "62.217.52.165"
    },
    {
@@ -123,7 +123,7 @@
     "message": "Vue.js",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
-    "what": "Technik „Vue.js“",
+    "what": "Technik „Vue.js“, 1 Meldung",
     "where": "gutachter.vectigal.tech"
    },
    {
@@ -131,7 +131,7 @@
     "message": "Node.js",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
-    "what": "Technik „Node.js“",
+    "what": "Technik „Node.js“, 1 Meldung",
     "where": "gutachter.vectigal.tech"
    }
   ],
@@ -174,17 +174,17 @@
    },
    {
     "c": "hoch",
-    "t": "httpx, header_check",
+    "t": "httpx, header_check, Webabruf, Weiterleitungsprüfung",
     "u": "HTTP-Antworten, Technologien und Sicherheits-Header je virtuellem Host"
    },
    {
     "c": "mittel",
-    "t": "webtech, wafw00f",
+    "t": "webtech, wafw00f, CMS-Erkennung",
     "u": "Web-Technologien und vorgelagerte Schutzsysteme"
    },
    {
     "c": "hoch",
-    "t": "dnsx, subfinder, gobuster, Certspotter, SecurityTrails",
+    "t": "DNS-Abfragen, dnsx, subfinder, gobuster, crt.sh, Certspotter, SecurityTrails",
     "u": "Ermittlung der Hostnamen, DNS-Auflösung und DNS-Sicherheitseinträge"
    },
    {
@@ -223,29 +223,82 @@
    {
     "items": [
      {
+      "checks": [
+       "spf_missing",
+       "spf_permissive",
+       "spf_softfail",
+       "mail_spoofing_unprotected"
+      ],
       "l": "SPF",
       "ok": false,
+      "subjects": [
+       "vectigal.tech",
+       "vectiscan.de"
+      ],
       "v": "Handlungsbedarf"
      },
      {
+      "checks": [
+       "dkim_missing"
+      ],
       "l": "DKIM",
       "ok": null,
+      "subjects": [
+       "vectigal.tech",
+       "vectiscan.de"
+      ],
       "v": "nicht prüfbar"
      },
      {
+      "checks": [
+       "dmarc_missing",
+       "dmarc_none",
+       "dmarc_quarantine",
+       "mail_spoofing_unprotected"
+      ],
       "l": "DMARC",
       "ok": false,
+      "subjects": [
+       "vectigal.tech",
+       "vectiscan.de"
+      ],
       "v": "Handlungsbedarf"
      },
      {
+      "checks": [
+       "mta_sts_missing"
+      ],
       "l": "MTA-STS",
       "ok": false,
+      "subjects": [
+       "vectigal.tech",
+       "vectiscan.de"
+      ],
       "v": "Handlungsbedarf"
      },
      {
-      "l": "TLS-RPT, DANE",
+      "checks": [
+       "tls_rpt_missing"
+      ],
+      "l": "TLS-RPT",
       "ok": false,
+      "subjects": [
+       "vectigal.tech",
+       "vectiscan.de"
+      ],
       "v": "Handlungsbedarf"
+     },
+     {
+      "checks": [
+       "dane_missing"
+      ],
+      "l": "DANE",
+      "ok": null,
+      "subjects": [
+       "vectigal.tech",
+       "vectiscan.de"
+      ],
+      "v": "entfällt (MX beim Dienstleister)"
      }
     ],
     "name": "E-Mail-Authentizität",
@@ -254,23 +307,51 @@
    {
     "items": [
      {
+      "checks": [
+       "dnssec_missing"
+      ],
       "l": "DNSSEC",
       "ok": false,
+      "subjects": [
+       "vectigal.tech",
+       "vectiscan.de"
+      ],
       "v": "Handlungsbedarf"
      },
      {
+      "checks": [
+       "caa_missing"
+      ],
       "l": "CAA",
       "ok": false,
+      "subjects": [
+       "vectigal.tech",
+       "vectiscan.de"
+      ],
       "v": "Handlungsbedarf"
      },
      {
+      "checks": [
+       "dns_zone_transfer"
+      ],
       "l": "Abruf der gesamten Zone",
-      "ok": true,
-      "v": "unauffällig"
+      "ok": null,
+      "subjects": [
+       "vectigal.tech",
+       "vectiscan.de"
+      ],
+      "v": "teilweise geprüft"
      },
      {
+      "checks": [
+       "dns_dangling_cname"
+      ],
       "l": "Verwaiste Einträge",
       "ok": null,
+      "subjects": [
+       "vectigal.tech",
+       "vectiscan.de"
+      ],
       "v": "entfällt"
      }
     ],
@@ -280,18 +361,82 @@
    {
     "items": [
      {
+      "checks": [
+       "tls_legacy_protocols",
+       "tls_no_13",
+       "tls_weak_ciphers",
+       "tls_weakness",
+       "tls_no_fallback_scsv"
+      ],
       "l": "62.217.52.165",
-      "ok": true,
-      "v": "unauffällig"
+      "ok": null,
+      "subjects": [
+       "62.217.52.165"
+      ],
+      "v": "teilweise geprüft"
      },
      {
+      "checks": [
+       "tls_legacy_protocols",
+       "tls_no_13",
+       "tls_weak_ciphers",
+       "tls_weakness",
+       "tls_no_fallback_scsv"
+      ],
       "l": "62.217.52.177",
       "ok": null,
+      "subjects": [
+       "62.217.52.177"
+      ],
       "v": "nicht prüfbar"
      },
      {
+      "checks": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "l": "Zertifikate",
       "ok": false,
+      "subjects": [
+       "10finance.vectigal.tech@62.217.52.165",
+       "62.217.52.165",
+       "62.217.52.177",
+       "agent.vectigal.tech@62.217.52.165",
+       "auth.vectigal.tech@62.217.52.165",
+       "board.vectigal.tech@62.217.52.165",
+       "crm.vectigal.tech@62.217.52.165",
+       "crmviewer.vectigal.tech@62.217.52.165",
+       "feedgenerator.vectigal.tech@62.217.52.165",
+       "gutachter-api.vectigal.tech@62.217.52.165",
+       "gutachter.vectigal.tech@62.217.52.165",
+       "id.vectigal.tech@62.217.52.165",
+       "ki-check-10finance.vectigal.tech@62.217.52.165",
+       "ki-check.vectigal.tech@62.217.52.165",
+       "logs.vectigal.tech@62.217.52.165",
+       "mcp-test.vectigal.tech@62.217.52.165",
+       "monitoring.vectigal.tech@62.217.52.165",
+       "page.vectigal.tech@62.217.52.165",
+       "protokoll-assist.vectigal.tech@62.217.52.165",
+       "rankingcoach.vectigal.tech@62.217.52.165",
+       "saferouter-admin.vectigal.tech@62.217.52.165",
+       "saferouter-api.vectigal.tech@62.217.52.165",
+       "saferouter-app.vectigal.tech@62.217.52.165",
+       "saferouter-auth.vectigal.tech@62.217.52.165",
+       "saferouter-www.vectigal.tech@62.217.52.165",
+       "scan-api.vectigal.tech@62.217.52.165",
+       "scan.vectigal.tech@62.217.52.165",
+       "shopify.vectigal.tech@62.217.52.165",
+       "status.vectigal.tech@62.217.52.165",
+       "test.vectigal.tech@62.217.52.177",
+       "traefik.vectigal.tech@62.217.52.165",
+       "vectigal.tech@62.217.52.165",
+       "webcheck.vectigal.tech@62.217.52.165"
+      ],
       "v": "Handlungsbedarf"
      }
     ],
@@ -301,13 +446,35 @@
    {
     "items": [
      {
+      "checks": [
+       "security_headers_incomplete",
+       "csp_missing",
+       "csp_weak",
+       "hsts_missing",
+       "hsts_short",
+       "header_duplicate"
+      ],
       "l": "62.217.52.165",
       "ok": false,
+      "subjects": [
+       "62.217.52.165"
+      ],
       "v": "Handlungsbedarf"
      },
      {
+      "checks": [
+       "security_headers_incomplete",
+       "csp_missing",
+       "csp_weak",
+       "hsts_missing",
+       "hsts_short",
+       "header_duplicate"
+      ],
       "l": "62.217.52.177",
       "ok": null,
+      "subjects": [
+       "62.217.52.177"
+      ],
       "v": "nicht prüfbar"
      }
     ],
@@ -315,7 +482,7 @@
     "short": "Sicherheits-Header"
    }
   ],
-  "reputation": "Reputation: keine Meldungen zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus.",
+  "reputation": "Reputation: zu mindestens einer der geprüften Adressen liegt in OTX eine Meldung vor.",
   "screens": [
    {
     "also": [],
@@ -400,7 +567,10 @@
   ]
  },
  "business": {
-  "implication": "Die Befunde dieses Berichts sind danach geordnet, wie nah sie an den Zugangswegen in das Unternehmensnetz liegen. Ein Dienst, über den sich jemand anmelden kann, wiegt schwerer als eine Abweichung an einer reinen Auslieferungsseite. Bei einem Vorfall mit personenbezogenen Daten gilt die Meldepflicht nach Art. 33 DSGVO innerhalb von 72 Stunden.",
+  "betriebsformen": [
+   "unbekannt"
+  ],
+  "implication": "Die Befunde dieses Berichts sind danach geordnet, wie nah sie an den Zugangswegen zu den betriebenen Servern und Diensten liegen. Ein Dienst, über den sich jemand anmelden kann, wiegt schwerer als eine Abweichung an einer reinen Auslieferungsseite. Bei einem Vorfall mit personenbezogenen Daten gilt die Meldepflicht nach Art. 33 DSGVO innerhalb von 72 Stunden.",
   "lead": "Was der Scan über das Unternehmen sichtbar macht, bestimmt, welche Befunde wirklich zählen. Maßgeblich ist nicht die Zahl der Meldungen, sondern welche Systeme am Perimeter stehen und wofür sie gebraucht werden.",
   "observed": [
    {
@@ -427,17 +597,30 @@
   {
    "affected": "vectiscan.de",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de · MX-Einträge: mx00.udag.de, mx01.udag.de · kein SPF-Eintrag",
+   "checks": [
+    "spf_missing"
+   ],
+   "evidence": "DNS-Abfragen · phase0/dns_records_vectiscan.de.json\nvectiscan.de · MX-Einträge: mx00.udag.de, mx01.udag.de · kein SPF-Eintrag",
    "found": "Für die Domain vectiscan.de liegt kein SPF-Eintrag vor: vectiscan.de. Empfangende Mailserver können damit nicht prüfen, welche Server im Namen der Domain versenden dürfen.",
    "id": "VS-2026-001",
    "impact": "Ohne SPF akzeptieren viele Empfangssysteme E-Mails im Namen der Domain unabhängig vom tatsächlich sendenden Server. Das erleichtert Absenderfälschung für Phishing- und Betrugsversuche gegenüber Kunden, Lieferanten und Mitarbeitenden.",
    "key": "mail_records/vectiscan.de/kunde",
    "level": "hoch",
    "level_label": "hoch",
+   "missing_headers": [],
    "operator": "",
    "operator_note": "",
    "plan_action": "Einen SPF-Eintrag veröffentlichen, der alle legitimen Versandquellen der Domain aufführt, und die Fehlbehandlung zunächst weich einstellen.",
    "plan_effect": "Schützt die Authentizität der eigenen E-Mail",
+   "plan_items": [
+    {
+     "action": "Einen SPF-Eintrag veröffentlichen, der alle legitimen Versandquellen der Domain aufführt, und die Fehlbehandlung zunächst weich einstellen.",
+     "check": "spf_missing",
+     "effect": "Schützt die Authentizität der eigenen E-Mail",
+     "lever": "SPF-Eintrag veröffentlichen",
+     "stage": "in_kuerze"
+    }
+   ],
    "plan_lever": "SPF-Eintrag veröffentlichen",
    "plan_stage": "in_kuerze",
    "policy": "spf_missing",
@@ -508,8 +691,11 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records)",
+   "source": "aktiv (DNS-Abfragen)",
    "status": "gelb",
+   "subjects": [
+    "spf_missing|vectiscan.de"
+   ],
    "threat": null,
    "title": "Einträge zur Absender-Authentizität für vectiscan.de: kein SPF-Eintrag",
    "urgency": "In Kürze",
@@ -518,17 +704,38 @@
   {
    "affected": "vectigal.tech:443 (Zertifikat für TRAEFIK DEFAULT CERT)",
    "cat": "D",
-   "evidence": "testssl\nvectigal.tech:443 · Zertifikat für: TRAEFIK DEFAULT CERT · weitere Namen: b7ac570d803b471e8b7b2b0fd41a6112.0cc7297b85e043717ea982a9e9019f1a.traefik.default · Aussteller: TRAEFIK DEFAULT CERT · gültig bis: 2027-09-20 · Vertrauenskette vollständig: nein · Name passt nicht: ja",
+   "checks": [
+    "cert_hostname_mismatch",
+    "cert_chain_incomplete"
+   ],
+   "evidence": "testssl.sh\nvectigal.tech:443 · Zertifikat für: TRAEFIK DEFAULT CERT · weitere Namen: b7ac570d803b471e8b7b2b0fd41a6112.0cc7297b85e043717ea982a9e9019f1a.traefik.default · Aussteller: TRAEFIK DEFAULT CERT · gültig bis: 20.09.2027, 09:03 UTC · Vertrauenskette vollständig: nein · Name passt nicht: ja",
    "found": "Für den Dienst vectigal.tech passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen Hostnamen: vectigal.tech:443 (Zertifikat für TRAEFIK DEFAULT CERT). Für den Dienst vectigal.tech liefert der TLS-Handshake eine unvollständige Zertifikatskette: vectigal.tech:443. Zwischen dem Server-Zertifikat und einer allgemein bekannten Vertrauensstelle fehlt mindestens ein Zwischenzertifikat.",
    "id": "VS-2026-002",
    "impact": "Ein TLS-Client kann die Identität des Dienstes nicht anhand des Zertifikats bestätigen und muss die Sicherheitswarnung entweder ablehnen oder ignorieren. Werden solche Warnungen ignoriert, fällt ein echter Man-in-the-Middle-Angriff mit einem passend gefälschten Zertifikat nicht mehr auf. Clients, die die fehlende Zwischenstelle nicht bereits im eigenen Speicher haben, können die Vertrauenskette nicht vollständig nachvollziehen und zeigen eine Warnung oder lehnen die Verbindung ab. Betroffen sind vor allem ältere oder abweichend konfigurierte Clients.",
    "key": "cert_health/62.217.52.165/kunde",
    "level": "hoch",
    "level_label": "hoch",
+   "missing_headers": [],
    "operator": "",
    "operator_note": "",
    "plan_action": "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält.",
    "plan_effect": "Beendet die Namenswarnung beim Aufruf des Dienstes",
+   "plan_items": [
+    {
+     "action": "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält.",
+     "check": "cert_hostname_mismatch",
+     "effect": "Beendet die Namenswarnung beim Aufruf des Dienstes",
+     "lever": "Zertifikate auf alle aufgerufenen Namen ausstellen",
+     "stage": "in_kuerze"
+    },
+    {
+     "action": "Die vollständige Zertifikatskette einschließlich aller Zwischenzertifikate auf dem Dienst hinterlegen, so wie es die ausstellende Stelle vorgibt.",
+     "check": "cert_chain_incomplete",
+     "effect": "Vermeidet Verbindungsfehler bei Clients, denen ein Zwischenzertifikat fehlt",
+     "lever": "Vollständige Zertifikatsketten hinterlegen",
+     "stage": "mittelfristig"
+    }
+   ],
    "plan_lever": "Zertifikate auf alle aufgerufenen Namen ausstellen",
    "plan_stage": "in_kuerze",
    "policy": "cert_chain_incomplete, cert_hostname_mismatch",
@@ -661,8 +868,14 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (testssl)",
+   "source": "aktiv (testssl.sh)",
    "status": "gelb",
+   "subjects": [
+    "cert_chain_incomplete|vectigal.tech:443@62.217.52.165",
+    "cert_chain_incomplete|vectigal.tech@62.217.52.165",
+    "cert_hostname_mismatch|vectigal.tech:443@62.217.52.165",
+    "cert_hostname_mismatch|vectigal.tech@62.217.52.165"
+   ],
    "threat": null,
    "title": "Zertifikate auf 62.217.52.165: Zertifikat passt nicht zum Namen und Vertrauenskette unvollständig",
    "urgency": "In Kürze",
@@ -671,17 +884,30 @@
   {
    "affected": "vectiscan.de (p=none)",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de · MX-Einträge: mx00.udag.de, mx01.udag.de · DMARC: v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de",
+   "checks": [
+    "dmarc_none"
+   ],
+   "evidence": "DNS-Abfragen · phase0/dns_records_vectiscan.de.json\nvectiscan.de · MX-Einträge: mx00.udag.de, mx01.udag.de · DMARC: v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de",
    "found": "Die DMARC-Richtlinie der Domain vectiscan.de ist auf reine Beobachtung gesetzt: vectiscan.de (p=none). E-Mails, die SPF oder DKIM nicht bestehen, werden dadurch nicht zurückgewiesen oder unter Quarantäne gestellt.",
    "id": "VS-2026-003",
    "impact": "Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte E-Mails im Namen der Domain kommen weiterhin beim Empfänger an. Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse.",
    "key": "mail_policy/vectiscan.de/kunde",
    "level": "mittel",
    "level_label": "mittel",
+   "missing_headers": [],
    "operator": "",
    "operator_note": "",
    "plan_action": "Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen.",
-   "plan_effect": "Weist gefälschte E-Mails im Namen der Domain ab",
+   "plan_effect": "Macht alle legitimen Versandquellen vor der Verschärfung sichtbar",
+   "plan_items": [
+    {
+     "action": "Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen.",
+     "check": "dmarc_none",
+     "effect": "Macht alle legitimen Versandquellen vor der Verschärfung sichtbar",
+     "lever": "DMARC-Richtlinie durchsetzen",
+     "stage": "mittelfristig"
+    }
+   ],
    "plan_lever": "DMARC-Richtlinie durchsetzen",
    "plan_stage": "mittelfristig",
    "policy": "dmarc_none",
@@ -761,8 +987,11 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records)",
+   "source": "aktiv (DNS-Abfragen)",
    "status": "gelb",
+   "subjects": [
+    "dmarc_none|vectiscan.de"
+   ],
    "threat": null,
    "title": "Richtlinien zur Absender-Authentizität für vectiscan.de: DMARC ohne Durchsetzung",
    "urgency": "Mittelfristig",
@@ -771,17 +1000,30 @@
   {
    "affected": "vectigal.tech",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nvectigal.tech · kein MX-Eintrag · kein SPF-Eintrag · kein DMARC-Eintrag",
+   "checks": [
+    "mail_spoofing_unprotected"
+   ],
+   "evidence": "DNS-Abfragen · phase0/dns_records.json\nvectigal.tech · kein MX-Eintrag · kein SPF-Eintrag · kein DMARC-Eintrag",
    "found": "Die Domain vectigal.tech hat keinen MX-Eintrag und nimmt damit keine E-Mails an. Ein SPF-Eintrag fehlt. Ein DMARC-Eintrag fehlt.",
    "id": "VS-2026-004",
    "impact": "Auch eine Domain ohne Mailbetrieb lässt sich als Absender fälschen. Ohne ausdrückliche Sperre können Empfangssysteme gefälschte Nachrichten im Namen dieser Domain nicht zuverlässig ablehnen.",
    "key": "mail_records/vectigal.tech/kunde",
    "level": "mittel",
    "level_label": "mittel",
+   "missing_headers": [],
    "operator": "",
    "operator_note": "",
    "plan_action": "Für die Domain den SPF-Eintrag v=spf1 -all und einen DMARC-Eintrag mit p=reject veröffentlichen.",
    "plan_effect": "Lässt Empfänger gefälschte E-Mails mit dieser Domain als Absender ablehnen",
+   "plan_items": [
+    {
+     "action": "Für die Domain den SPF-Eintrag v=spf1 -all und einen DMARC-Eintrag mit p=reject veröffentlichen.",
+     "check": "mail_spoofing_unprotected",
+     "effect": "Lässt Empfänger gefälschte E-Mails mit dieser Domain als Absender ablehnen",
+     "lever": "Domains ohne Mailbetrieb gegen Absenderfälschung sperren",
+     "stage": "mittelfristig"
+    }
+   ],
    "plan_lever": "Domains ohne Mailbetrieb gegen Absenderfälschung sperren",
    "plan_stage": "mittelfristig",
    "policy": "mail_spoofing_unprotected",
@@ -857,8 +1099,11 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records)",
+   "source": "aktiv (DNS-Abfragen)",
    "status": "gelb",
+   "subjects": [
+    "mail_spoofing_unprotected|vectigal.tech"
+   ],
    "threat": null,
    "title": "Einträge zur Absender-Authentizität für vectigal.tech: Domain ohne Mailbetrieb ohne Fälschungsschutz",
    "urgency": "Mittelfristig",
@@ -867,17 +1112,38 @@
   {
    "affected": "vectiscan.de",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de · MX-Einträge: mx00.udag.de, mx01.udag.de\n\ndns_security · phase0a/dns_security_vectiscan.de.json\nvectiscan.de · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
+   "checks": [
+    "mta_sts_missing",
+    "tls_rpt_missing"
+   ],
+   "evidence": "DNS-Abfragen · phase0/dns_records_vectiscan.de.json\nvectiscan.de · MX-Einträge: mx00.udag.de, mx01.udag.de\n\nDNS-Abfragen · phase0a/dns_security_vectiscan.de.json\nvectiscan.de · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
    "found": "Für vectiscan.de ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain vectiscan.de fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten. Für vectiscan.de ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain vectiscan.de fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können.",
    "id": "VS-2026-005",
    "impact": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen. Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.",
    "key": "mail_transport_enforcement/vectiscan.de/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
+   "missing_headers": [],
    "operator": "",
    "operator_note": "",
    "plan_action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
    "plan_effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
+   "plan_items": [
+    {
+     "action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
+     "check": "mta_sts_missing",
+     "effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
+     "lever": "MTA-STS für die Domain veröffentlichen",
+     "stage": "strategisch"
+    },
+    {
+     "action": "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten.",
+     "check": "tls_rpt_missing",
+     "effect": "Meldet fehlgeschlagene verschlüsselte Zustellungen an Sie zurück",
+     "lever": "TLS-RPT für die Domain veröffentlichen",
+     "stage": "strategisch"
+    }
+   ],
    "plan_lever": "MTA-STS für die Domain veröffentlichen",
    "plan_stage": "strategisch",
    "policy": "mta_sts_missing, tls_rpt_missing",
@@ -984,27 +1250,54 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (DNS-Abfragen)",
    "status": "blau",
+   "subjects": [
+    "mta_sts_missing|vectiscan.de",
+    "tls_rpt_missing|vectiscan.de"
+   ],
    "threat": null,
    "title": "Verschlüsselte Zustellung von E-Mails für vectiscan.de: kein MTA-STS und kein TLS-RPT",
    "urgency": "Strategisch",
    "verify": "DNS-Abfrage des TXT-Eintrags _mta-sts.vectiscan.de sowie Abruf der Richtliniendatei unter der zugehörigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine Richtliniendatei mit mode enforce. DNS-Abfrage des TXT-Eintrags _smtp._tls.vectiscan.de; erwartet wird ein Eintrag, der mit v=TLSRPTv1 beginnt und eine Meldeadresse (rua) nennt."
   },
   {
-   "affected": "10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy)",
+   "affected": "10finance.vectigal.tech (fehlend: Permissions-Policy), board.vectigal.tech (fehlend: Permissions-Policy), crmviewer.vectigal.tech (fehlend: Permissions-Policy), gutachter.vectigal.tech (fehlend: Permissions-Policy)",
    "cat": "D",
-   "evidence": "header_check · hosts/62.217.52.165/phase2/headers_10finance.vectigal.tech.json\n10finance.vectigal.tech · Adresse: https://10finance.vectigal.tech · Content-Security-Policy: nicht gesetzt · fehlende Header: content-security-policy, permissions-policy\n\nheader_check · hosts/62.217.52.165/phase2/headers_board.vectigal.tech.json\nboard.vectigal.tech · Adresse: https://board.vectigal.tech · Content-Security-Policy: nicht gesetzt · fehlende Header: content-security-policy, permissions-policy\n\nheader_check · hosts/62.217.52.165/phase2/headers_crm.vectigal.tech.json\ncrm.vectigal.tech · Adresse: https://crm.vectigal.tech · Content-Security-Policy: nicht gesetzt · fehlende Header: content-security-policy, permissions-policy\n\nheader_check · hosts/62.217.52.165/phase2/headers_crmviewer.vectigal.tech.json\ncrmviewer.vectigal.tech · Adresse: https://crmviewer.vectigal.tech · Content-Security-Policy: nicht gesetzt · fehlende Header: content-security-policy, permissions-policy\n\nheader_check · hosts/62.217.52.165/phase2/headers_gutachter.vectigal.tech.json\ngutachter.vectigal.tech · Adresse: https://gutachter.vectigal.tech · Content-Security-Policy: nicht gesetzt · fehlende Header: content-security-policy, permissions-policy",
-   "found": "Auf 62.217.52.165 ist keine Content-Security-Policy gesetzt: 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech. Auf 62.217.52.165 fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: 10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy).",
+   "checks": [
+    "csp_missing",
+    "security_headers_incomplete"
+   ],
+   "evidence": "header_check · hosts/62.217.52.165/phase2/headers_10finance.vectigal.tech.json\n10finance.vectigal.tech · Adresse: https://10finance.vectigal.tech · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy\n\nheader_check · hosts/62.217.52.165/phase2/headers_board.vectigal.tech.json\nboard.vectigal.tech · Adresse: https://board.vectigal.tech · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy\n\nheader_check · hosts/62.217.52.165/phase2/headers_crmviewer.vectigal.tech.json\ncrmviewer.vectigal.tech · Adresse: https://crmviewer.vectigal.tech · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy\n\nheader_check · hosts/62.217.52.165/phase2/headers_gutachter.vectigal.tech.json\ngutachter.vectigal.tech · Adresse: https://gutachter.vectigal.tech · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy",
+   "found": "Auf 62.217.52.165 ist keine Content-Security-Policy gesetzt: 10finance.vectigal.tech, board.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech. Auf 62.217.52.165 fehlen einzelne Sicherheits-Header der Webseite: 10finance.vectigal.tech (fehlend: Permissions-Policy), board.vectigal.tech (fehlend: Permissions-Policy), crmviewer.vectigal.tech (fehlend: Permissions-Policy), gutachter.vectigal.tech (fehlend: Permissions-Policy).",
    "id": "VS-2026-006",
-   "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar.",
+   "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Es fehlt nur die Permissions-Policy, die festlegt, welche Browserfunktionen wie Kamera, Mikrofon oder Standort eingebettete Inhalte nutzen dürfen. Die Auswirkung ist gering; die übrigen grundlegenden Sicherheits-Header sind gesetzt.",
    "key": "web_header_hygiene/62.217.52.165/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
+   "missing_headers": [
+    "Permissions-Policy"
+   ],
    "operator": "",
    "operator_note": "",
    "plan_action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
    "plan_effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+   "plan_items": [
+    {
+     "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
+     "check": "csp_missing",
+     "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+     "lever": "Inhaltsrichtlinie für die Webseiten einführen",
+     "stage": "mittelfristig"
+    },
+    {
+     "action": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet.",
+     "check": "security_headers_incomplete",
+     "effect": "Begrenzt die Browserfunktionen, die eingebettete Inhalte nutzen dürfen",
+     "lever": "Fehlende Sicherheits-Header ergänzen",
+     "stage": "mittelfristig"
+    }
+   ],
    "plan_lever": "Inhaltsrichtlinie für die Webseiten einführen",
    "plan_stage": "mittelfristig",
    "policy": "csp_missing, security_headers_incomplete",
@@ -1015,7 +1308,6 @@
      "members": [
       "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
       "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
-      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
       "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
       "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
      ],
@@ -1028,7 +1320,6 @@
      "members": [
       "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
       "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
-      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
       "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
       "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
      ],
@@ -1041,12 +1332,11 @@
      "members": [
       "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
       "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
-      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
       "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
       "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
      ],
      "statement": "observation[0]",
-     "text": "Auf 62.217.52.165 ist keine Content-Security-Policy gesetzt: 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech."
+     "text": "Auf 62.217.52.165 ist keine Content-Security-Policy gesetzt: 10finance.vectigal.tech, board.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech."
     },
     {
      "check": "security_headers_incomplete",
@@ -1054,12 +1344,11 @@
      "members": [
       "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
       "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
-      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
       "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
       "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
      ],
      "statement": "observation[0]",
-     "text": "Auf 62.217.52.165 fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: 10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy)."
+     "text": "Auf 62.217.52.165 fehlen einzelne Sicherheits-Header der Webseite: 10finance.vectigal.tech (fehlend: Permissions-Policy), board.vectigal.tech (fehlend: Permissions-Policy), crmviewer.vectigal.tech (fehlend: Permissions-Policy), gutachter.vectigal.tech (fehlend: Permissions-Policy)."
     },
     {
      "check": "csp_missing",
@@ -1067,7 +1356,6 @@
      "members": [
       "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
       "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
-      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
       "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
       "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
      ],
@@ -1080,12 +1368,11 @@
      "members": [
       "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
       "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
-      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
       "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
       "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
      ],
-     "statement": "meaning[0]",
-     "text": "Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar."
+     "statement": "meaning[4]",
+     "text": "Es fehlt nur die Permissions-Policy, die festlegt, welche Browserfunktionen wie Kamera, Mikrofon oder Standort eingebettete Inhalte nutzen dürfen. Die Auswirkung ist gering; die übrigen grundlegenden Sicherheits-Header sind gesetzt."
     },
     {
      "check": "csp_missing",
@@ -1093,7 +1380,6 @@
      "members": [
       "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
       "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
-      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
       "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
       "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
      ],
@@ -1106,12 +1392,23 @@
      "members": [
       "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
       "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
-      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
       "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
       "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
      ],
      "statement": "verify[0]",
-     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
+     "text": "HTTP-Antwortheader der Endseite von außen abrufen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "verify[4]",
+     "text": "Erwartet wird eine Permissions-Policy."
     },
     {
      "check": "csp_missing",
@@ -1119,7 +1416,6 @@
      "members": [
       "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
       "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
-      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
       "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
       "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
      ],
@@ -1132,12 +1428,11 @@
      "members": [
       "10finance.vectigal.tech@62.217.52.165|10finance.vectigal.tech@62.217.52.165",
       "board.vectigal.tech@62.217.52.165|board.vectigal.tech@62.217.52.165",
-      "crm.vectigal.tech@62.217.52.165|crm.vectigal.tech@62.217.52.165",
       "crmviewer.vectigal.tech@62.217.52.165|crmviewer.vectigal.tech@62.217.52.165",
       "gutachter.vectigal.tech@62.217.52.165|gutachter.vectigal.tech@62.217.52.165"
      ],
-     "statement": "recommendation[0]",
-     "text": "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
+     "statement": "recommendation[3]",
+     "text": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
     }
    ],
    "recommendation": [
@@ -1147,31 +1442,62 @@
     ],
     [
      "Mittelfristig",
-     "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
+     "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (header_check)",
    "status": "blau",
+   "subjects": [
+    "csp_missing|10finance.vectigal.tech@62.217.52.165",
+    "csp_missing|board.vectigal.tech@62.217.52.165",
+    "csp_missing|crmviewer.vectigal.tech@62.217.52.165",
+    "csp_missing|gutachter.vectigal.tech@62.217.52.165",
+    "security_headers_incomplete|10finance.vectigal.tech@62.217.52.165",
+    "security_headers_incomplete|board.vectigal.tech@62.217.52.165",
+    "security_headers_incomplete|crmviewer.vectigal.tech@62.217.52.165",
+    "security_headers_incomplete|gutachter.vectigal.tech@62.217.52.165"
+   ],
    "threat": null,
    "title": "Absicherung der Webdienste auf 62.217.52.165: Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
    "urgency": "Mittelfristig",
-   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
+   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird eine Permissions-Policy."
   },
   {
    "affected": "vectigal.tech",
    "cat": "E",
-   "evidence": "dns_security · phase0a/dns_security.json\nvectigal.tech · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
+   "checks": [
+    "caa_missing",
+    "dnssec_missing"
+   ],
+   "evidence": "DNS-Abfragen · phase0a/dns_security.json\nvectigal.tech · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
    "found": "Für vectigal.tech ist kein CAA-Eintrag veröffentlicht. Für die Domain vectigal.tech legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen. Für vectigal.tech ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain vectigal.tech lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
    "id": "VS-2026-007",
    "impact": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf. Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
    "key": "dns_hygiene/vectigal.tech/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
+   "missing_headers": [],
    "operator": "",
    "operator_note": "",
    "plan_action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
    "plan_effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+   "plan_items": [
+    {
+     "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
+     "check": "caa_missing",
+     "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+     "lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+     "stage": "mittelfristig"
+    },
+    {
+     "action": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
+     "check": "dnssec_missing",
+     "effect": "Schützt DNS-Antworten gegen Verfälschung auf dem Übertragungsweg",
+     "lever": "DNS-Zone mit DNSSEC signieren",
+     "stage": "strategisch"
+    }
+   ],
    "plan_lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
    "plan_stage": "mittelfristig",
    "policy": "caa_missing, dnssec_missing",
@@ -1278,8 +1604,12 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_security)",
+   "source": "aktiv (DNS-Abfragen)",
    "status": "blau",
+   "subjects": [
+    "caa_missing|vectigal.tech",
+    "dnssec_missing|vectigal.tech"
+   ],
    "threat": null,
    "title": "DNS-Absicherung für vectigal.tech: kein CAA-Eintrag und keine DNSSEC-Signatur",
    "urgency": "Mittelfristig",
@@ -1288,17 +1618,38 @@
   {
    "affected": "vectiscan.de",
    "cat": "E",
-   "evidence": "dns_security · phase0a/dns_security_vectiscan.de.json\nvectiscan.de · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
+   "checks": [
+    "caa_missing",
+    "dnssec_missing"
+   ],
+   "evidence": "DNS-Abfragen · phase0a/dns_security_vectiscan.de.json\nvectiscan.de · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
    "found": "Für vectiscan.de ist kein CAA-Eintrag veröffentlicht. Für die Domain vectiscan.de legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen. Für vectiscan.de ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain vectiscan.de lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
    "id": "VS-2026-008",
    "impact": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf. Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
    "key": "dns_hygiene/vectiscan.de/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
+   "missing_headers": [],
    "operator": "",
    "operator_note": "",
    "plan_action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
    "plan_effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+   "plan_items": [
+    {
+     "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
+     "check": "caa_missing",
+     "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+     "lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+     "stage": "mittelfristig"
+    },
+    {
+     "action": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
+     "check": "dnssec_missing",
+     "effect": "Schützt DNS-Antworten gegen Verfälschung auf dem Übertragungsweg",
+     "lever": "DNS-Zone mit DNSSEC signieren",
+     "stage": "strategisch"
+    }
+   ],
    "plan_lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
    "plan_stage": "mittelfristig",
    "policy": "caa_missing, dnssec_missing",
@@ -1405,8 +1756,12 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_security)",
+   "source": "aktiv (DNS-Abfragen)",
    "status": "blau",
+   "subjects": [
+    "caa_missing|vectiscan.de",
+    "dnssec_missing|vectiscan.de"
+   ],
    "threat": null,
    "title": "DNS-Absicherung für vectiscan.de: kein CAA-Eintrag und keine DNSSEC-Signatur",
    "urgency": "Mittelfristig",
@@ -1426,8 +1781,8 @@
     "key": "B",
     "level": 0,
     "name": "Patch- und EOL-Status",
-    "note": "Keine Befunde in dieser Kategorie",
-    "status": "gruen"
+    "note": "Nicht bewertbar: zu keiner erkannten Serversoftware liegt eine Version mit Lebenszyklusangabe vor",
+    "status": "grau"
    },
    {
     "key": "C",
@@ -1471,12 +1826,12 @@
     "title": "Zertifikate auf alle aufgerufenen Namen ausstellen"
    },
    {
-    "effect": "Weist gefälschte E-Mails im Namen der Domain ab",
+    "effect": "Vermeidet Verbindungsfehler bei Clients, denen ein Zwischenzertifikat fehlt",
     "n": 3,
     "refs": [
-     "VS-2026-003"
+     "VS-2026-002"
     ],
-    "title": "DMARC-Richtlinie durchsetzen"
+    "title": "Vollständige Zertifikatsketten hinterlegen"
    }
   ],
   "overall": "MITTEL",
@@ -1485,11 +1840,12 @@
  },
  "landscape_lead": "8 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 21,
-  "catalog_digest": "3def4b8b695693f10cdc3c448b9600bfc7e6ba365814cf1aef184ec7b573b6fd",
-  "catalog_version": "2026-09-26.1",
+  "after_fp": 19,
+  "catalog_digest": "004a04598e2072c37701db55752e05f8f2b155bf6ec91f987217067547919206",
+  "catalog_version": "2026-09-26.2",
   "classification": "Vertraulich",
   "consolidated": 8,
+  "context_fields": [],
   "context_sources": {},
   "customer": "Auftraggeber",
   "customer_short": "Auftraggeber",
@@ -1498,7 +1854,7 @@
    "vectiscan.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.0.7",
+  "facts_schema_version": "1.1.0",
   "fqdns_total": 31,
   "generation": null,
   "hosts_ipv4": 2,
@@ -1512,31 +1868,35 @@
   ],
   "package": "WebCheck",
   "package_label": "WEBCHECK",
-  "policy_version": "2026-09-26.1",
-  "positives": 3,
+  "policy_version": "2026-09-26.2",
+  "positives": 1,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
   "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
   "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
-  "raw_findings": 21,
+  "raw_findings": 6,
   "report_date": "19.09.2026",
   "report_id": "VS-2026-0920-7533",
   "report_version": "1",
   "scan_date": "20.09.2026",
   "scan_window": "20.09.2026, 11:07 bis 11:13 Uhr (CEST)",
   "systems_total": 2,
-  "tool_runs": 70
+  "tool_runs": 41
  },
  "plan": [
   {
    "action": "Einen SPF-Eintrag veröffentlichen, der alle legitimen Versandquellen der Domain aufführt, und die Fehlbehandlung zunächst weich einstellen.",
    "effect": "Schützt die Authentizität der eigenen E-Mail",
    "lever": "SPF-Eintrag veröffentlichen",
+   "operator": "",
    "prio": "In Kürze",
    "refs": [
     "VS-2026-001"
+   ],
+   "sources": [
+    "VS-2026-001:spf_missing"
    ],
    "st": "gelb"
   },
@@ -1544,19 +1904,41 @@
    "action": "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält.",
    "effect": "Beendet die Namenswarnung beim Aufruf des Dienstes",
    "lever": "Zertifikate auf alle aufgerufenen Namen ausstellen",
+   "operator": "",
    "prio": "In Kürze",
    "refs": [
     "VS-2026-002"
+   ],
+   "sources": [
+    "VS-2026-002:cert_hostname_mismatch"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Die vollständige Zertifikatskette einschließlich aller Zwischenzertifikate auf dem Dienst hinterlegen, so wie es die ausstellende Stelle vorgibt.",
+   "effect": "Vermeidet Verbindungsfehler bei Clients, denen ein Zwischenzertifikat fehlt",
+   "lever": "Vollständige Zertifikatsketten hinterlegen",
+   "operator": "",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-002"
+   ],
+   "sources": [
+    "VS-2026-002:cert_chain_incomplete"
    ],
    "st": "gelb"
   },
   {
    "action": "Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen.",
-   "effect": "Weist gefälschte E-Mails im Namen der Domain ab",
+   "effect": "Macht alle legitimen Versandquellen vor der Verschärfung sichtbar",
    "lever": "DMARC-Richtlinie durchsetzen",
+   "operator": "",
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-003"
+   ],
+   "sources": [
+    "VS-2026-003:dmarc_none"
    ],
    "st": "gelb"
   },
@@ -1564,9 +1946,13 @@
    "action": "Für die Domain den SPF-Eintrag v=spf1 -all und einen DMARC-Eintrag mit p=reject veröffentlichen.",
    "effect": "Lässt Empfänger gefälschte E-Mails mit dieser Domain als Absender ablehnen",
    "lever": "Domains ohne Mailbetrieb gegen Absenderfälschung sperren",
+   "operator": "",
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-004"
+   ],
+   "sources": [
+    "VS-2026-004:mail_spoofing_unprotected"
    ],
    "st": "gelb"
   },
@@ -1574,9 +1960,27 @@
    "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
    "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
    "lever": "Inhaltsrichtlinie für die Webseiten einführen",
+   "operator": "",
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-006"
+   ],
+   "sources": [
+    "VS-2026-006:csp_missing"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet.",
+   "effect": "Begrenzt die Browserfunktionen, die eingebettete Inhalte nutzen dürfen",
+   "lever": "Fehlende Sicherheits-Header ergänzen",
+   "operator": "",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-006"
+   ],
+   "sources": [
+    "VS-2026-006:security_headers_incomplete"
    ],
    "st": "blau"
   },
@@ -1584,10 +1988,15 @@
    "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
    "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
    "lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+   "operator": "",
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-007",
     "VS-2026-008"
+   ],
+   "sources": [
+    "VS-2026-007:caa_missing",
+    "VS-2026-008:caa_missing"
    ],
    "st": "blau"
   },
@@ -1595,9 +2004,43 @@
    "action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
    "effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
    "lever": "MTA-STS für die Domain veröffentlichen",
+   "operator": "",
    "prio": "Strategisch",
    "refs": [
     "VS-2026-005"
+   ],
+   "sources": [
+    "VS-2026-005:mta_sts_missing"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten.",
+   "effect": "Meldet fehlgeschlagene verschlüsselte Zustellungen an Sie zurück",
+   "lever": "TLS-RPT für die Domain veröffentlichen",
+   "operator": "",
+   "prio": "Strategisch",
+   "refs": [
+    "VS-2026-005"
+   ],
+   "sources": [
+    "VS-2026-005:tls_rpt_missing"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
+   "effect": "Schützt DNS-Antworten gegen Verfälschung auf dem Übertragungsweg",
+   "lever": "DNS-Zone mit DNSSEC signieren",
+   "operator": "",
+   "prio": "Strategisch",
+   "refs": [
+    "VS-2026-007",
+    "VS-2026-008"
+   ],
+   "sources": [
+    "VS-2026-007:dnssec_missing",
+    "VS-2026-008:dnssec_missing"
    ],
    "st": "blau"
   }
@@ -1605,6 +2048,9 @@
  "positives": [
   {
    "cat": "A",
+   "checks": [
+    "http_no_tls"
+   ],
    "provenance": [
     {
      "check": "http_no_tls",
@@ -1622,69 +2068,14 @@
       "62.217.52.165"
      ],
      "statement": "positive.text",
-     "text": "Der Host 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere) bietet seinen Webdienst über HTTPS an."
+     "text": "Der Host 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und 27 weitere) bietet seinen Webdienst über HTTPS an."
     }
    ],
-   "text": "Der Host 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere) bietet seinen Webdienst über HTTPS an.",
+   "subjects": [
+    "62.217.52.165"
+   ],
+   "text": "Der Host 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und 27 weitere) bietet seinen Webdienst über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
-  },
-  {
-   "cat": "A",
-   "provenance": [
-    {
-     "check": "urlhaus_compromise",
-     "field": "positive",
-     "members": [
-      "scan"
-     ],
-     "statement": "positive.title",
-     "text": "Keine Einträge in Malware-Feeds"
-    },
-    {
-     "check": "urlhaus_compromise",
-     "field": "positive",
-     "members": [
-      "scan"
-     ],
-     "statement": "positive.text",
-     "text": "Für vectigal.tech, vectiscan.de liegt kein Treffer in öffentlichen Datenbanken zur Schadsoftware-Verteilung vor."
-    }
-   ],
-   "text": "Für vectigal.tech, vectiscan.de liegt kein Treffer in öffentlichen Datenbanken zur Schadsoftware-Verteilung vor.",
-   "title": "Keine Einträge in Malware-Feeds"
-  },
-  {
-   "cat": "D",
-   "provenance": [
-    {
-     "check": "hsts_short",
-     "field": "positive",
-     "members": [
-      "10finance.vectigal.tech@62.217.52.165",
-      "board.vectigal.tech@62.217.52.165",
-      "crm.vectigal.tech@62.217.52.165",
-      "crmviewer.vectigal.tech@62.217.52.165",
-      "gutachter.vectigal.tech@62.217.52.165"
-     ],
-     "statement": "positive.title",
-     "text": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
-    },
-    {
-     "check": "hsts_short",
-     "field": "positive",
-     "members": [
-      "10finance.vectigal.tech@62.217.52.165",
-      "board.vectigal.tech@62.217.52.165",
-      "crm.vectigal.tech@62.217.52.165",
-      "crmviewer.vectigal.tech@62.217.52.165",
-      "gutachter.vectigal.tech@62.217.52.165"
-     ],
-     "statement": "positive.text",
-     "text": "Die Dienste 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech (insgesamt 5 Einträge) setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer."
-    }
-   ],
-   "text": "Die Dienste 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech (insgesamt 5 Einträge) setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer.",
-   "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   }
  ],
  "scope": {
@@ -1724,7 +2115,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Der Portscan fand keinen offenen Port; weitere Prüfungen entfielen.",
+    "coverage": "Ohne Antwort, vom Prüfstand aus nicht erreichbar; weitere Prüfungen entfielen.",
     "fqdns": "test.vectigal.tech",
     "ip": "62.217.52.177",
     "more_ips": [],
@@ -1736,67 +2127,310 @@
   "limitations": [
    {
     "checks": [
-     "Diensterkennung",
+     "Portscan und Diensterkennung",
      "Sicherheits-Header",
      "Transportverschlüsselung",
      "Webanalyse"
     ],
+    "code": "no_response",
     "detail": "Betroffen: 62.217.52.177 (test.vectigal.tech).",
-    "what": "Portscan ohne offenen Port"
+    "refs": [],
+    "subjects": [
+     "62.217.52.177"
+    ],
+    "what": "Ohne Antwort, vom Prüfstand aus nicht erreichbar"
    },
    {
     "checks": [
      "DKIM-Signatur"
     ],
+    "code": "dkim_selector_unknown",
     "detail": "Betroffen: vectiscan.de. Unter 62 abgefragten gängigen Selektoren, darunter default, selector1, selector2, google, k1, s1, war kein Schlüssel veröffentlicht (vollständige Liste im Anhang bei den eingesetzten Werkzeugen). Ob die Domain signiert, zeigt der Kopf einer echten E-Mail (DKIM-Signature, Angabe s=).",
+    "refs": [
+     "dkim_missing|vectiscan.de"
+    ],
+    "subjects": [
+     "vectiscan.de"
+    ],
     "what": "DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar"
    },
    {
     "checks": [
      "Bekannte Schwachstellen der erkannten Versionen"
     ],
+    "code": "no_enrichment",
     "detail": "Betroffen: 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, feedgenerator.vectigal.tech, gutachter-api.vectigal.tech, gutachter.vectigal.tech, id.vectigal.tech, ki-check-10finance.vectigal.tech, ki-check.vectigal.tech, logs.vectigal.tech, mcp-test.vectigal.tech, monitoring.vectigal.tech, page.vectigal.tech, protokoll-assist.vectigal.tech, rankingcoach.vectigal.tech, saferouter-admin.vectigal.tech, saferouter-api.vectigal.tech, saferouter-app.vectigal.tech, saferouter-auth.vectigal.tech, saferouter-www.vectigal.tech, scan-api.vectigal.tech, scan.vectigal.tech, shopify.vectigal.tech, status.vectigal.tech, traefik.vectigal.tech, vectigal.tech, webcheck.vectigal.tech).",
+    "refs": [
+     "cve_kev_listed|62.217.52.165",
+     "cve_known_version|62.217.52.165"
+    ],
+    "subjects": [
+     "62.217.52.165"
+    ],
     "what": "Keine Fremdbewertung aus Schwachstellendatenbanken zu den erkannten Versionen"
    },
    {
     "checks": [
-     "TLS-Protokollversionen",
-     "Verschlüsselungsverfahren"
+     "crm.vectigal.tech"
     ],
+    "code": "headers_redirect_only",
+    "detail": "Betroffen: crm.vectigal.tech (200 auf /welcome).",
+    "refs": [
+     "csp_missing|crm.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|crm.vectigal.tech@62.217.52.165"
+    ],
+    "subjects": [
+     "crm.vectigal.tech@62.217.52.165"
+    ],
+    "what": "Sicherheits-Header nur an einer Weiterleitung (200) gemessen, Endseite nicht bewertet"
+   },
+   {
+    "checks": [
+     "Zertifikatskette"
+    ],
+    "code": "cert_chain_unknown",
     "detail": "Betroffen: 10finance.vectigal.tech.",
-    "what": "Transportverschlüsselung nur über die ausgehandelte Verbindung belegt"
+    "refs": [
+     "cert_chain_incomplete|10finance.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|board.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|crm.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|crmviewer.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|gutachter.vectigal.tech@62.217.52.165"
+    ],
+    "subjects": [
+     "62.217.52.165"
+    ],
+    "what": "Vertrauenskette des Zertifikats nicht geprüft"
    },
    {
     "checks": [
      "Webanalyse"
     ],
-    "detail": "Betroffen: 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere).",
+    "code": "zap_api_error",
+    "detail": "Betroffen: 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und 27 weitere).",
+    "refs": [],
+    "subjects": [
+     "62.217.52.165"
+    ],
     "what": "Webanalyse im Scanner fehlgeschlagen"
    },
    {
     "checks": [
      "Abruf der gesamten DNS-Zone",
      "Content-Security-Policy",
-     "DMARC-Richtlinie",
      "Gültigkeit der Zertifikate",
      "HSTS",
      "Namen im Zertifikat",
      "Sicherheits-Header",
      "TLS 1.3",
      "TLS-Protokollversionen",
-     "Verschlüsselungsverfahren",
      "Zertifikatskette"
     ],
+    "code": "insufficient_facts",
     "detail": "Betroffen: ki-check-10finance.vectigal.tech, vectiscan.de.",
-    "what": "Werkzeugdaten reichen für eine Aussage nicht aus"
-   },
-   {
-    "checks": [
-     "Namen im Zertifikat",
-     "Zertifikatskette"
+    "refs": [
+     "cert_chain_incomplete|agent.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|auth.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|feedgenerator.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|gutachter-api.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|id.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|ki-check-10finance.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|ki-check.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|logs.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|mcp-test.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|monitoring.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|page.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|protokoll-assist.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|rankingcoach.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|saferouter-admin.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|saferouter-api.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|saferouter-app.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|saferouter-auth.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|saferouter-www.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|scan-api.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|scan.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|shopify.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|status.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|traefik.vectigal.tech@62.217.52.165",
+     "cert_chain_incomplete|webcheck.vectigal.tech@62.217.52.165",
+     "cert_expired|agent.vectigal.tech@62.217.52.165",
+     "cert_expired|auth.vectigal.tech@62.217.52.165",
+     "cert_expired|feedgenerator.vectigal.tech@62.217.52.165",
+     "cert_expired|gutachter-api.vectigal.tech@62.217.52.165",
+     "cert_expired|id.vectigal.tech@62.217.52.165",
+     "cert_expired|ki-check-10finance.vectigal.tech@62.217.52.165",
+     "cert_expired|ki-check.vectigal.tech@62.217.52.165",
+     "cert_expired|logs.vectigal.tech@62.217.52.165",
+     "cert_expired|mcp-test.vectigal.tech@62.217.52.165",
+     "cert_expired|monitoring.vectigal.tech@62.217.52.165",
+     "cert_expired|page.vectigal.tech@62.217.52.165",
+     "cert_expired|protokoll-assist.vectigal.tech@62.217.52.165",
+     "cert_expired|rankingcoach.vectigal.tech@62.217.52.165",
+     "cert_expired|saferouter-admin.vectigal.tech@62.217.52.165",
+     "cert_expired|saferouter-api.vectigal.tech@62.217.52.165",
+     "cert_expired|saferouter-app.vectigal.tech@62.217.52.165",
+     "cert_expired|saferouter-auth.vectigal.tech@62.217.52.165",
+     "cert_expired|saferouter-www.vectigal.tech@62.217.52.165",
+     "cert_expired|scan-api.vectigal.tech@62.217.52.165",
+     "cert_expired|scan.vectigal.tech@62.217.52.165",
+     "cert_expired|shopify.vectigal.tech@62.217.52.165",
+     "cert_expired|status.vectigal.tech@62.217.52.165",
+     "cert_expired|traefik.vectigal.tech@62.217.52.165",
+     "cert_expired|webcheck.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|agent.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|auth.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|feedgenerator.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|gutachter-api.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|id.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|ki-check-10finance.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|ki-check.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|logs.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|mcp-test.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|monitoring.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|page.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|protokoll-assist.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|rankingcoach.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|saferouter-admin.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|saferouter-api.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|saferouter-app.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|saferouter-auth.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|saferouter-www.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|scan-api.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|scan.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|shopify.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|status.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|traefik.vectigal.tech@62.217.52.165",
+     "cert_hostname_mismatch|webcheck.vectigal.tech@62.217.52.165",
+     "csp_missing|agent.vectigal.tech@62.217.52.165",
+     "csp_missing|auth.vectigal.tech@62.217.52.165",
+     "csp_missing|feedgenerator.vectigal.tech@62.217.52.165",
+     "csp_missing|gutachter-api.vectigal.tech@62.217.52.165",
+     "csp_missing|id.vectigal.tech@62.217.52.165",
+     "csp_missing|ki-check-10finance.vectigal.tech@62.217.52.165",
+     "csp_missing|ki-check.vectigal.tech@62.217.52.165",
+     "csp_missing|logs.vectigal.tech@62.217.52.165",
+     "csp_missing|mcp-test.vectigal.tech@62.217.52.165",
+     "csp_missing|monitoring.vectigal.tech@62.217.52.165",
+     "csp_missing|page.vectigal.tech@62.217.52.165",
+     "csp_missing|protokoll-assist.vectigal.tech@62.217.52.165",
+     "csp_missing|rankingcoach.vectigal.tech@62.217.52.165",
+     "csp_missing|saferouter-admin.vectigal.tech@62.217.52.165",
+     "csp_missing|saferouter-api.vectigal.tech@62.217.52.165",
+     "csp_missing|saferouter-app.vectigal.tech@62.217.52.165",
+     "csp_missing|saferouter-auth.vectigal.tech@62.217.52.165",
+     "csp_missing|saferouter-www.vectigal.tech@62.217.52.165",
+     "csp_missing|scan-api.vectigal.tech@62.217.52.165",
+     "csp_missing|scan.vectigal.tech@62.217.52.165",
+     "csp_missing|shopify.vectigal.tech@62.217.52.165",
+     "csp_missing|status.vectigal.tech@62.217.52.165",
+     "csp_missing|traefik.vectigal.tech@62.217.52.165",
+     "csp_missing|vectigal.tech@62.217.52.165",
+     "csp_missing|webcheck.vectigal.tech@62.217.52.165",
+     "dns_zone_transfer|vectiscan.de",
+     "hsts_missing|agent.vectigal.tech@62.217.52.165",
+     "hsts_missing|auth.vectigal.tech@62.217.52.165",
+     "hsts_missing|feedgenerator.vectigal.tech@62.217.52.165",
+     "hsts_missing|gutachter-api.vectigal.tech@62.217.52.165",
+     "hsts_missing|id.vectigal.tech@62.217.52.165",
+     "hsts_missing|ki-check-10finance.vectigal.tech@62.217.52.165",
+     "hsts_missing|ki-check.vectigal.tech@62.217.52.165",
+     "hsts_missing|logs.vectigal.tech@62.217.52.165",
+     "hsts_missing|mcp-test.vectigal.tech@62.217.52.165",
+     "hsts_missing|monitoring.vectigal.tech@62.217.52.165",
+     "hsts_missing|page.vectigal.tech@62.217.52.165",
+     "hsts_missing|protokoll-assist.vectigal.tech@62.217.52.165",
+     "hsts_missing|rankingcoach.vectigal.tech@62.217.52.165",
+     "hsts_missing|saferouter-admin.vectigal.tech@62.217.52.165",
+     "hsts_missing|saferouter-api.vectigal.tech@62.217.52.165",
+     "hsts_missing|saferouter-app.vectigal.tech@62.217.52.165",
+     "hsts_missing|saferouter-auth.vectigal.tech@62.217.52.165",
+     "hsts_missing|saferouter-www.vectigal.tech@62.217.52.165",
+     "hsts_missing|scan-api.vectigal.tech@62.217.52.165",
+     "hsts_missing|scan.vectigal.tech@62.217.52.165",
+     "hsts_missing|shopify.vectigal.tech@62.217.52.165",
+     "hsts_missing|status.vectigal.tech@62.217.52.165",
+     "hsts_missing|traefik.vectigal.tech@62.217.52.165",
+     "hsts_missing|vectigal.tech@62.217.52.165",
+     "hsts_missing|webcheck.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|agent.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|auth.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|feedgenerator.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|gutachter-api.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|id.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|ki-check-10finance.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|ki-check.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|logs.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|mcp-test.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|monitoring.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|page.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|protokoll-assist.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|rankingcoach.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|saferouter-admin.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|saferouter-api.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|saferouter-app.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|saferouter-auth.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|saferouter-www.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|scan-api.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|scan.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|shopify.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|status.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|traefik.vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|vectigal.tech@62.217.52.165",
+     "security_headers_incomplete|webcheck.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|agent.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|auth.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|feedgenerator.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|gutachter-api.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|id.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|ki-check-10finance.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|ki-check.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|logs.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|mcp-test.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|monitoring.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|page.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|protokoll-assist.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|rankingcoach.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|saferouter-admin.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|saferouter-api.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|saferouter-app.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|saferouter-auth.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|saferouter-www.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|scan-api.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|scan.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|shopify.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|status.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|traefik.vectigal.tech@62.217.52.165",
+     "tls_legacy_protocols|webcheck.vectigal.tech@62.217.52.165",
+     "tls_no_13|agent.vectigal.tech@62.217.52.165",
+     "tls_no_13|auth.vectigal.tech@62.217.52.165",
+     "tls_no_13|feedgenerator.vectigal.tech@62.217.52.165",
+     "tls_no_13|gutachter-api.vectigal.tech@62.217.52.165",
+     "tls_no_13|id.vectigal.tech@62.217.52.165",
+     "tls_no_13|ki-check-10finance.vectigal.tech@62.217.52.165",
+     "tls_no_13|ki-check.vectigal.tech@62.217.52.165",
+     "tls_no_13|logs.vectigal.tech@62.217.52.165",
+     "tls_no_13|mcp-test.vectigal.tech@62.217.52.165",
+     "tls_no_13|monitoring.vectigal.tech@62.217.52.165",
+     "tls_no_13|page.vectigal.tech@62.217.52.165",
+     "tls_no_13|protokoll-assist.vectigal.tech@62.217.52.165",
+     "tls_no_13|rankingcoach.vectigal.tech@62.217.52.165",
+     "tls_no_13|saferouter-admin.vectigal.tech@62.217.52.165",
+     "tls_no_13|saferouter-api.vectigal.tech@62.217.52.165",
+     "tls_no_13|saferouter-app.vectigal.tech@62.217.52.165",
+     "tls_no_13|saferouter-auth.vectigal.tech@62.217.52.165",
+     "tls_no_13|saferouter-www.vectigal.tech@62.217.52.165",
+     "tls_no_13|scan-api.vectigal.tech@62.217.52.165",
+     "tls_no_13|scan.vectigal.tech@62.217.52.165",
+     "tls_no_13|shopify.vectigal.tech@62.217.52.165",
+     "tls_no_13|status.vectigal.tech@62.217.52.165",
+     "tls_no_13|traefik.vectigal.tech@62.217.52.165",
+     "tls_no_13|webcheck.vectigal.tech@62.217.52.165"
     ],
-    "detail": "Betroffen: 10finance.vectigal.tech.",
-    "what": "Zertifikatsdetails nicht verfügbar"
+    "subjects": [
+     "62.217.52.165",
+     "vectiscan.de"
+    ],
+    "what": "Werkzeugdaten reichen für eine Aussage nicht aus"
    }
   ],
   "method_phases": [
@@ -1818,7 +2452,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 8 Befunde und 3 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 8 Befunde und 1 positive Feststellung."
    }
   ],
   "numbers": [
@@ -1828,11 +2462,11 @@
    },
    {
     "l": "Werkzeugläufe",
-    "v": "70"
+    "v": "41"
    },
    {
-    "l": "Einzelbeobachtungen",
-    "v": "21"
+    "l": "Einzelmeldungen",
+    "v": "6"
    },
    {
     "l": "Befunde im Bericht",

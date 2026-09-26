@@ -3,6 +3,7 @@
  "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
  "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben.",
  "hinweis_s6b2": "S6b-2 hat sieben Markierungen aufgeloest: Q13 4433 ohne Fingerabdruck nur noch als Werkzeugmeldung; Q14 cors_misconfiguration und zweimal csrf_token_missing als Werkzeugmeldung; Q4 dane_missing und SSH-Banner entfallen; Q12 ip_reputation nur ohne Meldungen, die Vercel-Adresse 216.150.1.65 zaehlt nicht. Es bleiben sechs Q8-Markierungen (S6c).",
+ "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Befunde: csp_missing edi.heuel.com (+mail.heuel.com) (R1); csp_missing online.heuel.com (R1); http_alt_port 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) (R9); security_headers_incomplete edi.heuel.com (+mail.heuel.com) (R1); security_headers_incomplete online.heuel.com (R1); entfallene Positivaussagen: tls_weak_ciphers edi.heuel.com (+mail.heuel.com) (R6 (CBC-Verfahren angeboten)); tls_weak_ciphers ose.heuel.com (R6 (CBC-Verfahren angeboten)); urlhaus_compromise heuel.com (R6 (URLhaus no_data ist kein Negativergebnis)). Q8 nach Entscheidung DC 1 aufgelöst (R1, Messung an der Endseite oder nicht prüfbar): csp_missing edi.heuel.com (+mail.heuel.com); csp_missing online.heuel.com; security_headers_incomplete edi.heuel.com (+mail.heuel.com); security_headers_incomplete online.heuel.com. Als Q8 für S6c bleiben (hsts_missing gilt an jeder Antwort): VS-2026-007 hsts_missing edi.heuel.com (+mail.heuel.com); VS-2026-008 hsts_missing online.heuel.com.",
  "strict": false,
  "orders": {
   "main": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8"
@@ -21,146 +22,120 @@
   "VS-2026-003": {
    "checks": [
     "csp_missing"
-   ],
-   "spec09": "Q8",
-   "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
-  },
-  "VS-2026-004": {
-   "checks": [
-    "csp_missing"
-   ],
-   "spec09": "Q8",
-   "warum": "Gemessen an der Vercel-Challenge (429 Security Checkpoint), nicht an der Anwendung."
-  },
-  "VS-2026-005": {
-   "checks": [
-    "csp_missing"
    ]
   },
-  "VS-2026-006": {
+  "VS-2026-004": {
    "checks": [
     "csp_weak"
    ]
   },
-  "VS-2026-007": {
+  "VS-2026-005": {
    "checks": [
     "dmarc_quarantine"
    ]
   },
-  "VS-2026-008": {
+  "VS-2026-006": {
    "checks": [
     "dnssec_missing"
    ]
   },
-  "VS-2026-009": {
+  "VS-2026-007": {
    "checks": [
     "hsts_missing"
    ],
    "spec09": "Q8",
    "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
   },
-  "VS-2026-010": {
+  "VS-2026-008": {
    "checks": [
     "hsts_missing"
    ],
    "spec09": "Q8",
    "warum": "Gemessen an der Vercel-Challenge (429 Security Checkpoint), nicht an der Anwendung."
   },
-  "VS-2026-011": {
+  "VS-2026-009": {
    "checks": [
     "hsts_missing"
+   ]
+  },
+  "VS-2026-010": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-011": {
+   "checks": [
+    "info_disclosure"
    ]
   },
   "VS-2026-012": {
    "checks": [
-    "http_alt_port"
+    "legacy_protocols_present"
    ]
   },
   "VS-2026-013": {
    "checks": [
-    "info_disclosure"
+    "legacy_protocols_present"
    ]
   },
   "VS-2026-014": {
    "checks": [
-    "info_disclosure"
+    "mta_sts_missing"
    ]
   },
   "VS-2026-015": {
    "checks": [
-    "legacy_protocols_present"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-016": {
    "checks": [
-    "legacy_protocols_present"
-   ]
+    "service_unidentified"
+   ],
+   "spec10": "R9",
+   "warum": "Offener Dienst ohne Banner, Titel oder Zertifikat; neue Prüfung statt „Zweck klären“ oder unverarbeitet."
   },
   "VS-2026-017": {
-   "checks": [
-    "mta_sts_missing"
-   ]
-  },
-  "VS-2026-018": {
-   "checks": [
-    "security_headers_incomplete"
-   ],
-   "spec09": "Q8",
-   "warum": "Gemessen an einer 403-Antwort; eine Fehlerseite ist keine Webseite des Kunden."
-  },
-  "VS-2026-019": {
-   "checks": [
-    "security_headers_incomplete"
-   ],
-   "spec09": "Q8",
-   "warum": "Gemessen an der Vercel-Challenge (429 Security Checkpoint), nicht an der Anwendung."
-  },
-  "VS-2026-020": {
-   "checks": [
-    "security_headers_incomplete"
-   ]
-  },
-  "VS-2026-021": {
    "checks": [
     "spf_softfail"
    ]
   },
-  "VS-2026-022": {
+  "VS-2026-018": {
    "checks": [
     "sri_missing"
    ]
   },
-  "VS-2026-023": {
+  "VS-2026-019": {
    "checks": [
     "tls_no_13"
    ]
   },
-  "VS-2026-024": {
+  "VS-2026-020": {
    "checks": [
     "tls_no_13"
    ]
   },
-  "VS-2026-025": {
+  "VS-2026-021": {
    "checks": [
     "tls_rpt_missing"
    ]
   },
-  "VS-2026-026": {
+  "VS-2026-022": {
    "checks": [
     "tls_weakness_reported"
    ]
   },
-  "VS-2026-027": {
+  "VS-2026-023": {
    "checks": [
     "tls_weakness_reported"
    ]
   },
-  "VS-2026-028": {
+  "VS-2026-024": {
    "checks": [
     "web_vulnerability_reported"
    ]
   },
-  "VS-2026-029": {
+  "VS-2026-025": {
    "checks": [
     "web_vulnerability_reported"
    ]
@@ -179,8 +154,10 @@
   },
   "VS-2026-P03": {
    "checks": [
-    "cert_expired"
-   ]
+    "cert_chain_incomplete"
+   ],
+   "spec10": "R4",
+   "warum": "Zertifikat über Fingerabdruck oder Namensabdeckung dem Namen zugeordnet."
   },
   "VS-2026-P04": {
    "checks": [
@@ -199,7 +176,7 @@
   },
   "VS-2026-P07": {
    "checks": [
-    "cert_hostname_mismatch"
+    "cert_expired"
    ]
   },
   "VS-2026-P08": {
@@ -209,22 +186,26 @@
   },
   "VS-2026-P09": {
    "checks": [
-    "csp_missing"
+    "cert_hostname_mismatch"
    ]
   },
   "VS-2026-P10": {
    "checks": [
-    "db_exposed"
-   ]
+    "cert_hostname_mismatch"
+   ],
+   "spec10": "R4",
+   "warum": "Zertifikat über Fingerabdruck oder Namensabdeckung dem Namen zugeordnet."
   },
   "VS-2026-P11": {
    "checks": [
-    "db_exposed"
-   ]
+    "cert_hostname_mismatch"
+   ],
+   "spec10": "R4",
+   "warum": "Zertifikat über Fingerabdruck oder Namensabdeckung dem Namen zugeordnet."
   },
   "VS-2026-P12": {
    "checks": [
-    "db_exposed"
+    "csp_missing"
    ]
   },
   "VS-2026-P13": {
@@ -234,57 +215,57 @@
   },
   "VS-2026-P14": {
    "checks": [
-    "dkim_missing"
+    "db_exposed"
    ]
   },
   "VS-2026-P15": {
    "checks": [
-    "dmarc_missing"
+    "db_exposed"
    ]
   },
   "VS-2026-P16": {
    "checks": [
-    "dns_dangling_cname"
+    "db_exposed"
    ]
   },
   "VS-2026-P17": {
    "checks": [
-    "dns_zone_transfer"
+    "dkim_missing"
    ]
   },
   "VS-2026-P18": {
    "checks": [
-    "ftp_plaintext"
+    "dmarc_missing"
    ]
   },
   "VS-2026-P19": {
    "checks": [
-    "ftp_plaintext"
+    "dns_dangling_cname"
    ]
   },
   "VS-2026-P20": {
    "checks": [
-    "hsts_missing"
+    "dns_zone_transfer"
    ]
   },
   "VS-2026-P21": {
    "checks": [
-    "hsts_short"
+    "ftp_plaintext"
    ]
   },
   "VS-2026-P22": {
    "checks": [
-    "http_no_tls"
+    "ftp_plaintext"
    ]
   },
   "VS-2026-P23": {
    "checks": [
-    "http_no_tls"
+    "hsts_missing"
    ]
   },
   "VS-2026-P24": {
    "checks": [
-    "http_no_tls"
+    "hsts_short"
    ]
   },
   "VS-2026-P25": {
@@ -294,17 +275,17 @@
   },
   "VS-2026-P26": {
    "checks": [
-    "ip_reputation"
+    "http_no_tls"
    ]
   },
   "VS-2026-P27": {
    "checks": [
-    "ip_reputation"
+    "http_no_tls"
    ]
   },
   "VS-2026-P28": {
    "checks": [
-    "ip_reputation"
+    "http_no_tls"
    ]
   },
   "VS-2026-P29": {
@@ -319,22 +300,22 @@
   },
   "VS-2026-P31": {
    "checks": [
-    "mail_plaintext"
+    "ip_reputation"
    ]
   },
   "VS-2026-P32": {
    "checks": [
-    "rdp_exposed"
+    "ip_reputation"
    ]
   },
   "VS-2026-P33": {
    "checks": [
-    "rdp_exposed"
+    "ip_reputation"
    ]
   },
   "VS-2026-P34": {
    "checks": [
-    "rdp_exposed"
+    "mail_plaintext"
    ]
   },
   "VS-2026-P35": {
@@ -344,22 +325,22 @@
   },
   "VS-2026-P36": {
    "checks": [
-    "security_headers_incomplete"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P37": {
    "checks": [
-    "smb_exposed"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P38": {
    "checks": [
-    "smb_exposed"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P39": {
    "checks": [
-    "smb_exposed"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-P40": {
@@ -369,55 +350,69 @@
   },
   "VS-2026-P41": {
    "checks": [
-    "spf_missing"
+    "smb_exposed"
    ]
   },
   "VS-2026-P42": {
    "checks": [
-    "tls_legacy_protocols"
+    "smb_exposed"
    ]
   },
   "VS-2026-P43": {
    "checks": [
-    "tls_legacy_protocols"
+    "smb_exposed"
    ]
   },
   "VS-2026-P44": {
    "checks": [
-    "tls_legacy_protocols"
+    "spf_missing"
    ]
   },
   "VS-2026-P45": {
    "checks": [
-    "tls_no_13"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P46": {
    "checks": [
-    "tls_no_13"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P47": {
    "checks": [
-    "tls_weak_ciphers"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P48": {
    "checks": [
-    "tls_weak_ciphers"
-   ]
+    "tls_legacy_protocols"
+   ],
+   "spec10": "R4",
+   "warum": "testssl-Ergebnis gilt je Adresse und Port für alle virtuellen Hosts."
   },
   "VS-2026-P49": {
    "checks": [
-    "tls_weak_ciphers"
+    "tls_no_13"
    ]
   },
   "VS-2026-P50": {
    "checks": [
-    "urlhaus_compromise"
+    "tls_no_13"
    ]
   },
   "VS-2026-P51": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P52": {
+   "checks": [
+    "tls_weak_ciphers"
+   ],
+   "spec10": "R4",
+   "warum": "testssl-Ergebnis gilt je Adresse und Port für alle virtuellen Hosts; ohne angebotene CBC-Verfahren."
+  },
+  "VS-2026-P53": {
    "checks": [
     "waf_present"
    ]

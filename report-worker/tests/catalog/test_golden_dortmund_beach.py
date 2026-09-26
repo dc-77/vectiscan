@@ -99,7 +99,9 @@ def test_web_vulnerability_active_ist_an_echten_daten_entschieden(results):
     nachgewiesen" und ist ein bekannter Falschpositiv-Kandidat. Jetzt ist sie eine
     Werkzeugmeldung im Anhang und kein Befund.
     """
-    rows = _by_check(results, "web_vulnerability_active")
+    # S6b-3 (spec/10 R3): der nicht eingerichtete Name pflege.dortmund-beach.com bekommt keine
+    # Webanalyse (parked_name); entschieden sein muessen die eingerichteten Namen.
+    rows = [r for r in _by_check(results, "web_vulnerability_active") if r.reason_code != "parked_name"]
     assert rows
     assert all(r.status in ("fail", "pass") for r in rows), (
         f"unentschieden: {[(r.status, r.reason_code) for r in rows]}")
@@ -121,7 +123,9 @@ def test_web_vulnerability_active_ist_an_echten_daten_entschieden(results):
 
 def test_sensitive_path_exposed_ist_pruefbar(results):
     """feroxbuster lief; die Pruefung ist damit entschieden, nicht ungedeckt."""
-    rows = _by_check(results, "sensitive_path_exposed")
+    # S6b-3 (spec/10 R3): der nicht eingerichtete Name pflege.dortmund-beach.com bekommt keine
+    # Webanalyse (parked_name); entschieden sein muessen die eingerichteten Namen.
+    rows = [r for r in _by_check(results, "sensitive_path_exposed") if r.reason_code != "parked_name"]
     assert rows
     assert all(r.status in ("fail", "pass") for r in rows), (
         f"unentschieden: {[(r.status, r.reason_code) for r in rows]}")

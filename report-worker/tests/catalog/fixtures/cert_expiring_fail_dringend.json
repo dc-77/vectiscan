@@ -1,45 +1,45 @@
 {
- "_note": "E2: bis sieben Tage Restlaufzeit rot und Unverzüglich (castenow mailstore, 1 Tag).",
- "facts": {
-  "tls": [
-   {
-    "host_ip": "10.0.0.1",
-    "fqdn": "www.example.test",
-    "port": 443,
-    "source": "testssl",
-    "protocols": {
-     "SSLv2": false,
-     "SSLv3": false,
-     "TLS1.0": false,
-     "TLS1.1": false,
-     "TLS1.2": true,
-     "TLS1.3": true
-    },
-    "cert": {
-     "cn": "www.example.test",
-     "san": [
-      "www.example.test"
-     ],
-     "issuer": "Beispiel CA",
-     "not_before": "2025-09-01T00:00:00Z",
-     "not_after": "2026-09-20T00:00:00Z",
-     "days_left": 1,
-     "expired": false,
-     "mismatch": false,
-     "chain_ok": true,
-     "self_signed": null
-    }
-   }
-  ]
- },
- "coverage_default": "ok",
- "expect": {
-  "status": "fail",
-  "group_key": "www.example.test@10.0.0.1",
-  "affected": [
-   "www.example.test:443 (1 Tag)"
-  ],
-  "positive": false,
-  "urgent": true
- }
+  "_note": "E2: bis sieben Tage Restlaufzeit rot und Unverzüglich (castenow mailstore, 1 Tag).",
+  "facts": {
+    "tls": [
+      {
+        "host_ip": "10.0.0.1",
+        "fqdn": "www.example.test",
+        "port": 443,
+        "source": "testssl",
+        "protocols": {
+          "SSLv2": false,
+          "SSLv3": false,
+          "TLS1.0": false,
+          "TLS1.1": false,
+          "TLS1.2": true,
+          "TLS1.3": true
+        },
+        "cert": {
+          "cn": "www.example.test",
+          "san": [
+            "www.example.test"
+          ],
+          "issuer": "Beispiel CA",
+          "not_before": "2025-09-01T00:00:00Z",
+          "not_after": "2026-09-20T00:00:00Z",
+          "days_left": 1,
+          "expired": false,
+          "mismatch": false,
+          "chain_ok": true,
+          "self_signed": null
+        }
+      }
+    ]
+  },
+  "coverage_default": "ok",
+  "expect": {
+    "status": "fail",
+    "group_key": "www.example.test@10.0.0.1",
+    "affected": [
+      "www.example.test:443 (gültig bis 20.09.2026; am Scantag 1 Tag Restlaufzeit)"
+    ],
+    "positive": false,
+    "urgent": true
+  }
 }

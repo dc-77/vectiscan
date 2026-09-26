@@ -452,6 +452,144 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
     ae8d1d70 36->34, f77ccff2 44->43; halbleer bleiben 2d2d4f39 Seite 28 und 4e6b6883 Seite
     27 (Merkposten S7).
 
+- S6b-3 (spec/10 R1 bis R19 und E13; Entscheidungen DC 26.09. zu Q8, RDP/SMB, HSTS und
+  Wortlaut R1), Fakten 1.1.0, Katalog 2026-09-26.2; Golden-Fakten, Reportdaten aller 21
+  Aufträge, HTML-Schnappschuss und die elf abgeleiteten Soll-Listen neu gebaut.
+  - R1 (Messbasis der Header): `security_headers_incomplete`, `csp_missing`, `csp_weak` und
+    `header_duplicate` lesen `http.header_eval` und sind an einer Weiterleitung, Fehlerseite
+    oder Sicherheitsabfrage nicht prüfbar (`headers_redirect_only`, `headers_error_only`,
+    `headers_challenge_only`); die Einschränkungszeile nennt den Statuscode aus dem Fakt und
+    das Ziel ("bergersysteme.com (301 auf www.bergersysteme.com)"). `hsts_missing` gilt an
+    jeder Antwort. Endseiten aus `redirect_probe` (junkerwerk outlook, huendgen exchange,
+    castenow owa und ubb-wiki), aus dem testssl-HTTP-Abschnitt (castenow bitwarden) und als
+    Teilbeleg aus ZAP (junkerwerk autodiscover, castenow mail und mail2). Abweichung von
+    spec/10: huendgen exchange hat eine Endseitenmessung (`logon.aspx`, redirect_probe), und
+    junkerwerk autodiscover ist nicht "nicht prüfbar", sondern ein Teilbefund aus ZAP an
+    `/owa/auth/logon.aspx` (X-Content-Type-Options und CSP fehlen, die übrigen Header sind
+    unbekannt, der Nachweis sagt "nur einzelne Header belegt").
+  - Q8 (Entscheidung DC 1): 15 der 18 Markierungen aufgelöst. Zwölf Einträge entfallen
+    (bergersysteme csp und security_headers an bergersysteme.com und ftp, castenow csp an
+    ubb-wiki, csp_weak und security_headers an mailstore, Positiv csp_missing an mailstore,
+    heuel csp und security_headers an edi und online), drei bleiben als Befund, jetzt an der
+    Endseite gemessen (huendgen exchange, junkerwerk autodiscover und outlook; Markierung
+    `spec10: R1`). Als Q8 für S6c bleiben die drei `hsts_missing` an bergersysteme ftp (403),
+    heuel edi (403) und heuel online (429); `test_nach_s6b3_bleiben_drei_q8_markierungen`.
+  - R2: Aussagen je fehlendem Header (`missing_header_names`), eigene niedrige Variante nur
+    Permissions-Policy, CSP je Direktive (script-src gegen style-src, Nonce und Hash),
+    Wildcard-Satz nur mit `wildcard_directives`; Gate `header_nicht_fehlend`.
+  - R3: Abdeckung "Transportverschlüsselung nur für 443 (SNI …) geprüft, nicht für Port …"
+    mit Zeile "Transportverschlüsselung nur für einen Teil der TLS-Dienste geprüft"
+    (dortmund-beach acht Ports, bergersysteme Plesk-Mailports); aktive Webanalyse "teilweise"
+    ohne echten Inhalt am zap_active-Ziel und bei ZAP ohne Meldungen (huendgen, heuel ose,
+    heuel online, junkerwerk .29 IIS-Standardseite); Hosts ohne nmap-Hostbericht "ohne
+    Antwort, vom Prüfstand aus nicht erreichbar" (heuel 195.225.241.75, bergersysteme
+    79.140.188.181; Grund `no_response` statt `no_open_ports`); neue Prüfung
+    `service_cert_expired` (bergersysteme Plesk-Mailports beim Hoster); Werkzeugläufe ohne
+    übersprungene und `ai_*`.
+  - R4: testssl je IP:Port für alle virtuellen Hosts, Zertifikat über Fingerabdruck oder SAN
+    (`cert_assigned_from`), Namensabgleich aus der SAN-Liste (heuel www); `blocked` nur mit
+    belegter Sperre (bergersysteme 198.202.211.1 ohne Sperre und ohne Anhang-E-Satz);
+    Faktenfamilien unterdrücken "Daten reichen nicht aus" neben einer Messung (castenow und
+    dortmund-beach DMARC); Parkname dortmund-beach pflege `parked_name`; Familie
+    `cert_trust` getrennt in Kette, Name und Selbstsignatur (sonst Widerspruch bei
+    krause-computer und trunk-immobilien).
+  - R5: Zeile "Gefunden, nicht geprüft" mit Namen und Adressen, Drittanbieter-Zeilen in 2.1
+    (castenow und heuel autodiscover, lumbeck-wolter autodiscover), Phase 0 "Geprüft wurden n
+    von m ermittelten Namen"; Gate-Warnung `namen_nicht_geprueft` (14 der 21 Aufträge).
+  - R6: Verfahren-Positivaussage nur ohne CBC (castenow .4, junkerwerk, huendgen exchange
+    und weitere verlieren sie); Reputation positiv nur, wenn alle gemessenen Adressen samt
+    Plattform ohne Meldung sind (heuel ohne Positivbefund, Kapitel 3 nennt 216.150.1.65 mit
+    26 Meldungen); URLhaus `no_data` ist kein Negativergebnis (Positiv `urlhaus_compromise`
+    entfällt überall); Kategorie B grau "nicht bewertbar" ohne Lebenszyklusquelle (castenow,
+    heuel); lumbeck-wolter und junkerwerk bleiben grün, weil Debian 12 mit LTS-Ende
+    30.06.2028 und Quelle Debian LTS bewertbar ist, der Positivbefund nennt nur diese Zeile
+    (Abweichung von spec/10, dort "grau" auf Grund von Debian 12 ohne Quelle); Zonentransfer
+    je Domain (junkerwerk.hu mit `zone_transfer_junkerwerk.hu.txt`); Listen mit sechs Namen
+    und "und n weitere"; Positivbefunde auf geteilten Systemen mit "beim Hoster X".
+  - RDP/SMB (Entscheidung DC 2): nur ein RDP- oder SMB-Port-Fakt widerspricht dem
+    Positivbefund. Die S6a-Konfliktregel (FTP, SSH ausserhalb 22, Verwaltungsoberfläche,
+    `positive_conflicts`) ist mit dem Titel aus #30 gegenstandslos; "außer X" steht nur noch
+    mit Port-Fakt, und dann entfällt der Positivbefund, weil der Befund im selben Bündel
+    steht. Die Hündgen-Regressionssperre (`tests/v3/fixtures/huendgen_62c1e866.json`,
+    `test_huendgen_ftp_host_bleibt_im_positivbefund`) prüft die neue Lesart: drei Hosts im
+    Positivbefund, FTP-Befund daneben. castenow ohne "außer 92.205.163.53".
+  - R7: POP3 ohne `USER` und mit leerem `SASL` vor `STLS` ist TLS-Zwang (lumbeck-wolter,
+    junkerwerk, heuel 110); `mail_plaintext` positiv nur mit belegtem TLS-Zwang; Gate
+    `positiv_widerspricht_befund`.
+  - R8: Posture aus denselben Regelergebnissen; "TLS-RPT" und "DANE" getrennt, DANE
+    "entfällt (MX beim Dienstleister)"; `hsts_short` unter Sicherheits-Header; Gate
+    `posture_widerspricht_befund`.
+  - R9 und HSTS (Entscheidung DC 3): `max-age=0` als "HSTS abgeschaltet" unter `hsts_missing`
+    (dortmund-beach: `hsts_short` entfällt, `hsts_missing` neu), `hsts_short` im Bündel
+    `web_header_hygiene`; Kennung vor "Zweck klären" (castenow Shoutcast und Icecast, huendgen
+    444 mit vollem Titel "Web Applications Portal" aus dem nmap-Element); neue Prüfung
+    `service_unidentified` (huendgen 1000 bis 1002, heuel 8443 statt `http_alt_port`);
+    castenow 8001 mit Kennung aus dem Zertifikat (Beobachtung ohne Regel); Exchange 2019 mit
+    Variante "Ablösung planen"; X-FEServer als interner Servername; Rollentexte
+    "Redaktionszugang" (castenow ubb-wiki, WordPress) und Zusatz "nur eine Fehlerseite
+    (400)" (castenow mailstore).
+  - R10: E5 je Adresse; Gate `e5_fehlt`.
+  - R11 (E8): eine Planzeile je getroffener Regel mit ihrer ersten Stufe und dem Effekt dieser
+    Stufe (`Recommendation.effect` für DMARC, software_eol, ip_reputation und http_alt_port);
+    Hebel nach Titel entdoppelt und mit "Beim Hoster einfordern:"; Planzeilen je Auftrag
+    siehe unten (junkerwerk 31d67a02 11 -> 22).
+  - R12: Beobachtungen ohne Regeltreffer als Liste statt Zusage; Anhang D "Grundlage sind die
+    vollständigen Werkzeugausgaben"; Gate `zusage_im_kundentext`.
+  - R13: `findings_data.customer_context` mit Wert und Quelle je Feld; Mitarbeiterzahl und
+    Branche nur mit Quelle Kunde oder Admin in der Prosa-Eingabe; Betriebsform je System;
+    "Unternehmensnetz" nur mit einem System am Anschluss; Prosa-Gate prüft Mitarbeiterzahl,
+    Anschluss, Mehrfaktor ohne Bedingung und relative Fristen.
+  - R14: Werkzeugzeilen mit deutschem Kopf ("IMAP-Fähigkeiten: …" ohne Füllwörter und
+    Antwortmarken), "oder neuer (Untergrenze)", TRACE-Zeile nur bei `http_trace_enabled`,
+    Kürzung an Kopf- oder Wortgrenzen, deutsches Datum, Quellen in 3.1 wie in Anhang C
+    (crt.sh, ffuf, CMS-Erkennung, Weiterleitungsprüfung), MariaDB durchgängig, A.3 mit den
+    wpscan-CVE (dortmund-beach 17, "Quelle wpscan, ohne Fremdbewertung"); Kennzahlen aus der
+    Bilanz `phase3_correlation`; Gate `cve_ohne_a3`.
+  - R15: deutscher Titel je ZAP-Regel, Anzahl in jeder Zeile, aktive Meldungen "nicht
+    bestätigt, Konfidenz …", ZAP-Meldungen ohne anschlagende Regel (`covered_by`) im Anhang
+    (castenow X-Powered-By, Header an Weiterleitungen), Spaltenbreiten.
+  - R16: Rechtsform mit Bindestrich ("Berger EDV-Systemberatungs"); Spalte "Netzbetreiber
+    (laut RIPE) / Rolle".
+  - R17: Zuständigkeitskasten ohne Fremddomains ("auf demselben Server laut Passivquelle n
+    weitere Domains anderer Kunden").
+  - R18: "gültig bis 24.09.2026, 23:59 UTC; am Scantag 1 Tag Restlaufzeit", mit Berichtstag
+    nach Ablauf "seit 24.09.2026 abgelaufen, sofern nicht erneuert"; Gate-Warnung
+    `frist_vor_berichtsdatum`.
+  - R19: neue Prüfungen `smtp_vrfy_enabled` (dortmund-beach 465, 587),
+    `smtp_vrfy_enabled_passive` (dortmund-beach, bergersysteme, castenow Port 25),
+    `wordpress_xmlrpc_enabled` (dortmund-beach), `login_over_http_passive` (bergersysteme
+    62.217.52.162), `spf_authorizes_shared_host` (castenow 159.69.143.80 und junkerwerk
+    188.40.3.130, beide Server laut Shodan mit Domains anderer Kunden); "Version beim
+    Betreiber prüfen" (heuel Wing FTP, FortiSSH); Konfidenz mittel bei widersprechender
+    Passivquelle (heuel FortiSSH gegen WingFTPServer); AUTH vor STARTTLS, readme, wp-cron und
+    Ressourcen-Versionen als Beobachtung ohne Regel.
+  - E13: Erneuerungsverlauf aus crt.sh als Nachweiszeile der Zertifikatsbefunde ("Erneuerung
+    laut CT-Logs: bisher im Mittel 32 Tage vor Ablauf, 66 Zertifikate").
+  - Zahlen je Auftrag (Befunde, Positivbefunde, Planzeilen, Anhangzeilen, Einschränkungen):
+    dortmund-beach 1fbc92b9 12->14, 5->6, 12->20, 17->17, 6->6 (A.3 0->17); lumbeck-wolter
+    c3d5724c 5->5, 6->7, 5->8, 0->0, 2->4; junkerwerk 31d67a02 15->16, 4->5, 11->22, 6->6,
+    8->9; huendgen 3cf01f8d 11->12, 7->6, 11->16, 5->5, 4->6; bergersysteme 68d59573 9->12,
+    6->5, 9->16, 2->2, 11->12; castenow 1f8bc977 19->20, 9->12, 18->24, 15->20, 9->12; heuel
+    2e56abe1 10->10, 7->6, 10->16, 15->16, 7->12. Übrige: 0bf16342 16->17, 3->3, 15->30;
+    14272c00 12->14, 5->6, 12->20; 176db198 8->7, 5->4, 8->13; 2572eebc 16->17, 5->5, 15->30;
+    2d2d4f39 27->29, 6->7, 22->33; 45bb234c 11->11, 3->4, 11->15; 4e6b6883 28->29, 6->6,
+    21->32; 57b3ac85 5->5, 6->7, 5->8; 75338c97 8->8, 3->1, 7->11; 860d0d5a 15->16, 4->5,
+    11->22; a6df9d9d 10->11, 7->7, 10->16; ae8d1d70 19->18, 5->4, 17->27; f77ccff2 28->29,
+    7->8, 21->32; fb13a98f 13->13, 5->4, 12->18.
+  - Drift-Test junkerwerk: neue Gründe in `expected_coverage_differences` (`no_response`,
+    `cert_chain_unknown`, `mx_external`, `zone_unsigned`, `headers_*`, `parked_name`,
+    `mail_tls_unknown`) und die Header an outlook als `expected_member_differences`
+    (Multi-Lauf nur Teilbeleg, Rescan Endseite). P08 der Prototyp-Liste nur noch mit
+    `ip_reputation`, `spf_authorizes_shared_host` in `subsumed`.
+  - Seitenerwartung (ops-update-pages, MR-Pipeline 3217): mehr Planzeilen je Regel (R11),
+    Einschränkungszeilen und Anhangzeilen kosten eine bis vier Seiten. Scan-Runde 1fbc92b9
+    24->28, c3d5724c 15->16, 31d67a02 27->29, 3cf01f8d 21->23, 68d59573 23->26, 1f8bc977
+    33->35, 2e56abe1 23->24; übrige 0bf16342 30->33, 14272c00 24->28, 2572eebc 30->32,
+    2d2d4f39 43->46, 45bb234c 22->23, 4e6b6883 43->47, 57b3ac85 15->16, 860d0d5a 27->30,
+    a6df9d9d 20->22, ae8d1d70 34->35, f77ccff2 43->45, fb13a98f 25->26; 176db198 und
+    75338c97 gleich. Halbleer vor einem Kapitelanfang: 2d2d4f39 Seite 30 (vorher 28),
+    4e6b6883 Seite 29 (vorher 27), neu f77ccff2 Seite 28 (Merkposten S7).
+
 ## Abgleich spec/09 nach S6b-2
 
 Jede in spec/09 als falsch belegte Aussage der sieben Auftraege mit ihrem Stand. "Erledigt"
@@ -466,7 +604,7 @@ nennt Session und Test, "offen" den Grund und die Session.
 | Q5 | Empfehlungsstaffel vor der Dringlichkeit | erledigt S6b-2 (`test_s6b2::test_erste_empfehlung_steht_auf_der_dringlichkeit`) |
 | Q6 | Plan nach Prioritaet und Effekt | erledigt S6b-2 (`test_plan`, `test_s6b2`) |
 | Q7 | Nachweis traegt die Behauptung nicht | erledigt S6b-2 (Selbstcheck `nachweis_*`, `test_spec08`) |
-| Q8 | Header an Weiterleitung, Fehler- oder Challenge-Seite | offen, Scanner (S6c); 18 Markierungen |
+| Q8 | Header an Weiterleitung, Fehler- oder Challenge-Seite | Bericht erledigt S6b-3 (R1, 15 Markierungen aufgelöst); drei `hsts_missing` offen, Scanner (S6c) |
 | Q9 | Hosts ohne Messergebnis vollstaendig | erledigt S6b-1 |
 | Q10 | Einschraenkungstabelle, TLS-Zuordnung | erledigt S6b-1; testssl an IP binden offen, Scanner (S6c) |
 | Q11 | Techniktabelle Dashboard und PDF | erledigt S6a2 und S6b-2 (Schwelle, Rohbezeichner, `test_tech_rows_paritaet`) |
@@ -502,6 +640,92 @@ nennt Session und Test, "offen" den Grund und die Session.
 | Teil 2 HL | FortiSSH gegen WingFTPServer (unsicher) | offen, nicht geklaert (S6c) |
 | Teil 3 | Deckblatt "Version / 1.0" | erledigt S6b-2 (Auslieferungsversion, Erzeugung in der Fusszeile) |
 | Teil 3 | halbleere Seiten | offen, Darstellung (S7) |
+
+## Abgleich spec/10 nach S6b-3
+
+Jede Aussage aus spec/10 Teil 1 und Teil 2 mit ihrem Stand. "Erledigt" nennt Stelle und Test,
+"offen" den Grund und die Session. Die Aussagen gelten den sieben Aufträgen der Scan-Runde.
+
+| Stelle | Aussage | Stand |
+|---|---|---|
+| R1 | Header-Regeln an 3xx, 4xx und Challenge | erledigt (Katalog `not_testable_when`, `test_facts_s6b3::test_keine_endseite`, Soll-Listen) |
+| R1 | Endantwort aus redirect_probe, wpscan, ZAP | erledigt (`http_headers.measure`, `test_jw_outlook_endseite_aus_redirect_probe`) |
+| R1 | Status und `location` im Nachweis | erledigt (Nachweis "Antwort: 302 · weitergeleitet auf") |
+| R1 | `csp_weak` nach script-src und style-src | erledigt (`csp_weak_pass_style_nonce`) |
+| R1 | header_check folgt Weiterleitungen, doppelte Header zusammenführen | offen, Scanner (S6c) |
+| R2 | Texte je fehlendem Header, Permissions-Policy allein niedrig, Gate | erledigt (Text-Fixtures, `header_nicht_fehlend`) |
+| R2 | Wildcard-Satz ohne Fakt | erledigt (`wildcard_directives`) |
+| R3 | TLS nur 443 mit SNI, übrige Ports als Zeile | erledigt (`coverage.tls_untested_ports`, `test_s6b1::test_tls_teilweise_nur_fuer_ungepruefte_ports`) |
+| R3 | aktive Webanalyse nur mit echtem Inhalt, ZAP ohne Meldungen teilweise | erledigt (`coverage._zap_active_state`) |
+| R3 | leere nmap-Ausgabe "ohne Antwort" | erledigt (`test_ohne_hostbericht_ohne_antwort`) |
+| R3 | Posture "teilweise geprüft" | erledigt (`chapters._result_state`) |
+| R3 | abgelaufenes Zertifikat an Mailports beim Hoster | erledigt (`service_cert_expired`, `test_bs_plesk_mailports_mit_abgelaufenem_zertifikat`) |
+| R3 | Werkzeugläufe ohne skipped und `ai_*` | erledigt (`report_data._counts`) |
+| R3 | testssl je Port mit `--starttls` | offen, Scanner (S6c) |
+| R4 | testssl je IP:Port an alle VHosts, Zertifikat über SAN und Fingerabdruck | erledigt (`test_testssl_gilt_fuer_alle_vhosts_eines_ports`) |
+| R4 | `blocked` nur mit belegter Sperre, kein Anhang-E-Satz | erledigt (`test_bs_198_202_211_1_ohne_sperre`) |
+| R4 | "Daten reichen nicht aus" neben Messung, Gate | erledigt (`families.py`, `einschraenkung_widerspricht_befund`) |
+| R4 | Header aus testssl (castenow bitwarden) | erledigt (`test_ca_bitwarden_ueber_testssl`) |
+| R4 | Parkname dortmund-beach pflege | erledigt (`parked_name`) |
+| R4 | heuel 217.72.203.132 Posture | erledigt (unauffällig; nur die Kette von www ist ungeprüft, eigenes Zertifikat) |
+| R5 | Zeile "Gefunden, nicht geprüft", Phase 0 "n von m", Gate-Warnung | erledigt (`test_gefundene_namen`, `namen_nicht_geprueft`) |
+| R5 | Discovery-Parser (erstes Feld, Teilausgabe) | offen, Scanner (S6c); Auslieferung nach Nachscan (DC) |
+| R6 | Cipher-Positiv nur ohne CBC | erledigt (`test_ca_cbc_angeboten`, Soll-Listen) |
+| R6 | Reputation mit Plattform- und CDN-Adressen | erledigt (`bundles.reputation_reported`, heuel Kapitel 3) |
+| R6 | URLhaus `no_data` | erledigt (`test_urlhaus_ohne_daten_ist_kein_negativergebnis`) |
+| R6 | Kategorie B grau, Herstellerpflege mit Quelle | erledigt (castenow, heuel grau; lumbeck-wolter, junkerwerk grün mit Debian 12 LTS und Quelle) |
+| R6 | Zonentransfer je Domain | erledigt (`test_zonentransfer_je_domain`) |
+| R6 | RDP/SMB "außer" nur mit Fakt | erledigt (Entscheidung DC 2, `test_bundles`) |
+| R6 | Positivbefunde beim Hoster, sechs Namen | erledigt (`operator_labels`, `test_viele_hosts_ohne_rdp_und_smb_ohne_ausser`) |
+| R7 | POP3 TLS-Zwang, Gate | erledigt (`test_pop3_ohne_user_und_sasl_vor_stls`, `positiv_widerspricht_befund`) |
+| R8 | Posture aus Regelergebnis, DANE entfällt, Gate | erledigt (`posture_widerspricht_befund`) |
+| R9 | Passivtexte, Kennung, Dienste ohne Kennung, Backport, HSTS, mail_plaintext, X-FEServer, Postfächer, Rollentexte | erledigt (Text-Fixtures, `service_unidentified`, `roles.py`) |
+| R10 | E5 je Adresse, Gate | erledigt (`test_e5_zeile_je_adresse`) |
+| R11 | Plan je Regel und Stufe, Effekt der Stufe, Hebel | erledigt (`test_jeder_befund_steht_genau_einmal_im_plan`) |
+| R12 | Zusagen, Gate | erledigt (`zusage_im_kundentext`) |
+| R13 | Kundenkontext im Export mit Quelle | erledigt (`findings_data.customer_context`, `facts.context`) |
+| R13 | Zahlen ohne Quelle, Betriebsform, MFA, Gate | erledigt (`prose._kunde`, `gate.context_claims`) |
+| R13 | "Polyethylen-Schaum" gegen Rohdaten (junkerwerk) | offen: Branchentext der Recherche; Prosa entsteht beim requeue, Prüfung im Gegenlesen spec/11 |
+| R14 | Übersetzungstabelle, Capabilities, Kürzung, Datum, MariaDB, A.3, Kennzahlen | erledigt (`werkzeug_zeile`, `test_cve_ohne_a3_greift`) |
+| R15 | ZAP-Titel, Anzahl, Konfidenz, Low/Medium im Anhang, Spaltenbreite | erledigt (`tables.ZAP_TITLES`, `uncovered_zap_messages`) |
+| R15 | `top_alerts` im Export vollständig mit Konfidenz; "CSP: Wildcard Directive" fehlt in den Daten | offen, Scanner und Export (S6c) |
+| R16 | Rechtsform mit Bindestrich, "laut RIPE" | erledigt |
+| R16 | Kurznamen huendgen, bergersysteme, heuel | offen, Claude nach dem Merge (Admin-API, E10) |
+| R17 | Fremddomains | erledigt (`operators.sentence`) |
+| R18 | absolutes Datum, Berichtstag, Gate-Warnung | erledigt (`test_frist_vor_berichtsdatum_castenow_mailstore`) |
+| R18 | Prozess E12 | offen, DC |
+| R19 | VRFY, XML-RPC, Anmeldung über HTTP, SPF geteilt, Version beim Betreiber, Konfidenz mittel, unprocessed | erledigt |
+| R19 | XML-RPC bei castenow | offen: kein Fakt in den Rohdaten (wpscan meldet dort kein xmlrpc) |
+| R19 | AUTH vor STARTTLS als Regel | offen, S6c-Fakt (Beobachtung ohne Regel bis dahin) |
+| R20 | Darstellung | offen, S7 |
+| E13 | Erneuerungsverlauf aus CT-Logs | erledigt (`test_erneuerungsverlauf_aus_crtsh`, Nachweiszeile) |
+| Teil 2 DB | Technikzeilen Slider Revolution und BeTheme doppelt, Webmin und froxlor fehlen | offen, S7 (Technikzeilen, Alias-Tabelle) |
+| Teil 2 DB | WordPress "Lifecycle prüfen" neben "aktuell"; Nachweis VS-004 nach Schwere, Zielversion | offen, S7 |
+| Teil 2 DB | Eingangs-Mailserver und DMARC-`rua` fremd, E5-Datum `last_update` | offen, S6c (Fakten) |
+| Teil 2 DB | Service-Karte 30000 grün trotz VS-003; Dateiname `v3` gegen "Version 1" | offen, S7 |
+| Teil 2 LW | R7, R10, R6, R12, R13, R14, R17 | erledigt wie oben; Kennzahl Werkzeugläufe ohne übersprungene erledigt |
+| Teil 2 JW | archiv (R5), X-FEServer (R9) | erledigt |
+| Teil 2 JW | `tech_profiles[0]` intern mit Exchange-Build und `aiStrategy` | offen, Dashboard und Admin (nicht PDF), nicht Teil von S6b-3 |
+| Teil 2 JW | Service-Karte .130 grün ohne Tiefenprüfung, 4433 grau; SonicWall-Datum; "Von der Scan-Steuerung übersprungen" für .28 | offen, S7 und S6c |
+| Teil 2 JW | RDP/SMB für .28 und .29 | geklärt, unverändert: die IPv6-Adresse ist nicht geprüft (`target_invalid_ipv6`, Issue #8), nicht prüfbar zählt nicht als bestanden (S6, spec/08 Punkt 7); Soll-Liste P01 `positives_unterdrueckt` |
+| Teil 2 JW | junkerwerk.hu ohne Hostsuche, "Tiefenprüfung (7 Hostnamen)", P03 ohne .hu, LUCKY13 | offen, S6c und S7 |
+| Teil 2 HE | Backport-Text (R9), 444 (R9), X-FEServer (R9), Erneuerungshistorie (E13) | erledigt |
+| Teil 2 HE | zweite Plattformadresse, 8443 Plattformdienst, stille Ausfälle, `/ecp` | offen, S6c |
+| Teil 2 HE | Cookiebot als Serversoftware, A100 ROW ohne Amazon | offen, S7 |
+| Teil 2 BS | R4, R3, R9, R5, R1 | erledigt wie oben |
+| Teil 2 BS | VS-003 IIS auf E4-Host als Gelb im Patch-Status | offen, S7 (Rolle "Mail-Webzugang laut Passivquelle") |
+| Teil 2 BS | IPv6, Cloudflare doppelt, jQuery ohne Version, CDN-Standardports | offen, S6c und S7 |
+| Teil 2 BS | 79.140.188.181 "keine Antwort" | erledigt (R3) |
+| Teil 2 CA | R1, R2, R6, R4, R18, R9, R13, R5, R17 | erledigt wie oben |
+| Teil 2 CA | VS-003 Empfehlung mit dem erneuerten Wildcard-Zertifikat, Netzbetreiber Vodafone | offen, S7 |
+| Teil 2 CA | SPF `a` auf geteilten Agenturserver | erledigt (`spf_authorizes_shared_host`) |
+| Teil 2 CA | Fremddienste in `zap_extra_urls`, stille Ausfälle, testssl umfrage an .123, BREACH an 301 | offen, S6c |
+| Teil 2 HL | R6, R1, R3, R4, R5, R7, R10, R16 | erledigt wie oben; Kurzname nach dem Merge |
+| Teil 2 HL | 8443 ohne Dienstantwort | erledigt (`service_unidentified`) |
+| Teil 2 HL | VS-004 ohne Host im Titel doppelt auf Seite 2 | nicht mehr sichtbar (Kategorie A nennt zuerst den Dienst ohne Kennung, der zweite Titel trägt "beim Hoster"); Host im Titel offen, S7 |
+| Teil 2 HL | Java/Servlet an 213.133.104.51, Neos CMS im Anhang, SRI auf `latest`, Fremdbewertungszeile | offen, S7 |
+| Teil 2 HL | help-ev.de "auf derselben Adresse" | erledigt (R17) |
+| Teil 2 HL | "(insgesamt 4 Einträge)" mit drei Namen | erledigt (R6) |
 
 ## Golden-Facts (S1)
 

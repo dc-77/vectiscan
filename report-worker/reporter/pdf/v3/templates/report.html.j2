@@ -203,7 +203,7 @@ tr{break-inside:avoid;}
   {% for c in g.categories %}
   <tr><td style="width:52mm" class="name"><span class="dot d-{{ c.status }}"></span>{{ c.name }}</td>
       <td style="width:42mm">{% for i in range(4) %}<span class="seg {% if i < c.level %}on-{{ c.status }}{% endif %}"></span>{% endfor %}</td>
-      <td style="width:16mm"><span class="pill p-{{ c.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU','gruen':'GRÜN'}[c.status] }}</span></td>
+      <td style="width:16mm"><span class="pill p-{{ c.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU','gruen':'GRÜN','grau':'OFFEN'}[c.status] }}</span></td>
       <td class="small" style="color:#475569;width:58mm">{{ c.note }}</td></tr>
   {% endfor %}
  </table>
@@ -243,7 +243,7 @@ tr{break-inside:avoid;}
  <p class="lead">{{ s.lead }}</p>
  <h3>2.1 Prüfungsumfang</h3>
  <table>
-  <thead><tr><th style="width:28mm">IP-Adresse</th><th style="width:54mm">Hostnamen</th><th style="width:42mm">Netzbetreiber / Rolle</th><th style="width:44mm">Abdeckung</th></tr></thead>
+  <thead><tr><th style="width:28mm">IP-Adresse</th><th style="width:54mm">Hostnamen</th><th style="width:42mm">Netzbetreiber (laut RIPE) / Rolle</th><th style="width:44mm">Abdeckung</th></tr></thead>
   {% for h in s.hosts %}
   <tr><td class="mono">{{ h.ip }}{% for a in h.more_ips %}<br>{{ a }}{% endfor %}</td><td class="wrap">{{ h.fqdns }}</td><td class="wrap">{{ h.operator }}<br><span class="small">{{ h.role }}</span></td>
       <td class="wrap"><span class="dot d-{{ {'voll':'gruen','teil':'gelb','keine':'rot','unerreichbar':'rot','extern':'grau'}[h.cov] }}"></span>{{ h.coverage }}</td></tr>
@@ -320,11 +320,11 @@ tr{break-inside:avoid;}
  <p class="lead">{{ landscape_lead }}</p>
  {% for c in g.categories %}
  {% set fs = findings|selectattr('cat','equalto',c.key)|list %}
- <div class="cat{% if fs|length > cat_keep %} lang{% endif %}"><div class="h"><span class="k">KATEGORIE {{ c.key }}</span><span class="nm">{{ c.name }}</span><span class="pill p-{{ c.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU','gruen':'GRÜN'}[c.status] }}</span><span class="ct">{{ fs|length }} Befund{{ 'e' if fs|length != 1 else '' }}</span></div>
+ <div class="cat{% if fs|length > cat_keep %} lang{% endif %}"><div class="h"><span class="k">KATEGORIE {{ c.key }}</span><span class="nm">{{ c.name }}</span><span class="pill p-{{ c.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU','gruen':'GRÜN','grau':'OFFEN'}[c.status] }}</span><span class="ct">{{ fs|length }} Befund{{ 'e' if fs|length != 1 else '' }}</span></div>
   <table><colgroup><col style="width:24mm"><col style="width:22mm"><col style="width:122mm"></colgroup>{% for f in fs %}<tr><td class="mono">{{ f.id }}</td><td><span class="pill p-{{ f.status }}">{{ f.urgency }}</span></td><td>{{ f.title }}</td></tr>{% endfor %}</table>
  </div>
  {% endfor %}
- <div class="cat{% if positives|length > cat_keep %} lang{% endif %}"><div class="h"><span class="k">POSITIV</span><span class="nm">Wirksame Schutzmaßnahmen</span><span class="pill p-gruen">GRÜN</span><span class="ct">{{ positives|length }} Feststellungen</span></div>
+ <div class="cat{% if positives|length > cat_keep %} lang{% endif %}"><div class="h"><span class="k">POSITIV</span><span class="nm">Wirksame Schutzmaßnahmen</span><span class="pill p-gruen">GRÜN</span><span class="ct">{{ positives|length }} {{ "Feststellung" if positives|length == 1 else "Feststellungen" }}</span></div>
   <table><colgroup><col style="width:24mm"><col style="width:144mm"></colgroup>{% for p in positives %}<tr><td><span class="dot d-gruen"></span><span class="small">Kat. {{ p.cat }}</span></td><td><b>{{ p.title }}</b><br><span class="small">{{ p.text }}</span></td></tr>{% endfor %}</table>
  </div>
 </section>
@@ -419,8 +419,8 @@ tr{break-inside:avoid;}
  {% if show_tool_findings %}
  <h4>{{ txt.TOOL_FINDINGS_TITLE }}</h4>
  <p class="small">{{ txt.TOOL_FINDINGS_LEAD }}</p>
- <table><thead><tr><th style="width:104mm">Meldung</th><th style="width:34mm">Betrifft</th><th style="width:30mm">Hinweis</th></tr></thead>
- {% for t in ap.tool_findings %}<tr><td>{{ t.what }}</td><td class="small">{{ t.where }}</td><td class="small">{{ t.note }}</td></tr>{% endfor %}</table>
+ <table style="table-layout:fixed"><thead><tr><th style="width:66mm">Meldung</th><th style="width:52mm">Betrifft</th><th style="width:50mm">Hinweis</th></tr></thead>
+ {% for t in ap.tool_findings %}<tr><td style="overflow-wrap:anywhere">{{ t.what }}</td><td class="small" style="overflow-wrap:anywhere">{{ t.where }}</td><td class="small">{{ t.note }}</td></tr>{% endfor %}</table>
  {% endif %}
 
 </section>

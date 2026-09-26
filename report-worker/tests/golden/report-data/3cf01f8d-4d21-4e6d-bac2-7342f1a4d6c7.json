@@ -13,7 +13,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 21 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (5 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 11 Befunde und 7 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Korrelation hat 12 Einzelmeldungen der Werkzeuge erfasst. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 12 Befunde und 6 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -38,44 +38,44 @@
    {
     "host": "18.197.248.23",
     "port": "443",
-    "ref": "VS-2026-003, VS-2026-009",
-    "svc": "HTTPS, TLS erzwungen"
+    "ref": "VS-2026-004, VS-2026-010",
+    "svc": "nginx, TLS erzwungen"
    },
    {
     "host": "18.197.248.23",
     "port": "8443",
-    "ref": "VS-2026-005",
+    "ref": "VS-2026-006",
     "svc": "nginx, TLS erzwungen"
    },
    {
     "host": "80.90.145.166",
     "port": "443",
-    "ref": "VS-2026-001, VS-2026-002, VS-2026-004, VS-2026-010",
-    "svc": "HTTPS, TLS erzwungen"
+    "ref": "VS-2026-002, VS-2026-003, VS-2026-005, VS-2026-011",
+    "svc": "Microsoft-IIS/10.0, TLS erzwungen"
    },
    {
     "host": "80.90.145.166",
     "port": "444",
-    "ref": "VS-2026-006",
+    "ref": "VS-2026-007",
     "svc": "Apache httpd, TLS erzwungen"
    },
    {
     "host": "80.90.145.166",
     "port": "1000",
-    "ref": "",
-    "svc": "CADLOCK"
+    "ref": "VS-2026-001",
+    "svc": "nicht identifiziert (Port 1000)"
    },
    {
     "host": "80.90.145.166",
     "port": "1001",
-    "ref": "",
-    "svc": "WEBPUSH"
+    "ref": "VS-2026-001",
+    "svc": "nicht identifiziert (Port 1001)"
    },
    {
     "host": "80.90.145.166",
     "port": "1002",
-    "ref": "",
-    "svc": "WINDOWS-ICFW"
+    "ref": "VS-2026-001",
+    "svc": "nicht identifiziert (Port 1002)"
    }
   ],
   "repeat": [
@@ -88,7 +88,7 @@
     "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
     "rule": "tls_weakness_reported",
-    "what": "„LUCKY13“",
+    "what": "„LUCKY13“, 1 Meldung",
     "where": "exchange.huendgen-entsorgung.de"
    },
    {
@@ -96,7 +96,7 @@
     "message": "Etracker",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
-    "what": "Technik „Etracker“",
+    "what": "Technik „Etracker“, 1 Meldung",
     "where": "18.197.248.23"
    },
    {
@@ -104,7 +104,7 @@
     "message": "jQuery Migrate",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
-    "what": "Technik „jQuery Migrate“",
+    "what": "Technik „jQuery Migrate“, 1 Meldung",
     "where": "18.197.248.23"
    },
    {
@@ -112,7 +112,7 @@
     "message": "jQuery",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
-    "what": "Technik „jQuery“",
+    "what": "Technik „jQuery“, 1 Meldung",
     "where": "18.197.248.23"
    },
    {
@@ -120,7 +120,7 @@
     "message": "Windows Server",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
-    "what": "Technik „Windows Server“",
+    "what": "Technik „Windows Server“, 1 Meldung",
     "where": "80.90.145.166"
    }
   ],
@@ -179,7 +179,7 @@
    },
    {
     "c": "hoch",
-    "t": "httpx, header_check",
+    "t": "httpx, header_check, Webabruf, Weiterleitungsprüfung",
     "u": "HTTP-Antworten, Technologien und Sicherheits-Header je virtuellem Host"
    },
    {
@@ -194,17 +194,17 @@
    },
    {
     "c": "mittel",
-    "t": "feroxbuster",
-    "u": "Verzeichnis- und Datei-Enumeration"
+    "t": "feroxbuster, ffuf",
+    "u": "Verzeichnis-, Datei- und Parameter-Enumeration"
    },
    {
     "c": "mittel",
-    "t": "webtech, wafw00f",
+    "t": "webtech, wafw00f, CMS-Erkennung",
     "u": "Web-Technologien und vorgelagerte Schutzsysteme"
    },
    {
     "c": "hoch",
-    "t": "dnsx, subfinder, gobuster, Certspotter, SecurityTrails",
+    "t": "DNS-Abfragen, dnsx, subfinder, gobuster, crt.sh, Certspotter, SecurityTrails",
     "u": "Ermittlung der Hostnamen, DNS-Auflösung und DNS-Sicherheitseinträge"
    },
    {
@@ -238,36 +238,81 @@
  },
  "architecture": {
   "lead": "Die geprüfte Angriffsfläche verteilt sich auf 2 Systeme mit folgenden Aufgaben: Mail-Webzugang und Website. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
-  "notes": [
-   "3 Beobachtungen der Werkzeuge haben keine Regel des Prüfkatalogs getroffen. Sie erscheinen nicht als Befund; wir prüfen sie und nehmen wiederkehrende Fälle in den Katalog auf."
-  ],
+  "notes": [],
   "posture": [
    {
     "items": [
      {
+      "checks": [
+       "spf_missing",
+       "spf_permissive",
+       "spf_softfail",
+       "mail_spoofing_unprotected"
+      ],
       "l": "SPF",
       "ok": true,
+      "subjects": [
+       "huendgen-entsorgung.de"
+      ],
       "v": "unauffällig"
      },
      {
+      "checks": [
+       "dkim_missing"
+      ],
       "l": "DKIM",
       "ok": true,
+      "subjects": [
+       "huendgen-entsorgung.de"
+      ],
       "v": "unauffällig"
      },
      {
+      "checks": [
+       "dmarc_missing",
+       "dmarc_none",
+       "dmarc_quarantine",
+       "mail_spoofing_unprotected"
+      ],
       "l": "DMARC",
       "ok": false,
+      "subjects": [
+       "huendgen-entsorgung.de"
+      ],
       "v": "Handlungsbedarf"
      },
      {
+      "checks": [
+       "mta_sts_missing"
+      ],
       "l": "MTA-STS",
       "ok": false,
+      "subjects": [
+       "huendgen-entsorgung.de"
+      ],
       "v": "Handlungsbedarf"
      },
      {
-      "l": "TLS-RPT, DANE",
+      "checks": [
+       "tls_rpt_missing"
+      ],
+      "l": "TLS-RPT",
       "ok": false,
+      "subjects": [
+       "huendgen-entsorgung.de"
+      ],
       "v": "Handlungsbedarf"
+     },
+     {
+      "checks": [
+       "dane_missing"
+      ],
+      "l": "DANE",
+      "ok": null,
+      "subjects": [
+       "huendgen-entsorgung.de"
+      ],
+      "v": "entfällt (MX beim Dienstleister)"
      }
     ],
     "name": "E-Mail-Authentizität",
@@ -276,23 +321,47 @@
    {
     "items": [
      {
+      "checks": [
+       "dnssec_missing"
+      ],
       "l": "DNSSEC",
       "ok": false,
+      "subjects": [
+       "huendgen-entsorgung.de"
+      ],
       "v": "Handlungsbedarf"
      },
      {
+      "checks": [
+       "caa_missing"
+      ],
       "l": "CAA",
       "ok": false,
+      "subjects": [
+       "huendgen-entsorgung.de"
+      ],
       "v": "Handlungsbedarf"
      },
      {
+      "checks": [
+       "dns_zone_transfer"
+      ],
       "l": "Abruf der gesamten Zone",
       "ok": true,
+      "subjects": [
+       "huendgen-entsorgung.de"
+      ],
       "v": "unauffällig"
      },
      {
+      "checks": [
+       "dns_dangling_cname"
+      ],
       "l": "Verwaiste Einträge",
       "ok": null,
+      "subjects": [
+       "huendgen-entsorgung.de"
+      ],
       "v": "entfällt"
      }
     ],
@@ -302,18 +371,53 @@
    {
     "items": [
      {
+      "checks": [
+       "tls_legacy_protocols",
+       "tls_no_13",
+       "tls_weak_ciphers",
+       "tls_weakness",
+       "tls_no_fallback_scsv"
+      ],
       "l": "18.197.248.23",
-      "ok": true,
-      "v": "unauffällig"
+      "ok": null,
+      "subjects": [
+       "18.197.248.23"
+      ],
+      "v": "teilweise geprüft"
      },
      {
+      "checks": [
+       "tls_legacy_protocols",
+       "tls_no_13",
+       "tls_weak_ciphers",
+       "tls_weakness",
+       "tls_no_fallback_scsv"
+      ],
       "l": "80.90.145.166",
-      "ok": true,
-      "v": "unauffällig"
+      "ok": null,
+      "subjects": [
+       "80.90.145.166"
+      ],
+      "v": "teilweise geprüft"
      },
      {
+      "checks": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "l": "Zertifikate",
       "ok": false,
+      "subjects": [
+       "18.197.248.23",
+       "80.90.145.166",
+       "exchange.huendgen-entsorgung.de@80.90.145.166",
+       "www.huendgen-entsorgung.de@18.197.248.23"
+      ],
       "v": "Handlungsbedarf"
      }
     ],
@@ -323,13 +427,35 @@
    {
     "items": [
      {
+      "checks": [
+       "security_headers_incomplete",
+       "csp_missing",
+       "csp_weak",
+       "hsts_missing",
+       "hsts_short",
+       "header_duplicate"
+      ],
       "l": "18.197.248.23",
       "ok": false,
+      "subjects": [
+       "18.197.248.23"
+      ],
       "v": "Handlungsbedarf"
      },
      {
+      "checks": [
+       "security_headers_incomplete",
+       "csp_missing",
+       "csp_weak",
+       "hsts_missing",
+       "hsts_short",
+       "header_duplicate"
+      ],
       "l": "80.90.145.166",
       "ok": false,
+      "subjects": [
+       "80.90.145.166"
+      ],
       "v": "Handlungsbedarf"
      }
     ],
@@ -337,7 +463,7 @@
     "short": "Sicherheits-Header"
    }
   ],
-  "reputation": "Reputation: keine Meldungen zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus. Nicht bewertet sind Adressen von Plattformen und Inhaltsnetzen, die auch andere Kunden nutzen: 18.197.248.23.",
+  "reputation": "Reputation: keine Meldungen zu den geprüften Adressen in AbuseIPDB und OTX. Das gilt auch für die Adressen von Plattformen und Inhaltsnetzen, die auch andere Kunden nutzen: 18.197.248.23.",
   "screens": [
    {
     "also": [],
@@ -367,7 +493,7 @@
      },
      {
       "p": "443",
-      "s": "HTTPS",
+      "s": "nginx",
       "st": "gelb"
      },
      {
@@ -383,7 +509,7 @@
     "ports": [
      {
       "p": "443",
-      "s": "HTTPS",
+      "s": "Microsoft-IIS/10.0",
       "st": "gelb"
      },
      {
@@ -393,18 +519,18 @@
      },
      {
       "p": "1000",
-      "s": "CADLOCK",
-      "st": "gruen"
+      "s": "nicht identifiziert (Port 1000)",
+      "st": "grau"
      },
      {
       "p": "1001",
-      "s": "WEBPUSH",
-      "st": "gruen"
+      "s": "nicht identifiziert (Port 1001)",
+      "st": "grau"
      },
      {
       "p": "1002",
-      "s": "WINDOWS-ICFW",
-      "st": "gruen"
+      "s": "nicht identifiziert (Port 1002)",
+      "st": "grau"
      }
     ]
    }
@@ -449,7 +575,7 @@
      {
       "c": "Microsoft Exchange",
       "conf": "mittel",
-      "note": "Herstellerpflege endete am 2025-10-14",
+      "note": "Herstellerpflege endete am 14.10.2025",
       "src": "cms_fingerprint, httpx, redirect_probe, zap_spider",
       "st": "rot",
       "status": "veraltet",
@@ -478,6 +604,10 @@
   ]
  },
  "business": {
+  "betriebsformen": [
+   "anschluss",
+   "plattform"
+  ],
   "implication": "Die Befunde dieses Berichts sind danach geordnet, wie nah sie an den Zugangswegen in das Unternehmensnetz liegen. Ein Dienst, über den sich jemand anmelden kann, wiegt schwerer als eine Abweichung an einer reinen Auslieferungsseite. Bei einem Vorfall mit personenbezogenen Daten gilt die Meldepflicht nach Art. 33 DSGVO innerhalb von 72 Stunden.",
   "lead": "Was der Scan über das Unternehmen sichtbar macht, bestimmt, welche Befunde wirklich zählen. Maßgeblich ist nicht die Zahl der Meldungen, sondern welche Systeme am Perimeter stehen und wofür sie gebraucht werden.",
   "observed": [
@@ -505,19 +635,154 @@
  },
  "findings": [
   {
-   "affected": "80.90.145.166: Microsoft Exchange 2019 (Support beendet 2025-10-14)",
-   "cat": "B",
-   "evidence": "cms_fingerprint · hosts/80.90.145.166/phase1/tech_profile.json\n80.90.145.166 · Produkt: Microsoft Exchange · Version: 2019 · Build: 15.2.1748 · Pflegestatus: ohne Herstellerpflege · Pflegeende: 2025-10-14 · Quelle der Lebenszyklusdaten: Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2019 · Beleg: technologies: Outlook Web App 15.2.1748\n\nhttpx · hosts/80.90.145.166/phase2/httpx_exchange.huendgen-entsorgung.de.json\n80.90.145.166 · Produkt: Microsoft Exchange · Version: 2019 · Build: 15.2.1748 · Pflegestatus: ohne Herstellerpflege · Pflegeende: 2025-10-14 · Quelle der Lebenszyklusdaten: Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2019 · Beleg: tech: Outlook Web App:15.2.1748",
-   "found": "Auf 80.90.145.166 (exchange.huendgen-entsorgung.de) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 80.90.145.166: Microsoft Exchange 2019 (Support beendet 2025-10-14).",
+   "affected": "80.90.145.166:1000 (nicht identifiziert), 80.90.145.166:1001 (nicht identifiziert), 80.90.145.166:1002 (nicht identifiziert)",
+   "cat": "A",
+   "checks": [
+    "service_unidentified"
+   ],
+   "evidence": "nmap · hosts/80.90.145.166/phase1/nmap.xml\n80.90.145.166:1000/tcp · Dienst: nicht identifiziert · 1000/tcp open cadlock\n\nnmap · hosts/80.90.145.166/phase1/nmap.xml\n80.90.145.166:1001/tcp · Dienst: nicht identifiziert · 1001/tcp open webpush\n\nnmap · hosts/80.90.145.166/phase1/nmap.xml\n80.90.145.166:1002/tcp · Dienst: nicht identifiziert · 1002/tcp open windows-icfw",
+   "found": "Der Host 80.90.145.166 (exchange.huendgen-entsorgung.de) hat offene Ports, deren Dienst sich weder mit Produkt noch mit Titel zu erkennen gibt: 80.90.145.166:1000 (nicht identifiziert), 80.90.145.166:1001 (nicht identifiziert), 80.90.145.166:1002 (nicht identifiziert). Der Portscan kennt nur die übliche Belegung dieser Portnummern, nicht den tatsächlichen Dienst.",
    "id": "VS-2026-001",
-   "impact": "Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits zurückgreifen. Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner nicht erkennbar ist: 80.90.145.166: Microsoft Exchange 2019 (Support beendet 2025-10-14).",
+   "impact": "Ein offener Dienst ohne erkennbaren Zweck vergrößert die Angriffsfläche. Ob er gepflegt wird und wer ihn nutzt, ist von außen nicht feststellbar.",
+   "key": "service_unidentified/scan/kunde",
+   "level": "erhoeht",
+   "level_label": "erhöht",
+   "missing_headers": [],
+   "operator": "",
+   "operator_note": "",
+   "plan_action": "Klären, welcher Dienst auf dem Port läuft und ob er aus dem Internet erreichbar sein muss; andernfalls den Port schließen.",
+   "plan_effect": "Verkleinert die Angriffsfläche um Dienste ohne erkennbaren Zweck",
+   "plan_items": [
+    {
+     "action": "Klären, welcher Dienst auf dem Port läuft und ob er aus dem Internet erreichbar sein muss; andernfalls den Port schließen.",
+     "check": "service_unidentified",
+     "effect": "Verkleinert die Angriffsfläche um Dienste ohne erkennbaren Zweck",
+     "lever": "Zweck offener Dienste ohne Kennung klären",
+     "stage": "in_kuerze"
+    }
+   ],
+   "plan_lever": "Zweck offener Dienste ohne Kennung klären",
+   "plan_stage": "in_kuerze",
+   "policy": "service_unidentified",
+   "provenance": [
+    {
+     "check": "service_unidentified",
+     "field": "title",
+     "members": [
+      "80.90.145.166|80.90.145.166:1000",
+      "80.90.145.166|80.90.145.166:1001",
+      "80.90.145.166|80.90.145.166:1002"
+     ],
+     "statement": "title",
+     "text": "Offener Dienst ohne Kennung"
+    },
+    {
+     "check": "service_unidentified",
+     "field": "observation",
+     "members": [
+      "80.90.145.166|80.90.145.166:1000",
+      "80.90.145.166|80.90.145.166:1001",
+      "80.90.145.166|80.90.145.166:1002"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Host 80.90.145.166 (exchange.huendgen-entsorgung.de) hat offene Ports, deren Dienst sich weder mit Produkt noch mit Titel zu erkennen gibt: 80.90.145.166:1000 (nicht identifiziert), 80.90.145.166:1001 (nicht identifiziert), 80.90.145.166:1002 (nicht identifiziert). Der Portscan kennt nur die übliche Belegung dieser Portnummern, nicht den tatsächlichen Dienst."
+    },
+    {
+     "check": "service_unidentified",
+     "field": "meaning",
+     "members": [
+      "80.90.145.166|80.90.145.166:1000",
+      "80.90.145.166|80.90.145.166:1001",
+      "80.90.145.166|80.90.145.166:1002"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ein offener Dienst ohne erkennbaren Zweck vergrößert die Angriffsfläche. Ob er gepflegt wird und wer ihn nutzt, ist von außen nicht feststellbar."
+    },
+    {
+     "check": "service_unidentified",
+     "field": "verify",
+     "members": [
+      "80.90.145.166|80.90.145.166:1000",
+      "80.90.145.166|80.90.145.166:1001",
+      "80.90.145.166|80.90.145.166:1002"
+     ],
+     "statement": "verify[0]",
+     "text": "Portscan der genannten Ports von einer externen Adresse wiederholen; erwartet wird ein geschlossener Port oder ein Dienst, dessen Zweck dokumentiert ist."
+    },
+    {
+     "check": "service_unidentified",
+     "field": "recommendation",
+     "members": [
+      "80.90.145.166|80.90.145.166:1000",
+      "80.90.145.166|80.90.145.166:1001",
+      "80.90.145.166|80.90.145.166:1002"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Klären, welcher Dienst auf dem Port läuft und ob er aus dem Internet erreichbar sein muss; andernfalls den Port schließen."
+    },
+    {
+     "check": "service_unidentified",
+     "field": "recommendation",
+     "members": [
+      "80.90.145.166|80.90.145.166:1000",
+      "80.90.145.166|80.90.145.166:1001",
+      "80.90.145.166|80.90.145.166:1002"
+     ],
+     "statement": "recommendation[1]",
+     "text": "Benötigte Dienste auf feste Quellnetze beschränken und in die Dokumentation der erreichbaren Dienste aufnehmen."
+    }
+   ],
+   "recommendation": [
+    [
+     "In Kürze",
+     "Klären, welcher Dienst auf dem Port läuft und ob er aus dem Internet erreichbar sein muss; andernfalls den Port schließen."
+    ],
+    [
+     "Mittelfristig",
+     "Benötigte Dienste auf feste Quellnetze beschränken und in die Dokumentation der erreichbaren Dienste aufnehmen."
+    ]
+   ],
+   "scale": "exposure",
+   "source": "aktiv (nmap)",
+   "status": "gelb",
+   "subjects": [
+    "service_unidentified|80.90.145.166",
+    "service_unidentified|80.90.145.166:1000",
+    "service_unidentified|80.90.145.166:1001",
+    "service_unidentified|80.90.145.166:1002"
+   ],
+   "threat": null,
+   "title": "Offener Dienst ohne Kennung",
+   "urgency": "In Kürze",
+   "verify": "Portscan der genannten Ports von einer externen Adresse wiederholen; erwartet wird ein geschlossener Port oder ein Dienst, dessen Zweck dokumentiert ist."
+  },
+  {
+   "affected": "80.90.145.166: Microsoft Exchange 2019 (Herstellerpflege beendet 14.10.2025 laut Microsoft Lifecycle)",
+   "cat": "B",
+   "checks": [
+    "software_eol"
+   ],
+   "evidence": "CMS-Erkennung · hosts/80.90.145.166/phase1/tech_profile.json\n80.90.145.166 · Produkt: Microsoft Exchange · Version: 2019 · Build: 15.2.1748 · Pflegestatus: ohne Herstellerpflege · Pflegeende: 14.10.2025 · Quelle der Lebenszyklusdaten: Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2019 · Beleg: erkannt: Outlook Web App 15.2.1748\n\nhttpx · hosts/80.90.145.166/phase2/httpx_exchange.huendgen-entsorgung.de.json\n80.90.145.166 · Produkt: Microsoft Exchange · Version: 2019 · Build: 15.2.1748 · Pflegestatus: ohne Herstellerpflege · Pflegeende: 14.10.2025 · Quelle der Lebenszyklusdaten: Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2019 · Beleg: erkannt: Outlook Web App:15.2.1748",
+   "found": "Auf 80.90.145.166 (exchange.huendgen-entsorgung.de) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 80.90.145.166: Microsoft Exchange 2019 (Herstellerpflege beendet 14.10.2025 laut Microsoft Lifecycle).",
+   "id": "VS-2026-002",
+   "impact": "Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits zurückgreifen.",
    "key": "software_eol/scan/kunde",
    "level": "erhoeht",
    "level_label": "erhöht",
+   "missing_headers": [],
    "operator": "",
    "operator_note": "",
-   "plan_action": "Prüfen, ob die Version tatsächlich ungepflegt ist oder ob die Distribution Sicherheits-Backports liefert.",
-   "plan_effect": "Schließt Lücken, für die der Hersteller keine Updates mehr liefert",
+   "plan_action": "Die Ablösung durch eine vom Hersteller gepflegte Version planen und bis dahin den Zugang aus dem Internet auf das Nötige einschränken.",
+   "plan_effect": "Begrenzt den Zugriff auf Software ohne Sicherheitsupdates bis zur Ablösung",
+   "plan_items": [
+    {
+     "action": "Die Ablösung durch eine vom Hersteller gepflegte Version planen und bis dahin den Zugang aus dem Internet auf das Nötige einschränken.",
+     "check": "software_eol",
+     "effect": "Begrenzt den Zugriff auf Software ohne Sicherheitsupdates bis zur Ablösung",
+     "lever": "Serversoftware ohne Herstellerpflege ersetzen",
+     "stage": "in_kuerze"
+    }
+   ],
    "plan_lever": "Serversoftware ohne Herstellerpflege ersetzen",
    "plan_stage": "in_kuerze",
    "policy": "software_eol",
@@ -540,7 +805,7 @@
       "80.90.145.166|sw:80.90.145.166:exchange.huendgen-entsorgung.de:exchange:2019"
      ],
      "statement": "observation[0]",
-     "text": "Auf 80.90.145.166 (exchange.huendgen-entsorgung.de) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 80.90.145.166: Microsoft Exchange 2019 (Support beendet 2025-10-14)."
+     "text": "Auf 80.90.145.166 (exchange.huendgen-entsorgung.de) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 80.90.145.166: Microsoft Exchange 2019 (Herstellerpflege beendet 14.10.2025 laut Microsoft Lifecycle)."
     },
     {
      "check": "software_eol",
@@ -551,16 +816,6 @@
      ],
      "statement": "meaning[0]",
      "text": "Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits zurückgreifen."
-    },
-    {
-     "check": "software_eol",
-     "field": "meaning",
-     "members": [
-      "80.90.145.166|sw:80.90.145.166:-:exchange:2019",
-      "80.90.145.166|sw:80.90.145.166:exchange.huendgen-entsorgung.de:exchange:2019"
-     ],
-     "statement": "meaning[1]",
-     "text": "Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner nicht erkennbar ist: 80.90.145.166: Microsoft Exchange 2019 (Support beendet 2025-10-14)."
     },
     {
      "check": "software_eol",
@@ -579,8 +834,8 @@
       "80.90.145.166|sw:80.90.145.166:-:exchange:2019",
       "80.90.145.166|sw:80.90.145.166:exchange.huendgen-entsorgung.de:exchange:2019"
      ],
-     "statement": "recommendation[0]",
-     "text": "Prüfen, ob die Version tatsächlich ungepflegt ist oder ob die Distribution Sicherheits-Backports liefert."
+     "statement": "recommendation[1]",
+     "text": "Die Ablösung durch eine vom Hersteller gepflegte Version planen und bis dahin den Zugang aus dem Internet auf das Nötige einschränken."
     },
     {
      "check": "software_eol",
@@ -589,14 +844,14 @@
       "80.90.145.166|sw:80.90.145.166:-:exchange:2019",
       "80.90.145.166|sw:80.90.145.166:exchange.huendgen-entsorgung.de:exchange:2019"
      ],
-     "statement": "recommendation[2]",
+     "statement": "recommendation[3]",
      "text": "Auf eine vom Hersteller gepflegte Version aktualisieren und einen festen Update-Rhythmus festlegen."
     }
    ],
    "recommendation": [
     [
      "In Kürze",
-     "Prüfen, ob die Version tatsächlich ungepflegt ist oder ob die Distribution Sicherheits-Backports liefert."
+     "Die Ablösung durch eine vom Hersteller gepflegte Version planen und bis dahin den Zugang aus dem Internet auf das Nötige einschränken."
     ],
     [
      "Mittelfristig",
@@ -604,8 +859,13 @@
     ]
    ],
    "scale": "exposure",
-   "source": "aktiv (cms_fingerprint, httpx)",
+   "source": "aktiv (CMS-Erkennung, httpx)",
    "status": "gelb",
+   "subjects": [
+    "software_eol|80.90.145.166",
+    "software_eol|sw:80.90.145.166:-:exchange:2019",
+    "software_eol|sw:80.90.145.166:exchange.huendgen-entsorgung.de:exchange:2019"
+   ],
    "threat": null,
    "title": "Serversoftware ohne Herstellerpflege",
    "urgency": "In Kürze",
@@ -614,17 +874,30 @@
   {
    "affected": "exchange.huendgen-entsorgung.de (Outlook)",
    "cat": "A",
-   "evidence": "web_probe · phase0/host_inventory.json\nexchange.huendgen-entsorgung.de · Status: 200 · Titel: Outlook · Zieladresse: https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0 · erreichbar: ja",
+   "checks": [
+    "login_portal_exposed"
+   ],
+   "evidence": "Webabruf · phase0/host_inventory.json\nexchange.huendgen-entsorgung.de · Status: 200 · Titel: Outlook · Zieladresse: https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0 · erreichbar: ja",
    "found": "Die Webseite exchange.huendgen-entsorgung.de zeigt ein Anmeldeportal, das aus dem gesamten Internet erreichbar ist: exchange.huendgen-entsorgung.de (Outlook). Die Erreichbarkeit selbst ist beabsichtigt, wenn das Portal für den externen Zugriff vorgesehen ist.",
-   "id": "VS-2026-002",
+   "id": "VS-2026-003",
    "impact": "Ein öffentlich erreichbares Anmeldeportal ist ein häufiges Ziel für automatisierte Anmeldeversuche mit gestohlenen oder erratenen Zugangsdaten. Ohne zusätzliche Absicherung genügt ein einzelnes bekanntes Passwort für den Zugriff.",
    "key": "login_portal_exposed/scan/kunde",
    "level": "mittel",
    "level_label": "mittel",
+   "missing_headers": [],
    "operator": "",
    "operator_note": "",
    "plan_action": "Die Anmeldung am Portal um einen zusätzlichen Faktor ergänzen, etwa eine Authentifizierungs-App oder ein Einmalkennwort.",
    "plan_effect": "Erschwert die Übernahme von Konten durch Rateangriffe",
+   "plan_items": [
+    {
+     "action": "Die Anmeldung am Portal um einen zusätzlichen Faktor ergänzen, etwa eine Authentifizierungs-App oder ein Einmalkennwort.",
+     "check": "login_portal_exposed",
+     "effect": "Erschwert die Übernahme von Konten durch Rateangriffe",
+     "lever": "Anmeldeportale mit zweiter Anmeldestufe schützen",
+     "stage": "mittelfristig"
+    }
+   ],
    "plan_lever": "Anmeldeportale mit zweiter Anmeldestufe schützen",
    "plan_stage": "mittelfristig",
    "policy": "login_portal_exposed",
@@ -708,27 +981,43 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (web_probe)",
+   "source": "aktiv (Webabruf)",
    "status": "gelb",
+   "subjects": [
+    "login_portal_exposed|exchange.huendgen-entsorgung.de@80.90.145.166"
+   ],
    "threat": null,
    "title": "Anmeldeportal aus dem Internet erreichbar",
    "urgency": "Mittelfristig",
    "verify": "Anmeldeversuch mit einem falschen Kennwort durchführen; erwartet wird eine Sperre oder Verzögerung nach mehreren Fehlversuchen sowie die Abfrage des zusätzlichen Faktors."
   },
   {
-   "affected": "huendgen-entsorgung.de:443 (17 Tage), www.huendgen-entsorgung.de:443 (17 Tage)",
+   "affected": "huendgen-entsorgung.de:443 (gültig bis 11.10.2026, 03:14 UTC; am Scantag 17 Tage Restlaufzeit), www.huendgen-entsorgung.de:443 (gültig bis 11.10.2026, 03:14 UTC; am Scantag 17 Tage Restlaufzeit)",
    "cat": "D",
-   "evidence": "testssl\nhuendgen-entsorgung.de:443 · Zertifikat für: www.huendgen-entsorgung.de · weitere Namen: huendgen-entsorgung.de, www.huendgen-entsorgung.de · Aussteller: YR2 (Let's Encrypt from US) · gültig bis: 2026-10-11 · abgelaufen: nein · Restlaufzeit in Tagen: 17\n\ntestssl\nwww.huendgen-entsorgung.de:443 · Zertifikat für: www.huendgen-entsorgung.de · weitere Namen: huendgen-entsorgung.de, www.huendgen-entsorgung.de · Aussteller: YR2 · gültig bis: 2026-10-11 · abgelaufen: nein · Restlaufzeit in Tagen: 17 · geprüft über: huendgen-entsorgung.de:443",
-   "found": "Für den Dienst www.huendgen-entsorgung.de (+huendgen-entsorgung.de) läuft das eingesetzte TLS-Zertifikat in den nächsten Wochen ab: huendgen-entsorgung.de:443 (17 Tage), www.huendgen-entsorgung.de:443 (17 Tage).",
-   "id": "VS-2026-003",
+   "checks": [
+    "cert_expiring_later"
+   ],
+   "evidence": "testssl.sh\nhuendgen-entsorgung.de:443 · Zertifikat für: www.huendgen-entsorgung.de · weitere Namen: huendgen-entsorgung.de, www.huendgen-entsorgung.de · Aussteller: YR2 (Let's Encrypt from US) · gültig bis: 11.10.2026, 03:14 UTC · abgelaufen: nein · Restlaufzeit in Tagen: 17 · Erneuerung laut CT-Logs: bisher im Mittel 32 Tage vor Ablauf, 66 Zertifikate\n\ntestssl.sh\nwww.huendgen-entsorgung.de:443 · Zertifikat für: www.huendgen-entsorgung.de · weitere Namen: huendgen-entsorgung.de, www.huendgen-entsorgung.de · Aussteller: YR2 · gültig bis: 11.10.2026, 03:14 UTC · abgelaufen: nein · Restlaufzeit in Tagen: 17 · Erneuerung laut CT-Logs: bisher im Mittel 32 Tage vor Ablauf, 61 Zertifikate · geprüft über: huendgen-entsorgung.de:443",
+   "found": "Für den Dienst www.huendgen-entsorgung.de (+huendgen-entsorgung.de) läuft das eingesetzte TLS-Zertifikat in den nächsten Wochen ab: huendgen-entsorgung.de:443 (gültig bis 11.10.2026, 03:14 UTC; am Scantag 17 Tage Restlaufzeit), www.huendgen-entsorgung.de:443 (gültig bis 11.10.2026, 03:14 UTC; am Scantag 17 Tage Restlaufzeit).",
+   "id": "VS-2026-004",
    "impact": "Läuft das Zertifikat ab, ohne dass eine Erneuerung vorbereitet ist, sehen alle Nutzer eine Vertrauenswarnung oder einen Verbindungsabbruch. Mit dem verbleibenden Vorlauf lässt sich die Erneuerung planmäßig erledigen.",
    "key": "cert_health/18.197.248.23/platform:eu-multiscreensite.com",
    "level": "mittel",
    "level_label": "mittel",
+   "missing_headers": [],
    "operator": "beim Plattformbetreiber eu-multiscreensite.com",
    "operator_note": "Dieser Sachverhalt liegt beim Plattformbetreiber eu-multiscreensite.com: der Hostname zeigt auf dessen Plattform, Server und Grundkonfiguration betreibt er. Die Empfehlung richtet sich an ihn; Sie können sie über den Vertrag oder die Einstellungen der Plattform einfordern.",
    "plan_action": "Die Erneuerung des Zertifikats vor dem Ablaufdatum einplanen und durchführen.",
    "plan_effect": "Verhindert den Ausfall des Dienstes zum Ablaufdatum des Zertifikats",
+   "plan_items": [
+    {
+     "action": "Die Erneuerung des Zertifikats vor dem Ablaufdatum einplanen und durchführen.",
+     "check": "cert_expiring_later",
+     "effect": "Verhindert den Ausfall des Dienstes zum Ablaufdatum des Zertifikats",
+     "lever": "Erneuerung der Zertifikate einplanen",
+     "stage": "mittelfristig"
+    }
+   ],
    "plan_lever": "Erneuerung der Zertifikate einplanen",
    "plan_stage": "mittelfristig",
    "policy": "cert_expiring_later",
@@ -751,7 +1040,7 @@
       "www.huendgen-entsorgung.de@18.197.248.23|www.huendgen-entsorgung.de:443@18.197.248.23"
      ],
      "statement": "observation[0]",
-     "text": "Für den Dienst www.huendgen-entsorgung.de (+huendgen-entsorgung.de) läuft das eingesetzte TLS-Zertifikat in den nächsten Wochen ab: huendgen-entsorgung.de:443 (17 Tage), www.huendgen-entsorgung.de:443 (17 Tage)."
+     "text": "Für den Dienst www.huendgen-entsorgung.de (+huendgen-entsorgung.de) läuft das eingesetzte TLS-Zertifikat in den nächsten Wochen ab: huendgen-entsorgung.de:443 (gültig bis 11.10.2026, 03:14 UTC; am Scantag 17 Tage Restlaufzeit), www.huendgen-entsorgung.de:443 (gültig bis 11.10.2026, 03:14 UTC; am Scantag 17 Tage Restlaufzeit)."
     },
     {
      "check": "cert_expiring_later",
@@ -805,27 +1094,65 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (testssl)",
+   "source": "aktiv (testssl.sh)",
    "status": "gelb",
+   "subjects": [
+    "cert_expiring_later|huendgen-entsorgung.de:443@18.197.248.23",
+    "cert_expiring_later|www.huendgen-entsorgung.de:443@18.197.248.23",
+    "cert_expiring_later|www.huendgen-entsorgung.de@18.197.248.23"
+   ],
    "threat": null,
    "title": "Zertifikate auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de): Zertifikat läuft in den nächsten Wochen ab (beim Plattformbetreiber eu-multiscreensite.com)",
    "urgency": "Mittelfristig",
    "verify": "Verbindung zum Dienst mit einem TLS-Client aufbauen und das Ablaufdatum des präsentierten Zertifikats prüfen; erwartet wird ein neues Zertifikat mit ausreichendem Vorlauf."
   },
   {
-   "affected": "exchange.huendgen-entsorgung.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
+   "affected": "exchange.huendgen-entsorgung.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy)",
    "cat": "D",
-   "evidence": "header_check · hosts/80.90.145.166/phase2/headers_exchange.huendgen-entsorgung.de.json\nexchange.huendgen-entsorgung.de · Adresse: https://exchange.huendgen-entsorgung.de · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection",
-   "found": "Der Dienst exchange.huendgen-entsorgung.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: exchange.huendgen-entsorgung.de. Auf exchange.huendgen-entsorgung.de ist keine Content-Security-Policy gesetzt: exchange.huendgen-entsorgung.de. Auf exchange.huendgen-entsorgung.de fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: exchange.huendgen-entsorgung.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
-   "id": "VS-2026-004",
-   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar.",
+   "checks": [
+    "hsts_missing",
+    "csp_missing",
+    "security_headers_incomplete"
+   ],
+   "evidence": "header_check · hosts/80.90.145.166/phase2/headers_exchange.huendgen-entsorgung.de.json\nexchange.huendgen-entsorgung.de · Adresse: https://exchange.huendgen-entsorgung.de · Antwort: 302 · weitergeleitet auf: https://exchange.huendgen-entsorgung.de/owa/ · bewertet an der Endseite: https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options",
+   "found": "Der Dienst exchange.huendgen-entsorgung.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: exchange.huendgen-entsorgung.de. Auf exchange.huendgen-entsorgung.de ist keine Content-Security-Policy gesetzt: exchange.huendgen-entsorgung.de. Auf exchange.huendgen-entsorgung.de fehlen einzelne Sicherheits-Header der Webseite: exchange.huendgen-entsorgung.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "id": "VS-2026-005",
+   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/80.90.145.166/kunde",
    "level": "mittel",
    "level_label": "mittel",
+   "missing_headers": [
+    "X-Content-Type-Options",
+    "Referrer-Policy",
+    "Permissions-Policy"
+   ],
    "operator": "",
    "operator_note": "",
    "plan_action": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
    "plan_effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+   "plan_items": [
+    {
+     "action": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
+     "check": "hsts_missing",
+     "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+     "lever": "HTTP Strict Transport Security setzen",
+     "stage": "mittelfristig"
+    },
+    {
+     "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
+     "check": "csp_missing",
+     "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+     "lever": "Inhaltsrichtlinie für die Webseiten einführen",
+     "stage": "mittelfristig"
+    },
+    {
+     "action": "X-Content-Type-Options mit dem Wert nosniff setzen.",
+     "check": "security_headers_incomplete",
+     "effect": "Verhindert Fehldeutungen ausgelieferter Inhalte im Browser",
+     "lever": "Fehlende Sicherheits-Header ergänzen",
+     "stage": "mittelfristig"
+    }
+   ],
    "plan_lever": "HTTP Strict Transport Security setzen",
    "plan_stage": "mittelfristig",
    "policy": "csp_missing, hsts_missing, security_headers_incomplete",
@@ -837,7 +1164,7 @@
       "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
      ],
      "statement": "short",
-     "text": "HSTS fehlt"
+     "text": "HSTS fehlt oder ist abgeschaltet"
     },
     {
      "check": "csp_missing",
@@ -882,7 +1209,7 @@
       "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
      ],
      "statement": "observation[0]",
-     "text": "Auf exchange.huendgen-entsorgung.de fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: exchange.huendgen-entsorgung.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)."
+     "text": "Auf exchange.huendgen-entsorgung.de fehlen einzelne Sicherheits-Header der Webseite: exchange.huendgen-entsorgung.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy)."
     },
     {
      "check": "hsts_missing",
@@ -908,8 +1235,26 @@
      "members": [
       "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
      ],
-     "statement": "meaning[0]",
-     "text": "Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar."
+     "statement": "meaning[1]",
+     "text": "Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
+     ],
+     "statement": "meaning[2]",
+     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
+     ],
+     "statement": "meaning[3]",
+     "text": "Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen."
     },
     {
      "check": "hsts_missing",
@@ -936,7 +1281,34 @@
       "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
      ],
      "statement": "verify[0]",
-     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
+     "text": "HTTP-Antwortheader der Endseite von außen abrufen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
+     ],
+     "statement": "verify[2]",
+     "text": "Erwartet wird X-Content-Type-Options mit dem Wert nosniff."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
+     ],
+     "statement": "verify[3]",
+     "text": "Erwartet wird eine Referrer-Policy."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
+     ],
+     "statement": "verify[4]",
+     "text": "Erwartet wird eine Permissions-Policy."
     },
     {
      "check": "hsts_missing",
@@ -962,8 +1334,26 @@
      "members": [
       "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
      ],
-     "statement": "recommendation[0]",
-     "text": "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
+     "statement": "recommendation[1]",
+     "text": "X-Content-Type-Options mit dem Wert nosniff setzen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
+     ],
+     "statement": "recommendation[2]",
+     "text": "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
+     ],
+     "statement": "recommendation[3]",
+     "text": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
     }
    ],
    "recommendation": [
@@ -977,31 +1367,57 @@
     ],
     [
      "Mittelfristig",
-     "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
+     "X-Content-Type-Options mit dem Wert nosniff setzen."
+    ],
+    [
+     "Mittelfristig",
+     "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
+    ],
+    [
+     "Mittelfristig",
+     "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (header_check)",
    "status": "gelb",
+   "subjects": [
+    "csp_missing|exchange.huendgen-entsorgung.de@80.90.145.166",
+    "hsts_missing|exchange.huendgen-entsorgung.de@80.90.145.166",
+    "security_headers_incomplete|exchange.huendgen-entsorgung.de@80.90.145.166"
+   ],
    "threat": null,
-   "title": "Absicherung der Webdienste auf 80.90.145.166: HSTS fehlt, Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
+   "title": "Absicherung der Webdienste auf 80.90.145.166: HSTS fehlt oder ist abgeschaltet, Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
    "urgency": "Mittelfristig",
-   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security. HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
+   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security. HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird X-Content-Type-Options mit dem Wert nosniff. Erwartet wird eine Referrer-Policy. Erwartet wird eine Permissions-Policy."
   },
   {
    "affected": "18.197.248.23:8443 (nginx)",
    "cat": "A",
-   "evidence": "nmap · hosts/18.197.248.23/phase1/nmap.xml\n18.197.248.23:8443/tcp · Dienst: http · Produkt: nginx · Seitentitel: 403 Forbidden · TLS erzwungen: ja",
-   "found": "Der Host 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) beantwortet Anfragen an einen Webdienst auf einem Port außerhalb der üblichen Web- und Verwaltungsports: 18.197.248.23:8443 (nginx). Der Zweck dieses Dienstes ist von außen nicht erkennbar.",
-   "id": "VS-2026-005",
+   "checks": [
+    "http_alt_port"
+   ],
+   "evidence": "nmap · hosts/18.197.248.23/phase1/nmap.xml\n18.197.248.23:8443/tcp · Dienst: http · Produkt: nginx · Seitentitel: 403 Forbidden · TLS erzwungen: ja · Zertifikat für: multiscreensite.com · Aussteller: YR2 · gültig bis: 08.12.2026, 03:54 UTC",
+   "found": "Der Host 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) beantwortet Anfragen an einen Webdienst auf einem Port außerhalb der üblichen Web- und Verwaltungsports: 18.197.248.23:8443 (nginx).",
+   "id": "VS-2026-006",
    "impact": "Ein Webdienst auf einem unüblichen Port bleibt bei einer Prüfung der Standardports leicht unbemerkt und vergrößert die Angriffsfläche um eine Anwendung, deren Pflegezustand von außen nicht erkennbar ist.",
    "key": "windows_edge_exposure/18.197.248.23/platform:eu-multiscreensite.com",
    "level": "niedrig",
    "level_label": "niedrig",
+   "missing_headers": [],
    "operator": "beim Plattformbetreiber eu-multiscreensite.com",
    "operator_note": "Dieser Sachverhalt liegt beim Plattformbetreiber eu-multiscreensite.com: der Hostname zeigt auf dessen Plattform, Server und Grundkonfiguration betreibt er. Die Empfehlung richtet sich an ihn; Sie können sie über den Vertrag oder die Einstellungen der Plattform einfordern.",
-   "plan_action": "Klären, welche Anwendung den Dienst bereitstellt und ob ein Zugriff aus dem gesamten Internet dafür erforderlich ist.",
-   "plan_effect": "Verkleinert die Angriffsfläche um nicht benötigte Webdienste",
+   "plan_action": "Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss.",
+   "plan_effect": "Klärt, ob der Dienst aus dem Internet erreichbar sein muss",
+   "plan_items": [
+    {
+     "action": "Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss.",
+     "check": "http_alt_port",
+     "effect": "Klärt, ob der Dienst aus dem Internet erreichbar sein muss",
+     "lever": "Zweck zusätzlicher Webports klären",
+     "stage": "mittelfristig"
+    }
+   ],
    "plan_lever": "Zweck zusätzlicher Webports klären",
    "plan_stage": "mittelfristig",
    "policy": "http_alt_port",
@@ -1022,7 +1438,7 @@
       "18.197.248.23|18.197.248.23:8443"
      ],
      "statement": "observation[0]",
-     "text": "Der Host 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) beantwortet Anfragen an einen Webdienst auf einem Port außerhalb der üblichen Web- und Verwaltungsports: 18.197.248.23:8443 (nginx). Der Zweck dieses Dienstes ist von außen nicht erkennbar."
+     "text": "Der Host 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) beantwortet Anfragen an einen Webdienst auf einem Port außerhalb der üblichen Web- und Verwaltungsports: 18.197.248.23:8443 (nginx)."
     },
     {
      "check": "http_alt_port",
@@ -1048,8 +1464,8 @@
      "members": [
       "18.197.248.23|18.197.248.23:8443"
      ],
-     "statement": "recommendation[0]",
-     "text": "Klären, welche Anwendung den Dienst bereitstellt und ob ein Zugriff aus dem gesamten Internet dafür erforderlich ist."
+     "statement": "recommendation[1]",
+     "text": "Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss."
     },
     {
      "check": "http_alt_port",
@@ -1057,14 +1473,14 @@
      "members": [
       "18.197.248.23|18.197.248.23:8443"
      ],
-     "statement": "recommendation[1]",
+     "statement": "recommendation[2]",
      "text": "Nicht mehr benötigte Dienste abschalten und den zugehörigen Port schließen; weiterhin benötigte Dienste auf feste Quellnetze beschränken."
     }
    ],
    "recommendation": [
     [
      "Mittelfristig",
-     "Klären, welche Anwendung den Dienst bereitstellt und ob ein Zugriff aus dem gesamten Internet dafür erforderlich ist."
+     "Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss."
     ],
     [
      "Strategisch",
@@ -1074,25 +1490,42 @@
    "scale": "hygiene",
    "source": "aktiv (nmap)",
    "status": "blau",
+   "subjects": [
+    "http_alt_port|18.197.248.23",
+    "http_alt_port|18.197.248.23:8443"
+   ],
    "threat": null,
    "title": "Webdienste auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de): zusätzlicher Webport (beim Plattformbetreiber eu-multiscreensite.com)",
    "urgency": "Mittelfristig",
    "verify": "Portscan des Hosts von einer externen Adresse wiederholen; erwartet wird, dass der Port nur noch für berechtigte Quellnetze erreichbar oder vollständig geschlossen ist."
   },
   {
-   "affected": "80.90.145.166:444 (Apache httpd)",
+   "affected": "80.90.145.166:444 (Apache httpd, Titel „Hündgen Entsorgungs GmbH & Co. KG Web Applications Portal“)",
    "cat": "A",
-   "evidence": "nmap · hosts/80.90.145.166/phase1/nmap.xml\n80.90.145.166:444/tcp · Dienst: http · Produkt: Apache httpd · Server-Kennung: Apache · Seitentitel: Hündgen Entsorgungs GmbH & Co. KG Web Applications Po (Auszug) · TLS erzwungen: ja",
-   "found": "Der Host 80.90.145.166 (exchange.huendgen-entsorgung.de) beantwortet Anfragen an einen Webdienst auf einem Port außerhalb der üblichen Web- und Verwaltungsports: 80.90.145.166:444 (Apache httpd). Der Zweck dieses Dienstes ist von außen nicht erkennbar.",
-   "id": "VS-2026-006",
+   "checks": [
+    "http_alt_port"
+   ],
+   "evidence": "nmap · hosts/80.90.145.166/phase1/nmap.xml\n80.90.145.166:444/tcp · Dienst: http · Produkt: Apache httpd · Server-Kennung: Apache · Seitentitel: Hündgen Entsorgungs GmbH & Co. KG Web Applications Portal · TLS erzwungen: ja · Zertifikat für: *.huendgen-entsorgung.de · Aussteller: Sectigo Public Server Authentication CA DV R36 · gültig bis: 03.01.2027, 23:59 UTC",
+   "found": "Der Host 80.90.145.166 (exchange.huendgen-entsorgung.de) beantwortet Anfragen an einen Webdienst auf einem Port außerhalb der üblichen Web- und Verwaltungsports: 80.90.145.166:444 (Apache httpd, Titel „Hündgen Entsorgungs GmbH & Co. KG Web Applications Portal“).",
+   "id": "VS-2026-007",
    "impact": "Ein Webdienst auf einem unüblichen Port bleibt bei einer Prüfung der Standardports leicht unbemerkt und vergrößert die Angriffsfläche um eine Anwendung, deren Pflegezustand von außen nicht erkennbar ist.",
    "key": "windows_edge_exposure/80.90.145.166/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
+   "missing_headers": [],
    "operator": "",
    "operator_note": "",
-   "plan_action": "Klären, welche Anwendung den Dienst bereitstellt und ob ein Zugriff aus dem gesamten Internet dafür erforderlich ist.",
-   "plan_effect": "Verkleinert die Angriffsfläche um nicht benötigte Webdienste",
+   "plan_action": "Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss.",
+   "plan_effect": "Klärt, ob der Dienst aus dem Internet erreichbar sein muss",
+   "plan_items": [
+    {
+     "action": "Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss.",
+     "check": "http_alt_port",
+     "effect": "Klärt, ob der Dienst aus dem Internet erreichbar sein muss",
+     "lever": "Zweck zusätzlicher Webports klären",
+     "stage": "mittelfristig"
+    }
+   ],
    "plan_lever": "Zweck zusätzlicher Webports klären",
    "plan_stage": "mittelfristig",
    "policy": "http_alt_port",
@@ -1113,7 +1546,7 @@
       "80.90.145.166|80.90.145.166:444"
      ],
      "statement": "observation[0]",
-     "text": "Der Host 80.90.145.166 (exchange.huendgen-entsorgung.de) beantwortet Anfragen an einen Webdienst auf einem Port außerhalb der üblichen Web- und Verwaltungsports: 80.90.145.166:444 (Apache httpd). Der Zweck dieses Dienstes ist von außen nicht erkennbar."
+     "text": "Der Host 80.90.145.166 (exchange.huendgen-entsorgung.de) beantwortet Anfragen an einen Webdienst auf einem Port außerhalb der üblichen Web- und Verwaltungsports: 80.90.145.166:444 (Apache httpd, Titel „Hündgen Entsorgungs GmbH & Co. KG Web Applications Portal“)."
     },
     {
      "check": "http_alt_port",
@@ -1139,8 +1572,8 @@
      "members": [
       "80.90.145.166|80.90.145.166:444"
      ],
-     "statement": "recommendation[0]",
-     "text": "Klären, welche Anwendung den Dienst bereitstellt und ob ein Zugriff aus dem gesamten Internet dafür erforderlich ist."
+     "statement": "recommendation[1]",
+     "text": "Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss."
     },
     {
      "check": "http_alt_port",
@@ -1148,14 +1581,14 @@
      "members": [
       "80.90.145.166|80.90.145.166:444"
      ],
-     "statement": "recommendation[1]",
+     "statement": "recommendation[2]",
      "text": "Nicht mehr benötigte Dienste abschalten und den zugehörigen Port schließen; weiterhin benötigte Dienste auf feste Quellnetze beschränken."
     }
    ],
    "recommendation": [
     [
      "Mittelfristig",
-     "Klären, welche Anwendung den Dienst bereitstellt und ob ein Zugriff aus dem gesamten Internet dafür erforderlich ist."
+     "Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss."
     ],
     [
      "Strategisch",
@@ -1165,6 +1598,10 @@
    "scale": "hygiene",
    "source": "aktiv (nmap)",
    "status": "blau",
+   "subjects": [
+    "http_alt_port|80.90.145.166",
+    "http_alt_port|80.90.145.166:444"
+   ],
    "threat": null,
    "title": "Webdienste auf 80.90.145.166 (exchange.huendgen-entsorgung.de): zusätzlicher Webport",
    "urgency": "Mittelfristig",
@@ -1173,17 +1610,30 @@
   {
    "affected": "huendgen-entsorgung.de (p=quarantine)",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nhuendgen-entsorgung.de · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere · DMARC: v=DMARC1; p=quarantine; fo=1",
+   "checks": [
+    "dmarc_quarantine"
+   ],
+   "evidence": "DNS-Abfragen · phase0/dns_records.json\nhuendgen-entsorgung.de · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere · DMARC: v=DMARC1; p=quarantine; fo=1",
    "found": "Die DMARC-Richtlinie der Domain huendgen-entsorgung.de stellt E-Mails, die SPF oder DKIM nicht bestehen, unter Quarantäne, weist sie aber nicht zurück: huendgen-entsorgung.de (p=quarantine).",
-   "id": "VS-2026-007",
+   "id": "VS-2026-008",
    "impact": "Eine Quarantäne-Richtlinie verschiebt verdächtige E-Mails in der Regel in einen Spam-Ordner, statt sie abzulehnen. Je nach Einstellung des Empfangssystems können gefälschte E-Mails im Namen der Domain trotzdem gelesen werden. Eine Meldeadresse ist nicht hinterlegt; Berichte über fehlgeschlagene Prüfungen erreichen Sie deshalb nicht.",
    "key": "mail_policy/huendgen-entsorgung.de/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
+   "missing_headers": [],
    "operator": "",
    "operator_note": "",
    "plan_action": "Nach einer Beobachtungsphase ohne Fehlmeldungen die Richtlinie auf Zurückweisung anheben, sobald alle legitimen Versandquellen der Domain erfasst sind.",
    "plan_effect": "Weist gefälschte E-Mails ab, statt sie nur zurückzustellen",
+   "plan_items": [
+    {
+     "action": "Nach einer Beobachtungsphase ohne Fehlmeldungen die Richtlinie auf Zurückweisung anheben, sobald alle legitimen Versandquellen der Domain erfasst sind.",
+     "check": "dmarc_quarantine",
+     "effect": "Weist gefälschte E-Mails ab, statt sie nur zurückzustellen",
+     "lever": "DMARC-Richtlinie auf Zurückweisung stellen",
+     "stage": "mittelfristig"
+    }
+   ],
    "plan_lever": "DMARC-Richtlinie auf Zurückweisung stellen",
    "plan_stage": "mittelfristig",
    "policy": "dmarc_quarantine",
@@ -1263,8 +1713,11 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records)",
+   "source": "aktiv (DNS-Abfragen)",
    "status": "blau",
+   "subjects": [
+    "dmarc_quarantine|huendgen-entsorgung.de"
+   ],
    "threat": null,
    "title": "Richtlinien zur Absender-Authentizität für huendgen-entsorgung.de: DMARC mit Quarantäne statt Zurückweisung",
    "urgency": "Mittelfristig",
@@ -1273,17 +1726,38 @@
   {
    "affected": "huendgen-entsorgung.de",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nhuendgen-entsorgung.de · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere\n\ndns_security · phase0a/dns_security.json\nhuendgen-entsorgung.de · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
+   "checks": [
+    "mta_sts_missing",
+    "tls_rpt_missing"
+   ],
+   "evidence": "DNS-Abfragen · phase0/dns_records.json\nhuendgen-entsorgung.de · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere\n\nDNS-Abfragen · phase0a/dns_security.json\nhuendgen-entsorgung.de · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
    "found": "Für huendgen-entsorgung.de ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain huendgen-entsorgung.de fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten. Für huendgen-entsorgung.de ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain huendgen-entsorgung.de fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können.",
-   "id": "VS-2026-008",
+   "id": "VS-2026-009",
    "impact": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen. Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.",
    "key": "mail_transport_enforcement/huendgen-entsorgung.de/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
+   "missing_headers": [],
    "operator": "",
    "operator_note": "",
    "plan_action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
    "plan_effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
+   "plan_items": [
+    {
+     "action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
+     "check": "mta_sts_missing",
+     "effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
+     "lever": "MTA-STS für die Domain veröffentlichen",
+     "stage": "strategisch"
+    },
+    {
+     "action": "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten.",
+     "check": "tls_rpt_missing",
+     "effect": "Meldet fehlgeschlagene verschlüsselte Zustellungen an Sie zurück",
+     "lever": "TLS-RPT für die Domain veröffentlichen",
+     "stage": "strategisch"
+    }
+   ],
    "plan_lever": "MTA-STS für die Domain veröffentlichen",
    "plan_stage": "strategisch",
    "policy": "mta_sts_missing, tls_rpt_missing",
@@ -1390,27 +1864,47 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (DNS-Abfragen)",
    "status": "blau",
+   "subjects": [
+    "mta_sts_missing|huendgen-entsorgung.de",
+    "tls_rpt_missing|huendgen-entsorgung.de"
+   ],
    "threat": null,
    "title": "Verschlüsselte Zustellung von E-Mails für huendgen-entsorgung.de: kein MTA-STS und kein TLS-RPT",
    "urgency": "Strategisch",
    "verify": "DNS-Abfrage des TXT-Eintrags _mta-sts.huendgen-entsorgung.de sowie Abruf der Richtliniendatei unter der zugehörigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine Richtliniendatei mit mode enforce. DNS-Abfrage des TXT-Eintrags _smtp._tls.huendgen-entsorgung.de; erwartet wird ein Eintrag, der mit v=TLSRPTv1 beginnt und eine Meldeadresse (rua) nennt."
   },
   {
-   "affected": "www.huendgen-entsorgung.de (fehlend: referrer-policy, permissions-policy)",
+   "affected": "www.huendgen-entsorgung.de (fehlend: Referrer-Policy, Permissions-Policy)",
    "cat": "D",
-   "evidence": "header_check · hosts/18.197.248.23/phase2/headers_www.huendgen-entsorgung.de.json\nwww.huendgen-entsorgung.de · Adresse: https://www.huendgen-entsorgung.de · fehlende Header: permissions-policy, referrer-policy, x-xss-protection",
-   "found": "Auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de) fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: www.huendgen-entsorgung.de (fehlend: referrer-policy, permissions-policy).",
-   "id": "VS-2026-009",
-   "impact": "Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar.",
+   "checks": [
+    "security_headers_incomplete"
+   ],
+   "evidence": "header_check · hosts/18.197.248.23/phase2/headers_www.huendgen-entsorgung.de.json\nwww.huendgen-entsorgung.de · Adresse: https://www.huendgen-entsorgung.de · Antwort: 200 · fehlende Header: Permissions-Policy, Referrer-Policy",
+   "found": "Auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de) fehlen einzelne Sicherheits-Header der Webseite: www.huendgen-entsorgung.de (fehlend: Referrer-Policy, Permissions-Policy).",
+   "id": "VS-2026-010",
+   "impact": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/18.197.248.23/platform:eu-multiscreensite.com",
    "level": "niedrig",
    "level_label": "niedrig",
+   "missing_headers": [
+    "Referrer-Policy",
+    "Permissions-Policy"
+   ],
    "operator": "beim Plattformbetreiber eu-multiscreensite.com",
    "operator_note": "Dieser Sachverhalt liegt beim Plattformbetreiber eu-multiscreensite.com: der Hostname zeigt auf dessen Plattform, Server und Grundkonfiguration betreibt er. Die Empfehlung richtet sich an ihn; Sie können sie über den Vertrag oder die Einstellungen der Plattform einfordern.",
-   "plan_action": "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen.",
-   "plan_effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
+   "plan_action": "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin.",
+   "plan_effect": "Hält Adressen und Parameter der Seite aus fremden Protokollen heraus",
+   "plan_items": [
+    {
+     "action": "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin.",
+     "check": "security_headers_incomplete",
+     "effect": "Hält Adressen und Parameter der Seite aus fremden Protokollen heraus",
+     "lever": "Fehlende Sicherheits-Header ergänzen",
+     "stage": "mittelfristig"
+    }
+   ],
    "plan_lever": "Fehlende Sicherheits-Header ergänzen",
    "plan_stage": "mittelfristig",
    "policy": "security_headers_incomplete",
@@ -1431,7 +1925,7 @@
       "www.huendgen-entsorgung.de@18.197.248.23|www.huendgen-entsorgung.de@18.197.248.23"
      ],
      "statement": "observation[0]",
-     "text": "Auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de) fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und ungewollter Weitergabe von Referrer-Informationen schützen: www.huendgen-entsorgung.de (fehlend: referrer-policy, permissions-policy)."
+     "text": "Auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de) fehlen einzelne Sicherheits-Header der Webseite: www.huendgen-entsorgung.de (fehlend: Referrer-Policy, Permissions-Policy)."
     },
     {
      "check": "security_headers_incomplete",
@@ -1439,8 +1933,17 @@
      "members": [
       "www.huendgen-entsorgung.de@18.197.248.23|www.huendgen-entsorgung.de@18.197.248.23"
      ],
-     "statement": "meaning[0]",
-     "text": "Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist gering, die Maßnahme aber schnell umsetzbar."
+     "statement": "meaning[2]",
+     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "www.huendgen-entsorgung.de@18.197.248.23|www.huendgen-entsorgung.de@18.197.248.23"
+     ],
+     "statement": "meaning[3]",
+     "text": "Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen."
     },
     {
      "check": "security_headers_incomplete",
@@ -1449,7 +1952,25 @@
       "www.huendgen-entsorgung.de@18.197.248.23|www.huendgen-entsorgung.de@18.197.248.23"
      ],
      "statement": "verify[0]",
-     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
+     "text": "HTTP-Antwortheader der Endseite von außen abrufen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "www.huendgen-entsorgung.de@18.197.248.23|www.huendgen-entsorgung.de@18.197.248.23"
+     ],
+     "statement": "verify[3]",
+     "text": "Erwartet wird eine Referrer-Policy."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "www.huendgen-entsorgung.de@18.197.248.23|www.huendgen-entsorgung.de@18.197.248.23"
+     ],
+     "statement": "verify[4]",
+     "text": "Erwartet wird eine Permissions-Policy."
     },
     {
      "check": "security_headers_incomplete",
@@ -1457,38 +1978,71 @@
      "members": [
       "www.huendgen-entsorgung.de@18.197.248.23|www.huendgen-entsorgung.de@18.197.248.23"
      ],
-     "statement": "recommendation[0]",
-     "text": "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
+     "statement": "recommendation[2]",
+     "text": "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "www.huendgen-entsorgung.de@18.197.248.23|www.huendgen-entsorgung.de@18.197.248.23"
+     ],
+     "statement": "recommendation[3]",
+     "text": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
     }
    ],
    "recommendation": [
     [
      "Mittelfristig",
-     "Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen."
+     "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
+    ],
+    [
+     "Mittelfristig",
+     "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (header_check)",
    "status": "blau",
+   "subjects": [
+    "security_headers_incomplete|www.huendgen-entsorgung.de@18.197.248.23"
+   ],
    "threat": null,
    "title": "Absicherung der Webdienste auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de): Sicherheits-Header unvollständig (beim Plattformbetreiber eu-multiscreensite.com)",
    "urgency": "Mittelfristig",
-   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header."
+   "verify": "HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird eine Referrer-Policy. Erwartet wird eine Permissions-Policy."
   },
   {
-   "affected": "exchange.huendgen-entsorgung.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-2019)",
+   "affected": "exchange.huendgen-entsorgung.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-2019)",
    "cat": "E",
-   "evidence": "header_check · hosts/80.90.145.166/phase2/headers_exchange.huendgen-entsorgung.de.json\nexchange.huendgen-entsorgung.de · Adresse: https://exchange.huendgen-entsorgung.de · Server: Microsoft-IIS/10.0 · X-FEServer: EXCHANGE-2019",
-   "found": "Die Webantwort von exchange.huendgen-entsorgung.de nennt in ihren Antwortheadern die Version der eingesetzten Serversoftware: exchange.huendgen-entsorgung.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-2019).",
-   "id": "VS-2026-010",
-   "impact": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs.",
+   "checks": [
+    "http_header_disclosure"
+   ],
+   "evidence": "header_check · hosts/80.90.145.166/phase2/headers_exchange.huendgen-entsorgung.de.json\nexchange.huendgen-entsorgung.de · Adresse: https://exchange.huendgen-entsorgung.de · Antwort: 302 · weitergeleitet auf: https://exchange.huendgen-entsorgung.de/owa/ · bewertet an der Endseite: https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0 · Server: Microsoft-IIS/10.0 · X-Powered-By: ASP.NET · X-AspNet-Version: 4.0.30319 · X-FEServer (interner Servername): EXCHANGE-2019",
+   "found": "Die Webantwort von exchange.huendgen-entsorgung.de nennt in ihren Antwortheadern die Version der eingesetzten Serversoftware: exchange.huendgen-entsorgung.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-2019). Der Antwortheader X-FEServer nennt den internen Namen des Frontend-Servers: exchange.huendgen-entsorgung.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-2019).",
+   "id": "VS-2026-011",
+   "impact": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs. Ein interner Servername verrät das Namensschema der Serverlandschaft; das erleichtert die Aufklärung vor einem gezielten Angriff.",
    "key": "banner_disclosure/scan/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
+   "missing_headers": [
+    "X-Content-Type-Options",
+    "Referrer-Policy",
+    "Permissions-Policy"
+   ],
    "operator": "",
    "operator_note": "",
-   "plan_action": "Die Versionskennung in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert ohne Versionsangabe setzen.",
+   "plan_action": "Versionskennungen und interne Servernamen in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert setzen.",
    "plan_effect": "Erschwert die gezielte Suche nach passenden Schwachstellen",
+   "plan_items": [
+    {
+     "action": "Versionskennungen und interne Servernamen in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert setzen.",
+     "check": "http_header_disclosure",
+     "effect": "Erschwert die gezielte Suche nach passenden Schwachstellen",
+     "lever": "Versionsangaben aus den Antwort-Headern entfernen",
+     "stage": "mittelfristig"
+    }
+   ],
    "plan_lever": "Versionsangaben aus den Antwort-Headern entfernen",
    "plan_stage": "mittelfristig",
    "policy": "http_header_disclosure",
@@ -1500,7 +2054,7 @@
       "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
      ],
      "statement": "short",
-     "text": "Versionsangabe im HTTP-Header"
+     "text": "Versions- oder Servername im HTTP-Header"
     },
     {
      "check": "http_header_disclosure",
@@ -1509,7 +2063,16 @@
       "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
      ],
      "statement": "observation[0]",
-     "text": "Die Webantwort von exchange.huendgen-entsorgung.de nennt in ihren Antwortheadern die Version der eingesetzten Serversoftware: exchange.huendgen-entsorgung.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-2019)."
+     "text": "Die Webantwort von exchange.huendgen-entsorgung.de nennt in ihren Antwortheadern die Version der eingesetzten Serversoftware: exchange.huendgen-entsorgung.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-2019)."
+    },
+    {
+     "check": "http_header_disclosure",
+     "field": "observation",
+     "members": [
+      "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
+     ],
+     "statement": "observation[1]",
+     "text": "Der Antwortheader X-FEServer nennt den internen Namen des Frontend-Servers: exchange.huendgen-entsorgung.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-2019)."
     },
     {
      "check": "http_header_disclosure",
@@ -1519,6 +2082,15 @@
      ],
      "statement": "meaning[0]",
      "text": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs."
+    },
+    {
+     "check": "http_header_disclosure",
+     "field": "meaning",
+     "members": [
+      "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
+     ],
+     "statement": "meaning[1]",
+     "text": "Ein interner Servername verrät das Namensschema der Serverlandschaft; das erleichtert die Aufklärung vor einem gezielten Angriff."
     },
     {
      "check": "http_header_disclosure",
@@ -1536,37 +2108,61 @@
       "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
      ],
      "statement": "recommendation[0]",
-     "text": "Die Versionskennung in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert ohne Versionsangabe setzen."
+     "text": "Versionskennungen und interne Servernamen in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert setzen."
     }
    ],
    "recommendation": [
     [
      "Mittelfristig",
-     "Die Versionskennung in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert ohne Versionsangabe setzen."
+     "Versionskennungen und interne Servernamen in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert setzen."
     ]
    ],
    "scale": "hygiene",
    "source": "aktiv (header_check)",
    "status": "blau",
+   "subjects": [
+    "http_header_disclosure|exchange.huendgen-entsorgung.de@80.90.145.166"
+   ],
    "threat": null,
-   "title": "Versionsangaben in den Antworten der Dienste: Versionsangabe im HTTP-Header",
+   "title": "Versionsangaben in den Antworten der Dienste: Versions- oder Servername im HTTP-Header",
    "urgency": "Mittelfristig",
    "verify": "HTTP-Antwortheader der genannten Adresse von außen abrufen; erwartet wird kein Header mit einer konkreten Versionsangabe."
   },
   {
    "affected": "huendgen-entsorgung.de",
    "cat": "E",
-   "evidence": "dns_security · phase0a/dns_security.json\nhuendgen-entsorgung.de · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
+   "checks": [
+    "caa_missing",
+    "dnssec_missing"
+   ],
+   "evidence": "DNS-Abfragen · phase0a/dns_security.json\nhuendgen-entsorgung.de · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
    "found": "Für huendgen-entsorgung.de ist kein CAA-Eintrag veröffentlicht. Für die Domain huendgen-entsorgung.de legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen. Für huendgen-entsorgung.de ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain huendgen-entsorgung.de lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
-   "id": "VS-2026-011",
+   "id": "VS-2026-012",
    "impact": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf. Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
    "key": "dns_hygiene/huendgen-entsorgung.de/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
+   "missing_headers": [],
    "operator": "",
    "operator_note": "",
    "plan_action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
    "plan_effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+   "plan_items": [
+    {
+     "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
+     "check": "caa_missing",
+     "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+     "lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+     "stage": "mittelfristig"
+    },
+    {
+     "action": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
+     "check": "dnssec_missing",
+     "effect": "Schützt DNS-Antworten gegen Verfälschung auf dem Übertragungsweg",
+     "lever": "DNS-Zone mit DNSSEC signieren",
+     "stage": "strategisch"
+    }
+   ],
    "plan_lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
    "plan_stage": "mittelfristig",
    "policy": "caa_missing, dnssec_missing",
@@ -1673,8 +2269,12 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_security)",
+   "source": "aktiv (DNS-Abfragen)",
    "status": "blau",
+   "subjects": [
+    "caa_missing|huendgen-entsorgung.de",
+    "dnssec_missing|huendgen-entsorgung.de"
+   ],
    "threat": null,
    "title": "DNS-Absicherung für huendgen-entsorgung.de: kein CAA-Eintrag und keine DNSSEC-Signatur",
    "urgency": "Mittelfristig",
@@ -1687,7 +2287,7 @@
     "key": "A",
     "level": 2,
     "name": "Perimeter-Exposition",
-    "note": "Anmeldeportal aus dem Internet erreichbar; Webdienste auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de): zusätzlicher Webport (beim Plattformbetreiber eu-multiscreensite.com)",
+    "note": "Offener Dienst ohne Kennung; Anmeldeportal aus dem Internet erreichbar",
     "status": "gelb"
    },
    {
@@ -1708,56 +2308,57 @@
     "key": "D",
     "level": 2,
     "name": "Web- und Transport-Hygiene",
-    "note": "Zertifikate auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de): Zertifikat läuft in den nächsten Wochen ab (beim Plattformbetreiber eu-multiscreensite.com); Absicherung der Webdienste auf 80.90.145.166: HSTS fehlt, Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
+    "note": "Zertifikate auf www.huendgen-entsorgung.de (+huendgen-entsorgung.de): Zertifikat läuft in den nächsten Wochen ab (beim Plattformbetreiber eu-multiscreensite.com); Absicherung der Webdienste auf 80.90.145.166: HSTS fehlt oder ist abgeschaltet, Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
     "status": "gelb"
    },
    {
     "key": "E",
     "level": 1,
     "name": "Konfiguration und Informations-Hygiene",
-    "note": "Versionsangaben in den Antworten der Dienste: Versionsangabe im HTTP-Header; DNS-Absicherung für huendgen-entsorgung.de: kein CAA-Eintrag und keine DNSSEC-Signatur",
+    "note": "Versionsangaben in den Antworten der Dienste: Versions- oder Servername im HTTP-Header; DNS-Absicherung für huendgen-entsorgung.de: kein CAA-Eintrag und keine DNSSEC-Signatur",
     "status": "blau"
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von huendgen-entsorgung.de am 23.09.2026: 3 Hostnamen auf 2 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "",
+  "coverage_warning": "Für 2 Systeme (18.197.248.23 und 80.90.145.166) liegt nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
-    "effect": "Schließt Lücken, für die der Hersteller keine Updates mehr liefert",
+    "effect": "Verkleinert die Angriffsfläche um Dienste ohne erkennbaren Zweck",
     "n": 1,
     "refs": [
      "VS-2026-001"
+    ],
+    "title": "Zweck offener Dienste ohne Kennung klären"
+   },
+   {
+    "effect": "Begrenzt den Zugriff auf Software ohne Sicherheitsupdates bis zur Ablösung",
+    "n": 2,
+    "refs": [
+     "VS-2026-002"
     ],
     "title": "Serversoftware ohne Herstellerpflege ersetzen"
    },
    {
     "effect": "Erschwert die Übernahme von Konten durch Rateangriffe",
-    "n": 2,
-    "refs": [
-     "VS-2026-002"
-    ],
-    "title": "Anmeldeportale mit zweiter Anmeldestufe schützen"
-   },
-   {
-    "effect": "Verhindert den Ausfall des Dienstes zum Ablaufdatum des Zertifikats",
     "n": 3,
     "refs": [
      "VS-2026-003"
     ],
-    "title": "Erneuerung der Zertifikate einplanen"
+    "title": "Anmeldeportale mit zweiter Anmeldestufe schützen"
    }
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
   "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
- "landscape_lead": "11 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "12 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 16,
-  "catalog_digest": "3def4b8b695693f10cdc3c448b9600bfc7e6ba365814cf1aef184ec7b573b6fd",
-  "catalog_version": "2026-09-26.1",
+  "after_fp": 17,
+  "catalog_digest": "004a04598e2072c37701db55752e05f8f2b155bf6ec91f987217067547919206",
+  "catalog_version": "2026-09-26.2",
   "classification": "Vertraulich",
-  "consolidated": 11,
+  "consolidated": 12,
+  "context_fields": [],
   "context_sources": {},
   "customer": "Auftraggeber",
   "customer_short": "Auftraggeber",
@@ -1765,7 +2366,7 @@
    "huendgen-entsorgung.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.0.7",
+  "facts_schema_version": "1.1.0",
   "fqdns_total": 3,
   "generation": null,
   "hosts_ipv4": 2,
@@ -1779,31 +2380,49 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-26.1",
-  "positives": 7,
+  "policy_version": "2026-09-26.2",
+  "positives": 6,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
   "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
   "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
-  "raw_findings": 21,
+  "raw_findings": 12,
   "report_date": "19.09.2026",
   "report_id": "VS-2026-0923-3cf0",
   "report_version": "1",
   "scan_date": "23.09.2026",
   "scan_window": "23.09.2026, 21:29 bis 21:51 Uhr (CEST)",
   "systems_total": 2,
-  "tool_runs": 52
+  "tool_runs": 41
  },
  "plan": [
   {
-   "action": "Prüfen, ob die Version tatsächlich ungepflegt ist oder ob die Distribution Sicherheits-Backports liefert.",
-   "effect": "Schließt Lücken, für die der Hersteller keine Updates mehr liefert",
-   "lever": "Serversoftware ohne Herstellerpflege ersetzen",
+   "action": "Klären, welcher Dienst auf dem Port läuft und ob er aus dem Internet erreichbar sein muss; andernfalls den Port schließen.",
+   "effect": "Verkleinert die Angriffsfläche um Dienste ohne erkennbaren Zweck",
+   "lever": "Zweck offener Dienste ohne Kennung klären",
+   "operator": "",
    "prio": "In Kürze",
    "refs": [
     "VS-2026-001"
+   ],
+   "sources": [
+    "VS-2026-001:service_unidentified"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Die Ablösung durch eine vom Hersteller gepflegte Version planen und bis dahin den Zugang aus dem Internet auf das Nötige einschränken.",
+   "effect": "Begrenzt den Zugriff auf Software ohne Sicherheitsupdates bis zur Ablösung",
+   "lever": "Serversoftware ohne Herstellerpflege ersetzen",
+   "operator": "",
+   "prio": "In Kürze",
+   "refs": [
+    "VS-2026-002"
+   ],
+   "sources": [
+    "VS-2026-002:software_eol"
    ],
    "st": "gelb"
   },
@@ -1811,9 +2430,13 @@
    "action": "Die Anmeldung am Portal um einen zusätzlichen Faktor ergänzen, etwa eine Authentifizierungs-App oder ein Einmalkennwort.",
    "effect": "Erschwert die Übernahme von Konten durch Rateangriffe",
    "lever": "Anmeldeportale mit zweiter Anmeldestufe schützen",
+   "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-002"
+    "VS-2026-003"
+   ],
+   "sources": [
+    "VS-2026-003:login_portal_exposed"
    ],
    "st": "gelb"
   },
@@ -1821,9 +2444,13 @@
    "action": "Beim Plattformbetreiber einfordern: Die Erneuerung des Zertifikats vor dem Ablaufdatum einplanen und durchführen.",
    "effect": "Verhindert den Ausfall des Dienstes zum Ablaufdatum des Zertifikats",
    "lever": "Erneuerung der Zertifikate einplanen",
+   "operator": "platform",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-003"
+    "VS-2026-004"
+   ],
+   "sources": [
+    "VS-2026-004:cert_expiring_later"
    ],
    "st": "gelb"
   },
@@ -1831,29 +2458,69 @@
    "action": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
    "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
    "lever": "HTTP Strict Transport Security setzen",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-004"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Beim Plattformbetreiber einfordern: Klären, welche Anwendung den Dienst bereitstellt und ob ein Zugriff aus dem gesamten Internet dafür erforderlich ist.",
-   "effect": "Verkleinert die Angriffsfläche um nicht benötigte Webdienste",
-   "lever": "Zweck zusätzlicher Webports klären",
+   "operator": "",
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-005"
    ],
-   "st": "blau"
+   "sources": [
+    "VS-2026-005:hsts_missing"
+   ],
+   "st": "gelb"
   },
   {
-   "action": "Klären, welche Anwendung den Dienst bereitstellt und ob ein Zugriff aus dem gesamten Internet dafür erforderlich ist.",
-   "effect": "Verkleinert die Angriffsfläche um nicht benötigte Webdienste",
+   "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
+   "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+   "lever": "Inhaltsrichtlinie für die Webseiten einführen",
+   "operator": "",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-005"
+   ],
+   "sources": [
+    "VS-2026-005:csp_missing"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "X-Content-Type-Options mit dem Wert nosniff setzen.",
+   "effect": "Verhindert Fehldeutungen ausgelieferter Inhalte im Browser",
+   "lever": "Fehlende Sicherheits-Header ergänzen",
+   "operator": "",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-005"
+   ],
+   "sources": [
+    "VS-2026-005:security_headers_incomplete"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Beim Plattformbetreiber einfordern: Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss.",
+   "effect": "Klärt, ob der Dienst aus dem Internet erreichbar sein muss",
    "lever": "Zweck zusätzlicher Webports klären",
+   "operator": "platform",
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-006"
+   ],
+   "sources": [
+    "VS-2026-006:http_alt_port"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss.",
+   "effect": "Klärt, ob der Dienst aus dem Internet erreichbar sein muss",
+   "lever": "Zweck zusätzlicher Webports klären",
+   "operator": "",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-007"
+   ],
+   "sources": [
+    "VS-2026-007:http_alt_port"
    ],
    "st": "blau"
   },
@@ -1861,29 +2528,41 @@
    "action": "Nach einer Beobachtungsphase ohne Fehlmeldungen die Richtlinie auf Zurückweisung anheben, sobald alle legitimen Versandquellen der Domain erfasst sind.",
    "effect": "Weist gefälschte E-Mails ab, statt sie nur zurückzustellen",
    "lever": "DMARC-Richtlinie auf Zurückweisung stellen",
+   "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-007"
+    "VS-2026-008"
+   ],
+   "sources": [
+    "VS-2026-008:dmarc_quarantine"
    ],
    "st": "blau"
   },
   {
-   "action": "Beim Plattformbetreiber einfordern: Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options, Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen.",
-   "effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
+   "action": "Beim Plattformbetreiber einfordern: Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin.",
+   "effect": "Hält Adressen und Parameter der Seite aus fremden Protokollen heraus",
    "lever": "Fehlende Sicherheits-Header ergänzen",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-009"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Die Versionskennung in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert ohne Versionsangabe setzen.",
-   "effect": "Erschwert die gezielte Suche nach passenden Schwachstellen",
-   "lever": "Versionsangaben aus den Antwort-Headern entfernen",
+   "operator": "platform",
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-010"
+   ],
+   "sources": [
+    "VS-2026-010:security_headers_incomplete"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Versionskennungen und interne Servernamen in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert setzen.",
+   "effect": "Erschwert die gezielte Suche nach passenden Schwachstellen",
+   "lever": "Versionsangaben aus den Antwort-Headern entfernen",
+   "operator": "",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-011"
+   ],
+   "sources": [
+    "VS-2026-011:http_header_disclosure"
    ],
    "st": "blau"
   },
@@ -1891,9 +2570,13 @@
    "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
    "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
    "lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+   "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-011"
+    "VS-2026-012"
+   ],
+   "sources": [
+    "VS-2026-012:caa_missing"
    ],
    "st": "blau"
   },
@@ -1901,9 +2584,41 @@
    "action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
    "effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
    "lever": "MTA-STS für die Domain veröffentlichen",
+   "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-008"
+    "VS-2026-009"
+   ],
+   "sources": [
+    "VS-2026-009:mta_sts_missing"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten.",
+   "effect": "Meldet fehlgeschlagene verschlüsselte Zustellungen an Sie zurück",
+   "lever": "TLS-RPT für die Domain veröffentlichen",
+   "operator": "",
+   "prio": "Strategisch",
+   "refs": [
+    "VS-2026-009"
+   ],
+   "sources": [
+    "VS-2026-009:tls_rpt_missing"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
+   "effect": "Schützt DNS-Antworten gegen Verfälschung auf dem Übertragungsweg",
+   "lever": "DNS-Zone mit DNSSEC signieren",
+   "operator": "",
+   "prio": "Strategisch",
+   "refs": [
+    "VS-2026-012"
+   ],
+   "sources": [
+    "VS-2026-012:dnssec_missing"
    ],
    "st": "blau"
   }
@@ -1911,6 +2626,9 @@
  "positives": [
   {
    "cat": "A",
+   "checks": [
+    "db_exposed"
+   ],
    "provenance": [
     {
      "check": "db_exposed",
@@ -1930,14 +2648,21 @@
       "80.90.145.166"
      ],
      "statement": "positive.text",
-     "text": "Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) und 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet kein Datenbankdienst auf Verbindungen von außen."
+     "text": "Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), beim Plattformbetreiber eu-multiscreensite.com und 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet kein Datenbankdienst auf Verbindungen von außen."
     }
    ],
-   "text": "Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) und 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet kein Datenbankdienst auf Verbindungen von außen.",
+   "subjects": [
+    "18.197.248.23",
+    "80.90.145.166"
+   ],
+   "text": "Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), beim Plattformbetreiber eu-multiscreensite.com und 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet kein Datenbankdienst auf Verbindungen von außen.",
    "title": "Keine Datenbankdienste aus dem Internet erreichbar"
   },
   {
    "cat": "A",
+   "checks": [
+    "http_no_tls"
+   ],
    "provenance": [
     {
      "check": "http_no_tls",
@@ -1957,14 +2682,22 @@
       "80.90.145.166"
      ],
      "statement": "positive.text",
-     "text": "Die Hosts 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) und 80.90.145.166 (exchange.huendgen-entsorgung.de) bieten ihre Webdienste über HTTPS an."
+     "text": "Die Hosts 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), beim Plattformbetreiber eu-multiscreensite.com und 80.90.145.166 (exchange.huendgen-entsorgung.de) bieten ihre Webdienste über HTTPS an."
     }
    ],
-   "text": "Die Hosts 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) und 80.90.145.166 (exchange.huendgen-entsorgung.de) bieten ihre Webdienste über HTTPS an.",
+   "subjects": [
+    "18.197.248.23",
+    "80.90.145.166"
+   ],
+   "text": "Die Hosts 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), beim Plattformbetreiber eu-multiscreensite.com und 80.90.145.166 (exchange.huendgen-entsorgung.de) bieten ihre Webdienste über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
    "cat": "A",
+   "checks": [
+    "rdp_exposed",
+    "smb_exposed"
+   ],
    "provenance": [
     {
      "check": "rdp_exposed,smb_exposed",
@@ -1986,7 +2719,7 @@
       "80.90.145.166"
      ],
      "statement": "positive.text",
-     "text": "Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) und 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet kein Fernwartungsdienst auf RDP-Verbindungen von außen."
+     "text": "Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), beim Plattformbetreiber eu-multiscreensite.com und 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet kein Fernwartungsdienst auf RDP-Verbindungen von außen."
     },
     {
      "check": "smb_exposed",
@@ -1996,14 +2729,21 @@
       "80.90.145.166"
      ],
      "statement": "positive.text",
-     "text": "Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) und 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet kein SMB-Dienst auf Verbindungen von außen."
+     "text": "Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), beim Plattformbetreiber eu-multiscreensite.com und 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet kein SMB-Dienst auf Verbindungen von außen."
     }
    ],
-   "text": "Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) und 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet kein Fernwartungsdienst auf RDP-Verbindungen von außen. Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) und 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet kein SMB-Dienst auf Verbindungen von außen.",
+   "subjects": [
+    "18.197.248.23",
+    "80.90.145.166"
+   ],
+   "text": "Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), beim Plattformbetreiber eu-multiscreensite.com und 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet kein Fernwartungsdienst auf RDP-Verbindungen von außen. Auf 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), beim Plattformbetreiber eu-multiscreensite.com und 80.90.145.166 (exchange.huendgen-entsorgung.de) antwortet kein SMB-Dienst auf Verbindungen von außen.",
    "title": "Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet erreichbar"
   },
   {
    "cat": "C",
+   "checks": [
+    "dns_zone_transfer"
+   ],
    "provenance": [
     {
      "check": "dns_zone_transfer",
@@ -2024,11 +2764,18 @@
      "text": "Für die Domain huendgen-entsorgung.de weisen die Nameserver einen vollständigen Zonentransfer ab."
     }
    ],
+   "subjects": [
+    "huendgen-entsorgung.de"
+   ],
    "text": "Für die Domain huendgen-entsorgung.de weisen die Nameserver einen vollständigen Zonentransfer ab.",
    "title": "Zonentransfer abgewiesen"
   },
   {
    "cat": "C",
+   "checks": [
+    "spf_missing",
+    "dkim_missing"
+   ],
    "provenance": [
     {
      "check": "spf_missing,dkim_missing",
@@ -2059,43 +2806,23 @@
      "text": "Für die Domain huendgen-entsorgung.de ist eine DKIM-Signatur veröffentlicht."
     }
    ],
+   "subjects": [
+    "huendgen-entsorgung.de"
+   ],
    "text": "Für die Domain huendgen-entsorgung.de ist ein SPF-Eintrag veröffentlicht. Für die Domain huendgen-entsorgung.de ist eine DKIM-Signatur veröffentlicht.",
    "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
   },
   {
-   "cat": "D",
-   "provenance": [
-    {
-     "check": "hsts_short",
-     "field": "positive",
-     "members": [
-      "www.huendgen-entsorgung.de@18.197.248.23"
-     ],
-     "statement": "positive.title",
-     "text": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
-    },
-    {
-     "check": "hsts_short",
-     "field": "positive",
-     "members": [
-      "www.huendgen-entsorgung.de@18.197.248.23"
-     ],
-     "statement": "positive.text",
-     "text": "Der Dienst www.huendgen-entsorgung.de (+huendgen-entsorgung.de) setzt den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer."
-    }
-   ],
-   "text": "Der Dienst www.huendgen-entsorgung.de (+huendgen-entsorgung.de) setzt den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer.",
-   "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
-  },
-  {
    "cat": "E",
+   "checks": [
+    "ip_reputation"
+   ],
    "provenance": [
     {
-     "check": "ip_reputation,urlhaus_compromise",
+     "check": "ip_reputation",
      "field": "positive",
      "members": [
-      "80.90.145.166",
-      "scan"
+      "80.90.145.166"
      ],
      "statement": "positive.title",
      "text": "Keine Einträge in Reputationsquellen"
@@ -2108,18 +2835,12 @@
      ],
      "statement": "positive.text",
      "text": "Für 80.90.145.166 (exchange.huendgen-entsorgung.de) liegen in den abgefragten Reputationsquellen keine Meldungen vor."
-    },
-    {
-     "check": "urlhaus_compromise",
-     "field": "positive",
-     "members": [
-      "scan"
-     ],
-     "statement": "positive.text",
-     "text": "Für huendgen-entsorgung.de liegt kein Treffer in öffentlichen Datenbanken zur Schadsoftware-Verteilung vor."
     }
    ],
-   "text": "Für 80.90.145.166 (exchange.huendgen-entsorgung.de) liegen in den abgefragten Reputationsquellen keine Meldungen vor. Für huendgen-entsorgung.de liegt kein Treffer in öffentlichen Datenbanken zur Schadsoftware-Verteilung vor.",
+   "subjects": [
+    "80.90.145.166"
+   ],
+   "text": "Für 80.90.145.166 (exchange.huendgen-entsorgung.de) liegen in den abgefragten Reputationsquellen keine Meldungen vor.",
    "title": "Keine Einträge in Reputationsquellen"
   }
  ],
@@ -2141,8 +2862,8 @@
   "domains": [],
   "hosts": [
    {
-    "cov": "voll",
-    "coverage": "Portscan, Transportverschlüsselung und aktive Webanalyse vollständig.",
+    "cov": "teil",
+    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI huendgen-entsorgung.de, www.huendgen-entsorgung.de) geprüft, nicht für Port 8443; Webanalyse ohne Meldungen, Ergebnis nicht belastbar.",
     "fqdns": "huendgen-entsorgung.de, www.huendgen-entsorgung.de",
     "ip": "18.197.248.23",
     "more_ips": [],
@@ -2150,8 +2871,8 @@
     "role": "Website · Plattform eu-multiscreensite.com"
    },
    {
-    "cov": "voll",
-    "coverage": "Portscan, Transportverschlüsselung und aktive Webanalyse vollständig.",
+    "cov": "teil",
+    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI exchange.huendgen-entsorgung.de) geprüft, nicht für Port 444; Webanalyse ohne Meldungen, Ergebnis nicht belastbar.",
     "fqdns": "exchange.huendgen-entsorgung.de",
     "ip": "80.90.145.166",
     "more_ips": [],
@@ -2159,14 +2880,64 @@
     "role": "Mail-Webzugang"
    }
   ],
-  "lead": "Der Scan hat 2 Systeme mit 2 IP-Adressen und 3 Hostnamen erfasst. Alle Systeme konnten aktiv geprüft werden.",
+  "lead": "Der Scan hat 2 Systeme mit 2 IP-Adressen und 3 Hostnamen erfasst. Für 2 Systeme (2 Adressen) war die aktive Prüfung nur teilweise möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
+   {
+    "checks": [
+     "Aktive Webanalyse"
+    ],
+    "code": "zap_partial",
+    "detail": "Betroffen: 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), 80.90.145.166 (exchange.huendgen-entsorgung.de).",
+    "refs": [],
+    "subjects": [
+     "18.197.248.23",
+     "80.90.145.166"
+    ],
+    "what": "Aktive Webanalyse nur teilweise"
+   },
+   {
+    "checks": [
+     "Ermittlung der Hostnamen"
+    ],
+    "code": "discovered",
+    "detail": "Betroffen: ftp.huendgen-entsorgung.de (87.79.4.40), ftp.mail.huendgen-entsorgung.de (217.160.231.238, 2001:8d8:1000:50be:93ee:211d:4bf5:602c). Die Hostsuche hat diese Namen gefunden, sie sind aber nicht in die Prüfung übernommen worden; Ergebnisse zu ihnen liegen nicht vor.",
+    "refs": [],
+    "subjects": [
+     "ftp.huendgen-entsorgung.de",
+     "ftp.mail.huendgen-entsorgung.de"
+    ],
+    "what": "Gefunden, nicht geprüft"
+   },
    {
     "checks": [
      "Bekannte Schwachstellen der erkannten Versionen"
     ],
+    "code": "no_enrichment",
     "detail": "Betroffen: 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), 80.90.145.166 (exchange.huendgen-entsorgung.de).",
+    "refs": [
+     "cve_kev_listed|18.197.248.23",
+     "cve_kev_listed|80.90.145.166",
+     "cve_known_version|18.197.248.23",
+     "cve_known_version|80.90.145.166"
+    ],
+    "subjects": [
+     "18.197.248.23",
+     "80.90.145.166"
+    ],
     "what": "Keine Fremdbewertung aus Schwachstellendatenbanken zu den erkannten Versionen"
+   },
+   {
+    "checks": [
+     "Transportverschlüsselung"
+    ],
+    "code": "tls_partial",
+    "detail": "Betroffen: 18.197.248.23 (Port 8443), 80.90.145.166 (Port 444). Geprüft wurde jeweils der Webdienst auf Port 443; die übrigen TLS-Dienste sind nur per Portscan erfasst, ihre Verschlüsselung und ihr Zertifikat sind nicht bewertet.",
+    "refs": [],
+    "subjects": [
+     "18.197.248.23",
+     "80.90.145.166"
+    ],
+    "what": "Transportverschlüsselung nur für einen Teil der TLS-Dienste geprüft"
    },
    {
     "checks": [
@@ -2177,33 +2948,52 @@
      "Preisgegebene Angaben",
      "Schutz der Formulare",
      "Sitzungskennungen in Adressen",
-     "Verzeichnisauflistung",
-     "Webanalyse"
+     "Verzeichnisauflistung"
     ],
-    "detail": "Betroffen: 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de), 80.90.145.166 (exchange.huendgen-entsorgung.de).",
+    "code": "zap_no_alerts",
+    "detail": "Betroffen: exchange.huendgen-entsorgung.de, www.huendgen-entsorgung.de (+huendgen-entsorgung.de).",
+    "refs": [
+     "cors_misconfiguration|exchange.huendgen-entsorgung.de@80.90.145.166",
+     "cors_misconfiguration|www.huendgen-entsorgung.de@18.197.248.23",
+     "csrf_token_missing|exchange.huendgen-entsorgung.de@80.90.145.166",
+     "csrf_token_missing|www.huendgen-entsorgung.de@18.197.248.23",
+     "directory_listing|exchange.huendgen-entsorgung.de@80.90.145.166",
+     "directory_listing|www.huendgen-entsorgung.de@18.197.248.23",
+     "info_disclosure|exchange.huendgen-entsorgung.de@80.90.145.166",
+     "info_disclosure|www.huendgen-entsorgung.de@18.197.248.23",
+     "js_library_outdated|exchange.huendgen-entsorgung.de@80.90.145.166",
+     "js_library_outdated|www.huendgen-entsorgung.de@18.197.248.23",
+     "session_in_url|exchange.huendgen-entsorgung.de@80.90.145.166",
+     "session_in_url|www.huendgen-entsorgung.de@18.197.248.23",
+     "sri_missing|exchange.huendgen-entsorgung.de@80.90.145.166",
+     "sri_missing|www.huendgen-entsorgung.de@18.197.248.23",
+     "web_vulnerability_reported|exchange.huendgen-entsorgung.de@80.90.145.166",
+     "web_vulnerability_reported|www.huendgen-entsorgung.de@18.197.248.23"
+    ],
+    "subjects": [
+     "18.197.248.23",
+     "80.90.145.166"
+    ],
     "what": "Webanalyse ohne Meldungen, Ergebnis nicht belastbar"
    },
    {
     "checks": [
      "Ermittlung der Hostnamen"
     ],
+    "code": "timeout",
     "detail": "Betroffen: huendgen-entsorgung.de.",
-    "what": "Zeitlimit der Prüfung überschritten"
-   },
-   {
-    "checks": [
-     "Namen im Zertifikat",
-     "Zertifikatskette"
+    "refs": [],
+    "subjects": [
+     "huendgen-entsorgung.de"
     ],
-    "detail": "Betroffen: www.huendgen-entsorgung.de (+huendgen-entsorgung.de).",
-    "what": "Zertifikatsdetails nicht verfügbar"
+    "what": "Zeitlimit der Prüfung überschritten"
    }
   ],
   "method_phases": [
    {
     "n": "0",
     "name": "Aufklärung (passiv)",
-    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 3 Hostnamen auf 2 IP-Adressen."
+    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 3 Hostnamen auf 2 IP-Adressen. Geprüft wurden 3 von 5 ermittelten Namen; die übrigen stehen in Kapitel 2 unter den Einschränkungen."
    },
    {
     "n": "1",
@@ -2218,7 +3008,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 11 Befunde und 7 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 12 Befunde und 6 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -2228,15 +3018,15 @@
    },
    {
     "l": "Werkzeugläufe",
-    "v": "52"
+    "v": "41"
    },
    {
-    "l": "Einzelbeobachtungen",
-    "v": "21"
+    "l": "Einzelmeldungen",
+    "v": "12"
    },
    {
     "l": "Befunde im Bericht",
-    "v": "11"
+    "v": "12"
    }
   ],
   "out_of_scope": [

@@ -25,18 +25,66 @@
    "expect": {
     "holds": {
      "10.0.0.5:110": [
-      "observation[0]"
+      "observation[0]",
+      "meaning[0]"
      ],
      "10.0.0.5:143": [
-      "observation[1]"
+      "observation[1]",
+      "meaning[1]"
      ]
     },
     "not_holds": {
      "10.0.0.5:110": [
-      "observation[1]"
+      "observation[1]",
+      "meaning[1]"
      ],
      "10.0.0.5:143": [
-      "observation[0]"
+      "observation[0]",
+      "meaning[0]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  },
+  {
+   "name": "POP3 ohne STARTTLS auf dem Mailserver des Kunden und auf einem Host ohne Mailbeleg (spec/10 R9)",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.0.5",
+      "serves_customer_mail": true
+     },
+     {
+      "ip": "10.0.0.6",
+      "serves_customer_mail": false
+     }
+    ],
+    "services": [
+     {
+      "host_ip": "10.0.0.5",
+      "port": 110,
+      "service": "pop3",
+      "starttls": false,
+      "tls_required": false
+     },
+     {
+      "host_ip": "10.0.0.6",
+      "port": 110,
+      "service": "pop3",
+      "starttls": false,
+      "tls_required": false
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "10.0.0.5:110": [
+      "recommendation[1]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.6:110": [
+      "recommendation[1]"
      ]
     }
    },

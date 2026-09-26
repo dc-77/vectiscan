@@ -62,6 +62,8 @@ GROUP_TYPES: dict[str, Any] = {
     "target": FS.TargetFact, "hosts": list, "services": list, "ports": set, "http_list": list, "tls_list": list,
     "softwares": list, "passives": list, "threats": list, "fqdns": list, "items": list, "fqdn_names": list,
     "group_key": str, "coverage_ok": CALLABLE, "coverage_status": CALLABLE, "coverage_reason": CALLABLE,
+    # S6b-3 (spec/10 R18): Berichtsdatum (JJJJ-MM-TT), ohne Angabe das Scanende.
+    "report_date": str,
 }
 
 
@@ -120,8 +122,10 @@ def without_third_party(facts: FS.Facts) -> FS.Facts:
 class FactsIndex:
     """Nachschlagestrukturen ueber ein Facts-Objekt (einmal je Auswertung)."""
 
-    def __init__(self, facts: FS.Facts):
+    def __init__(self, facts: FS.Facts, report_date: str | None = None):
         self.facts = facts
+        self.report_date: str | None = (report_date or (facts.scan.finished_at or facts.scan.started_at or "")[:10]
+                                        or None)
         self.domains: list[str] = list(facts.scan.domains) or [facts.scan.domain]
         self.hosts: list[FS.HostFact] = sorted(facts.hosts, key=lambda h: sort_key(h.family, h.ip))
         self.hosts_by_ip: dict[str, FS.HostFact] = {h.ip: h for h in self.hosts}
@@ -410,7 +414,7 @@ def _group_ctx(index: FactsIndex, g: Group) -> dict[str, Any]:
         "scan": f.scan, "hosts": index.hosts, "group_key": g.key, "fqdn_names": g.fqdn_names,
         "host": g.host, "fqdn": None, "http": None, "dns": None, "target": None,
         "services": [], "ports": set(), "http_list": [], "tls_list": [], "softwares": [], "passives": [],
-        "threats": [], "fqdns": [], "items": [],
+        "threats": [], "fqdns": [], "items": [], "report_date": index.report_date,
     }
     if g.kind in ("host", "fqdn") and ip:
         ctx["services"] = index.services_by_ip.get(ip, [])

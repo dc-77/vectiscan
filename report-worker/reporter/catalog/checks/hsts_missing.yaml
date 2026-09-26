@@ -8,10 +8,13 @@ group_by: fqdn
 scope: http
 applicable_when: has_port(services, 443)
 item_when: null
-when: http.hsts.present is False
-positive_when: http.hsts.present is True
+# S6b-3 (spec/10 R1, R9, Entscheidung DC 3): HSTS gilt an jeder Antwort, auch an einer
+# Weiterleitung. max-age=0 schaltet HSTS ab und steht hier als eigene Variante, nicht als
+# "kurze Gueltigkeit".
+when: http.hsts.present is False or http.hsts.max_age == 0
+positive_when: http.hsts.present is True and http.hsts.max_age != 0
 not_testable_when:
-  - when: http.reachable is not True or http.hsts is None
+  - when: http.hsts is None
     reason_code: unreachable
     context: item
 undetermined: not_testable
@@ -35,13 +38,22 @@ policy:
     Downgrade-Schutz betrifft jeden Aufruf des Hosts ueber HTTP gleichermassen, daher fuehrt die
     Simulation die Pruefung als Hygiene mittel (catalog_sim, S2-Auftrag).
 texts:
-  short: "HSTS fehlt"
+  short: "HSTS fehlt oder ist abgeschaltet"
   plan:
     lever: "HTTP Strict Transport Security setzen"
     effect: "Verhindert unverschlüsselte Aufrufe der Webseite"
-  observation: >-
-    {n:Der Dienst|Die Dienste} {group} {n:liefert seine|liefern ihre} Antworten ohne den HTTP Strict Transport Security Header, der
-    Browser dauerhaft auf die verschlüsselte Verbindung festlegt: {affected}.
+  observation:
+    - when: http.hsts.present is False
+      quantor: eines
+      text: >-
+        {n:Der Dienst|Die Dienste} {group} {n:liefert seine|liefern ihre} Antworten ohne den HTTP Strict Transport Security Header, der
+        Browser dauerhaft auf die verschlüsselte Verbindung festlegt: {affected}.
+    - when: http.hsts.present is True and http.hsts.max_age == 0
+      quantor: eines
+      text: >-
+        HSTS abgeschaltet: {n:der Dienst|die Dienste} {group} {n:setzt|setzen} den Header
+        Strict-Transport-Security mit max-age=0 und {n:hebt|heben} die Festlegung auf die
+        verschlüsselte Verbindung damit auf: {affected}.
   meaning: >-
     Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine
     unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift.
@@ -56,5 +68,5 @@ texts:
   positive:
     title: HTTP Strict Transport Security gesetzt
     text: >-
-      {n:Der Dienst|Die Dienste} {group} {n:setzt|setzen} den Header Strict-Transport-Security und legt Browser damit auf die
+      {n:Der Dienst|Die Dienste} {group} {n:setzt|setzen} den Header Strict-Transport-Security und {n:legt|legen} Browser damit auf die
       verschlüsselte Verbindung fest.

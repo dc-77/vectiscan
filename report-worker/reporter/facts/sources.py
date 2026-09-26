@@ -211,6 +211,10 @@ class ScanBundle:
     dns_cnames: dict[str, list[str]] = field(default_factory=dict)
     host_strategy: Optional[dict[str, Any]] = None
     ai_prioritization: Optional[dict[str, Any]] = None
+    # S6b-3 (spec/10 R5, E13): Teilausgabe der Hostsuche (``fqdn ip[,ip]`` je Zeile) und
+    # die Zertifikatsliste von crt.sh.
+    gobuster_dns_txt: Optional[str] = None
+    crtsh_raw: Optional[list[dict[str, Any]]] = None
     # Bilanz der Phase-3-Korrelation (Zeile ``phase3_correlation``): wie viele
     # Werkzeugmeldungen eingingen, wie viele als Doppel- oder Falschmeldung
     # verworfen wurden und mit welcher Begruendung. Protokoll, nie ein Befund.
@@ -402,6 +406,14 @@ def _load_bundle_from_reader(reader: _Reader, order_id_hint: str, source_kind: s
     if isinstance(cs, dict):
         b.passive["certspotter"] = cs
         b.refs["certspotter"] = "phase0/certspotter.json"
+    gb = reader.text("phase0/gobuster_dns.txt")
+    if gb is not None:
+        b.gobuster_dns_txt = gb
+        b.refs["gobuster_dns"] = "phase0/gobuster_dns.txt"
+    ct = reader.json("phase0/crtsh_raw.json")
+    if isinstance(ct, list):
+        b.crtsh_raw = [x for x in ct if isinstance(x, dict)]
+        b.refs["crtsh"] = "phase0/crtsh_raw.json"
     _load_domain_scoped(reader, b)
     cf = reader.json("phase3/correlated_findings.json")
     if isinstance(cf, list):
@@ -595,6 +607,20 @@ def merge_tool_runs(bundle: ScanBundle, runs: list[ToolRun], *, name: str | None
         if run.tool in NON_TOOL_ROWS:
             continue
         raw = run.raw_output or ""
+        if run.tool == "gobuster_dns" and not run.host_ip and bundle.gobuster_dns_txt is None:
+            # S6b-3 (spec/10 R5): bei Zeitueberschreitung steht die Teilausgabe hinter der
+            # Marke; die Zeile selbst traegt den Status "timeout".
+            teil = raw.split("--- PARTIAL OUTPUT ---", 1)[1] if "--- PARTIAL OUTPUT ---" in raw else raw
+            if teil.strip() and not teil.lstrip().startswith(("SKIPPED", "FAILED", "TIMEOUT", "OK:")):
+                bundle.gobuster_dns_txt = teil
+                bundle.refs["gobuster_dns"] = run.ref
+            continue
+        if run.tool == "crtsh" and not run.host_ip and bundle.crtsh_raw is None:
+            data = run.json()
+            if isinstance(data, list):
+                bundle.crtsh_raw = [x for x in data if isinstance(x, dict)]
+                bundle.refs["crtsh"] = run.ref
+            continue
         if not _useful(raw) and not run.is_ai:
             if run.tool == "urlhaus" and not run.host_ip and "urlhaus" not in bundle.passive:
                 bundle.passive["urlhaus"] = {"raw": raw.strip()[:200], "no_data": "no_data" in raw}

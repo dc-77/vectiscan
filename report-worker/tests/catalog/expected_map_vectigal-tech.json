@@ -1,5 +1,6 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/vectigal-tech.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
+ "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Befunde: csp_missing crm.vectigal.tech (R1); security_headers_incomplete crm.vectigal.tech (R1); entfallene Positivaussagen: tls_weak_ciphers vectigal.tech (R6 (CBC-Verfahren angeboten)); urlhaus_compromise vectigal.tech, vectiscan.de (R6 (URLhaus no_data ist kein Negativergebnis)). Q8 nach Entscheidung DC 1 aufgelöst (R1, Messung an der Endseite oder nicht prüfbar): csp_missing crm.vectigal.tech; security_headers_incomplete crm.vectigal.tech.",
  "strict": false,
  "orders": {
   "main": "75338c97-6707-4d11-92bf-bb3cd2e02cde"
@@ -47,12 +48,12 @@
   },
   "VS-2026-009": {
    "checks": [
-    "csp_missing"
+    "dmarc_none"
    ]
   },
   "VS-2026-010": {
    "checks": [
-    "dmarc_none"
+    "dnssec_missing"
    ]
   },
   "VS-2026-011": {
@@ -62,17 +63,17 @@
   },
   "VS-2026-012": {
    "checks": [
-    "dnssec_missing"
+    "mail_spoofing_unprotected"
    ]
   },
   "VS-2026-013": {
    "checks": [
-    "mail_spoofing_unprotected"
+    "mta_sts_missing"
    ]
   },
   "VS-2026-014": {
    "checks": [
-    "mta_sts_missing"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-015": {
@@ -92,20 +93,10 @@
   },
   "VS-2026-018": {
    "checks": [
-    "security_headers_incomplete"
-   ]
-  },
-  "VS-2026-019": {
-   "checks": [
-    "security_headers_incomplete"
-   ]
-  },
-  "VS-2026-020": {
-   "checks": [
     "spf_missing"
    ]
   },
-  "VS-2026-021": {
+  "VS-2026-019": {
    "checks": [
     "tls_rpt_missing"
    ]
@@ -144,137 +135,197 @@
   },
   "VS-2026-P07": {
    "checks": [
-    "db_exposed"
-   ]
+    "cert_hostname_mismatch"
+   ],
+   "spec10": "R4",
+   "warum": "Zertifikat über Fingerabdruck oder Namensabdeckung dem Namen zugeordnet."
   },
   "VS-2026-P08": {
    "checks": [
-    "dmarc_missing"
-   ]
+    "cert_hostname_mismatch"
+   ],
+   "spec10": "R4",
+   "warum": "Zertifikat über Fingerabdruck oder Namensabdeckung dem Namen zugeordnet."
   },
   "VS-2026-P09": {
    "checks": [
-    "dns_dangling_cname"
-   ]
+    "cert_hostname_mismatch"
+   ],
+   "spec10": "R4",
+   "warum": "Zertifikat über Fingerabdruck oder Namensabdeckung dem Namen zugeordnet."
   },
   "VS-2026-P10": {
    "checks": [
-    "dns_dangling_cname"
-   ]
+    "cert_hostname_mismatch"
+   ],
+   "spec10": "R4",
+   "warum": "Zertifikat über Fingerabdruck oder Namensabdeckung dem Namen zugeordnet."
   },
   "VS-2026-P11": {
    "checks": [
-    "dns_zone_transfer"
-   ]
+    "cert_hostname_mismatch"
+   ],
+   "spec10": "R4",
+   "warum": "Zertifikat über Fingerabdruck oder Namensabdeckung dem Namen zugeordnet."
   },
   "VS-2026-P12": {
    "checks": [
-    "hsts_missing"
+    "db_exposed"
    ]
   },
   "VS-2026-P13": {
    "checks": [
-    "hsts_missing"
+    "dmarc_missing"
    ]
   },
   "VS-2026-P14": {
    "checks": [
-    "hsts_missing"
+    "dns_dangling_cname"
    ]
   },
   "VS-2026-P15": {
    "checks": [
-    "hsts_missing"
+    "dns_dangling_cname"
    ]
   },
   "VS-2026-P16": {
    "checks": [
-    "hsts_missing"
+    "dns_zone_transfer"
    ]
   },
   "VS-2026-P17": {
    "checks": [
-    "hsts_short"
+    "hsts_missing"
    ]
   },
   "VS-2026-P18": {
    "checks": [
-    "hsts_short"
+    "hsts_missing"
    ]
   },
   "VS-2026-P19": {
    "checks": [
-    "hsts_short"
+    "hsts_missing"
    ]
   },
   "VS-2026-P20": {
    "checks": [
-    "hsts_short"
+    "hsts_missing"
    ]
   },
   "VS-2026-P21": {
    "checks": [
-    "hsts_short"
+    "hsts_missing"
    ]
   },
   "VS-2026-P22": {
    "checks": [
-    "http_no_tls"
+    "hsts_short"
    ]
   },
   "VS-2026-P23": {
    "checks": [
-    "rdp_exposed"
+    "hsts_short"
    ]
   },
   "VS-2026-P24": {
    "checks": [
-    "smb_exposed"
+    "hsts_short"
    ]
   },
   "VS-2026-P25": {
    "checks": [
-    "tls_legacy_protocols"
+    "hsts_short"
    ]
   },
   "VS-2026-P26": {
    "checks": [
-    "tls_no_13"
+    "hsts_short"
    ]
   },
   "VS-2026-P27": {
    "checks": [
-    "tls_no_13"
+    "http_no_tls"
    ]
   },
   "VS-2026-P28": {
    "checks": [
-    "tls_no_13"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P29": {
    "checks": [
-    "tls_no_13"
+    "smb_exposed"
    ]
   },
   "VS-2026-P30": {
    "checks": [
-    "tls_no_13"
-   ]
+    "tls_legacy_protocols"
+   ],
+   "spec10": "R4",
+   "warum": "testssl-Ergebnis gilt je Adresse und Port für alle virtuellen Hosts."
   },
   "VS-2026-P31": {
    "checks": [
-    "tls_no_13"
-   ]
+    "tls_legacy_protocols"
+   ],
+   "spec10": "R4",
+   "warum": "testssl-Ergebnis gilt je Adresse und Port für alle virtuellen Hosts."
   },
   "VS-2026-P32": {
    "checks": [
-    "tls_weak_ciphers"
-   ]
+    "tls_legacy_protocols"
+   ],
+   "spec10": "R4",
+   "warum": "testssl-Ergebnis gilt je Adresse und Port für alle virtuellen Hosts."
   },
   "VS-2026-P33": {
    "checks": [
-    "urlhaus_compromise"
+    "tls_legacy_protocols"
+   ],
+   "spec10": "R4",
+   "warum": "testssl-Ergebnis gilt je Adresse und Port für alle virtuellen Hosts."
+  },
+  "VS-2026-P34": {
+   "checks": [
+    "tls_legacy_protocols"
+   ],
+   "spec10": "R4",
+   "warum": "testssl-Ergebnis gilt je Adresse und Port für alle virtuellen Hosts."
+  },
+  "VS-2026-P35": {
+   "checks": [
+    "tls_legacy_protocols"
+   ]
+  },
+  "VS-2026-P36": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P37": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P38": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P39": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P40": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P41": {
+   "checks": [
+    "tls_no_13"
    ]
   }
  },

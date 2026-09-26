@@ -7,7 +7,9 @@ level: niedrig
 group_by: host
 scope: service
 applicable_when: null
-when: startswith(service.service, "http") and service.port not in WEB_PORTS and service.port not in ADMIN_PORTS and not matches(service.product, ADMIN_PRODUCTS) and not is_cdn(host, services)
+# S6b-3 (spec/10 R9): ein nmap-Tabellentreffer ohne Kennung ("https-alt?") ist kein erkannter
+# Webdienst; er steht unter service_unidentified.
+when: startswith(service.service, "http") and service.unidentified is not True and service.port not in WEB_PORTS and service.port not in ADMIN_PORTS and not matches(service.product, ADMIN_PRODUCTS) and not is_cdn(host, services)
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
@@ -15,7 +17,7 @@ requires:
   tools: [nmap]
 kind: check
 bundle: windows_edge_exposure
-affected_template: "{host_ip}:{port} ({product_or_service})"
+affected_template: "{host_ip}:{port} ({kennung_label})"
 evidence: [service]
 references: [CWE-16, OWASP2025-A05]
 frameworks:
@@ -32,19 +34,34 @@ texts:
   plan:
     lever: "Zweck zusätzlicher Webports klären"
     effect: "Verkleinert die Angriffsfläche um nicht benötigte Webdienste"
-  observation: >-
-    {n:Der Host|Die Hosts} {group} {n:beantwortet|beantworten} Anfragen an einen Webdienst auf einem Port außerhalb der
-    üblichen Web- und Verwaltungsports: {affected}. Der Zweck dieses Dienstes ist von außen
-    nicht erkennbar.
+  # S6b-3 (spec/10 R9): nennt der Dienst sich selbst (Produkt, Titel, Stream-Kopf), steht die
+  # Kennung im Befund; "Zweck nicht erkennbar" nur ohne jede Kennung.
+  observation:
+    - text: >-
+        {n:Der Host|Die Hosts} {group} {n:beantwortet|beantworten} Anfragen an einen Webdienst auf einem Port außerhalb der
+        üblichen Web- und Verwaltungsports: {affected}.
+    - when: service.kennung is None
+      quantor: eines
+      text: >-
+        Der Zweck dieses Dienstes ist von außen nicht erkennbar.
   meaning: >-
     Ein Webdienst auf einem unüblichen Port bleibt bei einer Prüfung der Standardports leicht
     unbemerkt und vergrößert die Angriffsfläche um eine Anwendung, deren Pflegezustand von
     außen nicht erkennbar ist.
   recommendation:
     - stage: in_kuerze
+      when: service.kennung is None
+      quantor: eines
       text: >-
         Klären, welche Anwendung den Dienst bereitstellt und ob ein Zugriff aus dem gesamten
         Internet dafür erforderlich ist.
+      effect: "Klärt, ob der Dienst aus dem Internet erreichbar sein muss"
+    - stage: in_kuerze
+      when: service.kennung is not None
+      quantor: eines
+      text: >-
+        Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss.
+      effect: "Klärt, ob der Dienst aus dem Internet erreichbar sein muss"
     - stage: mittelfristig
       text: >-
         Nicht mehr benötigte Dienste abschalten und den zugehörigen Port schließen;

@@ -24,6 +24,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "abuseipdb"
   },
   {
@@ -49,6 +50,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "abuseipdb"
   },
   {
@@ -74,6 +76,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "certspotter"
   },
   {
@@ -99,6 +102,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "crtsh"
   },
   {
@@ -124,6 +128,7 @@
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dns_records"
   },
   {
@@ -149,6 +154,7 @@
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dns_security"
   },
   {
@@ -174,6 +180,7 @@
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dns_security"
   },
   {
@@ -199,6 +206,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dnsx"
   },
   {
@@ -224,6 +232,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "failed",
+   "target": null,
    "tool": "gobuster_dns"
   },
   {
@@ -249,6 +258,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "greynoise"
   },
   {
@@ -274,6 +284,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "greynoise"
   },
   {
@@ -299,6 +310,7 @@
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "otx"
   },
   {
@@ -324,6 +336,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "otx"
   },
   {
@@ -349,6 +362,7 @@
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "securitytrails"
   },
   {
@@ -374,6 +388,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "securitytrails"
   },
   {
@@ -399,6 +414,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "shodan"
   },
   {
@@ -424,6 +440,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "shodan"
   },
   {
@@ -449,6 +466,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "subfinder"
   },
   {
@@ -474,6 +492,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "urlhaus"
   },
   {
@@ -499,6 +518,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "urlhaus"
   },
   {
@@ -524,6 +544,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "virustotal"
   },
   {
@@ -549,6 +570,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "virustotal"
   },
   {
@@ -574,6 +596,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "web_probe"
   },
   {
@@ -599,6 +622,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "whois"
   },
   {
@@ -624,6 +648,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "whois"
   },
   {
@@ -649,6 +674,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "nmap"
   },
   {
@@ -674,6 +700,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "nmap"
   },
   {
@@ -699,6 +726,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -724,6 +752,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "failed",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -749,6 +778,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "webtech"
   },
   {
@@ -774,6 +804,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "webtech"
   },
   {
@@ -799,6 +830,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "feroxbuster"
   },
   {
@@ -824,6 +856,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "feroxbuster"
   },
   {
@@ -849,6 +882,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "ffuf_param"
   },
   {
@@ -874,6 +908,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "ffuf_param"
   },
   {
@@ -899,6 +934,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "ffuf_sensitive"
   },
   {
@@ -924,6 +960,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "ffuf_sensitive"
   },
   {
@@ -949,6 +986,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -974,6 +1012,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -999,6 +1038,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -1024,6 +1064,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -1049,6 +1090,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "testssl"
   },
   {
@@ -1074,6 +1116,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "testssl"
   },
   {
@@ -1099,6 +1142,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "wpscan"
   },
   {
@@ -1124,6 +1168,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
+   "target": null,
    "tool": "wpscan"
   },
   {
@@ -1149,6 +1194,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "empty",
+   "target": null,
    "tool": "zap"
   },
   {
@@ -1174,6 +1220,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "empty",
+   "target": null,
    "tool": "zap"
   },
   {
@@ -1199,6 +1246,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": "https://www.huendgen-entsorgung.de",
    "tool": "zap_active"
   },
   {
@@ -1224,6 +1272,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": "https://exchange.huendgen-entsorgung.de",
    "tool": "zap_active"
   },
   {
@@ -1249,6 +1298,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "zap_spider"
   },
   {
@@ -1274,6 +1324,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "zap_spider"
   },
   {
@@ -1299,6 +1350,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "phase3_correlation"
   }
  ],
@@ -1766,26 +1818,31 @@
     "all_qualifier": "-all",
     "mechanisms": [
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "_spf.kundenserver.de"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "spf.hornetsecurity.com"
      },
      {
+      "ips": [],
       "kind": "include",
       "qualifier": "+",
       "value": "spf.vizito.be"
      },
      {
+      "ips": [],
       "kind": "ip4",
       "qualifier": "+",
       "value": "88.99.140.109"
      },
      {
+      "ips": [],
       "kind": "ip4",
       "qualifier": "+",
       "value": "157.90.214.107"
@@ -1829,7 +1886,9 @@
    "mode": "active",
    "name": "exchange.huendgen-entsorgung.de",
    "observed_at": "2026-09-23T19:32:39Z",
+   "real_content": true,
    "screenshot_key": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/80.90.145.166__exchange.huendgen-entsorgung.de.png",
+   "skipped": null,
    "source": "web_probe",
    "title": "Outlook",
    "waf": null,
@@ -1856,7 +1915,9 @@
    "mode": "active",
    "name": "huendgen-entsorgung.de",
    "observed_at": "2026-09-23T19:32:39Z",
+   "real_content": null,
    "screenshot_key": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/18.197.248.23__www.huendgen-entsorgung.de.png",
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": null,
@@ -1891,7 +1952,9 @@
    "mode": "active",
    "name": "www.huendgen-entsorgung.de",
    "observed_at": "2026-09-23T19:32:39Z",
+   "real_content": true,
    "screenshot_key": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/18.197.248.23__www.huendgen-entsorgung.de.png",
+   "skipped": null,
    "source": "web_probe",
    "title": "Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn",
    "waf": {
@@ -1926,6 +1989,7 @@
  },
  "hosts": [
   {
+   "betriebsform": "plattform",
    "blocked": {
     "detected": false,
     "reason": null,
@@ -1954,6 +2018,7 @@
    "id": "host:18.197.248.23",
    "ip": "18.197.248.23",
    "mode": "active",
+   "nmap_host_report": true,
    "nmap_state": "up",
    "observed_at": "2026-09-23T19:33:53Z",
    "ports_summary": {
@@ -1963,12 +2028,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "amazon.com",
     "isp": "A100 ROW GmbH",
     "usage_type": "Content Delivery Network"
    },
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -1979,6 +2046,8 @@
     "urlhaus_compromised": null
    },
    "reverse": "eu-staticip.multiscreensite.com",
+   "serves_customer_mail": false,
+   "serves_customer_web": true,
    "shared": {
     "evidence": [
      {
@@ -1998,6 +2067,7 @@
    "third_party": null
   },
   {
+   "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
     "reason": null,
@@ -2025,6 +2095,7 @@
    "id": "host:80.90.145.166",
    "ip": "80.90.145.166",
    "mode": "active",
+   "nmap_host_report": true,
    "nmap_state": "up",
    "observed_at": "2026-09-23T19:34:59Z",
    "ports_summary": {
@@ -2034,12 +2105,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "bn-t.de",
     "isp": "bn:t Blatzheim Networks Telecom GmbH",
     "usage_type": "Fixed Line ISP"
    },
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -2050,6 +2123,8 @@
     "urlhaus_compromised": null
    },
    "reverse": "gw-huendgen.bn-online.net",
+   "serves_customer_mail": false,
+   "serves_customer_web": true,
    "shared": null,
    "source": "nmap",
    "third_party": null
@@ -2058,21 +2133,34 @@
  "http": [
   {
    "alerts": [],
+   "aspnet_version": "4.0.30319",
    "confidence": 1.0,
    "cookies": [],
    "csp": {
+    "directives": {},
+    "frame_ancestors": null,
+    "nonce_or_hash": null,
     "present": false,
+    "script_unsafe_eval": null,
+    "script_unsafe_inline": null,
+    "style_unsafe_inline": null,
     "unsafe_eval": null,
     "unsafe_inline": null,
     "value": null,
-    "wildcard": null
+    "wildcard": null,
+    "wildcard_directives": []
    },
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "exchange.huendgen-entsorgung.de: erreichbar=ja score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE-2019",
+     "excerpt": "exchange.huendgen-entsorgung.de: erreichbar=ja status=302 location=https://exchange.huendgen-entsorgung.de/owa/ score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE-2019",
      "ref": "hosts/80.90.145.166/phase2/headers_exchange.huendgen-entsorgung.de.json",
      "tool": "header_check"
+    },
+    {
+     "excerpt": "exchange.huendgen-entsorgung.de: endseite=https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0 status=200 gesetzt=x-frame-options fehlend=x-content-type-options, referrer-policy, per...",
+     "ref": "hosts/80.90.145.166/phase1/tech_profile.json",
+     "tool": "redirect_probe"
     },
     {
      "excerpt": "exchange.huendgen-entsorgung.de: status=200 titel=Outlook webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET, Outlook Web App:15.2.1748, Windows Server",
@@ -2082,6 +2170,68 @@
    ],
    "forms": [],
    "fqdn": "exchange.huendgen-entsorgung.de",
+   "header_eval": {
+    "basis": "final",
+    "complete": true,
+    "evaluated": {
+     "challenge": null,
+     "content_type": "text/html; charset=utf-8",
+     "location": null,
+     "status_basis": "claimed",
+     "status_code": 200,
+     "tool": "redirect_probe",
+     "url": "https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0"
+    },
+    "first": {
+     "challenge": null,
+     "content_type": null,
+     "location": "https://exchange.huendgen-entsorgung.de/owa/",
+     "status_basis": "httpx_chain",
+     "status_code": 302,
+     "tool": "header_check",
+     "url": "https://exchange.huendgen-entsorgung.de"
+    },
+    "framing_protected": true,
+    "headers": {
+     "content-security-policy": {
+      "present": false,
+      "tool": "redirect_probe",
+      "url": "https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0",
+      "value": null
+     },
+     "permissions-policy": {
+      "present": false,
+      "tool": "redirect_probe",
+      "url": "https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0",
+      "value": null
+     },
+     "referrer-policy": {
+      "present": false,
+      "tool": "redirect_probe",
+      "url": "https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0",
+      "value": null
+     },
+     "x-content-type-options": {
+      "present": false,
+      "tool": "redirect_probe",
+      "url": "https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0",
+      "value": null
+     },
+     "x-frame-options": {
+      "present": true,
+      "tool": "redirect_probe",
+      "url": "https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0",
+      "value": "SAMEORIGIN"
+     }
+    },
+    "missing": [
+     "x-content-type-options",
+     "referrer-policy",
+     "permissions-policy",
+     "content-security-policy"
+    ],
+    "unknown": []
+   },
    "headers": {
     "cache-control": "no-cache",
     "content-length": "0",
@@ -3106,14 +3256,10 @@
      "url": "https://exchange.huendgen-entsorgung.de/2009.pdf"
     }
    ],
-   "powered_by": null,
+   "powered_by": "ASP.NET",
    "reachable": true,
    "score": "0/7",
    "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
     "permissions-policy": {
      "present": false,
      "value": null
@@ -3122,21 +3268,13 @@
      "present": false,
      "value": null
     },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
     "x-content-type-options": {
      "present": false,
      "value": null
     },
     "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
+     "present": true,
+     "value": "SAMEORIGIN"
     }
    },
    "server_header": "Microsoft-IIS/10.0",
@@ -3167,19 +3305,31 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": {
+    "directives": {
+     "frame-ancestors": [
+      "'self'"
+     ]
+    },
+    "frame_ancestors": "'self'",
+    "nonce_or_hash": false,
     "present": true,
+    "script_unsafe_eval": false,
+    "script_unsafe_inline": false,
+    "style_unsafe_inline": false,
     "unsafe_eval": false,
     "unsafe_inline": false,
     "value": "frame-ancestors 'self'",
-    "wildcard": false
+    "wildcard": false,
+    "wildcard_directives": []
    },
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "www.huendgen-entsorgung.de: erreichbar=ja score=4/7 server=nginx",
+     "excerpt": "www.huendgen-entsorgung.de: erreichbar=ja status=200 score=4/7 server=nginx",
      "ref": "hosts/18.197.248.23/phase2/headers_www.huendgen-entsorgung.de.json",
      "tool": "header_check"
     },
@@ -3191,6 +3341,66 @@
    ],
    "forms": [],
    "fqdn": "www.huendgen-entsorgung.de",
+   "header_eval": {
+    "basis": "final",
+    "complete": true,
+    "evaluated": {
+     "challenge": null,
+     "content_type": "text/html;charset=utf-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://www.huendgen-entsorgung.de"
+    },
+    "first": {
+     "challenge": null,
+     "content_type": "text/html;charset=utf-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://www.huendgen-entsorgung.de"
+    },
+    "framing_protected": true,
+    "headers": {
+     "content-security-policy": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://www.huendgen-entsorgung.de",
+      "value": "frame-ancestors 'self'"
+     },
+     "permissions-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://www.huendgen-entsorgung.de",
+      "value": null
+     },
+     "referrer-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://www.huendgen-entsorgung.de",
+      "value": null
+     },
+     "x-content-type-options": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://www.huendgen-entsorgung.de",
+      "value": "nosniff"
+     },
+     "x-frame-options": {
+      "present": true,
+      "tool": "header_check",
+      "url": "https://www.huendgen-entsorgung.de",
+      "value": "SAMEORIGIN"
+     }
+    },
+    "missing": [
+     "referrer-policy",
+     "permissions-policy"
+    ],
+    "unknown": []
+   },
    "headers": {
     "cache-control": "no-cache, must-revalidate",
     "content-security-policy": "frame-ancestors 'self'",
@@ -3224,10 +3434,6 @@
    "reachable": true,
    "score": "4/7",
    "security_headers": {
-    "content-security-policy": {
-     "present": true,
-     "value": "frame-ancestors 'self'"
-    },
     "permissions-policy": {
      "present": false,
      "value": null
@@ -3236,10 +3442,6 @@
      "present": false,
      "value": null
     },
-    "strict-transport-security": {
-     "present": true,
-     "value": "max-age=31536000; preload"
-    },
     "x-content-type-options": {
      "present": true,
      "value": "nosniff"
@@ -3247,10 +3449,6 @@
     "x-frame-options": {
      "present": true,
      "value": "SAMEORIGIN"
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
     }
    },
    "server_header": "nginx",
@@ -3478,7 +3676,7 @@
    "banner_excerpt": null,
    "confidence": 0.5,
    "details": {
-    "compromised": false
+    "compromised": null
    },
    "domain": "huendgen-entsorgung.de",
    "evidence": [
@@ -3581,9 +3779,10 @@
    }
   ]
  },
- "schema_version": "1.0.7",
+ "schema_version": "1.1.0",
  "services": [
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -3602,6 +3801,7 @@
    "fp_title": "403 Forbidden",
    "host_ip": "18.197.248.23",
    "id": "svc:18.197.248.23:80/tcp",
+   "kennung": "nginx",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -3612,15 +3812,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -3639,6 +3842,7 @@
    "fp_title": null,
    "host_ip": "18.197.248.23",
    "id": "svc:18.197.248.23:443/tcp",
+   "kennung": "nginx",
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -3649,21 +3853,29 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "https",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "multiscreensite.com",
+    "days_left": 75,
+    "expired": false,
+    "fingerprint_sha1": "5c442df10a65b99de0adc5b2f922d6154cbcda10",
+    "issuer": "YR2",
     "not_after": "2026-12-08T03:54:34Z",
+    "not_before": "2026-09-09T03:54:35Z",
     "san": [
      "*.cdn-website.com",
      "*.editor-sandbox.multiscreensite.com",
@@ -3673,7 +3885,8 @@
      "*.partnerwebsitedns.com",
      "*.website.thryv.com",
      "multiscreensite.com"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -3689,6 +3902,7 @@
    "fp_title": "403 Forbidden",
    "host_ip": "18.197.248.23",
    "id": "svc:18.197.248.23:8443/tcp",
+   "kennung": "nginx",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -3699,25 +3913,34 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "*.huendgen-entsorgung.de",
+    "days_left": 102,
+    "expired": false,
+    "fingerprint_sha1": "9a71ed8bca7e48e0bb58d65267b1211f94fd68a1",
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
     "not_after": "2027-01-03T23:59:59Z",
+    "not_before": "2025-12-04T00:00:00Z",
     "san": [
      "*.huendgen-entsorgung.de",
      "huendgen-entsorgung.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -3733,6 +3956,7 @@
    "fp_title": "Outlook",
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:443/tcp",
+   "kennung": "Microsoft-IIS/10.0",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -3743,25 +3967,34 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "https",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "*.huendgen-entsorgung.de",
+    "days_left": 102,
+    "expired": false,
+    "fingerprint_sha1": "9a71ed8bca7e48e0bb58d65267b1211f94fd68a1",
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
     "not_after": "2027-01-03T23:59:59Z",
+    "not_before": "2025-12-04T00:00:00Z",
     "san": [
      "*.huendgen-entsorgung.de",
      "huendgen-entsorgung.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -3774,9 +4007,10 @@
    "family": "apache",
    "fp_login": null,
    "fp_server": "Apache",
-   "fp_title": "Hündgen Entsorgungs GmbH & Co. KG Web Applications Po (Auszug)",
+   "fp_title": "Hündgen Entsorgungs GmbH & Co. KG Web Applications Portal",
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:444/tcp",
+   "kennung": "Apache httpd, Titel „Hündgen Entsorgungs GmbH & Co. KG Web Applications Portal“",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -3787,15 +4021,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -3814,6 +4051,7 @@
    "fp_title": null,
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:1000/tcp",
+   "kennung": null,
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -3824,15 +4062,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "cadlock",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": true,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -3851,6 +4092,7 @@
    "fp_title": null,
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:1001/tcp",
+   "kennung": null,
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -3861,15 +4103,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "webpush",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": true,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -3888,6 +4133,7 @@
    "fp_title": null,
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:1002/tcp",
+   "kennung": null,
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -3898,11 +4144,13 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "windows-icfw",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": true,
    "version_norm": null,
    "version_raw": null
   }
@@ -3911,6 +4159,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "webtech"
    ],
@@ -3950,6 +4199,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -3989,6 +4239,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4028,6 +4279,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4067,6 +4319,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -4121,6 +4374,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4160,6 +4414,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4199,6 +4454,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4238,6 +4494,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4277,6 +4534,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -4322,6 +4580,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -4371,6 +4630,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx",
     "webtech"
@@ -4416,6 +4676,7 @@
   {
    "build": "15.2.1748",
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "cms_fingerprint",
     "httpx",
@@ -4476,6 +4737,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx",
     "webtech"
@@ -4521,6 +4783,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4560,6 +4823,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4599,6 +4863,7 @@
   {
    "build": "15.2.1748",
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4640,6 +4905,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -4685,6 +4951,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4725,6 +4992,26 @@
  "targets": [
   {
    "confidence": 1.0,
+   "discovered": [
+    {
+     "fqdn": "ftp.huendgen-entsorgung.de",
+     "ips": [
+      "87.79.4.40"
+     ],
+     "source": "gobuster_dns",
+     "third_party": null
+    },
+    {
+     "fqdn": "ftp.mail.huendgen-entsorgung.de",
+     "ips": [
+      "217.160.231.238",
+      "2001:8d8:1000:50be:93ee:211d:4bf5:602c"
+     ],
+     "source": "gobuster_dns",
+     "third_party": null
+    }
+   ],
+   "discovered_total": null,
    "discovery_health": {
     "ct_sources_empty": false,
     "discovery_added_count": 7,
@@ -4787,15 +5074,26 @@
  "tls": [
   {
    "assigned_from": null,
+   "cbc_obsoleted_offered": false,
    "cert": {
     "chain_ok": true,
     "cn": "www.huendgen-entsorgung.de",
     "days_left": 17,
     "expired": false,
+    "fingerprint_sha256": "7c27e2061a228a7fc3c53ba136048500d5e89156a4f7eadc99ece49f3c7be3f9",
     "issuer": "YR2 (Let's Encrypt from US)",
     "mismatch": false,
     "not_after": "2026-10-11T03:14:00Z",
     "not_before": "2026-07-13T03:14:00Z",
+    "renewal": {
+     "certificates": 66,
+     "interval_days": 57,
+     "last_not_after": "2026-10-11T03:14:37Z",
+     "last_not_before": "2026-07-13T03:14:38Z",
+     "lead_days": 32,
+     "name": "huendgen-entsorgung.de",
+     "source": "crtsh"
+    },
     "san": [
      "huendgen-entsorgung.de",
      "www.huendgen-entsorgung.de"
@@ -4803,6 +5101,7 @@
     "self_signed": null,
     "wildcard": false
    },
+   "cert_assigned_from": null,
    "ciphers_weak": [],
    "confidence": 1.0,
    "entries": [
@@ -6079,15 +6378,26 @@
   },
   {
    "assigned_from": "huendgen-entsorgung.de:443",
+   "cbc_obsoleted_offered": false,
    "cert": {
-    "chain_ok": null,
+    "chain_ok": true,
     "cn": "www.huendgen-entsorgung.de",
     "days_left": 17,
     "expired": false,
+    "fingerprint_sha256": "7c27e2061a228a7fc3c53ba136048500d5e89156a4f7eadc99ece49f3c7be3f9",
     "issuer": "YR2",
-    "mismatch": null,
+    "mismatch": false,
     "not_after": "2026-10-11T03:14:37Z",
     "not_before": "2026-07-13T03:14:38Z",
+    "renewal": {
+     "certificates": 61,
+     "interval_days": 58,
+     "last_not_after": "2026-10-11T03:14:37Z",
+     "last_not_before": "2026-07-13T03:14:38Z",
+     "lead_days": 32,
+     "name": "www.huendgen-entsorgung.de",
+     "source": "crtsh"
+    },
     "san": [
      "huendgen-entsorgung.de",
      "www.huendgen-entsorgung.de"
@@ -6095,12 +6405,13 @@
     "self_signed": null,
     "wildcard": false
    },
+   "cert_assigned_from": "huendgen-entsorgung.de:443",
    "ciphers_weak": [],
    "confidence": 1.0,
    "entries": [],
    "evidence": [
     {
-     "excerpt": "www.huendgen-entsorgung.de:443 geprüft über huendgen-entsorgung.de:443, dessen Zertifikat www.huendgen-entsorgung.de abdeckt; angeboten: TLS1.2, TLS1.3",
+     "excerpt": "www.huendgen-entsorgung.de:443 geprüft über huendgen-entsorgung.de:443 (mit demselben Zertifikat); angeboten: TLS1.2, TLS1.3",
      "ref": "scan_results:testssl:18.197.248.23",
      "tool": "testssl"
     },
@@ -6138,15 +6449,26 @@
   },
   {
    "assigned_from": null,
+   "cbc_obsoleted_offered": true,
    "cert": {
     "chain_ok": true,
     "cn": "*.huendgen-entsorgung.de",
     "days_left": 102,
     "expired": false,
+    "fingerprint_sha256": "11a2ae2edf22a6ad7253bfcc213315a5dff3b397e739ae76b42d9e4b62f7ab03",
     "issuer": "Sectigo Public Server Authentication CA DV R36",
     "mismatch": false,
     "not_after": "2027-01-03T23:59:59Z",
     "not_before": "2025-12-04T00:00:00Z",
+    "renewal": {
+     "certificates": 66,
+     "interval_days": 57,
+     "last_not_after": "2026-10-11T03:14:37Z",
+     "last_not_before": "2026-07-13T03:14:38Z",
+     "lead_days": 32,
+     "name": "huendgen-entsorgung.de",
+     "source": "crtsh"
+    },
     "san": [
      "*.huendgen-entsorgung.de",
      "huendgen-entsorgung.de"
@@ -6154,6 +6476,7 @@
     "self_signed": null,
     "wildcard": true
    },
+   "cert_assigned_from": null,
    "ciphers_weak": [
     "cbc"
    ],

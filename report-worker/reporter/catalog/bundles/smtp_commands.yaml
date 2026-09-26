@@ -1,0 +1,13 @@
+id: smtp_commands
+title: "Mailserver auf {group}: {rules}"
+category: E
+merge_by: host
+members: [smtp_vrfy_enabled, smtp_vrfy_enabled_passive]
+target: findings
+references: [CWE-200, CWE-204]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+positive_title: Mailserver ohne Abfrage von Postfachnamen

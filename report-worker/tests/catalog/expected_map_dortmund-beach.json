@@ -1,5 +1,6 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/dortmund-beach.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
+ "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Befunde: hsts_short dortmund-beach.com (+www.dortmund-beach.com) (R9 (Entscheidung DC 3)); entfallene Positivaussagen: hsts_missing dortmund-beach.com (+www.dortmund-beach.com) (R9 (Entscheidung DC 3)); tls_weak_ciphers dortmund-beach.com (+www.dortmund-beach.com) (R6 (CBC-Verfahren angeboten)); urlhaus_compromise dortmund-beach.com (R6 (URLhaus no_data ist kein Negativergebnis)).",
  "strict": false,
  "orders": {
   "main": "14272c00-1145-4675-9b4c-19ce2ead403b"
@@ -32,8 +33,10 @@
   },
   "VS-2026-006": {
    "checks": [
-    "hsts_short"
-   ]
+    "hsts_missing"
+   ],
+   "spec10": "R9",
+   "warum": "max-age=0 steht als „HSTS abgeschaltet“ unter hsts_missing statt unter hsts_short (Entscheidung DC 3)."
   },
   "VS-2026-007": {
    "checks": [
@@ -67,43 +70,64 @@
   },
   "VS-2026-013": {
    "checks": [
-    "software_eol"
-   ]
+    "smtp_vrfy_enabled"
+   ],
+   "spec10": "R19",
+   "warum": "VRFY in smtp-commands auf 465 und 587; neue Prüfung."
   },
   "VS-2026-014": {
    "checks": [
-    "spf_softfail"
-   ]
+    "smtp_vrfy_enabled_passive"
+   ],
+   "spec10": "R19",
+   "warum": "VRFY im SMTP-Banner laut Shodan; neue Prüfung."
   },
   "VS-2026-015": {
    "checks": [
-    "tls_no_13"
+    "software_eol"
    ]
   },
   "VS-2026-016": {
    "checks": [
-    "tls_rpt_missing"
+    "spf_softfail"
    ]
   },
   "VS-2026-017": {
    "checks": [
-    "tls_weakness_reported"
+    "tls_no_13"
    ]
   },
   "VS-2026-018": {
    "checks": [
-    "web_vulnerability_reported"
+    "tls_rpt_missing"
    ]
   },
   "VS-2026-019": {
    "checks": [
-    "wordpress_plugin_vulnerable"
+    "tls_weakness_reported"
    ]
   },
   "VS-2026-020": {
    "checks": [
+    "web_vulnerability_reported"
+   ]
+  },
+  "VS-2026-021": {
+   "checks": [
+    "wordpress_plugin_vulnerable"
+   ]
+  },
+  "VS-2026-022": {
+   "checks": [
     "wordpress_user_enumeration"
    ]
+  },
+  "VS-2026-023": {
+   "checks": [
+    "wordpress_xmlrpc_enabled"
+   ],
+   "spec10": "R19",
+   "warum": "XML-RPC laut wpscan aktiv; neue Prüfung."
   }
  },
  "positives": {
@@ -144,47 +168,32 @@
   },
   "VS-2026-P08": {
    "checks": [
-    "hsts_missing"
+    "http_no_tls"
    ]
   },
   "VS-2026-P09": {
    "checks": [
-    "http_no_tls"
+    "ip_reputation"
    ]
   },
   "VS-2026-P10": {
    "checks": [
-    "ip_reputation"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P11": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P12": {
    "checks": [
-    "smb_exposed"
+    "spf_missing"
    ]
   },
   "VS-2026-P13": {
    "checks": [
-    "spf_missing"
-   ]
-  },
-  "VS-2026-P14": {
-   "checks": [
     "tls_legacy_protocols"
-   ]
-  },
-  "VS-2026-P15": {
-   "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P16": {
-   "checks": [
-    "urlhaus_compromise"
    ]
   }
  },

@@ -1,0 +1,49 @@
+id: smtp_vrfy_enabled
+title: Mailserver beantwortet den Befehl VRFY
+family: smtp_vrfy
+category: E
+scale: hygiene
+level: niedrig
+group_by: host
+scope: service
+applicable_when: null
+item_when: null
+when: service.smtp_vrfy is True
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [nmap]
+kind: check
+bundle: smtp_commands
+affected_template: "{host_ip}:{port} ({mail_name})"
+evidence: [service]
+references: [CWE-200, CWE-204]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: S6b-3 (spec/10 R19)
+  start_level: niedrig
+  deviation: null
+texts:
+  short: "VRFY beantwortet"
+  plan:
+    lever: "Befehl VRFY am Mailserver abschalten"
+    effect: "Verhindert die Abfrage gültiger Postfachnamen"
+  observation: >-
+    Der Mailserver auf {group} beantwortet den Befehl VRFY: {affected}. Damit lässt sich von
+    außen prüfen, ob ein Postfach existiert.
+  meaning: >-
+    Mit VRFY lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte
+    Phishing-Mails und Rateangriffe auf Zugangsdaten.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Den Befehl VRFY in der Konfiguration des Mailservers abschalten, bei Postfix über
+        disable_vrfy_command.
+  verify: >-
+    Verbindung zum Mailserver aufbauen und VRFY mit einem bekannten Postfachnamen senden;
+    erwartet wird eine Ablehnung ohne Aussage über das Postfach.

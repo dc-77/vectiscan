@@ -10,7 +10,17 @@ applicable_when: null
 when: http.csp.present is False
 positive_when: http.csp.present is True
 not_testable_when:
-  - when: http.reachable is not True or http.csp is None
+  # S6b-3 (spec/10 R1): nur an einer Endseite bewertbar.
+  - when: http.header_eval.basis == "redirect"
+    reason_code: headers_redirect_only
+    context: group
+  - when: http.header_eval.basis in ["client_error", "server_error", "non_html"]
+    reason_code: headers_error_only
+    context: group
+  - when: http.header_eval.basis == "challenge"
+    reason_code: headers_challenge_only
+    context: group
+  - when: http.header_eval.basis == "unreachable" or http.csp is None
     reason_code: unreachable
     context: item
 undetermined: not_testable

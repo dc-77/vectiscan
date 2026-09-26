@@ -1,0 +1,19 @@
+{
+ "facts": {
+  "hosts": [
+   {"ip": "203.0.113.10"}
+  ],
+  "dns": [
+   {"domain": "example.test", "mx": ["mx1.example.test"],
+    "spf": {"raw": "v=spf1 a -all", "all_qualifier": "-all",
+            "mechanisms": [{"kind": "a", "qualifier": "+", "ips": ["203.0.113.10"]}]}}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "example.test",
+  "affected": [],
+  "positive": false
+ }
+}

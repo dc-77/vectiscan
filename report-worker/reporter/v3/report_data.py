@@ -31,10 +31,12 @@ DEFAULT_CUSTOMER = "Auftraggeber"
 
 def _counts(facts: FS.Facts, output: CatalogOutput, n_findings: int, n_positives: int,
             runs: int, model: COV.Model) -> N.Counts:
-    members = sum(
-        1 for r in output.results if r.status == "fail" for m in r.members if m.status == "fail")
-    raw = members + sum(u.count for u in output.unprocessed) + sum(i.count for i in output.ignored)
-    fails = output.summary.by_status.get("fail", 0)
+    # S6b-3 (spec/10 R14): Einzelmeldungen und Doppelmeldungen aus der Bilanz der
+    # Phase-3-Korrelation; ohne Bilanz entfallen beide Zahlen (0).
+    bilanz = next((d.payload for d in facts.decisions if d.source == "phase3_correlation"), {})
+    raw = int(bilanz.get("total_findings") or 0)
+    doppelt = sum(int(v) for k, v in (bilanz.get("fp_by_reason") or {}).items()
+                  if "dedup" in str(k).lower() and isinstance(v, int))
     # Je System eine Zeile in 2.1 (IPv4 und IPv6 mit gleichem rDNS); der Satz ueber
     # Luecken zaehlt dieselben Zeilen, sonst widersprechen sich Satz und Tabelle.
     rows = model.system_rows()
@@ -53,16 +55,30 @@ def _counts(facts: FS.Facts, output: CatalogOutput, n_findings: int, n_positives
         hosts_ipv6=sum(1 for h in eigene if h.family == 6),
         fqdns_total=len({f.name.lower() for f in facts.fqdns if not f.wildcard and f.host_ip in eigene_ips}),
         runs=runs,
-        tool_runs=len(facts.coverage),
+        # S6b-3 (spec/10 R3): nur gelaufene Werkzeuge, ohne uebersprungene und KI-Schritte.
+        tool_runs=sum(1 for c in facts.coverage if c.status != "skipped" and not c.tool.startswith("ai_")),
         raw_findings=raw,
         findings=n_findings,
         positives=n_positives,
         coverage_full=cov.count("voll"),
         coverage_partial=cov.count("teil"),
         coverage_none=cov.count("keine") + cov.count("unerreichbar"),
-        duplicates=max(raw - fails, 0),
+        duplicates=doppelt if raw else 0,
         not_testable=output.summary.by_status.get("not_testable", 0),
+        names_found=COV.names_found(facts),
+        names_checked=COV.names_checked(facts),
+        betriebsformen=sorted({h.betriebsform for h in eigene if h.betriebsform}),
     )
+
+
+def _context_fields(context: dict[str, Any]) -> list[dict[str, str]]:
+    """Wert und Quelle je Kontextfeld (spec/10 R13); dieselben Felder wie ``facts.context``."""
+    from reporter.facts.build import context_from_customer_context
+
+    kontext = context_from_customer_context(context)
+    if kontext is None:
+        return []
+    return [{"name": f.name, "value": f.value, "source": f.source or ""} for f in kontext.fields]
 
 
 def _context_sources(context: dict[str, Any]) -> dict[str, str]:
@@ -101,7 +117,8 @@ def build_report_data(
     if isinstance(facts, dict):
         facts = FS.Facts.from_dict(facts)
     if catalog_output is None:
-        output = evaluate_catalog(facts)
+        # S6b-3 (spec/10 R18): Fristen im Text beziehen sich auf den Berichtstag.
+        output = evaluate_catalog(facts, report_date=C.iso_date(report_date or C.today()))
     elif isinstance(catalog_output, dict):
         output = CatalogOutput.model_validate(catalog_output)
     else:
@@ -141,7 +158,7 @@ def build_report_data(
     # Leitwerkzeugen des Pakets, nicht an jeder Luecke. Die Abdeckungstabelle
     # in Kapitel 2 zeigt weiterhin jede Luecke.
     # S6b-1: dieselbe Regel wie die Abdeckung in Kapitel 2.1 (coverage.py).
-    glance = C.build_glance(finding_items, finding_list, counts, model.system_gaps())
+    glance = C.build_glance(finding_items, finding_list, counts, model.system_gaps(), facts)
     glance.levers = levers
     business = C.build_business(facts, C.observed_systems(facts))
     scope = C.build_scope(facts, output, counts, model)
@@ -198,6 +215,7 @@ def build_report_data(
         catalog_digest=output.catalog_digest,
         facts_schema_version=output.facts_schema_version,
         context_sources=_context_sources(context),
+        context_fields=_context_fields(context),
         **T.PROVIDER,
     )
 

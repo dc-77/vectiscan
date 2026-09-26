@@ -10,7 +10,18 @@ applicable_when: null
 when: 'http.security_headers["x-frame-options"].present is False or http.security_headers["x-content-type-options"].present is False or http.security_headers["referrer-policy"].present is False or http.security_headers["permissions-policy"].present is False'
 positive_when: 'http.security_headers["x-frame-options"].present is True and http.security_headers["x-content-type-options"].present is True and http.security_headers["referrer-policy"].present is True and http.security_headers["permissions-policy"].present is True'
 not_testable_when:
-  - when: http.reachable is not True or len(http.security_headers) == 0
+  # S6b-3 (spec/10 R1): Header-Regeln werten nur eine Endseite aus (2xx, HTML). An einer
+  # Weiterleitung, Fehler- oder Abwehrseite sagt ein fehlender Header nichts über die Seite.
+  - when: http.header_eval.basis == "redirect"
+    reason_code: headers_redirect_only
+    context: group
+  - when: http.header_eval.basis in ["client_error", "server_error", "non_html"]
+    reason_code: headers_error_only
+    context: group
+  - when: http.header_eval.basis == "challenge"
+    reason_code: headers_challenge_only
+    context: group
+  - when: http.header_eval.basis == "unreachable" or len(http.security_headers) == 0
     reason_code: unreachable
     context: item
 undetermined: not_testable
@@ -37,22 +48,82 @@ texts:
   plan:
     lever: "Fehlende Sicherheits-Header ergänzen"
     effect: "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen"
+  # S6b-3 (spec/10 R2): jede Aussage nennt nur einen Header, der tatsächlich fehlt.
   observation: >-
-    Auf {group} fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und
-    ungewollter Weitergabe von Referrer-Informationen schützen: {affected}.
-  meaning: >-
-    Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne
-    X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist
-    gering, die Maßnahme aber schnell umsetzbar.
+    Auf {group} fehlen einzelne Sicherheits-Header der Webseite: {affected}.
+  meaning:
+    - when: 'http.security_headers["x-frame-options"].present is False'
+      quantor: eines
+      text: >-
+        Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die
+        Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking.
+    - when: 'http.security_headers["x-content-type-options"].present is False'
+      quantor: eines
+      text: >-
+        Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server
+        sie ausliefert.
+    - when: 'http.security_headers["referrer-policy"].present is False'
+      quantor: eines
+      text: >-
+        Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige
+        Adresse der Seite samt Parametern.
+    - when: 'http.security_headers["permissions-policy"].present is False and not (http.security_headers["x-frame-options"].present is True and http.security_headers["x-content-type-options"].present is True and http.security_headers["referrer-policy"].present is True)'
+      quantor: eines
+      text: >-
+        Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete
+        Inhalte nutzen dürfen.
+    - when: 'http.security_headers["permissions-policy"].present is False and http.security_headers["x-frame-options"].present is True and http.security_headers["x-content-type-options"].present is True and http.security_headers["referrer-policy"].present is True'
+      quantor: eines
+      text: >-
+        Es fehlt nur die Permissions-Policy, die festlegt, welche Browserfunktionen wie Kamera,
+        Mikrofon oder Standort eingebettete Inhalte nutzen dürfen. Die Auswirkung ist gering; die
+        übrigen grundlegenden Sicherheits-Header sind gesetzt.
   recommendation:
     - stage: mittelfristig
+      when: 'http.security_headers["x-frame-options"].present is False'
+      quantor: eines
       text: >-
-        Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options,
-        Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen.
-  verify: >-
-    HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header.
+        X-Frame-Options oder frame-ancestors in der Content-Security-Policy setzen.
+      effect: "Verhindert das Einbetten der Seite in fremde Seiten"
+    - stage: mittelfristig
+      when: 'http.security_headers["x-content-type-options"].present is False'
+      quantor: eines
+      text: >-
+        X-Content-Type-Options mit dem Wert nosniff setzen.
+      effect: "Verhindert Fehldeutungen ausgelieferter Inhalte im Browser"
+    - stage: mittelfristig
+      when: 'http.security_headers["referrer-policy"].present is False'
+      quantor: eines
+      text: >-
+        Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin.
+      effect: "Hält Adressen und Parameter der Seite aus fremden Protokollen heraus"
+    - stage: mittelfristig
+      when: 'http.security_headers["permissions-policy"].present is False'
+      quantor: eines
+      text: >-
+        Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet.
+      effect: "Begrenzt die Browserfunktionen, die eingebettete Inhalte nutzen dürfen"
+  verify:
+    - text: >-
+        HTTP-Antwortheader der Endseite von außen abrufen.
+    - when: 'http.security_headers["x-frame-options"].present is False'
+      quantor: eines
+      text: >-
+        Erwartet wird X-Frame-Options oder frame-ancestors in der Content-Security-Policy.
+    - when: 'http.security_headers["x-content-type-options"].present is False'
+      quantor: eines
+      text: >-
+        Erwartet wird X-Content-Type-Options mit dem Wert nosniff.
+    - when: 'http.security_headers["referrer-policy"].present is False'
+      quantor: eines
+      text: >-
+        Erwartet wird eine Referrer-Policy.
+    - when: 'http.security_headers["permissions-policy"].present is False'
+      quantor: eines
+      text: >-
+        Erwartet wird eine Permissions-Policy.
   positive:
     title: Sicherheits-Header vollständig
     text: >-
-      Auf {group} sind die Sicherheits-Header X-Frame-Options, X-Content-Type-Options,
-      Referrer-Policy und Permissions-Policy gesetzt.
+      Auf {group} sind Framing-Schutz (X-Frame-Options oder frame-ancestors),
+      X-Content-Type-Options, Referrer-Policy und Permissions-Policy gesetzt.

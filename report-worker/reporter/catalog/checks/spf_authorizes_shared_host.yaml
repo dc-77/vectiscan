@@ -1,0 +1,52 @@
+id: spf_authorizes_shared_host
+title: SPF gibt geteilten Server frei
+family: spf_shared_host
+category: C
+scale: hygiene
+level: mittel
+group_by: domain
+scope: dns
+applicable_when: dns.spf is not None
+when: len(spf_shared_ips(dns, hosts)) > 0
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [dns_records]
+kind: check
+bundle: null
+affected_template: "{domain} ({spf_shared_hosts})"
+evidence: [dns]
+references: [CWE-290]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: S6b-3 (spec/10 R19)
+  start_level: mittel
+  deviation: null
+texts:
+  short: "SPF gibt geteilten Server frei"
+  plan:
+    lever: "Absenderfreigabe auf eigene oder vertraglich gebundene Systeme beschränken"
+    effect: "Verhindert, dass andere Kunden desselben Servers im Namen der Domain senden"
+  observation: >-
+    Der SPF-Eintrag der Domain {domain} gibt einen Server als Absender frei, den der Hoster
+    auch für andere Kunden betreibt: {affected}.
+  meaning: >-
+    Jede Anwendung auf diesem Server darf damit E-Mails im Namen der Domain versenden, auch
+    die anderer Kunden. Empfänger erkennen solche Mails an SPF nicht als gefälscht.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Prüfen, ob über den genannten Server tatsächlich E-Mails der Domain versendet werden;
+        andernfalls den Mechanismus aus dem SPF-Eintrag entfernen.
+    - stage: strategisch
+      text: >-
+        E-Mails der Domain nur über eigene oder vertraglich gebundene Versanddienste senden
+        und diese im SPF-Eintrag gezielt freigeben.
+  verify: >-
+    SPF-Eintrag der Domain erneut abfragen; erwartet wird, dass kein geteilter Server des
+    Hosters mehr freigegeben ist.

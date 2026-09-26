@@ -47,6 +47,23 @@ Historie:
   SASL vor STLS gilt als Anmeldung ohne TLS-Zwang. Neu ``PassiveFact.service_seen_at``,
   der Zeitstempel des Dienstes (HTTP-Kopf ``Date`` im Banner); ``seen_at`` bleibt die
   Aktualisierung des Hosts bei der Quelle.
+- 1.1.0 (S6b-3, spec/10 R1 bis R19, E13): Bedeutung geaendert, deshalb Minor.
+  ``HttpFact.header_eval`` beschreibt, an welcher Antwort die Sicherheits-Header gemessen
+  sind (Status, ``location``, Endseite oder nicht) und welche Quelle die Endseite liefert
+  (header_check, redirect_probe, testssl, Teilbelege aus wpscan und ZAP); ``csp`` und
+  ``security_headers`` beschreiben diese bewertete Antwort. ``Csp`` zerlegt die Direktiven
+  (script-src und style-src getrennt, Nonce und Hash heben ``unsafe-inline`` auf).
+  ``HostFact.blocked`` gilt nur mit belegter Sperre (403, 429, Challenge); ``reach`` kennt
+  ``no_response`` (nmap ohne Hostbericht). Neu: ``HostFact.nmap_host_report``,
+  ``betriebsform``, ``Provider.domain``, ``Reputation.abuseipdb_distinct_users``,
+  ``FqdnFact.real_content`` und ``skipped``, ``CertShort`` mit Aussteller, Laufzeit und
+  Fingerabdruck (nmap ssl-cert), ``ServiceFact.kennung``, ``unidentified``,
+  ``smtp_vrfy`` und ``auth_before_starttls``, ``TlsCert.fingerprint_sha256`` und
+  ``renewal`` (crt.sh, E13), ``TlsFact.cert_assigned_from`` und
+  ``cbc_obsoleted_offered``, ``WordPressInfo.findings``, ``WebAlert.param``,
+  ``TargetFact.discovered`` (gefundene, nicht im Inventar angekommene Namen),
+  ``CoverageFact.target``, ``SoftwareFact.conflicts``. URLhaus ohne Daten heisst
+  ``compromised=None`` (Ausfall), nicht "nicht kompromittiert".
 """
 from __future__ import annotations
 
@@ -54,7 +71,7 @@ from typing import Any, ClassVar, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-FACTS_SCHEMA_VERSION = "1.0.7"
+FACTS_SCHEMA_VERSION = "1.1.0"
 
 Mode = Literal["active", "passive"]
 
@@ -131,6 +148,19 @@ class OutOfScope(Base):
     host_ip: Optional[str] = None
 
 
+class DiscoveredName(Base):
+    """Ein von der Hostsuche gefundener Name, der nicht im Host-Inventar ankam (spec/10 R5).
+
+    Quelle ist die Teilausgabe von gobuster_dns (``fqdn ip[,ip]`` je Zeile), die der
+    Scanner bei Zeitueberschreitung nicht weiterreicht (spec/09 Q1). ``third_party`` nennt
+    den Betreiber, wenn der Name erkennbar zu einem Drittanbieter gehoert (Microsoft 365
+    Autodiscover, CNAME auf eine fremde Domain)."""
+    fqdn: str
+    ips: list[str] = Field(default_factory=list)
+    third_party: Optional[str] = None
+    source: str = "gobuster_dns"
+
+
 class TargetFact(Fact):
     domain: str
     is_primary: bool = True
@@ -138,6 +168,10 @@ class TargetFact(Fact):
     whois: Optional[Whois] = None
     discovery_health: Optional[dict[str, Any]] = None
     out_of_scope: list[OutOfScope] = Field(default_factory=list)
+    # S6b-3 (spec/10 R5): gefunden, aber nicht im Inventar angekommen, bis S6c (Q1) die
+    # Discovery repariert. ``discovered_total`` zaehlt Inventarnamen plus diese Namen.
+    discovered: list[DiscoveredName] = Field(default_factory=list)
+    discovered_total: Optional[int] = None
 
 
 # ---------------------------------------------------------------- host / fqdn
@@ -146,6 +180,9 @@ class Provider(Base):
     isp: Optional[str] = None
     usage_type: Optional[str] = None
     country: Optional[str] = None
+    # S6b-3 (spec/10 Teil 2 CA): Domain des Netzbetreibers laut AbuseIPDB
+    # (``vodafone-ip.de`` bei ``isp`` "Castenow GmbH").
+    domain: Optional[str] = None
 
 
 class PortsSummary(Base):
@@ -171,10 +208,12 @@ class Reputation(Base):
     otx_pulse_count: Optional[int] = None
     urlhaus_compromised: Optional[bool] = None
     greynoise_classification: Optional[str] = None
+    abuseipdb_distinct_users: Optional[int] = None
 
 
 SharedKind = Literal["hoster", "platform"]
-ReachStatus = Literal["no_open_ports", "unreachable_from_scanner", "no_ipv6_route"]
+ReachStatus = Literal["no_open_ports", "no_response", "unreachable_from_scanner", "no_ipv6_route"]
+Betriebsform = Literal["rechenzentrum", "anschluss", "plattform", "unbekannt"]
 
 
 class SharedSystem(Base):
@@ -210,6 +249,8 @@ class Reach(Base):
     ``unreachable_from_scanner``: zusaetzlich meldet eine Passivquelle, die hoechstens
     sieben Tage vor dem Scanende gesehen wurde, Dienste auf dieser Adresse.
     ``no_ipv6_route``: der Pruefstand hatte keine IPv6-Verbindung.
+    ``no_response`` (S6b-3, spec/10 R3): nmap lieferte keinen Hostbericht (mit ``--open``
+    fehlt das ``<host>``-Element); ob der Host antwortet, ist nicht belegt.
     """
     status: ReachStatus
     passive_ports: list[int] = Field(default_factory=list)
@@ -233,6 +274,18 @@ class HostFact(Fact):
     shared: Optional[SharedSystem] = None
     third_party: Optional[ThirdParty] = None
     reach: Optional[Reach] = None
+    # S6b-3 (spec/10 R3): False, wenn nmap fuer die Adresse keinen Hostbericht schrieb und
+    # der Leser den Host aus der Laufstatistik ergaenzt hat.
+    nmap_host_report: Optional[bool] = None
+    # S6b-3 (spec/10 R13): Betriebsform fuer Auswirkungs- und Rollentexte. ``anschluss``:
+    # eigene Leitung des Kunden (AbuseIPDB-Nutzungsart Fixed Line ISP); ``rechenzentrum``:
+    # gemieteter oder geteilter Server; ``plattform``: SaaS, Baukasten oder CDN.
+    betriebsform: Optional[Betriebsform] = None
+    # S6b-3 (spec/10 R9): traegt der Host Mail des Kunden (MX, SPF-Mechanismus oder
+    # Autodiscover zeigen auf ihn) bzw. eine Webseite des Kunden mit Inhalt? Grundlage fuer
+    # "Postfaecher" und "Webseiten" in Zustaendigkeits- und Auswirkungstexten.
+    serves_customer_mail: Optional[bool] = None
+    serves_customer_web: Optional[bool] = None
 
 
 class Alias(Base):
@@ -265,6 +318,11 @@ class FqdnFact(Fact):
     waf: Optional[Waf] = None
     # S6b-1 (spec/09 Q3): CNAME-Kette aus der dnsx-Aufloesung, erstes Ziel zuerst.
     cname: list[str] = Field(default_factory=list)
+    # S6b-3 (spec/10 R3): Einordnung der Startseite durch die Scan-Steuerung (Inhalt oder
+    # Fehler-, Weiterleitungs-, Parkseite); nur fuer die Abdeckung, nie fuer einen Befund.
+    real_content: Optional[bool] = None
+    # S6b-3 (spec/10 R4): nicht eingerichteter Name ("parking"), vom Scanner uebersprungen.
+    skipped: Optional[str] = None
 
 
 # ---------------------------------------------------------------- service / tls
@@ -273,6 +331,13 @@ class CertShort(Base):
     cn: Optional[str] = None
     san: list[str] = Field(default_factory=list)
     not_after: Optional[str] = None
+    # S6b-3 (spec/10 R3): nmap ssl-cert vollstaendig, fuer Dienste ohne testssl-Lauf.
+    issuer: Optional[str] = None
+    not_before: Optional[str] = None
+    days_left: Optional[int] = None
+    expired: Optional[bool] = None
+    self_signed: Optional[bool] = None
+    fingerprint_sha1: Optional[str] = None
 
 
 class ServiceFact(Fact):
@@ -305,6 +370,14 @@ class ServiceFact(Fact):
     # S6b-2 (spec/09 Teil 2 LW, JW): der Dienst weist fremde Quellen vor jeder Anmeldung ab
     # (PostgreSQL "no pg_hba.conf entry"), laut Passivbanner desselben IP:Port.
     rejects_before_auth: Optional[bool] = None
+    # S6b-3 (spec/10 R9, R14): Kennung des Dienstes aus Produkt, Server-Kennung, Titel oder
+    # Stream-Kopf; ``unidentified`` bei einem nmap-Tabellentreffer ("cadlock?") ohne jede
+    # Kennung aus der Antwort des Dienstes.
+    kennung: Optional[str] = None
+    unidentified: Optional[bool] = None
+    # S6b-3 (spec/10 R19): SMTP-Faehigkeiten vor STARTTLS laut nmap smtp-commands.
+    smtp_vrfy: Optional[bool] = None
+    auth_before_starttls: Optional[bool] = None
 
 
 class TlsCert(Base):
@@ -319,6 +392,25 @@ class TlsCert(Base):
     chain_ok: Optional[bool] = None
     self_signed: Optional[bool] = None
     wildcard: Optional[bool] = None
+    # S6b-3 (spec/10 R4): Fingerabdruck fuer die Bindung an weitere VHosts.
+    fingerprint_sha256: Optional[str] = None
+    # S6b-3 (E13): Erneuerungshistorie des Namens aus den CT-Logs (crt.sh).
+    renewal: Optional["CertRenewal"] = None
+
+
+class CertRenewal(Base):
+    """Erneuerungshistorie eines Namens laut Certificate Transparency (crt.sh, E13).
+
+    ``certificates``: Zahl der Zertifikate fuer genau diesen Namen; ``interval_days``: typischer
+    Abstand zwischen zwei Ausstellungen (Median); ``lead_days``: typischer Vorlauf der
+    Neuausstellung vor dem Ablauf des Vorgaengers (Median). Noch ohne Regel."""
+    name: str
+    certificates: int
+    interval_days: Optional[int] = None
+    lead_days: Optional[int] = None
+    last_not_before: Optional[str] = None
+    last_not_after: Optional[str] = None
+    source: str = "crtsh"
 
 
 class TlsVuln(Base):
@@ -367,9 +459,13 @@ class TlsFact(Fact):
     entries: list[TlsEntry] = Field(default_factory=list)
     json_filtered: bool = False
     # S6b-1 (spec/09 Q10): Protokolle, Verfahren und Schwachstellen stammen aus dem
-    # testssl-Lauf desselben IP:Port mit anderem Namen, dessen Zertifikat diesen Namen
-    # abdeckt. Wert ist "<gepruefter Name>:<Port>".
+    # testssl-Lauf desselben IP:Port mit anderem Namen. Wert ist "<gepruefter Name>:<Port>".
+    # S6b-3 (spec/10 R4): gilt fuer alle VHosts desselben IP:Port; das Zertifikat nur, wenn
+    # Fingerabdruck oder Namensdeckung passen (``cert_assigned_from``).
     assigned_from: Optional[str] = None
+    cert_assigned_from: Optional[str] = None
+    # S6b-3 (spec/10 R6): testssl ``cipherlist_OBSOLETED`` ("Obsoleted CBC ciphers").
+    cbc_obsoleted_offered: Optional[bool] = None
 
 
 # ---------------------------------------------------------------- http
@@ -385,6 +481,15 @@ class Csp(Base):
     unsafe_inline: Optional[bool] = None
     unsafe_eval: Optional[bool] = None
     wildcard: Optional[bool] = None
+    # S6b-3 (spec/10 R1): Direktiven einzeln. ``script_*`` gilt fuer script-src (Rueckfall
+    # default-src); ein Nonce, Hash oder strict-dynamic hebt ``unsafe-inline`` dort auf.
+    directives: dict[str, list[str]] = Field(default_factory=dict)
+    script_unsafe_inline: Optional[bool] = None
+    script_unsafe_eval: Optional[bool] = None
+    style_unsafe_inline: Optional[bool] = None
+    nonce_or_hash: Optional[bool] = None
+    wildcard_directives: list[str] = Field(default_factory=list)
+    frame_ancestors: Optional[str] = None
 
 
 class Cookie(Base):
@@ -413,6 +518,8 @@ class WebAlert(Base):
     # S6b-2 (spec/09 Q14): Lauf, aus dem die Meldung stammt: "passive" (ZAP-Passivscanner,
     # sourceid 3) oder "active" (aktive Pruefung, sourceid 1).
     run: Optional[Literal["passive", "active"]] = None
+    # S6b-3 (spec/10 R15): betroffener Parameter oder Kopf (z. B. Content-Security-Policy).
+    param: Optional[str] = None
 
 
 class WebPath(Base):
@@ -431,6 +538,57 @@ class WordPressInfo(Base):
     core_vulnerabilities: Optional[int] = None
     # S6b-2 (spec/09 Teil 2 DB): Adresse, ueber die wpscan die Benutzernamen fand.
     users_found_by: list[str] = Field(default_factory=list)
+    # S6b-3 (spec/10 R19): wpscan ``interesting_findings`` (xmlrpc, readme, wp_cron ...).
+    findings: list["WpFinding"] = Field(default_factory=list)
+
+
+class WpFinding(Base):
+    type: str
+    url: Optional[str] = None
+    note: Optional[str] = None
+
+
+HeaderBasis = Literal["final", "redirect", "client_error", "server_error", "challenge",
+                      "non_html", "unreachable"]
+HeaderTool = Literal["header_check", "redirect_probe", "testssl", "wpscan", "zap"]
+
+
+class HttpResponse(Base):
+    """Eine gemessene HTTP-Antwort (spec/10 R1). ``status_basis``: woher der Statuscode
+    stammt, weil header_check ihn nicht selbst speichert (httpx-Kette, testssl,
+    ``location``, Inventar, Angabe des Werkzeugs)."""
+    tool: HeaderTool
+    url: Optional[str] = None
+    status_code: Optional[int] = None
+    status_basis: Optional[Literal["httpx_chain", "testssl", "location", "inventory", "claimed"]] = None
+    location: Optional[str] = None
+    content_type: Optional[str] = None
+    challenge: Optional[str] = None
+
+
+class HeaderValue(Base):
+    present: Optional[bool] = None
+    value: Optional[str] = None
+    tool: HeaderTool
+    url: Optional[str] = None
+
+
+class HeaderMeasurement(Base):
+    """An welcher Antwort die Sicherheits-Header gemessen sind (spec/10 R1).
+
+    ``basis`` ``final``: die bewertete Antwort ist eine Endseite (2xx, HTML, ohne
+    ``location``, ohne Challenge). Sonst ist die Messung nicht bewertbar, und nur HSTS
+    (aus ``first``) gilt. ``complete``: der volle Header-Satz der bewerteten Antwort ist
+    bekannt; Teilbelege (wpscan, ZAP) kennen nur einzelne Header. ``missing`` und
+    ``unknown`` nennen die kanonischen Header ohne Beleg bzw. ohne Aussage."""
+    basis: HeaderBasis
+    first: Optional[HttpResponse] = None
+    evaluated: Optional[HttpResponse] = None
+    complete: bool = False
+    headers: dict[str, HeaderValue] = Field(default_factory=dict)
+    missing: list[str] = Field(default_factory=list)
+    unknown: list[str] = Field(default_factory=list)
+    framing_protected: Optional[bool] = None
 
 
 class HttpFact(Fact):
@@ -448,6 +606,8 @@ class HttpFact(Fact):
     server_header: Optional[str] = None
     powered_by: Optional[str] = None
     x_feserver: Optional[str] = None
+    # S6b-3 (spec/10 R9): X-AspNet-Version aus der ersten Antwort oder der Endseite.
+    aspnet_version: Optional[str] = None
     duplicate_headers: list[str] = Field(default_factory=list)
     technologies: list[Tech] = Field(default_factory=list)
     forms: list[dict[str, Any]] = Field(default_factory=list)
@@ -456,6 +616,7 @@ class HttpFact(Fact):
     paths: list[WebPath] = Field(default_factory=list)
     spider_url_count: Optional[int] = None
     wordpress: Optional[WordPressInfo] = None
+    header_eval: Optional[HeaderMeasurement] = None
 
 
 # ---------------------------------------------------------------- dns
@@ -467,6 +628,9 @@ class SpfMechanism(Base):
     qualifier: str = "+"
     kind: str
     value: Optional[str] = None
+    # S6b-3 (spec/10 R19): Adressen des Auftrags, auf die der Mechanismus zeigt (``a`` auf den
+    # Domainnamen, ``a:name``, ``mx`` auf MX-Namen im Inventar, ``ip4`` mit einer Adresse).
+    ips: list[str] = Field(default_factory=list)
 
 
 class Spf(Base):
@@ -592,6 +756,9 @@ class SoftwareFact(Fact):
     # S6b-2: Veroeffentlichung der Version (wpscan) und die genannten Schwachstellen (#16).
     release_date: Optional[str] = None
     vulnerabilities: list[VulnRef] = Field(default_factory=list)
+    # S6b-3 (spec/10 R19): widersprechende Kennung einer anderen Quelle am selben Ort
+    # (heuel 20.79.218.75:22 nmap FortiSSH, Shodan SSH-2.0-WingFTPServer).
+    conflicts: list[str] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------- passive
@@ -629,6 +796,8 @@ class CoverageFact(Fact):
     reason: Optional[str] = None
     exit_code: Optional[int] = None
     duration_ms: Optional[int] = None
+    # S6b-3 (spec/10 R3): Ziel des Laufs laut Rohausgabe (zap_active ``target``).
+    target: Optional[str] = None
 
 
 # ---------------------------------------------------------------- threat
@@ -758,3 +927,7 @@ class Facts(Base):
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Facts":
         return cls.model_validate(data)
+
+
+TlsCert.model_rebuild()
+WordPressInfo.model_rebuild()

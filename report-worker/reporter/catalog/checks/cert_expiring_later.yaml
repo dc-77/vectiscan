@@ -16,7 +16,8 @@ requires:
   tools: [testssl]
 kind: check
 bundle: cert_health
-affected_template: "{target} ({days_left_text})"
+# S6b-3 (spec/10 R18, E12): absolutes Datum statt relativer Frist.
+affected_template: "{target} ({validity_text})"
 evidence: [tls]
 references: [CWE-298]
 frameworks:
@@ -35,9 +36,17 @@ texts:
   plan:
     lever: "Erneuerung der Zertifikate einplanen"
     effect: "Verhindert den Ausfall des Dienstes zum Ablaufdatum des Zertifikats"
-  observation: >-
-    Für {n:den Dienst|die Dienste} {group} läuft das eingesetzte TLS-Zertifikat in den nächsten Wochen ab:
-    {affected}.
+  observation:
+    - when: days_until(tls.cert.not_after, report_date) >= 0
+      quantor: eines
+      text: >-
+        Für {n:den Dienst|die Dienste} {group} läuft das eingesetzte TLS-Zertifikat in den nächsten Wochen ab:
+        {affected}.
+    - when: days_until(tls.cert.not_after, report_date) < 0
+      quantor: eines
+      text: >-
+        Für {n:den Dienst|die Dienste} {group} lief das eingesetzte TLS-Zertifikat nach dem Scan ab: {affected}.
+        Ist es inzwischen nicht erneuert, sehen alle Nutzer eine Vertrauenswarnung.
   meaning: >-
     Läuft das Zertifikat ab, ohne dass eine Erneuerung vorbereitet ist, sehen alle Nutzer eine
     Vertrauenswarnung oder einen Verbindungsabbruch. Mit dem verbleibenden Vorlauf lässt sich die

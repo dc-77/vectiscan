@@ -229,7 +229,8 @@ def test_coverage_junkerwerk_multi():
     assert any("junkerwerk.hu" in w for w in f.warnings)
     ticket = host["217.243.248.27"]
     assert ticket.nmap_state == "up" and ticket.ports_summary.open == 0
-    assert cov["cov:1:nmap:217.243.248.27"].reason == "no_open_ports"
+    # S6b-3 (spec/10 R3): nmap lieferte fuer den Host keinen Hostbericht (--open).
+    assert cov["cov:1:nmap:217.243.248.27"].reason == "no_response"
 
 
 def test_coverage_castenow_luecken():

@@ -2,7 +2,7 @@ id: web_header_hygiene
 title: "Absicherung der Webdienste auf {group}: {rules}"
 category: D
 merge_by: host
-members: [csp_missing, csp_weak, hsts_missing, security_headers_incomplete, header_duplicate, csrf_token_missing, cookie_flags, sri_missing, cors_misconfiguration, session_in_url]
+members: [csp_missing, csp_weak, hsts_missing, hsts_short, security_headers_incomplete, header_duplicate, csrf_token_missing, cookie_flags, sri_missing, cors_misconfiguration, session_in_url]
 target: findings
 references: [CWE-693, CWE-1021, CWE-352]
 frameworks:

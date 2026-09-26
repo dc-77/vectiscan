@@ -11,6 +11,7 @@ parsebare Ausgabe gewinnt (testssl exit 10/246 mit vollstaendigem Lauf ist ``ok`
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -36,6 +37,27 @@ EXIT_TIMEOUT, EXIT_ERROR, EXIT_SKIPPED = -1, -2, -3
 # weggelassen hat (``worker._load_tool_runs``, S5b). Die Zeile bleibt in der
 # Abdeckung sichtbar, statt still als leeres Ergebnis zu erscheinen.
 RAW_NOT_LOADED = "rohtext_nicht_geladen"
+# S6b-3 (spec/10 R4): eine Sperre gilt nur mit Beleg in der Rohausgabe: Status 403 oder 429
+# oder eine Abwehr- bzw. Challenge-Seite. Der Scanner markiert Zeilen auch dann ``blocked``,
+# wenn nur ein Textmerkmal einer WAF-Seite im Koerper stand (``waf_body_marker``, bergersysteme
+# 198.202.211.1 mit normalen 200- und 404-Antworten); das ist keine Sperre (S6c: Scanner).
+_BLOCK_STATUS_RE = re.compile(r'"status(?:_code)?"\s*:\s*(403|429)\b')
+# Nur Kopf- und Titelmerkmale einer Abwehrseite; Woerter wie "captcha" stehen auch in den
+# Pfaden der Wortlisten (ffuf "captcha.php") und belegen nichts.
+_CHALLENGE_RE = re.compile(r"x-vercel-mitigated|cf-mitigated|attention required|just a moment|"
+                           r"security checkpoint", re.I)
+
+
+def block_evidenced(run: ToolRun) -> bool:
+    """Belegt die Rohausgabe oder der Grund einer ``blocked``-Zeile eine Sperre?"""
+    reason = str(run.reason or "")
+    if re.search(r"(?<!\d)(403|429)(?!\d)|challenge|rate.?limit", reason, re.I):
+        return True
+    raw = run.raw_output or ""
+    if not raw.strip():
+        # Ohne Rohtext bleibt es bei der Angabe des Scanners.
+        return not run.raw_known
+    return bool(_BLOCK_STATUS_RE.search(raw) or _CHALLENGE_RE.search(raw))
 
 
 @dataclass
@@ -84,6 +106,9 @@ def classify_run(run: ToolRun) -> tuple[str, Optional[str], Optional[str]]:
     if run.raw_omitted and not reason:
         reason = RAW_NOT_LOADED
     raw = (run.raw_output or "").strip()
+    if raw_status == "blocked" and not block_evidenced(run):
+        # S6b-3 (spec/10 R4): Sperre ohne Beleg ist ein normaler Lauf.
+        return ("ok" if raw else "empty"), reason, raw_status
     if raw_status in ("ok", "skipped", "failed", "blocked"):
         status = raw_status
         if status == "ok" and not raw and run.raw_known \
@@ -126,7 +151,7 @@ def derive_blocked(sig: HostSignals, runs: list[ToolRun]) -> Blocked:
     if sig.inventory_blocked and sig.inventory_blocked.detected:
         return sig.inventory_blocked
     for r in runs:
-        if r.host_ip == sig.ip and r.status == "blocked":
+        if r.host_ip == sig.ip and r.status == "blocked" and block_evidenced(r):
             return Blocked(detected=True, reason=r.reason or "blocked", source="scan_results")
     if sig.web_ports_open and sig.headers_reachable and all(
             v is False for v in sig.headers_reachable.values()) \
@@ -144,7 +169,8 @@ def build_coverage(bundle: ScanBundle, signals: dict[str, HostSignals],
 
     def make(scope: str, tool: str, status: str, *, host_ip=None, fqdn=None, domain=None,
              phase=None, raw_status=None, reason=None, exit_code=None, duration_ms=None,
-             observed_at=None, evidence=None, confidence=CONFIDENCE_TOOL, source="scan_results"):
+             observed_at=None, evidence=None, confidence=CONFIDENCE_TOOL, source="scan_results",
+             target=None):
         key = f"cov:{phase if phase is not None else '-'}:{tool}:{_scope_key(scope, host_ip, fqdn, domain)}"
         n = seen_ids.get(key, 0)
         seen_ids[key] = n + 1
@@ -154,6 +180,7 @@ def build_coverage(bundle: ScanBundle, signals: dict[str, HostSignals],
             confidence=confidence, evidence=evidence or [], scope=scope, domain=domain,
             host_ip=host_ip, fqdn=fqdn, phase=phase, tool=tool, status=status,
             raw_status=raw_status, reason=reason, exit_code=exit_code, duration_ms=duration_ms,
+            target=target,
         ))
 
     if not bundle.tool_runs:
@@ -193,7 +220,7 @@ def build_coverage(bundle: ScanBundle, signals: dict[str, HostSignals],
              domain=None if ip else (row_domain or primary_domain),
              phase=run.phase, raw_status=raw_status,
              reason=reason, exit_code=run.exit_code, duration_ms=run.duration_ms,
-             observed_at=run.created_at, evidence=ev)
+             observed_at=run.created_at, evidence=ev, target=_run_target(run))
     # Domains, die eigene domainweite Zeilen mitgebracht haben, brauchen den
     # Platzhalter nicht mehr. Fuer die historischen Tars (Junkerwerk) bleibt er
     # erreichbar, deshalb wird der Grund nicht entfernt.
@@ -205,6 +232,17 @@ def build_coverage(bundle: ScanBundle, signals: dict[str, HostSignals],
              confidence=CONFIDENCE_DERIVED, source="facts_builder")
     facts.sort(key=lambda f: sort_key(f.phase, f.tool, f.host_ip, f.fqdn, f.domain, f.id))
     return facts
+
+
+def _run_target(run: ToolRun) -> Optional[str]:
+    """Ziel einer zap_active-Zeile laut Rohausgabe (spec/10 R3)."""
+    if run.tool_norm != "zap_active":
+        return None
+    data = run.json()
+    if isinstance(data, dict) and data.get("target"):
+        return str(data["target"])[:300]
+    m = re.search(r"'url':\s*'([^']+)'", run.raw_output or "")
+    return m.group(1)[:300] if m else None
 
 
 def _scope_key(scope: str, host_ip, fqdn, domain) -> str:

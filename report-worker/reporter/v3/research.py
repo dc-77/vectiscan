@@ -110,10 +110,12 @@ def firmenname_ohne_person(text: str) -> str:
 # S6b-1 (spec/09 Q15): "Junkerwerk Linder GmbH + Co. KG" wurde zu "Junkerwerk Linder
 # GmbH + Co.", weil die Liste nur "&" kannte. Die Form mit "Co." steht deshalb als
 # Muster da: "&", "+", "u." oder "und" vor "Co.", mit oder ohne Leerzeichen und KG.
+# S6b-3 (spec/10 R16): die Rechtsform kann mit Bindestrich anschliessen
+# ("Berger EDV-Systemberatungs-GmbH").
 _RECHTSFORM_CO = re.compile(
-    r"[\s,]+(?:(?:gmbh|ag|ug|se)\s*)?(?:&|\+|u\.|und)\s*co\.?(?:\s*(?:kgaa|kg|ohg))?\.?\s*$", re.I)
+    r"(?:[\s,]+|-)(?:(?:gmbh|ag|ug|se)\s*)?(?:&|\+|u\.|und)\s*co\.?(?:\s*(?:kgaa|kg|ohg))?\.?\s*$", re.I)
 _RECHTSFORM_EINFACH = re.compile(
-    r"[\s,]+(?:gemeinnützige\s+gmbh|ggmbh|gmbh|mbh|ug\s*\(haftungsbeschränkt\)|ug|aktiengesellschaft|"
+    r"(?:[\s,]+|-)(?:gemeinnützige\s+gmbh|ggmbh|gmbh|mbh|ug\s*\(haftungsbeschränkt\)|ug|aktiengesellschaft|"
     r"ag|kgaa|kg|ohg|gbr|e\.\s?k\.|ek|e\.\s?v\.|se|partg(?:\s*mbb)?|mbb)\.?\s*$", re.I)
 
 

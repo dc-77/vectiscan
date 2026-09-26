@@ -116,6 +116,22 @@ def f_has_version(text: Any) -> bool:
     return bool(text) and bool(re.search(r"\d+\.\d+", str(text)))
 
 
+def f_spf_shared_ips(dns: Any, hosts: Any) -> list[str]:
+    """Adressen geteilter Server beim Hoster, die der SPF-Eintrag als Absender freigibt
+    (S6b-3, spec/10 R19: castenow ``a`` auf den Agenturserver 159.69.143.80)."""
+    if dns is None or getattr(dns, "spf", None) is None:
+        return []
+    shared = {h.ip for h in hosts or [] if getattr(h, "shared", None) is not None and h.shared.kind == "hoster"}
+    out: list[str] = []
+    for mech in dns.spf.mechanisms:
+        if getattr(mech, "qualifier", "+") in ("-", "~"):
+            continue
+        for ip in getattr(mech, "ips", []) or []:
+            if ip in shared and ip not in out:
+                out.append(ip)
+    return out
+
+
 def f_is_cdn(host: Any, services: Any) -> bool:
     from reporter.catalog.tables import CDN_PRODUCTS
     if host is not None and getattr(host, "cdn_provider", None):
@@ -213,6 +229,13 @@ def f_admin_fp(obj: Any) -> bool:
     return bool(ADMIN_TITLES.search(str(getattr(obj, "fp_title", "") or "")) or f_panel_title(obj))
 
 
+def f_any_admin_fp(services: Any) -> bool:
+    """Gibt sich ein Dienst des Hosts als Verwaltungsoberflaeche zu erkennen (S6b-3, spec/10 R9)?
+    Dann ist ein weiterer, nur passiv gemeldeter Port derselben Oberflaeche kein unbekanntes
+    Produkt mehr."""
+    return any(f_admin_fp(s) for s in services or [])
+
+
 def f_panel_title(obj: Any) -> bool:
     """Nennt der Seitentitel des Dienstes ein Hosting-Panel (froxlor, Plesk, cPanel ...)?
 
@@ -263,13 +286,14 @@ def f_redirects_elsewhere(fqdn: Any) -> bool:
 
 
 FUNCS: dict[str, Callable[..., Any]] = {
-    "admin_fp": f_admin_fp, "hosting_panel": f_hosting_panel, "panel_title": f_panel_title, "mx_in_own_zone": f_mx_in_own_zone,
+    "admin_fp": f_admin_fp, "any_admin_fp": f_any_admin_fp, "hosting_panel": f_hosting_panel, "panel_title": f_panel_title, "mx_in_own_zone": f_mx_in_own_zone,
     "redirects_elsewhere": f_redirects_elsewhere,
     "has_enrichment": f_has_enrichment,
     "len": f_len, "count": f_count, "any_in": f_any_in, "matches": f_matches, "any_match": f_any_match, "startswith": f_startswith,
     "contains": f_contains, "lower": f_lower, "ports": f_ports, "has_port": f_has_port,
     "days_until": f_days_until, "has_version": f_has_version, "is_cdn": f_is_cdn, "any_attr": f_any_attr,
     "all_attr": f_all_attr, "get": f_get, "first": f_first, "zap_match": f_zap_match,
+    "spf_shared_ips": f_spf_shared_ips,
 }
 
 # ---------------------------------------------------------------- Typhilfen

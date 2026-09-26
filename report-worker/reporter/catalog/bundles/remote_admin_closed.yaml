@@ -11,14 +11,7 @@ frameworks:
   iso27001: []
   tr03116: []
 positive_title: Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet erreichbar
-# S6a (Issue #30): Der Positivbefund prueft nur RDP und SMB. Steht auf einem Host FTP,
-# ein SSH-Dienst ausserhalb Port 22 mit Befund oder eine Verwaltungsoberflaeche als
-# Befund, faellt dieser Host aus dem Positivbefund heraus; ohne verbleibenden Host
-# entfaellt er. Regressionssperre: Huendgen 62c1e866 (FTP auf 21),
-# tests/v3/test_bundles.py. S6b-2: die Verwaltungspruefungen des Buendels admin_access.
-positive_conflicts:
-  - checks: [ftp_plaintext, legacy_protocols_present]
-    ports: [21]
-  - checks: [admin_service_exposed, admin_panel_hoster, admin_service_unconfirmed, admin_portal_exposed,
-             admin_service_exposed_passive]
-  - noted_by: ssh_alt_port
+# S6a (Issue #30) nahm Hosts mit FTP, SSH ausserhalb 22 oder Verwaltungsoberflaeche aus dem
+# Positivbefund. Seit dem Titel aus #30 nennt der Positivbefund nur RDP und SMB; ein anderer
+# Dienst widerspricht ihm nicht. Entscheidung DC 26.09. (S6b-3, spec/10 R6): nur ein RDP- oder
+# SMB-Port-Fakt nimmt einen Host heraus, und dann ist es ein Befund dieses Buendels.

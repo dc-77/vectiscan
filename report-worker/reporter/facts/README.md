@@ -86,6 +86,47 @@ Konfidenz: Werkzeug 1.0 (nmap: `conf/10`), abgeleitet 0.8, passiv 0.5 (0.8 wenn 
 Port bestaetigt). `observed_at`: werkzeugeigen (httpx `timestamp`, nmap `@endtime`), sonst
 `createdAt` der Zeile (Ende des Laufs), sonst Scanende aus `meta.json`.
 
+### Seit Schema 1.1.0 (S6b-3, spec/10)
+
+Minor-Bump, weil sich die Bedeutung von `http.security_headers`, `http.csp` und
+`hosts.blocked` aendert: sie beschreiben jetzt die bewertete Antwort und eine belegte Sperre.
+
+| Feld | Inhalt | Quelle |
+|---|---|---|
+| `http[].header_eval` | Messbasis der Sicherheits-Header: `basis` (final, redirect, client_error, server_error, challenge, non_html, unreachable), erste Antwort mit Status und `location`, bewertete Antwort, `complete`, fehlende und unbekannte Header | `http_headers.measure` |
+| `http[].csp` | Direktiven, `script_unsafe_inline`, `script_unsafe_eval`, `style_unsafe_inline`, `nonce_or_hash`, `wildcard_directives`, `frame_ancestors` | `http_headers.parse_csp` |
+| `http[].aspnet_version`, `http[].alerts[].param` | X-AspNet-Version, Parameter der ZAP-Meldung | header_check, ZAP |
+| `http[].wordpress.findings` | wpscan `interesting_findings` (xmlrpc, readme, wp_cron) | wpscan |
+| `tls[].cert.fingerprint_sha256`, `tls[].cert.renewal` | Fingerabdruck; Erneuerungsverlauf aus crt.sh (Zahl, typischer Abstand, Vorlauf vor Ablauf, E13) | httpx, testssl, `phase0/crtsh_raw.json` |
+| `tls[].cert_assigned_from` | Name, dessen Zertifikat fuer diesen VHost gilt (gleicher Fingerabdruck oder SAN-Deckung) | `build._assign_testssl_by_san` |
+| `tls[].cbc_obsoleted_offered` | testssl `cipherlist_OBSOLETED` | testssl |
+| `services[].cert` | nmap `ssl-cert`: Aussteller, Laufzeit, `days_left`, `expired`, `self_signed` | nmap XML |
+| `services[].kennung`, `services[].unidentified` | Kennung aus Produkt, Server, Titel, Audiostream oder Zertifikat; ohne jede Angabe bei nmap-Tabellentreffer "nicht identifiziert" | `build.service_kennung` |
+| `services[].smtp_vrfy`, `services[].auth_before_starttls` | VRFY und AUTH vor STARTTLS aus `smtp-commands` | nmap |
+| `hosts[].nmap_host_report`, `reach.status = no_response` | nmap lieferte keinen Hostbericht (mit `--open` nicht von "kein offener Port" zu trennen) | nmap, `systems.derive` |
+| `hosts[].betriebsform` | rechenzentrum, anschluss, plattform, unbekannt | AbuseIPDB `usageType`, `shared`, CDN |
+| `hosts[].serves_customer_mail`, `hosts[].serves_customer_web` | MX, SPF oder Autodiscover zeigen auf den Host; ein Kunden-VHost mit Inhalt | `systems.derive` |
+| `hosts[].reputation.abuseipdb_distinct_users`, `provider.domain` | AbuseIPDB `numDistinctUsers`, `domain` | AbuseIPDB |
+| `targets[].discovered` | Namen der Hostsuche (gobuster_dns-Teilausgabe) mit Adressen, die nicht ins Inventar kamen; Drittanbieter (Microsoft 365 Autodiscover, CNAME fremd) | `phase0/gobuster_dns.txt`, results.json |
+| `fqdns[].real_content`, `fqdns[].skipped` | Seite mit echtem Inhalt laut site_summary; Parkname (`parking`) | tech_profile |
+| `software[].conflicts` | widersprechende Kennung einer Passivquelle am selben Port | Shodan gegen nmap |
+| `coverage[].target` | Ziel des Laufs laut Rohausgabe (zap_active) | zap_active |
+| `dns[].spf.mechanisms[].ips` | aufgeloeste Adressen eines `a`- oder `mx`-Mechanismus | dnsx |
+| `dns[].zone_transfer` | je Domain aus `zone_transfer_<domain>.txt` | dig |
+| `passive[urlhaus].details.compromised` | `None` bei `no_data` (kein Negativergebnis) | URLhaus |
+| `unprocessed[]` | Beobachtungen ohne Regel: AUTH vor STARTTLS, wpscan readme und wp_cron, Versionen in Ressourcen-URLs | build |
+
+Regeln: Endseite ist nur eine 2xx-Antwort ohne `location`, als HTML und ohne Challenge-
+Marker (`x-vercel-mitigated`, `cf-mitigated`). Reihenfolge der Quellen: header_check,
+`redirect_probe` (nur bei Weiterleitung auf demselben Host, Antwort ohne `location`, HTML,
+kein Fehlertitel, Header anders als bei header_check), testssl-HTTP-Abschnitt bei Status 200
+und gleicher SNI, zuletzt Teilbelege aus wpscan und ZAP an der Endseite (`complete false`).
+Eine clientseitige Weiterleitung (heuel ose "Redirector") zaehlt als Weiterleitung. Im
+API-Snapshot fehlt `reachable` in der header_check-Zeile; eine Antwort mit Headern gilt dann
+als Messung. `blocked` nur mit belegter Sperre (403, 429 oder Challenge-Marker in der
+Rohausgabe), `waf_body_marker` allein reicht nicht (bergersysteme 198.202.211.1). POP3 ohne
+`USER` und mit leerem `SASL` vor `STLS` ist `login_disabled` (wie IMAP `LOGINDISABLED`).
+
 ### Bump-Regel (semver)
 
 - Patch: neue optionale Felder mit Default, neue Warnungstexte.

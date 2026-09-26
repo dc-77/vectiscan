@@ -82,7 +82,9 @@ def test_castenow_teilt_auf_und_laesst_nichts_weg():
     # S6b-1: 31 statt 29, weil Sachverhalte beim Hoster oder Plattformbetreiber eigene
     # Befunde sind (spec/09 Q3). S6b-2: 28, weil dane_missing bei fremder MX-Zone,
     # BREACH und ZAP-Meldungen unter Konfidenz High keinen Befund mehr tragen (Q4, Q14).
-    gesamt = 28
+    # S6b-3: 29, neu sind SPF gibt geteilten Server frei, VRFY laut Passivquelle, Port 8001
+    # ohne Kennung (spec/10 R19, R9); Header-Befunde nach der Endseite (R1, R2).
+    gesamt = 29
     assert f"Dieses Kapitel zeigt die 15 dringendsten der {gesamt} Befunde" in text_of(html)
     haupt = _abschnitt(html, "Befunde im Detail", "Weitere Sachverhalte")
     anhang = _abschnitt(html, "Weitere Sachverhalte", "ANHÄNGE")

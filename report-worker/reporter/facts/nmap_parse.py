@@ -31,6 +31,9 @@ _EGRESS_RE = re.compile(r"Hello\s+\S+\s+\[([0-9a-fA-F.:]+)\]")
 class NmapScript:
     id: str
     output: str
+    # S6b-3 (spec/10 R3): strukturierte Felder aus dem XML (``<table key>``/``<elem key>``),
+    # Schluessel als Pfad ("issuer.commonName", "validity.notAfter", "sha1").
+    elems: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass
@@ -163,7 +166,8 @@ def parse_nmap_xml(text: str | bytes | None) -> Optional[NmapRun]:
                         except ValueError:
                             np.conf = None
                 for s in p.findall("script"):
-                    np.scripts.append(NmapScript(id=s.get("id", ""), output=s.get("output", "") or ""))
+                    np.scripts.append(NmapScript(id=s.get("id", ""), output=s.get("output", "") or "",
+                                                 elems=_script_elems(s)))
                 host.ports.append(np)
         osm = h.find("os/osmatch")
         if osm is not None:
@@ -182,6 +186,25 @@ def parse_nmap_xml(text: str | bytes | None) -> Optional[NmapRun]:
         except ValueError:
             pass
     return run
+
+
+def _script_elems(script: ET.Element) -> dict[str, str]:
+    """``<table key="issuer"><elem key="commonName">YR2</elem></table>`` -> ``issuer.commonName``.
+
+    Nur die erste Ebene unter benannten Tabellen und benannte Elemente direkt am Skript;
+    Listen ohne Schluessel (Erweiterungen, SAN-Liste) bleiben im Ausgabetext."""
+    out: dict[str, str] = {}
+    for el in script.findall("elem"):
+        if el.get("key") and el.text:
+            out[el.get("key", "")] = el.text.strip()
+    for table in script.findall("table"):
+        key = table.get("key")
+        if not key:
+            continue
+        for el in table.findall("elem"):
+            if el.get("key") and el.text:
+                out.setdefault(f"{key}.{el.get('key')}", el.text.strip())
+    return out
 
 
 # ------------------------------------------------------------------ Text-Fallback
@@ -293,15 +316,47 @@ class ServiceFlags:
     cert_cn: Optional[str] = None
     cert_san: list[str] = field(default_factory=list)
     cert_not_after: Optional[str] = None
+    # S6b-3 (spec/10 R3): Aussteller, Beginn, Fingerabdruck und Selbstsignatur aus ssl-cert.
+    cert_issuer: Optional[str] = None
+    cert_not_before: Optional[str] = None
+    cert_self_signed: Optional[bool] = None
+    cert_sha1: Optional[str] = None
     egress_ip: Optional[str] = None
     # S6b-2 (spec/09 Q13): Fingerabdruck aus der Antwort des Dienstes.
     fp_server: Optional[str] = None
     fp_title: Optional[str] = None
     fp_login: Optional[bool] = None
+    # S6b-3 (spec/10 R9): Name eines Audiostreams (Shoutcast/Icecast ``icy-name``).
+    fp_stream: Optional[str] = None
+    # S6b-3 (spec/10 R19): SMTP vor STARTTLS.
+    smtp_vrfy: Optional[bool] = None
+    auth_before_starttls: Optional[bool] = None
+
+
+# Woerter aus der Satzform von nmap ("Pre-login capabilities listed; have more ...
+# post-login"), keine Faehigkeiten des Dienstes (spec/10 R14).
+_NMAP_CAP_WORDS = frozenset({"more", "have", "ok", "listed", "capabilities", "post-login", "pre-login"})
 
 
 def _tokens(text: str) -> list[str]:
     return [t for t in re.split(r"[\s,]+", text.strip()) if t]
+
+
+def capability_tokens(text: str) -> list[str]:
+    """Faehigkeiten aus pop3-/imap-capabilities ohne nmap-Satzteile und ohne das
+    Befehlskennzeichen ``A0001`` am Wortende ("LOGINDISABLEDA0001", "AUTH=PLAINA0001").
+    Ein SASL-Block mit Leerzeichen ("SASL(PLAIN LOGIN)") bleibt ein Token."""
+    text = re.sub(r"SASL\(([^)]*)\)", lambda m: "SASL(" + ",".join(m.group(1).split()) + ")", text)
+    out: list[str] = []
+    for t in text.split():
+        t = t.rstrip(";")
+        if t.lower() in _NMAP_CAP_WORDS:
+            continue
+        if len(t) > 5:
+            t = re.sub(r"A\d{4}$", "", t)
+        if t and t not in out:
+            out.append(t)
+    return out
 
 
 def derive_service_flags(port: NmapPort) -> ServiceFlags:
@@ -319,29 +374,34 @@ def derive_service_flags(port: NmapPort) -> ServiceFlags:
         out = port.script(sid)
         if out is not None:
             caps_text = out
-            toks = _tokens(out.replace("\n", " "))
+            toks = capability_tokens(out)
             f.capabilities = toks
             if any(t.upper() in ("STLS", "STARTTLS") for t in toks):
                 f.starttls = True
             elif f.starttls is None:
                 f.starttls = False
-            if any(t.upper().startswith("LOGINDISABLED") for t in toks):
+            if any(t.upper() == "LOGINDISABLED" for t in toks):
                 f.login_disabled = True
             elif sid == "imap-capabilities":
                 f.login_disabled = False
             for t in toks:
                 up = t.upper()
                 if up.startswith("AUTH="):
-                    f.auth_mechanisms.append(re.sub(r"A\d{4}$", "", up[5:]))
+                    f.auth_mechanisms.append(up[5:])
                 elif up.startswith("SASL(") and up.endswith(")"):
                     f.auth_mechanisms.extend(x for x in up[5:-1].split(",") if x)
             # S6b-2 (spec/08 Punkt 4): POP3 kennt kein LOGINDISABLED. Bietet der Dienst vor
             # STLS die Anmeldung per USER oder ein SASL-Verfahren an, nimmt er sie ohne
             # Transportverschluesselung entgegen ("SASL(PLAIN LOGIN) USER ... STLS").
+            # S6b-3 (spec/10 R7): umgekehrt sperrt ein Dienst, der vor STLS weder USER noch
+            # ein SASL-Verfahren nennt ("STLS ... SASL" mit leerer Liste), die Anmeldung vor
+            # TLS; das ist das POP3-Gegenstueck zu IMAP LOGINDISABLED.
             if sid == "pop3-capabilities" and f.starttls:
-                sasl = any(t.upper().startswith("SASL(") for t in toks)
-                if sasl or any(t.upper() == "USER" for t in toks):
+                sasl_mech = any(t.upper().startswith("SASL(") and t.upper() != "SASL()" for t in toks)
+                if sasl_mech or any(t.upper() == "USER" for t in toks):
                     f.login_disabled = False
+                else:
+                    f.login_disabled = True
     smtp = port.script("smtp-commands")
     if smtp is not None:
         caps_text = smtp
@@ -359,6 +419,12 @@ def derive_service_flags(port: NmapPort) -> ServiceFlags:
         if has_starttls and not f.auth_mechanisms:
             # AUTH wird vor STARTTLS nicht angeboten: Anmeldung nur nach TLS.
             f.login_disabled = True
+        # S6b-3 (spec/10 R19): VRFY in den EHLO-Faehigkeiten oder der Befehlsliste; AUTH vor
+        # STARTTLS nur ohne impliziten TLS-Tunnel (auf 465 laeuft EHLO schon verschluesselt).
+        commands = smtp.split("Commands supported", 1)[1] if "Commands supported" in smtp else ""
+        f.smtp_vrfy = bool(re.search(r"\bVRFY\b", ehlo.upper() + " " + commands.upper()))
+        if has_starttls and not f.tunnel_ssl:
+            f.auth_before_starttls = bool(f.auth_mechanisms)
     mysql = port.script("mysql-info")
     if mysql is not None:
         m = re.search(r"Auth Plugin Name:\s*(\S+)", mysql)
@@ -394,10 +460,62 @@ def derive_service_flags(port: NmapPort) -> ServiceFlags:
         m = re.search(r"Not valid after:\s*(\S+)", cert)
         if m:
             f.cert_not_after = iso_utc(m.group(1))
+        m = re.search(r"Not valid before:\s*(\S+)", cert)
+        if m:
+            f.cert_not_before = iso_utc(m.group(1))
+        _cert_details(f, port)
     fp = _fingerprint(port)
     f.fp_server, f.fp_title, f.fp_login = fp
+    f.fp_stream = _stream_name(port)
+    if not f.fp_server:
+        f.fp_server = _stream_server(port)
     _ = caps_text
     return f
+
+
+def _cert_details(f: ServiceFlags, port: NmapPort) -> None:
+    """Aussteller, Fingerabdruck und Selbstsignatur aus ssl-cert (XML-Tabellen, sonst Text)."""
+    script = next((s for s in port.scripts if s.id == "ssl-cert"), None)
+    if script is None:
+        return
+    el = script.elems
+    text = script.output or ""
+    issuer = el.get("issuer.commonName") or el.get("issuer.organizationName")
+    if not issuer:
+        m = re.search(r"Issuer:\s*commonName=([^/\n,]+)", text)
+        issuer = m.group(1).strip() if m else None
+    f.cert_issuer = issuer
+    subject = (el.get("subject.commonName"), el.get("subject.organizationName"))
+    issuer_pair = (el.get("issuer.commonName"), el.get("issuer.organizationName"))
+    if any(subject) and any(issuer_pair):
+        f.cert_self_signed = subject == issuer_pair
+    sha1 = el.get("sha1")
+    if not sha1:
+        m = re.search(r"SHA-1:\s*([0-9a-fA-F ]{40,})", text)
+        sha1 = m.group(1).replace(" ", "") if m else None
+    f.cert_sha1 = sha1.replace(" ", "").lower() if sha1 else None
+    if not f.cert_not_before and el.get("validity.notBefore"):
+        f.cert_not_before = iso_utc(el["validity.notBefore"])
+    if not f.cert_not_after and el.get("validity.notAfter"):
+        f.cert_not_after = iso_utc(el["validity.notAfter"])
+
+
+_ICY_NAME_RE = re.compile(r"^icy-name:\s*([^\n]{1,80})", re.M | re.I)
+_ICY_SERVER_RE = re.compile(r"^icy-notice2:\s*(Shoutcast[^<\n/]*?)(?:/[^\n<]*?)?\s+v?(\d+(?:\.\d+)+)", re.M | re.I)
+
+
+def _stream_name(port: NmapPort) -> Optional[str]:
+    """Name eines Audiostreams aus dem Antwortkopf (``icy-name``), spec/10 R9 (castenow 8000)."""
+    m = _ICY_NAME_RE.search(_fp_text(port.servicefp))
+    return m.group(1).strip() if m else None
+
+
+def _stream_server(port: NmapPort) -> Optional[str]:
+    """Shoutcast nennt sich nicht im Kopf ``Server``, sondern in ``icy-notice2``."""
+    m = _ICY_SERVER_RE.search(_fp_text(port.servicefp))
+    if not m:
+        return None
+    return f"{m.group(1).strip()} {m.group(2)}"
 
 
 def _fp_text(servicefp: Optional[str]) -> str:
@@ -406,7 +524,8 @@ def _fp_text(servicefp: Optional[str]) -> str:
         return ""
     text = servicefp.replace("\\r\\n", "\n").replace("\\n", "\n")
     text = re.sub(r"\\x([0-9a-fA-F]{2})", lambda m: chr(int(m.group(1), 16)), text)
-    return text.replace('\\"', '"')
+    # nmap maskiert Sonderzeichen im Fingerprint ("tonausstrom\.de", "posix\(linux").
+    return re.sub(r"\\([^\w\s])", r"\1", text.replace('\\"', '"'))
 
 
 _FP_SERVER_RE = re.compile(r"^Server:\s*([^\n]{1,120})", re.M | re.I)
@@ -429,6 +548,11 @@ def _fingerprint(port: NmapPort) -> tuple[Optional[str], Optional[str], Optional
         m = _FP_SERVER_RE.search(fp)
         server = m.group(1).strip() if m else ""
     title = (port.script("http-title") or "").splitlines()[0].strip() if port.script("http-title") else ""
+    # S6b-3 (spec/10 R14): die Textausgabe kuerzt lange Titel mitten im Wort ("Web Applications
+    # Po..."), das XML-Element traegt den vollen Titel.
+    voll = next((sc.elems.get("title") for sc in port.scripts if sc.id == "http-title" and sc.elems.get("title")), None)
+    if voll and title.endswith("...") and voll.strip().startswith(title[:-3].strip()):
+        title = voll.strip()
     if title.lower().startswith(("did not follow redirect", "site doesn't have a title")):
         # nmap meldet eine Weiterleitung als Titel; das ist keine Seite des Dienstes.
         title = ""

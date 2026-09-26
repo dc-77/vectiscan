@@ -39,6 +39,54 @@
     }
    },
    "coverage_default": "ok"
+  },
+  {
+   "name": "Port 4433 ohne Kennung am Anschluss des Kunden und im Rechenzentrum (spec/10 R13)",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.0.7",
+      "betriebsform": "anschluss"
+     },
+     {
+      "ip": "10.0.0.8",
+      "betriebsform": "rechenzentrum"
+     }
+    ],
+    "services": [
+     {
+      "host_ip": "10.0.0.7",
+      "port": 4433,
+      "service": "https-alt",
+      "tunnel_ssl": true
+     },
+     {
+      "host_ip": "10.0.0.8",
+      "port": 4433,
+      "service": "https-alt",
+      "tunnel_ssl": true
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "10.0.0.7:4433": [
+      "meaning[0]"
+     ],
+     "10.0.0.8:4433": [
+      "meaning[1]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.7:4433": [
+      "meaning[1]"
+     ],
+     "10.0.0.8:4433": [
+      "meaning[0]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
   }
  ]
 }

@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "passive": [
+   {"host_ip": "203.0.113.5", "port": 443, "source": "shodan", "product": "Apache httpd",
+    "verified": false, "confidence": 0.5}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "203.0.113.5",
+  "affected": [],
+  "positive": false
+ }
+}

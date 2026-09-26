@@ -77,6 +77,8 @@ ERLAUBT: tuple[tuple[str, str], ...] = (
     # nie den Kunden; (Q10) die Einschraenkungstabelle nennt die betroffenen Pruefungen.
     ("IP-Adresse Hostnamen Betrieb / Rolle", "Spalte heisst jetzt Netzbetreiber / Rolle"),
     ("IP-Adresse Hostnamen Netzbetreiber / Rolle", "Spalte heisst jetzt Netzbetreiber / Rolle"),
+    # S6b-3 (spec/10 R16): die Quelle des Netzbetreibers steht im Spaltenkopf.
+    ("IP-Adresse Hostnamen Netzbetreiber (laut RIPE) / Rolle", "Spalte nennt die Quelle RIPE"),
     ("Einschränkung Auswirkung auf die Ergebnisse", "neue Spalte Betroffene Pruefungen"),
     ("Einschränkung Betroffene Prüfungen Auswirkung", "neue Spalte Betroffene Pruefungen"),
 )

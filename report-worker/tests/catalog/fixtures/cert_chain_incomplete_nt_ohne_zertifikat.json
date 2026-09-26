@@ -1,0 +1,28 @@
+{
+  "facts": {
+    "tls": [
+      {
+        "host_ip": "10.0.0.1",
+        "fqdn": "www.example.test",
+        "port": 443,
+        "source": "testssl",
+        "protocols": {
+          "SSLv2": false,
+          "SSLv3": false,
+          "TLS1.0": false,
+          "TLS1.1": false,
+          "TLS1.2": true,
+          "TLS1.3": true
+        },
+        "cert": null
+      }
+    ]
+  },
+  "coverage_default": "ok",
+  "expect": {
+    "status": "not_testable",
+    "group_key": "www.example.test@10.0.0.1",
+    "reason_code": "cert_unknown",
+    "positive": false
+  }
+}

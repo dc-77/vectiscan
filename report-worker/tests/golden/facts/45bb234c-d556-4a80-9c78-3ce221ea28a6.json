@@ -24,6 +24,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "certspotter"
   },
   {
@@ -49,6 +50,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "crtsh"
   },
   {
@@ -74,6 +76,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "crtsh"
   },
   {
@@ -99,6 +102,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "crtsh"
   },
   {
@@ -124,6 +128,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dns_records"
   },
   {
@@ -149,6 +154,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "dnsx"
   },
   {
@@ -174,6 +180,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "failed",
+   "target": null,
    "tool": "gobuster_dns"
   },
   {
@@ -199,6 +206,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "subfinder"
   },
   {
@@ -224,6 +232,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "web_probe"
   },
   {
@@ -249,6 +258,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "nmap"
   },
   {
@@ -274,6 +284,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -299,6 +310,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -324,6 +336,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -349,6 +362,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -374,6 +388,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wafw00f"
   },
   {
@@ -399,6 +414,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "webtech"
   },
   {
@@ -424,6 +440,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -449,6 +466,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -474,6 +492,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -499,6 +518,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -524,6 +544,7 @@
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "header_check"
   },
   {
@@ -549,6 +570,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -574,6 +596,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -599,6 +622,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -624,6 +648,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -649,6 +674,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "httpx"
   },
   {
@@ -674,6 +700,7 @@
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "wpscan"
   },
   {
@@ -699,6 +726,7 @@
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
+   "target": null,
    "tool": "phase3_correlation"
   }
  ],
@@ -1014,6 +1042,7 @@
     "all_qualifier": "-all",
     "mechanisms": [
      {
+      "ips": [],
       "kind": "mx",
       "qualifier": "+",
       "value": null
@@ -1055,7 +1084,9 @@
    "mode": "active",
    "name": "dev.trunk-immobilien.de",
    "observed_at": "2026-05-10T22:28:38Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -1086,7 +1117,9 @@
    "mode": "active",
    "name": "ftp.trunk-immobilien.de",
    "observed_at": "2026-05-10T22:28:38Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -1117,7 +1150,9 @@
    "mode": "active",
    "name": "trunk-immobilien.de",
    "observed_at": "2026-05-10T22:28:38Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -1148,7 +1183,9 @@
    "mode": "active",
    "name": "webmail.trunk-immobilien.de",
    "observed_at": "2026-05-10T22:28:38Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -1179,7 +1216,9 @@
    "mode": "active",
    "name": "www.trunk-immobilien.de",
    "observed_at": "2026-05-10T22:28:38Z",
+   "real_content": null,
    "screenshot_key": null,
+   "skipped": null,
    "source": "web_probe",
    "title": null,
    "waf": {
@@ -1214,6 +1253,7 @@
  },
  "hosts": [
   {
+   "betriebsform": "rechenzentrum",
    "blocked": {
     "detected": false,
     "reason": null,
@@ -1245,6 +1285,7 @@
    "id": "host:5.199.141.24",
    "ip": "5.199.141.24",
    "mode": "active",
+   "nmap_host_report": true,
    "nmap_state": "up",
    "observed_at": "2026-05-10T22:30:04Z",
    "ports_summary": {
@@ -1254,12 +1295,14 @@
    },
    "provider": {
     "country": "DE",
+    "domain": "wiit.cloud",
     "isp": "WIIT AG",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
    "reach": null,
    "reachable": true,
    "reputation": {
+    "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
@@ -1270,6 +1313,8 @@
     "urlhaus_compromised": null
    },
    "reverse": "home4.publishsoft.de",
+   "serves_customer_mail": false,
+   "serves_customer_web": false,
    "shared": {
     "evidence": [
      {
@@ -1306,13 +1351,27 @@
  "http": [
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
-   "csp": null,
+   "csp": {
+    "directives": {},
+    "frame_ancestors": null,
+    "nonce_or_hash": null,
+    "present": false,
+    "script_unsafe_eval": null,
+    "script_unsafe_inline": null,
+    "style_unsafe_inline": null,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null,
+    "wildcard_directives": []
+   },
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "dev.trunk-immobilien.de: score=0/7 server=nginx",
+     "excerpt": "dev.trunk-immobilien.de: status=200 score=0/7 server=nginx",
      "ref": "scan_results:header_check:5.199.141.24",
      "tool": "header_check"
     },
@@ -1324,6 +1383,69 @@
    ],
    "forms": [],
    "fqdn": "dev.trunk-immobilien.de",
+   "header_eval": {
+    "basis": "final",
+    "complete": true,
+    "evaluated": {
+     "challenge": null,
+     "content_type": "text/html; charset=UTF-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://dev.trunk-immobilien.de"
+    },
+    "first": {
+     "challenge": null,
+     "content_type": "text/html; charset=UTF-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://dev.trunk-immobilien.de"
+    },
+    "framing_protected": false,
+    "headers": {
+     "content-security-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://dev.trunk-immobilien.de",
+      "value": null
+     },
+     "permissions-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://dev.trunk-immobilien.de",
+      "value": null
+     },
+     "referrer-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://dev.trunk-immobilien.de",
+      "value": null
+     },
+     "x-content-type-options": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://dev.trunk-immobilien.de",
+      "value": null
+     },
+     "x-frame-options": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://dev.trunk-immobilien.de",
+      "value": null
+     }
+    },
+    "missing": [
+     "x-frame-options",
+     "x-content-type-options",
+     "referrer-policy",
+     "permissions-policy",
+     "content-security-policy"
+    ],
+    "unknown": []
+   },
    "headers": {
     "accept-ranges": "bytes",
     "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
@@ -1348,10 +1470,6 @@
    "reachable": true,
    "score": "0/7",
    "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
     "permissions-policy": {
      "present": false,
      "value": null
@@ -1360,19 +1478,11 @@
      "present": false,
      "value": null
     },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
     "x-content-type-options": {
      "present": false,
      "value": null
     },
     "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
      "present": false,
      "value": null
     }
@@ -1429,6 +1539,7 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": null,
@@ -1447,6 +1558,16 @@
    ],
    "forms": [],
    "fqdn": "ftp.trunk-immobilien.de",
+   "header_eval": {
+    "basis": "unreachable",
+    "complete": false,
+    "evaluated": null,
+    "first": null,
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {},
    "host_ip": "5.199.141.24",
    "hsts": null,
@@ -1458,36 +1579,7 @@
    "powered_by": null,
    "reachable": true,
    "score": "0/7",
-   "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
-    "permissions-policy": {
-     "present": false,
-     "value": null
-    },
-    "referrer-policy": {
-     "present": false,
-     "value": null
-    },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
-    "x-content-type-options": {
-     "present": false,
-     "value": null
-    },
-    "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
-    }
-   },
+   "security_headers": {},
    "server_header": null,
    "source": "header_check",
    "spider_url_count": null,
@@ -1504,13 +1596,14 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": null,
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "trunk-immobilien.de: score=0/7 server=nginx",
+     "excerpt": "trunk-immobilien.de: status=301 location=https://www.trunk-immobilien.de/ score=0/7 server=nginx",
      "ref": "scan_results:header_check:5.199.141.24",
      "tool": "header_check"
     },
@@ -1522,6 +1615,24 @@
    ],
    "forms": [],
    "fqdn": "trunk-immobilien.de",
+   "header_eval": {
+    "basis": "redirect",
+    "complete": false,
+    "evaluated": null,
+    "first": {
+     "challenge": null,
+     "content_type": "text/html",
+     "location": "https://www.trunk-immobilien.de/",
+     "status_basis": "httpx_chain",
+     "status_code": 301,
+     "tool": "header_check",
+     "url": "https://trunk-immobilien.de"
+    },
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {
     "content-length": "162",
     "content-type": "text/html",
@@ -1539,36 +1650,7 @@
    "powered_by": null,
    "reachable": true,
    "score": "0/7",
-   "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
-    "permissions-policy": {
-     "present": false,
-     "value": null
-    },
-    "referrer-policy": {
-     "present": false,
-     "value": null
-    },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
-    "x-content-type-options": {
-     "present": false,
-     "value": null
-    },
-    "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
-    }
-   },
+   "security_headers": {},
    "server_header": "nginx",
    "source": "header_check",
    "spider_url_count": null,
@@ -1614,6 +1696,7 @@
    "url": "https://trunk-immobilien.de",
    "wordpress": {
     "core_vulnerabilities": null,
+    "findings": [],
     "release_date": null,
     "users": [],
     "users_found_by": [],
@@ -1624,6 +1707,7 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
    "csp": null,
@@ -1642,6 +1726,16 @@
    ],
    "forms": [],
    "fqdn": "webmail.trunk-immobilien.de",
+   "header_eval": {
+    "basis": "unreachable",
+    "complete": false,
+    "evaluated": null,
+    "first": null,
+    "framing_protected": null,
+    "headers": {},
+    "missing": [],
+    "unknown": []
+   },
    "headers": {},
    "host_ip": "5.199.141.24",
    "hsts": null,
@@ -1653,36 +1747,7 @@
    "powered_by": null,
    "reachable": true,
    "score": "0/7",
-   "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
-    "permissions-policy": {
-     "present": false,
-     "value": null
-    },
-    "referrer-policy": {
-     "present": false,
-     "value": null
-    },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
-    "x-content-type-options": {
-     "present": false,
-     "value": null
-    },
-    "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
-     "present": false,
-     "value": null
-    }
-   },
+   "security_headers": {},
    "server_header": null,
    "source": "header_check",
    "spider_url_count": null,
@@ -1699,13 +1764,27 @@
   },
   {
    "alerts": [],
+   "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
-   "csp": null,
+   "csp": {
+    "directives": {},
+    "frame_ancestors": null,
+    "nonce_or_hash": null,
+    "present": false,
+    "script_unsafe_eval": null,
+    "script_unsafe_inline": null,
+    "style_unsafe_inline": null,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null,
+    "wildcard_directives": []
+   },
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "www.trunk-immobilien.de: score=0/7 server=nginx",
+     "excerpt": "www.trunk-immobilien.de: status=200 score=0/7 server=nginx",
      "ref": "scan_results:header_check:5.199.141.24",
      "tool": "header_check"
     },
@@ -1717,6 +1796,69 @@
    ],
    "forms": [],
    "fqdn": "www.trunk-immobilien.de",
+   "header_eval": {
+    "basis": "final",
+    "complete": true,
+    "evaluated": {
+     "challenge": null,
+     "content_type": "text/html; charset=UTF-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://www.trunk-immobilien.de"
+    },
+    "first": {
+     "challenge": null,
+     "content_type": "text/html; charset=UTF-8",
+     "location": null,
+     "status_basis": "httpx_chain",
+     "status_code": 200,
+     "tool": "header_check",
+     "url": "https://www.trunk-immobilien.de"
+    },
+    "framing_protected": false,
+    "headers": {
+     "content-security-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://www.trunk-immobilien.de",
+      "value": null
+     },
+     "permissions-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://www.trunk-immobilien.de",
+      "value": null
+     },
+     "referrer-policy": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://www.trunk-immobilien.de",
+      "value": null
+     },
+     "x-content-type-options": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://www.trunk-immobilien.de",
+      "value": null
+     },
+     "x-frame-options": {
+      "present": false,
+      "tool": "header_check",
+      "url": "https://www.trunk-immobilien.de",
+      "value": null
+     }
+    },
+    "missing": [
+     "x-frame-options",
+     "x-content-type-options",
+     "referrer-policy",
+     "permissions-policy",
+     "content-security-policy"
+    ],
+    "unknown": []
+   },
    "headers": {
     "cache-control": "max-age=2592000",
     "content-type": "text/html; charset=UTF-8",
@@ -1737,10 +1879,6 @@
    "reachable": true,
    "score": "0/7",
    "security_headers": {
-    "content-security-policy": {
-     "present": false,
-     "value": null
-    },
     "permissions-policy": {
      "present": false,
      "value": null
@@ -1749,19 +1887,11 @@
      "present": false,
      "value": null
     },
-    "strict-transport-security": {
-     "present": false,
-     "value": null
-    },
     "x-content-type-options": {
      "present": false,
      "value": null
     },
     "x-frame-options": {
-     "present": false,
-     "value": null
-    },
-    "x-xss-protection": {
      "present": false,
      "value": null
     }
@@ -1877,7 +2007,9 @@
   {
    "banner_excerpt": "SSH-2.0-OpenSSH_7.4 Key type: ssh-rsa Key: AAAAB3NzaC1yc2EAAAADAQABAAABAQDvVHOShuv3M7hVBiAlcUmwohKajfK7vK3WPrHB+JVXeGUu xxctyEO8rd3Nte9uPPe79MOJWi9b8zf5bAZ/2...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "ssh_software": "OpenSSH_7.4"
+   },
    "domain": null,
    "evidence": [
     {
@@ -1908,7 +2040,10 @@
   {
    "banner_excerpt": "220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-STARTTLS 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOG...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "smtp_auth_before_starttls": true,
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -2063,7 +2198,9 @@
   {
    "banner_excerpt": "220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN 250-ENHANC...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -2094,7 +2231,10 @@
   {
    "banner_excerpt": "220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-STARTTLS 250-ENHANCEDSTATUSCODES 250-8BITMIME 2...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "smtp_auth_before_starttls": false,
+    "smtp_vrfy": false
+   },
    "domain": null,
    "evidence": [
     {
@@ -2293,18 +2433,25 @@
    }
   ]
  },
- "schema_version": "1.0.7",
+ "schema_version": "1.1.0",
  "services": [
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "home4.publishsoft.de",
+    "days_left": 46,
+    "expired": false,
+    "fingerprint_sha1": "416b0a1812ebc74c43ac45e1e35a080185385bb1",
+    "issuer": "R13",
     "not_after": "2026-06-26T08:35:55Z",
+    "not_before": "2026-03-28T08:35:56Z",
     "san": [
      "home4.publishsoft.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2320,6 +2467,7 @@
    "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:21/tcp",
+   "kennung": "ProFTPD",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2330,15 +2478,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ftp",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -2357,6 +2508,7 @@
    "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:22/tcp",
+   "kennung": "OpenSSH 7.4",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2367,15 +2519,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ssh",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "7.4",
    "version_raw": "7.4"
   },
   {
+   "auth_before_starttls": true,
    "auth_mechanisms": [
     "CRAM-MD5",
     "DIGEST-MD5",
@@ -2397,10 +2552,16 @@
    ],
    "cert": {
     "cn": "home4.publishsoft.de",
+    "days_left": 46,
+    "expired": false,
+    "fingerprint_sha1": "416b0a1812ebc74c43ac45e1e35a080185385bb1",
+    "issuer": "R13",
     "not_after": "2026-06-26T08:35:55Z",
+    "not_before": "2026-03-28T08:35:56Z",
     "san": [
      "home4.publishsoft.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2421,6 +2582,7 @@
    "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:25/tcp",
+   "kennung": "Postfix smtpd",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2431,15 +2593,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_vrfy": false,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
@@ -2458,6 +2623,7 @@
    "fp_title": "Default Parallels Plesk Page",
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:80/tcp",
+   "kennung": "nginx, Titel „Default Parallels Plesk Page“",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2468,25 +2634,30 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
-   "auth_mechanisms": [],
-   "auth_required": null,
+   "auth_before_starttls": null,
+   "auth_mechanisms": [
+    "CRAM-MD5",
+    "DIGEST-MD5",
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
    "capabilities": [
     "APOP",
     "AUTH-RESP-CODE",
     "USER",
-    "SASL(PLAIN",
-    "LOGIN",
-    "DIGEST-MD5",
-    "CRAM-MD5)",
+    "SASL(PLAIN,LOGIN,DIGEST-MD5,CRAM-MD5)",
     "STLS",
     "UIDL",
     "TOP",
@@ -2496,10 +2667,16 @@
    ],
    "cert": {
     "cn": "home4.publishsoft.de",
+    "days_left": 46,
+    "expired": false,
+    "fingerprint_sha1": "416b0a1812ebc74c43ac45e1e35a080185385bb1",
+    "issuer": "R13",
     "not_after": "2026-06-26T08:35:55Z",
+    "not_before": "2026-03-28T08:35:56Z",
     "san": [
      "home4.publishsoft.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2520,6 +2697,7 @@
    "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:110/tcp",
+   "kennung": "Dovecot pop3d",
    "login_disabled": false,
    "method": "probed",
    "mode": "active",
@@ -2530,15 +2708,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "pop3",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": false,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "CRAM-MD5",
     "DIGEST-MD5",
@@ -2547,19 +2728,12 @@
    ],
    "auth_required": true,
    "capabilities": [
-    "OK",
-    "listed",
     "IDLE",
     "AUTH=LOGIN",
-    "capabilities",
     "ID",
-    "post-login",
     "SASL-IR",
-    "more",
-    "have",
     "LITERAL+",
-    "AUTH=CRAM-MD5A0001",
-    "Pre-login",
+    "AUTH=CRAM-MD5",
     "IMAP4rev1",
     "AUTH=PLAIN",
     "ENABLE",
@@ -2569,10 +2743,16 @@
    ],
    "cert": {
     "cn": "home4.publishsoft.de",
+    "days_left": 46,
+    "expired": false,
+    "fingerprint_sha1": "416b0a1812ebc74c43ac45e1e35a080185385bb1",
+    "issuer": "R13",
     "not_after": "2026-06-26T08:35:55Z",
+    "not_before": "2026-03-28T08:35:56Z",
     "san": [
      "home4.publishsoft.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2593,6 +2773,7 @@
    "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:143/tcp",
+   "kennung": "Dovecot imapd",
    "login_disabled": false,
    "method": "probed",
    "mode": "active",
@@ -2603,24 +2784,33 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "imap",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": false,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "home4.publishsoft.de",
+    "days_left": 46,
+    "expired": false,
+    "fingerprint_sha1": "416b0a1812ebc74c43ac45e1e35a080185385bb1",
+    "issuer": "R13",
     "not_after": "2026-06-26T08:35:55Z",
+    "not_before": "2026-03-28T08:35:56Z",
     "san": [
      "home4.publishsoft.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2636,6 +2826,7 @@
    "fp_title": "Default Parallels Plesk Page",
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:443/tcp",
+   "kennung": "nginx, Titel „Default Parallels Plesk Page“",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2646,15 +2837,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "CRAM-MD5",
     "DIGEST-MD5",
@@ -2675,10 +2869,16 @@
    ],
    "cert": {
     "cn": "home4.publishsoft.de",
+    "days_left": 46,
+    "expired": false,
+    "fingerprint_sha1": "416b0a1812ebc74c43ac45e1e35a080185385bb1",
+    "issuer": "R13",
     "not_after": "2026-06-26T08:35:55Z",
+    "not_before": "2026-03-28T08:35:56Z",
     "san": [
      "home4.publishsoft.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2699,6 +2899,7 @@
    "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:465/tcp",
+   "kennung": "Postfix smtpd",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2709,15 +2910,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_vrfy": false,
    "source": "nmap",
    "starttls": false,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": false,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [
@@ -2733,10 +2937,16 @@
    ],
    "cert": {
     "cn": "home4.publishsoft.de",
+    "days_left": 46,
+    "expired": false,
+    "fingerprint_sha1": "416b0a1812ebc74c43ac45e1e35a080185385bb1",
+    "issuer": "R13",
     "not_after": "2026-06-26T08:35:55Z",
+    "not_before": "2026-03-28T08:35:56Z",
     "san": [
      "home4.publishsoft.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2757,6 +2967,7 @@
    "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:587/tcp",
+   "kennung": "Postfix smtpd",
    "login_disabled": true,
    "method": "probed",
    "mode": "active",
@@ -2767,15 +2978,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_vrfy": false,
    "source": "nmap",
    "starttls": true,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "CRAM-MD5",
     "DIGEST-MD5",
@@ -2784,18 +2998,11 @@
    ],
    "auth_required": true,
    "capabilities": [
-    "OK",
-    "listed",
     "IDLE",
     "AUTH=LOGIN",
-    "capabilities",
     "ID",
-    "post-login",
     "SASL-IR",
-    "more",
-    "have",
-    "AUTH=CRAM-MD5A0001",
-    "Pre-login",
+    "AUTH=CRAM-MD5",
     "IMAP4rev1",
     "LITERAL+",
     "ENABLE",
@@ -2805,10 +3012,16 @@
    ],
    "cert": {
     "cn": "home4.publishsoft.de",
+    "days_left": 46,
+    "expired": false,
+    "fingerprint_sha1": "416b0a1812ebc74c43ac45e1e35a080185385bb1",
+    "issuer": "R13",
     "not_after": "2026-06-26T08:35:55Z",
+    "not_before": "2026-03-28T08:35:56Z",
     "san": [
      "home4.publishsoft.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2829,6 +3042,7 @@
    "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:993/tcp",
+   "kennung": "Dovecot imapd",
    "login_disabled": false,
    "method": "probed",
    "mode": "active",
@@ -2839,25 +3053,30 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "imap",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": false,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
-   "auth_mechanisms": [],
-   "auth_required": null,
+   "auth_before_starttls": null,
+   "auth_mechanisms": [
+    "CRAM-MD5",
+    "DIGEST-MD5",
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
    "capabilities": [
     "APOP",
     "AUTH-RESP-CODE",
     "USER",
-    "SASL(PLAIN",
-    "LOGIN",
-    "DIGEST-MD5",
-    "CRAM-MD5)",
+    "SASL(PLAIN,LOGIN,DIGEST-MD5,CRAM-MD5)",
     "UIDL",
     "TOP",
     "RESP-CODES",
@@ -2866,10 +3085,16 @@
    ],
    "cert": {
     "cn": "home4.publishsoft.de",
+    "days_left": 46,
+    "expired": false,
+    "fingerprint_sha1": "416b0a1812ebc74c43ac45e1e35a080185385bb1",
+    "issuer": "R13",
     "not_after": "2026-06-26T08:35:55Z",
+    "not_before": "2026-03-28T08:35:56Z",
     "san": [
      "home4.publishsoft.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2890,6 +3115,7 @@
    "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:995/tcp",
+   "kennung": "Dovecot pop3d",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2900,15 +3126,18 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "pop3",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": false,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [
     "mysql_native_password"
    ],
@@ -2934,6 +3163,7 @@
    "fp_title": null,
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:3306/tcp",
+   "kennung": "MySQL 5.5.68-MariaDB",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2944,24 +3174,33 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "mysql",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
+   "unidentified": false,
    "version_norm": "5.5.68",
    "version_raw": "5.5.68-MariaDB"
   },
   {
+   "auth_before_starttls": null,
    "auth_mechanisms": [],
    "auth_required": null,
    "capabilities": [],
    "cert": {
     "cn": "home4.publishsoft.de",
+    "days_left": 46,
+    "expired": false,
+    "fingerprint_sha1": "416b0a1812ebc74c43ac45e1e35a080185385bb1",
+    "issuer": "R13",
     "not_after": "2026-06-26T08:35:55Z",
+    "not_before": "2026-03-28T08:35:56Z",
     "san": [
      "home4.publishsoft.de"
-    ]
+    ],
+    "self_signed": false
    },
    "confidence": 1.0,
    "evidence": [
@@ -2977,6 +3216,7 @@
    "fp_title": "publishsoft LINUX Kundenserver",
    "host_ip": "5.199.141.24",
    "id": "svc:5.199.141.24:8443/tcp",
+   "kennung": "sw-cp-server",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -2987,11 +3227,13 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "https-alt",
+   "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   }
@@ -3000,6 +3242,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3059,6 +3302,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3103,6 +3347,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3157,6 +3402,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3201,6 +3447,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "webtech"
    ],
@@ -3240,6 +3487,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap",
     "webtech"
@@ -3290,6 +3538,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3344,6 +3593,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "nmap"
    ],
@@ -3388,6 +3638,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "cms_fingerprint",
     "webtech"
@@ -3433,6 +3684,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -3472,6 +3724,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -3511,6 +3764,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -3550,6 +3804,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -3589,6 +3844,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -3628,6 +3884,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -3673,6 +3930,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -3712,6 +3970,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -3757,6 +4016,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -3796,6 +4056,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -3835,6 +4096,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -3879,6 +4141,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -3918,6 +4181,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -3957,6 +4221,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -3996,6 +4261,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4035,6 +4301,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4074,6 +4341,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -4119,6 +4387,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4158,6 +4427,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4197,6 +4467,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4236,6 +4507,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4280,6 +4552,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4319,6 +4592,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4358,6 +4632,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4397,6 +4672,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4436,6 +4712,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4475,6 +4752,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check",
     "httpx"
@@ -4520,6 +4798,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4559,6 +4838,7 @@
   {
    "build": null,
    "confidence": 1.0,
+   "conflicts": [],
    "detection_sources": [
     "header_check"
    ],
@@ -4598,6 +4878,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4637,6 +4918,7 @@
   {
    "build": null,
    "confidence": 0.8,
+   "conflicts": [],
    "detection_sources": [
     "httpx"
    ],
@@ -4677,6 +4959,8 @@
  "targets": [
   {
    "confidence": 1.0,
+   "discovered": [],
+   "discovered_total": null,
    "discovery_health": null,
    "domain": "trunk-immobilien.de",
    "evidence": [
@@ -4700,21 +4984,25 @@
  "tls": [
   {
    "assigned_from": null,
+   "cbc_obsoleted_offered": null,
    "cert": {
     "chain_ok": null,
     "cn": "home4.publishsoft.de",
     "days_left": 46,
     "expired": false,
+    "fingerprint_sha256": "6589c368b0470a57e227608506d960dc0bfb700642d5da1adbba70323bcd9994",
     "issuer": "R13",
     "mismatch": true,
     "not_after": "2026-06-26T08:35:55Z",
     "not_before": "2026-03-28T08:35:56Z",
+    "renewal": null,
     "san": [
      "home4.publishsoft.de"
     ],
     "self_signed": null,
     "wildcard": false
    },
+   "cert_assigned_from": null,
    "ciphers_weak": [],
    "confidence": 1.0,
    "entries": [],
@@ -4747,6 +5035,45 @@
    "vulns": []
   }
  ],
- "unprocessed": [],
+ "unprocessed": [
+  {
+   "confidence": 0.8,
+   "count": 1,
+   "evidence": [
+    {
+     "excerpt": "CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "unp:smtp_auth_before_starttls:22f105f9",
+   "kind": "smtp_auth_before_starttls",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:38Z",
+   "source": "nmap",
+   "what": "5.199.141.24:25 AUTH vor STARTTLS"
+  },
+  {
+   "confidence": 0.8,
+   "count": 1,
+   "evidence": [
+    {
+     "excerpt": "220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-STARTTLS 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOG...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "unp:smtp_auth_before_starttls:d8fa0c58",
+   "kind": "smtp_auth_before_starttls",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:38Z",
+   "source": "shodan",
+   "what": "5.199.141.24:25 AUTH vor STARTTLS laut Passivquelle"
+  }
+ ],
  "warnings": []
 }

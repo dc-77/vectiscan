@@ -3,6 +3,7 @@
  "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
  "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben.",
  "hinweis_s6b2": "S6b-2 hat fuenf Markierungen aufgeloest: Q13 SonicWall 4433 laut Passivquelle mit Kennung als Exposition erhoeht, erste Empfehlung die Pruefung; Q4 dane_missing fuer .de und .hu entfaellt, TRACE aus der OPTIONS-Antwort nur als Werkzeugmeldung, SSH-Banner, MariaDB-Handshake und PostgreSQL-Untergrenze sind keine Versionspreisgabe. Es bleiben zwei Q8-Markierungen (S6c).",
+ "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Positivaussagen: tls_weak_ciphers autodiscover.junkerwerk.de (R6 (CBC-Verfahren angeboten)); tls_weak_ciphers cloud.junkerwerk.de (+team.junkerwerk.de) (R6 (CBC-Verfahren angeboten)); tls_weak_ciphers outlook.junkerwerk.de (R6 (CBC-Verfahren angeboten)); urlhaus_compromise junkerwerk.de, junkerwerk.hu (R6 (URLhaus no_data ist kein Negativergebnis)). Q8 nach Entscheidung DC 1 aufgelöst (R1, Messung an der Endseite oder nicht prüfbar): VS-2026-028 security_headers_incomplete|autodiscover.junkerwerk.de; VS-2026-030 security_headers_incomplete|outlook.junkerwerk.de.",
  "strict": false,
  "orders": {
   "main": "31d67a02-b485-4d05-b228-dbdde092cc68"
@@ -147,8 +148,8 @@
    "checks": [
     "security_headers_incomplete"
    ],
-   "spec09": "Q8",
-   "warum": "Gemessen an der Weiterleitung des Outlook-Portals; die Endseite /owa/auth/logon.aspx setzt X-Frame-Options SAMEORIGIN."
+   "spec10": "R1",
+   "warum": "Jetzt an der Endseite gemessen (redirect_probe oder ZAP); vorher Q8 an der Weiterleitung."
   },
   "VS-2026-029": {
    "checks": [
@@ -159,8 +160,8 @@
    "checks": [
     "security_headers_incomplete"
    ],
-   "spec09": "Q8",
-   "warum": "Gemessen an der Weiterleitung des Outlook-Portals; die Endseite /owa/auth/logon.aspx setzt X-Frame-Options SAMEORIGIN."
+   "spec10": "R1",
+   "warum": "Jetzt an der Endseite gemessen (redirect_probe oder ZAP); vorher Q8 an der Weiterleitung."
   },
   "VS-2026-031": {
    "checks": [
@@ -169,8 +170,10 @@
   },
   "VS-2026-032": {
    "checks": [
-    "spf_softfail"
-   ]
+    "spf_authorizes_shared_host"
+   ],
+   "spec10": "R19",
+   "warum": "SPF gibt einen Server frei, den der Hoster auch für andere Kunden betreibt; neue Prüfung."
   },
   "VS-2026-033": {
    "checks": [
@@ -179,17 +182,17 @@
   },
   "VS-2026-034": {
    "checks": [
-    "tls_legacy_protocols"
+    "spf_softfail"
    ]
   },
   "VS-2026-035": {
    "checks": [
-    "tls_no_fallback_scsv"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-036": {
    "checks": [
-    "tls_rpt_missing"
+    "tls_no_fallback_scsv"
    ]
   },
   "VS-2026-037": {
@@ -199,12 +202,12 @@
   },
   "VS-2026-038": {
    "checks": [
-    "tls_weakness"
+    "tls_rpt_missing"
    ]
   },
   "VS-2026-039": {
    "checks": [
-    "tls_weakness_reported"
+    "tls_weakness"
    ]
   },
   "VS-2026-040": {
@@ -216,13 +219,20 @@
    "checks": [
     "tls_weakness_reported"
    ]
+  },
+  "VS-2026-042": {
+   "checks": [
+    "tls_weakness_reported"
+   ]
   }
  },
  "positives": {
   "VS-2026-P01": {
    "checks": [
     "cert_chain_incomplete"
-   ]
+   ],
+   "spec10": "R4",
+   "warum": "Zertifikat über Fingerabdruck oder Namensabdeckung dem Namen zugeordnet."
   },
   "VS-2026-P02": {
    "checks": [
@@ -231,7 +241,7 @@
   },
   "VS-2026-P03": {
    "checks": [
-    "cert_expired"
+    "cert_chain_incomplete"
    ]
   },
   "VS-2026-P04": {
@@ -246,82 +256,86 @@
   },
   "VS-2026-P06": {
    "checks": [
-    "cert_hostname_mismatch"
+    "cert_expired"
    ]
   },
   "VS-2026-P07": {
    "checks": [
     "cert_hostname_mismatch"
-   ]
+   ],
+   "spec10": "R4",
+   "warum": "Zertifikat über Fingerabdruck oder Namensabdeckung dem Namen zugeordnet."
   },
   "VS-2026-P08": {
    "checks": [
-    "db_exposed"
+    "cert_hostname_mismatch"
    ]
   },
   "VS-2026-P09": {
    "checks": [
-    "db_exposed"
+    "cert_hostname_mismatch"
    ]
   },
   "VS-2026-P10": {
    "checks": [
-    "dkim_missing"
+    "db_exposed"
    ]
   },
   "VS-2026-P11": {
    "checks": [
-    "dkim_missing"
+    "db_exposed"
    ]
   },
   "VS-2026-P12": {
    "checks": [
-    "dns_dangling_cname"
+    "dkim_missing"
    ]
   },
   "VS-2026-P13": {
    "checks": [
-    "dns_dangling_cname"
+    "dkim_missing"
    ]
   },
   "VS-2026-P14": {
    "checks": [
-    "dns_zone_transfer"
+    "dns_dangling_cname"
    ]
   },
   "VS-2026-P15": {
    "checks": [
-    "ftp_plaintext"
+    "dns_dangling_cname"
    ]
   },
   "VS-2026-P16": {
    "checks": [
-    "http_no_tls"
+    "dns_zone_transfer"
    ]
   },
   "VS-2026-P17": {
    "checks": [
-    "http_no_tls"
-   ]
+    "dns_zone_transfer"
+   ],
+   "spec10": "R6",
+   "warum": "Zonentransfer je Domain; für junkerwerk.hu belegt zone_transfer_junkerwerk.hu.txt die Abweisung."
   },
   "VS-2026-P18": {
    "checks": [
-    "http_no_tls"
+    "ftp_plaintext"
    ]
   },
   "VS-2026-P19": {
    "checks": [
-    "ip_reputation"
+    "http_no_tls"
    ]
   },
   "VS-2026-P20": {
    "checks": [
-    "ip_reputation"
+    "http_no_tls"
    ]
   },
   "VS-2026-P21": {
    "checks": [
-    "ip_reputation"
+    "http_no_tls"
    ]
   },
   "VS-2026-P22": {
@@ -331,97 +345,92 @@
   },
   "VS-2026-P23": {
    "checks": [
-    "mail_plaintext"
+    "ip_reputation"
    ]
   },
   "VS-2026-P24": {
    "checks": [
-    "rdp_exposed"
+    "ip_reputation"
    ]
   },
   "VS-2026-P25": {
    "checks": [
-    "rdp_exposed"
+    "ip_reputation"
    ]
   },
   "VS-2026-P26": {
    "checks": [
-    "rdp_exposed"
+    "mail_plaintext"
    ]
   },
   "VS-2026-P27": {
    "checks": [
-    "smb_exposed"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P28": {
    "checks": [
-    "smb_exposed"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P29": {
    "checks": [
-    "smb_exposed"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P30": {
    "checks": [
-    "software_eol"
+    "smb_exposed"
    ]
   },
   "VS-2026-P31": {
    "checks": [
-    "spf_missing"
+    "smb_exposed"
    ]
   },
   "VS-2026-P32": {
    "checks": [
-    "spf_missing"
+    "smb_exposed"
    ]
   },
   "VS-2026-P33": {
    "checks": [
-    "tls_legacy_protocols"
+    "software_eol"
    ]
   },
   "VS-2026-P34": {
    "checks": [
-    "tls_legacy_protocols"
+    "spf_missing"
    ]
   },
   "VS-2026-P35": {
    "checks": [
-    "tls_no_13"
+    "spf_missing"
    ]
   },
   "VS-2026-P36": {
    "checks": [
-    "tls_no_13"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P37": {
    "checks": [
-    "tls_no_13"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P38": {
    "checks": [
-    "tls_weak_ciphers"
+    "tls_no_13"
    ]
   },
   "VS-2026-P39": {
    "checks": [
-    "tls_weak_ciphers"
+    "tls_no_13"
    ]
   },
   "VS-2026-P40": {
    "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P41": {
-   "checks": [
-    "urlhaus_compromise"
+    "tls_no_13"
    ]
   }
  },

@@ -53,6 +53,13 @@ class NotTestableRule(Base):
     context: Literal["group", "item"] = "group"
 
 
+class NotApplicableReason(Base):
+    """Grund, wenn ``applicable_when`` nicht zutrifft (S6b-3, spec/10 R8): DANE entfaellt,
+    weil der MX beim Dienstleister liegt, nicht nur "Voraussetzung nicht gegeben"."""
+    when: str
+    reason_code: str
+
+
 Quantor = Literal["alle", "eines"]
 
 # Textfelder, die aus Aussagen bestehen (S6b-2). Die Empfehlungen sind eigene Aussagen
@@ -85,6 +92,10 @@ class Recommendation(Base):
     text: str
     when: Optional[str] = None
     quantor: Quantor = "alle"
+    # S6b-3 (spec/10 R11): Effekt genau dieser Stufe fuer die Planzeile. Ohne Angabe gilt
+    # ``texts.plan.effect``; der Lint-Test verlangt ihn, wenn die erste Stufe etwas anderes
+    # bewirkt als die Hauptmassnahme (DMARC: "Berichte auswerten" vor "p=reject").
+    effect: Optional[str] = None
 
 
 class PositiveText(Base):
@@ -182,6 +193,7 @@ class CheckSpec(Base):
     urgent_when: Optional[str] = None
     positive_when: str = "absent"
     not_testable_when: list[NotTestableRule] = Field(default_factory=list)
+    not_applicable_reasons: list[NotApplicableReason] = Field(default_factory=list)
     undetermined: Undetermined = "not_testable"
     requires: Requires = Field(default_factory=Requires)
     kind: Kind = "check"
@@ -328,6 +340,9 @@ class IgnoreEntry(Base):
     ports: list[int] = Field(default_factory=list)
     only_cdn: bool = False
     reason: str
+    # S6b-3 (spec/10 R15): Pruefungen, die diese Werkzeugmeldung abdecken. Schlaegt keine davon
+    # an derselben Stelle an, steht die Meldung im Anhang statt stillschweigend zu entfallen.
+    covered_by: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _shape(self) -> "IgnoreEntry":
@@ -418,6 +433,10 @@ class CheckResult(Base):
     group_label: str
     status: Status
     positive: bool = False
+    # S6b-3 (spec/10 R4): das Subjekt ist fuer diese Regel gemessen (fehlgeschlagen oder
+    # die Positivbedingung traf zu). Grundlage der Unterdrueckung von "nicht pruefbar"-Zeilen
+    # derselben Faktenfamilie und des Gates gegen Widersprueche.
+    affirmed: bool = False
     active_proof: bool = False
     urgent: bool = False
     verified: Optional[bool] = None
@@ -461,6 +480,9 @@ class IgnoredItem(Base):
     fqdns: list[str] = Field(default_factory=list)
     count: int = 1
     reason: str
+    covered_by: list[str] = Field(default_factory=list)
+    plugin_id: Optional[str] = None
+    name: Optional[str] = None
 
 
 class Summary(Base):

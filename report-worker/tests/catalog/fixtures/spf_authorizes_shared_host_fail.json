@@ -1,0 +1,19 @@
+{
+ "facts": {
+  "hosts": [
+   {"ip": "203.0.113.80", "shared": {"kind": "hoster", "operator": "Hoster AG", "signals": ["fremde_namen_zertifikat"]}}
+  ],
+  "dns": [
+   {"domain": "example.test", "mx": ["mx1.example.test"],
+    "spf": {"raw": "v=spf1 a -all", "all_qualifier": "-all",
+            "mechanisms": [{"kind": "a", "qualifier": "+", "ips": ["203.0.113.80"]}]}}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "example.test",
+  "affected": ["example.test (203.0.113.80 beim Hoster Hoster AG)"],
+  "positive": false
+ }
+}

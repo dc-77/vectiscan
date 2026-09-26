@@ -56,6 +56,14 @@ _CVE_RE = re.compile(r"CVE-\d{4}-\d{4,}")
 # ``cve`` (die CVE, gegen die geprueft wurde). Wer sie als Fund liest, schreibt
 # Heartbleed in den Bericht eines Hosts, der nicht betroffen ist (S5b).
 VULN_SEVERITIES = frozenset({"LOW", "MEDIUM", "HIGH", "CRITICAL"})
+# S6b-3 (spec/10 R1, R4): testssl ruft "/" des gepruften Namens ab und nennt Status und
+# gesetzte Sicherheits-Header; fehlt ein Header, steht er nicht in der Liste
+# ("security_headers --" heisst: keiner gesetzt). Kanonische Namen wie im HTTP-Kopf.
+HTTP_HEADER_IDS = {
+    "X-Frame-Options": "x-frame-options", "X-Content-Type-Options": "x-content-type-options",
+    "Content-Security-Policy": "content-security-policy", "Referrer-Policy": "referrer-policy",
+    "Permissions-Policy": "permissions-policy", "X-XSS-Protection": "x-xss-protection",
+}
 _START_RE = re.compile(r"Start (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+-->> ([^\s:]+):(\d+) \(([^)]*)\) <<--")
 
 
@@ -78,6 +86,12 @@ class TestsslResult:
     started_at: Optional[str] = None
     json_parsed: bool = False
     text_parsed: bool = False
+    # S6b-3: HTTP-Status und Sicherheits-Header der Antwort auf "/" (spec/10 R1, R4),
+    # "Obsoleted CBC ciphers" angeboten (R6) und Fingerabdruck des Zertifikats (R4).
+    http_status: Optional[int] = None
+    http_headers: dict[str, str] = field(default_factory=dict)
+    http_headers_listed: bool = False
+    cbc_obsoleted: Optional[bool] = None
 
     @property
     def has_data(self) -> bool:
@@ -168,6 +182,8 @@ def apply_json(result: TestsslResult, entries: list[dict[str, Any]] | None) -> N
         elif eid in _CIPHER_IDS:
             if _offered(finding):
                 _add(result.ciphers_weak, _CIPHER_IDS[eid])
+            if eid == "cipherlist_OBSOLETED":
+                result.cbc_obsoleted = _offered(finding)
         elif eid == "fallback_SCSV":
             result.fallback_scsv = _fallback_state(finding)
         elif eid in _VULN_IDS:
@@ -222,6 +238,16 @@ def apply_json(result: TestsslResult, entries: list[dict[str, Any]] | None) -> N
                 result.hsts["preload"] = "not" not in finding.lower()
         elif eid.endswith("_multiple"):
             _add(result.duplicate_headers, eid[: -len("_multiple")].lower())
+        elif eid == "HTTP_status_code":
+            m = re.match(r"\s*(\d{3})\b", finding)
+            result.http_status = int(m.group(1)) if m else None
+        elif eid == "security_headers":
+            result.http_headers_listed = True
+        elif eid in HTTP_HEADER_IDS:
+            result.http_headers_listed = True
+            result.http_headers.setdefault(HTTP_HEADER_IDS[eid], finding.strip())
+        elif eid == "cert_fingerprintSHA256":
+            result.cert.setdefault("fingerprint_sha256", finding.strip().lower() or None)
     if result.json_parsed and not saw_protocol:
         result.json_filtered = True
 
@@ -299,6 +325,8 @@ def apply_text(result: TestsslResult, raw: str | None) -> None:
                 rest = re.split(r"\s{2,}", s, maxsplit=1)
                 if len(rest) == 2 and _offered(rest[1]) and key not in result.ciphers_weak:
                     result.ciphers_weak.append(key)
+                if len(rest) == 2 and label == "Obsoleted CBC ciphers" and result.cbc_obsoleted is None:
+                    result.cbc_obsoleted = _offered(rest[1])
         for label, name in _VULN_TEXT:
             if s.startswith(label):
                 parts = re.split(r"\s{2,}", s, maxsplit=1)

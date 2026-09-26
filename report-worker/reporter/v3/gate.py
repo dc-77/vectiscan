@@ -39,6 +39,18 @@ SEVERITY = re.compile(
     r"CRITICAL|HIGH|MEDIUM|LOW|INFO)\b")
 PLACEHOLDER = re.compile(r"\{.*?\}|\[Hinweis")
 
+# S6b-3 (spec/10 R13): Aussagen, die einen Fakt voraussetzen, den die Eingabe nicht immer hat.
+ANSCHLUSS = re.compile(r"Unternehmensnetz|\bAnschluss(?:es)?\b|dahinter liegende[nr]? Systeme", re.I)
+MITARBEITER = re.compile(
+    r"\b(?:\d+|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn|elf|zwölf)\s+"
+    r"(?:Mitarbeite\w*|Beschäftigte\w*)", re.I)
+MFA = re.compile(r"\bMFA\b|Mehrfaktor\w*|(?:zusätzliche|zweite)[nrms]? Faktor", re.I)
+BEDINGUNG = re.compile(r"\b(?:sofern|falls|wenn|soweit)\b", re.I)
+RELATIVE_FRIST = re.compile(
+    r"\bin (?:\d+|einem|einer|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn|elf|zwölf) "
+    r"(?:Tag|Tagen|Woche|Wochen|Monat|Monaten)\b", re.I)
+SATZ = re.compile(r"[^.!?]+[.!?]?")
+
 # Zahlen, die immer erlaubt sind: der Verweis auf die Meldepflicht.
 ALWAYS_ALLOWED_NUMBERS = frozenset({"33", "72"})
 
@@ -74,6 +86,25 @@ def count_mismatches(text: str, counts: dict[str, int]) -> list[str]:
             continue
         if zahl != counts[key]:
             out.append(f"{m.group(0)} widerspricht der Zählung in 2.1 ({counts[key]})")
+    return out
+
+
+def context_claims(text: str, haystack: str) -> list[str]:
+    """S6b-3 (spec/10 R13): Aussagen ohne tragenden Fakt in der Eingabe.
+
+    ``haystack`` ist die kleingeschriebene JSON-Eingabe der KI (``corpus``).
+    """
+    out: list[str] = []
+    if ANSCHLUSS.search(text) and '"anschluss"' not in haystack:
+        out.append("Unternehmensnetz oder Anschluss ohne System am Anschluss des Kunden")
+    if MITARBEITER.search(text) and '"mitarbeiter":' not in haystack:
+        out.append("Mitarbeiterzahl ohne Quelle Kunde oder Admin")
+    for satz in SATZ.findall(text):
+        if MFA.search(satz) and not BEDINGUNG.search(satz):
+            out.append("Aussage zur Mehrfaktor-Anmeldung ohne Bedingung")
+            break
+    if RELATIVE_FRIST.search(text):
+        out.append("relative Frist statt Datum")
     return out
 
 
@@ -144,6 +175,7 @@ def check_field(name: str, text: str, haystack: str, *, role_keys=None,
         reasons.append(f"Umschrift statt Umlaut: {sorted(set(umlauts))}")
     if counts is not None:
         reasons.extend(count_mismatches(text, counts))
+    reasons.extend(context_claims(text, haystack))
     if role_keys is not None:
         from reporter.v3.roles import role_words_without_fact
 

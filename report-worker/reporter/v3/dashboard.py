@@ -106,6 +106,9 @@ def findings_data_from_v3(data: ReportData, package: str) -> dict[str, Any]:
         "engine": "catalog",
         "catalog_version": data.meta.catalog_version,
         "facts_schema_version": data.meta.facts_schema_version,
+        # S6b-3 (spec/10 R13): Kundenkontext mit Quelle je Feld, damit Mitarbeiterzahl und
+        # Branche im Nachhinein pruefbar sind (Recherche-KI, Kunde oder Admin).
+        "customer_context": {"fields": list(data.meta.context_fields)},
     }
 
 

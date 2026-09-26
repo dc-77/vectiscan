@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 25, "service": "smtp", "product": "Postfix smtpd", "smtp_vrfy": true}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.1",
+  "affected": ["10.0.0.1:25 (SMTP)"],
+  "positive": false,
+  "members": {"10.0.0.1:25": "fail"}
+ }
+}

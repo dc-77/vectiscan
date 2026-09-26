@@ -392,7 +392,29 @@ geschaerfte Positivbefund von `remote_admin_closed` (S6a, Issue #30), `2026-09-2
 Abdeckung ohne offenen Port, TLS teilweise, Drittanbieter, Numerus (S6b-1), `2026-09-25.2`
 Texte je Regel mit Fakten-Bedingung, Sammeltitel, `urgent_when`, Verwaltungsoberflaechen
 nach E1, ZAP nur ab Konfidenz High, Lebenszyklus nach Q18 (S6b-2), `2026-09-26.1` Titel eines
-Hosting-Panels als Fingerabdruck mit Anmeldeseite, Meldungsname am Mitglied (Nachtrag S6b-2).
+Hosting-Panels als Fingerabdruck mit Anmeldeseite, Meldungsname am Mitglied (Nachtrag S6b-2),
+`2026-09-26.2` Messbasis der Header, neue Pruefungen fuer Zertifikate an Diensten, Dienste ohne
+Kennung, SMTP VRFY, XML-RPC, Anmeldung ueber HTTP und SPF auf geteilten Servern,
+Positivaussagen nur mit tragendem Fakt, Faktenfamilien, Berichtstag, Effekt je Stufe (S6b-3).
+
+### S6b-3 (spec/10)
+
+- **Faktenfamilien** (`families.py`): Pruefungen, die dieselbe Messung lesen. Eine "nicht
+  pruefbar"-Zeile mit einem Grund aus `SUPPRESSIBLE_REASONS` entfaellt im Bericht, wenn
+  dasselbe Subjekt fuer die Familie gemessen ist (fail oder `affirmed`); das Gate meldet
+  jeden verbleibenden Widerspruch (`einschraenkung_widerspricht_befund`).
+- **Nicht anwendbar mit Grund**: `not_applicable_reasons` je Pruefung (`mx_external`,
+  `zone_unsigned`); die Posture zeigt "entfällt (MX beim Dienstleister)".
+- **Berichtstag** (`evaluate(..., report_date=)`, Bindung `report_date`): Fristen im Text
+  beziehen sich darauf ("seit 24.09.2026 abgelaufen, sofern nicht erneuert"); die Stufe
+  bleibt am Scantag (E2).
+- **Effekt je Stufe** (`Recommendation.effect`): der Plan traegt je getroffener Regel ihre
+  erste Stufe mit dem Effekt genau dieser Stufe (E8).
+- **Gruppenvariablen** `missing_header_names` und `passed` (nur Mitglieder mit erfuellter
+  Positivbedingung).
+- **Ignorierliste** `covered_by`: welche Pruefungen eine Werkzeugmeldung abdecken; schlaegt
+  keine davon an derselben Stelle an, steht die Meldung im Anhang.
+
 
 ## Texte
 

@@ -1,0 +1,139 @@
+{
+ "check": "csp_weak",
+ "cases": [
+  {
+   "name": "nur unsafe-inline fuer Skripte",
+   "facts": {
+    "http": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "url": "https://www.example.test/",
+      "reachable": true,
+      "status_code": 200,
+      "csp": {
+       "present": true,
+       "value": "script-src 'self' 'unsafe-inline'",
+       "unsafe_inline": true,
+       "unsafe_eval": false,
+       "wildcard": false,
+       "script_unsafe_inline": true,
+       "script_unsafe_eval": false,
+       "style_unsafe_inline": false,
+       "nonce_or_hash": false,
+       "wildcard_directives": []
+      }
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[0]",
+      "recommendation[0]",
+      "verify[1]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[1]",
+      "meaning[2]",
+      "recommendation[1]",
+      "verify[2]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "nur unsafe-eval fuer Skripte",
+   "facts": {
+    "http": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "url": "https://www.example.test/",
+      "reachable": true,
+      "status_code": 200,
+      "csp": {
+       "present": true,
+       "value": "script-src 'self' 'unsafe-eval'",
+       "unsafe_inline": false,
+       "unsafe_eval": true,
+       "wildcard": false,
+       "script_unsafe_inline": false,
+       "script_unsafe_eval": true,
+       "style_unsafe_inline": false,
+       "nonce_or_hash": false,
+       "wildcard_directives": []
+      }
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[1]",
+      "recommendation[0]",
+      "verify[1]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[0]",
+      "meaning[2]",
+      "recommendation[1]",
+      "verify[2]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "nur Wildcard-Quelle in img-src",
+   "facts": {
+    "http": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "url": "https://www.example.test/",
+      "reachable": true,
+      "status_code": 200,
+      "csp": {
+       "present": true,
+       "value": "default-src 'self'; img-src *",
+       "unsafe_inline": false,
+       "unsafe_eval": false,
+       "wildcard": true,
+       "script_unsafe_inline": false,
+       "script_unsafe_eval": false,
+       "style_unsafe_inline": false,
+       "nonce_or_hash": false,
+       "wildcard_directives": [
+        "img-src"
+       ]
+      }
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[2]",
+      "recommendation[1]",
+      "verify[2]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[0]",
+      "meaning[1]",
+      "recommendation[0]",
+      "verify[1]"
+     ]
+    }
+   }
+  }
+ ]
+}

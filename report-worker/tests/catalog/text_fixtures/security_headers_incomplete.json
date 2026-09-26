@@ -1,0 +1,220 @@
+{
+ "check": "security_headers_incomplete",
+ "cases": [
+  {
+   "name": "nur Permissions-Policy fehlt",
+   "facts": {
+    "http": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "url": "https://www.example.test/",
+      "reachable": true,
+      "status_code": 200,
+      "security_headers": {
+       "x-frame-options": {
+        "present": true,
+        "value": "SAMEORIGIN"
+       },
+       "x-content-type-options": {
+        "present": true,
+        "value": "nosniff"
+       },
+       "referrer-policy": {
+        "present": true,
+        "value": "strict-origin-when-cross-origin"
+       },
+       "permissions-policy": {
+        "present": false
+       }
+      }
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[4]",
+      "recommendation[3]",
+      "verify[4]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[0]",
+      "meaning[1]",
+      "meaning[2]",
+      "meaning[3]",
+      "recommendation[0]",
+      "recommendation[1]",
+      "recommendation[2]",
+      "verify[1]",
+      "verify[2]",
+      "verify[3]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "alle vier Header fehlen",
+   "facts": {
+    "http": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "url": "https://www.example.test/",
+      "reachable": true,
+      "status_code": 200,
+      "security_headers": {
+       "x-frame-options": {
+        "present": false
+       },
+       "x-content-type-options": {
+        "present": false
+       },
+       "referrer-policy": {
+        "present": false
+       },
+       "permissions-policy": {
+        "present": false
+       }
+      }
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[0]",
+      "meaning[1]",
+      "meaning[2]",
+      "meaning[3]",
+      "recommendation[0]",
+      "recommendation[1]",
+      "recommendation[2]",
+      "recommendation[3]",
+      "verify[1]",
+      "verify[2]",
+      "verify[3]",
+      "verify[4]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[4]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "gemischt: X-Frame-Options und Referrer-Policy fehlen",
+   "facts": {
+    "http": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "url": "https://www.example.test/",
+      "reachable": true,
+      "status_code": 200,
+      "security_headers": {
+       "x-frame-options": {
+        "present": false
+       },
+       "x-content-type-options": {
+        "present": true,
+        "value": "nosniff"
+       },
+       "referrer-policy": {
+        "present": false
+       },
+       "permissions-policy": {
+        "present": true,
+        "value": "geolocation=()"
+       }
+      }
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[0]",
+      "meaning[2]",
+      "recommendation[0]",
+      "recommendation[2]",
+      "verify[1]",
+      "verify[3]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[1]",
+      "meaning[3]",
+      "meaning[4]",
+      "recommendation[1]",
+      "recommendation[3]",
+      "verify[2]",
+      "verify[4]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "gemischt: X-Content-Type-Options und Permissions-Policy fehlen",
+   "facts": {
+    "http": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "url": "https://www.example.test/",
+      "reachable": true,
+      "status_code": 200,
+      "security_headers": {
+       "x-frame-options": {
+        "present": true,
+        "value": "SAMEORIGIN"
+       },
+       "x-content-type-options": {
+        "present": false
+       },
+       "referrer-policy": {
+        "present": true,
+        "value": "strict-origin-when-cross-origin"
+       },
+       "permissions-policy": {
+        "present": false
+       }
+      }
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[1]",
+      "meaning[3]",
+      "recommendation[1]",
+      "recommendation[3]",
+      "verify[2]",
+      "verify[4]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test@10.0.0.1": [
+      "meaning[0]",
+      "meaning[2]",
+      "meaning[4]",
+      "recommendation[0]",
+      "recommendation[2]",
+      "verify[1]",
+      "verify[3]"
+     ]
+    }
+   }
+  }
+ ]
+}

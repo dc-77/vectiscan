@@ -2,7 +2,7 @@ id: cert_health
 title: "Zertifikate auf {group}: {rules}"
 category: D
 merge_by: host
-members: [cert_expired, cert_expiring, cert_expiring_later, cert_chain_incomplete, cert_hostname_mismatch, cert_self_signed]
+members: [cert_expired, cert_expiring, cert_expiring_later, cert_chain_incomplete, cert_hostname_mismatch, cert_self_signed, service_cert_expired]
 target: findings
 references: [CWE-295, CWE-297]
 frameworks:

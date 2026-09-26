@@ -50,6 +50,78 @@
     }
    },
    "coverage_default": "ok"
+  },
+  {
+   "name": "Hoster-Server mit Webseite des Kunden und Hoster-Server mit Postfaechern (spec/10 R9)",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.0.9",
+      "shared": {
+       "kind": "hoster",
+       "operator": "Hoster AG",
+       "signals": [
+        "fremde_namen_zertifikat"
+       ]
+      },
+      "betriebsform": "rechenzentrum",
+      "serves_customer_web": true,
+      "serves_customer_mail": false
+     },
+     {
+      "ip": "10.0.0.10",
+      "shared": {
+       "kind": "hoster",
+       "operator": "Hoster AG",
+       "signals": [
+        "fremde_namen_zertifikat"
+       ]
+      },
+      "betriebsform": "rechenzentrum",
+      "serves_customer_web": false,
+      "serves_customer_mail": true
+     }
+    ],
+    "services": [
+     {
+      "host_ip": "10.0.0.9",
+      "port": 8443,
+      "service": "https-alt",
+      "product": "sw-cp-server",
+      "tunnel_ssl": true,
+      "fp_title": "Plesk Obsidian 18.0.80",
+      "fp_login": true
+     },
+     {
+      "host_ip": "10.0.0.10",
+      "port": 8443,
+      "service": "https-alt",
+      "product": "sw-cp-server",
+      "tunnel_ssl": true,
+      "fp_title": "Plesk Obsidian 18.0.80",
+      "fp_login": true
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "10.0.0.9:8443": [
+      "meaning[1]"
+     ],
+     "10.0.0.10:8443": [
+      "meaning[2]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.9:8443": [
+      "meaning[2]"
+     ],
+     "10.0.0.10:8443": [
+      "meaning[1]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
   }
  ]
 }

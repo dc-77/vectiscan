@@ -52,6 +52,7 @@ texts:
       text: >-
         Die eigenen Systeme auf dieser Adresse auf Schadsoftware und ungewöhnliche
         Netzwerkaktivität prüfen.
+      effect: "Klärt, ob eigene Systeme die Meldungen verursachen"
     - stage: mittelfristig
       text: >-
         Nach Beseitigung der Ursache eine Löschung oder Korrektur der Bewertung bei den

@@ -56,11 +56,13 @@ texts:
       text: >-
         Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der
         Domain bestätigen.
+      effect: "Macht alle legitimen Versandquellen vor der Verschärfung sichtbar"
     - stage: in_kuerze
       when: len(dns.dmarc.rua) == 0
       text: >-
         Eine Meldeadresse (rua) in den DMARC-Eintrag aufnehmen, die Berichte auswerten und alle
         legitimen Versandquellen der Domain bestätigen.
+      effect: "Macht alle legitimen Versandquellen vor der Verschärfung sichtbar"
     - stage: mittelfristig
       text: >-
         Die Richtlinie auf Quarantäne und danach auf Zurückweisung anheben, sobald alle

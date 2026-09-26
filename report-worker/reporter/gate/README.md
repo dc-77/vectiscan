@@ -10,7 +10,7 @@ dorthin, wo der Admin sie sieht.
 | Datei | Inhalt |
 |---|---|
 | `defects.py` | `Defect` (Engine, Prüfung, Stufe, Meldung, Befund-ID) und die Adapter für beide Engines; `payload()` baut den Inhalt von `orders.report_defects`. |
-| `v3_checks.py` | Die vier Prüfungen aus S5, die über das Datenmodell hinausgehen. |
+| `v3_checks.py` | Die Prüfungen, die über das Datenmodell hinausgehen (S5 bis S6b-3). |
 | `__main__.py` | Das Gate von Hand fahren, mit gezielter Beschädigung für die Abnahme. |
 
 Die inhaltlichen Prüfungen des Datenmodells stehen weiter in
@@ -40,6 +40,15 @@ nicht zwei; woher ein Eintrag kommt, steht deshalb am Eintrag (`engine`).
 | Kein Werkzeuglauf mit Ergebnis | Fehler | Fällt der Lader aus, steht jede Zeile auf `empty` oder `unknown`; der Bericht liest sich dann wie eine unauffällige Prüfung (S6, offener Punkt nach S5b). |
 | Mehr als fünf Beobachtungen ohne Regel | Warnung | Ein Hinweis auf fehlende Prüfungen, kein Fehler im Bericht. |
 | Auftraggeber fehlt | Fehler unter `strict`, sonst Warnung | Bis S6 immer nur Warnung: der WebCheck-Bericht `75338c97` trug deshalb 39-mal „Auftraggeber“ und ging mit 0 Fehlern durch (spec/08 Punkt 8). Rückweg ist das Kundenkontext-Feld im Admin. |
+| Header im Befundtext, der laut Messung nicht fehlt (`header_nicht_fehlend`) | Fehler | S6b-3 (spec/10 R2): castenow VS-007/009 und huendgen VS-009 nannten X-Frame-Options, obwohl die Endseite ihn setzte. |
+| Einschränkung neben Befund oder „unauffällig“ derselben Faktenfamilie (`einschraenkung_widerspricht_befund`) | Fehler | S6b-3 (spec/10 R4): „nicht prüfbar“ und Befund zum selben Subjekt (DMARC, Zertifikat, Header). Familien in `catalog/families.py`. |
+| Positivbefund und Befund am selben Host:Port (`positiv_widerspricht_befund`) | Fehler | S6b-3 (spec/10 R7): POP3 110 bei lumbeck-wolter, junkerwerk und heuel stand im Positivbefund und als „ließ sich nicht feststellen“. |
+| Posture widerspricht den Befunden (`posture_widerspricht_befund`) | Fehler | S6b-3 (spec/10 R8): „unauffällig“ neben einem Befund derselben Regel oder „Handlungsbedarf“ ohne Befund (DANE bei MX beim Dienstleister). |
+| Passivport 25 ohne Einschränkungszeile (`e5_fehlt`) | Fehler | S6b-3 (spec/10 R10): E5 je Adresse, nicht nur für Hosts ohne andere Ursache. |
+| Zusage im Kundentext (`zusage_im_kundentext`) | Fehler | S6b-3 (spec/10 R12): „wir prüfen sie und nehmen … auf“, „auf Anfrage bereitgestellt“. |
+| CVE im Befund ohne Zeile in A.3 (`cve_ohne_a3`) | Fehler | S6b-3 (spec/10 R14): dortmund-beach zitierte 17 CVE aus wpscan bei leerem A.3. |
+| Gefundene Namen nicht geprüft (`namen_nicht_geprueft`) | Warnung | S6b-3 (spec/10 R5): bis S6c die Hostsuche repariert; Kapitel 2 nennt die Namen. |
+| Frist zwischen Scan- und Berichtstag abgelaufen (`frist_vor_berichtsdatum`) | Warnung | S6b-3 (spec/10 R18): Hinweis an den Admin im Review, den Stand beim Kunden zu prüfen (castenow mailstore 24.09. bei Bericht vom 26.09.). |
 
 ## Wo die Liste landet
 

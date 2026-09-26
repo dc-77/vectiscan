@@ -48,7 +48,8 @@ CDN_PRODUCTS = re.compile(r"cloudflare|cloudfront|akamai|fastly|incapsula|imperv
 # Cloudflare-Edge-Ports, die Shodan an jeder Edge-IP meldet (spec/06 Abschnitt 4, heuel.com).
 CDN_PASSIVE_PORTS = frozenset({2052, 2053, 2082, 2083, 2086, 2087, 2095, 2096, 8080, 8443, 8880})
 
-MAIL_PORTS: dict[int, str] = {25: "SMTP", 110: "POP3", 143: "IMAP", 587: "Submission"}
+MAIL_PORTS: dict[int, str] = {25: "SMTP", 110: "POP3", 143: "IMAP", 465: "SMTPS", 587: "Submission",
+                               993: "IMAPS", 995: "POP3S"}
 LEGACY_PORTS: dict[int, str] = {21: "FTP", 110: "POP3", 143: "IMAP"}
 WEB_PORTS = frozenset({80, 443})
 SSH_PORT = 22
@@ -74,6 +75,8 @@ SHARED_OPERATOR_CHECKS: frozenset[str] = frozenset({
     "admin_service_exposed", "admin_service_exposed_passive", "admin_panel_hoster", "admin_service_unconfirmed",
     "ftp_plaintext", "legacy_protocols_present", "mail_plaintext", "service_banner_version", "http_alt_port",
     "ssh_alt_port",
+    # S6b-3 (spec/10 R3, R9, R19): Dienste des Servers selbst (Mailports, Zusatzports).
+    "service_cert_expired", "service_unidentified", "smtp_vrfy_enabled", "smtp_vrfy_enabled_passive",
 })
 PLATFORM_CUSTOMER_SCOPES: frozenset[str] = frozenset({"dns", "dns.dangling_cnames", "target", "scan"})
 
@@ -182,6 +185,8 @@ COVERAGE_REASONS: dict[str, tuple[str, str]] = {
     # S6b-2 (spec/08 Punkt 4): der Portscan belegt beim FTP-Dienst weder TLS-Zwang noch
     # Klartext-Anmeldung. Ohne Beleg kein Befund "ohne TLS-Zwang".
     "ftp_tls_unknown": ("not_testable", "Ob der FTP-Dienst eine Anmeldung ohne Transportverschlüsselung ablehnt, zeigt der Portscan nicht."),
+    # S6b-3 (spec/10 R7): STARTTLS angeboten, ob die Anmeldung davor abgelehnt wird, ist nicht belegt.
+    "mail_tls_unknown": ("not_testable", "Ob der Mailabrufdienst eine Anmeldung vor STARTTLS ablehnt, zeigt der Portscan nicht."),
     "tls_protocols_unknown": ("not_testable", "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor."),
     "tls_ciphers_unknown": ("not_testable", "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor."),
     # S6b-1 (spec/09 Q10): httpx hat den Dienst gesehen, testssl nicht. "Nicht verfuegbar"
@@ -199,6 +204,26 @@ COVERAGE_REASONS: dict[str, tuple[str, str]] = {
     # einen, der Anzahl und Beispiele nennt.
     "dkim_selector_unknown": ("not_testable", "DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar: unter den gängigen Selektoren war kein Schlüssel veröffentlicht. Ob die Domain signiert, zeigt der Kopf einer echten E-Mail (DKIM-Signature, Angabe s=)."),
     "precondition_not_met": ("not_applicable", "Voraussetzung der Prüfung nicht gegeben."),
+    # S6b-3 (spec/10 R1, Entscheidung DC 4): die Sicherheits-Header liegen nur fuer eine
+    # Weiterleitung, eine Fehlerseite oder eine Sicherheitsabfrage vor. Den Statuscode setzt
+    # der Bericht aus dem Fakt ein; HSTS gilt auch an der ersten Antwort.
+    "headers_redirect_only": ("not_testable", "Sicherheits-Header nur an einer Weiterleitung gemessen, Endseite nicht bewertet."),
+    "headers_error_only": ("not_testable", "Sicherheits-Header nur an einer Fehlerseite gemessen, Endseite nicht bewertet."),
+    "headers_challenge_only": ("not_testable", "Sicherheits-Header nur an einer Sicherheitsabfrage der Plattform gemessen, Endseite nicht bewertet."),
+    # S6b-3 (spec/10 R4): nicht eingerichteter Name (Parkseite, dortmund-beach pflege).
+    "parked_name": ("not_testable", "Nicht eingerichteter Name, keine Web- und Header-Analyse."),
+    # S6b-3 (spec/10 R3): nmap ohne Hostbericht.
+    "no_response": ("not_testable", "Ohne Antwort, vom Prüfstand aus nicht erreichbar."),
+    # S6b-3 (spec/10 R4): Name und Laufzeit des Zertifikats sind bekannt, die Vertrauenskette
+    # nicht (Zertifikat nur aus dem Verbindungsaufbau, kein testssl-Lauf mit diesem Zertifikat).
+    "cert_chain_unknown": ("not_testable", "Vertrauenskette und Namensprüfung des Zertifikats nicht geprüft; bekannt sind Name und Laufzeit aus dem Verbindungsaufbau."),
+    # S6b-3 (spec/10 R8): DANE setzt am Mailempfang an; liegt der MX beim Dienstleister oder
+    # ist die Zone nicht signiert, entfaellt die Pruefung, sie ist kein Handlungsbedarf.
+    "mx_external": ("not_applicable", "Entfällt: der Mailempfang liegt beim Dienstleister."),
+    "zone_unsigned": ("not_applicable", "Entfällt: DANE setzt eine signierte Zone voraus."),
+    # S6b-3 (spec/10 R6): eine Passivquelle ohne Ergebnis ("OK: no_data") ist ein Ausfall,
+    # kein Negativbefund; Positivaussagen darauf entfallen.
+    "passive_no_data": ("not_testable", "Die Passivquelle lieferte kein Ergebnis."),
     "coverage_unknown": ("not_testable", "Ob dieses Werkzeug gelaufen ist, geht aus den Protokollen nicht hervor."),
     "rohtext_nicht_geladen": ("not_testable", "Die Werkzeugausgabe war zu groß und wurde nicht geladen; Ergebnis nicht belastbar."),
     "testssl_nicht_getestet": ("not_testable", "testssl konnte diese Schwachstelle nicht prüfen (Zeitüberschreitung oder Verbindungsfehler)."),
@@ -231,6 +256,9 @@ FAMILIES: frozenset[str] = frozenset({
     "cors_misconfiguration", "sri_missing", "waf_present",
     # S6b-2 (spec/08 Punkt 6): Domain ohne Mailbetrieb ohne Faelschungsschutz.
     "mail_spoofing_unprotected",
+    # S6b-3 (spec/10 R9, R19): offene Dienste ohne Kennung und Beobachtungen, die bis S6b-3
+    # nur in den Rohdaten standen.
+    "service_unidentified", "smtp_vrfy", "wordpress_xmlrpc", "login_over_http", "spf_shared_host",
 })
 
 # Namen, die in Ausdruecken als Tabellen sichtbar sind.

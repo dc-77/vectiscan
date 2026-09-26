@@ -18,6 +18,7 @@ from typing import Optional
 from reporter.catalog import tables as CT
 from reporter.catalog.schema import CheckResult
 from reporter.facts import schema as FS
+from reporter.facts.systems import registrable
 
 KIND_LABEL = {"hoster": "beim Hoster", "platform": "beim Plattformbetreiber"}
 ADDRESSEE = {"hoster": "den Hoster", "platform": "den Plattformbetreiber"}
@@ -29,7 +30,10 @@ class Operator:
     """Zustaendiger Betreiber eines Sachverhalts; ``None`` heisst: der Kunde."""
     kind: str          # hoster | platform
     name: str          # Betreibername laut Fakt, leer wenn unbekannt
-    foreign: tuple[str, ...] = ()
+    # S6b-3 (spec/10 R17, Entscheidung E11): Zahl der fremden Domains und ihre Quelle; die
+    # Namen selbst bleiben in den Fakten und stehen nicht im Kundentext.
+    foreign_count: int = 0
+    foreign_source: str = ""
 
     @property
     def key(self) -> str:
@@ -53,8 +57,11 @@ def operator_for(result: CheckResult, scope: str, hosts: dict[str, FS.HostFact])
         return None
     shared = host.shared
     if shared.kind == "platform" or result.check_id in CT.SHARED_OPERATOR_CHECKS:
+        domains = {registrable(n) for n in shared.foreign_names if n}
+        quelle = ("Passivquelle" if "fremde_namen_shodan" in shared.signals
+                  else "Zertifikat" if "fremde_namen_zertifikat" in shared.signals else "")
         return Operator(kind=shared.kind, name=shared.operator or "",
-                        foreign=tuple(shared.foreign_names[:3]))
+                        foreign_count=len(domains), foreign_source=quelle)
     return None
 
 
@@ -66,7 +73,13 @@ def sentence(op: Operator) -> str:
                 "dessen Plattform, Server und Grundkonfiguration betreibt er. Die Empfehlung "
                 "richtet sich an ihn; Sie können sie über den Vertrag oder die Einstellungen "
                 "der Plattform einfordern.")
-    fremd = f" (auf derselben Adresse auch {', '.join(op.foreign)})" if op.foreign else ""
+    fremd = ""
+    if op.foreign_count:
+        # Auf demselben Server, nicht "auf derselben Adresse": die Namen stammen auch von der
+        # IPv6-Adresse desselben Systems (junkerwerk toyota-motorsport.com).
+        laut = f" laut {op.foreign_source}" if op.foreign_source else ""
+        wort = "weitere Domain" if op.foreign_count == 1 else "weitere Domains"
+        fremd = f" (auf demselben Server{laut} {op.foreign_count} {wort} anderer Kunden)"
     return (f"Dieser Sachverhalt liegt beim Hoster{name}: der Server wird mit anderen Kunden "
             f"geteilt{fremd}, der Dienst gehört zum Server und nicht zu Ihrer Website. Die "
             "Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen "

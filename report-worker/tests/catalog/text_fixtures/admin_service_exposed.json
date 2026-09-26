@@ -47,6 +47,58 @@
     }
    },
    "coverage_default": "ok"
+  },
+  {
+   "name": "Webmin mit Anmeldung am Anschluss des Kunden und auf einem Server im Rechenzentrum (spec/10 R13)",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.0.7",
+      "betriebsform": "anschluss"
+     },
+     {
+      "ip": "10.0.0.8",
+      "betriebsform": "rechenzentrum"
+     }
+    ],
+    "services": [
+     {
+      "host_ip": "10.0.0.7",
+      "port": 10000,
+      "service": "snet-sensor-mgmt",
+      "tunnel_ssl": true,
+      "fp_server": "MiniServ",
+      "fp_login": true
+     },
+     {
+      "host_ip": "10.0.0.8",
+      "port": 10000,
+      "service": "snet-sensor-mgmt",
+      "tunnel_ssl": true,
+      "fp_server": "MiniServ",
+      "fp_login": true
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "10.0.0.7:10000": [
+      "meaning[0]"
+     ],
+     "10.0.0.8:10000": [
+      "meaning[1]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.7:10000": [
+      "meaning[1]"
+     ],
+     "10.0.0.8:10000": [
+      "meaning[0]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
   }
  ]
 }

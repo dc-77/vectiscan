@@ -1,0 +1,31 @@
+{
+  "_note": "Abgelaufenes, CA-ausgestelltes Zertifikat an einem FTP-Dienst ohne testssl-Lauf.",
+  "facts": {
+    "services": [
+      {
+        "host_ip": "10.0.0.10",
+        "port": 21,
+        "service": "ftp",
+        "product": "vsftpd",
+        "cert": {
+          "cn": "ftp.example.test",
+          "issuer": "Beispiel CA",
+          "not_before": "2025-01-01T00:00:00Z",
+          "not_after": "2026-03-01T00:00:00Z",
+          "days_left": -184,
+          "expired": true,
+          "self_signed": false
+        }
+      }
+    ]
+  },
+  "coverage_default": "ok",
+  "expect": {
+    "status": "fail",
+    "group_key": "10.0.0.10",
+    "affected": [
+      "10.0.0.10:21 (vsftpd, Zertifikat ftp.example.test, am Scantag seit 01.03.2026 abgelaufen)"
+    ],
+    "positive": false
+  }
+}

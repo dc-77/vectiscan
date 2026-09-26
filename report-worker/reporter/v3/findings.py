@@ -30,11 +30,13 @@ from reporter.v3 import ids as IDS
 from reporter.v3 import levels as L
 from reporter.v3 import tables as T
 from reporter.v3.bundles import GLOBAL_KEY, Consolidated
-from reporter.v3.models import CveRef, Finding, Positive, Provenance, Threat, ToolFinding
+from reporter.v3.models import CveRef, Finding, PlanItem, Positive, Provenance, Threat, ToolFinding
 from reporter.v3.operators import sentence as operator_sentence
 from reporter.v3.orthography import clean_foreign_text
 
 MAX_EVIDENCE_LINES = 6
+
+_CVE_RE = re.compile(r"CVE-\d{4}-\d{4,}", re.I)
 
 # Werkzeuge, deren Aussagen nicht aus einer eigenen Messung stammen.
 PASSIVE_TOOLS: frozenset[str] = frozenset({
@@ -46,17 +48,39 @@ PASSIVE_TOOLS: frozenset[str] = frozenset({
 # Webanalyse von ZAP ist eine eigene Messung, aber keine aktive Pruefung.
 TOOL_DISPLAY: dict[str, tuple[str, str]] = {
     "zap": ("passiv", "ZAP"),
+    "zap_spider": ("passiv", "ZAP"),
     "zap_active": ("aktiv", "ZAP"),
+}
+
+# S6b-3 (spec/10 R14): Quellen in 3.1 heissen wie in Anhang C (``tables.TOOL_ROWS``); interne
+# Kennungen (cms_fingerprint, redirect_probe, dns_records) stehen nicht im Kundentext.
+TOOL_NAMES: dict[str, str] = {
+    "dns_records": "DNS-Abfragen",
+    "dns_security": "DNS-Abfragen",
+    "web_probe": "Webabruf",
+    "redirect_probe": "Weiterleitungsprüfung",
+    "cms_fingerprint": "CMS-Erkennung",
+    "testssl": "testssl.sh",
+    "shodan": "Shodan",
+    "abuseipdb": "AbuseIPDB",
+    "otx": "OTX",
+    "urlhaus": "URLhaus",
+    "crtsh": "crt.sh",
+    "ffuf_param": "ffuf",
+    "ffuf_sensitive": "ffuf",
+    "securitytrails": "SecurityTrails",
+    "certspotter": "Certspotter",
 }
 
 
 # ---------------------------------------------------------------- Hilfen
 
-# S6b-1 (spec/09 Teil 3): kein Platzhalter "den geprüften Hosts" mehr. Ab vier Gruppen
-# stehen drei Namen und die Gesamtzahl; die Form ist fallneutral, weil die Texte sie
-# im Nominativ ("Die Hosts {group} bieten") und im Dativ ("Auf {group} antwortet")
-# einsetzen.
-NAMED_GROUPS = 3
+# S6b-1 (spec/09 Teil 3): kein Platzhalter "den geprüften Hosts" mehr. Die Form ist
+# fallneutral, weil die Texte sie im Nominativ ("Die Hosts {group} bieten") und im Dativ
+# ("Auf {group} antwortet") einsetzen. S6b-3 (spec/10 R6): bis zu sechs Namen, darueber
+# sechs Namen und "und n weitere"; Zahl und Namen kommen aus derselben Liste. Vorher
+# stand "(insgesamt 4 Einträge)" hinter drei Namen und las sich wie eine Meldungszahl.
+NAMED_GROUPS = 6
 
 # Ein Host mit vielen VHosts traegt sie alle im Gruppennamen, bei vectigal.tech 31 hinter
 # einer einzigen IP (spec/08 Punkt 13). In Einschraenkungen (chapters) und Positivbefunden
@@ -73,7 +97,7 @@ def kurz_label(label: str) -> str:
     if len(namen) <= _VHOSTS_IM_NAMEN:
         return label
     return (f"{treffer.group('kopf')} ("
-            f"{', '.join(namen[:_VHOSTS_IM_NAMEN])} und weitere)")
+            f"{', '.join(namen[:_VHOSTS_IM_NAMEN])} und {len(namen) - _VHOSTS_IM_NAMEN} weitere)")
 
 
 def aufzaehlung(names: list[str]) -> str:
@@ -98,7 +122,7 @@ def _group_label(results: list[CheckResult], groups: list[str], merge_key: str,
     if kurz:
         groups = [kurz_label(g) for g in groups]
     if len(results) == 1:
-        label = results[0].group_label or merge_key
+        label = (groups[0] if groups else "") or results[0].group_label or merge_key
         return (kurz_label(label) if kurz else label), 1
     if merge_key and merge_key != GLOBAL_KEY:
         return merge_key, 1
@@ -107,11 +131,13 @@ def _group_label(results: list[CheckResult], groups: list[str], merge_key: str,
         label = aufzaehlung(groups)
         if excluded and not label:
             label = "keinem Host"
+        elif excluded:
+            label += f" (außer {aufzaehlung(list(excluded))})"
         return label, max(count, 1)
-    zusatz = f"insgesamt {count} Einträge"
+    label = f"{', '.join(groups[:NAMED_GROUPS])} und {count - NAMED_GROUPS} weitere"
     if excluded:
-        zusatz += f", außer {aufzaehlung(list(excluded))}"
-    return f"{', '.join(groups[:NAMED_GROUPS])} ({zusatz})", count
+        label += f" (außer {aufzaehlung(list(excluded))})"
+    return label, count
 
 
 _LABEL_DETAIL = re.compile(r"^(?P<kopf>[^()]+?) \((?P<detail>.+)\)$")
@@ -149,18 +175,27 @@ def _clean_labels(labels: list[str]) -> list[str]:
 
 
 def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY,
-                kurz: bool = False, excluded: list[str] | None = None) -> dict[str, Any]:
-    """Platzhalterwerte fuer den zusammengefuehrten Sachverhalt."""
+                kurz: bool = False, excluded: list[str] | None = None,
+                operator_labels: dict[str, str] | None = None) -> dict[str, Any]:
+    """Platzhalterwerte fuer den zusammengefuehrten Sachverhalt.
+
+    ``operator_labels`` (S6b-3, spec/10 R6): Gruppen auf einem geteilten System tragen im
+    Positivbefund "beim Hoster X" hinter ihrem Namen.
+    """
     affected: list[str] = []
     groups: list[str] = []
     fqdns: list[str] = []
     notes: list[str] = []
     domain = ""
     host_ip = ""
+    operator_labels = operator_labels or {}
     for r in results:
         affected.extend(r.affected)
-        if r.group_label and r.group_label not in groups:
-            groups.append(r.group_label)
+        label = r.group_label
+        if label and r.group_key in operator_labels:
+            label = f"{kurz_label(label) if kurz else label}, {operator_labels[r.group_key]}"
+        if label and label not in groups:
+            groups.append(label)
         for name in r.vars.get("fqdn_names") or []:
             if name not in fqdns:
                 fqdns.append(name)
@@ -171,7 +206,18 @@ def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY,
         host_ip = host_ip or str(r.vars.get("host_ip") or "")
     affected = _clean_labels(affected)
     group, n = _group_label(results, groups, merge_key, kurz=kurz, excluded=excluded)
+    passed: list[str] = []
+    fehlend: list[str] = []
+    for r in results:
+        for x in r.vars.get("passed") or []:
+            if x not in passed:
+                passed.append(x)
+        for x in r.vars.get("missing_header_names") or []:
+            if x not in fehlend:
+                fehlend.append(x)
     return {
+        "passed": passed,
+        "missing_header_names": fehlend,
         "affected": affected,
         "count": len(affected),
         "group": group,
@@ -191,7 +237,7 @@ def _tool_display(tool: str) -> tuple[str, str]:
     """(Art, Anzeigename) eines Werkzeugs fuer die Quellenangabe."""
     if tool in TOOL_DISPLAY:
         return TOOL_DISPLAY[tool]
-    return ("passiv" if tool in PASSIVE_TOOLS else "aktiv"), tool
+    return ("passiv" if tool in PASSIVE_TOOLS else "aktiv"), TOOL_NAMES.get(tool, tool)
 
 
 def evidence_block(results: list[CheckResult]) -> str:
@@ -326,6 +372,7 @@ class Rendered:
     members: list[str]
     stage: str = ""
     quantor: str = "alle"
+    effect: str = ""
 
     def provenance(self) -> Provenance:
         return Provenance(field=self.field, check=self.check, statement=self.statement,
@@ -351,11 +398,14 @@ def select_statements(hit: RuleHit, name: str, values: dict[str, Any],
             werte = dict(values, affected=betroffen, count=len(betroffen))
         rendered = _render(text, werte, f"{where}.{hit.check.id}.{sid}")
         stage = ""
+        effect = ""
         if name == "recommendation":
-            stage = hit.check.texts.recommendation[int(sid.split("[")[1].rstrip("]"))].stage
+            rec = hit.check.texts.recommendation[int(sid.split("[")[1].rstrip("]"))]
+            stage = rec.stage
+            effect = rec.effect or ""
         out.append(Rendered(field=name, check=hit.check.id, statement=sid, text=rendered,
                             members=[_member_ref(r, m) for r, m in gilt], stage=stage,
-                            quantor=quantor))
+                            quantor=quantor, effect=effect))
     return out
 
 
@@ -382,6 +432,7 @@ class Composed:
     plan_stage: str
     plan_effect: str
     plan_lever: str
+    plan_items: list[PlanItem] = field(default_factory=list)
 
 
 def compose(item: Consolidated, checks: dict[str, CheckInfo], where: str) -> Composed:
@@ -392,6 +443,7 @@ def compose(item: Consolidated, checks: dict[str, CheckInfo], where: str) -> Com
     empfehlungen: list[tuple[int, int, str, Rendered]] = []
     wirksam: list[str] = []
     plan: Optional[tuple[str, str, str, str]] = None
+    plan_items: list[PlanItem] = []
     for reihe, hit in enumerate(hits):
         werte = merged_vars(hit.results, item.merge_key)
         for name in teile:
@@ -405,11 +457,18 @@ def compose(item: Consolidated, checks: dict[str, CheckInfo], where: str) -> Com
         for pos, (rec, stufe) in enumerate(zip(recs, verschoben)):
             rec.stage = stufe
             empfehlungen.append((L.STAGE_RANK[stufe], reihe * 100 + pos, rec.text, rec))
-        if plan is None and recs:
+        if recs:
+            # S6b-3 (spec/10 R11, Entscheidung E8): jede getroffene Regel bringt ihre erste
+            # Stufe in den Plan, mit dem Effekt genau dieser Stufe. Vorher kam nur die Regel
+            # an erster Stelle in den Plan (SPF-Hardfail, TLS-RPT und CSP fehlten).
             erste = min(zip(verschoben, recs), key=lambda p: L.STAGE_RANK[p[0]])[1]
             texte = hit.check.texts.plan
-            plan = (erste.text, erste.stage, texte.effect if texte else "",
-                    texte.lever if texte else "")
+            effekt = erste.effect or (texte.effect if texte else "")
+            hebel = texte.lever if texte else ""
+            plan_items.append(PlanItem(check=hit.check.id, action=erste.text, stage=erste.stage,
+                                       effect=effekt, lever=hebel))
+            if plan is None:
+                plan = (erste.text, erste.stage, effekt, hebel)
     empfehlungen.sort(key=lambda t: (t[0], t[1]))
     rec_out: list[list[str]] = []
     rec_prov: list[Provenance] = []
@@ -441,7 +500,7 @@ def compose(item: Consolidated, checks: dict[str, CheckInfo], where: str) -> Com
         title=title, found=_join(teile["observation"]), impact=_join(teile["meaning"]),
         verify=_join(teile["verify"]), recommendation=rec_out, urgency_stage=urgency_stage,
         provenance=prov, plan_action=action, plan_stage=stage, plan_effect=effect,
-        plan_lever=lever)
+        plan_lever=lever, plan_items=plan_items)
 
 
 def recommendations(item: Consolidated, checks: dict[str, CheckInfo]) -> list[list[str]]:
@@ -609,6 +668,7 @@ def build_findings(
     seen_cves: dict[str, list[str]] = {}
     excluded_keys = excluded_keys or set()
 
+    alerts = _alert_index(facts)
     index = 0
     for item in items:
         values = merged_vars(item.results, item.merge_key)
@@ -624,8 +684,12 @@ def build_findings(
                         continue
                     ort = m.fqdn or (f"{m.host_ip}:{m.port}" if m.host_ip and m.port else m.host_ip) or r.group_label
                     regel = f"{r.check_id}#{m.message_id}" if m.message_id else r.check_id
-                    tool_findings.append(ToolFinding(what=m.label, where=ort, note=f"{r.title}.",
-                                                     rule=regel, message=m.message))
+                    note, anzahl = f"{r.title}.", 1
+                    alert = alerts.get((m.fqdn or "", m.message_id or "", m.message or ""))
+                    if alert is not None:
+                        note, anzahl = zap_note(alert) or note, max(alert.count, 1)
+                    tool_findings.append(ToolFinding(what=m.label, where=ort, note=note,
+                                                     rule=regel, message=m.message, count=anzahl))
             continue
         index += 1
         fid = IDS.finding_id(kuerzel, year, index)
@@ -716,7 +780,32 @@ def build_findings(
             plan_stage=texte.plan_stage,
             plan_effect=texte.plan_effect,
             plan_lever=texte.plan_lever,
+            plan_items=texte.plan_items,
+            checks=list(item.rules),
+            subjects=finding_subjects(item.results),
+            missing_headers=missing_headers(item.results),
         ))
+    # S6b-3 (spec/10 R14): CVE-Kennungen, die ein Befund aus wpscan zitiert, stehen in A.3 mit
+    # ihrer Quelle; vorher stand dort "Keine CVE-Referenzen" neben 17 zitierten Kennungen (DB).
+    werkzeug_cves: dict[str, str] = {}
+    for sw in facts.software:
+        for v in sw.vulnerabilities:
+            for cve in v.cves:
+                werkzeug_cves.setdefault(cve.upper(), v.title)
+    for f in findings:
+        text = " ".join((f.found, f.evidence, f.impact))
+        for cve in dict.fromkeys(m.upper() for m in _CVE_RE.findall(text)):
+            if cve in seen_cves:
+                if f.id not in seen_cves[cve]:
+                    seen_cves[cve].append(f.id)
+                continue
+            if cve not in werkzeug_cves:
+                continue
+            seen_cves[cve] = [f.id]
+            cve_refs.append(CveRef(cve=cve, name=clean_foreign_text(werkzeug_cves[cve], limit=120),
+                                   score="", src="wpscan", ref=f.id,
+                                   note="Quelle wpscan, ohne Fremdbewertung."))
+    tool_findings.extend(uncovered_zap_messages(output, facts, alerts))
     for ref in cve_refs:
         erste = ref.cve.split(",")[0].strip()
         befunde: list[str] = []
@@ -740,7 +829,8 @@ def build_positives(items: list[Consolidated]) -> list[Positive]:
         # S6a (#30): ab vier Hosts nennt die Bezeichnung die herausgenommenen Hosts
         # ("insgesamt 5 Einträge, außer 10.0.0.3"); bis zu drei verbleibende Hosts stehen
         # ohnehin namentlich da.
-        values = merged_vars(item.results, item.merge_key, kurz=True, excluded=item.excluded_hosts)
+        values = merged_vars(item.results, item.merge_key, kurz=True, excluded=item.excluded_hosts,
+                             operator_labels=item.operator_labels)
         where = f"{item.key}/{GLOBAL_KEY}"
         texte: list[str] = []
         prov: list[Provenance] = []
@@ -751,7 +841,8 @@ def build_positives(items: list[Consolidated]) -> list[Positive]:
             info_texts = item.positive_texts.get(cid)
             if info_texts is None:
                 continue
-            werte = merged_vars(results, item.merge_key, kurz=True, excluded=item.excluded_hosts)
+            werte = merged_vars(results, item.merge_key, kurz=True, excluded=item.excluded_hosts,
+                                operator_labels=item.operator_labels)
             text = _render(info_texts.text, werte, f"{where}.{cid}.positive.text")
             if text not in texte:
                 texte.append(text)
@@ -762,7 +853,98 @@ def build_positives(items: list[Consolidated]) -> list[Positive]:
                                   statement="positive.title",
                                   members=[r.group_key for r in item.results], text=title))
         out.append(Positive(cat=item.category, title=title, text=" ".join(texte),
-                            provenance=prov))
+                            provenance=prov, checks=list(item.rules),
+                            subjects=positive_subjects(item.results)))
+    return out
+
+
+def finding_subjects(results: list[CheckResult]) -> list[str]:
+    """Je Regel die Gruppen und Orte (Host:Port oder Name) der fehlgeschlagenen Mitglieder,
+    als "regel|subjekt" (fuer das Gate, spec/10 R4 und R8). Ein Buendel traegt so nicht jede
+    Regel an jedem Subjekt seiner Mitglieder."""
+    out: set[str] = set()
+    for r in results:
+        if r.status != "fail":
+            continue
+        out.add(f"{r.check_id}|{r.group_key}")
+        out.update(f"{r.check_id}|{m.key}" for m in r.members if m.status == "fail" and m.key)
+    return sorted(out, key=sort_key)
+
+
+def positive_subjects(results: list[CheckResult]) -> list[str]:
+    """Gruppen und bestandene Mitglieder eines Positivbefunds (fuer das Gate, spec/10 R7)."""
+    out: set[str] = set()
+    for r in results:
+        out.add(r.group_key)
+        out.update(m.key for m in r.members if m.status == "pass" and m.key)
+    return sorted(out, key=sort_key)
+
+
+def missing_headers(results: list[CheckResult]) -> list[str]:
+    """Fehlende Header laut Messung, Anzeigenamen (spec/10 R2)."""
+    out: list[str] = []
+    for r in results:
+        if r.status != "fail":
+            continue
+        for name in r.vars.get("missing_header_names") or []:
+            if name not in out:
+                out.append(name)
+    return out
+
+
+# ---------------------------------------------------------------- Anhang: ZAP-Meldungen
+
+def _alert_index(facts: FS.Facts) -> dict[tuple[str, str, str], FS.WebAlert]:
+    out: dict[tuple[str, str, str], FS.WebAlert] = {}
+    for h in facts.http:
+        for a in h.alerts:
+            out.setdefault((h.fqdn or "", a.plugin_id or "", a.name), a)
+    return out
+
+
+def zap_note(alert: FS.WebAlert) -> str:
+    """Hinweis-Spalte (spec/10 R15): deutscher Titel der ZAP-Regel, bei aktiven Meldungen
+    "nicht bestätigt" mit der Konfidenz des Werkzeugs."""
+    titel = T.zap_title(alert.plugin_id, alert.name)
+    if not titel:
+        return ""
+    if alert.run == "active":
+        konf = T.ZAP_CONFIDENCE.get(alert.confidence or "", "")
+        return f"{titel}; aktive Prüfung, nicht bestätigt" + (f", Konfidenz {konf}" if konf else "") + "."
+    return f"{titel}."
+
+
+def uncovered_zap_messages(output: CatalogOutput, facts: FS.Facts,
+                           alerts: dict[tuple[str, str, str], FS.WebAlert]) -> list[ToolFinding]:
+    """ZAP-Meldungen (Low bis High), die die Ignorierliste einer Pruefung zuschreibt, die an
+    dieser Stelle nicht angeschlagen hat (spec/10 R15: castenow X-Powered-By ohne Version).
+    Sie standen bisher nirgends im Bericht."""
+    fails: set[tuple[str, str]] = set()
+    for r in output.results:
+        if r.status != "fail":
+            continue
+        for m in r.members:
+            if m.status == "fail":
+                fails.update((r.check_id, x) for x in (m.fqdn, m.host_ip) if x)
+        fails.update((r.check_id, x) for x in (str(r.vars.get("host_ip") or ""), r.group_key) if x)
+        for name in r.vars.get("fqdn_names") or []:
+            fails.add((r.check_id, name))
+    out: list[ToolFinding] = []
+    for item in output.ignored:
+        if item.kind != "zap_alert" or not item.covered_by:
+            continue
+        for fqdn in item.fqdns or [""]:
+            if any((cid, x) in fails for cid in item.covered_by for x in (fqdn, item.host_ip) if x):
+                continue
+            alert = alerts.get((fqdn, item.plugin_id or "", item.name or ""))
+            if alert is None or alert.risk not in ("Low", "Medium", "High"):
+                continue
+            kennung = f"#{alert.plugin_id}" if alert.plugin_id else ""
+            out.append(ToolFinding(
+                what=f"{alert.name} auf {fqdn}" if fqdn else alert.name,
+                where=fqdn or item.host_ip or "",
+                note=zap_note(alert) or "Werkzeugmeldung ohne eigene Einstufung.",
+                rule=f"zap_uncovered{kennung}", message=alert.name, count=max(alert.count, 1)))
     return out
 
 
@@ -788,7 +970,12 @@ def summarize_tool_messages(messages: list[ToolFinding]) -> list[ToolFinding]:
     """
     gruppen: dict[tuple[str, str], list[ToolFinding]] = {}
     for t in messages:
-        gruppen.setdefault((t.rule, t.message or ""), []).append(t)
+        # S6b-3 (spec/10 R15): eine Zeile je ZAP-Regel und Meldung, gleich ob eine Katalogregel
+        # sie aufnahm oder die abdeckende Regel nicht anschlug.
+        rule = t.rule
+        if "#" in rule and t.message and (rule.startswith("zap_uncovered") or _zap_rule(rule)):
+            rule = "zap#" + rule.split("#", 1)[1]
+        gruppen.setdefault((rule, t.message or ""), []).append(t)
     out: list[ToolFinding] = []
     for (rule, name), rows in gruppen.items():
         orte = sorted({r.where for r in rows if r.where}, key=sort_key)
@@ -804,9 +991,18 @@ def summarize_tool_messages(messages: list[ToolFinding]) -> list[ToolFinding]:
         else:
             # Ohne Meldungsnamen (TRACE aus OPTIONS, Passivport ohne Kennung): der Regeltitel.
             what = first.note.rstrip(".")
-        if len(rows) > 1:
-            what = f"{what}, {_meldungen(len(rows))}"
+        # S6b-3 (spec/10 R15): die Anzahl steht in jeder Zeile; bei ZAP die Zahl der
+        # betroffenen Adressen laut Werkzeug, sonst die Zahl der Einzelmeldungen.
+        anzahl = sum(max(r.count, 1) for r in rows)
+        what = f"{what}, {_meldungen(anzahl)}"
         note = first.note if (rule == "technik" or name) else "Werkzeugmeldung ohne eigene Einstufung."
         out.append(ToolFinding(what=what, where=betrifft, note=note, rule=rule, message=first.message,
-                               count=len(rows)))
+                               count=anzahl))
     return out
+
+
+_ZAP_APPENDIX_CHECKS = ("info_disclosure", "js_library_outdated", "web_vulnerability_reported")
+
+
+def _zap_rule(rule: str) -> bool:
+    return rule.split("#", 1)[0] in _ZAP_APPENDIX_CHECKS

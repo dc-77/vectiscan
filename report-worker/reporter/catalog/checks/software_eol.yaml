@@ -11,14 +11,16 @@ when: software.eol.status == "eol" and software.kind in ["webserver", "database"
 # S6b-2 (spec/09 Teil 2 castenow): Exchange SE ist gepflegt (kein EOL-Befund), aber ohne
 # Patchstand ist "laufende Herstellerpflege" nicht belegt; nur eine Version mit Lebenszyklus
 # "supported" traegt den Positivbefund.
-positive_when: software.kind in ["webserver", "database", "mail", "os", "ssh", "ftp", "control_panel"] and software.eol.status == "supported"
+# S6b-3 (spec/10 R6): positiv nur mit Lebenszyklusquelle je Produkt (Debian 12 mit LTS-Datum
+# und Quelle), der Positivbefund nennt Produkt, Datum und Quelle.
+positive_when: software.kind in ["webserver", "database", "mail", "os", "ssh", "ftp", "control_panel"] and software.eol.status == "supported" and software.eol.source is not None
 not_testable_when: []
 undetermined: pass_silent
 requires:
   tools: [nmap]
 kind: check
 bundle: null
-affected_template: "{host_ip}: {product} {version} (Support beendet {eol_date})"
+affected_template: "{host_ip}: {product} {version} ({lifecycle_text})"
 evidence: [software]
 references: [CWE-1104]
 frameworks:
@@ -47,7 +49,8 @@ texts:
         Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte
         Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits
         zurückgreifen.
-    - when: software.kind != "os"
+    # S6b-3 (spec/10 R9): der Backport-Satz nur bei einem Distributionspaket (Paketsuffix).
+    - when: software.kind != "os" and software.distro is not None
       quantor: eines
       text: >-
         Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner nicht
@@ -60,10 +63,17 @@ texts:
         mehr: {affected}.
   recommendation:
     - stage: in_kuerze
-      when: software.kind != "os"
+      when: software.kind != "os" and software.distro is not None
       text: >-
         Prüfen, ob die Version tatsächlich ungepflegt ist oder ob die Distribution
         Sicherheits-Backports liefert.
+      effect: "Klärt, ob die Software noch Sicherheitsupdates erhält"
+    - stage: in_kuerze
+      when: software.kind != "os" and software.distro is None
+      text: >-
+        Die Ablösung durch eine vom Hersteller gepflegte Version planen und bis dahin den Zugang
+        aus dem Internet auf das Nötige einschränken.
+      effect: "Begrenzt den Zugriff auf Software ohne Sicherheitsupdates bis zur Ablösung"
     - stage: in_kuerze
       when: software.kind == "os"
       text: >-
@@ -79,5 +89,5 @@ texts:
   positive:
     title: Serversoftware mit laufender Herstellerpflege
     text: >-
-      Auf {group} ist Serversoftware nachweislich in einer vom Hersteller gepflegten Version im
-      Einsatz.
+      Auf {group} ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz:
+      {passed}.

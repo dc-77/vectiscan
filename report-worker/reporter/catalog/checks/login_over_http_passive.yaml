@@ -1,0 +1,52 @@
+id: login_over_http_passive
+title: Anmeldeseite laut Passivquelle über HTTP erreichbar
+family: login_over_http
+category: D
+scale: hygiene
+level: mittel
+group_by: host
+scope: passive
+applicable_when: null
+item_when: null
+when: passive.source == "shodan" and passive.details["login_over_http"] is not None
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [shodan]
+kind: check
+bundle: null
+affected_template: "{host_ip}:{port} ({login_url}, laut Passivquelle)"
+evidence: [passive]
+references: [CWE-319, CWE-523]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: S6b-3 (spec/10 R19)
+  start_level: mittel
+  deviation: >-
+    Passivfund, nicht bestätigt; die erste Empfehlung ist die Prüfung.
+texts:
+  short: "Anmeldung über HTTP laut Passivquelle"
+  plan:
+    lever: "Anmeldeseiten nur über HTTPS ausliefern"
+    effect: "Schützt Zugangsdaten auf dem Übertragungsweg"
+  observation: >-
+    Laut Passivquelle leitet {group} auf eine Anmeldeseite über eine unverschlüsselte Verbindung
+    weiter: {affected}. Der Portscan konnte das nicht bestätigen.
+  meaning: >-
+    Über HTTP gesendete Zugangsdaten lassen sich auf dem Übertragungsweg mitlesen.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Prüfen, ob die genannte Anmeldeseite noch über HTTP erreichbar ist, und sie
+        ausschließlich über HTTPS ausliefern.
+    - stage: mittelfristig
+      text: >-
+        Unverschlüsselte Aufrufe der Anwendung auf HTTPS umleiten und HSTS setzen.
+  verify: >-
+    Die genannte Adresse von außen über HTTP aufrufen; erwartet wird eine Weiterleitung auf
+    HTTPS vor jeder Anmeldung.

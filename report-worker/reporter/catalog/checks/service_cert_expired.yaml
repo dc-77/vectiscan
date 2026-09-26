@@ -1,0 +1,62 @@
+id: service_cert_expired
+title: Abgelaufenes Zertifikat an Diensten außerhalb der Webseiten
+family: cert_expired
+category: D
+scale: exposure
+level: erhoeht
+group_by: host
+scope: service
+applicable_when: null
+# S6b-3 (spec/10 R3): Zertifikat eines Dienstes ohne eigenen TLS-Fakt (Mailports, FTP,
+# Zusatzports), von nmap ueber ssl-cert erkannt. Dienste, die testssl bereits als TLS-Fakt
+# fuehrt, laufen ueber cert_expired.
+when: service.cert is not None and service.cert.expired is True and service.port not in ports(tls_list)
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [nmap]
+kind: check
+bundle: cert_health
+affected_template: "{host_ip}:{port} ({kennung_label}, Zertifikat {cert_cn}, {cert_validity_text})"
+evidence: [service]
+references: [CWE-295, CWE-298]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: S6b-3 (spec/10 R3)
+  start_level: erhoeht
+  deviation: null
+texts:
+  short: "abgelaufenes Zertifikat an Diensten"
+  plan:
+    lever: "Gültige Zertifikate für alle TLS-Dienste hinterlegen"
+    effect: "Verhindert Zertifikatswarnungen an Mail- und Dateiclients"
+  observation:
+    - text: >-
+        Auf {group} liefern Dienste außerhalb der Webseiten ein abgelaufenes Zertifikat aus:
+        {affected}.
+    - when: service.cert.self_signed is True
+      quantor: eines
+      text: >-
+        Das Zertifikat ist zudem selbst signiert und stammt von keiner anerkannten
+        Zertifizierungsstelle: {affected}.
+  meaning: >-
+    Mail- und Dateiclients warnen bei abgelaufenen Zertifikaten oder brechen die Verbindung
+    ab; wer die Warnung regelmäßig wegklickt, erkennt ein untergeschobenes Zertifikat nicht
+    mehr.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Für die betroffenen Dienste ein gültiges Zertifikat hinterlegen, das den Servernamen
+        abdeckt, mit dem die Clients sich verbinden.
+    - stage: mittelfristig
+      text: >-
+        Die Erneuerung der Zertifikate für alle TLS-Dienste automatisieren und überwachen,
+        nicht nur für die Webseiten.
+  verify: >-
+    Verbindung zu den genannten Ports mit TLS aufbauen (bei 110, 143 und 587 nach STARTTLS)
+    und das Zertifikat prüfen; erwartet wird ein gültiges, nicht abgelaufenes Zertifikat.

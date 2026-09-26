@@ -98,7 +98,8 @@ URGENT_EXCEPTIONS: dict[str, str] = {
 TRIAGE_UNKNOWN = Triage("blau", ("mittelfristig",), "LOW")
 
 # Triage-Farbe -> Balkenwert der Ampel auf Seite 2 (vier Segmente).
-BAR_BY_STATUS: dict[str, int] = {"rot": 4, "gelb": 2, "blau": 1, "gruen": 0}
+# S6b-3 (spec/10 R6): "grau" = nicht bewertbar (Kategorie B ohne bewertbare Version).
+BAR_BY_STATUS: dict[str, int] = {"rot": 4, "gelb": 2, "blau": 1, "gruen": 0, "grau": 0}
 
 # Triage-Farbe -> Gesamtbewertung als Wort.
 OVERALL_BY_STATUS: dict[str, str] = {
@@ -108,10 +109,10 @@ OVERALL_BY_STATUS: dict[str, str] = {
     "gruen": "GERING",
 }
 
-STATUS_RANK: dict[str, int] = {"rot": 0, "gelb": 1, "blau": 2, "gruen": 3}
+STATUS_RANK: dict[str, int] = {"rot": 0, "gelb": 1, "blau": 2, "gruen": 3, "grau": 4}
 
 STATUS_LABELS: dict[str, str] = {
-    "rot": "Rot", "gelb": "Gelb", "blau": "Blau", "gruen": "Grün",
+    "rot": "Rot", "gelb": "Gelb", "blau": "Blau", "gruen": "Grün", "grau": "Grau",
 }
 
 LEVEL_LABELS: dict[str, str] = {

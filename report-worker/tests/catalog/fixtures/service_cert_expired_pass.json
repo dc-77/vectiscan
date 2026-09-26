@@ -1,0 +1,29 @@
+{
+ "facts": {
+  "services": [
+   {
+    "host_ip": "10.0.0.1",
+    "port": 995,
+    "service": "pop3s",
+    "product": "Dovecot pop3d",
+    "tunnel_ssl": true,
+    "cert": {
+     "cn": "mail.example.test",
+     "issuer": "Beispiel CA",
+     "not_before": "2026-01-01T00:00:00Z",
+     "not_after": "2027-01-01T00:00:00Z",
+     "days_left": 100,
+     "expired": false,
+     "self_signed": false
+    }
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.1",
+  "affected": [],
+  "positive": false
+ }
+}

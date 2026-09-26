@@ -1,0 +1,53 @@
+{
+ "check": "admin_portal_exposed",
+ "cases": [
+  {
+   "name": "SonicWall am Anschluss des Kunden, Plesk im Rechenzentrum (spec/10 R13)",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.0.1",
+      "betriebsform": "anschluss"
+     },
+     {
+      "ip": "10.0.0.2",
+      "betriebsform": "rechenzentrum"
+     }
+    ],
+    "fqdns": [
+     {
+      "name": "fw.example.test",
+      "host_ip": "10.0.0.1",
+      "http_status": 200,
+      "title": "SonicWall - Authentication"
+     },
+     {
+      "name": "panel.example.test",
+      "host_ip": "10.0.0.2",
+      "http_status": 200,
+      "title": "Plesk Obsidian 18.0"
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "fw.example.test@10.0.0.1": [
+      "meaning[0]"
+     ],
+     "panel.example.test@10.0.0.2": [
+      "meaning[1]"
+     ]
+    },
+    "not_holds": {
+     "fw.example.test@10.0.0.1": [
+      "meaning[1]"
+     ],
+     "panel.example.test@10.0.0.2": [
+      "meaning[0]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  }
+ ]
+}

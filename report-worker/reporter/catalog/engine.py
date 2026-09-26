@@ -25,7 +25,8 @@ from pydantic import ValidationError
 from reporter.catalog import render
 from reporter.catalog import tables as T
 from reporter.catalog.catchall import run_catchalls
-from reporter.catalog.evidence import KEEP_FACT_EVIDENCE, auszug, detail_evidence, ist_redundant
+from reporter.catalog.evidence import (KEEP_FACT_EVIDENCE, NUR_FUER, auszug, detail_evidence, ist_redundant,
+                                       werkzeug_zeile)
 from reporter.catalog.expr import CatalogSpecError, Expr, compile_expr
 from reporter.catalog.schema import (CATEGORY_NAMES, LEVEL_LABELS, BundleSpec, CatalogOutput, CheckInfo,
                                      CheckResult, CheckRollup, CheckSpec, EvidenceRef, IgnoreList, Member,
@@ -56,6 +57,8 @@ class CompiledCheck:
     statements: list[tuple[str, Optional[Expr]]] = field(default_factory=list)
     # S6b-2 (spec/09 Q7): Fakten, auf die die Regel sieht; daraus entsteht der Nachweis.
     evidence_paths: frozenset[str] = frozenset()
+    # S6b-3: (Grund, Bedingung) fuer nicht anwendbare Gruppen.
+    na_reasons: list[tuple[str, Expr]] = field(default_factory=list)
 
 
 @dataclass
@@ -198,6 +201,9 @@ def compile_check(spec: CheckSpec, path: Path | None = None) -> CompiledCheck:
     if spec.texts.plan is not None:
         render.validate_template(spec.texts.plan.lever, (), f"{where} texts.plan.lever")
         render.validate_template(spec.texts.plan.effect, (), f"{where} texts.plan.effect")
+    for i, rec in enumerate(spec.texts.recommendation):
+        if rec.effect is not None:
+            render.validate_template(rec.effect, (), f"{where} recommendation[{i}].effect")
     # S6b-2: jede Aussage wird wie ``when`` kompiliert; eine Bedingung, die der Compiler
     # nicht kennt, ist ein Ladefehler und kein stilles Weglassen im Bericht.
     statements: list[tuple[str, Optional[Expr]]] = []
@@ -208,9 +214,17 @@ def compile_check(spec: CheckSpec, path: Path | None = None) -> CompiledCheck:
     for ex in (when, applicable, item_filter):
         if ex is not None:
             paths |= set(ex.paths)
+    na_reasons: list[tuple[str, Expr]] = []
+    for i, rule in enumerate(spec.not_applicable_reasons):
+        ex = comp(rule.when, f"not_applicable_reasons[{i}]")
+        assert ex is not None
+        if rule.reason_code not in T.COVERAGE_REASONS:
+            raise CatalogSpecError(f"{where}: unbekannter Grund {rule.reason_code!r}")
+        na_reasons.append((rule.reason_code, ex))
     return CompiledCheck(spec=spec, when=when, positive=positive, applicable=applicable, nt_group=nt_group,
                          nt_item=nt_item, item_filter=item_filter, active_proof=active_proof, urgent=urgent,
-                         path=path, statements=statements, evidence_paths=frozenset(paths))
+                         path=path, statements=statements, evidence_paths=frozenset(paths),
+                         na_reasons=na_reasons)
 
 
 def load_catalog(catalog_dir: Path | str | None = None) -> Catalog:
@@ -273,7 +287,7 @@ def _evidence_of(obj: Any) -> list[EvidenceRef]:
     # S6b-2 (spec/09 Q7): ein von der Faktenschicht gekuerzter Auszug traegt den Hinweis
     # "(Auszug)" statt drei Punkten; Rueckfall-Fundstellen der Datenbank stehen nicht da.
     return [EvidenceRef(fact_id=fid, tool=e.tool, ref="" if e.ref.startswith("scan_results:") else e.ref,
-                        excerpt=auszug(e.excerpt)) for e in evs]
+                        excerpt=werkzeug_zeile(auszug(e.excerpt))) for e in evs]
 
 
 def _source_mode(modes: list[str]) -> str:
@@ -324,7 +338,12 @@ class _Eval:
         if g.kind == "domain" and spec.scope in DNS_SCOPES and gctx.get("dns") is None:
             return self.result(g, "not_testable", reason_code=g.dns_missing_reason or "no_dns_facts")
         if self.cc.applicable is not None and not self.cc.applicable.test(gctx):
-            return self.result(g, "not_applicable", reason_code="precondition_not_met")
+            return self.result(g, "not_applicable", reason_code=self.not_applicable_reason(gctx))
+        # S6b-3 (spec/10 R4): ein nicht eingerichteter Name (Parkseite) hat keine eigene
+        # Webseite; Web-, Header- und TLS-Pruefungen sind dort nicht pruefbar, mit eigenem Grund.
+        fq = gctx.get("fqdn")
+        if fq is not None and getattr(fq, "skipped", None) == "parking"                 and spec.scope.split(".")[0] in ("http", "tls"):
+            return self.result(g, "not_testable", reason_code="parked_name")
         for rule, ex in self.cc.nt_group:
             if not ex.test(gctx):
                 continue
@@ -340,17 +359,23 @@ class _Eval:
 
         members: list[Member] = []
         matched_positive = False
+        # S6b-3 (spec/10 R6): {passed} nennt nur Mitglieder, die die Positivbedingung erfuellen;
+        # "pass_silent" (Debian ohne Lebenszyklusquelle) ist kein Beleg fuer den Positivtext.
+        bestaetigt: list[str] = []
         seen_ok = 0
         notes: list[str] = []
         evidence: list[EvidenceRef] = []
         active_proof = False
         urgent = False
+        fehlend: list[str] = []
         for item in g.items:
             ictx = {**gctx, **item.ctx}
             if self.cc.item_filter is not None and not self.cc.item_filter.test(ictx):
                 continue
             ivars = render.item_vars(spec.scope, item, g, self.index)
             label = render.format_strict(spec.affected_template, ivars, f"check {spec.id} affected_template")
+            # Leere Variable am Klammerende ("POP3 " ohne Anmeldeangabe): Leerraum glaetten.
+            label = " ".join(label.split()).replace(" )", ")").replace("( ", "(").replace(" ()", "")
             if self.cc.when is not None and self.cc.when.test(ictx):
                 self.claimed.add(item.claim_id)
                 if spec.kind == "note":
@@ -361,6 +386,10 @@ class _Eval:
                     dringend = self.cc.urgent is not None and self.cc.urgent.test(ictx)
                     members.append(_member(item, label, "fail", holds=holds, urgent=dringend,
                                            message=_message_of(spec.scope, ivars)))
+                    # S6b-3 (spec/10 R2): die tatsaechlich fehlenden Header dieses Mitglieds.
+                    for name in ivars.get("missing_headers_basic") or []:
+                        if name not in fehlend:
+                            fehlend.append(name)
                     evidence.extend(self.evidence(item, ictx))
                     # S6: aktiver Nachweis. Trifft der Ausdruck fuer ein
                     # fehlgeschlagenes Mitglied, ist der ganze Sachverhalt
@@ -376,6 +405,7 @@ class _Eval:
             if self.cc.positive is not None:
                 if self.cc.positive.test(ictx):
                     matched_positive = True
+                    bestaetigt.append(label)
                     members.append(_member(item, label, "pass"))
                 elif spec.undetermined == "pass_silent":
                     members.append(_member(item, label, "pass"))
@@ -390,17 +420,27 @@ class _Eval:
         fails = [m for m in members if m.status == "fail"]
         if fails:
             return self.result(g, "fail", members=members, evidence=evidence, notes=notes,
-                               seen=seen_ok, active_proof=active_proof, urgent=urgent)
+                               seen=seen_ok, active_proof=active_proof, urgent=urgent, affirmed=True,
+                               extra={"missing_header_names": fehlend})
         nts = [m for m in members if m.status == "not_testable"]
         if nts:
             return self.result(g, "not_testable", members=members, reason_code=nts[0].reason_code, notes=notes, seen=seen_ok)
         passes = [m for m in members if m.status == "pass"]
         if passes or seen_ok:
             positive = self.is_positive(matched_positive)
-            return self.result(g, "pass", members=members, positive=positive, notes=notes, seen=seen_ok)
+            return self.result(g, "pass", members=members, positive=positive, notes=notes, seen=seen_ok,
+                               affirmed=matched_positive,
+                               extra={"passed": sorted(set(bestaetigt), key=sort_key)})
         if members:
             return self.result(g, "not_applicable", members=members, reason_code="precondition_not_met")
         return self.empty_group(g)
+
+    def not_applicable_reason(self, gctx: dict[str, Any]) -> str:
+        """Grund einer nicht anwendbaren Gruppe: eigener Code, wenn die Pruefung einen nennt."""
+        for code, ex in self.cc.na_reasons:
+            if ex.test(gctx):
+                return code
+        return "precondition_not_met"
 
     def is_positive(self, matched_positive: bool) -> bool:
         spec = self.spec
@@ -430,6 +470,16 @@ class _Eval:
             return self.result(g, "not_applicable", reason_code="precondition_not_met")
         return self.result(g, "not_testable", reason_code="insufficient_facts")
 
+    def _tragend(self, refs: list[EvidenceRef]) -> list[EvidenceRef]:
+        """S6b-3 (spec/10 R14): Zeilen, die nur fuer eine andere Pruefung etwas sagen, entfallen
+        ("Potentially risky methods: TRACE" im Nachweis eines Zertifikatsbefunds)."""
+        out: list[EvidenceRef] = []
+        for e in refs:
+            fremd = next((cid for text, cid in NUR_FUER.items() if text in (e.excerpt or "")), None)
+            if fremd is None or fremd == self.spec.id:
+                out.append(e)
+        return out
+
     def evidence(self, item: Item, ictx: dict[str, Any]) -> list[EvidenceRef]:
         """Nachweis dieses Treffers.
 
@@ -441,14 +491,15 @@ class _Eval:
         """
         out = detail_evidence(self.spec.scope, item, ictx, self.spec.evidence_detail,
                               self.cc.evidence_paths)
+        out = self._tragend(out)
         if not out:
-            out.extend(_evidence_of(item.fact))
+            out.extend(self._tragend(_evidence_of(item.fact)))
         elif self.spec.scope in KEEP_FACT_EVIDENCE:
             # Der woertliche Werkzeugauszug bleibt, soweit er etwas sagt, das
             # nicht schon in der Detailzeile steht (``21/tcp open ftp ProFTPD``
             # neben ``...:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open``).
             detail = " ".join(e.excerpt for e in out)
-            out.extend(e for e in _evidence_of(item.fact)
+            out.extend(e for e in self._tragend(_evidence_of(item.fact))
                        if not ist_redundant(e.excerpt, detail))
         if out:
             return out
@@ -465,7 +516,8 @@ class _Eval:
 
     def result(self, g: Group, status: str, *, members: list[Member] | None = None, reason_code: str | None = None,
                evidence: list[EvidenceRef] | None = None, positive: bool = False, notes: list[str] | None = None,
-               seen: int = 0, active_proof: bool = False, urgent: bool = False) -> CheckResult:
+               seen: int = 0, active_proof: bool = False, urgent: bool = False,
+               affirmed: bool = False, extra: dict[str, Any] | None = None) -> CheckResult:
         spec = self.spec
         members = members or []
         notes = notes or []
@@ -495,7 +547,10 @@ class _Eval:
             ev.append(e)
             if len(ev) >= MAX_EVIDENCE:
                 break
-        gvars = render.group_vars(g, labels, notes)
+        passed = (extra or {}).get("passed")
+        if passed is None:
+            passed = sorted({m.label for m in members if m.status == "pass"}, key=sort_key)
+        gvars = render.group_vars(g, labels, notes, {**(extra or {}), "passed": passed})
         observation = ""
         if status == "fail":
             # Gruppenansicht: nur Aussagen, deren Bedingung fuer jedes fehlgeschlagene
@@ -515,7 +570,7 @@ class _Eval:
         return CheckResult(
             check_id=spec.id, family=spec.family, bundle=spec.bundle, kind=spec.kind, title=spec.title,
             category=spec.category, scale=spec.scale, level=spec.level, group_by=spec.group_by, group_key=g.key,
-            group_label=g.label, status=status, positive=positive, active_proof=active_proof,
+            group_label=g.label, status=status, positive=positive, affirmed=affirmed, active_proof=active_proof,
             urgent=urgent, verified=verified, source_mode=source_mode,
             affected=labels, affected_fact_ids=fact_ids, members=members, items_seen=seen + len(members), evidence=ev,
             reason_code=reason_code, reason=reason_text, notes=sorted(set(notes), key=sort_key),
@@ -551,13 +606,18 @@ def rollup(check: CheckSpec, results: list[CheckResult]) -> CheckRollup:
                        affected_total=sum(len(r.affected) for r in results))
 
 
-def evaluate(facts: FS.Facts | dict[str, Any], catalog: Catalog | None = None) -> CatalogOutput:
-    """Katalog auf eine Faktendatei anwenden. Deterministisch: Reihenfolge nach check_id und group_key."""
+def evaluate(facts: FS.Facts | dict[str, Any], catalog: Catalog | None = None, *,
+             report_date: str | None = None) -> CatalogOutput:
+    """Katalog auf eine Faktendatei anwenden. Deterministisch: Reihenfolge nach check_id und group_key.
+
+    ``report_date`` (JJJJ-MM-TT) ist das Berichtsdatum fuer Aussagen, die sich darauf beziehen
+    (spec/10 R18: "seit ... abgelaufen"); ohne Angabe gilt das Scanende.
+    """
     if isinstance(facts, dict):
         facts = FS.Facts.from_dict(facts)
     cat = catalog or default_catalog()
     facts = without_third_party(facts)
-    index = FactsIndex(facts)
+    index = FactsIndex(facts, report_date=report_date)
     claimed: set[str] = set()
     results: list[CheckResult] = []
     rollups: list[CheckRollup] = []

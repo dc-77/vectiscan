@@ -35,7 +35,8 @@ def test_nmap_xml_capabilities():
     assert f21.cert_san == ["*.example.test", "example.test"]
     assert f21.cert_not_after == "2026-11-02T23:59:59Z"
     f110 = derive_service_flags(by_port[110])
-    assert f110.starttls is True and f110.login_disabled is None
+    # S6b-3 (spec/10 R7): STLS ohne USER und mit leerem SASL sperrt die Anmeldung vor TLS.
+    assert f110.starttls is True and f110.login_disabled is True and f110.tls_required is True
     f143 = derive_service_flags(by_port[143])
     assert f143.starttls is True and f143.login_disabled is True and f143.tls_required is True
     f443 = derive_service_flags(by_port[443])
