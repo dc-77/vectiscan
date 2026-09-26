@@ -1,0 +1,85 @@
+{
+ "check": "hsts_missing",
+ "cases": [
+  {
+   "name": "HSTS-Header fehlt",
+   "facts": {
+    "services": [
+     {
+      "host_ip": "10.0.0.1",
+      "port": 443,
+      "service": "http",
+      "tls_required": true,
+      "tunnel_ssl": true
+     }
+    ],
+    "http": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "url": "https://www.example.test/",
+      "reachable": true,
+      "status_code": 200,
+      "hsts": {
+       "present": false
+      }
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "www.example.test@10.0.0.1": [
+      "observation[0]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test@10.0.0.1": [
+      "observation[1]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "HSTS mit max-age=0 abgeschaltet",
+   "facts": {
+    "services": [
+     {
+      "host_ip": "10.0.0.1",
+      "port": 443,
+      "service": "http",
+      "tls_required": true,
+      "tunnel_ssl": true
+     }
+    ],
+    "http": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "url": "https://www.example.test/",
+      "reachable": true,
+      "status_code": 200,
+      "hsts": {
+       "present": true,
+       "max_age": 0,
+       "raw": "max-age=0"
+      }
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "www.example.test@10.0.0.1": [
+      "observation[1]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test@10.0.0.1": [
+      "observation[0]"
+     ]
+    }
+   }
+  }
+ ]
+}

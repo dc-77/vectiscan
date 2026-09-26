@@ -1,0 +1,29 @@
+{
+ "facts": {
+  "services": [
+   {
+    "host_ip": "10.0.0.2",
+    "port": 8001,
+    "service": "vcom-tunnel",
+    "product": null,
+    "method": "table",
+    "nmap_conf": 3,
+    "unidentified": false,
+    "kennung": "TLS-Dienst, Zertifikat tonausstrom.de",
+    "tls_required": true,
+    "tunnel_ssl": true,
+    "cert": {
+     "cn": "tonausstrom.de",
+     "self_signed": false
+    }
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.2",
+  "affected": [],
+  "positive": false
+ }
+}

@@ -10,8 +10,13 @@ applicable_when: null
 when: tls.cert.chain_ok is False
 positive_when: tls.cert.chain_ok is True
 not_testable_when:
-  - when: tls.cert is None or tls.cert.chain_ok is None
+  - when: tls.cert is None
     reason_code: cert_unknown
+    context: item
+  # S6b-3 (spec/10 R4): Name und Laufzeit sind bekannt, nur die Kette nicht (kein testssl-Lauf
+  # mit diesem Zertifikat); das ist keine fehlende Zertifikatsangabe.
+  - when: tls.cert.chain_ok is None
+    reason_code: cert_chain_unknown
     context: item
 undetermined: not_testable
 requires:

@@ -79,6 +79,87 @@ def value_text(value: Any) -> Any:
     return value
 
 
+def datum(iso: Any, with_time: bool = False) -> Optional[str]:
+    """Deutsches Datum im Nachweis (spec/10 R14: "24.09.2026" statt "2026-09-24")."""
+    from reporter.catalog.render import date_de
+    return date_de(iso, with_time=with_time)
+
+
+# S6b-3 (spec/10 R14): Untergrenzen und Rohpraefixe der Werkzeuge in Kundensprache.
+def version_text(value: Any) -> Any:
+    if not isinstance(value, str):
+        return value
+    import re as _re
+    m = _re.match(r"^\s*(\d[\w.]*)\s+or\s+(later|newer)\b", value, _re.I)
+    if m:
+        return f"{m.group(1)} oder neuer (Untergrenze)"
+    return value
+
+
+_BELEG_PREFIXES = (("technologies: ", "erkannt: "), ("tech: ", "erkannt: "), ("server: ", "Server: "),
+                   ("x-powered-by: ", "X-Powered-By: "), ("x-aspnet-version: ", "X-AspNet-Version: "))
+
+
+def beleg_text(text: Any) -> Any:
+    if not isinstance(text, str):
+        return text
+    for roh, deutsch in _BELEG_PREFIXES:
+        if text.lower().startswith(roh):
+            return deutsch + text[len(roh):]
+    return text
+
+
+# S6b-3 (spec/10 R14): woertliche Werkzeugzeilen mit Skriptnamen und Faehigkeitslisten in
+# Kundensprache. Der Wortlaut des Werkzeugs bleibt, nur Kopf und Fuellwoerter aendern sich.
+_SKRIPT_NAMEN = {
+    "pop3-capabilities": "POP3-Fähigkeiten", "imap-capabilities": "IMAP-Fähigkeiten",
+    "smtp-commands": "SMTP-Befehle", "http-methods": "HTTP-Methoden", "ssl-cert": "Zertifikat",
+    "ssh-hostkey": "SSH-Schlüssel", "http-title": "Seitentitel", "http-server-header": "Server-Kennung",
+    "fingerprint-strings": "Rohantwort", "ssl-date": "Serverzeit", "tls-alpn": "TLS-ALPN",
+    "ftp-anon": "Anonyme FTP-Anmeldung", "mysql-info": "MySQL-Protokoll", "rdp-ntlm-info": "RDP-Kennung",
+    "http-generator": "Generator", "http-robots.txt": "robots.txt",
+}
+# Fuellwoerter der nmap-Faehigkeitslisten ("more have STARTTLS OK listed", spec/10 R14).
+_FAEHIGKEIT_FUELL = frozenset({"listed", "have", "capabilities", "more", "pre-login", "post-login", "ok",
+                               "capability", "completed", "and", "the", "server", "supports"})
+# Nicht tragende Zeilen, die nur fuer eine bestimmte Pruefung etwas sagen.
+NUR_FUER = {"Potentially risky methods": "http_trace_enabled"}
+
+
+def _faehigkeiten(werte: str) -> str:
+    import re as _re
+    out: list[str] = []
+    for token in werte.split():
+        if token.lower() in _FAEHIGKEIT_FUELL:
+            continue
+        # IMAP-Antwortmarke am Ende ("LOGINDISABLEDA0001", "AUTH=LOGINA0001").
+        token = _re.sub(r"(?<=[A-Z\-=+)])A\d{4}$", "", token) if len(token) > 5 else token
+        if token and token not in out:
+            out.append(token)
+    return " ".join(out)
+
+
+def werkzeug_zeile(text: Any) -> Any:
+    """Woertliche Werkzeugzeile mit deutschem Kopf (S6b-3, spec/10 R14)."""
+    if not isinstance(text, str):
+        return text
+    import re as _re
+    text = _re.sub(r"\b(\d[\w.]*)\s+or\s+(?:later|newer)\b", r"\1 oder neuer (Untergrenze)", text)
+    m = _re.match(r"^([a-z0-9][a-z0-9.\-]*):\s(.*)$", text, _re.S)
+    if m and m.group(1) in _SKRIPT_NAMEN:
+        name, rest = m.group(1), m.group(2)
+        if name.endswith("-capabilities"):
+            rest = _faehigkeiten(rest)
+        return f"{_SKRIPT_NAMEN[name]}: {rest}"
+    return text
+
+
+HEADER_BASIS_TEXT = {
+    "redirect": "Weiterleitung", "client_error": "Fehlerseite", "server_error": "Fehlerseite",
+    "challenge": "Sicherheitsabfrage der Plattform", "non_html": "keine Webseite",
+}
+
+
 def liste(values: Iterable[Any], limit: int = LIST_MAX) -> Optional[str]:
     """Aufzaehlung mit hoechstens ``limit`` Eintraegen und "und N weitere"."""
     items = [str(v) for v in values if v not in (None, "")]
@@ -147,7 +228,8 @@ def auszug(text: str) -> str:
     Statt der drei Punkte sagt der Text, dass es ein Auszug ist (spec/09 Q7).
     """
     if text.endswith("..."):
-        return text[:-3].rstrip() + " (Auszug)"
+        # S6b-3 (spec/10 R14): an einer Kopf- oder Wortgrenze, nicht mitten im Wort.
+        return (_auszug(text) or "").rstrip(" ,;·") + " (Auszug)"
     return text
 
 
@@ -160,14 +242,31 @@ def _touches(paths: frozenset[str], *prefixes: str) -> bool:
 
 def _http(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[EvidenceRef]:
     """Die Header, auf die die Regel sieht, mit Adresse (spec/08 Punkt 3, spec/09 Q7)."""
+    from reporter.catalog.render import header_names
     http = item.fact
     alle = not paths
     paare: list[tuple[str, Any]] = [("", f"{http.fqdn or http.host_ip}")]
     if http.url:
         paare.append(("Adresse", http.url))
+    # S6b-3 (spec/10 R1): Status und Weiterleitung der gemessenen Antwort, und woran die
+    # Header bewertet sind, in jeder Nachweiszeile.
+    he = getattr(http, "header_eval", None)
+    if he is not None and he.first is not None:
+        first = he.first
+        art = HEADER_BASIS_TEXT.get(he.basis) if he.evaluated is None else None
+        status = str(first.status_code) if first.status_code else None
+        paare.append(("Antwort", " ".join(x for x in (status, f"({art})" if art else None) if x) or None))
+        paare.append(("weitergeleitet auf", first.location))
+        if first.challenge:
+            paare.append(("Abwehrmerkmal", first.challenge))
+    if he is not None and he.evaluated is not None and (he.first is None or he.evaluated.url != he.first.url):
+        paare.append(("bewertet an der Endseite", he.evaluated.url))
+        if not he.complete:
+            paare.append(("nur einzelne Header belegt", liste(header_names(
+                [n for n, v in he.headers.items() if v.present is not None]))))
     if alle or _touches(paths, "http.security_headers"):
-        fehlend = sorted(name for name, h in (http.security_headers or {}).items()
-                         if not getattr(h, "present", False))
+        fehlend = header_names(sorted(name for name, h in (http.security_headers or {}).items()
+                                      if not getattr(h, "present", False)))
         if fehlend:
             paare.append(("fehlende Header", liste(fehlend, 10)))
     if alle or _touches(paths, "http.csp"):
@@ -180,13 +279,15 @@ def _http(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Eviden
             paare.append(("Strict-Transport-Security", http.hsts.raw or f"max-age={http.hsts.max_age}"))
         elif http.hsts is not None:
             paare.append(("Strict-Transport-Security", "nicht gesetzt"))
-    if alle or _touches(paths, "http.server_header", "http.powered_by", "http.x_feserver"):
+    if alle or _touches(paths, "http.server_header", "http.powered_by", "http.x_feserver", "http.aspnet_version"):
         if http.server_header:
             paare.append(("Server", http.server_header))
         if http.powered_by:
             paare.append(("X-Powered-By", http.powered_by))
+        if getattr(http, "aspnet_version", None):
+            paare.append(("X-AspNet-Version", http.aspnet_version))
         if http.x_feserver:
-            paare.append(("X-FEServer", http.x_feserver))
+            paare.append(("X-FEServer (interner Servername)", http.x_feserver))
     if alle or _touches(paths, "http.duplicate_headers"):
         if http.duplicate_headers:
             paare.append(("doppelt gesetzt", liste(http.duplicate_headers)))
@@ -281,10 +382,15 @@ def _tls(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Evidenc
     cert = tls.cert
     if cert is not None and (alle or _touches(paths, "tls.cert")):
         paare += [("Zertifikat für", cert.cn), ("weitere Namen", liste(cert.san, 4)),
-                  ("Aussteller", cert.issuer), ("gültig bis", (cert.not_after or "")[:10] or None)]
+                  ("Aussteller", cert.issuer), ("gültig bis", datum(cert.not_after, with_time=True))]
         for pfad, label, attr in _CERT_FIELDS:
             if alle or _touches(paths, pfad):
                 paare.append((label, getattr(cert, attr, None)))
+        # S6b-3 (E13): Erneuerungshistorie des Namens aus den CT-Logs, noch ohne Regel.
+        ren = getattr(cert, "renewal", None)
+        if ren is not None and ren.certificates > 1 and ren.lead_days is not None:
+            paare.append(("Erneuerung laut CT-Logs",
+                          f"bisher im Mittel {ren.lead_days} Tage vor Ablauf, {ren.certificates} Zertifikate"))
     if alle or _touches(paths, "tls.protocols"):
         aktiv = sorted(name.replace("TLS1.", "TLS 1.") for name, on in (tls.protocols or {}).items() if on is True)
         if aktiv:
@@ -300,6 +406,8 @@ def _tls(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Evidenc
             paare.append(("HSTS max-age", tls.hsts.max_age))
     if tls.assigned_from:
         paare.append(("geprüft über", tls.assigned_from))
+    if getattr(tls, "cert_assigned_from", None) and tls.cert_assigned_from != tls.assigned_from:
+        paare.append(("Zertifikat geprüft über", tls.cert_assigned_from))
     return _line(tls, _zeile(paare), tool="testssl" if tls.source == "testssl" else None)
 
 
@@ -322,18 +430,33 @@ def _tls_vuln(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Ev
 
 def _service(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[EvidenceRef]:
     svc = item.obj
-    return _line(svc, _zeile([("", f"{svc.host_ip}:{svc.port}/{svc.proto}"),
-                              ("Dienst", svc.service), ("Produkt", svc.product),
-                              ("Version", svc.version_raw or svc.version_norm),
-                              ("Server-Kennung", svc.fp_server),
-                              ("Seitentitel", svc.fp_title),
-                              ("Anmeldung verlangt", svc.fp_login),
-                              ("TLS erzwungen", svc.tls_required),
-                              ("STARTTLS", svc.starttls),
-                              ("Anmeldung vor TLS gesperrt", svc.login_disabled),
-                              ("Anmeldeverfahren", liste(svc.auth_mechanisms or [], 4)),
-                              ("Abweisung vor der Anmeldung laut Passivquelle", svc.rejects_before_auth)]),
-                 tool="nmap")
+    # S6b-3 (spec/10 R14): ein nmap-Tabellentreffer ("snet-sensor-mgmt?") ist kein Dienstname;
+    # die Kennung kommt aus der Antwort des Dienstes. Die Abweisung laut Passivquelle steht
+    # unter der Quelle, nicht unter nmap.
+    dienst = svc.service if (svc.method or "") != "table" else None
+    if getattr(svc, "unidentified", None):
+        dienst = "nicht identifiziert"
+    cert = svc.cert
+    out = _line(svc, _zeile([("", f"{svc.host_ip}:{svc.port}/{svc.proto}"),
+                             ("Dienst", dienst), ("Produkt", svc.product),
+                             ("Kennung", getattr(svc, "kennung", None) if not svc.product else None),
+                             ("Version", version_text(svc.version_raw or svc.version_norm)),
+                             ("Server-Kennung", svc.fp_server),
+                             ("Seitentitel", svc.fp_title),
+                             ("Anmeldung verlangt", svc.fp_login),
+                             ("TLS erzwungen", svc.tls_required),
+                             ("STARTTLS", svc.starttls),
+                             ("Anmeldung vor TLS gesperrt", svc.login_disabled),
+                             ("Anmeldeverfahren", liste(svc.auth_mechanisms or [], 4)),
+                             ("Zertifikat für", cert.cn if cert else None),
+                             ("Aussteller", cert.issuer if cert else None),
+                             ("gültig bis", datum(cert.not_after, with_time=True) if cert else None),
+                             ("selbstsigniert", cert.self_signed if cert and cert.self_signed else None)]),
+                tool="nmap")
+    if svc.rejects_before_auth:
+        out.extend(_line(svc, f"{svc.host_ip}:{svc.port}{PART_SEP}Abweisung vor der Anmeldung laut Passivquelle",
+                         tool="shodan"))
+    return out
 
 
 # DNS: je Teilfakt eine Zeile mit dem liefernden Werkzeug.
@@ -348,7 +471,9 @@ def _dns_part(dns: Any, part: str) -> Optional[str]:
     if part == "mx":
         return f"MX-Einträge: {liste(dns.mx, 3)}" if dns.mx else "kein MX-Eintrag"
     if part == "spf":
-        return f"SPF: {dns.spf.raw}" if dns.spf is not None else "kein SPF-Eintrag"
+        # S6b-3 (spec/10 R14): mehrteilige TXT-Strings stehen als ein Eintrag da.
+        return f"SPF: {dns.spf.raw.replace(chr(34) + ' ' + chr(34), '').replace(chr(34), '')}" \
+            if dns.spf is not None else "kein SPF-Eintrag"
     if part == "dmarc":
         if dns.dmarc is None or not dns.dmarc.present:
             return "kein DMARC-Eintrag"
@@ -418,6 +543,9 @@ def _dns_dangling(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> lis
                                     ("Grund", entry.reason)]))
 
 
+LIFECYCLE_SOURCE = {"endoflife_date": "endoflife.date"}
+
+
 def _software(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[EvidenceRef]:
     sw = item.obj
     paare: list[tuple[str, Any]] = [
@@ -425,15 +553,15 @@ def _software(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Ev
         ("Version", sw.version_norm or sw.version_raw), ("Build", sw.build),
     ]
     if sw.eol is not None and sw.eol.status != "unknown":
-        paare += [("Pflegestatus", value_text(sw.eol.status)), ("Pflegeende", sw.eol.date),
-                  ("Quelle der Lebenszyklusdaten", sw.eol.source)]
+        paare += [("Pflegestatus", value_text(sw.eol.status)), ("Pflegeende", datum(sw.eol.date)),
+                  ("Quelle der Lebenszyklusdaten", LIFECYCLE_SOURCE.get(sw.eol.source or "", sw.eol.source))]
     if sw.release_date:
-        paare.append(("Veröffentlichung", sw.release_date))
+        paare.append(("Veröffentlichung", datum(sw.release_date)))
     # Die woertliche Zeile des Dienstes, aus der die Version stammt (nmap-Banner,
     # Server-Header); Zusammenfassungen von wpscan und Profildatei stehen schon oben.
     beleg = next((e for e in sw.evidence if e.tool in ("nmap", "header_check", "httpx")), None)
     if beleg is not None:
-        paare.append(("Beleg", beleg.excerpt))
+        paare.append(("Beleg", beleg_text(beleg.excerpt)))
     if sw.vulnerabilities:
         paare.append(("bekannte Schwachstellen laut wpscan", len(sw.vulnerabilities)))
     out = _line(sw, _zeile(paare))
@@ -458,15 +586,26 @@ def _passive(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Evi
     return _line(pv, _zeile([("Quelle", pv.source),
                              ("", f"{pv.host_ip}:{pv.port}" if pv.port else pv.domain),
                              ("Produkt", pv.product), ("Version", pv.version),
-                             ("Dienst gesehen am", (pv.service_seen_at or "")[:10] or None),
+                             ("Dienst gesehen am", datum(pv.service_seen_at)),
                              ("Banner (Auszug)", _auszug(pv.banner_excerpt))]))
 
 
 def _auszug(text: Optional[str]) -> Optional[str]:
-    """Bannerauszug ohne Kuerzungszeichen; die Bezeichnung sagt, dass es ein Auszug ist."""
+    """Bannerauszug ohne Kuerzungszeichen; die Bezeichnung sagt, dass es ein Auszug ist.
+
+    S6b-3 (spec/10 R14): gekuerzt wird an der letzten vollstaendigen Kopfzeile, nicht mitten im
+    Wort ("Connection: keep-a", "X-XSS-Protectio")."""
     if not text:
         return None
-    return text[:-3].rstrip() if text.endswith("...") else text
+    if not text.endswith("..."):
+        return text
+    import re as _re
+    rumpf = text[:-3].rstrip()
+    grenzen = [m.start() for m in _re.finditer(r" (?=[A-Za-z][A-Za-z0-9-]*: )", rumpf)]
+    if grenzen and grenzen[-1] > len(rumpf) // 3:
+        return rumpf[:grenzen[-1]].rstrip()
+    leer = rumpf.rfind(" ")
+    return rumpf[:leer].rstrip() if leer > len(rumpf) // 2 else rumpf
 
 
 def _threat(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[EvidenceRef]:
@@ -494,7 +633,7 @@ def _host(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Eviden
         return []
     return _line(h, _zeile([("", h.ip), ("AbuseIPDB-Bewertung", rep.abuseipdb_score),
                             ("Meldungen", rep.abuseipdb_total_reports),
-                            ("zuletzt gemeldet", (rep.abuseipdb_last_reported_at or "")[:10] or None),
+                            ("zuletzt gemeldet", datum(rep.abuseipdb_last_reported_at)),
                             ("auf der Freigabeliste von AbuseIPDB", rep.abuseipdb_whitelisted),
                             ("Tor-Knoten", rep.is_tor), ("OTX-Pulse", rep.otx_pulse_count)]),
                  tool="abuseipdb")
@@ -559,4 +698,4 @@ _REDUNDANT_TOKENS = frozenset({"open", "tunnel=ssl", "(protocol", "2.0)"})
 
 
 __all__ = ["detail_evidence", "ist_redundant", "BUILDERS", "DETAIL_MAX",
-           "KEEP_FACT_EVIDENCE", "VALUE_TEXT", "value_text", "liste"]
+           "KEEP_FACT_EVIDENCE", "VALUE_TEXT", "value_text", "liste", "werkzeug_zeile", "NUR_FUER"]

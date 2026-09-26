@@ -1,15 +1,31 @@
 {
- "facts": {
-  "services": [
-   {"host_ip": "10.0.0.1", "port": 110, "service": "pop3", "product": "Dovecot pop3d", "starttls": true},
-   {"host_ip": "10.0.0.1", "port": 143, "service": "imap", "product": "Dovecot imapd", "starttls": true}
-  ]
- },
- "coverage_default": "ok",
- "expect": {
-  "status": "pass",
-  "group_key": "10.0.0.1",
-  "affected": [],
-  "positive": true
- }
+  "facts": {
+    "services": [
+      {
+        "host_ip": "10.0.0.1",
+        "port": 110,
+        "service": "pop3",
+        "product": "Dovecot pop3d",
+        "starttls": true,
+        "tls_required": true,
+        "login_disabled": true
+      },
+      {
+        "host_ip": "10.0.0.1",
+        "port": 143,
+        "service": "imap",
+        "product": "Dovecot imapd",
+        "starttls": true,
+        "tls_required": true,
+        "login_disabled": true
+      }
+    ]
+  },
+  "coverage_default": "ok",
+  "expect": {
+    "status": "pass",
+    "group_key": "10.0.0.1",
+    "affected": [],
+    "positive": true
+  }
 }

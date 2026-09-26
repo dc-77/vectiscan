@@ -191,15 +191,17 @@ def catalog() -> Catalog:
     return get_catalog()
 
 
-def run_check(check_id: str, facts: FS.Facts | dict[str, Any], cat: Catalog | None = None) -> list[CheckResult]:
-    """Nur eine Pruefung auswerten (ohne Auffangregeln)."""
+def run_check(check_id: str, facts: FS.Facts | dict[str, Any], cat: Catalog | None = None,
+              report_date: str | None = None) -> list[CheckResult]:
+    """Nur eine Pruefung auswerten (ohne Auffangregeln). ``report_date`` (S6b-3): Berichtsdatum
+    fuer Aussagen, die sich darauf beziehen; ohne Angabe gilt das Scanende."""
     cat = cat or get_catalog()
     if check_id not in cat.by_id:
         raise KeyError(f"Pruefung {check_id!r} nicht im Katalog")
     if isinstance(facts, dict):
         facts = FS.Facts.from_dict(facts)
     from reporter.catalog.scope import FactsIndex
-    return evaluate_check(cat.by_id[check_id], FactsIndex(facts), set())
+    return evaluate_check(cat.by_id[check_id], FactsIndex(facts, report_date=report_date), set())
 
 
 def pick_result(results: list[CheckResult], expect: dict[str, Any]) -> CheckResult:

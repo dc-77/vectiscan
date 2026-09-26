@@ -8,7 +8,7 @@ mit Komma verbunden.
 from __future__ import annotations
 
 import string
-from typing import Any
+from typing import Any, Optional
 
 from reporter.catalog import tables as T
 from reporter.catalog.expr import CatalogSpecError
@@ -25,7 +25,7 @@ ITEM_VARS: dict[str, tuple[str, ...]] = {
     "scan": ("domain", "domains", "order_id"),
     "service": ("host_ip", "port", "proto", "service", "product", "product_or_service", "version", "family",
                 "db_name", "admin_name", "mail_name", "legacy_name", "fqdn_names", "host_label", "tls_note",
-                "mail_login", "admin_label"),
+                "mail_login", "admin_label", "kennung_label", "cert_validity_text", "cert_cn", "cert_issuer"),
     "host": ("host_ip", "fqdn_names", "host_label", "ports_list", "reverse", "abuseipdb_score", "otx_pulse_count"),
     "fqdn": ("fqdn", "host_ip", "title", "http_status", "final_url", "waf_name", "host_label", "year_hint_names"),
     "http": ("fqdn", "host_ip", "url", "score", "missing_headers", "missing_headers_basic", "server_header", "powered_by",
@@ -36,21 +36,45 @@ ITEM_VARS: dict[str, tuple[str, ...]] = {
     "http.paths": ("fqdn", "host_ip", "url_path", "status", "host_label"),
     "http.cookies": ("fqdn", "host_ip", "name", "flags_missing", "host_label"),
     "tls": ("fqdn", "host_ip", "port", "legacy_protocols", "ciphers_weak", "vulns", "cert_cn", "days_left", "not_after",
-            "issuer", "grade", "hsts_max_age", "host_label", "target", "days_left_text"),
+            "issuer", "grade", "hsts_max_age", "host_label", "target", "days_left_text", "validity_text"),
     "tls.vulns": ("fqdn", "host_ip", "port", "name", "status", "host_label", "target"),
-    "dns": ("domain", "spf_raw", "spf_qualifier", "dmarc_p", "dmarc_raw", "mx", "mx_count", "ns", "dkim_selectors"),
+    "dns": ("domain", "spf_raw", "spf_qualifier", "dmarc_p", "dmarc_raw", "mx", "mx_count", "ns", "dkim_selectors",
+            "spf_shared_hosts"),
     "dns.dangling_cnames": ("domain", "fqdn", "cname_target", "takeover_risk"),
     "software": ("host_ip", "fqdn", "product", "family", "kind", "version", "build", "edition", "eol_date", "eol_status",
+                 "lifecycle_text",
                  "host_label", "vulnerabilities_count"),
     "passive": ("host_ip", "port", "product", "version", "source", "seen_at", "domain", "host_label",
-                "product_or_banner"),
+                "product_or_banner", "login_url", "seen_date"),
     "threat": ("cve_id", "host_ip", "port", "cvss", "epss", "kev", "product", "version", "host_label"),
     "target": ("domain", "expires_at", "registrar", "days_left"),
 }
 
 # Variablen fuer texts.observation (Gruppenebene).
 OBSERVATION_VARS: tuple[str, ...] = ("affected", "count", "group", "fqdn_names", "domain", "host_ip", "notes",
-                                     "n")
+                                     "n", "missing_header_names", "passed")
+
+# S6b-3 (spec/10 R2): Anzeigenamen der Sicherheits-Header im Kundentext.
+HEADER_NAMES = {
+    "x-frame-options": "X-Frame-Options", "x-content-type-options": "X-Content-Type-Options",
+    "referrer-policy": "Referrer-Policy", "permissions-policy": "Permissions-Policy",
+    "content-security-policy": "Content-Security-Policy",
+}
+
+
+def header_names(keys: Any) -> list[str]:
+    return [HEADER_NAMES.get(k, k) for k in keys or []]
+
+
+def date_de(iso: Any, *, with_time: bool = False) -> Optional[str]:
+    """ISO-Zeitpunkt als deutsches Datum ("24.09.2026", mit Uhrzeit "24.09.2026, 23:59 UTC")."""
+    text = str(iso or "")
+    if len(text) < 10 or text[4] != "-":
+        return None
+    out = f"{text[8:10]}.{text[5:7]}.{text[:4]}"
+    if with_time and len(text) >= 16 and text[10] == "T" and text[11:16] != "00:00":
+        out += f", {text[11:16]} UTC"
+    return out
 
 
 class Numerus:
@@ -184,7 +208,16 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
                   "version": _version_of(sw.version_norm if sw else None, o.version_norm), "family": o.family,
                   "db_name": T.DB_PORTS.get(o.port), "admin_name": T.ADMIN_PORTS.get(o.port),
                   "mail_name": T.MAIL_PORTS.get(o.port), "legacy_name": T.LEGACY_PORTS.get(o.port),
-                  "tls_note": "TLS erzwungen" if o.tls_required is True else ("STARTTLS" if o.starttls is True else "")})
+                  "tls_note": "TLS erzwungen" if o.tls_required is True else ("STARTTLS" if o.starttls is True else ""),
+                  # S6b-3 (spec/10 R9, R14): Kennung aus der Antwort des Dienstes; ohne Kennung
+                  # "nicht identifiziert", nie der geratene nmap-Portname.
+                  # MariaDB meldet sich im Handshake als "5.5.5-10.11.18-MariaDB" (Negativ-Fixture
+                  # NEG-MARIADB-55): der Name kommt aus der Familie, nicht aus der Kennung.
+                  "kennung_label": (mariadb_label(o) or o.kennung
+                                    or ("nicht identifiziert" if o.unidentified else (product or o.service))),
+                  "cert_validity_text": validity_text(o.cert, index.report_date) if o.cert else None,
+                  "cert_cn": o.cert.cn if o.cert else None,
+                  "cert_issuer": o.cert.issuer if o.cert else None})
     elif scope == "host":
         rep = o.reputation
         v.update({"ports_list": sorted(s.port for s in index.services_by_ip.get(o.ip, [])), "reverse": o.reverse,
@@ -198,12 +231,18 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
     elif scope == "http":
         missing = sorted(k for k, sh in o.security_headers.items() if not sh.present)
         basic = ("x-frame-options", "x-content-type-options", "referrer-policy", "permissions-policy")
-        missing_basic = [k for k in basic if k in o.security_headers and not o.security_headers[k].present]
+        missing_basic = header_names([k for k in basic if k in o.security_headers and not o.security_headers[k].present])
         csp_flags = []
         if o.csp:
-            csp_flags = [k for k, on in (("unsafe-inline", o.csp.unsafe_inline), ("unsafe-eval", o.csp.unsafe_eval),
-                                         ("Wildcard", o.csp.wildcard)) if on]
+            # S6b-3 (spec/10 R1): Freigaben mit ihrer Direktive, nur was den Befund traegt.
+            if o.csp.script_unsafe_inline:
+                csp_flags.append("unsafe-inline für Skripte")
+            if o.csp.script_unsafe_eval:
+                csp_flags.append("unsafe-eval für Skripte")
+            if o.csp.wildcard_directives:
+                csp_flags.append("Wildcard-Quelle in " + ", ".join(o.csp.wildcard_directives[:6]))
         disclosure = [f"{k}: {val}" for k, val in (("Server", o.server_header), ("X-Powered-By", o.powered_by),
+                                                     ("X-AspNet-Version", o.aspnet_version),
                                                      ("X-FEServer", o.x_feserver)) if val]
         v.update({"url": o.url, "score": o.score, "missing_headers": missing, "missing_headers_basic": missing_basic,
                   "disclosure_headers": disclosure, "server_header": o.server_header,
@@ -237,6 +276,9 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
                   "days_left_text": (None if not cert or cert.days_left is None
                                      else f"{cert.days_left} {'Tag' if cert.days_left == 1 else 'Tage'}"),
                   "not_after": (cert.not_after or "")[:10] if cert and cert.not_after else None,
+                  # S6b-3 (spec/10 R18): absolutes Datum statt relativer Frist; liegt der
+                  # Ablauf vor dem Berichtsdatum, sagt der Text das.
+                  "validity_text": validity_text(cert, index.report_date),
                   "issuer": cert.issuer if cert else None, "grade": o.grade,
                   "hsts_max_age": o.hsts.max_age if o.hsts else None, "target": f"{o.fqdn or ip}:{o.port}"})
     elif scope == "tls.vulns":
@@ -246,16 +288,24 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
         v.update({"domain": o.domain, "spf_raw": o.spf.raw if o.spf else None,
                   "spf_qualifier": o.spf.all_qualifier if o.spf else None, "dmarc_p": o.dmarc.p if o.dmarc else None,
                   "dmarc_raw": o.dmarc.raw if o.dmarc else None, "mx": o.mx, "mx_count": len(o.mx), "ns": o.ns,
-                  "dkim_selectors": o.dkim.selectors if o.dkim else []})
+                  "dkim_selectors": o.dkim.selectors if o.dkim else [],
+                  # S6b-3 (spec/10 R19): freigegebene geteilte Server mit Betreiber.
+                  "spf_shared_hosts": _spf_shared_label(o, index)})
     elif scope == "dns.dangling_cnames":
         v.update({"fqdn": o.fqdn, "cname_target": o.cname_target, "takeover_risk": o.takeover_risk})
     elif scope == "software":
         v.update({"product": o.product, "family": o.family, "kind": o.kind, "version": _version_of(o.version_norm, o.version_raw),
-                  "build": o.build, "edition": o.edition, "eol_date": o.eol.date, "eol_status": o.eol.status,
+                  "build": o.build, "edition": o.edition, "eol_date": date_de(o.eol.date) if o.eol.date else o.eol.date, "eol_status": o.eol.status,
+                  # S6b-3 (spec/10 R6): Lebenszyklus mit Datum und Quelle je Produkt.
+                  "lifecycle_text": lifecycle_text(o.eol),
                   "vulnerabilities_count": o.vulnerabilities_count})
     elif scope == "passive":
         v.update({"product": o.product, "version": o.version, "source": o.source, "seen_at": (o.seen_at or "")[:10] or None,
-                  "domain": o.domain, "product_or_banner": o.product or banner_product(o.banner_excerpt)})
+                  "domain": o.domain, "product_or_banner": o.product or banner_product(o.banner_excerpt),
+                  # Adresse ohne Abfrageteil: Parameter sind kein Beleg und tragen "?" in den Text.
+                  "login_url": (str((o.details or {}).get("login_over_http")).split("?")[0]
+                                if (o.details or {}).get("login_over_http") else None),
+                  "seen_date": date_de(o.service_seen_at or o.seen_at)})
     elif scope == "threat":
         sw = item.ctx.get("software")
         v.update({"cve_id": o.cve_id, "cvss": o.cvss_nvd.score if o.cvss_nvd else None,
@@ -269,10 +319,64 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
     return v
 
 
-def group_vars(group: Group, labels: list[str], notes: list[str]) -> dict[str, Any]:
-    return {"affected": labels, "count": len(labels), "group": group.label, "fqdn_names": group.fqdn_names,
-            "domain": group.domain or "", "host_ip": group.host.ip if group.host else "", "notes": notes,
-            "n": Numerus(1)}
+def _spf_shared_label(dns: Any, index: FactsIndex) -> list[str]:
+    from reporter.catalog.expr import f_spf_shared_ips
+    out = []
+    for ip in f_spf_shared_ips(dns, index.hosts):
+        h = index.hosts_by_ip.get(ip)
+        op = h.shared.operator if h is not None and h.shared is not None else None
+        out.append(f"{ip} beim Hoster {op}" if op else ip)
+    return out
+
+
+def lifecycle_text(eol: Any) -> Optional[str]:
+    """Lebenszyklus mit Datum und Quelle ("Herstellerpflege bis 30.06.2028 laut Debian LTS")."""
+    if eol is None:
+        return None
+    quelle = str(eol.source or "").split(",")[0].strip() or None
+    quelle = {"endoflife_date": "endoflife.date"}.get(quelle or "", quelle)
+    datum = date_de(eol.date)
+    if eol.status == "eol":
+        if not datum:
+            return "Herstellerpflege beendet"
+        return f"Herstellerpflege beendet {datum}" + (f" laut {quelle}" if quelle else "")
+    if eol.status == "supported":
+        if datum and quelle:
+            return f"Herstellerpflege bis {datum} laut {quelle}"
+        return f"gepflegt laut {quelle}" if quelle else "gepflegt"
+    return None
+
+
+def mariadb_label(o: Any) -> Optional[str]:
+    if getattr(o, "family", None) != "mariadb":
+        return None
+    return f"MariaDB {o.version_norm}" if getattr(o, "version_norm", None) else "MariaDB"
+
+
+def validity_text(cert: Any, report_date: Optional[str]) -> Optional[str]:
+    """ "gültig bis 24.09.2026, 23:59 UTC; am Scantag 1 Tag Restlaufzeit" oder, wenn das
+    Berichtsdatum nach dem Ablauf liegt, "seit 24.09.2026, 23:59 UTC abgelaufen, sofern nicht
+    erneuert" (spec/10 R18, Entscheidung DC E12)."""
+    if cert is None or not cert.not_after:
+        return None
+    bis = date_de(cert.not_after, with_time=True)
+    if cert.days_left is not None and cert.days_left < 0:
+        return f"am Scantag seit {bis} abgelaufen"
+    if report_date and str(cert.not_after)[:10] < str(report_date)[:10]:
+        return f"seit {bis} abgelaufen, sofern nicht erneuert"
+    if cert.days_left is None:
+        return f"gültig bis {bis}"
+    tage = f"{cert.days_left} {'Tag' if cert.days_left == 1 else 'Tage'}"
+    return f"gültig bis {bis}; am Scantag {tage} Restlaufzeit"
+
+
+def group_vars(group: Group, labels: list[str], notes: list[str],
+               extra: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+    out = {"affected": labels, "count": len(labels), "group": group.label, "fqdn_names": group.fqdn_names,
+           "domain": group.domain or "", "host_ip": group.host.ip if group.host else "", "notes": notes,
+           "n": Numerus(1), "missing_header_names": [], "passed": []}
+    out.update(extra or {})
+    return out
 
 
 __all__ = ["ITEM_VARS", "OBSERVATION_VARS", "UNKNOWN", "Numerus", "validate_template", "format_strict", "template_fields",

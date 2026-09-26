@@ -50,9 +50,20 @@ texts:
     - text: >-
         Der Server gehört dem Hoster und trägt auch Namen anderer Kunden; die Verwaltung
         betreibt der Hoster.
-  meaning: >-
-    Eine Übernahme der Verwaltungsoberfläche beträfe alle Dienste auf diesem Server, auch die
-    eigenen Webseiten und Postfächer. Abschalten oder beschränken kann sie nur der Hoster.
+  # S6b-3 (spec/10 R9): "Webseiten" und "Postfaecher" nur mit Beleg (Kunden-VHost mit Inhalt,
+  # MX, SPF oder Autodiscover auf diesem Host).
+  meaning:
+    - text: >-
+        Eine Übernahme der Verwaltungsoberfläche beträfe alle Dienste auf diesem Server.
+        Abschalten oder beschränken kann sie nur der Hoster.
+    - when: host.serves_customer_web is True
+      quantor: eines
+      text: >-
+        Dazu gehören die eigenen Webseiten auf diesem Server.
+    - when: host.serves_customer_mail is True
+      quantor: eines
+      text: >-
+        Dazu gehören die eigenen Postfächer und der Mailversand über diesen Server.
   recommendation:
     - stage: in_kuerze
       text: >-

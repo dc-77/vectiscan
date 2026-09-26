@@ -65,13 +65,30 @@ Bump-Historie:
                   `admin_panel_hoster` (erhoeht). Neue Aussagen fuer die Standardseite des
                   Webservers (Port 80/443 ueber die IP). Mitglieder tragen Name und
                   Kennung der Werkzeugmeldung (`message`, `message_id`) fuer den Anhang.
+    2026-09-26.2  S6b-3 (spec/10 R1 bis R19): Header-Regeln lesen `http.header_eval` und sind
+                  an Weiterleitung, Fehlerseite oder Sicherheitsabfrage nicht pruefbar
+                  (`headers_redirect_only`, `headers_error_only`, `headers_challenge_only`),
+                  Parkname `parked_name`; Aussagen je fehlendem Header
+                  (`missing_header_names`), CSP je Direktive; `hsts_short` im Buendel
+                  `web_header_hygiene`, `max-age=0` als "HSTS abgeschaltet" unter
+                  `hsts_missing` (Entscheidung DC 3). Neue Pruefungen
+                  `service_cert_expired`, `service_unidentified`, `smtp_vrfy_enabled`,
+                  `smtp_vrfy_enabled_passive`, `wordpress_xmlrpc_enabled`,
+                  `login_over_http_passive`, `spf_authorizes_shared_host`; Buendel
+                  `smtp_commands`. Positivaussagen nur mit tragendem Fakt (CBC, POP3-TLS-Zwang,
+                  Lebenszyklusquelle, Zonentransfer je Domain); `remote_admin_closed` ohne die
+                  S6a-Konflikte (Entscheidung DC 2). `not_applicable` mit eigenem Grund
+                  (`mx_external`, `zone_unsigned`), Faktenfamilien (`families.py`),
+                  Berichtstag als Bezug fuer Fristen (`report_date`), Effekt je Empfehlungsstufe
+                  (`Recommendation.effect`), Ignorierliste mit `covered_by`, Texte nach
+                  Betriebsform statt "Anschluss" (R13).
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-26.1"
+CATALOG_VERSION = "2026-09-26.2"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"

@@ -2,7 +2,7 @@ id: tls_hardening
 title: "Transportverschlüsselung auf {group}: {rules}"
 category: D
 merge_by: host
-members: [tls_legacy_protocols, tls_no_13, tls_no_fallback_scsv, tls_weak_ciphers, tls_weakness, hsts_short]
+members: [tls_legacy_protocols, tls_no_13, tls_no_fallback_scsv, tls_weak_ciphers, tls_weakness]
 target: findings
 references: [CWE-326, CWE-327]
 frameworks:

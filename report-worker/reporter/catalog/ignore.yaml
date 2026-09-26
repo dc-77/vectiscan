@@ -45,44 +45,55 @@ entries:
     plugin_id: "10035"
     name: "^strict-transport-security"
     reason: Abgedeckt durch hsts_missing und hsts_short (Quelle header_check je virtuellem Host).
+    covered_by: [hsts_missing, hsts_short]
   - kind: zap_alert
     plugin_id: "10038"
     name: "^content security policy \\(csp\\) header not set$"
     reason: Abgedeckt durch csp_missing.
+    covered_by: [csp_missing]
   - kind: zap_alert
     plugin_id: "10055"
     name: "^csp:"
     reason: CSP-Unteralerts sind durch csp_weak abgedeckt (unsafe-inline, unsafe-eval, Wildcard).
+    covered_by: [csp_weak, csp_missing]
   - kind: zap_alert
     name: "^csp:"
     reason: CSP-Unteralerts ohne plugin_id (API-Snapshot) sind durch csp_weak abgedeckt.
+    covered_by: [csp_weak, csp_missing]
   - kind: zap_alert
     plugin_id: "10021"
     name: "^x-content-type-options header missing$"
     reason: Abgedeckt durch security_headers_incomplete.
+    covered_by: [security_headers_incomplete]
   - kind: zap_alert
     plugin_id: "10020"
     name: "^missing anti-clickjacking header$"
     reason: Abgedeckt durch security_headers_incomplete (X-Frame-Options).
+    covered_by: [security_headers_incomplete]
   - kind: zap_alert
     plugin_id: "10020"
     name: "^multiple x-frame-options header entries$"
     reason: Abgedeckt durch header_duplicate (Quelle header_check duplicate_headers).
+    covered_by: [header_duplicate]
   - kind: zap_alert
     plugin_id: "10063"
     name: "^permissions policy header not set$"
     reason: Abgedeckt durch security_headers_incomplete.
+    covered_by: [security_headers_incomplete]
   - kind: zap_alert
     plugin_id: "10036"
     name: "^server leaks version information"
     reason: Abgedeckt durch http_header_disclosure (Server-Header aus header_check).
+    covered_by: [http_header_disclosure, service_banner_version]
   - kind: zap_alert
     plugin_id: "10037"
     name: "^server leaks information via \"x-powered-by\""
     reason: Abgedeckt durch http_header_disclosure (X-Powered-By aus header_check).
+    covered_by: [http_header_disclosure]
   - kind: zap_alert
     name: "^strict-transport-security disabled$"
     reason: Abgedeckt durch hsts_missing.
+    covered_by: [hsts_missing]
   # S6b-2 (spec/09 Teil 2 HL): die ZAP-Cookie-Meldungen 10010, 10011 und 10054 stehen nicht
   # mehr hier. cookie_flags sieht nur die Cookies der Startseite (header_check); die
   # Sitzungscookies an login.seam meldete nur ZAP, und der Bericht verschwieg sie. Sie

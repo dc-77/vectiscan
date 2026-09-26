@@ -10,8 +10,11 @@ applicable_when: null
 when: tls.cert.mismatch is True
 positive_when: tls.cert.mismatch is False
 not_testable_when:
-  - when: tls.cert is None or tls.cert.mismatch is None
+  - when: tls.cert is None
     reason_code: cert_unknown
+    context: item
+  - when: tls.cert.mismatch is None
+    reason_code: cert_chain_unknown
     context: item
 undetermined: not_testable
 requires:

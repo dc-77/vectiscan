@@ -97,7 +97,8 @@ def run_catchalls(index: FactsIndex, claimed: set[str], ignore: IgnoreList) -> t
             unprocessed[key] = Unprocessed(kind=kind, what=what, host_ip=host_ip, fqdns=[fqdn] if fqdn else [], port=port,
                                            count=count, fact_ids=[fact_id] if fact_id else [], note=note)
 
-    def add_ignored(kind: str, what: str, reason: str, *, host_ip=None, fqdn=None, count=1) -> None:
+    def add_ignored(kind: str, what: str, reason: str, *, host_ip=None, fqdn=None, count=1,
+                    covered_by=None, plugin_id=None, name=None) -> None:
         key = (kind, what, host_ip)
         if key in ignored:
             ignored[key].count += count
@@ -105,7 +106,8 @@ def run_catchalls(index: FactsIndex, claimed: set[str], ignore: IgnoreList) -> t
                 ignored[key].fqdns.append(fqdn)
         else:
             ignored[key] = IgnoredItem(kind=kind, what=what, host_ip=host_ip, fqdns=[fqdn] if fqdn else [], count=count,
-                                       reason=reason)
+                                       reason=reason, covered_by=list(covered_by or []), plugin_id=plugin_id,
+                                       name=name)
 
     # 1 Dienste
     for ip, svcs in sorted(index.services_by_ip.items(), key=lambda kv: sort_key(kv[0])):
@@ -125,7 +127,8 @@ def run_catchalls(index: FactsIndex, claimed: set[str], ignore: IgnoreList) -> t
             entry = alert_ignored(a, entries)
             what = f"{a.name} ({a.plugin_id})" if a.plugin_id else a.name
             if entry is not None:
-                add_ignored("zap_alert", what, entry.reason, host_ip=h.host_ip, fqdn=h.fqdn, count=a.count)
+                add_ignored("zap_alert", what, entry.reason, host_ip=h.host_ip, fqdn=h.fqdn, count=a.count,
+                            covered_by=entry.covered_by, plugin_id=a.plugin_id, name=a.name)
             else:
                 add_unprocessed("zap_alert_unmapped", what, host_ip=h.host_ip, fqdn=h.fqdn, count=a.count, fact_id=h.id,
                                 note="Werkzeugbefund ohne Zuordnung; Anhang ohne Bewertung.")

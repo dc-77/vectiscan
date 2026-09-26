@@ -1,0 +1,55 @@
+id: service_unidentified
+title: Offener Dienst ohne Kennung
+family: service_unidentified
+category: A
+scale: exposure
+level: erhoeht
+group_by: host
+scope: service
+applicable_when: null
+# S6b-3 (spec/10 R9, spec/09 Teil 4): ein nmap-Tabellentreffer (Name mit "?") ohne Produkt,
+# Server-Kennung, Titel oder Protokollskript ist ein offener Dienst ohne erkennbaren Zweck.
+when: service.unidentified is True and not is_cdn(host, services)
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [nmap]
+kind: check
+bundle: null
+affected_template: "{host_ip}:{port} ({kennung_label})"
+evidence: [service]
+references: [CWE-16]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: S6b-3 (spec/10 R9)
+  start_level: erhoeht
+  deviation: null
+texts:
+  short: "offener Dienst ohne Kennung"
+  plan:
+    lever: "Zweck offener Dienste ohne Kennung klären"
+    effect: "Verkleinert die Angriffsfläche um Dienste ohne erkennbaren Zweck"
+  observation: >-
+    {n:Der Host|Die Hosts} {group} {n:hat|haben} offene Ports, deren Dienst sich weder mit
+    Produkt noch mit Titel zu erkennen gibt: {affected}. Der Portscan kennt nur die übliche
+    Belegung dieser Portnummern, nicht den tatsächlichen Dienst.
+  meaning: >-
+    Ein offener Dienst ohne erkennbaren Zweck vergrößert die Angriffsfläche. Ob er gepflegt
+    wird und wer ihn nutzt, ist von außen nicht feststellbar.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Klären, welcher Dienst auf dem Port läuft und ob er aus dem Internet erreichbar sein
+        muss; andernfalls den Port schließen.
+    - stage: mittelfristig
+      text: >-
+        Benötigte Dienste auf feste Quellnetze beschränken und in die Dokumentation der
+        erreichbaren Dienste aufnehmen.
+  verify: >-
+    Portscan der genannten Ports von einer externen Adresse wiederholen; erwartet wird ein
+    geschlossener Port oder ein Dienst, dessen Zweck dokumentiert ist.

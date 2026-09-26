@@ -47,6 +47,7 @@ texts:
       text: >-
         Einen DMARC-Eintrag mit p=none und einer Reporting-Adresse (rua) anlegen und vier Wochen die
         Berichte auswerten.
+      effect: "Macht sichtbar, wer im Namen der Domain E-Mails versendet"
     - stage: mittelfristig
       text: >-
         Die Richtlinie auf p=quarantine und danach auf p=reject anheben, sobald alle legitimen

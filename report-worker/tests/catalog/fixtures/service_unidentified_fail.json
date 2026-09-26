@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 1000, "service": "cadlock", "product": null, "method": "table",
+    "nmap_conf": 3, "unidentified": true, "kennung": null}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.1",
+  "affected": ["10.0.0.1:1000 (nicht identifiziert)"],
+  "positive": false
+ }
+}

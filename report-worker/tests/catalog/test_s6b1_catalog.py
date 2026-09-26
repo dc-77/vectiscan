@@ -39,7 +39,10 @@ def test_erklaerte_passivports_sind_keine_offene_beobachtung(order):
     out = output(order)
     assert not [u for u in out.unprocessed if u.kind == "passive_port_unverified"]
     gruende = {i.reason for i in out.ignored if i.kind == "passive_port"}
-    assert gruende & set(PASSIVE_EXPLAINED.values())
+    # S6b-3 (spec/10 R19): nennt das Passivbanner VRFY, traegt der Port einen eigenen Befund
+    # (smtp_vrfy_enabled_passive) statt nur der E5-Erklaerung (dortmund-beach Port 25).
+    vrfy = [r for r in out.results if r.check_id == "smtp_vrfy_enabled_passive" and r.status == "fail"]
+    assert gruende & set(PASSIVE_EXPLAINED.values()) or vrfy
 
 
 def test_port_25_und_ipv6_bei_junkerwerk():
@@ -56,7 +59,8 @@ def test_nicht_erreichbarer_host_ohne_positivbefund():
         assert rows and all(r.status == "not_testable" for r in rows)
         assert rows[0].reason_code == "unreachable_from_scanner"
     rows = [r for r in out.results if r.check_id == "db_exposed" and r.vars.get("host_ip") == "79.140.188.181"]
-    assert rows[0].status == "not_testable" and rows[0].reason_code == "no_open_ports"
+    # S6b-3 (spec/10 R3): nmap ohne Hostbericht heisst "ohne Antwort", nicht "kein offener Port".
+    assert rows[0].status == "not_testable" and rows[0].reason_code == "no_response"
 
 
 @pytest.mark.parametrize("count,expected", [(1, "Der Host bietet"), (2, "Die Hosts bieten"), (7, "Die Hosts bieten")])
@@ -72,5 +76,6 @@ def test_numerus_ohne_form_ist_die_zahl():
 def test_ein_tag_nicht_ein_tage():
     labels = [a for r in output("1f8bc977-39a7-47c7-b4ad-7b05dbac2d52").results
               if r.check_id == "cert_expiring" for a in r.affected]
-    assert any(a.endswith("(1 Tag)") for a in labels)
-    assert not any("(1 Tage)" in a for a in labels)
+    # S6b-3 (spec/10 R18): absolutes Datum, die Restlaufzeit am Scantag im Singular.
+    assert any("gültig bis 24.09.2026, 23:59 UTC; am Scantag 1 Tag Restlaufzeit" in a for a in labels)
+    assert not any("1 Tage" in a for a in labels)

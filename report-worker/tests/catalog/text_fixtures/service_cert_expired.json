@@ -1,0 +1,55 @@
+{
+ "check": "service_cert_expired",
+ "cases": [
+  {
+   "name": "Plesk selbstsigniert auf POP3, CA-Zertifikat auf IMAP",
+   "facts": {
+    "services": [
+     {
+      "host_ip": "10.0.0.9",
+      "port": 110,
+      "service": "pop3",
+      "product": "Dovecot pop3d",
+      "cert": {
+       "cn": "Plesk",
+       "issuer": "Plesk",
+       "not_before": "2024-07-18T18:06:14Z",
+       "not_after": "2025-07-18T18:06:14Z",
+       "days_left": -433,
+       "expired": true,
+       "self_signed": true
+      }
+     },
+     {
+      "host_ip": "10.0.0.9",
+      "port": 143,
+      "service": "imap",
+      "product": "Dovecot imapd",
+      "cert": {
+       "cn": "mail.example.test",
+       "issuer": "Beispiel CA",
+       "not_before": "2025-01-01T00:00:00Z",
+       "not_after": "2026-01-01T00:00:00Z",
+       "days_left": -243,
+       "expired": true,
+       "self_signed": false
+      }
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "10.0.0.9:110": [
+      "observation[1]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.9:143": [
+      "observation[1]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  }
+ ]
+}

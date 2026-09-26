@@ -8,12 +8,15 @@ group_by: fqdn
 scope: tls
 applicable_when: null
 when: any_in(tls.ciphers_weak, TLS_WEAK_CIPHER_KEYS)
-positive_when: not any_in(tls.ciphers_weak, TLS_WEAK_CIPHER_KEYS)
+# S6b-3 (spec/10 R6): "ausschliesslich sicher eingestufte Cipher-Suiten" nur, wenn testssl
+# "Obsoleted CBC ciphers not offered" meldet; CBC angeboten ist kein Befund (LUCKY13 steht im
+# Anhang), traegt aber auch keinen Positivbefund.
+positive_when: not any_in(tls.ciphers_weak, TLS_WEAK_CIPHER_KEYS) and tls.cbc_obsoleted_offered is False
 not_testable_when:
   - when: 'tls.source != "testssl" and tls.assigned_from is None'
     reason_code: tls_ciphers_partial
     context: item
-undetermined: not_testable
+undetermined: pass_silent
 requires:
   tools: [testssl]
 kind: check

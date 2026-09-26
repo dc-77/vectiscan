@@ -1,0 +1,60 @@
+{
+ "check": "http_alt_port",
+ "cases": [
+  {
+   "name": "Webdienst auf Port 8000 ohne Kennung",
+   "facts": {
+    "services": [
+     {
+      "host_ip": "10.0.0.1",
+      "port": 8000,
+      "service": "http-alt",
+      "unidentified": false
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "10.0.0.1:8000": [
+      "observation[1]",
+      "recommendation[0]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.1:8000": [
+      "recommendation[1]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "Webdienst auf Port 8000 mit Kennung",
+   "facts": {
+    "services": [
+     {
+      "host_ip": "10.0.0.1",
+      "port": 8000,
+      "service": "http-alt",
+      "unidentified": false,
+      "kennung": "Apache Tomcat"
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "10.0.0.1:8000": [
+      "recommendation[1]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.1:8000": [
+      "observation[1]",
+      "recommendation[0]"
+     ]
+    }
+   }
+  }
+ ]
+}

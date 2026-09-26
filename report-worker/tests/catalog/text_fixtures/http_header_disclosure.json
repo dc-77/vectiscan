@@ -1,0 +1,93 @@
+{
+ "check": "http_header_disclosure",
+ "cases": [
+  {
+   "name": "nur Server-Header mit Version",
+   "facts": {
+    "http": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "url": "https://www.example.test/",
+      "reachable": true,
+      "status_code": 200,
+      "server_header": "nginx/1.18.0"
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "www.example.test@10.0.0.1": [
+      "observation[0]",
+      "meaning[0]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test@10.0.0.1": [
+      "observation[1]",
+      "meaning[1]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "nur X-FEServer ohne Versionsangabe",
+   "facts": {
+    "http": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "url": "https://www.example.test/",
+      "reachable": true,
+      "status_code": 200,
+      "server_header": "Microsoft-IIS",
+      "x_feserver": "EXCH01"
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "www.example.test@10.0.0.1": [
+      "observation[1]",
+      "meaning[1]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test@10.0.0.1": [
+      "observation[0]",
+      "meaning[0]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "X-AspNet-Version und X-FEServer zusammen",
+   "facts": {
+    "http": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "url": "https://www.example.test/",
+      "reachable": true,
+      "status_code": 200,
+      "aspnet_version": "4.0.30319",
+      "x_feserver": "EXCH01"
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "www.example.test@10.0.0.1": [
+      "observation[0]",
+      "observation[1]",
+      "meaning[0]",
+      "meaning[1]"
+     ]
+    }
+   }
+  }
+ ]
+}

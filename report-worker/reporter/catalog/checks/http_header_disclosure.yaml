@@ -1,5 +1,5 @@
 id: http_header_disclosure
-title: Webdienst gibt Versionskennung preis
+title: Webdienst gibt Versionskennung oder internen Servernamen preis
 family: banner_version_disclosure
 category: E
 scale: hygiene
@@ -7,7 +7,9 @@ level: niedrig
 group_by: fqdn
 scope: http
 applicable_when: null
-when: has_version(http.server_header) or has_version(http.powered_by) or http.x_feserver is not None
+# S6b-3 (spec/10 R9): X-AspNet-Version und X-Powered-By mit Version gehoeren hierher (auch von der
+# Endseite); X-FEServer nennt keinen Versionsstand, sondern den internen Servernamen.
+when: has_version(http.server_header) or has_version(http.powered_by) or http.aspnet_version is not None or http.x_feserver is not None
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
@@ -28,23 +30,38 @@ policy:
   start_level: LOW
   deviation: null
 texts:
-  short: "Versionsangabe im HTTP-Header"
+  short: "Versions- oder Servername im HTTP-Header"
   plan:
     lever: "Versionsangaben aus den Antwort-Headern entfernen"
     effect: "Erschwert die gezielte Suche nach passenden Schwachstellen"
-  observation: >-
-    {n:Die Webantwort|Die Webantworten} von {group} {n:nennt|nennen} in ihren Antwortheadern die Version der eingesetzten
-    Serversoftware: {affected}.
-  meaning: >-
-    Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten
-    Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich
-    genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines
-    Angriffs.
+  observation:
+    - when: has_version(http.server_header) or has_version(http.powered_by) or http.aspnet_version is not None
+      quantor: eines
+      text: >-
+        {n:Die Webantwort|Die Webantworten} von {group} {n:nennt|nennen} in ihren Antwortheadern die Version der eingesetzten
+        Serversoftware: {affected}.
+    - when: http.x_feserver is not None
+      quantor: eines
+      text: >-
+        Der Antwortheader X-FEServer nennt den internen Namen des Frontend-Servers: {affected}.
+  meaning:
+    - when: has_version(http.server_header) or has_version(http.powered_by) or http.aspnet_version is not None
+      quantor: eines
+      text: >-
+        Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten
+        Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich
+        genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines
+        Angriffs.
+    - when: http.x_feserver is not None
+      quantor: eines
+      text: >-
+        Ein interner Servername verrät das Namensschema der Serverlandschaft; das erleichtert die
+        Aufklärung vor einem gezielten Angriff.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Die Versionskennung in den Antwortheadern der Webserver- und Anwendungskonfiguration
-        entfernen oder auf einen generischen Wert ohne Versionsangabe setzen.
+        Versionskennungen und interne Servernamen in den Antwortheadern der Webserver- und
+        Anwendungskonfiguration entfernen oder auf einen generischen Wert setzen.
   verify: >-
     HTTP-Antwortheader der genannten Adresse von außen abrufen; erwartet wird kein Header mit
     einer konkreten Versionsangabe.

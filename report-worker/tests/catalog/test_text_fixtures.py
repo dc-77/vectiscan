@@ -31,7 +31,7 @@ def _fixtures() -> list[tuple[str, dict]]:
 def _members(check_id: str, case: dict) -> dict[str, list[str]]:
     facts = make_facts(case["facts"], coverage_default=case.get("coverage_default"))
     out: dict[str, list[str]] = {}
-    for result in run_check(check_id, facts):
+    for result in run_check(check_id, facts, report_date=case.get("report_date")):
         for m in result.members:
             if m.status == "fail":
                 out[m.key] = list(m.holds)

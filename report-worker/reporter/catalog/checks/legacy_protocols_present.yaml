@@ -33,10 +33,10 @@ texts:
   plan:
     lever: "Nicht benötigte Altprotokolle abschalten"
     effect: "Verkleinert die Angriffsfläche um selten gepflegte Dienste"
+  # S6b-3 (spec/10 R13): "Anschluss" nur bei einer eigenen Leitung des Kunden.
   observation:
     - text: >-
-        {n:Der Host|Die Hosts} {group} {n:bietet|bieten} ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des
-        Anschlusses zählt: {affected}.
+        {n:Der Host|Die Hosts} {group} {n:bietet|bieten} ein älteres Übertragungsprotokoll an: {affected}.
     - when: service.tls_required is True or service.tunnel_ssl is True
       quantor: eines
       text: >-
@@ -46,10 +46,19 @@ texts:
       text: >-
         Ob dort eine Anmeldung ohne Transportverschlüsselung abgelehnt wird, ließ sich von außen
         nicht feststellen: {affected}.
-  meaning: >-
-    Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses,
-    unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen
-    zudem eigene, seltener gepflegte Serverkomponenten mit.
+  meaning:
+    - when: host.betriebsform == "anschluss"
+      quantor: eines
+      text: >-
+        Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses,
+        unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt.
+    - when: host.betriebsform != "anschluss"
+      quantor: eines
+      text: >-
+        Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Servers,
+        unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt.
+    - text: >-
+        Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.
   recommendation:
     - stage: in_kuerze
       text: >-

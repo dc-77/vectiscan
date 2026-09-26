@@ -8,9 +8,21 @@ group_by: fqdn
 scope: http
 applicable_when: http is not None and http.csp is not None and http.csp.present is True
 item_when: http.csp is not None and http.csp.present is True
-when: http.csp.unsafe_inline is True or http.csp.unsafe_eval is True or http.csp.wildcard is True
+# S6b-3 (spec/10 R1): unsafe-inline zaehlt nur in script-src (Rueckfall default-src) und nur
+# ohne Nonce oder Hash; unsafe-inline allein in style-src ist kein Befund. Wildcard heisst eine
+# Quelle "*", "https://*" oder ein blosses Schema, nicht data: oder blob:.
+when: http.csp.script_unsafe_inline is True or http.csp.script_unsafe_eval is True or len(http.csp.wildcard_directives) > 0
 positive_when: never
-not_testable_when: []
+not_testable_when:
+  - when: http.header_eval.basis == "redirect"
+    reason_code: headers_redirect_only
+    context: group
+  - when: http.header_eval.basis in ["client_error", "server_error", "non_html"]
+    reason_code: headers_error_only
+    context: group
+  - when: http.header_eval.basis == "challenge"
+    reason_code: headers_challenge_only
+    context: group
 undetermined: not_testable
 requires:
   tools: [header_check]
@@ -36,19 +48,43 @@ texts:
   observation: >-
     Auf {group} ist eine Content-Security-Policy gesetzt, die einzelne Direktiven wieder
     lockert: {affected}.
-  meaning: >-
-    Die Direktiven unsafe-inline und unsafe-eval erlauben eingebettete oder zur Laufzeit
-    erzeugte Skripte, eine Wildcard-Quelle erlaubt Inhalte von beliebigen Ursprüngen. Jede
-    dieser Lockerungen hebt genau den Schutz auf, den die Content-Security-Policy gegen
-    eingeschleuste Skripte bieten soll.
+  meaning:
+    - when: http.csp.script_unsafe_inline is True
+      quantor: eines
+      text: >-
+        Die Freigabe unsafe-inline für Skripte erlaubt eingebettete Skripte in der Seite und hebt
+        damit den Schutz gegen eingeschleuste Skripte weitgehend auf.
+    - when: http.csp.script_unsafe_eval is True
+      quantor: eines
+      text: >-
+        Die Freigabe unsafe-eval erlaubt Skripte, die zur Laufzeit aus Zeichenketten erzeugt
+        werden.
+    - when: len(http.csp.wildcard_directives) > 0
+      quantor: eines
+      text: >-
+        Eine Wildcard-Quelle erlaubt Inhalte von beliebigen Ursprüngen.
   recommendation:
     - stage: mittelfristig
+      when: http.csp.script_unsafe_inline is True or http.csp.script_unsafe_eval is True
+      quantor: eines
       text: >-
-        Die Direktiven unsafe-inline und unsafe-eval aus der Content-Security-Policy entfernen
-        und stattdessen Nonces oder Hashes für eingebettete Skripte verwenden.
+        Die Freigaben unsafe-inline und unsafe-eval für Skripte aus der Content-Security-Policy
+        entfernen und eingebettete Skripte über Nonces oder Hashes freigeben.
     - stage: mittelfristig
+      when: len(http.csp.wildcard_directives) > 0
+      quantor: eines
       text: >-
         Wildcard-Quellen durch eine Liste der tatsächlich benötigten Ursprünge ersetzen.
-  verify: >-
-    HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird eine
-    Content-Security-Policy ohne unsafe-inline, ohne unsafe-eval und ohne Wildcard-Quelle.
+      effect: "Beschränkt die Inhaltsquellen auf bekannte Ursprünge"
+  verify:
+    - text: >-
+        HTTP-Antwortheader der Endseite von außen abrufen.
+    - when: http.csp.script_unsafe_inline is True or http.csp.script_unsafe_eval is True
+      quantor: eines
+      text: >-
+        Erwartet wird eine Content-Security-Policy ohne unsafe-inline und unsafe-eval für
+        Skripte.
+    - when: len(http.csp.wildcard_directives) > 0
+      quantor: eines
+      text: >-
+        Erwartet wird eine Content-Security-Policy ohne Wildcard-Quelle.

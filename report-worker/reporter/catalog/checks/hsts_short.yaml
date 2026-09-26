@@ -8,7 +8,8 @@ group_by: fqdn
 scope: http
 applicable_when: http is not None and http.hsts is not None and http.hsts.present is True
 item_when: http.hsts is not None and http.hsts.present is True
-when: http.hsts.max_age < HSTS_MIN_MAX_AGE
+# S6b-3 (spec/10 R9): max-age=0 ist abgeschaltet, nicht kurz (hsts_missing).
+when: http.hsts.max_age < HSTS_MIN_MAX_AGE and http.hsts.max_age > 0
 positive_when: http.hsts.max_age >= HSTS_MIN_MAX_AGE
 not_testable_when:
   - when: http.hsts.max_age is None
@@ -18,7 +19,7 @@ undetermined: not_testable
 requires:
   tools: [header_check]
 kind: check
-bundle: tls_hardening
+bundle: web_header_hygiene
 affected_template: "{fqdn} (max-age {hsts_max_age})"
 evidence: [http]
 references: [CWE-693]

@@ -1,20 +1,54 @@
 {
- "facts": {
-  "services": [
-   {"host_ip": "10.0.0.1", "port": 443, "service": "http", "product": "nginx", "version_raw": "1.22.1", "version_norm": "1.22.1", "family": "nginx", "tls_required": true, "tunnel_ssl": true}
-  ],
-  "software": [
-   {"host_ip": "10.0.0.1", "product": "nginx", "family": "nginx", "kind": "webserver", "version_raw": "1.22.1", "version_norm": "1.22.1",
-    "eol": {"status": "eol", "date": "2023-04-11", "source": "endoflife_date", "latest_patch": "1.22.1"}},
-   {"host_ip": "10.0.0.1", "product": "PHP", "family": "php", "kind": "language", "version_norm": "8.0.30",
-    "eol": {"status": "eol", "date": "2023-11-26", "source": "endoflife_date"}}
-  ]
- },
- "coverage_default": "ok",
- "expect": {
-  "status": "fail",
-  "group_key": "10.0.0.1",
-  "affected": ["10.0.0.1: nginx 1.22.1 (Support beendet 2023-04-11)"],
-  "positive": false
- }
+  "facts": {
+    "services": [
+      {
+        "host_ip": "10.0.0.1",
+        "port": 443,
+        "service": "http",
+        "product": "nginx",
+        "version_raw": "1.22.1",
+        "version_norm": "1.22.1",
+        "family": "nginx",
+        "tls_required": true,
+        "tunnel_ssl": true
+      }
+    ],
+    "software": [
+      {
+        "host_ip": "10.0.0.1",
+        "product": "nginx",
+        "family": "nginx",
+        "kind": "webserver",
+        "version_raw": "1.22.1",
+        "version_norm": "1.22.1",
+        "eol": {
+          "status": "eol",
+          "date": "2023-04-11",
+          "source": "endoflife_date",
+          "latest_patch": "1.22.1"
+        }
+      },
+      {
+        "host_ip": "10.0.0.1",
+        "product": "PHP",
+        "family": "php",
+        "kind": "language",
+        "version_norm": "8.0.30",
+        "eol": {
+          "status": "eol",
+          "date": "2023-11-26",
+          "source": "endoflife_date"
+        }
+      }
+    ]
+  },
+  "coverage_default": "ok",
+  "expect": {
+    "status": "fail",
+    "group_key": "10.0.0.1",
+    "affected": [
+      "10.0.0.1: nginx 1.22.1 (Herstellerpflege beendet 11.04.2023 laut endoflife.date)"
+    ],
+    "positive": false
+  }
 }

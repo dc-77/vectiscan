@@ -1,0 +1,102 @@
+{
+ "check": "cert_expiring_later",
+ "cases": [
+  {
+   "name": "17 Tage Restlaufzeit, Bericht am Scantag (Huendgen)",
+   "facts": {
+    "tls": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "port": 443,
+      "source": "testssl",
+      "protocols": {
+       "SSLv2": false,
+       "SSLv3": false,
+       "TLS1.0": false,
+       "TLS1.1": false,
+       "TLS1.2": true,
+       "TLS1.3": true
+      },
+      "cert": {
+       "cn": "www.example.test",
+       "san": [
+        "www.example.test"
+       ],
+       "issuer": "Beispiel CA",
+       "not_before": "2026-06-20T12:00:00Z",
+       "not_after": "2026-09-18T12:00:00Z",
+       "days_left": 17,
+       "expired": false,
+       "mismatch": false,
+       "chain_ok": true,
+       "self_signed": null
+      }
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "www.example.test:443@10.0.0.1": [
+      "observation[0]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test:443@10.0.0.1": [
+      "observation[1]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  },
+  {
+   "name": "17 Tage Restlaufzeit am Scantag, Bericht nach dem Ablauf (spec/10 R18)",
+   "report_date": "2026-09-26",
+   "facts": {
+    "tls": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "port": 443,
+      "source": "testssl",
+      "protocols": {
+       "SSLv2": false,
+       "SSLv3": false,
+       "TLS1.0": false,
+       "TLS1.1": false,
+       "TLS1.2": true,
+       "TLS1.3": true
+      },
+      "cert": {
+       "cn": "www.example.test",
+       "san": [
+        "www.example.test"
+       ],
+       "issuer": "Beispiel CA",
+       "not_before": "2026-06-20T12:00:00Z",
+       "not_after": "2026-09-18T12:00:00Z",
+       "days_left": 17,
+       "expired": false,
+       "mismatch": false,
+       "chain_ok": true,
+       "self_signed": null
+      }
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "www.example.test:443@10.0.0.1": [
+      "observation[1]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test:443@10.0.0.1": [
+      "observation[0]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  }
+ ]
+}

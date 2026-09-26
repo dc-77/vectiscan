@@ -11,10 +11,16 @@ item_when: service.port in [110, 143]
 # S6b-2 (spec/08 Punkt 4): auch STARTTLS schuetzt nicht, wenn der Dienst die Anmeldung
 # vorher annimmt (IMAP ohne LOGINDISABLED, POP3 mit USER oder SASL vor STLS).
 when: service.tunnel_ssl is False and service.tls_required is not True and (service.starttls is False or service.tls_required is False)
-positive_when: service.starttls is True or service.tls_required is True or service.tunnel_ssl is True
+# S6b-3 (spec/10 R7): positiv nur mit belegtem TLS-Zwang (LOGINDISABLED bei IMAP, POP3 ohne
+# USER und SASL vor STLS, impliziter TLS-Tunnel). STARTTLS allein belegt keine Ablehnung der
+# Anmeldung davor.
+positive_when: service.tls_required is True or service.tunnel_ssl is True
 not_testable_when:
   - when: service.starttls is None and service.tls_required is None
     reason_code: mail_capabilities_unknown
+    context: item
+  - when: service.starttls is True and service.tls_required is None
+    reason_code: mail_tls_unknown
     context: item
 undetermined: not_testable
 requires:
@@ -53,10 +59,19 @@ texts:
       text: >-
         Auf {group} bietet der Mailabrufdienst zwar STARTTLS an, nimmt eine Anmeldung aber
         schon vor dem Aufbau der Verschlüsselung entgegen: {affected}.
-  meaning: >-
-    Ohne STARTTLS oder eine gleichwertige Verschlüsselungspflicht übertragen POP3 und IMAP
-    Anmeldedaten und Nachrichteninhalte im Klartext über das Netz. Jeder Mitleser auf dem
-    Übertragungsweg kann Postfach-Zugangsdaten abgreifen und für weitere Zugriffe nutzen.
+  # S6b-3 (spec/10 R9): die Auswirkung richtet sich nach dem STARTTLS-Fakt.
+  meaning:
+    - when: service.starttls is False
+      quantor: eines
+      text: >-
+        Ohne STARTTLS übertragen POP3 und IMAP Anmeldedaten und Nachrichteninhalte im Klartext
+        über das Netz. Jeder Mitleser auf dem Übertragungsweg kann Zugangsdaten abgreifen und für
+        weitere Zugriffe nutzen.
+    - when: service.starttls is True
+      quantor: eines
+      text: >-
+        STARTTLS wird angeboten, aber nicht verlangt: Ein Angreifer auf dem Übertragungsweg kann
+        das Angebot unterdrücken und die Anmeldedaten dann im Klartext mitlesen.
   recommendation:
     - stage: unverzueglich
       text: >-
@@ -64,6 +79,8 @@ texts:
         auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten
         Varianten anbieten.
     - stage: in_kuerze
+      when: host.serves_customer_mail is True
+      quantor: eines
       text: >-
         Postfach-Zugangsdaten rotieren und die Zugriffsprotokolle auf unverschlüsselte
         Anmeldeversuche prüfen.

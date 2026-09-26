@@ -39,10 +39,21 @@ texts:
     {n:Die Webseite|Die Webseiten} {group} {n:zeigt|zeigen} auf {n:ihrer Startseite|ihren Startseiten} eine Verwaltungs- oder Anmeldeoberfläche,
     die aus dem gesamten Internet erreichbar ist: {affected}. Eine Zugriffsbeschränkung auf
     bestimmte Quellnetze ist von außen nicht erkennbar.
-  meaning: >-
-    Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten
-    Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten
-    oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen.
+  # S6b-3 (spec/10 R13): "Anschluss" nur bei einer eigenen Leitung des Kunden.
+  meaning:
+    - when: host.betriebsform == "anschluss"
+      quantor: eines
+      text: >-
+        Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten
+        Anschluss mit den dahinter liegenden Systemen.
+    - when: host.betriebsform != "anschluss"
+      quantor: eines
+      text: >-
+        Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft das gesamte
+        System und alle Dienste darauf.
+    - text: >-
+        Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der
+        Verwaltungssoftware ausnutzen.
   recommendation:
     - stage: unverzueglich
       text: >-

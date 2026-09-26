@@ -1,0 +1,14 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 8001, "service": "vcom-tunnel", "product": "nginx", "unidentified": false}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.1",
+  "affected": [],
+  "positive": false
+ }
+}

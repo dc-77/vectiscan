@@ -1,0 +1,22 @@
+{
+ "facts": {
+  "passive": [
+   {
+    "host_ip": "10.0.0.1",
+    "port": 25,
+    "source": "shodan",
+    "product": "Postfix smtpd",
+    "details": {"smtp_vrfy": true},
+    "verified": true,
+    "confidence": 0.5
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.1",
+  "affected": [],
+  "positive": false
+ }
+}

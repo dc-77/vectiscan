@@ -1,0 +1,164 @@
+{
+ "check": "admin_service_exposed_passive",
+ "cases": [
+  {
+   "name": "SonicWall laut Passivquelle am Anschluss des Kunden, Portscan ohne Kennung (heuel 4433)",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.0.1",
+      "betriebsform": "anschluss"
+     }
+    ],
+    "services": [
+     {
+      "host_ip": "10.0.0.1",
+      "port": 443,
+      "service": "http",
+      "product": "Microsoft IIS httpd",
+      "tls_required": true,
+      "tunnel_ssl": true
+     }
+    ],
+    "passive": [
+     {
+      "host_ip": "10.0.0.1",
+      "port": 4433,
+      "source": "shodan",
+      "product": "SonicWall",
+      "seen_at": "2026-08-30T14:00:00Z",
+      "verified": false,
+      "confidence": 0.5
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "shodan:10.0.0.1:4433": [
+      "observation[0]",
+      "meaning[0]",
+      "meaning[3]",
+      "recommendation[0]",
+      "recommendation[1]",
+      "recommendation[3]"
+     ]
+    },
+    "not_holds": {
+     "shodan:10.0.0.1:4433": [
+      "observation[1]",
+      "meaning[1]",
+      "meaning[2]",
+      "recommendation[2]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  },
+  {
+   "name": "Plesk aktiv erkannt, weiterer Plesk-Port laut Passivquelle auf eigenem Server im Rechenzentrum",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.0.2",
+      "betriebsform": "rechenzentrum"
+     }
+    ],
+    "services": [
+     {
+      "host_ip": "10.0.0.2",
+      "port": 8443,
+      "service": "https-alt",
+      "product": "sw-cp-server",
+      "tunnel_ssl": true,
+      "fp_title": "Plesk Obsidian 18.0.80"
+     }
+    ],
+    "passive": [
+     {
+      "host_ip": "10.0.0.2",
+      "port": 8880,
+      "source": "shodan",
+      "product": "Plesk",
+      "seen_at": "2026-08-30T14:00:00Z",
+      "verified": false,
+      "confidence": 0.5
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "shodan:10.0.0.2:8880": [
+      "observation[1]",
+      "meaning[1]",
+      "recommendation[0]"
+     ]
+    },
+    "not_holds": {
+     "shodan:10.0.0.2:8880": [
+      "observation[0]",
+      "meaning[0]",
+      "meaning[3]",
+      "recommendation[2]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  },
+  {
+   "name": "Plesk-Port laut Passivquelle auf einem geteilten Server des Hosters",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.0.9",
+      "betriebsform": "rechenzentrum",
+      "shared": {
+       "kind": "hoster",
+       "operator": "Hoster AG",
+       "signals": [
+        "fremde_namen_zertifikat"
+       ]
+      }
+     }
+    ],
+    "services": [
+     {
+      "host_ip": "10.0.0.9",
+      "port": 443,
+      "service": "https",
+      "product": "Apache httpd",
+      "tunnel_ssl": true
+     }
+    ],
+    "passive": [
+     {
+      "host_ip": "10.0.0.9",
+      "port": 8880,
+      "source": "shodan",
+      "product": "Plesk",
+      "seen_at": "2026-08-30T14:00:00Z",
+      "verified": false,
+      "confidence": 0.5
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "shodan:10.0.0.9:8880": [
+      "meaning[2]",
+      "recommendation[2]"
+     ]
+    },
+    "not_holds": {
+     "shodan:10.0.0.9:8880": [
+      "meaning[0]",
+      "meaning[1]",
+      "recommendation[0]",
+      "recommendation[1]",
+      "recommendation[3]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  }
+ ]
+}

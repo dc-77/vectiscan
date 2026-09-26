@@ -1,5 +1,6 @@
 id: plaintext_services
-title: "Datei- und Mailzugänge auf {group}: {rules}"
+# S6b-3 (spec/10 R9): der Titel nennt nur, was die enthaltenen Regeln sagen ({rules}).
+title: "Zugänge auf {group}: {rules}"
 category: A
 merge_by: host
 members: [ftp_plaintext, mail_plaintext]

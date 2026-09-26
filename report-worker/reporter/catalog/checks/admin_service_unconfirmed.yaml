@@ -51,10 +51,20 @@ texts:
         {n:Der Host|Die Hosts} {group} {n:beantwortet|beantworten} Verbindungen auf einem Port, der üblicherweise für eine
         Verwaltungsoberfläche genutzt wird: {affected}. Welche Software dort antwortet, war von
         außen nicht erkennbar.
-  meaning: >-
-    Steht hinter dem Port eine Verwaltungsoberfläche, ist sie ein hochwertiges Ziel: eine
-    Übernahme beträfe den gesamten Anschluss und die dahinter liegenden Systeme. Ob das hier
-    der Fall ist, lässt sich erst mit Kenntnis des Dienstes beurteilen.
+  # S6b-3 (spec/10 R13): "Anschluss" nur bei einer eigenen Leitung des Kunden.
+  meaning:
+    - when: host.betriebsform == "anschluss"
+      quantor: eines
+      text: >-
+        Steht hinter dem Port eine Verwaltungsoberfläche, ist sie ein hochwertiges Ziel: eine
+        Übernahme beträfe den gesamten Anschluss mit den dahinter liegenden Systemen.
+    - when: host.betriebsform != "anschluss"
+      quantor: eines
+      text: >-
+        Steht hinter dem Port eine Verwaltungsoberfläche, ist sie ein hochwertiges Ziel: eine
+        Übernahme beträfe das gesamte System und alle Dienste darauf.
+    - text: >-
+        Ob das hier der Fall ist, lässt sich erst mit Kenntnis des Dienstes beurteilen.
   recommendation:
     - stage: in_kuerze
       text: >-

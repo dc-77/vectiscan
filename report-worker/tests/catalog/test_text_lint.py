@@ -74,7 +74,9 @@ def test_host_satz_mit_numerus(spec):
 def test_keine_platzhalter_oder_fragezeichen(spec):
     for name, text in _texts(spec):
         stripped = NUMERUS.sub("", text)
-        stripped = re.sub(r"\{(affected|count|group|fqdn_names|domain|host_ip|notes)\}", "", stripped)
+        # S6b-3: missing_header_names (spec/10 R2) und passed (R6) sind Gruppenvariablen.
+        stripped = re.sub(r"\{(affected|count|group|fqdn_names|domain|host_ip|notes|missing_header_names|passed)\}",
+                          "", stripped)
         assert "{" not in stripped and "}" not in stripped, f"{spec.id}.{name}: unbekannter Platzhalter"
         assert "?" not in text, f"{spec.id}.{name}: Fragezeichen"
         assert "[Hinweis" not in text and "TODO" not in text, f"{spec.id}.{name}: interner Hinweis"

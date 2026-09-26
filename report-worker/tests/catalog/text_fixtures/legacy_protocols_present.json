@@ -39,6 +39,56 @@
     }
    },
    "coverage_default": "ok"
+  },
+  {
+   "name": "FTP mit erzwungenem TLS am Anschluss des Kunden und im Rechenzentrum (spec/10 R13)",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.0.3",
+      "betriebsform": "anschluss"
+     },
+     {
+      "ip": "10.0.0.4",
+      "betriebsform": "rechenzentrum"
+     }
+    ],
+    "services": [
+     {
+      "host_ip": "10.0.0.3",
+      "port": 21,
+      "service": "ftp",
+      "product": "ProFTPD",
+      "tls_required": true
+     },
+     {
+      "host_ip": "10.0.0.4",
+      "port": 21,
+      "service": "ftp",
+      "product": "ProFTPD",
+      "tls_required": true
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "10.0.0.3:21": [
+      "meaning[0]"
+     ],
+     "10.0.0.4:21": [
+      "meaning[1]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.3:21": [
+      "meaning[1]"
+     ],
+     "10.0.0.4:21": [
+      "meaning[0]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
   }
  ]
 }

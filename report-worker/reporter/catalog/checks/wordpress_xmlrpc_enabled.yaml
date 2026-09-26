@@ -1,0 +1,49 @@
+id: wordpress_xmlrpc_enabled
+title: XML-RPC-Schnittstelle von WordPress erreichbar
+family: wordpress_xmlrpc
+category: E
+scale: hygiene
+level: niedrig
+group_by: fqdn
+scope: http
+applicable_when: http is not None and http.wordpress is not None
+item_when: http.wordpress is not None
+when: any_attr(http.wordpress.findings, "type", ["xmlrpc"])
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [wpscan]
+kind: check
+bundle: null
+affected_template: "{fqdn}"
+evidence: [http]
+references: [CWE-307]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: S6b-3 (spec/10 R19)
+  start_level: niedrig
+  deviation: null
+texts:
+  short: "XML-RPC erreichbar"
+  plan:
+    lever: "XML-RPC-Schnittstelle der Website abschalten"
+    effect: "Nimmt Rateangriffen auf Anmeldungen einen Zugangsweg"
+  observation: >-
+    Auf {group} ist die XML-RPC-Schnittstelle von WordPress aus dem Internet erreichbar:
+    {affected}.
+  meaning: >-
+    Über XML-RPC lassen sich viele Anmeldeversuche in einer einzigen Anfrage bündeln; Sperren
+    gegen wiederholte Fehlversuche auf der Anmeldeseite greifen dort oft nicht. Zusammen mit
+    bekannten Benutzernamen erleichtert das Rateangriffe auf Zugangsdaten.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Die XML-RPC-Schnittstelle abschalten oder den Zugriff auf xmlrpc.php sperren, sofern
+        keine Anwendung sie benötigt.
+  verify: >-
+    Die Adresse xmlrpc.php der Website von außen aufrufen; erwartet wird eine Ablehnung.

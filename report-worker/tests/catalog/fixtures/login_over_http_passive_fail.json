@@ -1,0 +1,17 @@
+{
+ "facts": {
+  "passive": [
+   {"host_ip": "203.0.113.5", "port": 443, "source": "shodan", "product": "Apache httpd",
+    "details": {"login_over_http": "http://203.0.113.5/app/login.cfm"}, "verified": false, "confidence": 0.5}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "203.0.113.5",
+  "affected": ["203.0.113.5:443 (http://203.0.113.5/app/login.cfm, laut Passivquelle)"],
+  "verified": false,
+  "source_mode": "passive",
+  "positive": false
+ }
+}
