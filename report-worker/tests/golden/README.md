@@ -581,7 +581,14 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
     `mail_tls_unknown`) und die Header an outlook als `expected_member_differences`
     (Multi-Lauf nur Teilbeleg, Rescan Endseite). P08 der Prototyp-Liste nur noch mit
     `ip_reputation`, `spf_authorizes_shared_host` in `subsumed`.
-  - Seitenerwartung: siehe ops-update-pages der MR-Pipeline (Nachtrag nach dem Lauf).
+  - Seitenerwartung (ops-update-pages, MR-Pipeline 3217): mehr Planzeilen je Regel (R11),
+    Einschränkungszeilen und Anhangzeilen kosten eine bis vier Seiten. Scan-Runde 1fbc92b9
+    24->28, c3d5724c 15->16, 31d67a02 27->29, 3cf01f8d 21->23, 68d59573 23->26, 1f8bc977
+    33->35, 2e56abe1 23->24; übrige 0bf16342 30->33, 14272c00 24->28, 2572eebc 30->32,
+    2d2d4f39 43->46, 45bb234c 22->23, 4e6b6883 43->47, 57b3ac85 15->16, 860d0d5a 27->30,
+    a6df9d9d 20->22, ae8d1d70 34->35, f77ccff2 43->45, fb13a98f 25->26; 176db198 und
+    75338c97 gleich. Halbleer vor einem Kapitelanfang: 2d2d4f39 Seite 30 (vorher 28),
+    4e6b6883 Seite 29 (vorher 27), neu f77ccff2 Seite 28 (Merkposten S7).
 
 ## Abgleich spec/09 nach S6b-2
 
