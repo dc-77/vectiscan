@@ -34,6 +34,8 @@ PASSIVE_RECENT_DAYS = 7
 # Adresse sind eigene Zweitdomains oder alte Eintraege, kein geteiltes Hosting
 # (Junkerwerk .28 mit junkerwerk-solingen.de).
 OWN_LINE_USAGE = "fixed line isp"
+# S6b-3 (spec/10 R13): Nutzungsarten eines Anschlusses (AbuseIPDB ``usageType``).
+LINE_USAGES = frozenset({OWN_LINE_USAGE, "mobile isp", "fixed line isp/mobile isp"})
 IPV6_ROUTE_REASONS = frozenset({"no_ipv6_route", "target_invalid_ipv6"})
 
 _IP_LIKE = re.compile(r"^\d{1,3}(?:[.-]\d{1,3}){3}\b")
@@ -170,9 +172,30 @@ def derive(facts: S.Facts, *, finished: Optional[str]) -> None:
         shared = _shared(facts, members, domains, fq_by_ip)
         for h in members:
             h.shared = shared
+    mail_ips = _customer_mail_ips(facts, domains)
     for h in facts.hosts:
         h.third_party = _third_party(h, fq_by_ip.get(h.ip, []), domains, skipped, facts)
         h.reach = None if h.third_party else _reach(facts, h, finished)
+        h.betriebsform = betriebsform(h)
+        h.serves_customer_mail = h.ip in mail_ips
+        h.serves_customer_web = any(fq.real_content is True and not fq.wildcard for fq in fq_by_ip.get(h.ip, []))
+
+
+def _customer_mail_ips(facts: S.Facts, domains: list[str]) -> set[str]:
+    """Adressen, auf die MX, ein SPF-Mechanismus oder Autodiscover des Kunden zeigen (spec/10 R9)."""
+    by_name: dict[str, set[str]] = defaultdict(set)
+    for fq in facts.fqdns:
+        by_name[clean_name(fq.name)].add(fq.host_ip)
+    out: set[str] = set()
+    for d in facts.dns:
+        for mx in d.mx:
+            out |= by_name.get(clean_name(str(mx).split()[-1]), set())
+        if d.spf:
+            for mech in d.spf.mechanisms:
+                if mech.kind in ("a", "mx", "ip4", "ip6"):
+                    out.update(mech.ips)
+        out |= by_name.get(clean_name(f"autodiscover.{d.domain}"), set())
+    return out
 
 
 def _names_on(facts: S.Facts, ips: set[str]) -> dict[str, tuple[str, str, str]]:
@@ -293,14 +316,38 @@ def _reach(facts: S.Facts, h: S.HostFact, finished: Optional[str]) -> Optional[S
         return S.Reach(status="unreachable_from_scanner",
                        passive_ports=sorted({p.port for p in recent if p.port is not None}),
                        passive_seen_at=seen, passive_source=recent[0].source)
+    # S6b-3 (spec/10 R3): ohne Hostbericht von nmap ist nicht belegt, dass der Host
+    # antwortet; "kein offener Port" waere eine Aussage, die die Messung nicht traegt.
+    if h.nmap_host_report is False:
+        return S.Reach(status="no_response")
     return S.Reach(status="no_open_ports")
+
+
+def betriebsform(h: S.HostFact) -> S.Betriebsform:
+    """Betriebsform einer Adresse (spec/10 R13): wo steht das System?
+
+    ``plattform``: geteiltes System der Art Plattform oder CDN-Kante. ``anschluss``: die
+    Nutzungsart laut AbuseIPDB ist ein Festnetz- oder Mobilanschluss (eigene Leitung des
+    Kunden, Junkerwerk 217.243.248.28). ``rechenzentrum``: geteilter Server beim Hoster oder
+    Nutzungsart Rechenzentrum/Hosting. Sonst ``unbekannt``; dann stehen neutrale Texte.
+    """
+    if h.shared is not None and h.shared.kind == "platform" or h.cdn_provider:
+        return "plattform"
+    usage = (h.provider.usage_type or "").strip().lower() if h.provider else ""
+    if usage in LINE_USAGES:
+        return "anschluss"
+    if h.shared is not None and h.shared.kind == "hoster":
+        return "rechenzentrum"
+    if any(k in usage for k in ("data center", "hosting", "content delivery")):
+        return "rechenzentrum"
+    return "unbekannt"
 
 
 def adjust_nmap_coverage(facts: S.Facts) -> None:
     """nmap ohne offenen Port ist kein Messergebnis (spec/09 Q9): ``empty`` mit dem
     Grund aus ``reach`` statt ``ok``."""
     reach = {h.ip: h.reach.status for h in facts.hosts
-             if h.reach and h.reach.status in ("no_open_ports", "unreachable_from_scanner")}
+             if h.reach and h.reach.status in ("no_open_ports", "no_response", "unreachable_from_scanner")}
     for c in facts.coverage:
         if c.tool == "nmap" and c.host_ip in reach and c.status == "ok":
             c.status = "empty"

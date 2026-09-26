@@ -117,7 +117,9 @@ def test_vom_pruefstand_nicht_erreichbar():
         r = host(f, ip).reach
         assert r is not None and r.status == "unreachable_from_scanner"
         assert r.passive_ports == ports and r.passive_source == "shodan"
-    assert host(f, "79.140.188.181").reach.status == "no_open_ports"
+    # S6b-3 (spec/10 R3): ohne nmap-Hostbericht ist der Host ohne Antwort, nicht "ohne offenen
+    # Port"; mit --open ist beides nicht zu unterscheiden, der Bericht sagt "ohne Antwort".
+    assert host(f, "79.140.188.181").reach.status == "no_response"
     assert host(f, "92.205.224.174").reach is None
 
 
@@ -125,10 +127,10 @@ def test_nmap_ohne_port_ist_kein_messergebnis():
     f = facts(BS)
     rows = {c.host_ip: (c.status, c.reason) for c in f.coverage if c.tool == "nmap"}
     assert rows["62.217.52.166"] == ("empty", "unreachable_from_scanner")
-    assert rows["79.140.188.181"] == ("empty", "no_open_ports")
+    assert rows["79.140.188.181"] == ("empty", "no_response")
     assert rows["92.205.224.174"][0] == "ok"
     hl = {c.host_ip: (c.status, c.reason) for c in facts(HL).coverage if c.tool == "nmap"}
-    assert hl["195.225.241.75"] == ("empty", "no_open_ports")
+    assert hl["195.225.241.75"] == ("empty", "no_response")
 
 
 def test_ipv6_ohne_route():

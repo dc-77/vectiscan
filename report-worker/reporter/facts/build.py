@@ -19,6 +19,7 @@ from reporter.facts.serialize import (
     days_between, dumps, excerpt, ip_family, ip_token, iso_utc, kv, sha256_text_file,
     short_hash, sort_key, try_json,
 )
+from reporter.facts import http_headers as HH
 from reporter.facts import systems as SYS
 from reporter.facts.sources import (
     ScanBundle, ToolRun, apply_overrides, attach_orders_json, load_from_snapshot, load_scan_source,
@@ -212,6 +213,8 @@ def build_from_bundle(bundle: ScanBundle) -> S.Facts:
     software = _finish_software(ctx)
     passive = _build_passive(ctx, all_ips, inv_by_ip, primary_domain)
     _mark_rejects_before_auth(services, passive)
+    _identify_web_services(services, http, tls)
+    _unprocessed_observations(ctx, services, passive, http, software)
     coverage = build_coverage(b, signals, blocked, ctx.finished, primary_domain, extra_domains)
     threats = _build_threats(ctx, software, services)
     _unprocessed_from_bundle(ctx)
@@ -358,6 +361,7 @@ def _build_targets(ctx: _Ctx, inv_hosts: list[dict]) -> tuple[list[S.TargetFact]
                                                  host_ip=str(h.get("ip"))))
     out_of_scope.sort(key=lambda o: sort_key(o.kind, o.value, o.host_ip))
     whois = _whois(b.passive.get("whois"))
+    discovered = _discovered_names(ctx, domains, inv_hosts)
     facts: list[S.TargetFact] = []
     for i, dom in enumerate(domains):
         ev = [S.Evidence(tool="host_inventory", ref=b.refs.get("host_inventory", ""), excerpt=f"domain={dom}")]
@@ -372,8 +376,70 @@ def _build_targets(ctx: _Ctx, inv_hosts: list[dict]) -> tuple[list[S.TargetFact]
             whois=dom_whois,
             discovery_health=b.host_inventory.get("discovery_health") if i == 0 else None,
             out_of_scope=out_of_scope if i == 0 else [],
+            discovered=[d for d in discovered if SYS.under(d.fqdn, [dom])
+                        and not any(SYS.under(d.fqdn, [o]) and len(o) > len(dom) for o in domains)],
         ))
     return facts, primary, extra
+
+
+# S6b-3 (spec/10 R5): Microsoft-365-Adressbereiche fuer Autodiscover und Co. (Drittanbieter).
+_MS365_NETS = ("40.96.0.0/13", "40.104.0.0/15", "52.96.0.0/14", "13.107.0.0/16")
+_MS365_LABELS = frozenset({"autodiscover", "lyncdiscover", "enterpriseregistration",
+                           "enterpriseenrollment", "sip", "msoid"})
+
+
+def _discovered_names(ctx: _Ctx, domains: list[str], inv_hosts: list[dict]) -> list[S.DiscoveredName]:
+    """Von gobuster_dns gefundene Namen, die nicht im Host-Inventar ankamen (spec/10 R5).
+
+    Die Teilausgabe (``fqdn ip[,ip]`` je Zeile) geht beim Scanner-Zeitlimit verloren
+    (spec/09 Q1, Behebung in S6c). Bis dahin nennt der Bericht die Namen als gefunden, aber
+    nicht geprueft. Namen, die nur auf die Adressen eines Wildcard-Eintrags zeigen, sind
+    keine eigenen Namen (dortmund-beach); Namen im Microsoft-365-Netz mit einem
+    Dienstnamen wie ``autodiscover`` gehoeren dem Drittanbieter.
+    """
+    import ipaddress
+    text = ctx.b.gobuster_dns_txt or ""
+    if not text.strip():
+        return []
+    known: set[str] = set()
+    wildcard_ips: set[str] = set()
+    third_ips: dict[str, str] = {}
+    for h in inv_hosts:
+        ip = str(h.get("ip"))
+        names = [str(n) for n in (h.get("fqdns") or [])] + \
+                [str(v.get("fqdn")) for v in (h.get("vhosts") or []) if isinstance(v, dict) and v.get("fqdn")]
+        for n in names:
+            known.add(SYS.clean_name(n))
+            if n.startswith("*."):
+                wildcard_ips.add(ip)
+    for sh in ctx.b.host_inventory.get("skipped_hosts") or []:
+        if isinstance(sh, dict) and sh.get("ip"):
+            for n in sh.get("fqdns") or []:
+                known.add(SYS.clean_name(n))
+    nets = [ipaddress.ip_network(n) for n in _MS365_NETS]
+    out: dict[str, S.DiscoveredName] = {}
+    for raw_line in text.splitlines():
+        parts = raw_line.strip().split()
+        if not parts:
+            continue
+        name = SYS.clean_name(parts[0])
+        if not name or not SYS.is_dns_name(name) or not SYS.under(name, domains) or name in known:
+            continue
+        ips = sorted({x.strip() for p in parts[1:] for x in p.split(",") if x.strip()}, key=sort_key)
+        v4 = [x for x in ips if ":" not in x]
+        if ips and all(x in wildcard_ips for x in ips):
+            continue
+        third = None
+        chain = ctx.b.dns_cnames.get(name, [])
+        foreign = next((c for c in chain if not SYS.under(c, domains)), None)
+        if name.split(".")[0] in _MS365_LABELS and v4 and all(
+                any(ipaddress.ip_address(x) in n for n in nets) for x in v4):
+            third = "Microsoft 365"
+        elif foreign:
+            third = SYS.registrable(foreign)
+        out.setdefault(name, S.DiscoveredName(fqdn=name, ips=v4 + [x for x in ips if ":" in x],
+                                              third_party=third))
+    return sorted(out.values(), key=lambda d: sort_key(d.fqdn))
 
 
 def _whois(data: Any) -> Optional[S.Whois]:
@@ -456,7 +522,8 @@ def _build_hosts(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> tuple
         a = abuse.get(ip) if isinstance(abuse, dict) else None
         provider = None
         if isinstance(a, dict):
-            provider = S.Provider(isp=a.get("isp"), usage_type=a.get("usageType"), country=a.get("countryCode"))
+            provider = S.Provider(isp=a.get("isp"), usage_type=a.get("usageType"), country=a.get("countryCode"),
+                                  domain=a.get("domain") or None)
         pi = inv.get("passive_intel") if isinstance(inv.get("passive_intel"), dict) else {}
         gn = greynoise.get(ip) if isinstance(greynoise, dict) else None
         rep = S.Reputation(
@@ -468,6 +535,7 @@ def _build_hosts(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> tuple
             otx_pulse_count=_int_or_none(pi.get("otx_pulse_count")),
             urlhaus_compromised=_bool_or_none(pi.get("urlhaus_compromised")),
             greynoise_classification=(gn.get("classification") if isinstance(gn, dict) else pi.get("greynoise_classification")),
+            abuseipdb_distinct_users=_int_or_none((a or {}).get("numDistinctUsers")),
         )
         if not any(v is not None for v in rep.model_dump().values()):
             rep = None
@@ -490,6 +558,7 @@ def _build_hosts(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> tuple
             blocked=blocked, cdn_provider=inv.get("cdn_provider") or None,
             edge_ips=sorted(str(x) for x in (inv.get("edge_ips") or [])),
             reputation=rep, fqdns=sorted((str(x) for x in (inv.get("fqdns") or [])), key=sort_key),
+            nmap_host_report=(nh.reason != "runstats") if nh is not None else None,
         ))
     return facts, signals, blocked_map
 
@@ -544,8 +613,14 @@ def _build_fqdns(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[
         vhosts = [v for v in (inv.get("vhosts") or []) if isinstance(v, dict) and v.get("fqdn")]
         by_name = {str(v["fqdn"]): v for v in vhosts}
         names = sorted(set(by_name) | {str(x) for x in (inv.get("fqdns") or [])}, key=sort_key)
+        # S6b-3 (spec/10 R4): vom Scanner uebersprungene, nicht eingerichtete Namen (Parkseite).
+        # Der Titel der Parkseite ("froxlor - Domain not configured") ist kein Titel des
+        # Namens; er bleibt draussen, sonst hielte ihn der Katalog fuer ein Hosting-Panel.
+        skipped = {str(vs.get("fqdn")): str(vs.get("reason") or "")
+                   for vs in inv.get("vhost_skipped") or [] if isinstance(vs, dict) and vs.get("fqdn")}
         for name in names:
             v = by_name.get(name, {})
+            ss = v.get("site_summary") if isinstance(v.get("site_summary"), dict) else {}
             waf = _waf_for(h, name, inv.get("ip"), b)
             aliases = [S.Alias(fqdn=str(a.get("fqdn")), status=_int_or_none(a.get("status")), reason=a.get("reason"))
                        for a in (v.get("aliases") or []) if isinstance(a, dict) and a.get("fqdn")]
@@ -563,6 +638,9 @@ def _build_fqdns(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[
                 is_primary=_bool_or_none(v.get("is_primary")), aliases=aliases, screenshot_key=screenshot or None,
                 web_probe_reachable=(True if isinstance(v.get("status"), int) else (False if v else None)),
                 waf=waf, cname=list(b.dns_cnames.get(SYS.clean_name(name), [])),
+                real_content=_bool_or_none(ss.get("is_real_content")),
+                skipped=("parking" if skipped.get(name) == "parking" else (skipped.get(name) or None))
+                if name in skipped else None,
             ))
     facts.sort(key=lambda f: sort_key(f.name, f.host_ip))
     return facts
@@ -622,7 +700,13 @@ def _build_services(ctx: _Ctx, ips: list[str]) -> list[S.ServiceFact]:
                     ev.append(S.Evidence(tool="nmap", ref=ref or "", excerpt=excerpt(f"{sid}: {out}", 240)))
             cert = None
             if flags.cert_cn or flags.cert_not_after:
-                cert = S.CertShort(cn=flags.cert_cn, san=flags.cert_san, not_after=flags.cert_not_after)
+                days = days_between(flags.cert_not_after, ctx.finished) \
+                    if flags.cert_not_after and ctx.finished else None
+                cert = S.CertShort(cn=flags.cert_cn, san=flags.cert_san, not_after=flags.cert_not_after,
+                                   issuer=flags.cert_issuer, not_before=flags.cert_not_before,
+                                   days_left=days, expired=(days < 0) if days is not None else None,
+                                   self_signed=flags.cert_self_signed, fingerprint_sha1=flags.cert_sha1)
+            kennung, unidentified = service_kennung(p, flags)
             conf = (p.conf / 10.0) if isinstance(p.conf, int) and 0 < p.conf <= 10 else S.CONFIDENCE_DERIVED
             facts.append(S.ServiceFact(
                 id=f"svc:{ip_token(ip)}:{p.port}/{p.proto}", source="nmap", mode="active", observed_at=observed,
@@ -634,6 +718,8 @@ def _build_services(ctx: _Ctx, ips: list[str]) -> list[S.ServiceFact]:
                 auth_mechanisms=flags.auth_mechanisms, capabilities=[excerpt(c, 80) for c in flags.capabilities][:40],
                 cert=cert, nmap_conf=p.conf, method=p.method,
                 fp_server=flags.fp_server, fp_title=flags.fp_title, fp_login=flags.fp_login,
+                kennung=kennung, unidentified=unidentified,
+                smtp_vrfy=flags.smtp_vrfy, auth_before_starttls=flags.auth_before_starttls,
             ))
             if p.product or p.version:
                 _add_software(ctx, ip, None, p.product, p.version, "nmap", ref or "", line, conf,
@@ -645,6 +731,60 @@ def _build_services(ctx: _Ctx, ips: list[str]) -> list[S.ServiceFact]:
                               ref or "", f"{p.port}/{p.proto} http-title: {title}", conf)
     facts.sort(key=lambda f: sort_key(f.host_ip, f.proto, f.port))
     return facts
+
+
+# Server-Kennungen, die ein bekanntes Produkt unter anderem Namen fuehren (spec/10 R9, R14):
+# Webmin meldet sich als "MiniServ", nmap raet am Port 10000 "snet-sensor-mgmt?".
+_KENNUNG_ALIASES = {"miniserv": "Webmin"}
+
+
+def service_kennung(p: Any, flags: Any) -> tuple[Optional[str], Optional[bool]]:
+    """(Kennung, nicht identifiziert) eines Dienstes (spec/10 R9, R14).
+
+    Die Kennung kommt aus der Antwort des Dienstes: Produkt und Version (nmap-Probe),
+    Server-Kennung, Seitentitel oder Name eines Audiostreams. Ein nmap-Tabellentreffer
+    (``method=table``, Name mit ``?``) ohne jede dieser Angaben ist nicht identifiziert;
+    der Portname aus der Tabelle ist dann keine Aussage ueber den Dienst.
+    """
+    product = (p.product or "").strip()
+    title = (flags.fp_title or "").strip()
+    if title and re.match(r"^\s*\d{3}\b|^(forbidden|not found|index of)", title, re.I):
+        title = ""
+    if product:
+        ver = (p.version or "").strip()
+        name = f"{product} {ver}".strip() if ver and not ver.startswith(product) else product
+        # Ein Webserver sagt nichts ueber die Anwendung; der Titel schon (huendgen 444).
+        if title and re.search(r"apache|nginx|iis|httpd|lighttpd|caddy", product, re.I):
+            name = f"{name}, Titel „{title}“"
+        return name, False
+    server = (flags.fp_server or "").strip()
+    stream = (flags.fp_stream or "").strip()
+    if server:
+        name = server
+        for key, alias in _KENNUNG_ALIASES.items():
+            if server.lower().startswith(key):
+                name = f"{alias} ({server})"
+        return (f"{name}, Stream {stream}" if stream else name), False
+    if stream:
+        return f"Audiostream {stream}", False
+    if title:
+        return f"Titel „{title}“", False
+    # Ein Protokollskript mit Antwort (Faehigkeiten, Befehle, Schluessel) belegt den Dienst,
+    # auch wenn nmap nur die Portnamen-Tabelle kennt (imaps und pop3s bei lumbeck-wolter).
+    protocol_scripts = [s for s in p.scripts if s.id not in _NON_PROTOCOL_SCRIPTS and (s.output or "").strip()]
+    if (p.method or "") != "table" or protocol_scripts:
+        return None, None
+    # S6b-3 (spec/10 R9): ohne jede andere Angabe benennt ein Zertifikat den Dienst
+    # (castenow 8001, tonausstrom.de).
+    cn = (getattr(flags, "cert_cn", None) or "").strip()
+    if cn:
+        return f"TLS-Dienst, Zertifikat {cn}", False
+    return None, True
+
+
+# Skripte, die keinen Dienst kennzeichnen (Zertifikat, Uhrzeit, Rohantworten).
+_NON_PROTOCOL_SCRIPTS = frozenset({"ssl-cert", "ssl-date", "fingerprint-strings", "tls-alpn",
+                                   "tls-nextprotoneg", "ssl-enum-ciphers"})
 
 
 # ------------------------------------------------------------------ software
@@ -1099,6 +1239,12 @@ def _build_tls(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S.
                 continue
             fqdn = str(line.get("input") or tls.get("host") or line.get("host") or "")
             fqdn = fqdn.split("/")[0]
+            # S6b-3 (spec/10 R4): folgt httpx einer Weiterleitung auf einen anderen Namen,
+            # beschreibt der TLS-Block dessen Verbindung (bergersysteme.com zeigte das
+            # Zertifikat von www an 198.202.211.1). Der Block gehoert dann nicht hierher.
+            sni = str(tls.get("sni") or tls.get("host") or "").strip().lower()
+            if sni and fqdn and sni != fqdn.lower() and not SYS.is_ip_like(sni):
+                continue
             try:
                 port = int(tls.get("port") or line.get("port") or 443)
             except (TypeError, ValueError):
@@ -1115,10 +1261,19 @@ def _build_tls(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S.
             cert.not_after = iso_utc(tls.get("not_after")) or cert.not_after
             if isinstance(tls.get("mismatched"), bool):
                 cert.mismatch = tls["mismatched"]
+            elif cert.mismatch is None and fqdn and (cert.cn or cert.san):
+                # S6b-3 (spec/10 R4): httpx nennt "mismatched" nur bei Abweichung; deckt ein
+                # Name des Zertifikats den Hostnamen, ist der Abgleich belegt (heuel www).
+                namen = [cert.cn or "", *cert.san]
+                if any(SYS.covers(n, fqdn) for n in namen):
+                    cert.mismatch = False
             if isinstance(tls.get("wildcard_certificate"), bool):
                 cert.wildcard = tls["wildcard_certificate"]
             if isinstance(tls.get("self_signed"), bool):
                 cert.self_signed = tls["self_signed"]
+            fph = tls.get("fingerprint_hash") if isinstance(tls.get("fingerprint_hash"), dict) else {}
+            if fph.get("sha256"):
+                cert.fingerprint_sha256 = str(fph["sha256"]).replace(":", "").lower()
             fact.cert = cert
             ver = str(tls.get("tls_version") or "")
             for token, keyname in (("tls13", "TLS1.3"), ("tls12", "TLS1.2"), ("tls11", "TLS1.1"), ("tls10", "TLS1.0")):
@@ -1162,7 +1317,10 @@ def _build_tls(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S.
                 cert.wildcard = c["wildcard"]
             if c.get("expired") is not None and cert.expired is None:
                 cert.expired = c["expired"]
+            if c.get("fingerprint_sha256") and not cert.fingerprint_sha256:
+                cert.fingerprint_sha256 = str(c["fingerprint_sha256"]).replace(":", "").lower()
             fact.cert = cert
+            fact.cbc_obsoleted_offered = ts.cbc_obsoleted
             if ts.hsts:
                 fact.hsts = S.HstsInfo(**{k: ts.hsts.get(k) for k in ("present", "max_age", "include_subdomains", "preload", "raw")})
             fact.fallback_scsv = ts.fallback_scsv
@@ -1185,8 +1343,14 @@ def _build_tls(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S.
             fact.observed_at = ts.started_at or ctx.run_time("testssl", ip) or fact.observed_at
             facts[key] = fact
     _assign_testssl_by_san(ctx, facts)
+    history = _renewal_history(ctx)
     out = []
     for fact in facts.values():
+        if fact.cert is not None and history:
+            key = SYS.clean_name(fact.fqdn or "") if fact.fqdn else ""
+            renewal = history.get(key) or (history.get(SYS.clean_name(fact.cert.cn or "")) if fact.cert.cn else None)
+            if renewal is not None:
+                fact.cert.renewal = renewal
         if fact.cert:
             if fact.cert.not_after and ctx.finished:
                 fact.cert.days_left = days_between(fact.cert.not_after, ctx.finished)
@@ -1213,6 +1377,14 @@ def _assign_testssl_by_san(ctx: _Ctx, facts: dict[tuple[str, str, int], S.TlsFac
     Schwachstellen gelten fuer einen VHost, wenn das von testssl gesehene Zertifikat
     seinen Namen abdeckt; die Zuordnung steht in ``assigned_from`` und im Nachweis.
     Zertifikat und HSTS bleiben die des VHosts selbst.
+
+    S6b-3 (spec/10 R4): Protokolle, Verfahren und Schwachstellen sind Eigenschaften des
+    Dienstes an IP:Port und gelten fuer jeden VHost dort, auch ohne Namensdeckung (JW
+    autodiscover, HE www, CA www und mail, HL www). Das Zertifikat ist eine Eigenschaft des
+    Namens: seine von testssl gepruften Merkmale (Kette, Selbstsignatur, Namenspruefung)
+    gelten nur bei gleichem Fingerabdruck, ohne Fingerabdruck bei gleichem Namen und
+    Ablaufdatum, und ohne eigenes Zertifikat, wenn das gepruefte den Namen abdeckt
+    (``cert_assigned_from``). Ein abweichendes Zertifikat bleibt das eigene.
     """
     by_port: dict[tuple[str, int], list[S.TlsFact]] = defaultdict(list)
     for (ip, _fq, port), fact in facts.items():
@@ -1220,15 +1392,17 @@ def _assign_testssl_by_san(ctx: _Ctx, facts: dict[tuple[str, str, int], S.TlsFac
     for (ip, port), group in by_port.items():
         donors = [f for f in group if f.source == "testssl" and f.cert is not None
                   and any(v is not None for v in f.protocols.values())]
+        if not donors:
+            continue
         for fact in group:
             if fact.source == "testssl" or not fact.fqdn:
                 continue
             if fact.protocols.get("TLS1.0") is not None or fact.protocols.get("TLS1.1") is not None:
                 continue
-            donor = next((d for d in donors
-                          if any(SYS.covers(n, fact.fqdn) for n in [d.cert.cn, *d.cert.san] if n)), None)
-            if donor is None:
-                continue
+            donor = next((d for d in donors if _same_cert(d.cert, fact.cert)), None) \
+                or next((d for d in donors
+                         if any(SYS.covers(n, fact.fqdn) for n in [d.cert.cn, *d.cert.san] if n)), None) \
+                or donors[0]
             for k, v in donor.protocols.items():
                 if fact.protocols.get(k) is None and v is not None:
                     fact.protocols[k] = v
@@ -1237,12 +1411,77 @@ def _assign_testssl_by_san(ctx: _Ctx, facts: dict[tuple[str, str, int], S.TlsFac
                 fact.vulns = list(donor.vulns)
             if fact.fallback_scsv is None:
                 fact.fallback_scsv = donor.fallback_scsv
+            if fact.cbc_obsoleted_offered is None:
+                fact.cbc_obsoleted_offered = donor.cbc_obsoleted_offered
             fact.assigned_from = f"{donor.fqdn or ip}:{port}"
+            covers = any(SYS.covers(n, fact.fqdn) for n in [donor.cert.cn, *donor.cert.san] if n)
+            if _same_cert(donor.cert, fact.cert) or (fact.cert is None and covers):
+                own = fact.cert or S.TlsCert()
+                for attr in ("cn", "issuer", "not_before", "not_after", "expired", "mismatch", "chain_ok",
+                             "self_signed", "wildcard", "fingerprint_sha256"):
+                    if getattr(own, attr) is None and getattr(donor.cert, attr) is not None:
+                        setattr(own, attr, getattr(donor.cert, attr))
+                if not own.san and donor.cert.san:
+                    own.san = list(donor.cert.san)
+                if fact.cert is None or own.mismatch is None:
+                    own.mismatch = not covers if own.mismatch is None else own.mismatch
+                fact.cert = own
+                fact.cert_assigned_from = f"{donor.fqdn or ip}:{port}"
             angeboten = ", ".join(k for k, v in fact.protocols.items() if v is True) or "keine"
+            zert = (f"mit demselben Zertifikat" if fact.cert_assigned_from
+                    else "mit eigenem Zertifikat")
             fact.evidence.insert(0, S.Evidence(
                 tool="testssl", ref=ctx.run_ref("testssl", ip),
-                excerpt=excerpt(f"{fact.fqdn}:{port} geprüft über {donor.fqdn or ip}:{port}, "
-                                f"dessen Zertifikat {fact.fqdn} abdeckt; angeboten: {angeboten}", 220)))
+                excerpt=excerpt(f"{fact.fqdn}:{port} geprüft über {donor.fqdn or ip}:{port} ({zert}); "
+                                f"angeboten: {angeboten}", 220)))
+
+
+def _renewal_history(ctx: _Ctx) -> dict[str, S.CertRenewal]:
+    """Erneuerungshistorie je Name aus crt.sh (E13, noch ohne Regel).
+
+    Je Name die Zertifikate (Duplikate aus Vor- und Endzertifikat ueber die Seriennummer
+    zusammengefasst), der typische Abstand zwischen zwei Ausstellungen und der typische
+    Vorlauf, mit dem das Nachfolgezertifikat vor dem Ablauf des Vorgaengers ausgestellt wurde.
+    Eine Plattform, die sieben Tage vor Ablauf erneuert, hat einen Vorlauf von sieben Tagen.
+    """
+    from statistics import median
+    rows = ctx.b.crtsh_raw or []
+    by_name: dict[str, dict[str, tuple[str, str]]] = defaultdict(dict)
+    for r in rows:
+        nb, na = iso_utc(r.get("not_before")), iso_utc(r.get("not_after"))
+        if not nb or not na:
+            continue
+        serial = str(r.get("serial_number") or f"{nb}|{na}")
+        names = {SYS.clean_name(n) for n in str(r.get("name_value") or "").split("\n") if n.strip()}
+        if r.get("common_name"):
+            names.add(SYS.clean_name(str(r["common_name"])))
+        for n in names:
+            if n:
+                by_name[n].setdefault(serial, (nb, na))
+    out: dict[str, S.CertRenewal] = {}
+    for name, certs in by_name.items():
+        items = sorted(set(certs.values()))
+        if not items:
+            continue
+        intervals = [days_between(b_[0], a_[0]) for a_, b_ in zip(items, items[1:])]
+        leads = [days_between(a_[1], b_[0]) for a_, b_ in zip(items, items[1:])]
+        intervals = [d for d in intervals if d is not None and d > 0]
+        leads = [d for d in leads if d is not None]
+        out[name] = S.CertRenewal(
+            name=name, certificates=len(items),
+            interval_days=int(median(intervals)) if intervals else None,
+            lead_days=int(median(leads)) if leads else None,
+            last_not_before=items[-1][0], last_not_after=items[-1][1])
+    return out
+
+
+def _same_cert(a: Optional[S.TlsCert], b: Optional[S.TlsCert]) -> bool:
+    """Dasselbe Zertifikat: gleicher Fingerabdruck, ohne Fingerabdruck gleicher Name und Ablauf."""
+    if a is None or b is None:
+        return False
+    if a.fingerprint_sha256 and b.fingerprint_sha256:
+        return a.fingerprint_sha256 == b.fingerprint_sha256
+    return bool(a.cn and a.cn == b.cn and a.not_after and a.not_after == b.not_after)
 
 
 def _new_tls(ctx: _Ctx, ip: str, fqdn: str, port: int) -> S.TlsFact:
@@ -1297,6 +1536,7 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
         redirect_data = tp.get("redirect_data") if isinstance(tp.get("redirect_data"), dict) else {}
         wp = h.wpscan if isinstance(h.wpscan, dict) else None
         wp_host = urlsplit(str((wp or {}).get("target_url") or "")).hostname if wp else None
+        zap_raw = [a for a in (h.zap_alerts or []) if isinstance(a, dict)]
 
         for vh in sorted(vhost_names, key=sort_key):
             res = headers_map.get(vh)
@@ -1311,16 +1551,22 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
                 headers = {str(k).lower(): str(v) for k, v in rd["response_headers"].items()}
             if not headers and not line and not res and not rd:
                 continue
-            sec: dict[str, S.SecHeader] = {}
-            if isinstance(res, dict):
-                for k, v in (res.get("security_headers") or {}).items():
-                    if isinstance(v, dict):
-                        sec[str(k).lower()] = S.SecHeader(present=bool(v.get("present")), value=v.get("value"))
-            csp_raw = headers.get("content-security-policy")
-            csp = S.Csp(present=True, value=csp_raw[:500], unsafe_inline="'unsafe-inline'" in csp_raw,
-                        unsafe_eval="'unsafe-eval'" in csp_raw, wildcard=bool(re.search(r"(^|\s)\*(\s|;|$)", csp_raw))) \
-                if csp_raw else (S.Csp(present=False) if res is not None and res.get("reachable") else None)
+            # S6b-3 (spec/10 R1, R4): Sicherheits-Header und CSP beschreiben die bewertete
+            # Antwort (Endseite), nicht mehr blind die erste Antwort von header_check.
+            inv_status = next((_int_or_none(v.get("status")) for v in inv.get("vhosts") or []
+                               if isinstance(v, dict) and v.get("fqdn") == vh), None)
+            measured = HH.measure(vh, res if isinstance(res, dict) else None, line, rd, ts, wp,
+                                  zap_raw, inv_status)
+            header_eval = measured.measurement if measured else None
+            sec = dict(measured.security_headers) if measured else {}
+            csp = measured.csp if measured else None
             hsts = _hsts_from_header(headers.get("strict-transport-security"), res)
+            if hsts is None and header_eval is not None and header_eval.evaluated is not None \
+                    and header_eval.evaluated.tool == "testssl" and ts is not None and ts.hsts:
+                hsts = S.HstsInfo(**{k: ts.hsts.get(k) for k in ("present", "max_age", "include_subdomains",
+                                                                 "preload", "raw")})
+            final_headers = measured.headers if (measured and header_eval and header_eval.evaluated
+                                                 and header_eval.evaluated.tool != "header_check") else {}
             cookies = _cookies(headers.get("set-cookie"))
             technologies = []
             # S6b-1 (Issue #33): leitet der VHost auf einen Host an anderer Adresse
@@ -1383,7 +1629,8 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
                     version=str(ver.get("number")) if ver and ver.get("number") else None,
                     release_date=str(ver.get("release_date")) if ver and ver.get("release_date") else None,
                     core_vulnerabilities=len(ver.get("vulnerabilities") or []) if ver else None,
-                    users_found_by=_wp_users_found_by(wp.get("users")))
+                    users_found_by=_wp_users_found_by(wp.get("users")),
+                    findings=_wp_findings(wp))
             status_code = _int_or_none((line or {}).get("status_code")) if line else None
             if status_code is None and rd:
                 status_code = _int_or_none(rd.get("status_code"))
@@ -1394,11 +1641,24 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
             if status_code == 0:
                 status_code = None
             ev: list[S.Evidence] = []
+            first = header_eval.first if header_eval else None
             if res is not None:
                 ev.append(S.Evidence(tool="header_check", ref=ref_hdr, excerpt=kv([
                     ("", f"{vh}:"), ("erreichbar", res.get("reachable")),
+                    ("status", first.status_code if first else None),
+                    ("location", first.location if first else None),
                     ("score", res.get("score")), ("server", server),
-                    ("x-feserver", headers.get("x-feserver"))], 220)))
+                    ("x-feserver", headers.get("x-feserver"))], 260)))
+            if header_eval is not None and header_eval.evaluated is not None \
+                    and header_eval.evaluated.tool != "header_check":
+                e_ = header_eval.evaluated
+                ev.append(S.Evidence(tool=e_.tool, ref=(h.refs.get("tech_profile.json", "") if e_.tool == "redirect_probe"
+                                                        else h.refs.get("testssl.json", "") if e_.tool == "testssl"
+                                                        else h.refs.get("wpscan.json", "") if e_.tool == "wpscan"
+                                                        else h.refs.get("zap_alerts.json", "")),
+                                     excerpt=kv([("", f"{vh}:"), ("endseite", e_.url), ("status", e_.status_code),
+                                                 ("gesetzt", [n for n, v in header_eval.headers.items() if v.present]),
+                                                 ("fehlend", header_eval.missing)], 260)))
             if line:
                 ev.append(S.Evidence(tool="httpx", ref=(h.httpx_ref_by_vhost.get(vh)
                                                        or h.refs.get("httpx.json")
@@ -1420,10 +1680,12 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
                 url=(res or {}).get("url") or (line or {}).get("url") or (rd or {}).get("final_url"),
                 reachable=reachable, status_code=status_code, headers=headers, security_headers=sec,
                 score=(res or {}).get("score"), csp=csp, hsts=hsts, cookies=cookies, server_header=server,
-                powered_by=powered, x_feserver=headers.get("x-feserver"),
+                powered_by=powered or final_headers.get("x-powered-by"),
+                x_feserver=headers.get("x-feserver") or final_headers.get("x-feserver"),
+                aspnet_version=headers.get("x-aspnet-version") or final_headers.get("x-aspnet-version"),
                 duplicate_headers=list(ts.duplicate_headers) if ts and (ts.fqdn == vh or not ts.fqdn) else [],
                 technologies=technologies, forms=[], login_form=login, alerts=alerts, paths=paths,
-                spider_url_count=spider_by_host.get(vh), wordpress=wordpress,
+                spider_url_count=spider_by_host.get(vh), wordpress=wordpress, header_eval=header_eval,
             ))
         # Alerts, die zu keinem VHost gehoeren: Host-Ebene
         for other_host, alerts in sorted(alerts_by_host.items(), key=lambda kv: sort_key(kv[0])):
@@ -1439,6 +1701,19 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
             ))
     facts.sort(key=lambda f: sort_key(f.fqdn, f.host_ip))
     return facts
+
+
+def _wp_findings(wp: dict) -> list[S.WpFinding]:
+    """wpscan ``interesting_findings`` als Fakten (spec/10 R19): XML-RPC, readme, externes
+    WP-Cron und weitere. Header-Eintraege gehoeren zur Header-Messung, nicht hierher."""
+    out: list[S.WpFinding] = []
+    for item in wp.get("interesting_findings") or []:
+        if not isinstance(item, dict) or str(item.get("type") or "") in ("", "headers", "robots_txt"):
+            continue
+        note = str(item.get("to_s") or "")[:200] or None
+        out.append(S.WpFinding(type=str(item["type"]), url=str(item.get("url") or "")[:300] or None, note=note))
+    out.sort(key=lambda f: sort_key(f.type, f.url))
+    return out
 
 
 def _split_httpx_tech(t: str) -> tuple[str, Optional[str]]:
@@ -1536,6 +1811,7 @@ def _zap_alerts_by_host(ctx: _Ctx, h) -> dict[str, list[S.WebAlert]]:
             url=None, cwe=f"CWE-{cwe}" if cwe not in (None, "", "-1", "0") else None,
             evidence=excerpt(a.get("evidence"), 200) or None, count=0,
             run=_ZAP_RUN.get(str(a.get("sourceid") or "")),
+            param=str(a.get("param"))[:120] if a.get("param") else None,
         )
     for key, alert in grouped.items():
         host = key[0]
@@ -1673,6 +1949,9 @@ def _dns_fact(ctx: _Ctx, domain: str, *, dr: dict, ds: dict, dnsf: dict,
         m = re.search(r"([~+?-]?)all\b", spf_raw)
         spf = S.Spf(raw=spf_raw.strip(), all_qualifier=(m.group(1) or "+") + "all" if m else None,
                     mechanisms=_spf_mechanisms(spf_raw))
+        mx_names = [str(x) for x in (dr.get("mx") or dnsf.get("mx") or [])]
+        for mech in spf.mechanisms:
+            mech.ips = _spf_ips(ctx, domain, mech, mx_names)
     dmarc = _dmarc(dr.get("dmarc_policy") if isinstance(dr.get("dmarc_policy"), dict) else None,
                    dr.get("dmarc") if dr.get("dmarc") is not None else dnsf.get("dmarc"),
                    ds.get("dmarc") if isinstance(ds.get("dmarc"), dict) else None)
@@ -1705,6 +1984,14 @@ def _dns_fact(ctx: _Ctx, domain: str, *, dr: dict, ds: dict, dnsf: dict,
     zt = None
     zt_allowed = _bool_or_none(dnsf.get("zone_transfer"))
     ns_tested = re.findall(r"=== NS: (\S+) ===", zone_txt or "")
+    if zt_allowed is None and ns_tested:
+        # S6b-3 (spec/10 R6): Ergebnis je Nameserver aus der dig-Ausgabe, auch fuer weitere
+        # Zieldomains (junkerwerk.hu); ein SOA-Eintrag im Abschnitt heisst Transfer erlaubt.
+        sections = re.split(r"=== NS: \S+ ===", zone_txt or "")[1:]
+        if any(re.search(r"\sIN\s+SOA\s", sec) for sec in sections):
+            zt_allowed = True
+        elif sections and all(re.search(r"Transfer failed|REFUSED|NOTAUTH", sec) for sec in sections):
+            zt_allowed = False
     if zt_allowed is not None or ns_tested:
         zt = S.ZoneTransfer(allowed=zt_allowed, ns_tested=sorted(set(ns_tested)))
     dangling = []
@@ -1766,6 +2053,25 @@ def _spf_mechanisms(raw: str) -> list[S.SpfMechanism]:
     return out
 
 
+def _spf_ips(ctx: _Ctx, domain: str, mech: S.SpfMechanism, mx_names: list[str]) -> list[str]:
+    """Adressen des Auftrags, die ein SPF-Mechanismus freigibt (spec/10 R19).
+
+    Nur Adressen, die im Host-Inventar stehen; ``include`` und Netze bleiben aussen vor."""
+    ips: set[str] = set()
+    if mech.kind == "a":
+        ips |= ctx.fqdn_ips.get(SYS.clean_name(mech.value or domain), set())
+    elif mech.kind == "mx" and not mech.value:
+        for mx in mx_names:
+            name = SYS.clean_name(mx.split()[-1])
+            ips |= ctx.fqdn_ips.get(name, set())
+    elif mech.kind in ("ip4", "ip6") and mech.value:
+        value = mech.value.split("/")[0]
+        prefix = mech.value.split("/")[1] if "/" in mech.value else None
+        if prefix in (None, "32", "128") and any(value == ip for ips_ in ctx.fqdn_ips.values() for ip in ips_):
+            ips.add(value)
+    return sorted(ips, key=sort_key)
+
+
 def _dmarc(policy: Optional[dict], raw: Any, sec: Optional[dict]) -> Optional[S.Dmarc]:
     src = policy or sec
     if isinstance(src, dict) and src:
@@ -1823,6 +2129,7 @@ def _build_passive(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict], domain
                     banner_excerpt=excerpt(s.get("banner"), 160) or None, seen_at=seen,
                     service_seen_at=_banner_date(s.get("banner")),
                     verified=(port in open_ports) if open_ports is not None else None, hostnames=hostnames,
+                    details=_banner_details(s.get("module"), s.get("banner")),
                 ))
     otx = b.passive.get("otx")
     if isinstance(otx, dict) and isinstance(otx.get("domain"), dict) and domain:
@@ -1845,7 +2152,12 @@ def _build_passive(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict], domain
     uh = b.passive.get("urlhaus")
     if isinstance(uh, dict) and domain:
         comp = uh.get("compromised")
-        details = {"compromised": comp if isinstance(comp, bool) else (False if uh.get("no_data") else None)}
+        # S6b-3 (spec/10 R6): "OK: no_data" ist ein Ausfall der Quelle, kein Negativergebnis.
+        # Nur ein ausdrueckliches Ergebnis traegt eine Aussage (compromised True/False oder
+        # query_status no_results).
+        if not isinstance(comp, bool) and str(uh.get("query_status") or "").lower() == "no_results":
+            comp = False
+        details = {"compromised": comp if isinstance(comp, bool) else None}
         facts.append(S.PassiveFact(id=f"passive:urlhaus:{domain}", source="urlhaus", mode="passive",
                                    observed_at=ctx.run_time("urlhaus") or ctx.finished, confidence=S.CONFIDENCE_PASSIVE,
                                    evidence=[S.Evidence(tool="urlhaus", ref=b.refs.get("urlhaus", ""),
@@ -2152,6 +2464,132 @@ def _banner_date(banner: Any) -> Optional[str]:
     if dt is None:
         return None
     return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _identify_web_services(services: list[S.ServiceFact], http: list[S.HttpFact], tls: list[S.TlsFact]) -> None:
+    """Ein Webport, auf dem httpx, header_check oder testssl eine Antwort bekamen, ist
+    identifiziert, auch wenn nmap nur die Portnamen-Tabelle kannte (huendgen 18.197.248.23:443
+    auf der Duda-Plattform, spec/10 R9)."""
+    answered: dict[tuple[str, int], Optional[str]] = {}
+    for h in http:
+        if not (h.reachable is True or h.status_code) or not h.url:
+            continue
+        try:
+            parts = urlsplit(h.url)
+            port = parts.port or (443 if parts.scheme == "https" else 80)
+        except ValueError:
+            continue
+        answered.setdefault((h.host_ip, port), h.server_header)
+    tls_ports = {(t.host_ip, t.port) for t in tls}
+    for svc in services:
+        if not svc.unidentified:
+            continue
+        key = (svc.host_ip, svc.port)
+        if key in answered or key in tls_ports:
+            svc.unidentified = False
+            svc.kennung = svc.kennung or answered.get(key) or "Webserver"
+
+
+_LOCATION_RE = re.compile(r"^location:\s*(\S+)", re.M | re.I)
+
+
+def _banner_details(module: Any, banner: Any) -> dict[str, Any]:
+    """Aussagen aus einem vollstaendigen Shodan-Banner (spec/10 R19), vor der Kuerzung.
+
+    SMTP: ``VRFY`` und ``AUTH`` in der EHLO-Antwort vor STARTTLS (beides wird im Klartext
+    angeboten). HTTP(S): eine Weiterleitung auf eine Anmeldeseite ueber ``http://``. SSH: die
+    Kennung aus der Protokollzeile (``SSH-2.0-WingFTPServer``).
+    """
+    text = str(banner or "").replace("\r\n", "\n")
+    if not text.strip():
+        return {}
+    mod = str(module or "").strip().lower()
+    out: dict[str, Any] = {}
+    if mod == "smtp" or text.startswith("220 "):
+        ehlo = [ln[4:].strip().upper() for ln in text.splitlines() if ln.startswith(("250-", "250 "))]
+        if ehlo:
+            out["smtp_vrfy"] = any(e == "VRFY" for e in ehlo)
+            starttls = any(e == "STARTTLS" for e in ehlo)
+            auth = any(e.startswith("AUTH ") or e.startswith("AUTH=") for e in ehlo)
+            if starttls:
+                out["smtp_auth_before_starttls"] = auth
+    if mod.startswith("http") or text.startswith("HTTP/"):
+        m = _LOCATION_RE.search(text)
+        if m and m.group(1).lower().startswith("http://") and _LOGIN_URL_RE.search(m.group(1)):
+            out["login_over_http"] = m.group(1)[:200]
+    first = text.splitlines()[0].strip() if text.splitlines() else ""
+    if first.startswith("SSH-"):
+        out["ssh_software"] = first.split("-", 2)[2][:80] if first.count("-") >= 2 else first[:80]
+    return out
+
+
+# S6b-3 (spec/10 R19): Bibliotheksversionen in Ressourcen-URLs (JSF: ``ln=primefaces&v=11.0.1``).
+_RESOURCE_VERSION_RE = re.compile(r"[?&]ln=([A-Za-z][\w-]{1,40})&(?:amp;)?v=(\d[\w.\-]{0,30})")
+# Eigene Ressourcenbibliotheken der Anwendung (css, javascript, images) sind keine Software.
+_RESOURCE_GENERIC = frozenset({"css", "javascript", "js", "images", "img", "fonts", "font", "icons"})
+
+
+def _unprocessed_observations(ctx: _Ctx, services: list[S.ServiceFact], passive: list[S.PassiveFact],
+                              http: list[S.HttpFact], software: list[S.SoftwareFact]) -> None:
+    """Werkzeugfunde ohne Regel des Katalogs in ``unprocessed`` (spec/10 R19).
+
+    Bis S6c eine Regel fuer SMTP-AUTH vor STARTTLS bringt (je Port aus einer eigenen Sonde),
+    stehen die Beobachtungen aus nmap und Shodan hier; ebenso wpscan-Funde ohne Regel und
+    Bibliotheksversionen in Ressourcen-URLs. Widersprechen sich Portscan und Passivquelle am
+    selben Port, steht der Widerspruch an der Software (Konfidenz mittel im Bericht).
+    """
+    for svc in services:
+        if svc.auth_before_starttls:
+            ctx.add_unprocessed("smtp_auth_before_starttls", f"{svc.host_ip}:{svc.port} AUTH vor STARTTLS",
+                                host_ip=svc.host_ip, source="nmap", ref=svc.evidence[0].ref if svc.evidence else "",
+                                excerpt_text=", ".join(svc.auth_mechanisms))
+    for p in passive:
+        if p.source == "shodan" and p.details.get("smtp_auth_before_starttls"):
+            ctx.add_unprocessed("smtp_auth_before_starttls", f"{p.host_ip}:{p.port} AUTH vor STARTTLS laut Passivquelle",
+                                host_ip=p.host_ip, source="shodan", ref=p.evidence[0].ref if p.evidence else "",
+                                excerpt_text=p.banner_excerpt or "")
+    for h in http:
+        wp = h.wordpress
+        for f in (wp.findings if wp else []):
+            if f.type == "xmlrpc":
+                continue
+            ctx.add_unprocessed(f"wpscan_{f.type}", f"{h.fqdn}: {f.type} {f.url or ''}".strip(),
+                                host_ip=h.host_ip, fqdn=h.fqdn, source="wpscan", ref="wpscan.json",
+                                excerpt_text=f.note or "")
+    seen: set[tuple[str, str, str]] = set()
+    for ip, host in sorted(ctx.b.hosts.items(), key=lambda kv: sort_key(kv[0])):
+        tp = host.tech_profile if isinstance(host.tech_profile, dict) else {}
+        urls: list[str] = [str(u) for u in (host.zap_spider_urls or [])]
+        for rd in (tp.get("redirect_data") or {}).values():
+            if isinstance(rd, dict) and isinstance(rd.get("tech_info"), dict):
+                urls.extend(str(u) for u in (rd["tech_info"].get("scripts") or []))
+                urls.extend(str(u) for u in (rd["tech_info"].get("stylesheets") or []))
+        for url in urls:
+            m = _RESOURCE_VERSION_RE.search(url)
+            if not m or m.group(1).lower() in _RESOURCE_GENERIC or "." not in m.group(2):
+                continue
+            fq = urlsplit(url).hostname or ""
+            key = (fq, m.group(1).lower(), m.group(2))
+            if key in seen:
+                continue
+            seen.add(key)
+            ctx.add_unprocessed("resource_version", f"{fq}: {m.group(1)} {m.group(2)} in Ressourcen-URL",
+                                host_ip=ip, fqdn=fq or None, source="redirect_probe",
+                                ref=host.refs.get("tech_profile.json", ""), excerpt_text=url)
+    by_port = {(s.host_ip, s.port): s for s in services}
+    for p in passive:
+        soft = p.details.get("ssh_software") if p.source == "shodan" else None
+        svc = by_port.get((p.host_ip, p.port))
+        if not soft or svc is None or not svc.product:
+            continue
+        a = svc.product.split()[0].lower()
+        if a in soft.lower() or soft.split("_")[0].lower() in svc.product.lower():
+            continue
+        note = f"Shodan {p.port}/tcp: SSH-2.0-{soft}"
+        for sw in software:
+            if sw.host_ip == svc.host_ip and "nmap" in sw.detection_sources \
+                    and sw.product.split()[0].lower() == a and note not in sw.conflicts:
+                sw.conflicts.append(note)
 
 
 def released_after_eol(eol: S.Eol, release_date: Optional[str]) -> S.Eol:
