@@ -453,6 +453,275 @@ def zaehlung_widerspruch(data: Any) -> list[Defect]:
     return out
 
 
+# ---------------------------------------------------------------- S6b-3 (spec/10)
+
+def _ip_of(subject: str) -> str:
+    """Adresse eines Subjekts: "name@ip" -> ip, "ip:port" -> ip, sonst das Subjekt selbst."""
+    if "@" in subject:
+        return subject.rsplit("@", 1)[1]
+    if subject.count(":") == 1:
+        return subject.split(":", 1)[0]
+    return subject
+
+
+def _family(check_id: str) -> Optional[str]:
+    from reporter.catalog.families import family_of
+
+    return family_of(check_id)
+
+
+def _text_felder(f: Any) -> list[tuple[str, str]]:
+    felder = [("found", f.found or ""), ("impact", f.impact or ""), ("verify", f.verify or "")]
+    felder += [(f"recommendation[{i}]", r[1]) for i, r in enumerate(f.recommendation or []) if len(r) > 1]
+    felder += [(f"plan[{p.check}]", p.action) for p in (getattr(f, "plan_items", None) or [])]
+    return felder
+
+
+def header_nicht_fehlend(data: Any) -> list[Defect]:
+    """Ein Header steht im Befundtext, fehlt laut Messung aber nicht (spec/10 R2).
+
+    castenow VS-007/009 und huendgen VS-009 nannten X-Frame-Options, obwohl die Endseite ihn
+    setzte. Geprueft werden die vier Grundheader der Regel security_headers_incomplete; ein
+    Header aus header_duplicate ("X-Frame-Options mehrfach gesetzt") ist kein Widerspruch.
+    """
+    from reporter.catalog.render import HEADER_NAMES
+
+    grund = {HEADER_NAMES[k] for k in ("x-frame-options", "x-content-type-options", "referrer-policy",
+                                       "permissions-policy") if k in HEADER_NAMES}
+    out: list[Defect] = []
+    for f in data.findings:
+        checks = set(getattr(f, "checks", None) or [])
+        if "security_headers_incomplete" not in checks:
+            continue
+        fehlend = set(getattr(f, "missing_headers", None) or [])
+        erlaubt = fehlend | ({"X-Frame-Options"} if "header_duplicate" in checks else set())
+        for where, text in _text_felder(f):
+            genannt = sorted(h for h in grund if h in text and h not in erlaubt)
+            if genannt:
+                out.append(Defect(engine=ENGINE_V3, check="header_nicht_fehlend", severity=SEVERITY_ERROR,
+                                  finding_id=f.id,
+                                  message=f"{f.id} {where}: {', '.join(genannt)} steht im Text, fehlt laut Messung aber nicht",
+                                  detail={"where": where, "header": genannt, "fehlend": sorted(fehlend)}))
+    return out
+
+
+def einschraenkung_widerspricht_befund(data: Any) -> list[Defect]:
+    """Eine Einschraenkung "nicht pruefbar" neben einem Befund oder "unauffaellig" derselben
+    Faktenfamilie am selben Subjekt (spec/10 R4: DMARC, Zertifikat, Header)."""
+    befund: set[tuple[str, str]] = set()
+    for f in data.findings:
+        for eintrag in getattr(f, "subjects", None) or []:
+            check, _, sub = eintrag.partition("|")
+            fam = _family(check)
+            if fam:
+                befund.add((fam, sub))
+    ruhig: set[tuple[str, str]] = set()
+    for block in data.architecture.posture:
+        for item in block.items:
+            if item.v != "unauffällig":
+                continue
+            for check in getattr(item, "checks", None) or []:
+                fam = _family(check)
+                if fam:
+                    for sub in getattr(item, "subjects", None) or []:
+                        ruhig.add((fam, sub))
+                        ruhig.add((fam, _ip_of(sub)))
+    out: list[Defect] = []
+    for lim in data.scope.limitations:
+        for ref in getattr(lim, "refs", None) or []:
+            check, _, gruppe = ref.partition("|")
+            fam = _family(check)
+            if not fam:
+                continue
+            if (fam, gruppe) in befund:
+                grund = "Befund"
+            elif (fam, gruppe) in ruhig or (fam, _ip_of(gruppe)) in ruhig:
+                grund = "unauffällig in der Posture"
+            else:
+                continue
+            out.append(Defect(engine=ENGINE_V3, check="einschraenkung_widerspricht_befund",
+                              severity=SEVERITY_ERROR,
+                              message=f"Einschränkung „{lim.what}“ ({check}, {gruppe}) neben {grund} derselben Familie {fam}",
+                              detail={"ref": ref, "familie": fam}))
+    return out
+
+
+# Werkzeugsaetze, die eine Positivaussage offen lassen (legacy_protocols_present vor S6b-3:
+# "Ob dort eine Anmeldung ohne Transportverschlüsselung abgelehnt wird, ließ sich von außen
+# nicht feststellen" neben "POP3 und IMAP erzwingen TLS vor der Anmeldung").
+UNGEWISS = re.compile(r"nicht feststellen|nicht festgestellt|nicht belegt|nicht prüfbar", re.I)
+
+
+def positiv_widerspricht_befund(data: Any) -> list[Defect]:
+    """Positivbefund und Befund am selben Host:Port widersprechen sich (spec/10 R7)."""
+    out: list[Defect] = []
+    for pos in data.positives:
+        orte = {s for s in (getattr(pos, "subjects", None) or []) if s.count(":") == 1}
+        if not orte:
+            continue
+        regeln = set(getattr(pos, "checks", None) or [])
+        for f in data.findings:
+            for pv in f.provenance or []:
+                if pv.field == "title":
+                    continue
+                treffer = sorted({m.split("|", 1)[-1] for m in pv.members} & orte)
+                if not treffer:
+                    continue
+                if pv.check in regeln or UNGEWISS.search(pv.text or ""):
+                    out.append(Defect(engine=ENGINE_V3, check="positiv_widerspricht_befund",
+                                      severity=SEVERITY_ERROR, finding_id=f.id,
+                                      message=(f"Positivbefund „{pos.title}“ und {f.id} ({pv.check}) "
+                                               f"widersprechen sich an {', '.join(treffer)}"),
+                                      detail={"orte": treffer, "regel": pv.check}))
+                    break
+    return out
+
+
+def posture_widerspricht_befund(data: Any) -> list[Defect]:
+    """Posture "unauffällig" neben einem Befund derselben Regel oder "Handlungsbedarf" ohne
+    Befund (spec/10 R8: DANE als Handlungsbedarf neben "MX beim Dienstleister")."""
+    befunde: list[tuple[str, str]] = []
+    for f in data.findings:
+        for eintrag in getattr(f, "subjects", None) or []:
+            check, _, sub = eintrag.partition("|")
+            befunde.append((check, sub))
+    out: list[Defect] = []
+    for block in data.architecture.posture:
+        for item in block.items:
+            checks = set(getattr(item, "checks", None) or [])
+            if not checks:
+                continue
+            subs = set(getattr(item, "subjects", None) or [])
+            subs |= {_ip_of(s) for s in subs}
+            passend = [c for c, sub in befunde
+                       if c in checks and (not subs or sub in subs or _ip_of(sub) in subs)]
+            if item.v == "unauffällig" and passend:
+                grund = "unauffällig neben einem Befund"
+            elif item.v == "Handlungsbedarf" and not passend:
+                grund = "Handlungsbedarf ohne Befund"
+            else:
+                continue
+            out.append(Defect(engine=ENGINE_V3, check="posture_widerspricht_befund", severity=SEVERITY_ERROR,
+                              message=f"Posture {block.name} / {item.l}: {grund}",
+                              detail={"block": block.name, "eintrag": item.l, "status": item.v}))
+    return out
+
+
+def e5_fehlt(data: Any, facts: Any) -> list[Defect]:
+    """Port 25 laut Passivquelle, vom Portscan nicht gesehen, ohne Einschraenkungszeile
+    (spec/10 R10: lumbeck-wolter, junkerwerk 188.40.3.130, heuel 213.133.104.51)."""
+    genannt: set[str] = set()
+    for lim in data.scope.limitations:
+        if getattr(lim, "code", "") in ("e5", "unreachable_from_scanner", "no_ipv6_route"):
+            genannt.update(getattr(lim, "subjects", None) or [])
+    eigene = {h.ip for h in facts.hosts if h.third_party is None}
+    out: list[Defect] = []
+    for p in facts.passive:
+        if p.source == "shodan" and p.port == 25 and p.verified is False and p.host_ip in eigene \
+                and p.host_ip not in genannt:
+            out.append(Defect(engine=ENGINE_V3, check="e5_fehlt", severity=SEVERITY_ERROR,
+                              message=f"{p.host_ip}:25 laut Passivquelle offen, Kapitel 2 nennt die Einschränkung nicht",
+                              detail={"host": p.host_ip}))
+    return out
+
+
+# Zusagen im Kundentext (spec/10 R12): "wir prüfen sie und nehmen wiederkehrende Fälle in den
+# Katalog auf", "werden auf Anfrage bereitgestellt".
+ZUSAGE = re.compile(r"\bwir (?:prüfen|nehmen|stellen|liefern)\b|\bnehmen wir\b|\bauf Anfrage\b|"
+                    r"\bwerden\b[^.]{0,40}\bbereitgestellt\b", re.I)
+_OHNE_KUNDENTEXT = {"provenance", "tool_messages", "evidence", "meta", "refs", "subjects", "checks",
+                    "sources", "key", "rule", "message"}
+
+
+def _kundentexte(obj: Any, pfad: str = ""):
+    if hasattr(obj, "model_dump"):
+        obj = obj.model_dump()
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if k not in _OHNE_KUNDENTEXT:
+                yield from _kundentexte(v, f"{pfad}.{k}")
+    elif isinstance(obj, list):
+        for i, v in enumerate(obj):
+            yield from _kundentexte(v, f"{pfad}[{i}]")
+    elif isinstance(obj, str):
+        yield pfad, obj
+
+
+def zusage_im_kundentext(data: Any) -> list[Defect]:
+    out: list[Defect] = []
+    for pfad, text in _kundentexte(data):
+        m = ZUSAGE.search(text)
+        if m:
+            out.append(Defect(engine=ENGINE_V3, check="zusage_im_kundentext", severity=SEVERITY_ERROR,
+                              message=f"{pfad}: Zusage „{m.group(0)}“ im Kundentext",
+                              detail={"where": pfad, "text": m.group(0)}))
+    return out
+
+
+_CVE_ID = re.compile(r"CVE-\d{4}-\d{4,}", re.I)
+
+
+def cve_ohne_a3(data: Any) -> list[Defect]:
+    """Eine CVE im Befundtext ohne Zeile in Anhang A.3 (spec/10 R14: 17 wpscan-CVEs bei DB)."""
+    gelistet = {c.upper() for ref in data.appendix.cve_refs for c in _CVE_ID.findall(ref.cve)}
+    out: list[Defect] = []
+    for f in data.findings:
+        text = " ".join([f.found or "", f.impact or "", f.evidence or ""]
+                        + list(f.threat.cves if f.threat else []))
+        fehlend = sorted({c.upper() for c in _CVE_ID.findall(text)} - gelistet)
+        if fehlend:
+            out.append(Defect(engine=ENGINE_V3, check="cve_ohne_a3", severity=SEVERITY_ERROR, finding_id=f.id,
+                              message=f"{f.id} zitiert {', '.join(fehlend[:5])}" + (" und weitere" if len(fehlend) > 5 else "")
+                                      + ", Anhang A.3 führt sie nicht",
+                              detail={"cves": fehlend}))
+    return out
+
+
+def namen_nicht_geprueft(facts: Any) -> list[Defect]:
+    """Die Hostsuche hat Namen gefunden, die nicht ins Inventar kamen (spec/10 R5, bis S6c)."""
+    namen = sorted({d.fqdn for t in facts.targets for d in t.discovered})
+    if not namen:
+        return []
+    return [Defect(engine=ENGINE_V3, check="namen_nicht_geprueft", severity=SEVERITY_WARNING,
+                   message=(f"{len(namen)} gefundene Namen nicht geprüft (Kapitel 2 nennt sie): "
+                            + ", ".join(namen[:6]) + (" und weitere" if len(namen) > 6 else "")),
+                   detail={"namen": namen})]
+
+
+_DATUM_DE = re.compile(r"(?:gültig bis|seit) (\d{2})\.(\d{2})\.(\d{4})")
+
+
+def frist_vor_berichtsdatum(data: Any) -> list[Defect]:
+    """Ein Ablaufdatum im Befund liegt vor dem Berichtsdatum (spec/10 R18, castenow mailstore
+    24.09. bei Bericht vom 26.09.). Hinweis an den Admin im Review, kein Fehler."""
+    from datetime import date
+
+    def _tag(text: Any) -> Optional[date]:
+        try:
+            t, m, j = (int(x) for x in str(text).split("."))
+            return date(j, m, t)
+        except (ValueError, AttributeError):
+            return None
+
+    bericht, scan = _tag(data.meta.report_date), _tag(data.meta.scan_date)
+    if bericht is None:
+        return []
+    out: list[Defect] = []
+    for f in data.findings:
+        for m_ in _DATUM_DE.finditer(" ".join([f.affected or "", f.found or ""])):
+            frist = date(int(m_.group(3)), int(m_.group(2)), int(m_.group(1)))
+            # Nur Fristen, die zwischen Scan- und Berichtstag ablaufen; was am Scantag schon
+            # abgelaufen war, sagt der Befund selbst ("am Scantag seit ... abgelaufen").
+            if (scan is None or frist >= scan) and frist < bericht and f.status in ("rot", "gelb"):
+                out.append(Defect(engine=ENGINE_V3, check="frist_vor_berichtsdatum", severity=SEVERITY_WARNING,
+                                  finding_id=f.id,
+                                  message=(f"{f.id}: Frist {m_.group(0)} liegt vor dem Berichtsdatum "
+                                           f"{data.meta.report_date}; Stand beim Kunden prüfen"),
+                                  detail={"frist": frist.isoformat()}))
+                break
+    return out
+
+
 def run_all(data: Any, facts: Any, output: Any, *, strict: bool = False) -> list[Defect]:
     """Alle Pruefungen in fester Reihenfolge."""
     defects: list[Defect] = []
@@ -466,4 +735,14 @@ def run_all(data: Any, facts: Any, output: Any, *, strict: bool = False) -> list
     defects.extend(rolle_ohne_fakt(data))
     defects.extend(aussage_ohne_fakt(data, output))
     defects.extend(zaehlung_widerspruch(data))
+    # S6b-3 (spec/10): Widersprueche zwischen Teilen des Berichts, Zusagen, Fristen.
+    defects.extend(header_nicht_fehlend(data))
+    defects.extend(einschraenkung_widerspricht_befund(data))
+    defects.extend(positiv_widerspricht_befund(data))
+    defects.extend(posture_widerspricht_befund(data))
+    defects.extend(e5_fehlt(data, facts))
+    defects.extend(zusage_im_kundentext(data))
+    defects.extend(cve_ohne_a3(data))
+    defects.extend(namen_nicht_geprueft(facts))
+    defects.extend(frist_vor_berichtsdatum(data))
     return defects

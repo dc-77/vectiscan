@@ -166,11 +166,13 @@ def test_run_all_liefert_alle_pruefungen_in_fester_reihenfolge() -> None:
     erste = {}
     for d in defekte:
         erste.setdefault(d.check, d)
+    # S6b-3: namen_nicht_geprueft (archiv.junkerwerk.de) als Warnung am Ende.
     assert list(erste) == [
         "abdeckungskapitel_leer", "tech_widerspricht_befund",
         "unprocessed_ueber_schwelle", "auftraggeber_fehlt", "aussage_ohne_fakt",
+        "namen_nicht_geprueft",
     ]
-    assert [d.is_error for d in erste.values()] == [True, True, False, False, True]
+    assert [d.is_error for d in erste.values()] == [True, True, False, False, True, False]
     assert any(d.finding_id == "VS-2026-099" and "ohne Herkunft" in d.message
                for d in defekte if d.check == "aussage_ohne_fakt")
 
