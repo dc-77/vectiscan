@@ -2,16 +2,18 @@
 
 Kontext: Lies zuerst report-prototype/spec/05-architektur-befund-und-plan.md, dann
 spec/07-claude-code-handover.md (Abschnitt 9 ab „Abschluss S6b-1"), spec/09-gegenlesen-scanrunde.md
-(Q1, Q3, Q8, Q16, Q17, Teil 4, Entscheidungen E3 bis E5) und spec/10-gegenlesen-scanrunde-2.md (Teil 5,
-Zuschnitt S6c, sowie die Scanner-Belege in R1, R3, R4, R5, R19). Diese Dateien sind die Wahrheit für dieses
-Vorhaben; ältere Markdown-Dateien im Repo können veraltet sein. Bei Widerspruch: Code und spec/05 bis
-10 gelten, sonst nachfragen. Leitprinzipien: kein Befund ohne Fakt aus einem Werkzeug; keine KI-erzeugten
+(Q1, Q3, Q8, Q16, Q17, Teil 4, Entscheidungen E3 bis E5), spec/10-gegenlesen-scanrunde-2.md (Teil 5,
+Zuschnitt S6c, sowie die Scanner-Belege in R1, R3, R4, R5, R19) und spec/11-gegenlesen-scanrunde-3.md
+(Teil 5 Zuschnitt S6c, die Scanner-Belege in T1, T2, T7, T8 und die Entscheidung E19). Diese Dateien
+sind die Wahrheit für dieses Vorhaben; ältere Markdown-Dateien im Repo können veraltet sein. Bei
+Widerspruch: Code und spec/05 bis 11 gelten, sonst nachfragen. Leitprinzipien: kein Befund ohne Fakt aus einem Werkzeug; keine KI-erzeugten
 Befunde, Einstufungen oder CVSS-Werte; keine Zusagen im Kundenreport; jede Scanner-Änderung hat ein
 Fixture aus Rohdaten (Timeout-Teilausgabe, Weiterleitung, Challenge, leere nmap-Ausgabe); Deutsch in
 Texten mit echten Umlauten, ASCII nur in Bezeichnern, Dateinamen und IDs; keine Gedankenstriche in
 Texten. Arbeite im Plan-Modus, zeige den Plan, warte auf Freigabe. Am Ende: Tests grün, kurze
 Zusammenfassung, Liste offener Fragen.
-Schritt 0: git merge main --no-edit im Worktree (S6b-3 muss gemerged sein). Nichts an spec/ ändern.
+Schritt 0: git merge main --no-edit im Worktree (S6b-3 und S6b-4 müssen gemerged sein). Nichts an spec/
+ändern.
 Regeln: Jedes Abbild kommt aus der eigenen Registry ghcr.io/dc-77/vectiscan/, Fremdabbilder nur
 gespiegelt und per Digest gepinnt (scripts/ops/mirror-images.sh, tests/test_compose_images.py); ein
 neues Werkzeug im scan-worker-Abbild wird zur Build-Zeit installiert und in Issue #34 vermerkt. Nicht
@@ -58,6 +60,13 @@ kürzen (Konfidenzfilter Q14 ist sonst nicht prüfbar); AJAX-Spider je Instanz s
 scan_in_progress einmal nachfassen (#27); Cookie-Meldungen an Login-Seiten mit URL.
 (7) whois (#35): fehlgeschlagener Abruf ist failed, nicht ok mit no_data; Quelle reparieren oder das
 Werkzeug aus dem Paket nehmen; dasselbe Muster bei urlhaus und securitytrails prüfen (spec/10 R6).
+Dazu eine RDAP-Abfrage je Adresse (rdap.org oder die RIR-Endpunkte) als Fakt netblock_owner mit Quelle
+RIR, damit die Netzbetreiber-Spalte im Bericht eine echte Registry-Quelle bekommt (spec/11 T2, E17);
+bis dahin bleibt „laut AbuseIPDB".
+(7a) Ports mit ?-Namen (spec/11 T1 Scannerteil): imap-capabilities, pop3-capabilities, smtp-commands
+und ssl-cert als Kennungsfakten je Port exportieren, nicht nur den nmap-Dienstnamen; XML-RPC bei
+castenow: wpscan meldet es dort nicht, deshalb eine eigene Sonde auf /xmlrpc.php (POST system.listMethods)
+als Fakt wordpress_xmlrpc, Fixture DB (aktiv) und CA.
 (8) KI #1 (Host-Strategie) und ai_phase2_config: keine Fremdports in zap_extra_urls (E3), Drittanbieter-
 Skip mit Grund (bleibt), „or later" als Untergrenze (S6a2 bleibt); aiStrategy „veraltete PostgreSQL 9.6"
 darf nicht mehr entstehen (JW).
@@ -66,6 +75,8 @@ E5 (klärt DC außerhalb des Codes).
 Abnahme: alle Suiten grün (scan-worker-Tests mit den neuen Fixtures, report-worker unverändert grün);
 Golden-Facts aus den Rohdaten der Scan-Runde bleiben gültig, neue Fakten kommen nur mit neuen Scans.
 Nach dem Merge zweite Scan-Runde gegen die sieben Ziele (macht Claude über die API, nacheinander, kein
-Merge während der Scans), neue Aufträge werden Golden-Fixtures, Gegenlesen als spec/12. Push über SSH,
+Merge während der Scans), darin der Nachscan der gefundenen, nicht geprüften Namen nach spec/11 E19
+(LW eset und ftp, HE ftp und ftp.mail, JW archiv, HL as2 und control, BS nur nach Klärung von E4);
+neue Aufträge werden Golden-Fixtures, Gegenlesen als spec/12. Push über SSH,
 MR gegen main, Merge nach grüner Pipeline mit Source-Branch entfernen, danach Merge-Commit,
 MR-Nummer und Ergebnisse melden.
