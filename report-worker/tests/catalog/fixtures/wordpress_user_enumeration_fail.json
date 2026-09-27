@@ -9,7 +9,7 @@
  "expect": {
   "status": "fail",
   "group_key": "www.example.test@10.0.0.1",
-  "affected": ["www.example.test (admin)"],
+  "affected": ["www.example.test (1 Anmeldename)"],
   "positive": false
  }
 }

@@ -221,7 +221,9 @@ def test_anhang_eine_zeile_je_meldung():
     ap = data_for(CASTENOW_VORLAUF).appendix
     # S6b-3 (spec/10 R15): dazu kommen die ZAP-Meldungen, deren abdeckende Regel am selben
     # Namen nicht angeschlagen hat (Header an Namen, die nur an einer Weiterleitung gemessen sind).
-    assert len(ap.tool_messages) >= 40 and len(ap.tool_findings) <= 22
+    # S6b-4n (spec/11 N12): Meldungen zu Headern, die ein Befund oder Positivbefund am selben Host
+    # bewertet, entfallen (39 statt 40).
+    assert len(ap.tool_messages) >= 39 and len(ap.tool_findings) <= 22
     # S6b-3 (spec/10 R15): die Anzahl ist die Zahl der betroffenen Adressen laut Werkzeug.
     assert sum(t.count for t in ap.tool_findings) == sum(max(m.count, 1) for m in ap.tool_messages)
     schluessel = [(t.rule, t.message) for t in ap.tool_findings]

@@ -712,6 +712,158 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
     f77ccff2 45->44. Halbleer vor einem Kapitelanfang nur noch 2d2d4f39 Seite 30; 4e6b6883
     und f77ccff2 ohne halbleere Seite.
 
+- S6b-4n (Nachtrag S6b-4, spec/11 Teil 6, N1 bis N15, E24 und E25 als Vorschlag umgesetzt):
+  Faktenschema 1.3.0, Katalog 2026-09-27.2. Neu gebaut: Golden-Fakten aller 21 Aufträge,
+  Reportdaten, HTML-Schnappschuss und die elf abgeleiteten Soll-Listen; geänderte oder neue
+  Einträge tragen `spec11` mit der N-Nummer (ein vorheriger T-Eintrag steht dahinter als
+  "vorher …") und `warum`, jede Liste `hinweis_s6b4n` mit den entfallenen Einträgen. Die
+  kuratierte `junkerwerk.json` behält ihre Liste; im Drift-Test neu die `X-AspNet-Version` an
+  autodiscover als `expected_member_differences` (httpx im Rescan, N12). Abweichungen je
+  N-Nummer:
+  - N1: `Csp.script_rule` (script-src oder default-src). huendgen www und castenow ubb-wiki
+    (nur frame-ancestors) tragen `csp_missing` in der Variante "Inhaltsrichtlinie nur mit
+    frame-ancestors, keine Regel für Skriptquellen" statt des Positivbefunds; castenow www
+    bleibt in der Katalogliste positiv, der Bericht unterdrückt den Positivbefund neben
+    `csp_weak` am selben Namen (`bundles.POSITIVE_BLOCKED_BY`). P "Content-Security-Policy
+    gesetzt" nennt bei castenow nur noch bitwarden, bei huendgen entfällt er.
+  - N2 (E24): HSTS an 3xx und 400 ist eine Messung, an 429 und Challenge nie, auch kein
+    Rückgriff auf die erste Antwort aus redirect_probe. Positivbefund mit Messort "gemessen an
+    der Weiterleitung mit Status 301" und "gemessen an der Fehlerseite mit Status 400"
+    (castenow umfrage, ubb-wiki, mailstore). Abweichung zum Wortlaut in spec/11: die Klammer
+    "(301)" stünde im Bericht in der Klammer hinter dem Namen, der Status steht deshalb ohne
+    zweite Klammer. heuel online ohne HSTS-Positiv (Soll-Liste heuel-0923), 176db198 ohne den
+    HSTS-Befund an online. Gruppennamen der Header-Regeln nennen nur Aliasnamen mit eigener
+    Header-Messung: bergersysteme ohne "+cdn", dazu dortmund-beach "+www", junkerwerk
+    "+team", heuel "+heuel.com, jobs.heuel.com", castenow "+castenow.de" und huendgen
+    "+huendgen-entsorgung.de" (Einträge mit N2 markiert; zwei Markierungen aus spec/10 R9
+    und R19 bei dortmund-beach am neuen Gruppennamen nachgetragen).
+  - N3: `HeaderEval.final_response` und `client_redirect`; gleiche Antwort über ETag (ohne
+    `W/`, Anführungszeichen und Kompressionssuffix), Last-Modified oder Content-Length. heuel
+    ose: ZAP je URL als Quelle, Referrer- und Permissions-Policy "nur an der
+    Weiterleitungsseite gemessen" statt fehlend (Soll-Liste heuel-0923 ose ohne die beiden);
+    castenow mail und mail2 "an der Endseite nicht gemessen". Gegenprobe junkerwerk outlook
+    und huendgen www bleiben Endantwort.
+  - N4: `login_form` nur, wenn die Endseite auf demselben Host liegt; webtech- und
+    CMS-Einträge eines Hosts, dessen Web-Namen alle auf einen anderen Host weiterleiten, gehen
+    an das Ziel (heuel 213.133.104.51 nur noch nmap-Technik, bergersysteme 92.205.224.174
+    ohne Webflow und Cloudflare). Rolle "Weiterleitung auf <Ziel>" neben den eigenen Diensten
+    (heuel dl und webportal: Dateiaustausch, Mailabruf und Einlieferung, Weiterleitung auf
+    ose.heuel.com; bergersysteme 92.205.224.174). Bilder nur am Host, dessen Antwort sie
+    zeigen (heuel online und webportal ohne eigenes Bild). Scan-Steuerung bei bergersysteme
+    "wegen Weiterleitung auf die Webflow-Seite www.bergersysteme.com".
+  - N5 (Entscheidung DC 27.09.): weitere A-Einträge in `additional_ips` mit `family`
+    (huendgen 52.59.120.70, heuel 216.150.16.65, castenow 3.174.98.123, .30, .63). Neue
+    Einschränkung "Weitere Adresse laut DNS, nicht geprüft" mit den dort gelaufenen
+    Messungen; Posture "am Namen gemessen (<Adresse>)" (heuel 216.150.1.65, castenow
+    3.174.98.120), ein Befund am Host bleibt Handlungsbedarf (huendgen 18.197.248.23);
+    Positivbefunde, Anhang B und 3.1 mit "gemessen an <Adresse>"; Rotationszeile mit
+    "Webabruf und Technologie-Erkennung". Abweichung zu spec/11: "Technologie-Erkennung
+    (httpx)" ohne Werkzeugnamen, weil `werkzeugname_im_kundentext` httpx im Kundentext sperrt.
+    Zählung "n IP-Adressen, davon m nur aus DNS oder ohne Antwort".
+  - N6: Kategorie grün nur mit mindestens einer gemessenen Regel, sonst grau "Nicht
+    bewertbar" (lumbeck-wolter D). `ip_reputation` auf Plattform- und CDN-Adressen nicht
+    anwendbar, positiv nur ohne Meldung im Abfragefenster von 90 Tagen (Positivbefund ohne
+    bergersysteme 198.202.211.1, huendgen 18.197.248.23, castenow 3.174.98.120; Soll-Listen
+    ohne diese Positiveinträge). Zonentransfer mit Nachweis je Domain aus der eigenen Datei.
+    Abweichung zu spec/11 (Entscheidung DC 27.09.): junkerwerk.hu behält den Positivbefund,
+    weil das Tar `phase0/zone_transfer_junkerwerk.hu.txt` mit drei AXFR-Läufen enthält
+    (`; Transfer failed.` an ns.udag.de, .net, .org); spec/11 sagt "kein AXFR-Lauf".
+  - N7: `Dmarc.delegated_to` aus den dnsx-Ketten oder den Shodan-Domaindaten; bergersysteme
+    VS-005 trennt dmarc@bergersysteme.com (eigene Domain, "auswerten") und die Adresse bei
+    hornetdmarc.com ("beim Dienstleister anfordern") und nennt die CNAME-Delegation;
+    dortmund-beach begründet den Betreiber-Satz mit SPF `mx`.
+  - N8: Vorlagezertifikat nur bei gleichem SAN-Satz, gleichem Aussteller, gleicher
+    Zuständigkeit und testssl mit vollständiger Kette: castenow mailstore nur 195.50.179.4,
+    huendgen ohne Hinweis (Sectigo-Wildcard der Exchange-Linie). "sofern nicht erneuert" in
+    Hebel, Effekt und Auswirkung.
+  - N9: "fehlerbereinigt ab" aus `fixed_in`, "neueste laut wpscan" aus `latest_version`,
+    "Verzeichnis von wpscan veraltet" bei fixed_in über latest (Slider Revolution 6.7.38 zu
+    6.7.35); Produktnamen aus `PRODUCT_NAMES` in Betroffen und Plan (Soll-Listen dortmund-beach
+    mit "BeTheme", "Slider Revolution"); `SoftwareFact.child_of`, BeTheme Child "nicht
+    bestimmbar (eigenes Kindtheme, Elterntheme BeTheme, siehe VS-…)". Plakette in 3.1 nur
+    "veraltet" oder "LTS", Anzahl, Zielversion und Datum in der Hinweisspalte; der
+    Positivbefund zur Herstellerpflege sagt "(in Langzeitpflege bis 30.06.2028 laut Debian)"
+    ohne zweite Klammer.
+  - N10: Passivregel am selben Produkt nur als Portzusatz im ersten Satz und im Titel
+    ("Verwaltungsoberfläche Plesk auf 443, 8443 und laut Passivquelle 8880", "VRFY angeboten
+    (laut EHLO) auf 465, 587 und laut Passivquelle 25"), eine Stufe, eine Verifikation;
+    Baustein-Schlüssel `key` für die Versionspreisgabe (junkerwerk VS-014 eine Auswirkung),
+    X-FEServer unter "interner Name"; `service_cert_expired` nennt das Zertifikat einmal
+    (Soll-Liste bergersysteme ohne Zertifikat je Port), "Mailclients" und "für die
+    Maildienste" bei Mailports; castenow VS-001 Satzfolge der Auswirkung.
+  - N11: Quelle je fremdem Namen (`SharedSystem.foreign_sources`), Satz "laut Passivquelle 2
+    weitere Domains und laut Zertifikat 1 weitere Domain" (castenow .53) und "laut
+    Passivquelle n weitere Domains" in `spf_authorizes_shared_host` (Soll-Listen junkerwerk,
+    castenow). `secureserver.net` stand schon in `HOSTER_DOMAINS`; die "3" entstand aus
+    tonausstrom.de (Zertifikat an 8000 und 8001). 8800 (Icecast) ohne Domainfakt: "die
+    Zuordnung zu einer Domain ist nicht belegt", grau und nicht bewertet. Drittanbieter-Zeilen
+    "(laut Namensauflösung und SPF)".
+  - N12: Fundort in Anhang C ("an Nebenpfaden", "an der Sicherheitsabfrage"), Meldungen zu
+    bewerteten Regeln am selben Host entfallen; ASP.NET-Version auch aus httpx (Soll-Listen
+    castenow mail, mail2 und junkerwerk autodiscover mit X-AspNet-Version); Shodan-OS als zweite
+    Quelle; Skript-Adressen (`gtm.js`, `fbevents.js`) und der Sitzungs-Cookie JSESSIONID aus
+    redirect_probe als zweite Quelle (heuel GTM, Facebook Pixel, Java/Servlet jetzt in 3.1
+    statt in Anhang C); Neos eine Zeile ("Neos", cms_fingerprint und httpx);
+    `tls_weakness_reported` nur mit eigenem testssl-Lauf (entfällt an junkerwerk autodiscover,
+    castenow mail und owa, heuel ose); URLhaus und SecurityTrails "(ohne Ergebnis)"; Anhang D
+    "davon n gleiche Meldungen der Webanalyse zusammengeführt".
+  - N13: "Protokolle und Verfahren nicht bewertet, Zertifikat aus dem Portscan"; Pfadsuche
+    je Werkzeug (`PathSearchFact.tool_reasons`, `statistics`) mit Zeitlimit, fehlender
+    Statistik und nie durchsuchter Anwendung; wafw00f-Zeitlimit in der Zeile "Zeitlimit der
+    Prüfung überschritten" (huendgen 80.90.145.166, "Erkennung vorgelagerter Schutzsysteme"); E4-Zeile
+    "Ergebnisse eigener Messungen liegen nicht vor; VS-… beruhen allein auf der
+    Passivquelle"; ZAP mit Ursache und "ohne Meldungen" aus `CoverageFact.run_status`; kein
+    "vollständig" bei Kurzlauf unter 60 Sekunden oder nur einem von mehreren VHosts
+    (junkerwerk 217.243.248.28 jetzt teilweise); "abgebrochen, der Scanner vermutete in der
+    Startseite (200) ein Abwehrmerkmal"; Ziel der aktiven Webanalyse nach Art der Antwort
+    (junkerwerk cloud "einer Seite ohne eigenen Inhalt" mit Titel und Status statt "ohne
+    Seiteninhalt (Status 200)", heuel edi "einer Fehlerseite", online "einer
+    Sicherheitsabfrage"); Numerus bei einer AAAA-Adresse; Gate-Text
+    `ipv6_ohne_inventar` "nicht im Scan-Inventar, im Bericht als ungeprüft ausgewiesen".
+  - N14: Rollen aus SPF `a`, aktiv bestätigten Abruf- und Einlieferungsports ("Mailabruf und
+    Einlieferung", mit SPF zusammengefasst "Mailabruf, Einlieferung und Versand laut SPF"),
+    `db_exposed` ("Datenbanken erreichbar"), Passivpfad `/owa/` ("Mail-Webzugang laut
+    Passivquelle") und Seitentitel weiterer Ports ("Anmeldeportal (Port 444)"), auch auf
+    geteilten Systemen; `MAX_ROLES` 5. Die Rolle "Mailabruf und Einlieferung" erlaubt keine
+    Mail-Rollenwörter (offene Abrufports belegen keine Postfächer des Unternehmens, spec/09
+    Q2 lumbeck-wolter). Abweichung zu spec/11: dortmund-beach bekommt keine Rolle
+    "Datenbanken erreichbar", der Server hat keinen Datenbankport (VS-001 ist Webmin und
+    froxlor).
+  - N15: Referrer-Policy nach der heutigen Voreinstellung; 587 "Anmeldung erst nach
+    STARTTLS"; A.1-Ausnahme nur `cert_expiring`, abgelaufene Dienstzertifikate mit eigenem
+    Satz; 53 "DNS", tcpwrapped "Dienst ohne Antwort"; "Hosteintrag aktualisiert am" für den
+    Shodan-Hosteintrag, "gesehen am" nur mit Zeitstempel des Dienstes (Soll-Listen der
+    Passivregeln, Drift-Test `_LAUF_ZUSATZ`); Numerus; eine Klammer für Titelzusatz und
+    Betreiber ("(TLS erzwungen; beim Hoster Hetzner Online GmbH)"); kein doppeltes Präfix im
+    Plan; Plattformzusatz hinter der Adresse; E25 (Vorschlag umgesetzt): Anmeldenamen nur als
+    Anzahl und Fundweg (Soll-Listen dortmund-beach und castenow), Gate
+    `anmeldename_im_kundentext`; Cloudflare-Ports mit Banner-Kennung, 8880 Plesk; ProFTPD und
+    mod_sftp eine Zeile; Etracker wie Cookiebot ausgeblendet; heuel 4433 unter "Beobachtungen
+    ohne Regeltreffer" mit dem Antwortkopf `Server: xxxx`; Satz zur CDN-Kante bei
+    bergersysteme 198.202.211.1.
+    Abweichung zu spec/11: bergersysteme 2052 und 2095 bleiben "unbekannt", weil der
+    Shodan-Export die Banner vor dem Server-Header abschneidet (`Cache-Control: private,
+    max-age=0, no-store, no-cache,`); nur 2053 und 2096 tragen "Server: cloudflare".
+  - Zahlen je Auftrag (Befunde, Positivbefunde, Planzeilen, Anhangzeilen, Einschränkungen,
+    Hosts in 2.1): dortmund-beach 1fbc92b9 14->14, 5->5, 19->19, 14->14, 6->7, 1->1;
+    lumbeck-wolter c3d5724c 5->5, 7->7, 8->8, 0->0, 6->6, 2->2; junkerwerk 31d67a02 16->16,
+    7->7, 21->21, 6->5, 10->12, 3->3; huendgen 3cf01f8d 12->12, 8->7, 16->17, 2->1, 8->10,
+    2->2; bergersysteme 68d59573 12->12, 6->6, 15->15, 1->1, 16->16, 7->7; castenow 1f8bc977
+    18->18, 13->13, 20->21, 18->14, 14->17, 7->7; heuel 2e56abe1 9->9, 7->7, 15->15, 17->12,
+    15->17, 6->6. Übrige: 0bf16342 17->17, 3->3, 28->28, 9->7, 15->17; 14272c00 14->14, 5->5,
+    19->19, 14->14, 6->7; 176db198 8->7, 5->5, 15->14, 22->20, 13->15 (HSTS an der Abwehrseite
+    von online entfällt, N2); 2572eebc 17->17, 6->6, 28->28, 4->4, 17->18; 2d2d4f39 27->27,
+    7->7, 28->29, 17->15, 19->22; 45bb234c unverändert; 4e6b6883 27->27, 6->6, 28->29, 17->15,
+    18->21; 57b3ac85 unverändert; 75338c97 unverändert; 860d0d5a 16->16, 7->7, 21->21, 6->5,
+    10->12; a6df9d9d, ae8d1d70 und fb13a98f unverändert; f77ccff2 27->27, 8->8, 28->29,
+    15->14, 14->16. Gesamtbewertung überall unverändert.
+  - Seitenerwartung (ops-update-pages, MR-Pipeline 3225): Scan-Runde 1f8bc977 33->35,
+    2e56abe1 23->24, 3cf01f8d 23->24, c3d5724c 16->17 (Einschränkungszeilen, Rollen, weitere
+    Adressen laut DNS); 1fbc92b9, 31d67a02 und 68d59573 gleich. Übrige 176db198 23->22,
+    4e6b6883 44->47, 57b3ac85 16->17, 860d0d5a 30->31, f77ccff2 44->45, fb13a98f 26->27.
+    Halbleer vor einem Kapitelanfang: 2d2d4f39 Seite 30 wie bisher, neu f77ccff2 Seite 30
+    (Merkposten S7).
+
 ## Abgleich spec/09 nach S6b-2
 
 Jede in spec/09 als falsch belegte Aussage der sieben Auftraege mit ihrem Stand. "Erledigt"
@@ -977,6 +1129,103 @@ den sieben Aufträgen der Scan-Runde; Golden-Stichtag 19.09.2026, Fälle mit Ber
 | E21 | Vorabmeldung CA mailstore | offen, DC |
 | E22 | Passivbefunde auf E4-Hosts blau | erledigt (T11) |
 | E23 | Firmenname aus der Recherche | Gate-Warnung erledigt; bestätigte Namen setzt Claude nach dem Merge |
+
+## Abgleich spec/11 Teil 6 nach S6b-4n
+
+Jede Aussage aus spec/11 Teil 6 (N1 bis N15, Regressionsstand, E23 bis E26) mit ihrem Stand.
+"Erledigt" nennt den Test (ohne Pfad in `tests/v3/test_s6b4n.py`, `tests/test_facts_s6b4n.py`,
+`tests/gate/test_v3_checks_s6b4n.py`), "offen" den Grund und die Session. Golden-Stichtag
+19.09.2026, Fälle mit Berichtsdatum am 27.09.2026.
+
+| Stelle | Aussage | Stand |
+|---|---|---|
+| N1 | HE www: CSP-Positiv bei `frame-ancestors 'self'` ohne Skriptregel | erledigt, Variante von `csp_missing` (`test_n1_csp_nur_frame_ancestors_ist_befund`, Fixture `csp_missing_fail_nur_frame_ancestors`, Text-Fixture `csp_missing`) |
+| N1 | CA P08 nennt ubb-wiki (nur frame-ancestors) und www (Gelb `csp_weak`) | erledigt (`test_n1_csp_positiv_nicht_neben_csp_weak`) |
+| N2 | CA P09 mailstore (400) und umfrage (301) neben "Endseite nicht bewertet" | erledigt nach E24, Messort im Positivbefund, HSTS nicht in der Zeile (`test_n2_hsts_positiv_mit_messort`, `test_n2_hsts_nicht_unter_endseite_nicht_bewertet`); Wortlaut "mit Status 301" statt "(301)", siehe Abweichungen |
+| N2 | HL P06 online aus der ersten Antwort in redirect_probe | erledigt (`test_n2_hsts_nicht_an_der_sicherheitsabfrage`, `test_hsts_nie_an_der_sicherheitsabfrage`) |
+| N2 | HL Anhang C "HSTS nicht gesetzt" an der Abwehrseite | erledigt, Fundort "an der Sicherheitsabfrage" (N12) |
+| N2 | BS VS-007 "(+cdn.bergersysteme.com)" ohne Messung | erledigt (`test_n2_gruppenname_ohne_ungemessenen_alias`); gilt für alle Header-Gruppen |
+| N3 | HL VS-002 "bewertet an der Endseite" mit den Headern der ersten Antwort | erledigt (`test_n3_ose_nicht_an_der_endseite_bewertet`, `test_hl_ose_ohne_endantwort`, Gate `test_endseite_ohne_endantwort_greift`) |
+| N3 | HL online `server: Vercel` und `location` neben `final_url` www | erledigt, keine Endantwort, kein HSTS-Fakt (E24) |
+| N3 | Gegenprobe JW und HE `logon.aspx` mit Endseiten-Headern | erledigt (`test_endantwort_nach_http_weiterleitung_bleibt`, `test_endseite_mit_endantwort_bleibt`) |
+| N3 | CA VS-009 mail und mail2 nur XCTO fehlend, Referrer- und Permissions-Policy nicht gemessen | erledigt (`test_n3_ca_mail_nicht_gemessen_statt_fehlend`) |
+| N3 | Scanner: redirect_probe exportiert die Header der Endantwort | offen, S6c (Scanner unberührt) |
+| N4 | HL 213.133.104.51 "Webanwendung mit Anmeldung (dl, webportal)" | erledigt, Rolle "Weiterleitung auf ose.heuel.com" plus eigene Dienste (`test_n4_redirector_mit_eigenen_diensten`, `test_anmeldeform_nur_am_eigenen_host`) |
+| N4 | HL Anhang C: Java/Servlet, GTM, Facebook Pixel am Weiterleitungshost | erledigt (`test_n4_technik_des_ziels_nicht_am_redirector`, `test_technik_des_weiterleitungsziels_nicht_am_redirector`) |
+| N4 | JW `tech_profiles[0].cms "Microsoft Exchange"` am Hetzner-Host (nur Export) | erledigt für die Berichts- und Dashboard-Zeilen aus den Fakten (188.40.3.130 ohne Exchange); das Rohfeld `cms` im Scanner-Export ändert S6c |
+| N4 | BS Scan-Steuerung `hosted-cms-webflow` auf dem Plesk-Server | erledigt im Bericht, Grund "wegen Weiterleitung auf die Webflow-Seite" (`test_n4_scan_steuerung_mit_grund`, `test_bs_plesk_server_ohne_webflow`); KI-Regelwahl nicht aus Weiterleitungszielen offen, S6c |
+| N4 | Bildquellen nur aus Antworten desselben Hosts | erledigt (`test_n4_bild_nur_am_eigenen_host`) |
+| N5 | 2.1 "vollständig" für HL 216.150.1.65, Posture "✔" an Inventaradressen, "✘ 18.197.248.23" | erledigt, "am Namen gemessen an <Adresse>" und Posture "am Namen gemessen (<Adresse>)"; Befund am Host bleibt Handlungsbedarf (`test_n5_posture_am_namen_gemessen`) |
+| N5 | Anhang B, P02 und 3.1 unter der Inventaradresse | erledigt ("gemessen an <Adresse>", `test_n5_positiv_nennt_messadresse`) |
+| N5 | HL 216.150.16.65 fehlt im Inventar | erledigt, Zeile "Weitere Adresse laut DNS, nicht geprüft" (`test_n5_weitere_adresse_laut_dns`, `test_weitere_adressen_mit_familie`); Entscheidung DC: alle zweiten A-Einträge |
+| N5 | Rotationszeile um "Technologie-Erkennung (httpx)" | erledigt als "Webabruf und Technologie-Erkennung" ohne Werkzeugnamen (`test_n5_rotationszeile_mit_technologie_erkennung`) |
+| N6 | LW Kategorie D grün ohne Messung | erledigt, grau "Nicht bewertbar" (`test_n6_kategorie_ohne_messung_grau`) |
+| N6 | JW P06 junkerwerk.hu ohne AXFR-Lauf | Abweichung, Entscheidung DC 27.09.: das Tar enthält den Lauf für .hu, der Positivbefund bleibt mit Nachweis je Domain (`test_zonentransfer_mit_eigenem_lauf`, `test_n6_zonentransfer_je_domain_mit_eigenem_lauf`) |
+| N6 | BS P06 Reputation mit der CDN-Kante (`lastReportedAt 2026-09-21`) | erledigt, `ip_reputation` auf CDN und Plattform nicht anwendbar, Abfragefenster 90 Tage (`test_n6_reputation_ohne_plattformadressen`, Fixtures `ip_reputation_na_plattform*`, `ip_reputation_pass_gemeldet_*`) |
+| N6 | Gate "Positiv gegen Rohfakt" | erledigt, `positiv_ohne_rohfakt` (`test_positiv_ohne_rohfakt_greift_ohne_eigenen_axfr_lauf`, `test_positiv_ohne_bejahte_regel_greift`) |
+| N7 | BS VS-005 zweite Adresse in der eigenen Domain, "beim Empfänger dieser Adresse anfordern" | erledigt (`test_n7_meldeadressen_je_domain_getrennt`, Text-Fixture `dmarc_none`) |
+| N7 | Betreiber-Satz aus dem MX statt aus der Delegation oder SPF `mx` | erledigt (`test_dmarc_delegation_aus_cname`, `test_n7_betreibersatz_aus_spf_mx`) |
+| N8 | HE VS-004 Vorlage aus der Sectigo-Linie | erledigt (`test_n8_kein_hinweis_aus_fremder_linie`, `test_keine_vorlage_aus_fremder_linie`) |
+| N8 | CA VS-003 Vorlage 195.50.179.6 mit unvollständiger Kette | erledigt (`test_vorlage_nur_mit_vollstaendiger_kette`) |
+| N8 | CA Hebel, Planeffekt und Auswirkung ohne "sofern nicht erneuert" | erledigt (`test_n8_sofern_nicht_erneuert_in_hebel_effekt_und_auswirkung`, Text-Fixture `cert_expiring`) |
+| N9 | DB Slider Revolution "aktuell 6.7.35" gegen "mindestens 6.7.38" | erledigt (`test_n9_zielversion_getrennt_und_verzeichnis_veraltet`) |
+| N9 | DB betheme-child "aktuell laut wpscan" ohne `latest_version` | erledigt (`test_n9_kindtheme_nicht_bestimmbar`, `test_kindtheme_mit_elterntheme`) |
+| N9 | Plaketten überdrucken die Hinweisspalte (DB, LW, JW) | erledigt (`test_n9_plakette_nur_veraltet_oder_lts`) |
+| N10 | BS VS-001 zwei Stufen, zwei Verifikationen, Titel wie zwei Oberflächen, "laut Zertifikat oder Passivquelle" im Plural | erledigt (`test_n10_plesk_ein_titelbaustein_und_eine_stufe`) |
+| N10 | CA "Dazu gehören die eigenen Webseiten" am Hoster-Satz | erledigt (`test_n10_ca_satzfolge_der_auswirkung`) |
+| N10 | DB VS-012 VRFY doppelt | erledigt (`test_n10_vrfy_eine_auswirkung_und_passivport_im_ersten_satz`) |
+| N10 | JW VS-014 Auswirkung doppelt, X-FEServer unter "Version" | erledigt (`test_n10_x_feserver_nicht_unter_version`) |
+| N10 | BS VS-003 Betroffenenliste zweimal, "Mail- und Dateiclients", Hebel "für alle TLS-Dienste" | erledigt (`test_n10_zertifikat_einmal_und_mailclients`, Text-Fixture `service_cert_expired`) |
+| N11 | CA .53 "3 weitere Domains laut Passivquelle" | erledigt, Zählung je Quelle (`test_fremdnamen_je_quelle`, `test_n11_fremddomains_nach_quelle`); `secureserver.net` war schon Hoster |
+| N11 | 8800 Icecast ohne Domainfakt als Fremddienst, 8000, 8001, 8800 grün | erledigt, grau, 8800 "Zuordnung nicht belegt" (`test_fremddienst_nur_mit_domainfakt`, `test_n11_fremddienste_grau_in_der_servicekarte`) |
+| N11 | 2.1 .80 "geteiltes System beim Hoster" neben Hetzner, VS-006 "Server von planwerk6.de" | erledigt ("Server von planwerk6.de, laut Passivquelle geteilt"; `test_n11_betreiber_des_servers`) |
+| N11 | "Microsoft 365" in der Spalte "laut AbuseIPDB" (LW, HL, CA) | erledigt ("(laut Namensauflösung und SPF)") |
+| N12 | ZAP "HSTS nicht gesetzt" an robots.txt, sitemap.xml oder der Abwehrseite neben HSTS-Positiv | erledigt, Fundort in der Zeile |
+| N12 | "CSP Header Not Set" neben P08 (CA) | erledigt (`test_n12_keine_anhangzeile_zu_bewerteter_regel`) |
+| N12 | "X-AspNet-Version nicht eingeflossen" neben VS-014; CA mail und mail2 ohne Wert | erledigt (`test_aspnet_version_mit_quelle`) |
+| N12 | "ohne zweite Quelle" trotz Shodan `os` (HE, CA), Skript-URLs und Cookies (HL) | erledigt (`test_betriebssystem_aus_shodan_als_zweite_quelle`, `test_skript_und_cookie_als_zweite_quelle`) |
+| N12 | Neos "nicht in der Technologietabelle" (HL) | erledigt (`test_n12_neos_eine_zeile_mit_zweiter_quelle`) |
+| N12 | LUCKY13 "3 Meldungen" mit autodiscover ohne eigenen testssl-Lauf (JW) | erledigt, 2 Meldungen an cloud und outlook; `tls_weakness_reported` nur mit eigenem Lauf (Fixture `tls_weakness_reported_pass_uebernommen`) |
+| N12 | URLhaus und SecurityTrails als eingesetzt bei `no_data` | erledigt, "(ohne Ergebnis)" (`test_n12_werkzeuge_ohne_daten`) |
+| N12 | Anhang D "Doppelmeldungen mehrerer Werkzeuge und Durchgänge" | erledigt (`test_n12_anhang_d_aus_zusammengefuehrten_meldungen`) |
+| N13 | "Verschlüsselung und Zertifikat nicht bewertet" bei Zertifikat aus nmap (BS, HL Port 21) | erledigt (`test_n13_zertifikat_aus_dem_portscan`) |
+| N13 | Pfadsuche-Zeile fehlt bei Timeout (DB, LW), bitwarden, ose, JW .29 | erledigt (`test_n13_pfadsuche_bei_zeitlimit`, Zeilen je Werkzeug) |
+| N13 | wafw00f-Timeout ungenannt (HE) | erledigt, Zeile "Zeitlimit der Prüfung überschritten" mit "Erkennung vorgelagerter Schutzsysteme" |
+| N13 | BS E4 "Ergebnisse zu diesen Hosts liegen deshalb nicht vor" neben Passivbefunden | erledigt (`test_n13_e4_ohne_eigene_messungen`) |
+| N13 | HE ZAP ohne Ursache, "nur teilweise" bei `complete` und 0 Meldungen | erledigt (`test_n13_zap_ohne_meldungen`, `test_zap_active_mit_laufergebnis`) |
+| N13 | JW "nur an cloud … ohne Seiteninhalt (Status 200)" unverständlich | erledigt (`test_n13_ziel_der_aktiven_webanalyse_nach_art_der_antwort`) |
+| N13 | "vollständig" beim 10-Sekunden-Kurzlauf (JW .28, CA .4) | erledigt (`test_n13_kurzlauf_nicht_vollstaendig`) |
+| N13 | BS www "abgebrochen (Abwehrmerkmal der Seite)" bei normaler 200 | erledigt (`test_n13_waf_vermutung_bei_normaler_startseite`) |
+| N13 | IPv6 und E4-Adressen als geprüft gezählt (LW, BS) | erledigt, "davon m nur aus DNS oder ohne Antwort" (`test_n13_zaehlung_nur_aus_dns`) |
+| N13 | Numerus "Die Adressen stehen als AAAA-Eintrag" bei einer | erledigt (`test_n13_zaehlung_nur_aus_dns`) |
+| N13 | Gate-Text `ipv6_ohne_inventar` "nicht im Inventar" | erledigt (`test_ipv6_ohne_inventar_nur_ipv6_und_neuer_wortlaut`) |
+| N14 | DB und JW ohne "E-Mail-Versand laut SPF" beziehungsweise "Mailabruf" | erledigt (`test_n14_rollen_aus_fakten`) |
+| N14 | "Datenbanken erreichbar" trotz Rot VS-001 (DB, LW, JW) | erledigt für LW und JW; Abweichung DB: kein Datenbankport, VS-001 ist Webmin und froxlor |
+| N14 | HE 444 "Web Applications Portal" ohne Rolle | erledigt ("Anmeldeportal (Port 444)") |
+| N14 | BS .166 ohne "Mail-Webzugang laut Passivquelle" | erledigt (`test_n14_rollen_aus_fakten`) |
+| N15 | Referrer-Policy-Auswirkung überholt | erledigt (`test_n15_referrer_policy_heutige_voreinstellung`) |
+| N15 | 587 "TLS erzwungen" statt "Anmeldung erst nach STARTTLS" (LW, CA) | erledigt (`test_n15_starttls_statt_tls_erzwungen`) |
+| N15 | A.1-Ausnahme umfasst abgelaufene Zertifikate, BS VS-003 Gelb | erledigt (`test_n15_a1_ausnahme_nur_fuer_ablaufende_zertifikate`) |
+| N15 | `53 DOMAIN`, `106 TCPWRAPPED`, `https-alt` ohne `?` | erledigt (`test_n15_dienstnamen`, nmap-Nachweis mit `?`) |
+| N15 | "gesehen am" für das Shodan-Host-`last_update` | erledigt (`test_n15_hosteintrag_statt_gesehen`) |
+| N15 | Numerus ("1 weitere gefundene Name", "hat offene Ports" bei einem, "welcher Dienst auf dem Port" bei drei) | erledigt (`test_n15_numerus_eines_namens`, `service_unidentified` mit `{m:}`) |
+| N15 | Doppelklammern in Titeln (JW VS-010) | erledigt (`test_jw_zusaetzliche_dienste_mit_tls_zwang` in `test_s6b4.py`) |
+| N15 | Doppeltes Präfix "Beim Plattformbetreiber einfordern: Beim Plattformbetreiber erfragen" (HE) | erledigt (`test_n15_doppeltes_praefix_im_plan`) |
+| N15 | HE P01 bis P03 und P08 lesen sich wie drei Orte; CA "beim Plattformbetreiber umfrageonline.com" als eigenes Listenelement | erledigt, Plattformzusatz in der Klammer hinter der Adresse |
+| N15 | Beobachtungsliste 587 doppelt (DB) | erledigt |
+| N15 | CA VS-018 Anmeldename im Kundentext (E25) | erledigt (`test_n15_e25_anmeldenamen_nur_als_anzahl`, Gate `test_anmeldename_im_kundentext_greift`) |
+| N15 | BS 2052, 2053, 2095, 2096 "unbekannt" trotz Cloudflare-Banner, 8880 "HTTPS" statt Plesk | erledigt für 2053, 2096 und 8880, Satz zur CDN-Kante; offen für 2052 und 2095: der Shodan-Export schneidet deren Banner vor dem Server-Header ab (S6c) |
+| N15 | ProFTPD und mod_sftp zwei Zeilen (LW) | erledigt (`test_n15_proftpd_eine_zeile_und_etracker_ausgeblendet`) |
+| N15 | Etracker bleibt, Cookiebot entfernt (HE) | erledigt (`test_n15_proftpd_eine_zeile_und_etracker_ausgeblendet`) |
+| N15 | HL 4433 in Anhang C, aber nicht in `unprocessed` | erledigt, unter "Beobachtungen ohne Regeltreffer" mit Antwortkopf |
+| N15 | HL online-Zertifikat 28 Tage am Berichtsdatum (Vercel erneuert selbst) | offen, keine Änderung: `cert_expiring_later` misst am Scantag (31 Tage, Schwelle 30); ob Fristen dieser Regel am Berichtsdatum gelten, ist eine Frage an DC |
+| Regressionsstand | R14 (`argument:host_inventory`, "Some (Auszug)", rohe Quellennamen in 3.1) | offen, S7 |
+| Regressionsstand | R20 | offen, S7 |
+| E23 | Firmennamen bestätigen | offen, DC |
+| E24 | HSTS an Weiterleitungen und Fehlerseiten | Vorschlag umgesetzt (N2) |
+| E25 | Personennamen im Kundentext | Vorschlag umgesetzt (N15, Gate `anmeldename_im_kundentext`) |
+| E26 | Freigabe vor dem Nachscan | Entscheidung DC, nicht Teil der Session |
+| Startprompt | AXFR-Rohausgabe im API-Export | offen, S6c (Scanner unberührt) |
 
 ## Golden-Facts (S1)
 

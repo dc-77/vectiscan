@@ -10,7 +10,9 @@ applicable_when: null
 # S6b-2 (spec/09 Q4, Teil 2 JW): BREACH gilt laut testssl fuer statische Seiten nicht
 # ("Can be ignored for static pages"), LUCKY13 meldet testssl nur experimentell. Beide stehen
 # als Werkzeugmeldung im Anhang, ohne Befund und ohne CVE an einem Befund.
-when: 'vuln.name in TLS_REPORTED_VULNS and vuln.status != "not_tested"'
+# S6b-4n (spec/11 N12): nur fuer Namen mit eigenem testssl-Lauf; ein uebernommenes Ergebnis desselben
+# IP:Port (junkerwerk autodiscover, castenow mail und owa) nennt LUCKY13 nicht noch einmal.
+when: 'vuln.name in TLS_REPORTED_VULNS and vuln.status != "not_tested" and tls.assigned_from is None'
 positive_when: never
 not_testable_when: []
 undetermined: not_applicable

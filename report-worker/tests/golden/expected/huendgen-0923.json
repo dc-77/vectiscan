@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-27.1 auf tests/golden/facts/3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7.json",
+ "source": "reporter.catalog 2026-09-27.2 auf tests/golden/facts/3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -53,6 +53,20 @@
   },
   {
    "id": "VS-2026-004",
+   "check": "csp_missing",
+   "family": "csp_missing",
+   "cat": "D",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "www.huendgen-entsorgung.de",
+   "affected": [
+    "www.huendgen-entsorgung.de"
+   ],
+   "title": "Content-Security-Policy fehlt",
+   "zustaendig": "platform"
+  },
+  {
+   "id": "VS-2026-005",
    "check": "dmarc_quarantine",
    "family": "dmarc_quarantine",
    "cat": "C",
@@ -65,7 +79,7 @@
    "title": "DMARC-Richtlinie unterhalb von Zurückweisung"
   },
   {
-   "id": "VS-2026-005",
+   "id": "VS-2026-006",
    "check": "dnssec_missing",
    "family": "dnssec_missing",
    "cat": "E",
@@ -78,7 +92,7 @@
    "title": "DNS-Zone ohne DNSSEC-Signatur"
   },
   {
-   "id": "VS-2026-006",
+   "id": "VS-2026-007",
    "check": "hsts_missing",
    "family": "hsts_missing",
    "cat": "D",
@@ -91,7 +105,7 @@
    "title": "HTTP Strict Transport Security nicht gesetzt"
   },
   {
-   "id": "VS-2026-007",
+   "id": "VS-2026-008",
    "check": "http_alt_port",
    "family": "http_alt_port",
    "cat": "A",
@@ -105,7 +119,7 @@
    "zustaendig": "platform"
   },
   {
-   "id": "VS-2026-008",
+   "id": "VS-2026-009",
    "check": "http_alt_port",
    "family": "http_alt_port",
    "cat": "A",
@@ -118,7 +132,7 @@
    "title": "Webdienst auf unüblichem Port erreichbar"
   },
   {
-   "id": "VS-2026-009",
+   "id": "VS-2026-010",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -131,7 +145,7 @@
    "title": "Webdienst gibt Versionskennung oder internen Servernamen preis"
   },
   {
-   "id": "VS-2026-010",
+   "id": "VS-2026-011",
    "check": "login_portal_exposed",
    "family": "login_portal_exposed",
    "cat": "A",
@@ -144,7 +158,7 @@
    "title": "Anmeldeportal aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-011",
+   "id": "VS-2026-012",
    "check": "mta_sts_missing",
    "family": "mta_sts_missing",
    "cat": "C",
@@ -157,7 +171,7 @@
    "title": "MTA-STS nicht wirksam veröffentlicht"
   },
   {
-   "id": "VS-2026-012",
+   "id": "VS-2026-013",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -170,13 +184,13 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-013",
+   "id": "VS-2026-014",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
    "scale": "hygiene",
    "level": "niedrig",
-   "group": "www.huendgen-entsorgung.de (+huendgen-entsorgung.de)",
+   "group": "www.huendgen-entsorgung.de",
    "affected": [
     "www.huendgen-entsorgung.de (fehlend: Referrer-Policy, Permissions-Policy)"
    ],
@@ -184,7 +198,7 @@
    "zustaendig": "platform"
   },
   {
-   "id": "VS-2026-014",
+   "id": "VS-2026-015",
    "check": "service_unidentified",
    "family": "service_unidentified",
    "cat": "A",
@@ -199,7 +213,7 @@
    "title": "Offener Dienst ohne Kennung"
   },
   {
-   "id": "VS-2026-015",
+   "id": "VS-2026-016",
    "check": "software_eol",
    "family": "software_eol",
    "cat": "B",
@@ -212,7 +226,7 @@
    "title": "Serversoftware ohne Herstellerpflege"
   },
   {
-   "id": "VS-2026-016",
+   "id": "VS-2026-017",
    "check": "tls_rpt_missing",
    "family": "tls_rpt_missing",
    "cat": "C",
@@ -225,7 +239,7 @@
    "title": "TLS-RPT nicht eingerichtet"
   },
   {
-   "id": "VS-2026-017",
+   "id": "VS-2026-018",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -289,14 +303,6 @@
   },
   {
    "id": "VS-2026-P07",
-   "check": "csp_missing",
-   "family": "csp_missing",
-   "cat": "D",
-   "group": "www.huendgen-entsorgung.de (+huendgen-entsorgung.de)",
-   "title": "Content-Security-Policy gesetzt"
-  },
-  {
-   "id": "VS-2026-P08",
    "check": "db_exposed",
    "family": "db_exposed",
    "cat": "A",
@@ -304,7 +310,7 @@
    "title": "Keine Datenbankdienste aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P09",
+   "id": "VS-2026-P08",
    "check": "db_exposed",
    "family": "db_exposed",
    "cat": "A",
@@ -312,7 +318,7 @@
    "title": "Keine Datenbankdienste aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P10",
+   "id": "VS-2026-P09",
    "check": "dkim_missing",
    "family": "dkim_missing",
    "cat": "C",
@@ -320,7 +326,7 @@
    "title": "DKIM vorhanden"
   },
   {
-   "id": "VS-2026-P11",
+   "id": "VS-2026-P10",
    "check": "dmarc_missing",
    "family": "dmarc_missing",
    "cat": "C",
@@ -328,7 +334,7 @@
    "title": "DMARC-Richtlinie vorhanden"
   },
   {
-   "id": "VS-2026-P12",
+   "id": "VS-2026-P11",
    "check": "dns_dangling_cname",
    "family": "dns_dangling",
    "cat": "C",
@@ -336,7 +342,7 @@
    "title": "Keine verwaisten CNAME-Einträge"
   },
   {
-   "id": "VS-2026-P13",
+   "id": "VS-2026-P12",
    "check": "dns_zone_transfer",
    "family": "dns_axfr",
    "cat": "C",
@@ -344,87 +350,79 @@
    "title": "Zonentransfer abgewiesen"
   },
   {
-   "id": "VS-2026-P14",
+   "id": "VS-2026-P13",
    "check": "hsts_missing",
    "family": "hsts_missing",
    "cat": "D",
-   "group": "www.huendgen-entsorgung.de (+huendgen-entsorgung.de)",
+   "group": "www.huendgen-entsorgung.de",
    "title": "HTTP Strict Transport Security gesetzt"
   },
   {
-   "id": "VS-2026-P15",
+   "id": "VS-2026-P14",
    "check": "hsts_short",
    "family": "hsts_short",
    "cat": "D",
-   "group": "www.huendgen-entsorgung.de (+huendgen-entsorgung.de)",
+   "group": "www.huendgen-entsorgung.de",
    "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
+  },
+  {
+   "id": "VS-2026-P15",
+   "check": "http_no_tls",
+   "family": "http_no_tls",
+   "cat": "A",
+   "group": "18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de)",
+   "title": "Webdienst mit Transportverschlüsselung"
   },
   {
    "id": "VS-2026-P16",
    "check": "http_no_tls",
    "family": "http_no_tls",
    "cat": "A",
-   "group": "18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de)",
+   "group": "80.90.145.166 (exchange.huendgen-entsorgung.de)",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
    "id": "VS-2026-P17",
-   "check": "http_no_tls",
-   "family": "http_no_tls",
-   "cat": "A",
+   "check": "ip_reputation",
+   "family": "ip_reputation",
+   "cat": "E",
    "group": "80.90.145.166 (exchange.huendgen-entsorgung.de)",
-   "title": "Webdienst mit Transportverschlüsselung"
+   "title": "Keine Einträge in Reputationsquellen"
   },
   {
    "id": "VS-2026-P18",
-   "check": "ip_reputation",
-   "family": "ip_reputation",
-   "cat": "E",
+   "check": "rdp_exposed",
+   "family": "rdp_exposed",
+   "cat": "A",
    "group": "18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de)",
-   "title": "Keine Einträge in Reputationsquellen"
+   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
    "id": "VS-2026-P19",
-   "check": "ip_reputation",
-   "family": "ip_reputation",
-   "cat": "E",
+   "check": "rdp_exposed",
+   "family": "rdp_exposed",
+   "cat": "A",
    "group": "80.90.145.166 (exchange.huendgen-entsorgung.de)",
-   "title": "Keine Einträge in Reputationsquellen"
+   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
    "id": "VS-2026-P20",
-   "check": "rdp_exposed",
-   "family": "rdp_exposed",
+   "check": "smb_exposed",
+   "family": "smb_exposed",
    "cat": "A",
    "group": "18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de)",
-   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
+   "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
    "id": "VS-2026-P21",
-   "check": "rdp_exposed",
-   "family": "rdp_exposed",
+   "check": "smb_exposed",
+   "family": "smb_exposed",
    "cat": "A",
    "group": "80.90.145.166 (exchange.huendgen-entsorgung.de)",
-   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
+   "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
    "id": "VS-2026-P22",
-   "check": "smb_exposed",
-   "family": "smb_exposed",
-   "cat": "A",
-   "group": "18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de)",
-   "title": "Kein SMB-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P23",
-   "check": "smb_exposed",
-   "family": "smb_exposed",
-   "cat": "A",
-   "group": "80.90.145.166 (exchange.huendgen-entsorgung.de)",
-   "title": "Kein SMB-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P24",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
@@ -432,7 +430,7 @@
    "title": "SPF-Eintrag vorhanden"
   },
   {
-   "id": "VS-2026-P25",
+   "id": "VS-2026-P23",
    "check": "spf_softfail",
    "family": "spf_softfail",
    "cat": "C",
@@ -440,39 +438,39 @@
    "title": "SPF-Eintrag mit harter Fehlbehandlung"
   },
   {
-   "id": "VS-2026-P26",
+   "id": "VS-2026-P24",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
    "group": "exchange.huendgen-entsorgung.de",
    "title": "Nur aktuelle TLS-Protokolle"
+  },
+  {
+   "id": "VS-2026-P25",
+   "check": "tls_legacy_protocols",
+   "family": "tls_legacy_protocols",
+   "cat": "D",
+   "group": "www.huendgen-entsorgung.de (+huendgen-entsorgung.de)",
+   "title": "Nur aktuelle TLS-Protokolle"
+  },
+  {
+   "id": "VS-2026-P26",
+   "check": "tls_no_13",
+   "family": "tls_no_13",
+   "cat": "D",
+   "group": "exchange.huendgen-entsorgung.de",
+   "title": "TLS 1.3 verfügbar"
   },
   {
    "id": "VS-2026-P27",
-   "check": "tls_legacy_protocols",
-   "family": "tls_legacy_protocols",
+   "check": "tls_no_13",
+   "family": "tls_no_13",
    "cat": "D",
    "group": "www.huendgen-entsorgung.de (+huendgen-entsorgung.de)",
-   "title": "Nur aktuelle TLS-Protokolle"
+   "title": "TLS 1.3 verfügbar"
   },
   {
    "id": "VS-2026-P28",
-   "check": "tls_no_13",
-   "family": "tls_no_13",
-   "cat": "D",
-   "group": "exchange.huendgen-entsorgung.de",
-   "title": "TLS 1.3 verfügbar"
-  },
-  {
-   "id": "VS-2026-P29",
-   "check": "tls_no_13",
-   "family": "tls_no_13",
-   "cat": "D",
-   "group": "www.huendgen-entsorgung.de (+huendgen-entsorgung.de)",
-   "title": "TLS 1.3 verfügbar"
-  },
-  {
-   "id": "VS-2026-P30",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",

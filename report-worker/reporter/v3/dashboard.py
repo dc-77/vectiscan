@@ -129,7 +129,7 @@ _TECH_STATUS: dict[str, tuple[str, str]] = {
     "supported": ("current", "aktuell"),
     "unknown": ("unbekannt", "unbekannt"),
     # S6b-4 (spec/11 T11, T15): derselbe Patch-Status wie die Technologietabelle.
-    "lts": ("current", "Langzeitpflege"),
+    "lts": ("current", "LTS"),
     "outdated": ("outdated", "veraltet"),
     "insecure": ("outdated", "unsicher"),
 }

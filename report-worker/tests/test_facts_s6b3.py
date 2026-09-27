@@ -95,8 +95,12 @@ def test_ca_bitwarden_ueber_testssl():
 
 
 def test_hl_ose_clientseitige_weiterleitung():
+    """S6b-4n (spec/11 N3): redirect_probe liefert fuer ose die Header der ersten Antwort
+    (Redirector, gleiche ETag wie header_check); die Endseite ist nicht gemessen. ZAP je URL
+    ist Quelle, Referrer- und Permissions-Policy bleiben ungemessen."""
     he = http(HL, "ose.heuel.com").header_eval
-    assert he.evaluated.tool == "redirect_probe"
+    assert he.evaluated.tool == "zap" and he.final_response is False and he.client_redirect is True
+    assert he.unknown == ["referrer-policy", "permissions-policy"]
 
 
 def test_snapshot_ohne_reachable_ist_eine_messung():

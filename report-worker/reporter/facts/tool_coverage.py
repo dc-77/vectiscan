@@ -170,7 +170,7 @@ def build_coverage(bundle: ScanBundle, signals: dict[str, HostSignals],
     def make(scope: str, tool: str, status: str, *, host_ip=None, fqdn=None, domain=None,
              phase=None, raw_status=None, reason=None, exit_code=None, duration_ms=None,
              observed_at=None, evidence=None, confidence=CONFIDENCE_TOOL, source="scan_results",
-             target=None):
+             target=None, run_status=None):
         key = f"cov:{phase if phase is not None else '-'}:{tool}:{_scope_key(scope, host_ip, fqdn, domain)}"
         n = seen_ids.get(key, 0)
         seen_ids[key] = n + 1
@@ -180,7 +180,7 @@ def build_coverage(bundle: ScanBundle, signals: dict[str, HostSignals],
             confidence=confidence, evidence=evidence or [], scope=scope, domain=domain,
             host_ip=host_ip, fqdn=fqdn, phase=phase, tool=tool, status=status,
             raw_status=raw_status, reason=reason, exit_code=exit_code, duration_ms=duration_ms,
-            target=target,
+            target=target, run_status=run_status,
         ))
 
     if not bundle.tool_runs:
@@ -220,7 +220,8 @@ def build_coverage(bundle: ScanBundle, signals: dict[str, HostSignals],
              domain=None if ip else (row_domain or primary_domain),
              phase=run.phase, raw_status=raw_status,
              reason=reason, exit_code=run.exit_code, duration_ms=run.duration_ms,
-             observed_at=run.created_at, evidence=ev, target=_run_target(run))
+             observed_at=run.created_at, evidence=ev, target=_run_target(run),
+             run_status=_run_status(run))
     # Domains, die eigene domainweite Zeilen mitgebracht haben, brauchen den
     # Platzhalter nicht mehr. Fuer die historischen Tars (Junkerwerk) bleibt er
     # erreichbar, deshalb wird der Grund nicht entfernt.
@@ -243,6 +244,16 @@ def _run_target(run: ToolRun) -> Optional[str]:
         return str(data["target"])[:300]
     m = re.search(r"'url':\s*'([^']+)'", run.raw_output or "")
     return m.group(1)[:300] if m else None
+
+
+def _run_status(run: ToolRun) -> Optional[str]:
+    """Abschluss einer zap_active-Zeile laut Rohausgabe (``status: complete``, spec/11 N13)."""
+    if run.tool_norm != "zap_active":
+        return None
+    data = run.json()
+    if isinstance(data, dict) and data.get("status"):
+        return str(data["status"])[:40]
+    return None
 
 
 def _scope_key(scope: str, host_ip, fqdn, domain) -> str:

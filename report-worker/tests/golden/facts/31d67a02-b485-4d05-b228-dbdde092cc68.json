@@ -21,6 +21,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": "no_data",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -47,6 +48,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -73,6 +75,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -99,6 +102,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -125,6 +129,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
@@ -151,6 +156,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
@@ -177,6 +183,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
@@ -203,6 +210,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
@@ -229,6 +237,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
@@ -255,6 +264,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -281,6 +291,7 @@
    "phase": 0,
    "raw_status": "timeout",
    "reason": "timeout_after_180s",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "failed",
@@ -307,6 +318,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": "no_data",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -333,6 +345,7 @@
    "phase": 0,
    "raw_status": "skipped",
    "reason": "not_in_package",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
@@ -359,6 +372,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
@@ -385,6 +399,7 @@
    "phase": 0,
    "raw_status": "skipped",
    "reason": "not_in_package",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
@@ -411,6 +426,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "domain",
    "source": "scan_results",
    "status": "ok",
@@ -437,6 +453,7 @@
    "phase": 0,
    "raw_status": "skipped",
    "reason": "not_in_package",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
@@ -463,6 +480,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -489,6 +507,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -515,6 +534,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -541,6 +561,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": "no_data",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -567,6 +588,7 @@
    "phase": 0,
    "raw_status": "skipped",
    "reason": "not_in_package",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
@@ -593,6 +615,7 @@
    "phase": 0,
    "raw_status": "skipped",
    "reason": "not_in_package",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
@@ -619,6 +642,7 @@
    "phase": 0,
    "raw_status": "skipped",
    "reason": "not_in_package",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
@@ -645,6 +669,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -671,6 +696,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": "no_data",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -697,6 +723,7 @@
    "phase": 0,
    "raw_status": "ok",
    "reason": "no_data",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -723,6 +750,7 @@
    "phase": 0,
    "raw_status": "skipped",
    "reason": "not_in_package",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "skipped",
@@ -749,6 +777,7 @@
    "phase": 1,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -775,6 +804,7 @@
    "phase": 1,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -801,6 +831,7 @@
    "phase": 1,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -827,6 +858,7 @@
    "phase": 1,
    "raw_status": "failed",
    "reason": "no_ipv6_route",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "failed",
@@ -853,6 +885,7 @@
    "phase": 1,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -879,6 +912,7 @@
    "phase": 1,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -905,6 +939,7 @@
    "phase": 1,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -931,6 +966,7 @@
    "phase": 1,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -957,6 +993,7 @@
    "phase": 1,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -983,6 +1020,7 @@
    "phase": 1,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1009,6 +1047,7 @@
    "phase": 1,
    "raw_status": "failed",
    "reason": "web_unreachable_after_portscan",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
@@ -1035,6 +1074,7 @@
    "phase": 1,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1061,6 +1101,7 @@
    "phase": 1,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1087,6 +1128,7 @@
    "phase": 1,
    "raw_status": "failed",
    "reason": "no_tech_signals",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "failed",
@@ -1113,6 +1155,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1139,6 +1182,7 @@
    "phase": 2,
    "raw_status": "skipped",
    "reason": "ai_skip",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
@@ -1165,6 +1209,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1191,6 +1236,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1217,6 +1263,7 @@
    "phase": 2,
    "raw_status": "skipped",
    "reason": "no_api_urls",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
@@ -1243,6 +1290,7 @@
    "phase": 2,
    "raw_status": "skipped",
    "reason": "no_api_urls",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
@@ -1269,6 +1317,7 @@
    "phase": 2,
    "raw_status": "skipped",
    "reason": "no_api_urls",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
@@ -1295,6 +1344,7 @@
    "phase": 2,
    "raw_status": "skipped",
    "reason": "no_api_urls",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
@@ -1321,6 +1371,7 @@
    "phase": 2,
    "raw_status": "timeout",
    "reason": "web_unreachable_after_portscan",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
@@ -1347,6 +1398,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1373,6 +1425,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1399,6 +1452,7 @@
    "phase": 2,
    "raw_status": "timeout",
    "reason": "timeout_after_180s",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "failed",
@@ -1425,6 +1479,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": "web_unreachable_after_portscan",
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "blocked",
@@ -1451,6 +1506,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": "web_unreachable_after_portscan",
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "blocked",
@@ -1477,6 +1533,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1503,6 +1560,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1529,6 +1587,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1555,6 +1614,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": "unreachable",
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "empty",
@@ -1581,6 +1641,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": "web_unreachable_after_portscan",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
@@ -1607,6 +1668,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": "web_unreachable_after_portscan",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
@@ -1633,6 +1695,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1659,6 +1722,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1685,6 +1749,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1711,6 +1776,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "empty",
@@ -1737,6 +1803,7 @@
    "phase": 2,
    "raw_status": "failed",
    "reason": "web_unreachable_after_portscan",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
@@ -1763,6 +1830,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1789,6 +1857,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1815,6 +1884,7 @@
    "phase": 2,
    "raw_status": "skipped",
    "reason": "no_ssl",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
@@ -1841,6 +1911,7 @@
    "phase": 2,
    "raw_status": "skipped",
    "reason": "cms_not_wordpress",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
@@ -1867,6 +1938,7 @@
    "phase": 2,
    "raw_status": "skipped",
    "reason": "cms_not_wordpress",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
@@ -1893,6 +1965,7 @@
    "phase": 2,
    "raw_status": "skipped",
    "reason": "cms_not_wordpress",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
@@ -1919,6 +1992,7 @@
    "phase": 2,
    "raw_status": "skipped",
    "reason": "cms_not_wordpress",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "skipped",
@@ -1945,6 +2019,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": "web_unreachable_after_portscan",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
@@ -1971,6 +2046,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1997,6 +2073,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -2023,6 +2100,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": "zap_no_alerts",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "empty",
@@ -2049,6 +2127,7 @@
    "phase": 2,
    "raw_status": "failed",
    "reason": "web_unreachable_after_portscan",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "blocked",
@@ -2075,6 +2154,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": "complete",
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -2101,6 +2181,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": "complete",
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -2127,6 +2208,7 @@
    "phase": 2,
    "raw_status": "failed",
    "reason": "ZAP API error 400: url_not_found / URL Not Found in the Scan Tree [endpoint=/JSON/ascan/action/scan/, params={'url': 'https://nachhaltigkeit.junkerwerk.de', 're",
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "failed",
@@ -2153,6 +2235,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -2179,6 +2262,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -2205,6 +2289,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -2231,6 +2316,7 @@
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -2257,6 +2343,7 @@
    "phase": 3,
    "raw_status": "ok",
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -2930,6 +3017,7 @@
    "dmarc": {
     "adkim": "r",
     "aspf": "r",
+    "delegated_to": null,
     "p": null,
     "pct": 100,
     "present": false,
@@ -2956,6 +3044,11 @@
      "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security.json",
      "tool": "dns_security"
+    },
+    {
+     "excerpt": "junkerwerk.de AXFR nameserver=ns.udag.de, ns.udag.net, ns.udag.org antwort=Transfer failed",
+     "ref": "phase0/zone_transfer.txt",
+     "tool": "zone_transfer"
     }
    ],
    "id": "dns:junkerwerk.de",
@@ -3121,6 +3214,7 @@
    "dmarc": {
     "adkim": "r",
     "aspf": "r",
+    "delegated_to": null,
     "p": null,
     "pct": 100,
     "present": false,
@@ -3147,6 +3241,11 @@
      "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security_junkerwerk.hu.json",
      "tool": "dns_security"
+    },
+    {
+     "excerpt": "junkerwerk.hu AXFR nameserver=ns.udag.de, ns.udag.net, ns.udag.org antwort=Transfer failed",
+     "ref": "phase0/zone_transfer_junkerwerk.hu.txt",
+     "tool": "zone_transfer"
     }
    ],
    "id": "dns:junkerwerk.hu",
@@ -3609,6 +3708,12 @@
      "toyota-motorsport.com",
      "www.erbbauverein.de"
     ],
+    "foreign_sources": {
+     "passive": [
+      "erbbauverein.de",
+      "toyota-motorsport.com"
+     ]
+    },
     "kind": "hoster",
     "operator": "Hetzner Online GmbH",
     "server_operator": null,
@@ -3843,6 +3948,12 @@
      "toyota-motorsport.com",
      "www.erbbauverein.de"
     ],
+    "foreign_sources": {
+     "passive": [
+      "erbbauverein.de",
+      "toyota-motorsport.com"
+     ]
+    },
     "kind": "hoster",
     "operator": "Hetzner Online GmbH",
     "server_operator": null,
@@ -4025,7 +4136,8 @@
      ]
     }
    ],
-   "aspnet_version": null,
+   "aspnet_source": "httpx",
+   "aspnet_version": "4.0.30319",
    "confidence": 1.0,
    "cookies": [],
    "csp": {
@@ -4033,6 +4145,7 @@
     "frame_ancestors": null,
     "nonce_or_hash": null,
     "present": false,
+    "script_rule": null,
     "script_unsafe_eval": null,
     "script_unsafe_inline": null,
     "style_unsafe_inline": null,
@@ -4064,6 +4177,7 @@
    "fqdn": "autodiscover.junkerwerk.de",
    "header_eval": {
     "basis": "final",
+    "client_redirect": null,
     "complete": false,
     "evaluated": {
      "challenge": null,
@@ -4074,6 +4188,7 @@
      "tool": "zap",
      "url": "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2f&reason=0"
     },
+    "final_response": false,
     "first": {
      "challenge": null,
      "content_type": null,
@@ -4290,6 +4405,7 @@
      ]
     }
    ],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -4298,6 +4414,7 @@
     "frame_ancestors": null,
     "nonce_or_hash": null,
     "present": false,
+    "script_rule": null,
     "script_unsafe_eval": null,
     "script_unsafe_inline": null,
     "style_unsafe_inline": null,
@@ -4324,6 +4441,7 @@
    "fqdn": "cloud.junkerwerk.de",
    "header_eval": {
     "basis": "final",
+    "client_redirect": null,
     "complete": true,
     "evaluated": {
      "challenge": null,
@@ -4334,6 +4452,7 @@
      "tool": "header_check",
      "url": "https://cloud.junkerwerk.de"
     },
+    "final_response": true,
     "first": {
      "challenge": null,
      "content_type": "text/html",
@@ -4478,6 +4597,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -4494,8 +4614,10 @@
    "fqdn": "nachhaltigkeit.junkerwerk.de",
    "header_eval": {
     "basis": "unreachable",
+    "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final_response": null,
     "first": null,
     "framing_protected": null,
     "headers": {},
@@ -4526,6 +4648,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -4542,8 +4665,10 @@
    "fqdn": "nachhaltigkeit.junkerwerk.de",
    "header_eval": {
     "basis": "unreachable",
+    "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final_response": null,
     "first": null,
     "framing_protected": null,
     "headers": {},
@@ -4741,6 +4866,7 @@
      ]
     }
    ],
+   "aspnet_source": "redirect_probe",
    "aspnet_version": "4.0.30319",
    "confidence": 1.0,
    "cookies": [],
@@ -4749,6 +4875,7 @@
     "frame_ancestors": null,
     "nonce_or_hash": null,
     "present": false,
+    "script_rule": null,
     "script_unsafe_eval": null,
     "script_unsafe_inline": null,
     "style_unsafe_inline": null,
@@ -4780,6 +4907,7 @@
    "fqdn": "outlook.junkerwerk.de",
    "header_eval": {
     "basis": "final",
+    "client_redirect": null,
     "complete": true,
     "evaluated": {
      "challenge": null,
@@ -4790,6 +4918,7 @@
      "tool": "redirect_probe",
      "url": "https://outlook.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2f&reason=0"
     },
+    "final_response": true,
     "first": {
      "challenge": null,
      "content_type": null,
@@ -5917,6 +6046,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -5933,8 +6063,10 @@
    "fqdn": "www.junkerwerk.de",
    "header_eval": {
     "basis": "unreachable",
+    "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final_response": null,
     "first": null,
     "framing_protected": null,
     "headers": {},
@@ -6679,8 +6811,13 @@
    "observed_at": "2026-09-23T19:31:26Z",
    "requests": 1,
    "source": "feroxbuster",
+   "statistics": true,
    "status_codes": [],
    "target_url": "https://junkerwerk.de",
+   "tool_reasons": {
+    "feroxbuster": "connect",
+    "ffuf_sensitive": "timeout_after_180s"
+   },
    "tools": {
     "feroxbuster": "aborted",
     "ffuf_sensitive": "aborted"
@@ -6710,10 +6847,12 @@
    "observed_at": "2026-09-23T19:35:26Z",
    "requests": null,
    "source": "feroxbuster",
+   "statistics": false,
    "status_codes": [
     302
    ],
    "target_url": "https://outlook.junkerwerk.de",
+   "tool_reasons": {},
    "tools": {
     "feroxbuster": "skipped",
     "ffuf_sensitive": "unreliable"
@@ -6743,8 +6882,10 @@
    "observed_at": "2026-09-23T19:41:40Z",
    "requests": null,
    "source": "feroxbuster",
+   "statistics": false,
    "status_codes": [],
    "target_url": "https://cloud.junkerwerk.de",
+   "tool_reasons": {},
    "tools": {
     "feroxbuster": "reliable",
     "ffuf_sensitive": "reliable"
@@ -6774,8 +6915,13 @@
    "observed_at": "2026-09-23T19:45:05Z",
    "requests": 1,
    "source": "feroxbuster",
+   "statistics": true,
    "status_codes": [],
    "target_url": "https://nachhaltigkeit.junkerwerk.de",
+   "tool_reasons": {
+    "feroxbuster": "connect",
+    "ffuf_sensitive": "timeout_after_180s"
+   },
    "tools": {
     "feroxbuster": "aborted",
     "ffuf_sensitive": "aborted"
@@ -6863,7 +7009,7 @@
    }
   ]
  },
- "schema_version": "1.2.0",
+ "schema_version": "1.3.0",
  "services": [
   {
    "auth_before_starttls": null,
@@ -6894,6 +7040,7 @@
    ],
    "family": "proftpd",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -6936,6 +7083,7 @@
    ],
    "family": "proftpd_sftp",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -6978,6 +7126,7 @@
    ],
    "family": "apache",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": "404 Not Found",
@@ -7047,6 +7196,7 @@
    ],
    "family": "courier",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7117,6 +7267,7 @@
    ],
    "family": "dovecot",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7159,6 +7310,7 @@
    ],
    "family": "openssh",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7214,6 +7366,7 @@
    ],
    "family": "apache",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": "404 Not Found",
@@ -7287,6 +7440,7 @@
    ],
    "family": null,
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7357,6 +7511,7 @@
    ],
    "family": null,
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7416,7 +7571,7 @@
    "confidence": 0.3,
    "evidence": [
     {
-     "excerpt": "993/tcp open imaps",
+     "excerpt": "993/tcp open imaps?",
      "ref": "hosts/188.40.3.130/phase1/nmap.xml",
      "tool": "nmap"
     },
@@ -7428,6 +7583,7 @@
    ],
    "family": null,
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7487,7 +7643,7 @@
    "confidence": 0.3,
    "evidence": [
     {
-     "excerpt": "995/tcp open pop3s",
+     "excerpt": "995/tcp open pop3s?",
      "ref": "hosts/188.40.3.130/phase1/nmap.xml",
      "tool": "nmap"
     },
@@ -7499,6 +7655,7 @@
    ],
    "family": null,
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7561,6 +7718,7 @@
    ],
    "family": "mariadb",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7616,6 +7774,7 @@
    ],
    "family": "postgresql",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7671,6 +7830,7 @@
    ],
    "family": null,
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": "Microsoft-IIS/10.0",
    "fp_title": "Outlook",
@@ -7733,6 +7893,7 @@
    ],
    "family": "iis",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": "Microsoft-IIS/10.0",
    "fp_title": "IIS Windows Server",
@@ -7795,6 +7956,7 @@
    ],
    "family": "iis",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": "Microsoft-IIS/10.0",
    "fp_title": "IIS Windows Server",
@@ -7825,6 +7987,7 @@
  "software": [
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -7883,6 +8046,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -7931,6 +8095,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -7979,6 +8144,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -8027,6 +8193,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -8075,6 +8242,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -8123,6 +8291,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -8171,6 +8340,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -8221,6 +8391,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -8269,6 +8440,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -8317,6 +8489,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -8366,6 +8539,7 @@
   },
   {
    "build": "15.2.2562",
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -8436,6 +8610,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -8485,6 +8660,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -8528,6 +8704,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -8571,6 +8748,7 @@
   },
   {
    "build": "15.2.2562",
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -8617,6 +8795,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -8666,6 +8845,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -8709,6 +8889,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -8752,6 +8933,7 @@
   },
   {
    "build": "15.2.2562",
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -8798,6 +8980,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -8847,6 +9030,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -8890,6 +9074,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -8939,6 +9124,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -9004,11 +9190,13 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
     "httpx",
-    "nmap"
+    "nmap",
+    "shodan"
    ],
    "distro": null,
    "edition": null,
@@ -9030,6 +9218,11 @@
      "excerpt": "443/tcp ostype=Windows",
      "ref": "hosts/217.243.248.29/phase1/nmap.xml",
      "tool": "nmap"
+    },
+    {
+     "excerpt": "217.243.248.29: os=Windows",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
     }
    ],
    "family": "windows_server",
@@ -9053,6 +9246,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -9102,6 +9296,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -9151,11 +9346,13 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
     "httpx",
-    "nmap"
+    "nmap",
+    "shodan"
    ],
    "distro": null,
    "edition": null,
@@ -9177,6 +9374,11 @@
      "excerpt": "443/tcp ostype=Windows",
      "ref": "hosts/217.243.248.29/phase1/nmap.xml",
      "tool": "nmap"
+    },
+    {
+     "excerpt": "217.243.248.29: os=Windows",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
     }
    ],
    "family": "windows_server",

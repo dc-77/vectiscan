@@ -9,10 +9,14 @@ scope: host
 # S6b-2 (spec/09 Q12): Adressen von Plattformen und Inhaltsnetzen bewertet der Bericht nicht
 # als Befund; Kapitel 3 nennt sie. Score 0 allein heisst nicht "keine Meldungen" (isWhitelisted).
 # S6b-4 (spec/11 Teil 3 BS): der Positivbefund nennt sie mit (198.202.211.1 ohne Meldung).
-applicable_when: null
+# S6b-4n (spec/11 N6): nicht mehr. Die Reputation einer geteilten CDN- oder Plattformadresse ist
+# nicht kundenbezogen (bergersysteme 198.202.211.1: Anycast mit Fremddomains); sie ist hier nicht
+# anwendbar und steht weder als Befund noch im Positivbefund. Eine Meldung innerhalb des
+# Abfragefensters von 90 Tagen (lastReportedAt) ist kein "keine Meldungen", auch bei totalReports 0.
+applicable_when: host.cdn_provider is None and (host.shared is None or host.shared.kind != "platform")
 item_when: null
-when: host.cdn_provider is None and (host.shared is None or host.shared.kind != "platform") and host.reputation is not None and (host.reputation.abuseipdb_score >= ABUSEIPDB_FAIL_SCORE or host.reputation.urlhaus_compromised is True or host.reputation.greynoise_classification == "malicious")
-positive_when: host.reputation is not None and host.reputation.abuseipdb_score == 0 and host.reputation.abuseipdb_total_reports == 0 and host.reputation.urlhaus_compromised is not True and host.reputation.otx_pulse_count in [0, None]
+when: host.reputation is not None and (host.reputation.abuseipdb_score >= ABUSEIPDB_FAIL_SCORE or host.reputation.urlhaus_compromised is True or host.reputation.greynoise_classification == "malicious")
+positive_when: host.reputation is not None and host.reputation.abuseipdb_score == 0 and host.reputation.abuseipdb_total_reports == 0 and host.reputation.urlhaus_compromised is not True and host.reputation.otx_pulse_count in [0, None] and (host.reputation.abuseipdb_last_reported_at is None or days_until(scan.finished_at, host.reputation.abuseipdb_last_reported_at) > ABUSEIPDB_WINDOW_DAYS)
 not_testable_when:
   - when: coverage_status("abuseipdb") != "ok"
     reason_code: coverage:abuseipdb

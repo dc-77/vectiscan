@@ -52,7 +52,7 @@
    "coverage_default": "ok"
   },
   {
-   "name": "Hoster-Server mit Webseite des Kunden und Hoster-Server mit Postfaechern (spec/10 R9)",
+   "name": "Hoster-Server mit Webseite des Kunden und Hoster-Server mit Postfaechern (spec/10 R9); S6b-4n (spec/11 N10, N11): Fremddomains mit Quelle nur mit Fakt",
    "facts": {
     "hosts": [
      {
@@ -62,7 +62,21 @@
        "operator": "Hoster AG",
        "signals": [
         "fremde_namen_zertifikat"
-       ]
+       ],
+       "foreign_names": [
+        "kunde-a.example",
+        "kunde-b.example",
+        "kunde-c.example"
+       ],
+       "foreign_sources": {
+        "passive": [
+         "kunde-a.example",
+         "kunde-b.example"
+        ],
+        "certificate": [
+         "kunde-c.example"
+        ]
+       }
       },
       "betriebsform": "rechenzentrum",
       "serves_customer_web": true,
@@ -106,18 +120,22 @@
    "expect": {
     "holds": {
      "10.0.0.9:8443": [
-      "meaning[1]"
+      "meaning[1]",
+      "observation[2]"
      ],
      "10.0.0.10:8443": [
-      "meaning[2]"
+      "meaning[2]",
+      "observation[3]"
      ]
     },
     "not_holds": {
      "10.0.0.9:8443": [
-      "meaning[2]"
+      "meaning[2]",
+      "observation[3]"
      ],
      "10.0.0.10:8443": [
-      "meaning[1]"
+      "meaning[1]",
+      "observation[2]"
      ]
     }
    },

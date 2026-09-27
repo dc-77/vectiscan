@@ -462,6 +462,11 @@
    "note": "S6b-3 (spec/10 R1): Messbasis der Header je Lauf verschieden. Multi-Lauf und de-Lauf ohne redirect_probe an outlook (Teilbeleg aus ZAP beziehungsweise nur die Weiterleitung), der Rescan misst die Endseite /owa/auth/logon.aspx vollstaendig."
   },
   {
+   "check": "http_header_disclosure",
+   "member": "autodiscover.junkerwerk.de@217.243.248.28",
+   "note": "S6b-4n (spec/11 N12): X-AspNet-Version aus der httpx-Kennung; httpx nannte sie in Multi- und de-Lauf, im Rescan nicht."
+  },
+  {
    "check": "security_headers_incomplete",
    "member": "outlook.junkerwerk.de@217.243.248.28",
    "note": "S6b-3 (spec/10 R1): Messbasis der Header je Lauf verschieden. Multi-Lauf und de-Lauf ohne redirect_probe an outlook (Teilbeleg aus ZAP beziehungsweise nur die Weiterleitung), der Rescan misst die Endseite /owa/auth/logon.aspx vollstaendig."

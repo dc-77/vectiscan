@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-27.1 auf tests/golden/facts/2e56abe1-c1a6-442e-b36a-dc9f83c81da8.json",
+ "source": "reporter.catalog 2026-09-27.2 auf tests/golden/facts/2e56abe1-c1a6-442e-b36a-dc9f83c81da8.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -56,7 +56,7 @@
    "cat": "D",
    "scale": "hygiene",
    "level": "mittel",
-   "group": "www.heuel.com (+heuel.com, jobs.heuel.com)",
+   "group": "www.heuel.com",
    "affected": [
     "www.heuel.com (unsafe-inline für Skripte, unsafe-eval für Skripte, Wildcard-Quelle in connect-src, default-src, font-src, img-src, script-src, style-src)"
    ],
@@ -180,7 +180,7 @@
    "level": "niedrig",
    "group": "ose.heuel.com",
    "affected": [
-    "ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)"
+    "ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options)"
    ],
    "title": "Sicherheits-Header unvollständig"
   },
@@ -277,19 +277,6 @@
   },
   {
    "id": "VS-2026-021",
-   "check": "tls_weakness_reported",
-   "family": "tls_weakness",
-   "cat": "D",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "ose.heuel.com",
-   "affected": [
-    "ose.heuel.com:443: LUCKY13 (Hinweis der TLS-Analyse)"
-   ],
-   "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
-  },
-  {
-   "id": "VS-2026-022",
    "check": "web_vulnerability_reported",
    "family": "web_vulnerability_reported",
    "cat": "E",
@@ -306,7 +293,7 @@
    "title": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-023",
+   "id": "VS-2026-022",
    "check": "web_vulnerability_reported",
    "family": "web_vulnerability_reported",
    "cat": "E",
@@ -414,7 +401,7 @@
    "check": "csp_missing",
    "family": "csp_missing",
    "cat": "D",
-   "group": "www.heuel.com (+heuel.com, jobs.heuel.com)",
+   "group": "www.heuel.com",
    "title": "Content-Security-Policy gesetzt"
   },
   {
@@ -502,39 +489,39 @@
    "check": "hsts_missing",
    "family": "hsts_missing",
    "cat": "D",
-   "group": "online.heuel.com",
+   "group": "www.heuel.com",
    "title": "HTTP Strict Transport Security gesetzt"
   },
   {
    "id": "VS-2026-P24",
-   "check": "hsts_missing",
-   "family": "hsts_missing",
+   "check": "hsts_short",
+   "family": "hsts_short",
    "cat": "D",
-   "group": "www.heuel.com (+heuel.com, jobs.heuel.com)",
-   "title": "HTTP Strict Transport Security gesetzt"
+   "group": "www.heuel.com",
+   "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   },
   {
    "id": "VS-2026-P25",
-   "check": "hsts_short",
-   "family": "hsts_short",
-   "cat": "D",
-   "group": "online.heuel.com",
-   "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
+   "check": "http_no_tls",
+   "family": "http_no_tls",
+   "cat": "A",
+   "group": "20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com)",
+   "title": "Webdienst mit Transportverschlüsselung"
   },
   {
    "id": "VS-2026-P26",
-   "check": "hsts_short",
-   "family": "hsts_short",
-   "cat": "D",
-   "group": "www.heuel.com (+heuel.com, jobs.heuel.com)",
-   "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
+   "check": "http_no_tls",
+   "family": "http_no_tls",
+   "cat": "A",
+   "group": "213.133.104.51 (dl.heuel.com, webportal.heuel.com)",
+   "title": "Webdienst mit Transportverschlüsselung"
   },
   {
    "id": "VS-2026-P27",
    "check": "http_no_tls",
    "family": "http_no_tls",
    "cat": "A",
-   "group": "20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com)",
+   "group": "216.150.1.65 (online.heuel.com)",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
@@ -542,27 +529,11 @@
    "check": "http_no_tls",
    "family": "http_no_tls",
    "cat": "A",
-   "group": "213.133.104.51 (dl.heuel.com, webportal.heuel.com)",
-   "title": "Webdienst mit Transportverschlüsselung"
-  },
-  {
-   "id": "VS-2026-P29",
-   "check": "http_no_tls",
-   "family": "http_no_tls",
-   "cat": "A",
-   "group": "216.150.1.65 (online.heuel.com)",
-   "title": "Webdienst mit Transportverschlüsselung"
-  },
-  {
-   "id": "VS-2026-P30",
-   "check": "http_no_tls",
-   "family": "http_no_tls",
-   "cat": "A",
    "group": "217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com)",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
-   "id": "VS-2026-P31",
+   "id": "VS-2026-P29",
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
@@ -570,11 +541,27 @@
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
-   "id": "VS-2026-P32",
+   "id": "VS-2026-P30",
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
    "group": "20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com)",
+   "title": "Keine Einträge in Reputationsquellen"
+  },
+  {
+   "id": "VS-2026-P31",
+   "check": "ip_reputation",
+   "family": "ip_reputation",
+   "cat": "E",
+   "group": "213.133.104.51 (dl.heuel.com, webportal.heuel.com)",
+   "title": "Keine Einträge in Reputationsquellen"
+  },
+  {
+   "id": "VS-2026-P32",
+   "check": "ip_reputation",
+   "family": "ip_reputation",
+   "cat": "E",
+   "group": "217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
@@ -582,27 +569,11 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "213.133.104.51 (dl.heuel.com, webportal.heuel.com)",
-   "title": "Keine Einträge in Reputationsquellen"
-  },
-  {
-   "id": "VS-2026-P34",
-   "check": "ip_reputation",
-   "family": "ip_reputation",
-   "cat": "E",
-   "group": "217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com)",
-   "title": "Keine Einträge in Reputationsquellen"
-  },
-  {
-   "id": "VS-2026-P35",
-   "check": "ip_reputation",
-   "family": "ip_reputation",
-   "cat": "E",
    "group": "2a01:4f8:d0a:2757::2 (webportal.heuel.com)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
-   "id": "VS-2026-P36",
+   "id": "VS-2026-P34",
    "check": "mail_plaintext",
    "family": "mail_plaintext",
    "cat": "A",
@@ -610,11 +581,27 @@
    "title": "POP3 und IMAP erzwingen TLS vor der Anmeldung"
   },
   {
-   "id": "VS-2026-P37",
+   "id": "VS-2026-P35",
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
    "group": "20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com)",
+   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
+  },
+  {
+   "id": "VS-2026-P36",
+   "check": "rdp_exposed",
+   "family": "rdp_exposed",
+   "cat": "A",
+   "group": "213.133.104.51 (dl.heuel.com, webportal.heuel.com)",
+   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
+  },
+  {
+   "id": "VS-2026-P37",
+   "check": "rdp_exposed",
+   "family": "rdp_exposed",
+   "cat": "A",
+   "group": "216.150.1.65 (online.heuel.com)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
@@ -622,35 +609,19 @@
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "213.133.104.51 (dl.heuel.com, webportal.heuel.com)",
-   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P39",
-   "check": "rdp_exposed",
-   "family": "rdp_exposed",
-   "cat": "A",
-   "group": "216.150.1.65 (online.heuel.com)",
-   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P40",
-   "check": "rdp_exposed",
-   "family": "rdp_exposed",
-   "cat": "A",
    "group": "217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P41",
+   "id": "VS-2026-P39",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
-   "group": "www.heuel.com (+heuel.com, jobs.heuel.com)",
+   "group": "www.heuel.com",
    "title": "Sicherheits-Header vollständig"
   },
   {
-   "id": "VS-2026-P42",
+   "id": "VS-2026-P40",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -658,7 +629,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P43",
+   "id": "VS-2026-P41",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -666,7 +637,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P44",
+   "id": "VS-2026-P42",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -674,7 +645,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P45",
+   "id": "VS-2026-P43",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -682,7 +653,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P46",
+   "id": "VS-2026-P44",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
@@ -690,7 +661,7 @@
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
-   "id": "VS-2026-P47",
+   "id": "VS-2026-P45",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
@@ -698,7 +669,7 @@
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
-   "id": "VS-2026-P48",
+   "id": "VS-2026-P46",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
@@ -706,7 +677,7 @@
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
-   "id": "VS-2026-P49",
+   "id": "VS-2026-P47",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
@@ -714,39 +685,39 @@
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
-   "id": "VS-2026-P50",
+   "id": "VS-2026-P48",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
    "group": "online.heuel.com",
    "title": "TLS 1.3 verfügbar"
+  },
+  {
+   "id": "VS-2026-P49",
+   "check": "tls_no_13",
+   "family": "tls_no_13",
+   "cat": "D",
+   "group": "www.heuel.com (+heuel.com, jobs.heuel.com)",
+   "title": "TLS 1.3 verfügbar"
+  },
+  {
+   "id": "VS-2026-P50",
+   "check": "tls_weak_ciphers",
+   "family": "tls_weak_ciphers",
+   "cat": "D",
+   "group": "online.heuel.com",
+   "title": "Keine schwachen TLS-Cipher"
   },
   {
    "id": "VS-2026-P51",
-   "check": "tls_no_13",
-   "family": "tls_no_13",
+   "check": "tls_weak_ciphers",
+   "family": "tls_weak_ciphers",
    "cat": "D",
    "group": "www.heuel.com (+heuel.com, jobs.heuel.com)",
-   "title": "TLS 1.3 verfügbar"
+   "title": "Keine schwachen TLS-Cipher"
   },
   {
    "id": "VS-2026-P52",
-   "check": "tls_weak_ciphers",
-   "family": "tls_weak_ciphers",
-   "cat": "D",
-   "group": "online.heuel.com",
-   "title": "Keine schwachen TLS-Cipher"
-  },
-  {
-   "id": "VS-2026-P53",
-   "check": "tls_weak_ciphers",
-   "family": "tls_weak_ciphers",
-   "cat": "D",
-   "group": "www.heuel.com (+heuel.com, jobs.heuel.com)",
-   "title": "Keine schwachen TLS-Cipher"
-  },
-  {
-   "id": "VS-2026-P54",
    "check": "waf_present",
    "family": "waf_present",
    "cat": "D",

@@ -397,7 +397,16 @@ Hosting-Panels als Fingerabdruck mit Anmeldeseite, Meldungsname am Mitglied (Nac
 Kennung, SMTP VRFY, XML-RPC, Anmeldung ueber HTTP und SPF auf geteilten Servern,
 Positivaussagen nur mit tragendem Fakt, Faktenfamilien, Berichtstag, Effekt je Stufe (S6b-3),
 `2026-09-27.1` Varianten fuer Kurztitel und Hebel, Planzeile je Regel, Hinweise nach E22,
-HSTS nach E20, Zertifikat am Berichtsdatum, VRFY "angeboten" (S6b-4).
+HSTS nach E20, Zertifikat am Berichtsdatum, VRFY "angeboten" (S6b-4), `2026-09-27.2` CSP nur mit
+Skriptregel positiv, Reputation ohne CDN-Adressen, DMARC-Meldeadressen je Domain, Zielversionen und
+Produktnamen aus wpscan, Baustein-Schluessel `key`, Zertifikat einmal je Befund, Anmeldenamen nur als
+Anzahl (Nachtrag S6b-4, spec/11 N1 bis N15).
+
+Baustein-Schluessel (S6b-4n): eine Aussage unter `observation`, `meaning` oder `verify` kann ein
+`key` tragen. Treffen in einem Befund mehrere Regeln mit Aussagen desselben Schluessels, steht die
+erste einmal (Versionspreisgabe im HTTP-Header und im Dienstbanner). Eine Passivregel, deren aktives
+Gegenstueck im selben Befund trifft (`findings.PASSIVE_COUNTERPARTS`), steht nur als Portzusatz im
+ersten Satz des Gegenstuecks; ihre uebrigen Aussagen, Stufen und Verifikationen entfallen.
 
 **Gesamtbewertung** (spec/11 T6, E16): die schlechteste Ampel der fuenf Kategorien, rot ist
 HOCH, gelb MITTEL, blau NIEDRIG, ohne Befund GERING (`reporter/v3/levels.py::OVERALL_RULE`,

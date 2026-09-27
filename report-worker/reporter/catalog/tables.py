@@ -261,6 +261,21 @@ FAMILIES: frozenset[str] = frozenset({
     "service_unidentified", "smtp_vrfy", "wordpress_xmlrpc", "login_over_http", "spf_shared_host",
 })
 
+# S6b-4n (spec/11 N6): Abfragefenster der Reputationsquelle (AbuseIPDB maxAgeInDays im Scanner).
+ABUSEIPDB_WINDOW_DAYS = 90
+
+# S6b-4n (spec/11 N9): Produktname je wpscan-Slug (Softwarefamilie) fuer Betroffen, Empfehlung und
+# Plan; der Slug ist eine Kennung des Verzeichnisses, kein Name ("revslider" ist Slider Revolution).
+PRODUCT_NAMES: dict[str, str] = {
+    "revslider": "Slider Revolution",
+    "betheme": "BeTheme",
+    "betheme_child": "BeTheme Child",
+    "burst_statistics": "Burst Statistics",
+    "complianz_gdpr": "Complianz",
+    "ultimate_member": "Ultimate Member",
+    "myknowledgebase": "MyKnowledgeBase",
+}
+
 # Namen, die in Ausdruecken als Tabellen sichtbar sind.
 EXPR_TABLES: dict[str, object] = {
     k: v for k, v in globals().items()

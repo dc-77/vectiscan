@@ -82,7 +82,8 @@ def test_keine_platzhalter_oder_fragezeichen(spec):
         # S6b-3: missing_header_names (spec/10 R2) und passed (R6) sind Gruppenvariablen;
         # S6b-4: valid_elsewhere (T14) und target_versions (T12) gesammelt ueber die Mitglieder.
         stripped = re.sub(r"\{(affected|count|group|fqdn_names|domain|host_ip|notes|missing_header_names|passed|"
-                          r"valid_elsewhere|target_versions|dmarc_rua|mx)\}",
+                          r"valid_elsewhere|target_versions|dmarc_rua|mx|dmarc_rua_own|dmarc_rua_foreign|dmarc_delegated_to|"
+                          r"version_headers|feserver_names|cert_summary|shared_domains)\}",
                           "", stripped)
         assert "{" not in stripped and "}" not in stripped, f"{spec.id}.{name}: unbekannter Platzhalter"
         assert "?" not in text, f"{spec.id}.{name}: Fragezeichen"

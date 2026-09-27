@@ -39,7 +39,8 @@ CASTENOW = "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52"
 def _status(status: str, farbe: str) -> str:
     """S6b-4 (spec/11 T11, T15): Langzeitpflege ist gepflegt, eine laut wpscan veraltete
     Erweiterung (gelb) "outdated", das Ende der Herstellerpflege (rot) "eol"."""
-    if status == "in Langzeitpflege (LTS)":
+    # S6b-4n (spec/11 N9): die Plakette heisst nur noch "LTS".
+    if status in ("in Langzeitpflege (LTS)", "LTS"):
         return "current"
     if status == "unsicher" or (farbe == "gelb" and status.startswith("veraltet")):
         return "outdated"
@@ -160,15 +161,22 @@ HEUEL = "2e56abe1-c1a6-442e-b36a-dc9f83c81da8"
 
 
 def test_heuel_ohne_version_aus_einer_quelle_im_anhang() -> None:
-    """(c): "Java/Servlet" (webtech) und "Neos Flow" (httpx) ohne Version stehen im Anhang;
-    "NEOS" aus cms_fingerprint bleibt in der Tabelle, Rohbezeichner mit Suffix gibt es nicht."""
+    """(c): "Java/Servlet" (webtech) ohne Version steht im Anhang; "NEOS" aus cms_fingerprint
+    bleibt in der Tabelle, Rohbezeichner mit Suffix gibt es nicht.
+
+    S6b-4n (spec/11 N12): "Neos Flow" (httpx) ist dasselbe Produkt wie "NEOS" und steht als
+    zweite Quelle in dessen Zeile ("Neos", cms_fingerprint und httpx), nicht mehr im Anhang.
+    "Java/Servlet" hat mit dem Sitzungs-Cookie JSESSIONID der Seite (redirect_probe) eine zweite
+    Quelle und steht in der Tabelle; im Anhang bleibt PHP (nur httpx)."""
     namen = {r.c for block in data_for(HEUEL).architecture.tech for r in block.rows}
     namen |= {r["name"] for r in _zeilen(HEUEL)}
     assert not any(":" in n for n in namen), namen
-    assert "NEOS" in namen
-    assert "Java/Servlet" not in namen and "Neos Flow" not in namen
+    assert "Neos" in namen and "NEOS" not in namen
+    assert "Java/Servlet" in namen and "Neos Flow" not in namen
+    neos = [r for block in data_for(HEUEL).architecture.tech for r in block.rows if r.c == "Neos"]
+    assert [r.src for r in neos] == ["cms_fingerprint, httpx"]
     meldungen = _werkzeugmeldungen(facts_for(HEUEL))
-    assert "Java/Servlet" in meldungen and "Neos Flow" in meldungen
+    assert "PHP" in meldungen and "Java/Servlet" not in meldungen and "Neos Flow" not in meldungen
     assert not any(":neos" in m for m in meldungen)
 
 

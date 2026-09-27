@@ -1,0 +1,45 @@
+{
+ "facts": {
+  "tls": [
+   {
+    "host_ip": "10.0.0.1",
+    "fqdn": "autodiscover.example.test",
+    "port": 443,
+    "source": "testssl",
+    "protocols": {
+     "SSLv2": false,
+     "SSLv3": false,
+     "TLS1.0": false,
+     "TLS1.1": false,
+     "TLS1.2": true,
+     "TLS1.3": true
+    },
+    "ciphers_weak": [],
+    "vulns": [
+     {
+      "name": "SWEET32",
+      "status": "vulnerable"
+     },
+     {
+      "name": "BREACH",
+      "status": "potential"
+     },
+     {
+      "name": "LUCKY13",
+      "status": "potential"
+     }
+    ],
+    "fallback_scsv": true,
+    "assigned_from": "www.example.test:443"
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "autodiscover.example.test@10.0.0.1",
+  "affected": [],
+  "positive": false
+ },
+ "_note": "S6b-4n (spec/11 N12): das TLS-Ergebnis wurde nur von einem anderen Namen desselben IP:Port uebernommen (junkerwerk autodiscover, heuel ose); ohne eigenen testssl-Lauf kein Hinweis am Namen."
+}

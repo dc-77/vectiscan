@@ -1,0 +1,35 @@
+{
+ "facts": {
+  "http": [
+   {
+    "host_ip": "10.0.0.1",
+    "fqdn": "www.example.test",
+    "reachable": true,
+    "csp": {
+     "present": true,
+     "value": "frame-ancestors 'self'",
+     "unsafe_inline": false,
+     "unsafe_eval": false,
+     "wildcard": false,
+     "frame_ancestors": "'self'",
+     "directives": {
+      "frame-ancestors": [
+       "'self'"
+      ]
+     },
+     "script_rule": false
+    }
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "www.example.test@10.0.0.1",
+  "affected": [
+   "www.example.test"
+  ],
+  "positive": false
+ },
+ "_kommentar": "S6b-4n (spec/11 N1): CSP nur mit frame-ancestors regelt keine Skriptquellen (huendgen www)."
+}

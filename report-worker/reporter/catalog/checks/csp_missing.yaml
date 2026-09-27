@@ -7,8 +7,11 @@ level: niedrig
 group_by: fqdn
 scope: http
 applicable_when: null
-when: http.csp.present is False
-positive_when: http.csp.present is True
+# S6b-4n (spec/11 N1): eine Richtlinie ohne script-src und ohne default-src (huendgen www und
+# castenow ubb-wiki: nur frame-ancestors) regelt keine Skriptquellen; sie ist eine Variante
+# dieser Regel, kein Positivbefund.
+when: http.csp.present is False or (http.csp.present is True and http.csp.script_rule is False)
+positive_when: http.csp.present is True and http.csp.script_rule is True
 not_testable_when:
   # S6b-3 (spec/10 R1): nur an einer Endseite bewertbar.
   - when: http.header_eval.basis == "redirect"
@@ -45,20 +48,50 @@ policy:
     niedrigeren SP-Einstufung und setzt Hygiene niedrig an.
 texts:
   short: "Inhaltsrichtlinie fehlt"
+  short_variants:
+    - when: http.csp.present is True and http.csp.script_rule is False and http.csp.frame_ancestors is not None
+      text: "Inhaltsrichtlinie nur mit frame-ancestors, keine Regel für Skriptquellen"
+    - when: http.csp.present is True and http.csp.script_rule is False
+      text: "Inhaltsrichtlinie ohne Regel für Skriptquellen"
   plan:
     lever: "Inhaltsrichtlinie für die Webseiten einführen"
     effect: "Begrenzt die Wirkung eingeschleuster Skripte im Browser"
-  observation: >-
-    Auf {group} ist keine Content-Security-Policy gesetzt: {affected}.
-  meaning: >-
-    Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche
-    Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von
-    Fremdinhalten fehlt damit eine zweite Verteidigungslinie.
+  observation:
+    - when: http.csp.present is False
+      quantor: eines
+      text: >-
+        Auf {group} ist keine Content-Security-Policy gesetzt: {affected}.
+    - when: http.csp.present is True and http.csp.script_rule is False
+      quantor: eines
+      text: >-
+        Auf {group} ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen
+        enthält (weder script-src noch default-src): {affected}.
+  meaning:
+    - when: http.csp.present is False
+      quantor: eines
+      text: >-
+        Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche
+        Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von
+        Fremdinhalten fehlt damit eine zweite Verteidigungslinie.
+    - when: http.csp.present is True and http.csp.script_rule is False
+      quantor: eines
+      text: >-
+        Eine Richtlinie ohne Regel für Skriptquellen schränkt nicht ein, welche Skripte eine Seite
+        laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit die zweite
+        Verteidigungslinie; der Schutz vor Einbettung in fremde Seiten bleibt davon unberührt.
   recommendation:
     - stage: mittelfristig
+      when: http.csp.present is False
+      quantor: eines
       text: >-
         Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die
         Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.
+    - stage: mittelfristig
+      when: http.csp.present is True and http.csp.script_rule is False
+      quantor: eines
+      text: >-
+        Die bestehende Content-Security-Policy um eine Regel für Skriptquellen (script-src oder
+        default-src) ergänzen, die nur die tatsächlich benötigten Ursprünge zulässt.
   verify: >-
     HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header
     Content-Security-Policy mit einer Regel für Skriptquellen.

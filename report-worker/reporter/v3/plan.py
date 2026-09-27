@@ -15,6 +15,8 @@ eine Zeile beim Hoster oder Plattformbetreiber trägt das im Hebeltitel.
 """
 from __future__ import annotations
 
+import re
+
 from reporter.v3 import levels as L
 from reporter.v3 import narrative as N
 from reporter.v3.bundles import Consolidated
@@ -64,7 +66,7 @@ def build_plan(pairs: list[tuple[Consolidated, Finding]]) -> list[PlanRow]:
         if details:
             text = f"{action}: {'; '.join(dict.fromkeys(details))}"
             action = text
-        if lead_item.operator is not None:
+        if lead_item.operator is not None and not an_betreiber(action):
             text = f"{ASK_AT[lead_item.operator.kind]} einfordern: {action}"
         effects: list[str] = []
         refs: list[str] = []
@@ -98,6 +100,16 @@ def build_plan(pairs: list[tuple[Consolidated, Finding]]) -> list[PlanRow]:
     return plan
 
 
+# S6b-4n (spec/11 N15): Massnahmen, die sich schon an Hoster oder Plattformbetreiber richten
+# ("Beim Plattformbetreiber erfragen ...", "Den Hoster bitten ..."), bekommen kein zweites Praefix.
+_AN_BETREIBER = re.compile(r"^\s*(?:beim (?:hoster|plattformbetreiber)|den (?:hoster|plattformbetreiber))\b"
+                           r"|beim (?:hoster|plattformbetreiber) \w+ lassen\b", re.I)
+
+
+def an_betreiber(text: str) -> bool:
+    return bool(_AN_BETREIBER.search(text or ""))
+
+
 def build_levers(plan: list[PlanRow], findings: list[Finding]) -> list[Lever]:
     """Die drei gewichtigsten Planzeilen als Hebel, nach Titel entdoppelt (spec/10 R11).
 
@@ -114,7 +126,7 @@ def build_levers(plan: list[PlanRow], findings: list[Finding]) -> list[Lever]:
         if lead is None or lead.id in befunde:
             continue
         title = row.lever or lead.title
-        if row.operator:
+        if row.operator and not an_betreiber(title):
             title = f"{ASK_AT[row.operator]} einfordern: {title}"
         if title in titel:
             continue

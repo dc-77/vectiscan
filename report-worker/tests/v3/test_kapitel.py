@@ -104,8 +104,9 @@ def test_technik_tabelle_ohne_doppelte_zeilen(data):
 def test_technik_status_und_farbe_passen_zusammen(data):
     # S6b-4 (spec/11 T11, T15): Langzeitpflege mit Quelle ist gruen, eine laut wpscan veraltete
     # Erweiterung gelb ("veraltet, 12 bekannte Lücken, aktuell 28.5.10"), ein unsicherer Kern rot.
+    # S6b-4n (spec/11 N9): Plakette nur "veraltet" oder "LTS", Rest in der Hinweisspalte.
     erlaubt = {("aktuell", "gruen"), ("veraltet", "rot"), ("unbekannt", "grau"),
-               ("in Langzeitpflege (LTS)", "gruen"), ("unsicher", "rot")}
+               ("LTS", "gruen"), ("unsicher", "rot")}
     for block in data.architecture.tech:
         for row in block.rows:
             ok = (row.status, row.st) in erlaubt or (row.st == "gelb" and row.status.startswith("veraltet"))
@@ -182,7 +183,9 @@ def test_werkzeugliste_nur_gelaufene_werkzeuge(data):
     from reporter.v3.tables import TOOL_ROWS
 
     for row in data.appendix.tools:
-        tools = next(t for label, _, _, t in TOOL_ROWS if label == row.t)
+        # S6b-4n (spec/11 N12): gelaufene Quellen ohne Daten tragen "(ohne Ergebnis)".
+        label_ohne = row.t.replace(" (ohne Ergebnis)", "")
+        tools = next(t for label, _, _, t in TOOL_ROWS if label == label_ohne)
         assert gelaufen & set(tools), row.t
 
 

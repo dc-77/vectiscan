@@ -16,7 +16,8 @@ requires:
   tools: [wpscan]
 kind: check
 bundle: null
-affected_template: "{fqdn} ({wp_users})"
+# S6b-4n (E25, spec/11 N15): Anzahl und Fundweg, keine Anmeldenamen in Personenform im Kundentext.
+affected_template: "{fqdn} ({wp_users_text})"
 evidence: [http]
 evidence_detail: http.wordpress
 references: [CWE-203, OWASP2025-A07]

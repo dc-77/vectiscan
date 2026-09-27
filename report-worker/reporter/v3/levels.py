@@ -90,8 +90,14 @@ TRIAGE_ACTIVE_PROOF = Triage("rot", ("unverzueglich",), "CRITICAL")
 # hier mit dem Satz, den Anhang A.1 dazu nennt; ein Test haelt Katalog und Tabelle gleich.
 TRIAGE_URGENT = Triage("rot", ("unverzueglich",), "CRITICAL")
 URGENT_EXCEPTIONS: dict[str, str] = {
-    "cert_expiring": "ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen",
+    # S6b-4n (spec/11 N15): nur ein noch gueltiges Zertifikat; ein abgelaufenes an einem Dienst
+    # (service_cert_expired) folgt der Tabelle und steht in A.1 getrennt.
+    "cert_expiring": "ein noch gültiges Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen",
 }
+# S6b-4n (spec/11 N15): Satz in A.1 zu abgelaufenen Zertifikaten an Diensten ausserhalb der Webseiten.
+EXPIRED_SERVICE_NOTE = ("Ein am Scantag bereits abgelaufenes Zertifikat an Diensten außerhalb der "
+                        "Webseiten (Mail, Datei, Verwaltung) folgt der Tabelle: Exposition erhöht, Gelb, "
+                        "In Kürze.")
 
 # S6b-4 (spec/11 T11, E22): benannte Ausnahmen in die andere Richtung. Eine Pruefung mit
 # ``hint_when`` wird bei Treffer fuer jedes Mitglied ein blauer Hinweis: ein Passivbefund auf
@@ -302,7 +308,7 @@ def urgent_phrase() -> str:
         return ""
     faelle = sorted(URGENT_EXCEPTIONS.values())
     return ("Ausnahme: Rot und Unverzüglich gelten auch für "
-            + (" und ".join(faelle)) + ".")
+            + (" und ".join(faelle)) + ". " + EXPIRED_SERVICE_NOTE)
 
 
 def hint_phrase() -> str:

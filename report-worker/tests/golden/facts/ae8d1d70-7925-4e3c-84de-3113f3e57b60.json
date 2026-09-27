@@ -21,6 +21,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -47,6 +48,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -73,6 +75,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -99,6 +102,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": "exit_28",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "failed",
@@ -125,6 +129,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -151,6 +156,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -177,6 +183,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": "timeout",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "failed",
@@ -203,6 +210,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -229,6 +237,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -255,6 +264,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -281,6 +291,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -307,6 +318,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -333,6 +345,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -359,6 +372,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -385,6 +399,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -411,6 +426,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -437,6 +453,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -463,6 +480,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -489,6 +507,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -515,6 +534,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -541,6 +561,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -567,6 +588,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -593,6 +615,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -619,6 +642,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -645,6 +669,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -671,6 +696,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -697,6 +723,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -723,6 +750,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -749,6 +777,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -775,6 +804,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -801,6 +831,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -827,6 +858,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -853,6 +885,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -879,6 +912,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -905,6 +939,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -931,6 +966,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -957,6 +993,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -983,6 +1020,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1009,6 +1047,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1035,6 +1074,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1061,6 +1101,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1087,6 +1128,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1113,6 +1155,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1139,6 +1182,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1165,6 +1209,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1191,6 +1236,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1217,6 +1263,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1243,6 +1290,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1269,6 +1317,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1295,6 +1344,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -1321,6 +1371,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1347,6 +1398,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1373,6 +1425,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1399,6 +1452,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1425,6 +1479,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1451,6 +1506,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1477,6 +1533,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1503,6 +1560,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1529,6 +1587,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1555,6 +1614,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1581,6 +1641,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1607,6 +1668,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1633,6 +1695,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1659,6 +1722,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "empty",
@@ -1685,6 +1749,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1711,6 +1776,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1737,6 +1803,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1763,6 +1830,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1789,6 +1857,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1815,6 +1884,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -1841,6 +1911,7 @@
    "phase": 3,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -3022,6 +3093,7 @@
    "dmarc": {
     "adkim": "r",
     "aspf": "r",
+    "delegated_to": null,
     "p": "reject",
     "pct": 100,
     "present": true,
@@ -3052,6 +3124,11 @@
      "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security.json",
      "tool": "dns_security"
+    },
+    {
+     "excerpt": "securess.de AXFR nameserver=ns1a.dodns.net, ns2a.dodns.net antwort=Transfer failed",
+     "ref": "phase0/zone_transfer.txt",
+     "tool": "zone_transfer"
     }
    ],
    "id": "dns:securess.de",
@@ -4166,6 +4243,7 @@
      }
     ],
     "foreign_names": [],
+    "foreign_sources": {},
     "kind": "platform",
     "operator": "assfinetcloud.de",
     "server_operator": null,
@@ -4802,6 +4880,7 @@
  "http": [
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [
@@ -4817,6 +4896,7 @@
     "frame_ancestors": null,
     "nonce_or_hash": null,
     "present": false,
+    "script_rule": null,
     "script_unsafe_eval": null,
     "script_unsafe_inline": null,
     "style_unsafe_inline": null,
@@ -4843,6 +4923,7 @@
    "fqdn": "connect.securess.de",
    "header_eval": {
     "basis": "final",
+    "client_redirect": null,
     "complete": true,
     "evaluated": {
      "challenge": null,
@@ -4853,6 +4934,7 @@
      "tool": "header_check",
      "url": "https://connect.securess.de"
     },
+    "final_response": true,
     "first": {
      "challenge": null,
      "content_type": "text/html; charset=utf-8",
@@ -4989,6 +5071,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -5012,6 +5095,7 @@
     "frame_ancestors": null,
     "nonce_or_hash": false,
     "present": true,
+    "script_rule": true,
     "script_unsafe_eval": true,
     "script_unsafe_inline": true,
     "style_unsafe_inline": true,
@@ -5041,6 +5125,7 @@
    "fqdn": "eset.securess.de",
    "header_eval": {
     "basis": "final",
+    "client_redirect": null,
     "complete": true,
     "evaluated": {
      "challenge": null,
@@ -5051,6 +5136,7 @@
      "tool": "header_check",
      "url": "https://eset.securess.de"
     },
+    "final_response": true,
     "first": {
      "challenge": null,
      "content_type": "text/html; charset=utf-8",
@@ -5168,6 +5254,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -5189,8 +5276,10 @@
    "fqdn": "ftp.securess.de",
    "header_eval": {
     "basis": "redirect",
+    "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final_response": null,
     "first": {
      "challenge": null,
      "content_type": "text/html; charset=UTF-8",
@@ -5286,6 +5375,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -5307,8 +5397,10 @@
    "fqdn": "login-kundenportal.securess.de",
    "header_eval": {
     "basis": "redirect",
+    "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final_response": null,
     "first": {
      "challenge": null,
      "content_type": null,
@@ -5385,6 +5477,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [
@@ -5400,6 +5493,7 @@
     "frame_ancestors": null,
     "nonce_or_hash": null,
     "present": false,
+    "script_rule": null,
     "script_unsafe_eval": null,
     "script_unsafe_inline": null,
     "style_unsafe_inline": null,
@@ -5426,6 +5520,7 @@
    "fqdn": "mailcleaner.securess.de",
    "header_eval": {
     "basis": "final",
+    "client_redirect": null,
     "complete": true,
     "evaluated": {
      "challenge": null,
@@ -5436,6 +5531,7 @@
      "tool": "header_check",
      "url": "https://mailcleaner.securess.de"
     },
+    "final_response": true,
     "first": {
      "challenge": null,
      "content_type": "text/html; charset=UTF-8",
@@ -5570,6 +5666,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [
@@ -5585,6 +5682,7 @@
     "frame_ancestors": null,
     "nonce_or_hash": null,
     "present": false,
+    "script_rule": null,
     "script_unsafe_eval": null,
     "script_unsafe_inline": null,
     "style_unsafe_inline": null,
@@ -5611,6 +5709,7 @@
    "fqdn": "mailin.securess.de",
    "header_eval": {
     "basis": "final",
+    "client_redirect": null,
     "complete": true,
     "evaluated": {
      "challenge": null,
@@ -5621,6 +5720,7 @@
      "tool": "header_check",
      "url": "https://mailin.securess.de"
     },
+    "final_response": true,
     "first": {
      "challenge": null,
      "content_type": "text/html; charset=UTF-8",
@@ -5755,6 +5855,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [
@@ -5770,6 +5871,7 @@
     "frame_ancestors": null,
     "nonce_or_hash": null,
     "present": false,
+    "script_rule": null,
     "script_unsafe_eval": null,
     "script_unsafe_inline": null,
     "style_unsafe_inline": null,
@@ -5796,6 +5898,7 @@
    "fqdn": "mailout.securess.de",
    "header_eval": {
     "basis": "final",
+    "client_redirect": null,
     "complete": true,
     "evaluated": {
      "challenge": null,
@@ -5806,6 +5909,7 @@
      "tool": "header_check",
      "url": "https://mailout.securess.de"
     },
+    "final_response": true,
     "first": {
      "challenge": null,
      "content_type": "text/html; charset=UTF-8",
@@ -5940,6 +6044,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [
@@ -5955,6 +6060,7 @@
     "frame_ancestors": null,
     "nonce_or_hash": null,
     "present": false,
+    "script_rule": null,
     "script_unsafe_eval": null,
     "script_unsafe_inline": null,
     "style_unsafe_inline": null,
@@ -5981,6 +6087,7 @@
    "fqdn": "mx1.securess.de",
    "header_eval": {
     "basis": "final",
+    "client_redirect": null,
     "complete": true,
     "evaluated": {
      "challenge": null,
@@ -5991,6 +6098,7 @@
      "tool": "header_check",
      "url": "https://mx1.securess.de"
     },
+    "final_response": true,
     "first": {
      "challenge": null,
      "content_type": "text/html; charset=UTF-8",
@@ -6125,6 +6233,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -6148,6 +6257,7 @@
     "frame_ancestors": null,
     "nonce_or_hash": false,
     "present": true,
+    "script_rule": true,
     "script_unsafe_eval": true,
     "script_unsafe_inline": true,
     "style_unsafe_inline": true,
@@ -6174,6 +6284,7 @@
    "fqdn": "openotp.securess.de",
    "header_eval": {
     "basis": "final",
+    "client_redirect": null,
     "complete": true,
     "evaluated": {
      "challenge": null,
@@ -6184,6 +6295,7 @@
      "tool": "header_check",
      "url": "https://openotp.securess.de"
     },
+    "final_response": true,
     "first": {
      "challenge": null,
      "content_type": "text/html; charset=utf-8",
@@ -6301,6 +6413,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -6322,8 +6435,10 @@
    "fqdn": "partner.securess.de",
    "header_eval": {
     "basis": "unreachable",
+    "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final_response": null,
     "first": null,
     "framing_protected": null,
     "headers": {},
@@ -6367,6 +6482,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -6383,8 +6499,10 @@
    "fqdn": "rdgw.securess.de",
    "header_eval": {
     "basis": "unreachable",
+    "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final_response": null,
     "first": null,
     "framing_protected": null,
     "headers": {},
@@ -6415,6 +6533,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -6436,8 +6555,10 @@
    "fqdn": "securess.de",
    "header_eval": {
     "basis": "redirect",
+    "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final_response": null,
     "first": {
      "challenge": null,
      "content_type": "text/html; charset=UTF-8",
@@ -6533,6 +6654,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -6554,8 +6676,10 @@
    "fqdn": "vermittler.securess.de",
    "header_eval": {
     "basis": "unreachable",
+    "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final_response": null,
     "first": null,
     "framing_protected": null,
     "headers": {},
@@ -6599,6 +6723,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -6607,6 +6732,7 @@
     "frame_ancestors": null,
     "nonce_or_hash": null,
     "present": false,
+    "script_rule": null,
     "script_unsafe_eval": null,
     "script_unsafe_inline": null,
     "style_unsafe_inline": null,
@@ -6633,6 +6759,7 @@
    "fqdn": "www.securess.de",
    "header_eval": {
     "basis": "final",
+    "client_redirect": null,
     "complete": true,
     "evaluated": {
      "challenge": null,
@@ -6643,6 +6770,7 @@
      "tool": "header_check",
      "url": "https://www.securess.de"
     },
+    "final_response": true,
     "first": {
      "challenge": null,
      "content_type": "text/html; charset=UTF-8",
@@ -7684,7 +7812,7 @@
    }
   ]
  },
- "schema_version": "1.2.0",
+ "schema_version": "1.3.0",
  "services": [
   {
    "auth_before_starttls": null,
@@ -7714,6 +7842,7 @@
    ],
    "family": "proftpd",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7756,6 +7885,7 @@
    ],
    "family": "openssh",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7831,6 +7961,7 @@
    ],
    "family": "postfix",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7873,6 +8004,7 @@
    ],
    "family": "apache",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": "Apache",
    "fp_title": null,
@@ -7915,6 +8047,7 @@
    ],
    "family": null,
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7989,6 +8122,7 @@
    ],
    "family": "dovecot",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8064,6 +8198,7 @@
    ],
    "family": "dovecot",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8118,6 +8253,7 @@
    ],
    "family": "apache",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": "Apache",
    "fp_title": "Page Not Found",
@@ -8192,6 +8328,7 @@
    ],
    "family": "postfix",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8266,6 +8403,7 @@
    ],
    "family": "dovecot",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8339,6 +8477,7 @@
    ],
    "family": "dovecot",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8393,6 +8532,7 @@
    ],
    "family": "plesk",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": true,
    "fp_server": "sw-cp-server",
    "fp_title": "Plesk Obsidian 18.0.78",
@@ -8435,6 +8575,7 @@
    ],
    "family": null,
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": "Microsoft Azure Web App - Error 404",
@@ -8518,6 +8659,7 @@
    ],
    "family": null,
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": "Microsoft Azure Web App - Error 404",
@@ -8584,6 +8726,7 @@
    ],
    "family": null,
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8639,6 +8782,7 @@
    ],
    "family": "apache",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": "Apache",
    "fp_title": "Securess Versicherungsmakler GmbH Web Applications Portal",
@@ -8708,6 +8852,7 @@
    ],
    "family": "postfix",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8763,6 +8908,7 @@
    ],
    "family": "apache",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": "nginx/1.31.2",
    "fp_title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)",
@@ -8836,6 +8982,7 @@
    ],
    "family": null,
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8910,6 +9057,7 @@
    ],
    "family": null,
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8983,6 +9131,7 @@
    ],
    "family": "dovecot",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -9025,6 +9174,7 @@
    ],
    "family": "openssh",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -9067,6 +9217,7 @@
    ],
    "family": "nginx",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -9122,6 +9273,7 @@
    ],
    "family": "nginx",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": "nginx/1.22.1",
    "fp_title": null,
@@ -9177,6 +9329,7 @@
    ],
    "family": "microsoft_httpapi_httpd",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -9207,6 +9360,7 @@
  "software": [
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -9272,6 +9426,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -9335,6 +9490,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -9383,6 +9539,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -9431,6 +9588,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -9484,6 +9642,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -9537,6 +9696,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -9585,6 +9745,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -9634,6 +9795,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -9683,6 +9845,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -9726,6 +9889,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -9769,6 +9933,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -9812,6 +9977,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -9855,6 +10021,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -9898,6 +10065,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -9946,6 +10114,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -9989,6 +10158,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10037,6 +10207,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10080,6 +10251,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10123,6 +10295,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10166,6 +10339,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10209,6 +10383,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10252,6 +10427,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10295,6 +10471,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10338,6 +10515,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10381,6 +10559,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10430,6 +10609,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -10495,6 +10675,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -10544,6 +10725,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -10593,6 +10775,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -10646,6 +10829,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10689,6 +10873,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -10737,6 +10922,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10780,6 +10966,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10823,6 +11010,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10866,6 +11054,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -10909,6 +11098,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -10957,6 +11147,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11000,6 +11191,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11043,6 +11235,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11086,6 +11279,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -11135,6 +11329,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -11184,6 +11379,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11227,6 +11423,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11270,6 +11467,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11313,6 +11511,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -11362,6 +11561,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -11411,6 +11611,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11454,6 +11655,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11497,6 +11699,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11540,6 +11743,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -11589,6 +11793,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -11638,6 +11843,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11681,6 +11887,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11724,6 +11931,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11767,6 +11975,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -11816,6 +12025,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -11865,6 +12075,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -11913,6 +12124,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11956,6 +12168,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -11999,6 +12212,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12042,6 +12256,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12085,6 +12300,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -12143,6 +12359,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -12191,6 +12408,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12234,6 +12452,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12277,6 +12496,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.9,
    "conflicts": [],
    "detection_sources": [
@@ -12325,6 +12545,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12368,6 +12589,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12411,6 +12633,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12454,6 +12677,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12497,6 +12721,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12540,6 +12765,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12583,6 +12809,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -12632,6 +12859,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12675,6 +12903,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12718,6 +12947,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12761,6 +12991,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12804,6 +13035,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12847,6 +13079,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12890,6 +13123,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12933,6 +13167,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -12976,6 +13211,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13019,6 +13255,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -13068,6 +13305,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13111,6 +13349,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13154,6 +13393,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13197,6 +13437,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13240,6 +13481,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13283,6 +13525,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13326,6 +13569,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13369,6 +13613,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13412,6 +13657,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13455,6 +13701,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -13504,6 +13751,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13547,6 +13795,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13590,6 +13839,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13633,6 +13883,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13676,6 +13927,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -13719,6 +13971,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -13950,14 +14203,8 @@
      "connect.securess.de"
     ],
     "self_signed": null,
-    "valid_elsewhere": [
-     "51.116.154.224:443",
-     "85.22.47.38:443",
-     "85.22.47.39:443",
-     "85.22.47.41:443",
-     "85.22.47.46:443"
-    ],
-    "valid_elsewhere_not_after": "2026-09-12T23:59:59Z",
+    "valid_elsewhere": [],
+    "valid_elsewhere_not_after": null,
     "wildcard": false
    },
    "cert_assigned_from": null,

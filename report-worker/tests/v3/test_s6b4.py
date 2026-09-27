@@ -119,8 +119,9 @@ def test_erzeugungsdatum_nur_mit_erzeugungsnummer():
 
 def test_e5_datum_je_adresse():
     zeile = grenze(data_for(JW), "SMTP auf Port 25")
-    assert "188.40.3.130 gesehen am 23.09.2026" in zeile.detail
-    assert "217.243.248.28 gesehen am 19.09.2026" in zeile.detail
+    # S6b-4n (spec/11 N15): Shodan last_update ist die Aktualisierung des Hosteintrags.
+    assert "188.40.3.130 Hosteintrag der Passivquelle aktualisiert am 23.09.2026" in zeile.detail
+    assert "217.243.248.28 Hosteintrag der Passivquelle aktualisiert am 19.09.2026" in zeile.detail
 
 
 def test_gesamtbewertungsregel_in_a1():
@@ -156,7 +157,9 @@ def test_aaaa_im_system_und_in_der_zaehlung():
 
 def test_pfadsuche_mit_urteil():
     data = data_for(BS)
-    assert "(Abwehrmerkmal der Seite)" in grenze(data, "Suche nach nicht verlinkten Pfaden abgebrochen").detail
+    # S6b-4n (spec/11 N13): die Startseite antwortete normal (200); der Scanner vermutete das Merkmal.
+    assert ("abgebrochen, der Scanner vermutete in der Startseite (200) ein Abwehrmerkmal"
+            in grenze(data, "Suche nach nicht verlinkten Pfaden abgebrochen").detail)
     assert "Weiterleitung 301" in grenze(data, "Suche nach nicht verlinkten Pfaden nur gegen").detail
     phase2 = next(m for m in data.scope.method_phases if m.n == "2")
     assert "nicht belastbar" in phase2.text
@@ -186,7 +189,10 @@ def test_fremde_dienste_im_zustaendigkeitskasten():
     data = data_for(CA)
     assert not any(f.checks == ["http_alt_port"] for f in data.findings)
     f = befund(data, "admin_panel_hoster")
-    assert "Dienste weiterer Domains (Ports 8000, 8001, 8800)" in f.operator_note
+    # S6b-4n (spec/11 N11): 8800 (Icecast) ohne Domainfakt ist kein Dienst einer weiteren Domain.
+    assert "Dienste weiterer Domains (Ports 8000, 8001)" in f.operator_note
+    assert "Auf Port 8800 läuft Icecast streaming media server; die Zuordnung zu einer Domain ist nicht belegt" \
+        in f.operator_note
 
 
 def test_spf_auf_geteilten_server_mit_mechanismus_und_betreiber():
@@ -205,7 +211,8 @@ def test_kategorien_nur_aus_getroffenen_regeln():
 
 
 def test_rollentexte_am_fakt():
-    lw = next(o for o in data_for(LW).business.observed if o.system.startswith("Website"))
+    # S6b-4n (spec/11 N14): LW traegt weitere belegte Rollen; die Website steht nicht mehr vorn.
+    lw = next(o for o in data_for(LW).business.observed if "Website" in o.system)
     assert "Formulareingaben" not in lw.meaning
     db = data_for(DB).business.observed[0]
     assert "Unternehmensnetz" not in db.meaning
@@ -222,9 +229,10 @@ def test_mfa_empfehlung_prueft_zuerst():
 
 def test_langzeitpflege_mit_quelle_in_3_1():
     zeilen = [r for b in data_for(JW).architecture.tech for r in b.rows if r.c == "Debian GNU/Linux"]
-    assert zeilen and zeilen[0].status == "in Langzeitpflege (LTS)" and zeilen[0].note == "bis 30.06.2028 laut Debian"
+    # S6b-4n (spec/11 N9): Plakette nur "LTS", Zeitraum und Quelle in der Hinweisspalte.
+    assert zeilen and zeilen[0].status == "LTS" and zeilen[0].note == "in Langzeitpflege bis 30.06.2028 laut Debian"
     pos = next(p for p in data_for(JW).positives if p.title == "Serversoftware mit laufender Herstellerpflege")
-    assert "in Langzeitpflege (LTS) bis 30.06.2028 laut Debian" in pos.text
+    assert "Debian GNU/Linux 12 (in Langzeitpflege bis 30.06.2028 laut Debian)" in pos.text
 
 
 def test_passivbefund_auf_e4_host_als_blauer_hinweis():
@@ -263,7 +271,9 @@ def test_wordpress_erweiterungen_alle_cves_und_zielversionen():
     data = data_for(DB)
     f = befund(data, "wordpress_plugin_vulnerable")
     assert f.title == "WordPress-Erweiterungen mit bekannten Schwachstellen"
-    assert "betheme 28.5.10" in f.recommendation[0][1] and "complianz-gdpr 7.5.5" in f.recommendation[0][1]
+    # S6b-4n (spec/11 N9): fehlerbereinigte Version getrennt von der neuesten laut wpscan, Produktname.
+    assert "BeTheme (fehlerbereinigt ab 28.5.8, neueste laut wpscan 28.5.10)" in f.recommendation[0][1]
+    assert "Complianz (neueste und fehlerbereinigte Version laut wpscan 7.5.5)" in f.recommendation[0][1]
     assert "CVE-2026-83561" in f.evidence
     assert any("CVE-2026-83561" in r.cve for r in data.appendix.cve_refs)
 
@@ -308,7 +318,9 @@ def test_erneuerungsmuster_im_nachweis():
 def test_am_berichtsdatum_abgelaufen_sofern_nicht_erneuert():
     f = befund(am_27(CA), "cert_expiring")
     assert "am Berichtsdatum abgelaufen, sofern nicht erneuert" in f.title
-    assert any("195.50.179.4:443 und 195.50.179.6:443" in text for _, text in f.recommendation)
+    # S6b-4n (spec/11 N8): 195.50.179.6 liefert eine unvollstaendige Kette und ist keine Vorlage.
+    assert any("195.50.179.4:443 (gültig bis 14.03.2027)" in text for _, text in f.recommendation)
+    assert not any("195.50.179.6" in text for _, text in f.recommendation)
 
 
 def test_stufenwechsel_bis_zum_berichtsdatum():
@@ -330,7 +342,10 @@ def test_eine_zeile_je_produkt_mit_wpscan_status():
     t = tech(DB)
     assert [k for k in t if "Slider" in k[1]] == [("88.99.35.112", "Slider Revolution")]
     assert t[("88.99.35.112", "BeTheme")].v == "27.5.3"
-    assert t[("88.99.35.112", "BeTheme")].status == "veraltet, 12 bekannte Lücken, aktuell 28.5.10"
+    # S6b-4n (spec/11 N9): Plakette nur "veraltet", Anzahl und Zielversionen in der Hinweisspalte.
+    assert t[("88.99.35.112", "BeTheme")].status == "veraltet"
+    assert t[("88.99.35.112", "BeTheme")].note == (
+        "12 bekannte Lücken, fehlerbereinigt ab 28.5.8, neueste laut wpscan 28.5.10")
     assert t[("88.99.35.112", "WordPress")].status == "veraltet"
 
 
@@ -365,7 +380,7 @@ def test_service_karte_ueber_den_softwareport():
 
 def test_jw_sonicwall_mit_datum_und_portbereich():
     f = befund(data_for(JW), "admin_service_exposed_passive")
-    assert "gesehen am 19.09.2026" in f.affected and "außerhalb des geprüften Portbereichs" in f.found
+    assert "Hosteintrag aktualisiert am 19.09.2026" in f.affected and "außerhalb des geprüften Portbereichs" in f.found
     # T16: der Passivport mit Befund steht in dessen Ampel, nicht grau.
     assert karte(data_for(JW), "217.243.248.28")["4433"] == ("SonicWall", f.status)
 
@@ -384,7 +399,8 @@ def test_jw_beast_vermutlich_abgeschwaecht_und_verwaiste_eintraege():
 
 def test_jw_zusaetzliche_dienste_mit_tls_zwang():
     f = befund(data_for(JW), "legacy_protocols_present")
-    assert f.title.startswith("Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen)")
+    # S6b-4n (spec/11 N15): Titelzusatz und Betreiber in einer Klammer.
+    assert f.title == "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen; beim Hoster Hetzner Online GmbH)"
     assert "älteres Übertragungsprotokoll" not in f.found
 
 
@@ -397,7 +413,8 @@ def test_he_8443_als_plattformhinweis():
 def test_ca_rollen_und_liesmich():
     data = data_for(CA)
     systeme = [o.system for o in data.business.observed]
-    assert "Anmeldung zur Website (ubb-wiki.castenow.de)" in systeme
+    # S6b-4n (spec/11 N14): Dienste aus dem Portscan auch auf dem geteilten System.
+    assert "Anmeldung zur Website, Dateiaustausch, Mailabruf und Einlieferung (ubb-wiki.castenow.de)" in systeme
     assert "Umfrageplattform (umfrageonline.com), leitet auf die Website weiter (umfrage.castenow.de)" in systeme
     assert any("liesmich.html der WordPress-Installation abrufbar" in n for n in data.architecture.notes)
     assert "X-Powered-By: PHP/8.4.25" in befund(data, "http_header_disclosure").affected
@@ -408,7 +425,9 @@ def test_hl_rolle_und_bildunterschriften():
     assert any(o.system.startswith("Dateiaustausch (FTP, SFTP), Webanwendung mit Anmeldung")
                for o in data.business.observed)
     bilder = {s.host: s.what for s in data.architecture.screens}
-    assert bilder["online.heuel.com"].endswith("(www.heuel.com)")
+    # S6b-4n (spec/11 N4): online leitet auf www (anderer Host) weiter; das Bild zeigt www und steht
+    # nur dort.
+    assert "online.heuel.com" not in bilder and "www.heuel.com" in bilder
     assert bilder["ose.heuel.com"] == "Webmodule (ose.heuel.com/webmodule-ee/login.seam)"
 
 
@@ -425,7 +444,8 @@ def test_bs_zertifikatsliste_einmal_und_reputation_mit_cdn():
     f = befund(data, "service_cert_expired")
     assert f.found.count("92.205.224.174:110") == 1 and "587" not in f.verify
     rep = next(p for p in data.positives if p.title == "Keine Einträge in Reputationsquellen")
-    assert "198.202.211.1" in rep.text
+    # S6b-4n (spec/11 N6): die geteilte CDN-Kante ist nicht kundenbezogen und steht nicht im Positivbefund.
+    assert "198.202.211.1" not in rep.text
 
 
 def test_db_dmarc_beim_dienstleister_und_p05_nur_bei_hardfail():

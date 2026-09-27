@@ -548,10 +548,23 @@ ROLE_DEFS: dict[str, tuple[str, str]] = {
         "Website",
         "Außendarstellung des Unternehmens. Betroffen wären vor allem Seiteninhalte und "
         "Formulareingaben."),
+    # S6b-4n (spec/11 N14): Name nach dem Fakt db_exposed, auch auf geteilten Systemen.
     "datenbank": (
-        "Datenbankdienst",
+        "Datenbanken erreichbar",
         "Datenbestände hinter den Anwendungen. Ein von außen erreichbarer Datenbankdienst ist ein "
         "direktes Ziel für Anmeldeversuche."),
+    # S6b-4n (spec/11 N14): Abruf (POP3, IMAP) und Einlieferung (Submission) aus bestätigten Mailports.
+    # Offene Abrufports belegen nicht, dass hier die Postfächer des Unternehmens liegen (spec/09 Q2,
+    # lumbeck-wolter: MX bei Microsoft 365); die Rolle erlaubt deshalb keine Mail-Rollenwörter.
+    "mail_dienste": (
+        "Mailabruf und Einlieferung",
+        "Über diesen Server lassen sich E-Mails abrufen oder einliefern. Mit erbeuteten Zugangsdaten "
+        "ist darüber die dort abgelegte E-Mail erreichbar."),
+    # S6b-4n (spec/11 N4): ein Name leitet auf einen anderen Host weiter; bewertet ist dort das Ziel.
+    "weiterleitung": (
+        "Weiterleitung",
+        "Unter diesem Namen liegt keine eigene Seite; er leitet auf einen anderen Host weiter, dessen "
+        "Inhalte dort bewertet sind."),
     "fernzugang": (
         "Fernzugang und Verwaltung",
         "Der Weg von außen in das Unternehmensnetz. Solche Zugänge sind das bevorzugte Ziel, weil "
@@ -577,7 +590,8 @@ ROLE_VARIANTS: dict[tuple[str, str], str] = {
 # Reihenfolge, in der Rollen genannt werden; die spezifischere zuerst.
 ROLE_ORDER: tuple[str, ...] = ("mail_kalender", "mail", "webmail", "passwort", "kollaboration",
                                "anmeldeportal", "redaktion", "fernzugang", "datenbank", "dateiaustausch",
-                               "plattform", "website", "webanwendung", "mail_versand")
+                               "mail_dienste", "plattform", "website", "webanwendung", "mail_versand",
+                               "weiterleitung")
 # S6b-4 (spec/11 Teil 3 CA): Art des Dienstes je Plattform-Domain; ohne Eintrag bleibt es bei
 # "Dienst eines Plattformanbieters".
 PLATFORM_SERVICES: dict[str, str] = {
@@ -616,4 +630,6 @@ ROLE_CATEGORIES: dict[str, frozenset[str]] = {
     "webanwendung": frozenset({"anmeldeportal"}),
     "plattform": frozenset(),
     "website": frozenset(),
+    "mail_dienste": frozenset(),
+    "weiterleitung": frozenset(),
 }

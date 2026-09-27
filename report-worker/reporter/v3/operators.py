@@ -38,6 +38,9 @@ class Operator:
     # S6b-4 (spec/11 T9): Rechenzentrum, wenn der Server laut rDNS einem anderen Betreiber
     # gehoert als dem Netzbetreiber (castenow 159.69.143.80: planwerk6.de bei Hetzner).
     datacenter: str = ""
+    # S6b-4n (spec/11 N11): Zaehlung je Quelle ("laut Passivquelle 2 weitere Domains und laut
+    # Zertifikat 1 weitere Domain"); castenow .53 zaehlte tonausstrom.de aus dem Zertifikat mit.
+    foreign_text: str = ""
 
     @property
     def key(self) -> str:
@@ -66,12 +69,13 @@ def operator_for(result: CheckResult, scope: str, hosts: dict[str, FS.HostFact])
         domains = SYS.foreign_domains(shared)
         quelle = ("Passivquelle" if "fremde_namen_shodan" in shared.signals
                   else "Zertifikat" if "fremde_namen_zertifikat" in shared.signals else "")
+        text, _ = SYS.foreign_domains_text(shared)
         if shared.server_operator:
             return Operator(kind=shared.kind, name=shared.server_operator,
                             foreign_count=len(domains), foreign_source=quelle,
-                            datacenter=shared.operator or "")
+                            datacenter=shared.operator or "", foreign_text=text)
         return Operator(kind=shared.kind, name=shared.operator or "",
-                        foreign_count=len(domains), foreign_source=quelle)
+                        foreign_count=len(domains), foreign_source=quelle, foreign_text=text)
     return None
 
 
@@ -91,7 +95,8 @@ def sentence(op: Operator) -> str:
         laut = f"laut {op.foreign_source} " if op.foreign_source else ""
         wort = "weitere Domain" if op.foreign_count == 1 else "weitere Domains"
         verb = "steht" if op.foreign_count == 1 else "stehen"
-        fremd = f" Auf demselben Server {verb} {laut}{op.foreign_count} {wort}."
+        text = op.foreign_text or f"{laut}{op.foreign_count} {wort}"
+        fremd = f" Auf demselben Server {verb} {text}."
     if op.datacenter:
         # castenow 159.69.143.80: rDNS yak.planwerk6.de im Netz von Hetzner.
         return (f"Dieser Sachverhalt liegt beim Betreiber des Servers: laut Reverse-DNS gehört der "

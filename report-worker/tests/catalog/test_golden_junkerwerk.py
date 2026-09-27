@@ -116,7 +116,8 @@ def test_alle_familien_der_soll_liste_gemappt():
 
 # S6b-4 (spec/11 T6, Teil 3 JW): Zusaetze, die aus den Rohdaten des einzelnen Laufs stammen
 # (Shodan-Datum je Lauf, testssl "likely mitigated" nur im Nachscan), sind keine Drift der Regel.
-_LAUF_ZUSATZ = re.compile(r", gesehen am \d{2}\.\d{2}\.\d{4}|, vermutlich abgeschwächt")
+# S6b-4n (spec/11 N15): ohne Zeitstempel des Dienstes "Hosteintrag aktualisiert am".
+_LAUF_ZUSATZ = re.compile(r", (?:gesehen|Hosteintrag aktualisiert) am \d{2}\.\d{2}\.\d{4}|, vermutlich abgeschwächt")
 
 
 def _member_table(out: CatalogOutput) -> dict[tuple[str, str], tuple[str, str]]:

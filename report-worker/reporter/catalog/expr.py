@@ -297,6 +297,33 @@ def f_rua_external(dns: Any, domains: Any) -> bool:
     return False
 
 
+def f_rua_own(dns: Any, domains: Any) -> bool:
+    """Geht eine DMARC-Meldeadresse an eine beauftragte Domain (spec/11 N7: bergersysteme
+    dmarc@bergersysteme.com neben der Adresse bei hornetdmarc.com)?"""
+    dmarc = getattr(dns, "dmarc", None)
+    doms = [str(d).rstrip(".").lower() for d in (domains or [])]
+    if dmarc is None or not doms:
+        return False
+    for addr in getattr(dmarc, "rua", None) or []:
+        host = str(addr).split("@")[-1].rstrip(".").lower()
+        if host and any(host == d or host.endswith("." + d) for d in doms):
+            return True
+    return False
+
+
+def f_dmarc_delegated(dns: Any) -> bool:
+    """``_dmarc`` per CNAME an einen Dienstleister uebertragen (spec/11 N7)."""
+    dmarc = getattr(dns, "dmarc", None)
+    return bool(dmarc is not None and getattr(dmarc, "delegated_to", None))
+
+
+def f_spf_has_mx(dns: Any) -> bool:
+    """Gibt der SPF-Eintrag die MX-Server mit ``mx`` als Absender frei (spec/11 N7, dortmund-beach)?"""
+    spf = getattr(dns, "spf", None)
+    return bool(spf is not None and any(getattr(m, "kind", "") == "mx" and getattr(m, "qualifier", "+") == "+"
+                                        for m in getattr(spf, "mechanisms", None) or []))
+
+
 def f_redirects_elsewhere(fqdn: Any) -> bool:
     """Endet der Aufruf eines Namens auf einem anderen Host (Weiterleitung)?"""
     if fqdn is None:
@@ -313,6 +340,8 @@ def f_redirects_elsewhere(fqdn: Any) -> bool:
 FUNCS: dict[str, Callable[..., Any]] = {
     "admin_fp": f_admin_fp, "any_admin_fp": f_any_admin_fp, "hosting_panel": f_hosting_panel, "panel_title": f_panel_title, "mx_in_own_zone": f_mx_in_own_zone,
     "redirects_elsewhere": f_redirects_elsewhere, "rua_external": f_rua_external,
+    # S6b-4n (spec/11 N7)
+    "rua_own": f_rua_own, "dmarc_delegated": f_dmarc_delegated, "spf_has_mx": f_spf_has_mx,
     "has_enrichment": f_has_enrichment,
     "len": f_len, "count": f_count, "any_in": f_any_in, "matches": f_matches, "any_match": f_any_match, "startswith": f_startswith,
     "contains": f_contains, "lower": f_lower, "ports": f_ports, "has_port": f_has_port,

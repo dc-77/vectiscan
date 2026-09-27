@@ -39,9 +39,13 @@ texts:
   observation: >-
     Der Dienst auf {group} gibt beim Verbindungsaufbau seine Produkt- und Versionskennung
     preis: {affected}.
-  meaning: >-
-    Eine sichtbare Versionskennung erleichtert die gezielte Suche nach bekannten Schwachstellen
-    für genau diese Version und beschleunigt damit die Vorbereitung eines Angriffs.
+  # S6b-4n (spec/11 N10): derselbe Baustein wie bei der Versionspreisgabe im HTTP-Header; im
+  # gemeinsamen Befund steht er einmal (junkerwerk VS-014).
+  meaning:
+    - key: versionskennung
+      text: >-
+        Eine sichtbare Versionskennung erleichtert die gezielte Suche nach bekannten Schwachstellen
+        für genau diese Version und beschleunigt damit die Vorbereitung eines Angriffs.
   recommendation:
     - stage: mittelfristig
       text: >-

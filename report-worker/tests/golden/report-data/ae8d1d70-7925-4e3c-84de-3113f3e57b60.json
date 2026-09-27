@@ -57,7 +57,7 @@
     "host": "212.227.60.78",
     "port": "106",
     "ref": "",
-    "svc": "TCPWRAPPED"
+    "svc": "Dienst ohne Antwort"
    },
    {
     "host": "212.227.60.78",
@@ -117,7 +117,7 @@
     "host": "85.22.47.38",
     "port": "25",
     "ref": "",
-    "svc": "SMTP, TLS erzwungen"
+    "svc": "SMTP, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "85.22.47.38",
@@ -129,7 +129,7 @@
     "host": "85.22.47.39",
     "port": "25",
     "ref": "VS-2026-018",
-    "svc": "Postfix smtpd, TLS erzwungen"
+    "svc": "Postfix smtpd, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "85.22.47.39",
@@ -183,7 +183,7 @@
     "host": "212.227.60.78",
     "port": "8880",
     "ref": "VS-2026-001",
-    "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
+    "svc": "Plesk, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "212.227.60.78",
@@ -224,20 +224,20 @@
   ],
   "tool_findings": [
    {
-    "count": 6,
+    "count": 3,
     "message": "BREACH",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
     "rule": "tls_weakness_reported",
-    "what": "„BREACH“, 6 Meldungen",
-    "where": "connect.securess.de, eset.securess.de, mailcleaner.securess.de, mx1.securess.de, openotp.securess.de, vermittler.securess.de"
+    "what": "„BREACH“, 3 Meldungen",
+    "where": "connect.securess.de, eset.securess.de, mailcleaner.securess.de"
    },
    {
-    "count": 7,
+    "count": 5,
     "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
     "rule": "tls_weakness_reported",
-    "what": "„LUCKY13“, 7 Meldungen",
-    "where": "eset.securess.de, login-kundenportal.securess.de, mailcleaner.securess.de, mx1.securess.de, openotp.securess.de, rdgw.securess.de und 1 weitere"
+    "what": "„LUCKY13“, 5 Meldungen",
+    "where": "eset.securess.de, login-kundenportal.securess.de, mailcleaner.securess.de, rdgw.securess.de, securess.de"
    },
    {
     "count": 1,
@@ -363,38 +363,6 @@
    },
    {
     "count": 1,
-    "message": "BREACH",
-    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
-    "rule": "tls_weakness_reported",
-    "what": "mx1.securess.de:443: BREACH (Hinweis der TLS-Analyse)",
-    "where": "mx1.securess.de"
-   },
-   {
-    "count": 1,
-    "message": "LUCKY13",
-    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
-    "rule": "tls_weakness_reported",
-    "what": "mx1.securess.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
-    "where": "mx1.securess.de"
-   },
-   {
-    "count": 1,
-    "message": "BREACH",
-    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
-    "rule": "tls_weakness_reported",
-    "what": "openotp.securess.de:443: BREACH (Hinweis der TLS-Analyse)",
-    "where": "openotp.securess.de"
-   },
-   {
-    "count": 1,
-    "message": "LUCKY13",
-    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
-    "rule": "tls_weakness_reported",
-    "what": "openotp.securess.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
-    "where": "openotp.securess.de"
-   },
-   {
-    "count": 1,
     "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
     "rule": "tls_weakness_reported",
@@ -408,14 +376,6 @@
     "rule": "tls_weakness_reported",
     "what": "securess.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "securess.de"
-   },
-   {
-    "count": 1,
-    "message": "BREACH",
-    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
-    "rule": "tls_weakness_reported",
-    "what": "vermittler.securess.de:443: BREACH (Hinweis der TLS-Analyse)",
-    "where": "vermittler.securess.de"
    },
    {
     "count": 1,
@@ -569,7 +529,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein noch gültiges Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen. Ein am Scantag bereits abgelaufenes Zertifikat an Diensten außerhalb der Webseiten (Mail, Datei, Verwaltung) folgt der Tabelle: Exposition erhöht, Gelb, In Kürze."
    },
    {
     "l": "Gelb",
@@ -589,9 +549,9 @@
   ]
  },
  "architecture": {
-  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 12 Systeme mit folgenden Aufgaben: Dateiaustausch, E-Mail-Server, E-Mail-Versand laut SPF, Fernzugang und Verwaltung und Webanwendung mit Anmeldung. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 12 Systeme mit folgenden Aufgaben: Dateiaustausch, E-Mail-Server, E-Mail-Versand laut SPF, Fernzugang und Verwaltung, Mailabruf und Einlieferung und Webanwendung mit Anmeldung. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
-   "Beobachtungen ohne Regeltreffer, nicht als Befund bewertet: 212.227.60.78:18018 laut Passivquelle, außerhalb des geprüften Portbereichs; 85.22.47.42:443 laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.42:5060 (STARFACE PBX) laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.42:80 laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.43:443 (Outlook Web App) laut Passivquelle, vom Portscan nicht bestätigt; Anmeldung vor STARTTLS angeboten (212.227.60.78:25, laut Passivquelle); Anmeldung vor STARTTLS angeboten (212.227.60.78:25); Anmeldung vor STARTTLS angeboten (85.22.47.39:587)."
+   "Beobachtungen ohne Regeltreffer, nicht als Befund bewertet: 212.227.60.78:18018 laut Passivquelle, außerhalb des geprüften Portbereichs; 85.22.47.42:443 laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.42:5060 (STARFACE PBX) laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.42:80 laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.43:443 (Outlook Web App) laut Passivquelle, vom Portscan nicht bestätigt; Anmeldung vor STARTTLS angeboten (212.227.60.78:25); Anmeldung vor STARTTLS angeboten (85.22.47.39:587)."
   ],
   "posture": [
    {
@@ -1415,7 +1375,7 @@
      },
      {
       "p": "106",
-      "s": "TCPWRAPPED",
+      "s": "Dienst ohne Antwort",
       "st": "gruen"
      },
      {
@@ -1455,7 +1415,7 @@
      },
      {
       "p": "8880",
-      "s": "HTTPS",
+      "s": "Plesk",
       "st": "rot"
      },
      {
@@ -1774,10 +1734,10 @@
      {
       "c": "Debian GNU/Linux",
       "conf": "hoch",
-      "note": "bis 30.06.2028 laut Debian",
+      "note": "in Langzeitpflege bis 30.06.2028 laut Debian",
       "src": "nmap",
       "st": "gruen",
-      "status": "in Langzeitpflege (LTS)",
+      "status": "LTS",
       "v": "12"
      },
      {
@@ -1847,14 +1807,18 @@
     "evidence": [
      "22/tcp ssh OpenSSH",
      "8443/tcp https-alt sw-cp-server",
-     "21/tcp ftp ProFTPD"
+     "21/tcp ftp ProFTPD",
+     "110/tcp Dovecot pop3d",
+     "143/tcp Dovecot imapd",
+     "993/tcp Dovecot imapd"
     ],
     "meaning": "Zugang zur Verwaltung dieses Servers. Solche Zugänge sind das bevorzugte Ziel, weil über sie der Server selbst und alle Dienste darauf gesteuert werden.",
     "role_keys": [
      "fernzugang",
-     "dateiaustausch"
+     "dateiaustausch",
+     "mail_dienste"
     ],
-    "system": "Fernzugang und Verwaltung, Dateiaustausch (connect.securess.de, partner.securess.de, vermittler.securess.de)"
+    "system": "Fernzugang und Verwaltung, Dateiaustausch, Mailabruf und Einlieferung (connect.securess.de, partner.securess.de, vermittler.securess.de)"
    },
    {
     "evidence": [
@@ -1879,10 +1843,16 @@
     "system": "Nicht näher bestimmbar (eset.securess.de, openotp.securess.de)"
    },
    {
-    "evidence": [],
-    "meaning": "Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte intern geklärt werden.",
-    "role_keys": [],
-    "system": "Nicht näher bestimmbar (imap.securess.de, mailcleaner.securess.de, mailin.securess.de)"
+    "evidence": [
+     "993/tcp Dovecot imapd",
+     "465/tcp SMTP über TLS",
+     "587/tcp SMTP"
+    ],
+    "meaning": "Über diesen Server lassen sich E-Mails abrufen oder einliefern. Mit erbeuteten Zugangsdaten ist darüber die dort abgelegte E-Mail erreichbar.",
+    "role_keys": [
+     "mail_dienste"
+    ],
+    "system": "Mailabruf und Einlieferung (imap.securess.de, mailcleaner.securess.de, mailin.securess.de)"
    },
    {
     "evidence": [],
@@ -1947,9 +1917,9 @@
     "admin_service_exposed_passive"
    ],
    "evidence": "nmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:8443/tcp · Dienst: https-alt · Produkt: sw-cp-server · Server-Kennung: sw-cp-server · Seitentitel: Plesk Obsidian 18.0.78 · Anmeldung verlangt: ja · TLS erzwungen: ja · Zertifikat für: cool-khorana.212-227-60-78.plesk.page · Aussteller: YR2 · gültig bis: 14.10.2026, 12:16 UTC\n\nShodan · phase0a/shodan_hosts.json\nQuelle: shodan · 212.227.60.78:8880 · Dienst gesehen am: 03.07.2026 · Banner (Auszug): HTTP/1.1 303 See Other Server: sw-cp-server Date: Fri, 03 Jul 2026 05:08:45 GMT Content-Type: text/html; charset=UTF-8",
-   "found": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 212.227.60.78:8443 (Plesk). Laut Passivquelle ist dieselbe Verwaltungsoberfläche auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) zusätzlich über einen weiteren Port erreichbar: 212.227.60.78:8880 (Plesk, laut Passivquelle, gesehen am 03.07.2026). Der Port liegt außerhalb des geprüften Portbereichs; der Portscan hat ihn nicht erfasst. Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung: 212.227.60.78:8443 (Plesk). Eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar.",
+   "found": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 212.227.60.78:8443 (Plesk) und laut Passivquelle 212.227.60.78:8880 (Plesk, gesehen am 03.07.2026, außerhalb des geprüften Portbereichs). Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung: 212.227.60.78:8443 (Plesk). Eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar.",
    "id": "VS-2026-001",
-   "impact": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft das gesamte System und alle Dienste darauf. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen. Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft das gesamte System und alle Dienste darauf.",
+   "impact": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft das gesamte System und alle Dienste darauf. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen.",
    "key": "admin_access/212.227.60.78/kunde",
    "level": "kritisch",
    "level_label": "kritisch",
@@ -1980,16 +1950,7 @@
       "212.227.60.78|212.227.60.78:8443"
      ],
      "statement": "short",
-     "text": "Verwaltungsoberfläche mit Anmeldung"
-    },
-    {
-     "check": "admin_service_exposed_passive",
-     "field": "title",
-     "members": [
-      "212.227.60.78|shodan:212.227.60.78:8880"
-     ],
-     "statement": "short",
-     "text": "Verwaltungsoberfläche laut Passivquelle"
+     "text": "Verwaltungsoberfläche Plesk auf 8443 und laut Passivquelle 8880"
     },
     {
      "check": "admin_service_exposed",
@@ -1998,25 +1959,7 @@
       "212.227.60.78|212.227.60.78:8443"
      ],
      "statement": "observation[0]",
-     "text": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 212.227.60.78:8443 (Plesk)."
-    },
-    {
-     "check": "admin_service_exposed_passive",
-     "field": "observation",
-     "members": [
-      "212.227.60.78|shodan:212.227.60.78:8880"
-     ],
-     "statement": "observation[1]",
-     "text": "Laut Passivquelle ist dieselbe Verwaltungsoberfläche auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) zusätzlich über einen weiteren Port erreichbar: 212.227.60.78:8880 (Plesk, laut Passivquelle, gesehen am 03.07.2026)."
-    },
-    {
-     "check": "admin_service_exposed_passive",
-     "field": "observation",
-     "members": [
-      "212.227.60.78|shodan:212.227.60.78:8880"
-     ],
-     "statement": "observation[3]",
-     "text": "Der Port liegt außerhalb des geprüften Portbereichs; der Portscan hat ihn nicht erfasst."
+     "text": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 212.227.60.78:8443 (Plesk) und laut Passivquelle 212.227.60.78:8880 (Plesk, gesehen am 03.07.2026, außerhalb des geprüften Portbereichs)."
     },
     {
      "check": "admin_service_exposed",
@@ -2055,15 +1998,6 @@
      "text": "Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen."
     },
     {
-     "check": "admin_service_exposed_passive",
-     "field": "meaning",
-     "members": [
-      "212.227.60.78|shodan:212.227.60.78:8880"
-     ],
-     "statement": "meaning[1]",
-     "text": "Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft das gesamte System und alle Dienste darauf."
-    },
-    {
      "check": "admin_service_exposed",
      "field": "verify",
      "members": [
@@ -2074,12 +2008,12 @@
     },
     {
      "check": "admin_service_exposed_passive",
-     "field": "verify",
+     "field": "observation_zusatz",
      "members": [
       "212.227.60.78|shodan:212.227.60.78:8880"
      ],
-     "statement": "verify[0]",
-     "text": "Verbindungsversuch auf den gemeldeten Port von einer externen Adresse; erwartet wird keine Verwaltungsanmeldung ohne Zugriffsbeschränkung."
+     "statement": "observation[1]",
+     "text": "und laut Passivquelle 212.227.60.78:8880 (Plesk, gesehen am 03.07.2026, außerhalb des geprüften Portbereichs)"
     },
     {
      "check": "admin_service_exposed",
@@ -2100,24 +2034,6 @@
      "text": "Prüfen, ob die Verwaltungsoberfläche eine Mehrfaktor-Anmeldung verlangt, und sie andernfalls aktivieren; Standardkonten deaktivieren oder umbenennen."
     },
     {
-     "check": "admin_service_exposed_passive",
-     "field": "recommendation",
-     "members": [
-      "212.227.60.78|shodan:212.227.60.78:8880"
-     ],
-     "statement": "recommendation[0]",
-     "text": "Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand."
-    },
-    {
-     "check": "admin_service_exposed_passive",
-     "field": "recommendation",
-     "members": [
-      "212.227.60.78|shodan:212.227.60.78:8880"
-     ],
-     "statement": "recommendation[1]",
-     "text": "Firmware gegen die Sicherheitshinweise des Herstellers abgleichen; lokale Benutzerkonten und Standardkonten prüfen."
-    },
-    {
      "check": "admin_service_exposed",
      "field": "recommendation",
      "members": [
@@ -2125,15 +2041,6 @@
      ],
      "statement": "recommendation[3]",
      "text": "Softwarestand der Verwaltungsoberfläche gegen die Sicherheitshinweise des Herstellers abgleichen und Anmeldeversuche überwachen."
-    },
-    {
-     "check": "admin_service_exposed_passive",
-     "field": "recommendation",
-     "members": [
-      "212.227.60.78|shodan:212.227.60.78:8880"
-     ],
-     "statement": "recommendation[3]",
-     "text": "Zugriff auf benötigte Quellnetze beschränken und Anmeldeversuche überwachen."
     }
    ],
    "recommendation": [
@@ -2146,20 +2053,8 @@
      "Prüfen, ob die Verwaltungsoberfläche eine Mehrfaktor-Anmeldung verlangt, und sie andernfalls aktivieren; Standardkonten deaktivieren oder umbenennen."
     ],
     [
-     "In Kürze",
-     "Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand."
-    ],
-    [
-     "In Kürze",
-     "Firmware gegen die Sicherheitshinweise des Herstellers abgleichen; lokale Benutzerkonten und Standardkonten prüfen."
-    ],
-    [
      "Mittelfristig",
      "Softwarestand der Verwaltungsoberfläche gegen die Sicherheitshinweise des Herstellers abgleichen und Anmeldeversuche überwachen."
-    ],
-    [
-     "Mittelfristig",
-     "Zugriff auf benötigte Quellnetze beschränken und Anmeldeversuche überwachen."
     ]
    ],
    "scale": "exposure",
@@ -2172,9 +2067,9 @@
     "admin_service_exposed|212.227.60.78:8443"
    ],
    "threat": null,
-   "title": "Verwaltungszugänge auf 212.227.60.78: Verwaltungsoberfläche mit Anmeldung und Verwaltungsoberfläche laut Passivquelle",
+   "title": "Verwaltungszugänge auf 212.227.60.78: Verwaltungsoberfläche Plesk auf 8443 und laut Passivquelle 8880",
    "urgency": "Unverzüglich",
-   "verify": "Verbindungsversuch auf den betroffenen Port von einer externen Adresse außerhalb der freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung. Verbindungsversuch auf den gemeldeten Port von einer externen Adresse; erwartet wird keine Verwaltungsanmeldung ohne Zugriffsbeschränkung."
+   "verify": "Verbindungsversuch auf den betroffenen Port von einer externen Adresse außerhalb der freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung."
   },
   {
    "affected": "212.227.60.78:110 (POP3 mit Anmeldung vor STARTTLS), 212.227.60.78:143 (IMAP mit Anmeldung vor STARTTLS)",
@@ -3265,7 +3160,7 @@
    "evidence": "header_check\nmailcleaner.securess.de · Cookie: SERVERID · ohne: Secure, HttpOnly, SameSite · Adresse: https://mailcleaner.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options\n\nheader_check\nmailin.securess.de · Cookie: SERVERID · ohne: Secure, HttpOnly, SameSite · Adresse: https://mailin.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options\n\nheader_check\nmailout.securess.de · Cookie: SERVERID · ohne: Secure, HttpOnly, SameSite · Adresse: https://mailout.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options\n\nheader_check\nmx1.securess.de · Cookie: SERVERID · ohne: Secure, HttpOnly, SameSite · Adresse: https://mx1.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options",
    "found": "Der Dienst 85.22.47.39 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mx1.securess.de. Auf 85.22.47.39 setzen Cookies nicht alle Sicherheits-Attribute: mailcleaner.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailin.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailout.securess.de (SERVERID: Secure, HttpOnly, SameSite), mx1.securess.de (SERVERID: Secure, HttpOnly, SameSite). Auf 85.22.47.39 ist keine Content-Security-Policy gesetzt: mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mx1.securess.de. Auf 85.22.47.39 fehlen einzelne Sicherheits-Header der Webseite: mailcleaner.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailin.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailout.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mx1.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-008",
-   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne das Attribut Secure kann ein Cookie auch über eine unverschlüsselte Verbindung übertragen werden. Ohne HttpOnly kann clientseitiges Skript auf das Cookie zugreifen, etwa nach einer erfolgreichen Einschleusung von Fremdinhalten. Ohne SameSite kann das Cookie bei Anfragen von anderen Seiten mitgesendet werden. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne das Attribut Secure kann ein Cookie auch über eine unverschlüsselte Verbindung übertragen werden. Ohne HttpOnly kann clientseitiges Skript auf das Cookie zugreifen, etwa nach einer erfolgreichen Einschleusung von Fremdinhalten. Ohne SameSite kann das Cookie bei Anfragen von anderen Seiten mitgesendet werden. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/85.22.47.39/kunde",
    "level": "mittel",
    "level_label": "mittel",
@@ -3474,7 +3369,7 @@
       "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
      ],
      "statement": "meaning[2]",
-     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
+     "text": "Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter."
     },
     {
      "check": "security_headers_incomplete",
@@ -3712,7 +3607,7 @@
    "evidence": "header_check\nwww.securess.de · Adresse: https://www.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options\n\nheader_check\nftp.securess.de · Adresse: https://ftp.securess.de · Antwort: 301 (Weiterleitung) · weitergeleitet auf: https://www.securess.de/ · Strict-Transport-Security: nicht gesetzt\n\nheader_check\nsecuress.de · Adresse: https://securess.de · Antwort: 301 (Weiterleitung) · weitergeleitet auf: https://www.securess.de/ · Strict-Transport-Security: nicht gesetzt",
    "found": "Der Dienst 85.22.47.41 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: ftp.securess.de, securess.de, www.securess.de. Auf www.securess.de ist keine Content-Security-Policy gesetzt: www.securess.de. Auf www.securess.de fehlen einzelne Sicherheits-Header der Webseite: www.securess.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-009",
-   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/85.22.47.41/kunde",
    "level": "mittel",
    "level_label": "mittel",
@@ -3862,7 +3757,7 @@
       "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
      ],
      "statement": "meaning[2]",
-     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
+     "text": "Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter."
     },
     {
      "check": "security_headers_incomplete",
@@ -4535,7 +4430,7 @@
    "evidence": "header_check\nconnect.securess.de · Adresse: https://connect.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Frame-Options",
    "found": "Auf connect.securess.de ist keine Content-Security-Policy gesetzt: connect.securess.de. Auf connect.securess.de fehlen einzelne Sicherheits-Header der Webseite: connect.securess.de (fehlend: X-Frame-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-014",
-   "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+   "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/212.227.60.78/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -4633,7 +4528,7 @@
       "connect.securess.de@212.227.60.78|connect.securess.de@212.227.60.78"
      ],
      "statement": "meaning[2]",
-     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
+     "text": "Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter."
     },
     {
      "check": "security_headers_incomplete",
@@ -5249,7 +5144,7 @@
     "key": "A",
     "level": 4,
     "name": "Perimeter-Exposition",
-    "note": "Verwaltungszugänge auf 212.227.60.78: Verwaltungsoberfläche mit Anmeldung und Verwaltungsoberfläche laut Passivquelle; Zugänge auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de): POP3 oder IMAP ohne TLS-Zwang",
+    "note": "Verwaltungszugänge auf 212.227.60.78: Verwaltungsoberfläche Plesk auf 8443 und laut Passivquelle 8880; Zugänge auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de): POP3 oder IMAP ohne TLS-Zwang",
     "status": "rot"
    },
    {
@@ -5315,9 +5210,9 @@
  },
  "landscape_lead": "18 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 67,
-  "catalog_digest": "bbd6dccec70f05898fcc9e7fbbb77f57bca528dd070683052c467e758681182a",
-  "catalog_version": "2026-09-27.1",
+  "after_fp": 64,
+  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
+  "catalog_version": "2026-09-27.2",
   "classification": "Vertraulich",
   "consolidated": 18,
   "context_fields": [],
@@ -5328,7 +5223,7 @@
    "securess.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.2.0",
+  "facts_schema_version": "1.3.0",
   "fqdns_total": 26,
   "generated_on": null,
   "generation": null,
@@ -5343,7 +5238,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.1",
+  "policy_version": "2026-09-27.2",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -5759,7 +5654,7 @@
       "85.22.47.46"
      ],
      "statement": "positive.text",
-     "text": "Die Hosts 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), beim Plattformbetreiber assfinetcloud.de, 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de und 4 weitere), 85.22.47.41 (ftp.securess.de, securess.de, www.securess.de) und 85.22.47.46 (rdgw.securess.de) bieten ihre Webdienste über HTTPS an."
+     "text": "Die Hosts 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de; beim Plattformbetreiber assfinetcloud.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de und 4 weitere), 85.22.47.41 (ftp.securess.de, securess.de, www.securess.de) und 85.22.47.46 (rdgw.securess.de) bieten ihre Webdienste über HTTPS an."
     }
    ],
    "subjects": [
@@ -5770,7 +5665,7 @@
     "85.22.47.41",
     "85.22.47.46"
    ],
-   "text": "Die Hosts 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), beim Plattformbetreiber assfinetcloud.de, 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de und 4 weitere), 85.22.47.41 (ftp.securess.de, securess.de, www.securess.de) und 85.22.47.46 (rdgw.securess.de) bieten ihre Webdienste über HTTPS an.",
+   "text": "Die Hosts 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de; beim Plattformbetreiber assfinetcloud.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de und 4 weitere), 85.22.47.41 (ftp.securess.de, securess.de, www.securess.de) und 85.22.47.46 (rdgw.securess.de) bieten ihre Webdienste über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
@@ -5934,7 +5829,7 @@
     "ip": "212.227.60.78",
     "more_ips": [],
     "operator": "IONOS SE",
-    "role": "Fernzugang und Verwaltung, Dateiaustausch"
+    "role": "Fernzugang und Verwaltung, Dateiaustausch, Mailabruf und Einlieferung"
    },
    {
     "cov": "teil",
@@ -5970,7 +5865,7 @@
     "ip": "85.22.47.39",
     "more_ips": [],
     "operator": "Securess Versicherungsmakler GmbH (85-22-47-39.ip.dokom21.de)",
-    "role": "Nicht näher bestimmbar"
+    "role": "Mailabruf und Einlieferung"
    },
    {
     "cov": "keine",
@@ -6108,7 +6003,7 @@
      "Reputation der Adressen"
     ],
     "code": "no_coverage_rows",
-    "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de), 85.22.47.41 (ftp.securess.de, securess.de, www.securess.de), 85.22.47.46 (rdgw.securess.de) und 1 weitere.",
+    "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de), 85.22.47.41 (ftp.securess.de, securess.de, www.securess.de), 85.22.47.46 (rdgw.securess.de), login-kundenportal.securess.de und 1 weitere.",
     "refs": [
      "admin_port_passive_unidentified|85.22.47.39",
      "admin_service_exposed_passive|85.22.47.39",
@@ -6181,7 +6076,6 @@
      "info_disclosure|webmail.securess.de@85.22.47.39",
      "info_disclosure|www.securess.de@85.22.47.41",
      "ip_reputation|212.227.60.78",
-     "ip_reputation|51.116.154.224",
      "ip_reputation|85.22.47.38",
      "ip_reputation|85.22.47.39",
      "ip_reputation|85.22.47.41",
@@ -6345,7 +6239,7 @@
      "Transportverschlüsselung"
     ],
     "code": "tls_partial",
-    "detail": "Betroffen: 212.227.60.78 (Port 21, 25, 110, 143, 465, 993, 995, 8443), 85.22.47.38 (Port 25), 85.22.47.39 (Port 25, 465, 587, 993). Geprüft wurde jeweils der Webdienst auf Port 443; die übrigen TLS-Dienste sind nur per Portscan erfasst, ihre Verschlüsselung und ihr Zertifikat sind nicht bewertet.",
+    "detail": "Betroffen: 212.227.60.78 (Ports 21, 25, 110, 143, 465, 993, 995, 8443: Protokolle und Verfahren nicht bewertet, Zertifikat aus dem Portscan), 85.22.47.38 (Port 25: Protokolle und Verfahren nicht bewertet, Zertifikat aus dem Portscan), 85.22.47.39 (Ports 25, 465, 587, 993: Protokolle und Verfahren nicht bewertet, Zertifikat aus dem Portscan). Geprüft wurde jeweils der Webdienst auf Port 443; die übrigen TLS-Dienste sind nur per Portscan erfasst.",
     "refs": [],
     "subjects": [
      "212.227.60.78",

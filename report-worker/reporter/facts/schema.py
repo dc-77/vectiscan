@@ -78,6 +78,21 @@ Historie:
   Passivbanner desselben Ports; ``CertRenewal`` beschreibt die Zertifikatslinie (gleiches
   Namensset und gleicher Aussteller) statt aller Zertifikate eines Namens (T14); ``HttpFact.hsts``
   wertet keine 4xx-, 429- oder Challenge-Antwort (T4).
+- 1.3.0 (S6b-4n, spec/11 N1 bis N15): keine neue Entitaet, Bedeutung geaendert, deshalb Minor.
+  ``HostFact.additional_ips`` fuehrt auch weitere A-Eintraege derselben Namen (N5);
+  ``HttpFact.hsts`` gilt nach E24 auch an einer Fehlerseite (4xx ausser 429), dort nur als gesetzt,
+  und hinter einer Sicherheitsabfrage nie aus der ersten Antwort von redirect_probe (N2);
+  ``HeaderMeasurement.evaluated`` ist redirect_probe nur mit eigener Endantwort (N3);
+  ``HttpFact.login_form`` nur fuer Anmeldeseiten desselben Namens (N4); Technik aus webtech und
+  CMS-Erkennung einer Adresse, deren Webnamen alle auf einen anderen Host weiterleiten, gehoert
+  dem Ziel (N4); ``TlsCert.valid_elsewhere`` nur fuer dieselbe Zertifikatslinie, dieselbe
+  Zustaendigkeit und aus testssl mit vollstaendiger Kette (N8). Neue optionale Felder:
+  ``Csp.script_rule`` (N1), ``HeaderMeasurement.final_response`` und ``client_redirect`` (N3),
+  ``Dmarc.delegated_to`` (N7), ``SoftwareFact.child_of`` (N9), ``SharedSystem.foreign_sources``
+  und ``ServiceFact.foreign_domain`` (N11), ``HttpFact.aspnet_source`` (N12),
+  ``CoverageFact.run_status`` und ``PathSearchFact.tool_reasons``, ``statistics`` (N13). Der
+  DNS-Fakt traegt den Nachweis des Zonentransfers je Domain (N6), ein Windows-Eintrag Shodan
+  ``os`` als zweite Quelle (N12).
 """
 from __future__ import annotations
 
@@ -85,7 +100,7 @@ from typing import Any, ClassVar, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-FACTS_SCHEMA_VERSION = "1.2.0"
+FACTS_SCHEMA_VERSION = "1.3.0"
 
 Mode = Literal["active", "passive"]
 
@@ -251,6 +266,9 @@ class SharedSystem(Base):
     foreign_names: list[str] = Field(default_factory=list)
     signals: list[str] = Field(default_factory=list)
     evidence: list[Evidence] = Field(default_factory=list)
+    # S6b-4n (spec/11 N11): registrierbare fremde Domains je Quelle ("passive": Hostnamen der
+    # Passivquelle, "certificate": Zertifikate), fuer die Zaehlung mit Quelle im Bericht.
+    foreign_sources: dict[str, list[str]] = Field(default_factory=dict)
 
 
 class ThirdParty(Base):
@@ -284,7 +302,9 @@ class AdditionalIp(Base):
 
     dnsx loest die Namen des Auftrags auch nach AAAA auf; der Scanner uebernimmt nur die
     A-Eintraege. Die Adresse gehoert zum System der IPv4-Adresse derselben Namen und ist
-    vom Pruefstand aus nicht geprueft."""
+    vom Pruefstand aus nicht geprueft. S6b-4n (spec/11 N5): auch weitere A-Eintraege eines
+    Namens, von denen der Scanner nur einen ins Inventar nahm (``family`` 4); testssl und httpx
+    koennen dort gemessen haben (``measured_ip``), der Portscan nicht."""
     ip: str
     family: Literal[4, 6]
     names: list[str] = Field(default_factory=list)
@@ -421,6 +441,9 @@ class ServiceFact(Fact):
     # (Zertifikat oder Stream-Kennung einer fremden Domain). Kein Dienst des Kunden; er
     # erscheint als Beobachtung beim Betreiber, nicht als Befund.
     foreign: Optional[bool] = None
+    # S6b-4n (spec/11 N11): die fremde Domain laut Zertifikat oder Kennung; ohne sie ist der Dienst
+    # kein belegter Dienst einer anderen Domain (castenow 8800, Icecast ohne Domain).
+    foreign_domain: Optional[str] = None
 
 
 class TlsCert(Base):
@@ -554,6 +577,9 @@ class Csp(Base):
     nonce_or_hash: Optional[bool] = None
     wildcard_directives: list[str] = Field(default_factory=list)
     frame_ancestors: Optional[str] = None
+    # S6b-4n (spec/11 N1): die Richtlinie regelt Skriptquellen (script-src oder default-src);
+    # eine CSP nur mit frame-ancestors schuetzt vor Einbettung, nicht vor fremden Skripten.
+    script_rule: Optional[bool] = None
 
 
 class Cookie(Base):
@@ -655,6 +681,15 @@ class HeaderMeasurement(Base):
     missing: list[str] = Field(default_factory=list)
     unknown: list[str] = Field(default_factory=list)
     framing_protected: Optional[bool] = None
+    # S6b-4n (spec/11 N3): die bewerteten Header stammen aus der Endantwort (header_check an einer
+    # Endseite, redirect_probe mit eigener Endantwort, testssl mit Status 200). False bei
+    # Teilbelegen (wpscan, ZAP je URL); redirect_probe speichert bei clientseitiger Weiterleitung
+    # die Header der ersten Antwort (heuel ose: gleicher ETag wie header_check), die gelten nicht.
+    final_response: Optional[bool] = None
+    # Die erste Antwort ist eine clientseitige Weiterleitung (Status 200, die Probe endet auf einer
+    # anderen Seite desselben Hosts mit anderem Titel); ``unknown`` ist dann nur an dieser
+    # Weiterleitungsseite gemessen.
+    client_redirect: Optional[bool] = None
 
 
 class HttpFact(Fact):
@@ -674,6 +709,9 @@ class HttpFact(Fact):
     x_feserver: Optional[str] = None
     # S6b-3 (spec/10 R9): X-AspNet-Version aus der ersten Antwort oder der Endseite.
     aspnet_version: Optional[str] = None
+    # S6b-4n (spec/11 N12): Werkzeug, das den Wert geliefert hat (header_check, redirect_probe,
+    # httpx); ohne Kopf in der Antwort nennt httpx die Version (castenow mail, mail2).
+    aspnet_source: Optional[str] = None
     duplicate_headers: list[str] = Field(default_factory=list)
     technologies: list[Tech] = Field(default_factory=list)
     forms: list[dict[str, Any]] = Field(default_factory=list)
@@ -717,6 +755,9 @@ class Dmarc(Base):
     ruf: list[str] = Field(default_factory=list)
     adkim: Optional[str] = None
     aspf: Optional[str] = None
+    # S6b-4n (spec/11 N7): ``_dmarc.<domain>`` zeigt per CNAME auf einen Dienstleister
+    # (bergersysteme: ``bergersysteme.com.dmarc.hornetdmarc.com``); die Richtlinie pflegt dann dieser.
+    delegated_to: Optional[str] = None
 
 
 class Dkim(Base):
@@ -833,6 +874,9 @@ class SoftwareFact(Fact):
     # S6b-4 (spec/11 T15): wpscan ``outdated`` und ``latest_version`` je Erweiterung.
     outdated: Optional[bool] = None
     latest_version: Optional[str] = None
+    # S6b-4n (spec/11 N9): Slug des Elternthemes, wenn dies ein Kindtheme ist; ein eigenes
+    # Kindtheme hat keine neueste Version im Verzeichnis, sein Stand folgt dem Elterntheme.
+    child_of: Optional[str] = None
 
 
 # ---------------------------------------------------------------- passive
@@ -885,6 +929,11 @@ class PathSearchFact(Fact):
     tools: dict[str, str] = Field(default_factory=dict)
     requests: Optional[int] = None
     hits: Optional[int] = None
+    # S6b-4n (spec/11 N13): Abbruchgrund je Werkzeug (Zeitlimit von ffuf neben einer belastbaren
+    # feroxbuster-Suche, dortmund-beach) und ob feroxbuster seine Abschlussstatistik schrieb
+    # (junkerwerk .29: am Zeitlimit ohne Statistik beendet).
+    tool_reasons: dict[str, str] = Field(default_factory=dict)
+    statistics: Optional[bool] = None
 
 
 # ---------------------------------------------------------------- coverage
@@ -903,6 +952,8 @@ class CoverageFact(Fact):
     duration_ms: Optional[int] = None
     # S6b-3 (spec/10 R3): Ziel des Laufs laut Rohausgabe (zap_active ``target``).
     target: Optional[str] = None
+    # S6b-4n (spec/11 N13): Abschluss des Laufs laut Rohausgabe (zap_active ``status: complete``).
+    run_status: Optional[str] = None
 
 
 # ---------------------------------------------------------------- threat

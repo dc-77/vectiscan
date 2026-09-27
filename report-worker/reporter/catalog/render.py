@@ -30,6 +30,7 @@ ITEM_VARS: dict[str, tuple[str, ...]] = {
     "fqdn": ("fqdn", "host_ip", "title", "http_status", "final_url", "waf_name", "host_label", "year_hint_names"),
     "http": ("fqdn", "host_ip", "url", "score", "missing_headers", "missing_headers_basic", "server_header", "powered_by",
              "disclosure_headers", "hsts_max_age", "csp_flags", "duplicate_headers", "x_feserver", "wp_users",
+             "wp_users_text",
              "wp_version_status", "host_label"),
     "http.alerts": ("fqdn", "host_ip", "plugin_id", "name", "risk", "confidence", "url_path", "count",
                     "host_label", "run_label"),
@@ -40,13 +41,14 @@ ITEM_VARS: dict[str, tuple[str, ...]] = {
             "valid_elsewhere"),
     "tls.vulns": ("fqdn", "host_ip", "port", "name", "status", "host_label", "target", "name_label"),
     "dns": ("domain", "spf_raw", "spf_qualifier", "dmarc_p", "dmarc_raw", "mx", "mx_count", "ns", "dkim_selectors",
-            "spf_shared_hosts", "dkim_selector_note", "dmarc_rua"),
+            "spf_shared_hosts", "dkim_selector_note", "dmarc_rua", "dmarc_rua_own", "dmarc_rua_foreign",
+            "dmarc_delegated_to"),
     "dns.dangling_cnames": ("domain", "fqdn", "cname_target", "takeover_risk"),
     "software": ("host_ip", "fqdn", "product", "family", "kind", "version", "build", "edition", "eol_date", "eol_status",
                  "lifecycle_text",
                  "host_label", "vulnerabilities_count", "target_versions"),
     "passive": ("host_ip", "port", "product", "version", "source", "seen_at", "domain", "host_label",
-                "product_or_banner", "login_url", "seen_date"),
+                "product_or_banner", "login_url", "seen_date", "seen_text"),
     "threat": ("cve_id", "host_ip", "port", "cvss", "epss", "kev", "product", "version", "host_label"),
     "target": ("domain", "expires_at", "registrar", "days_left"),
 }
@@ -54,10 +56,12 @@ ITEM_VARS: dict[str, tuple[str, ...]] = {
 # Variablen fuer texts.observation (Gruppenebene).
 OBSERVATION_VARS: tuple[str, ...] = ("affected", "count", "group", "fqdn_names", "domain", "host_ip", "notes",
                                      "n", "m", "missing_header_names", "passed", "valid_elsewhere",
-                                     "target_versions", "dmarc_rua", "mx")
+                                     "target_versions", "dmarc_rua", "mx", "dmarc_rua_own", "dmarc_rua_foreign",
+                                     "dmarc_delegated_to", "version_headers", "feserver_names", "cert_summary", "shared_domains")
 # S6b-4 (spec/11 T12, T14): Item-Werte, die die Engine ueber die fehlgeschlagenen Mitglieder einer
 # Gruppe sammelt und als Gruppenvariable in Texte gibt.
-COLLECT_VARS: tuple[str, ...] = ("valid_elsewhere", "target_versions", "dmarc_rua", "mx")
+COLLECT_VARS: tuple[str, ...] = ("valid_elsewhere", "target_versions", "dmarc_rua", "mx", "dmarc_rua_own",
+                                  "dmarc_rua_foreign", "dmarc_delegated_to", "version_headers", "feserver_names", "cert_summary", "shared_domains")
 
 # S6b-3 (spec/10 R2): Anzeigenamen der Sicherheits-Header im Kundentext.
 HEADER_NAMES = {
@@ -155,6 +159,8 @@ _BANNER_PRODUCTS: tuple[tuple[str, str], ...] = (
     ("sonicwall", "SonicWall"), ("fortigate", "FortiGate"), ("fortinet", "Fortinet"),
     ("cpanel", "cPanel"), ("portainer", "Portainer"), ("proxmox", "Proxmox"),
     ("froxlor", "froxlor"), ("directadmin", "DirectAdmin"), ("ispconfig", "ISPConfig"),
+    # S6b-4n (spec/11 N15): Standardports der CDN-Kante mit "Server: cloudflare" im Banner.
+    ("server: cloudflare", "Cloudflare"),
 )
 
 
@@ -213,7 +219,10 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
                   "version": _version_of(sw.version_norm if sw else None, o.version_norm), "family": o.family,
                   "db_name": T.DB_PORTS.get(o.port), "admin_name": T.ADMIN_PORTS.get(o.port),
                   "mail_name": T.MAIL_PORTS.get(o.port), "legacy_name": T.LEGACY_PORTS.get(o.port),
-                  "tls_note": "TLS erzwungen" if o.tls_required is True else ("STARTTLS" if o.starttls is True else ""),
+                  # S6b-4n (spec/11 N15): mit STARTTLS "Anmeldung erst nach STARTTLS".
+                  "tls_note": ("Anmeldung erst nach STARTTLS" if o.tls_required is True and o.starttls is True
+                               else "TLS erzwungen" if o.tls_required is True
+                               else ("STARTTLS" if o.starttls is True else "")),
                   # S6b-3 (spec/10 R9, R14): Kennung aus der Antwort des Dienstes; ohne Kennung
                   # "nicht identifiziert", nie der geratene nmap-Portname.
                   # MariaDB meldet sich im Handshake als "5.5.5-10.11.18-MariaDB" (Negativ-Fixture
@@ -222,7 +231,12 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
                                     or ("nicht identifiziert" if o.unidentified else (product or o.service))),
                   "cert_validity_text": validity_text(o.cert, index.report_date) if o.cert else None,
                   "cert_cn": o.cert.cn if o.cert else None,
-                  "cert_issuer": o.cert.issuer if o.cert else None})
+                  "cert_issuer": o.cert.issuer if o.cert else None,
+                  # S6b-4n (spec/11 N10): das Zertifikat einmal fuer alle Ports (bergersysteme VS-003).
+                  "cert_summary": ([f"Zertifikat {o.cert.cn}, {validity_text(o.cert, index.report_date)}"]
+                                   if o.cert and o.cert.cn else []),
+                  # S6b-4n (spec/11 N10, N11): weitere Domains des geteilten Servers je Quelle.
+                  "shared_domains": _shared_domains(index, ip)})
     elif scope == "host":
         rep = o.reputation
         v.update({"ports_list": sorted(s.port for s in index.services_by_ip.get(o.ip, [])), "reverse": o.reverse,
@@ -249,11 +263,18 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
         disclosure = [f"{k}: {val}" for k, val in (("Server", o.server_header), ("X-Powered-By", o.powered_by),
                                                      ("X-AspNet-Version", o.aspnet_version),
                                                      ("X-FEServer", o.x_feserver)) if val]
+        # S6b-4n (spec/11 N10): X-FEServer ist ein interner Servername, keine Version.
+        version = [f"{k}: {val}" for k, val in (("Server", o.server_header), ("X-Powered-By", o.powered_by),
+                                                  ("X-AspNet-Version", o.aspnet_version)) if val]
+        v.update({"version_headers": [f"{item.fqdn or ip} ({', '.join(version)})"] if version else [],
+                  "feserver_names": [f"{item.fqdn or ip} (X-FEServer: {o.x_feserver})"] if o.x_feserver else []})
         v.update({"url": o.url, "score": o.score, "missing_headers": missing, "missing_headers_basic": missing_basic,
                   "disclosure_headers": disclosure, "server_header": o.server_header,
                   "powered_by": o.powered_by, "hsts_max_age": o.hsts.max_age if o.hsts else None,
                   "csp_flags": csp_flags, "duplicate_headers": o.duplicate_headers, "x_feserver": o.x_feserver,
                   "wp_users": o.wordpress.users if o.wordpress else [],
+                  # S6b-4n (E25, spec/11 N15): Anmeldenamen in Personenform nur als Anzahl und Fundweg.
+                  "wp_users_text": wp_users_text(o.wordpress),
                   "wp_version_status": o.wordpress.version_status if o.wordpress else None})
     elif scope == "http.alerts":
         from reporter.catalog.scope import _url_path
@@ -299,6 +320,10 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
                   "dkim_selectors": o.dkim.selectors if o.dkim else [],
                   # S6b-4 (spec/11 Teil 3 DB): Meldeadressen ohne "mailto:".
                   "dmarc_rua": [str(a).split(":", 1)[-1] for a in (o.dmarc.rua if o.dmarc else [])],
+                  # S6b-4n (spec/11 N7): Meldeadressen je eigener und fremder Domain getrennt.
+                  "dmarc_rua_own": _rua_split(o, index, eigene=True),
+                  "dmarc_rua_foreign": _rua_split(o, index, eigene=False),
+                  "dmarc_delegated_to": [o.dmarc.delegated_to] if o.dmarc and o.dmarc.delegated_to else [],
                   # S6b-4 (spec/11 Teil 3 JW): die gefundenen Selektoren im Positivbefund.
                   "dkim_selector_note": _selector_note(o.dkim.selectors if o.dkim else []),
                   # S6b-3 (spec/10 R19): freigegebene geteilte Server mit Betreiber.
@@ -306,21 +331,28 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
     elif scope == "dns.dangling_cnames":
         v.update({"fqdn": o.fqdn, "cname_target": o.cname_target, "takeover_risk": o.takeover_risk})
     elif scope == "software":
-        v.update({"product": o.product, "family": o.family, "kind": o.kind, "version": _version_of(o.version_norm, o.version_raw),
+        v.update({"product": product_name(o), "family": o.family, "kind": o.kind,
+                  "version": _version_of(o.version_norm, o.version_raw),
                   "build": o.build, "edition": o.edition, "eol_date": date_de(o.eol.date) if o.eol.date else o.eol.date, "eol_status": o.eol.status,
                   # S6b-3 (spec/10 R6): Lebenszyklus mit Datum und Quelle je Produkt.
                   "lifecycle_text": lifecycle_text(o.eol),
                   "vulnerabilities_count": o.vulnerabilities_count,
-                  # S6b-4 (spec/11 T12): Zielversion laut wpscan (aktuelle Version, mindestens die
-                  # hoechste "behoben in"-Version der genannten Schwachstellen).
-                  "target_versions": [f"{o.product} {z}"] if (z := target_version(o)) else []})
+                  # S6b-4n (spec/11 N9): "fehlerbereinigt ab" (hoechstes "behoben in") getrennt von
+                  # "neueste laut wpscan"; liegt die Bereinigung ueber der neuesten Version, ist das
+                  # Verzeichnis von wpscan veraltet.
+                  "target_versions": [z] if (z := target_text(o)) else []})
     elif scope == "passive":
         v.update({"product": o.product, "version": o.version, "source": o.source, "seen_at": (o.seen_at or "")[:10] or None,
                   "domain": o.domain, "product_or_banner": o.product or banner_product(o.banner_excerpt),
                   # Adresse ohne Abfrageteil: Parameter sind kein Beleg und tragen "?" in den Text.
                   "login_url": (str((o.details or {}).get("login_over_http")).split("?")[0]
                                 if (o.details or {}).get("login_over_http") else None),
-                  "seen_date": date_de(o.service_seen_at or o.seen_at)})
+                  "seen_date": date_de(o.service_seen_at or o.seen_at),
+                  # S6b-4n (spec/11 N15): ohne Zeitstempel des Dienstes ist das Datum die letzte
+                  # Aktualisierung des Hosteintrags bei der Quelle, nicht "gesehen am".
+                  "seen_text": (f"gesehen am {date_de(o.service_seen_at)}" if o.service_seen_at
+                                else f"Hosteintrag aktualisiert am {date_de(o.seen_at)}"
+                                if o.seen_at else "ohne Datum")})
     elif scope == "threat":
         sw = item.ctx.get("software")
         v.update({"cve_id": o.cve_id, "cvss": o.cvss_nvd.score if o.cvss_nvd else None,
@@ -341,6 +373,50 @@ def likely_mitigated(tls: Any, name: str) -> bool:
     return bool(eintrag and eintrag.finding and "likely mitigated" in eintrag.finding.lower())
 
 
+def _shared_domains(index: FactsIndex, ip: str | None) -> list[str]:
+    """"Auf dem Server liegen laut Passivquelle 2 weitere Domains" (spec/11 N10, N11); leer ohne
+    Fakt. Vorher stand "laut Zertifikat oder Passivquelle weitere Domains" ohne Zertifikatsfakt
+    und im Plural neben "1 weitere Domain"."""
+    from reporter.facts.systems import foreign_domains_text
+    host = index.hosts_by_ip.get(ip or "")
+    text, n = foreign_domains_text(host.shared if host is not None else None)
+    if not n:
+        return []
+    return [f"Auf dem Server {'liegt' if n == 1 else 'liegen'} {text}"]
+
+
+def _spf_label_domains(h: Any) -> str:
+    from reporter.facts.systems import foreign_domains_text
+    text, _ = foreign_domains_text(h.shared if h is not None else None)
+    return f", {text}" if text else ""
+
+
+def wp_users_text(wp: Any) -> str:
+    """"2 Anmeldenamen, gefunden über /wp-json/wp/v2/users" (Entscheidung E25): der Bericht geht an
+    Hoster und Agentur weiter; die Namen selbst bleiben in den Rohdaten."""
+    if wp is None or not getattr(wp, "users", None):
+        return ""
+    n = len(wp.users)
+    text = f"{n} {'Anmeldename' if n == 1 else 'Anmeldenamen'}"
+    wege = [str(w) for w in (getattr(wp, "users_found_by", None) or [])][:3]
+    if wege:
+        text += ", gefunden über " + ", ".join(wege)
+    return text
+
+
+def _rua_split(dns: Any, index: FactsIndex, *, eigene: bool) -> list[str]:
+    """Meldeadressen der eigenen (``eigene``) oder fremder Domains, ohne "mailto:" (spec/11 N7)."""
+    doms = [str(d).rstrip(".").lower() for d in (index.facts.scan.domains or [index.facts.scan.domain]) if d]
+    out: list[str] = []
+    for addr in (dns.dmarc.rua if dns.dmarc else []):
+        adresse = str(addr).split(":", 1)[-1]
+        host = adresse.split("@")[-1].rstrip(".").lower()
+        eigen = any(host == d or host.endswith("." + d) for d in doms)
+        if eigen == eigene:
+            out.append(adresse)
+    return out
+
+
 def _selector_note(selectors: list[str]) -> str:
     if not selectors:
         return ""
@@ -355,12 +431,13 @@ def _spf_shared_label(dns: Any, index: FactsIndex) -> list[str]:
         h = index.hosts_by_ip.get(ip)
         shared = h.shared if h is not None else None
         # S6b-4 (spec/11 T9): Betreiber des Servers laut rDNS vor dem Netzbetreiber.
+        weitere = _spf_label_domains(h)
         if shared is not None and shared.server_operator:
             dc = f" im Rechenzentrum {shared.operator}" if shared.operator else ""
-            out.append(f"{ip}, Server von {shared.server_operator}{dc}")
+            out.append(f"{ip}, Server von {shared.server_operator}{dc}{weitere}")
             continue
         op = shared.operator if shared is not None else None
-        out.append(f"{ip} beim Hoster {op}" if op else ip)
+        out.append((f"{ip} beim Hoster {op}" if op else ip) + weitere)
     return out
 
 
@@ -378,8 +455,10 @@ def lifecycle_text(eol: Any) -> Optional[str]:
     if eol.status == "supported":
         if datum and quelle and getattr(eol, "lts_since", None):
             # S6b-4 (spec/11 T11): in der LTS-Phase nicht "aktuell", sondern Langzeitpflege.
+            # S6b-4n (spec/11 N9, N15): Wortlaut wie die Hinweisspalte in 3.1, ohne zweite Klammer
+            # hinter der Version ("Debian GNU/Linux 12 (in Langzeitpflege bis ...)").
             herausgeber = quelle.replace(" LTS", "")
-            return f"in Langzeitpflege (LTS) bis {datum} laut {herausgeber}"
+            return f"in Langzeitpflege bis {datum} laut {herausgeber}"
         if datum and quelle:
             return f"Herstellerpflege bis {datum} laut {quelle}"
         return f"gepflegt laut {quelle}" if quelle else "gepflegt"
@@ -395,6 +474,49 @@ def mariadb_label(o: Any) -> Optional[str]:
 def _vkey(v: str) -> tuple:
     import re as _re
     return tuple(int(x) if x.isdigit() else 0 for x in _re.split(r"[.\-+]", str(v)) if x)
+
+
+def product_name(sw: Any) -> str:
+    """Produktname statt Slug (spec/11 N9): "Slider Revolution" statt "revslider"."""
+    return T.PRODUCT_NAMES.get(getattr(sw, "family", "") or "", getattr(sw, "product", "") or "")
+
+
+def fixed_version(sw: Any) -> Optional[str]:
+    """Hoechste Version, in der eine laut wpscan genannte Schwachstelle behoben ist."""
+    werte = [x.fixed_in for x in (getattr(sw, "vulnerabilities", None) or []) if x.fixed_in]
+    return max(werte, key=_vkey) if werte else None
+
+
+def wpscan_directory_stale(sw: Any) -> bool:
+    """Liegt die Fehlerbereinigung ueber der neuesten Version laut wpscan (dortmund-beach revslider:
+    behoben in 6.7.38, neueste 6.7.35)? Dann ist das Verzeichnis von wpscan veraltet."""
+    fix, latest = fixed_version(sw), getattr(sw, "latest_version", None)
+    return bool(fix and latest and _vkey(fix) > _vkey(latest))
+
+
+def version_parts(sw: Any) -> list[str]:
+    """"fehlerbereinigt ab 6.7.38", "neueste laut wpscan 6.7.35" (spec/11 N9); gleiche Werte stehen
+    einmal ("neueste und fehlerbereinigte Version laut wpscan 7.5.5")."""
+    fix, latest = fixed_version(sw), getattr(sw, "latest_version", None)
+    if fix and latest and _vkey(fix) == _vkey(latest):
+        return [f"neueste und fehlerbereinigte Version laut wpscan {latest}"]
+    teile = []
+    if fix:
+        teile.append(f"fehlerbereinigt ab {fix}")
+    if latest:
+        teile.append(f"neueste laut wpscan {latest}")
+    return teile
+
+
+def target_text(sw: Any) -> Optional[str]:
+    """"Slider Revolution fehlerbereinigt ab 6.7.38, neueste laut wpscan 6.7.35 (Verzeichnis von
+    wpscan veraltet)" (spec/11 N9)."""
+    teile = version_parts(sw)
+    if not teile:
+        return None
+    if wpscan_directory_stale(sw):
+        teile.append("Verzeichnis von wpscan veraltet")
+    return f"{product_name(sw)} ({', '.join(teile)})"
 
 
 def target_version(sw: Any) -> Optional[str]:
@@ -439,7 +561,9 @@ def group_vars(group: Group, labels: list[str], notes: list[str],
     out = {"affected": labels, "count": len(labels), "group": group.label, "fqdn_names": group.fqdn_names,
            "domain": group.domain or "", "host_ip": group.host.ip if group.host else "", "notes": notes,
            "n": Numerus(1), "m": Numerus(len(labels)), "missing_header_names": [], "passed": [],
-           "valid_elsewhere": [], "target_versions": [], "dmarc_rua": [], "mx": []}
+           "valid_elsewhere": [], "target_versions": [], "dmarc_rua": [], "mx": [], "dmarc_rua_own": [],
+           "dmarc_rua_foreign": [], "dmarc_delegated_to": [], "version_headers": [], "feserver_names": [],
+           "cert_summary": [], "shared_domains": []}
     out.update(extra or {})
     return out
 

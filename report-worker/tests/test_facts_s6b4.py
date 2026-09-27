@@ -46,8 +46,9 @@ def service(order: str, ip: str, port: int) -> S.ServiceFact:
 
 
 def test_schema_1_2_0():
-    assert S.FACTS_SCHEMA_VERSION == "1.2.0"
-    assert all(facts(o).schema_version == "1.2.0" for o in (DB, LW, JW, HE, BS, CA, HL))
+    # S6b-4n: Schema 1.3.0 (tests/test_facts_s6b4n.py); 1.2.0 steht in der Historie.
+    assert "1.2.0" in S.__doc__ or "1.2.0" in open(S.__file__, encoding="utf-8").read()
+    assert all(facts(o).schema_version == S.FACTS_SCHEMA_VERSION for o in (DB, LW, JW, HE, BS, CA, HL))
 
 
 # ---------------------------------------------------------------- T1 Kennung
@@ -191,7 +192,9 @@ def test_erneuerungslinie_je_aussteller():
 
 def test_gueltiges_zertifikat_desselben_namens_an_anderer_adresse():
     t = next(t for t in facts(CA).tls if t.fqdn == "mailstore.castenow.de")
-    assert t.cert.valid_elsewhere == ["195.50.179.4:443", "195.50.179.6:443"]
+    # S6b-4n (spec/11 N8): .6 liefert eine unvollstaendige Kette (Chain of trust NOT ok) und ist
+    # keine Vorlage mehr.
+    assert t.cert.valid_elsewhere == ["195.50.179.4:443"]
     assert t.cert.valid_elsewhere_not_after.startswith("2027-03-14")
 
 

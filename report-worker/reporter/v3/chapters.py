@@ -243,8 +243,24 @@ def dkim_selectors_for_appendix(facts: FS.Facts, output: CatalogOutput) -> list[
     return sorted(out)
 
 
+def passive_only_findings(facts: FS.Facts, findings: list[Finding] | None) -> list[str]:
+    """Befunde, deren Subjekte alle auf Hosts liegen, die vom Pruefstand aus nicht erreichbar sind
+    (E4); sie beruhen allein auf der Passivquelle (spec/11 N13, bergersysteme VS-004, -006, -012)."""
+    e4 = {h.ip for h in facts.hosts if h.reach is not None and h.reach.status == "unreachable_from_scanner"}
+    out: list[str] = []
+    for f in findings or []:
+        ips = set()
+        for eintrag in f.subjects or []:
+            sub = eintrag.partition("|")[2]
+            v4 = re.search(r"\d{1,3}(?:\.\d{1,3}){3}", sub)
+            ips.add(sub.rsplit("@", 1)[1] if "@" in sub else (v4.group(0) if v4 else sub))
+        if ips and ips <= e4:
+            out.append(f.id)
+    return out
+
+
 def limitations(facts: FS.Facts, output: CatalogOutput,
-                model: COV.Model | None = None) -> list[Limitation]:
+                model: COV.Model | None = None, findings: list[Finding] | None = None) -> list[Limitation]:
     """Einschraenkungen: eine Zeile je Ursache mit Pruefungsnamen (spec/09 Q10)."""
     model = model or COV.build_model(facts)
     zusatz: list[str] = []
@@ -256,7 +272,8 @@ def limitations(facts: FS.Facts, output: CatalogOutput,
             zusatz.append(text)
         return DKIM_WHAT
 
-    rows = COV.limitations(facts, output, model, dkim_text=dkim)
+    rows = COV.limitations(facts, output, model, dkim_text=dkim,
+                           passive_ids=passive_only_findings(facts, findings))
     for row in rows:
         if row.what == DKIM_WHAT and zusatz:
             row.detail = f"{row.detail} {' '.join(zusatz)}".strip()
@@ -285,8 +302,27 @@ def patch_bewertbar(facts: FS.Facts | None) -> bool:
                for sw in facts.software)
 
 
+# S6b-4n (spec/11 N6): Kategorien, deren Ampel eine Messung ihrer Faktenfamilie braucht, und die
+# Pruefungen, die dann "nicht moeglich" waren.
+MEASURED_CATEGORIES: dict[str, str] = {
+    "C": "Prüfung der E-Mail-Authentizität",
+    "D": "Prüfung von Transportverschlüsselung und Sicherheits-Headern",
+}
+
+
+def category_measured(output: CatalogOutput | None, key: str) -> bool:
+    """Hat mindestens eine Regel der Kategorie gemessen (fehlgeschlagen oder Positivbedingung
+    getroffen) und gehoert zu einer Faktenfamilie? Ohne Katalogausgabe gilt ja."""
+    if output is None:
+        return True
+    from reporter.catalog.families import family_of
+    return any(r.category == key and r.kind == "check" and family_of(r.check_id)
+               and (r.status == "fail" or r.affirmed) for r in output.results)
+
+
 def build_glance(items: list[Consolidated], findings: list[Finding], counts: N.Counts,
-                 gap_systems: list[list[str]], facts: FS.Facts | None = None) -> Glance:
+                 gap_systems: list[list[str]], facts: FS.Facts | None = None,
+                 output: CatalogOutput | None = None) -> Glance:
     by_cat: dict[str, list[Finding]] = {}
     for f in findings:
         by_cat.setdefault(f.cat, []).append(f)
@@ -299,6 +335,11 @@ def build_glance(items: list[Consolidated], findings: list[Finding], counts: N.C
             status = "grau"
             note = ("Nicht bewertbar: zu keiner erkannten Serversoftware liegt eine Version mit "
                     "Lebenszyklusangabe vor")
+        elif key in MEASURED_CATEGORIES and not group and not category_measured(output, key):
+            # S6b-4n (spec/11 N6): lumbeck-wolter Kategorie D war "GRÜN, 0 Befunde", obwohl weder
+            # TLS noch Header gemessen werden konnten.
+            status = "grau"
+            note = f"Nicht bewertbar: {MEASURED_CATEGORIES[key]} nicht möglich, siehe 2.2"
         categories.append(GlanceCategory(
             key=key, name=CATEGORY_NAMES[key], status=status,
             level=L.BAR_BY_STATUS[status], note=note))
@@ -429,13 +470,18 @@ def _shared_hint(host: FS.HostFact) -> str:
         return ""
     if host.shared.kind == "platform":
         return f"Plattform {host.shared.operator}" if host.shared.operator else "Plattform eines Anbieters"
+    # S6b-4n (spec/11 N11): Betreiber des Servers laut rDNS und Standardzertifikat und die Quelle,
+    # die das Teilen belegt (castenow .80: "Server von planwerk6.de, laut Passivquelle geteilt").
+    if host.shared.server_operator:
+        quelle = ("Passivquelle" if "fremde_namen_shodan" in host.shared.signals else "Zertifikat")
+        return f"Server von {host.shared.server_operator}, laut {quelle} geteilt"
     return "geteiltes System beim Hoster"
 
 
 # ---------------------------------------------------------------- Kapitel 2
 
 def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
-                model: COV.Model) -> Scope:
+                model: COV.Model, findings: list[Finding] | None = None) -> Scope:
     hosts: list[ScopeHost] = []
     for members in _systems(facts):
         lead = members[0]
@@ -473,10 +519,17 @@ def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
             operator=operator, role="Drittanbieter", coverage=model.hosts[host.ip].text, cov="extern"))
     # S6b-3 (spec/10 R5): gefundene Namen eines Drittanbieters (Microsoft 365 Autodiscover),
     # die nicht ins Inventar kamen, stehen als "Drittanbieter, nicht geprüft".
+    # S6b-4n (spec/11 N11): die Zuordnung stammt aus Namensaufloesung (und SPF), nicht aus AbuseIPDB;
+    # die Zeile sagt das in der Betreiberspalte.
+    spf_ms = any(m.kind == "include" and "outlook.com" in (m.value or "")
+                 for d_ in facts.dns if d_.spf for m in d_.spf.mechanisms)
     for target in facts.targets:
         for d in target.discovered:
             if d.third_party and d.ips:
-                hosts.append(ScopeHost(ip=d.ips[0], more_ips=[], fqdns=d.fqdn, operator=d.third_party,
+                quelle = "laut Namensauflösung und SPF" if spf_ms and "microsoft" in d.third_party.lower() \
+                    else "laut Namensauflösung"
+                hosts.append(ScopeHost(ip=d.ips[0], more_ips=[], fqdns=d.fqdn,
+                                       operator=f"{d.third_party} ({quelle})",
                                        role="Drittanbieter", coverage="Drittanbieter, nicht geprüft",
                                        cov="extern"))
     out_of_scope = list(N.OUT_OF_SCOPE_BASE)
@@ -491,7 +544,7 @@ def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
         hosts=hosts,
         domains=[DomainScope(domain=d, text=t) for d, t in domains] if len(domains) > 1 else [],
         out_of_scope=out_of_scope,
-        limitations=limitations(facts, output, model),
+        limitations=limitations(facts, output, model, findings),
         method_phases=[MethodPhase(n=n, name=name, text=text)
                        for n, name, text in N.method_phases(counts)],
         numbers=[NumberTile(v=v, l=label) for v, label in N.numbers(counts)],
@@ -516,7 +569,8 @@ _EOL_STATUS = {
     "supported": ("aktuell", "gruen"),
     "unknown": (UNKNOWN, "grau"),
     # S6b-4 (spec/11 T11, T15): Langzeitpflege mit Quelle, Erweiterung laut wpscan veraltet.
-    "lts": ("in Langzeitpflege (LTS)", "gruen"),
+    # S6b-4n (spec/11 N9): die Plakette sagt nur "LTS"; Datum und Quelle stehen im Hinweis.
+    "lts": ("LTS", "gruen"),
     "outdated": ("veraltet", "gelb"),
     "insecure": ("unsicher", "rot"),
 }
@@ -529,6 +583,8 @@ TECH_ALIASES: dict[str, tuple[str, str]] = {
     "slider_revolution": ("slider_revolution", "Slider Revolution"),
     "powered_by_slider_revolution": ("slider_revolution", "Slider Revolution"),
     "betheme": ("betheme", "BeTheme"),
+    # S6b-4n (spec/11 N9): das Kindtheme ist eine eigene Zeile, mit Anzeigename statt Slug.
+    "betheme_child": ("betheme_child", "BeTheme Child"),
     "burst": ("burst_statistics", "Burst Statistics"),
     "burst_statistics": ("burst_statistics", "Burst Statistics"),
     "complianz": ("complianz", "Complianz"),
@@ -536,10 +592,25 @@ TECH_ALIASES: dict[str, tuple[str, str]] = {
     "ultimate_member": ("ultimate_member", "Ultimate Member"),
     "cloudflare": ("cloudflare", "Cloudflare"),
     "cloudflare_http_proxy": ("cloudflare", "Cloudflare"),
+    # S6b-4n (spec/11 N12, N15): Neos aus CMS-Erkennung und httpx eine Zeile (heuel); ProFTPD und
+    # sein SFTP-Modul eine Zeile (lumbeck-wolter).
+    "neos": ("neos", "Neos"),
+    "neos_cms": ("neos", "Neos"),
+    "neos_flow": ("neos", "Neos"),
+    "proftpd": ("proftpd", "ProFTPD"),
+    "proftpd_mod_sftp": ("proftpd", "ProFTPD"),
+    "proftpd_sftp": ("proftpd", "ProFTPD"),
 }
 # Dienste eines Anbieters, die nur eingebunden sind und nicht auf dem System laufen (huendgen:
-# Cookiebot als "CMS-Plugin").
-TECH_HIDDEN = frozenset({"cookiebot"})
+# Cookiebot als "CMS-Plugin"). S6b-4n (spec/11 N15): Etracker ebenso.
+TECH_HIDDEN = frozenset({"cookiebot", "etracker"})
+# S6b-4n (spec/11 N12): Sitzungs-Cookies, die eine Technik als zweite Quelle bestaetigen.
+COOKIE_TECH: dict[str, tuple[str, ...]] = {
+    "jsessionid": ("java",),
+    "phpsessid": ("php",),
+    "asp.net_sessionid": ("asp",),
+    "aspsessionid": ("asp",),
+}
 
 
 @dataclass(frozen=True)
@@ -598,9 +669,13 @@ def _versionsangabe(sw: FS.SoftwareFact) -> bool:
     return bool(v) and not _CACHE_BUSTER.fullmatch(v)
 
 
-def _tech_bestaetigt(gruppe: list[FS.SoftwareFact]) -> bool:
+def _tech_bestaetigt(gruppe: list[FS.SoftwareFact], cookies: set[str] | None = None) -> bool:
     quellen = _tech_quellen(gruppe)
     if quellen & TECH_MEASURED:
+        return True
+    # S6b-4n (spec/11 N12): ein Sitzungs-Cookie derselben Technik am selben Host ist eine zweite
+    # Quelle (heuel JSESSIONID, castenow PHPSESSID).
+    if cookies and any(any(t in s.family for c in cookies for t in COOKIE_TECH.get(c, ())) for s in gruppe):
         return True
     return any(_versionsangabe(s) for s in gruppe) or len(quellen) >= 2
 
@@ -628,21 +703,31 @@ def _patch_status(facts: FS.Facts, gruppe: list[FS.SoftwareFact],
     Quelle; Pflege mit Quelle. Ein Herstellerdatum ohne Beleg steht nicht mehr da ("Lifecycle
     prüfen, Hersteller nennt 16.07.2024" bei WordPress 6.5.12, das wpscan als veraltet meldet).
     """
-    from reporter.catalog.render import lifecycle_text
+    from reporter.catalog.render import lifecycle_text, version_parts, wpscan_directory_stale
 
     if sw.eol.status == "eol" and sw.eol.date:
         quelle = str(sw.eol.source or "").split(",")[0].strip()
         return "eol", "", f"Herstellerpflege endete am {_datum_de(sw.eol.date)}" + (f" laut {quelle}" if quelle else "")
+    kind = next((s for s in gruppe if getattr(s, "child_of", None) and not s.latest_version), None)
+    if kind is not None:
+        # S6b-4n (spec/11 N9): ein eigenes Kindtheme hat keine Version im Verzeichnis; sein Stand
+        # folgt dem Elterntheme (dortmund-beach betheme-child).
+        return "unknown", "", f"nicht bestimmbar (eigenes Kindtheme, Elterntheme {kind.child_of})"
     wp = next((s for s in gruppe if "wpscan" in s.detection_sources and s.outdated is not None), None)
     if wp is not None:
+        # S6b-4n (spec/11 N9): die Plakette sagt "veraltet"; Anzahl, Fehlerbereinigung und neueste
+        # Version stehen im Hinweis, getrennt ("fehlerbereinigt ab 6.7.38", "neueste laut wpscan 6.7.35").
+        teile: list[str] = []
+        n = len(wp.vulnerabilities or [])
+        if n:
+            teile.append(f"{n} bekannte {'Lücke' if n == 1 else 'Lücken'}")
+        teile.extend(version_parts(wp))
+        if wpscan_directory_stale(wp):
+            teile.append("Verzeichnis von wpscan veraltet")
         if wp.outdated:
-            teile = ["veraltet"]
-            n = len(wp.vulnerabilities or [])
-            if n:
-                teile.append(f"{n} bekannte {'Lücke' if n == 1 else 'Lücken'}")
-            if wp.latest_version:
-                teile.append(f"aktuell {wp.latest_version}")
-            return "outdated", ", ".join(teile), "laut wpscan"
+            return "outdated", "", ", ".join(teile) or "laut wpscan"
+        if wpscan_directory_stale(wp):
+            return "unknown", "", ", ".join(teile)
         return "supported", "aktuell", "laut wpscan"
     if sw.family == "wordpress":
         status = _wp_core_status(facts, sw)
@@ -655,7 +740,7 @@ def _patch_status(facts: FS.Facts, gruppe: list[FS.SoftwareFact],
     if sw.eol.status == "supported":
         if getattr(sw.eol, "lts_since", None) and sw.eol.date:
             quelle = str(sw.eol.source or "").split(",")[0].strip().replace(" LTS", "")
-            return "lts", "", f"bis {_datum_de(sw.eol.date)}" + (f" laut {quelle}" if quelle else "")
+            return "lts", "", f"in Langzeitpflege bis {_datum_de(sw.eol.date)}" + (f" laut {quelle}" if quelle else "")
         # Kategorie B gruen nur mit sichtbarer Quelle (spec/11 T11).
         return ("supported", "", lifecycle_text(sw.eol) or "") if sw.eol.source else ("unknown", "", "")
     return "unknown", "", ""
@@ -674,6 +759,14 @@ def tech_lines(facts: FS.Facts, *, unconfirmed: list[TechLine] | None = None) ->
     from reporter.catalog.scope import without_third_party
 
     facts = without_third_party(facts)
+    cookies: dict[str, set[str]] = {}
+    gemessen_an: dict[tuple[str, str], str] = {}
+    for h in facts.http:
+        for c in h.cookies:
+            cookies.setdefault(h.host_ip, set()).add(c.name.lower())
+        if h.fqdn and h.measured_ip:
+            gemessen_an[(h.host_ip, h.fqdn)] = h.measured_ip
+    systeme = {ip: set(ips) for ip, ips in SYS.system_of(facts.hosts).items()}
     by_host: dict[str, list[FS.SoftwareFact]] = {}
     for sw in facts.software:
         if sw.family in TECH_HIDDEN:
@@ -713,7 +806,7 @@ def tech_lines(facts: FS.Facts, *, unconfirmed: list[TechLine] | None = None) ->
             else:
                 sw = max(gruppe, key=lambda s: (s.confidence, s.product != s.product.lower()))
                 product = sw.product
-            bestaetigt = _tech_bestaetigt(gruppe)
+            bestaetigt = _tech_bestaetigt(gruppe, cookies.get(host.ip))
             quellen = sorted({q for s in gruppe for q in s.detection_sources}) or [sw.source]
             patch, status_text, lebenszyklus = _patch_status(facts, gruppe, sw)
             note = T.tech_note(sw.note)
@@ -724,6 +817,13 @@ def tech_lines(facts: FS.Facts, *, unconfirmed: list[TechLine] | None = None) ->
                 # S6b-3 (spec/10 R19, E14): Herstellerprodukt ohne Version an einem
                 # Nicht-Web-Port (heuel Wing FTP 20.79.218.75:21).
                 note = "Version beim Betreiber prüfen"
+            # S6b-4n (spec/11 N5): httpx hat den Namen an einer anderen Adresse gemessen (huendgen:
+            # die Technikzeilen unter .23 stammen aus der Messung an 52.59.120.70).
+            orte = sorted({ip_ for s in gruppe if s.fqdn and "httpx" in s.detection_sources
+                           and (ip_ := gemessen_an.get((s.host_ip, s.fqdn)))
+                           and ip_ not in systeme.get(s.host_ip, {s.host_ip})}, key=sort_key)
+            if orte and not (_tech_quellen(gruppe) & TECH_MEASURED):
+                note = (note + "; " if note else "") + f"gemessen an {', '.join(orte)}"
             conf = sw.confidence
             conflicts = [c for s in gruppe for c in s.conflicts]
             if conflicts:
@@ -791,7 +891,12 @@ def service_display(svc: FS.ServiceFact) -> str:
         return svc.product
     if svc.kennung:
         return svc.kennung
-    return (svc.service or "").upper() or UNKNOWN
+    # S6b-4n (spec/11 N15): Portnamen, die nmap ohne Kennung fuehrt, in Kundensprache.
+    return SERVICE_NAMES.get((svc.service or "").lower()) or (svc.service or "").upper() or UNKNOWN
+
+
+# S6b-4n (spec/11 N15): "53 DOMAIN" und "106 TCPWRAPPED" stehen als DNS und "Dienst ohne Antwort".
+SERVICE_NAMES: dict[str, str] = {"domain": "DNS", "tcpwrapped": "Dienst ohne Antwort"}
 
 
 def port_outside_range(facts: FS.Facts, port: Optional[int]) -> bool:
@@ -812,7 +917,18 @@ def _tech_version(sw: FS.SoftwareFact) -> str:
     return version
 
 
-def build_tech(facts: FS.Facts) -> list[TechBlock]:
+def _parent_finding(findings: list[Finding] | None, slug: str) -> str:
+    """Befund zum Elterntheme eines Kindthemes ("siehe VS-2026-004", spec/11 N9)."""
+    from reporter.catalog.tables import PRODUCT_NAMES
+    name = PRODUCT_NAMES.get(slug.replace("-", "_"), slug)
+    for f in findings or []:
+        if "wordpress_plugin_vulnerable" in (f.checks or []) and \
+                re.search(rf"\b{re.escape(name)}\b", f.affected or "", re.I):
+            return f.id
+    return ""
+
+
+def build_tech(facts: FS.Facts, findings: list[Finding] | None = None) -> list[TechBlock]:
     hosts = {h.ip: h for h in facts.hosts}
     blocks: list[TechBlock] = []
     for ip, lines in tech_lines(facts).items():
@@ -821,8 +937,15 @@ def build_tech(facts: FS.Facts) -> list[TechBlock]:
         for line in lines:
             status, colour = _EOL_STATUS.get(line.patch, (UNKNOWN, "grau"))
             status = line.status_text or status
+            note = line.note
+            eltern = getattr(line.software, "child_of", None)
+            if eltern and note.startswith("nicht bestimmbar (eigenes Kindtheme"):
+                fid = _parent_finding(findings, eltern)
+                from reporter.catalog.tables import PRODUCT_NAMES
+                name = PRODUCT_NAMES.get(eltern.replace("-", "_"), eltern)
+                note = f"nicht bestimmbar (eigenes Kindtheme, Elterntheme {name}" + (f", siehe {fid})" if fid else ")")
             rows.append(TechRow(c=line.product, v=line.version, src=line.sources, conf=line.conf_label,
-                                status=status, st=colour, note=line.note))
+                                status=status, st=colour, note=note))
         label = f"{host.ip} ({host.reverse})" if host.reverse else host.ip
         blocks.append(TechBlock(host=label, rows=rows))
     return blocks
@@ -877,10 +1000,48 @@ def finding_ports(facts: FS.Facts, items: list[Consolidated],
 
 def passive_service_label(pv: FS.PassiveFact) -> str:
     """Dienstname laut Passivquelle: Produkt, sonst die Kennung aus dem Banner (S6b-4, spec/11
-    T1: "ManageSieve (Dovecot Pigeonhole)"), sonst das Modul (E5: "SMTP" statt "unbekannt")."""
+    T1: "ManageSieve (Dovecot Pigeonhole)"), sonst ein Produkt im Banner (S6b-4n, spec/11 N15:
+    "Server: cloudflare", "sw-cp-server" ist Plesk), sonst das Modul (E5: "SMTP" statt "unbekannt")."""
+    from reporter.catalog.render import banner_product
     if pv.product:
         return pv.product
-    return pv.kennung or COV.passive_module_name(pv) or UNKNOWN
+    return pv.kennung or banner_product(pv.banner_excerpt) or COV.passive_module_name(pv) or UNKNOWN
+
+
+def foreign_service_label(svc: FS.ServiceFact, label: str) -> str:
+    """Dienst einer weiteren Domain auf einem geteilten Server (spec/11 N11): nicht bewertet; ohne
+    Domainfakt ist die Zuordnung nicht belegt (castenow 8800, Icecast)."""
+    if getattr(svc, "foreign_domain", None):
+        return f"{label}, Dienst einer weiteren Domain, nicht bewertet"
+    return f"{label}, Zuordnung nicht belegt, nicht bewertet"
+
+
+def cdn_edge_notes(facts: FS.Facts) -> list[str]:
+    """Satz zur CDN-Kante (spec/11 N15): die Passivquelle meldet an einer Adresse des Anbieters dessen
+    Standardports (bergersysteme 198.202.211.1: Cloudflare 2052 bis 2096, 8080, 8880)."""
+    from reporter.catalog.render import banner_product
+    out: list[str] = []
+    for host in sorted(facts.hosts, key=lambda h: (h.family, h.ip)):
+        if host.third_party is not None:
+            continue
+        cdn = host.cdn_provider or next((s.product for s in facts.services if s.host_ip == host.ip
+                                         and CDN_PRODUCT.search(s.product or "")), None)
+        if not cdn:
+            continue
+        offen = {s.port for s in facts.services if s.host_ip == host.ip and s.state == "open"}
+        ports = sorted({p.port for p in facts.passive if p.host_ip == host.ip and p.port and p.port not in offen})
+        if not ports:
+            continue
+        treffer = CDN_PRODUCT.search(cdn)
+        name = CDN_NAMES.get(treffer.group(0).lower(), cdn) if treffer else (banner_product(cdn) or cdn)
+        out.append(f"An {host.ip} meldet die Passivquelle die Ports {', '.join(str(p) for p in ports)}; es sind "
+                   f"Standardports der CDN-Kante des Anbieters ({name}), sie gehören nicht zu Ihren Systemen "
+                   "und sind nicht bewertet.")
+    return out
+
+
+CDN_PRODUCT = re.compile(r"cloudflare|akamai|fastly|cloudfront", re.I)
+CDN_NAMES = {"cloudflare": "Cloudflare", "akamai": "Akamai", "fastly": "Fastly", "cloudfront": "Amazon CloudFront"}
 
 
 def build_services(facts: FS.Facts, items: list[Consolidated],
@@ -897,6 +1058,10 @@ def build_services(facts: FS.Facts, items: list[Consolidated],
             label = service_display(svc)
             befunde = refs.get((host.ip, svc.port), [])
             colour = min((f.status for f in befunde), key=lambda s: L.STATUS_RANK[s]) if befunde else "gruen"
+            if svc.foreign:
+                # S6b-4n (spec/11 N11): Dienste weiterer Domains stehen grau, nicht bewertet.
+                ports.append(ServicePort(p=str(svc.port), s=foreign_service_label(svc, label), st="grau"))
+                continue
             if svc.unidentified and not befunde:
                 # S6b-3 (spec/10 R9): ein Dienst ohne Kennung ist nicht "unauffällig". S6b-4
                 # (spec/11 T16): mit dem Befund service_unidentified gilt dessen Ampel.
@@ -1031,6 +1196,11 @@ def build_posture(output: CatalogOutput, model: COV.Model | None = None,
                 # geprueft sind (Plesk-Mailports bei bergersysteme, acht Dienste bei dortmund-beach).
                 if spec["name"] == "Transportverschlüsselung" and ok is True and host in tls_offen:
                     ok, text = None, "teilweise geprüft"
+                # S6b-4n (spec/11 N5): gemessen hat testssl nur an einer anderen Adresse desselben
+                # Namens; die Inventaradresse ist nicht "unauffaellig", der Name ist gemessen.
+                anderswo = COV.tls_only_elsewhere(facts, host) if facts is not None else []
+                if spec["name"] == "Transportverschlüsselung" and ok is not False and anderswo:
+                    ok, text = None, f"am Namen gemessen ({', '.join(anderswo)})"
                 items.append(PostureItem(l=host, ok=ok, v=text, checks=item_checks, subjects=[host],
                                          pulls=item_pulls))
         for label, checks in spec["items"]:  # type: ignore[index]
@@ -1093,6 +1263,12 @@ def build_screens(facts: FS.Facts) -> list[Screenshot]:
     kandidaten = [fq for fq in facts.fqdns
                   if fq.screenshot_key and not fq.wildcard and eigenes_bild(fq)
                   and next((h for h in facts.hosts if h.ip == fq.host_ip and h.third_party is None), None)]
+    # S6b-4n (spec/11 N4): ein Bild zeigt die Antwort seines Hosts. Leitet ein Name auf einen anderen
+    # Host weiter und hat das Ziel ein eigenes Bild, entfaellt das Bild der Weiterleitung (heuel online
+    # zeigte www); ohne eigenes Bild des Ziels sagt die Unterschrift, dass es die Zielseite zeigt.
+    mit_bild = {fq.name.lower() for fq in kandidaten}
+    ziele = {fq.name: R.redirect_target(facts, fq) for fq in kandidaten}
+    kandidaten = [fq for fq in kandidaten if not (ziele[fq.name] and ziele[fq.name] in mit_bild)]
 
     def rang(fq: FS.FqdnFact) -> tuple:
         ziel = (urlsplit(fq.final_url or "").hostname or "").lower()
@@ -1112,12 +1288,16 @@ def build_screens(facts: FS.Facts) -> list[Screenshot]:
     for members in groups.values():
         members.sort(key=rang)
         fq = members[0]
+        was = screen_caption(fq)
+        if ziele.get(fq.name):
+            was = f"Weiterleitung auf {ziele[fq.name]}, das Bild zeigt die Zielseite: {was}"
         out.append(Screenshot(
             file=fq.screenshot_key.rsplit("/", 1)[-1],
             key=fq.screenshot_key,
             host=fq.name,
-            what=screen_caption(fq),
-            also=sorted({m.name for m in members[1:]} - {fq.name}, key=sort_key)))
+            what=was,
+            # S6b-4n (spec/11 N4): weitere Namen nur vom selben Host.
+            also=sorted({m.name for m in members[1:] if m.host_ip == fq.host_ip} - {fq.name}, key=sort_key)))
     return sorted(out, key=lambda s: s.host)
 
 
@@ -1165,6 +1345,22 @@ def unprocessed_notes(facts: FS.Facts, output: CatalogOutput) -> list[str]:
                 add(f"{u.what} laut Passivquelle, vom Portscan nicht bestätigt")
         else:
             add(f"Werkzeugmeldung {u.what}")
+    # S6b-4n (spec/11 N15): ein Verwaltungsport laut Passivquelle ohne Kennung steht auch unter den
+    # Beobachtungen (heuel 4433: Shodan "Server: xxxx", im Anhang C als Werkzeugmeldung).
+    for r in output.results:
+        if r.check_id != "admin_port_passive_unidentified" or r.status != "fail":
+            continue
+        for m in r.members:
+            if m.status != "fail" or not m.host_ip or not m.port:
+                continue
+            pv = next((p for p in facts.passive if p.host_ip == m.host_ip and p.port == m.port), None)
+            server = re.search(r"Server:\s*(\S+)", (pv.banner_excerpt or "") if pv else "")
+            kennung = f" (Antwortkopf {server.group(0)})" if server else ""
+            wo = ("außerhalb des geprüften Portbereichs" if port_outside_range(facts, m.port)
+                  else "vom Portscan nicht bestätigt")
+            add(f"Verwaltungsport {m.port} auf {m.host_ip} laut Passivquelle ohne Produktkennung{kennung}, {wo}")
+    aktiv_auth = {str(u.what).split(" ")[0] for u in facts.unprocessed
+                  if u.kind == "smtp_auth_before_starttls" and "Passivquelle" not in str(u.what)}
     for u in facts.unprocessed:
         was = _BEOBACHTUNG_FAKTEN.get(u.kind) or (
             "Hinweis der Webanalyse ohne Regel" if u.kind.startswith("wpscan_") else None)
@@ -1177,6 +1373,9 @@ def unprocessed_notes(facts: FS.Facts, output: CatalogOutput) -> list[str]:
             if datei:
                 was = f"{datei} der WordPress-Installation abrufbar"
         if u.kind == "smtp_auth_before_starttls":
+            # S6b-4n (spec/11 N15): derselbe Port aktiv gemessen, die Passivangabe entfaellt (DB 587).
+            if "Passivquelle" in what and what.split(" ")[0] in aktiv_auth:
+                continue
             ort = what.split(" ")[0] + (", laut Passivquelle" if "Passivquelle" in what else "")
         elif u.kind == "resource_version":
             ort_, _, rest = what.partition(": ")
@@ -1215,12 +1414,14 @@ def build_architecture(facts: FS.Facts, output: CatalogOutput, items: list[Conso
         notes.append(f"{wort} ohne Regeltreffer, nicht als Befund bewertet: " + "; ".join(beobachtungen) + ".")
     for wert in sorted(_unbeauftragt(facts, output)):
         notes.append(f"Sichtbar, aber nicht beauftragt: {wert}.")
+    # S6b-4n (spec/11 N15): Standardports einer CDN-Kante laut Passivquelle.
+    notes.extend(cdn_edge_notes(facts))
     # facts.warnings sind Hinweise des Faktenbauers an den Betreiber, keine Kundentexte.
     # Was davon den Kunden betrifft, steht ueber die Abdeckungsgruende in Kapitel 2.
     return Architecture(
         # S6b-2 (Nachtrag S6b-1): Kapitel 3 zaehlt in Systemen wie Kapitel 2.1.
         lead=N.architecture_lead(len(model.system_rows()), roles),
-        tech=build_tech(facts),
+        tech=build_tech(facts, findings),
         services=build_services(facts, items, findings),
         services_note=N.SERVICES_NOTE,
         posture=build_posture(output, model, facts, findings),

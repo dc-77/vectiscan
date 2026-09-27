@@ -79,6 +79,9 @@ class Statement(Base):
     text: str
     when: Optional[str] = None
     quantor: Quantor = "alle"
+    # S6b-4n (spec/11 N10): Baustein-Schluessel; Aussagen mit gleichem Schluessel aus mehreren
+    # Regeln eines Befunds stehen einmal (Versionspreisgabe im Header und im Dienstbanner).
+    key: Optional[str] = None
 
 
 def _as_statements(value: Any) -> Any:
@@ -150,6 +153,15 @@ class Texts(Base):
                 if name in data:
                     data[name] = _as_statements(data[name])
         return data
+
+    def statement_key(self, name: str, sid: str) -> Optional[str]:
+        """Baustein-Schluessel einer Aussage (spec/11 N10), None ohne Schluessel."""
+        if name not in STATEMENT_FIELDS:
+            return None
+        try:
+            return getattr(self, name)[int(sid.rsplit("[", 1)[1].rstrip("]"))].key
+        except (IndexError, ValueError):
+            return None
 
     def statements(self, name: str) -> list[tuple[str, str, Optional[str], str]]:
         """(Aussage-ID, Text, Bedingung, Quantor) eines Felds in Katalogreihenfolge."""

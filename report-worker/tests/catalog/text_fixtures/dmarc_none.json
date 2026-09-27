@@ -39,8 +39,11 @@
       "meaning[2]",
       "meaning[3]",
       "meaning[4]",
+      "meaning[5]",
+      "meaning[6]",
       "recommendation[1]",
-      "recommendation[3]"
+      "recommendation[3]",
+      "recommendation[4]"
      ]
     }
    },
@@ -86,7 +89,7 @@
    "coverage_default": "ok"
   },
   {
-   "name": "S6b-4: Meldeadresse und MX beim Dienstleister (dortmund-beach, spec/11 Teil 3)",
+   "name": "S6b-4: Meldeadresse und MX beim Dienstleister; S6b-4n (spec/11 N7): ohne SPF mx und ohne Delegation kein Betreiber-Satz",
    "facts": {
     "scan": {
      "domain": "example.test",
@@ -116,14 +119,133 @@
     "holds": {
      "example.test": [
       "meaning[3]",
-      "meaning[4]",
       "recommendation[3]"
      ]
     },
     "not_holds": {
      "example.test": [
       "meaning[1]",
-      "recommendation[0]"
+      "meaning[4]",
+      "meaning[5]",
+      "meaning[6]",
+      "recommendation[0]",
+      "recommendation[4]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "S6b-4n (spec/11 N7, dortmund-beach): SPF gibt den MX beim Dienstleister mit mx frei",
+   "facts": {
+    "scan": {
+     "domain": "example.test",
+     "domains": [
+      "example.test"
+     ]
+    },
+    "dns": [
+     {
+      "domain": "example.test",
+      "mx": [
+       "mail1.provider.example"
+      ],
+      "dmarc": {
+       "present": true,
+       "p": "none",
+       "raw": "v=DMARC1; p=none; rua=mailto:postmaster@provider.example",
+       "rua": [
+        "mailto:postmaster@provider.example"
+       ]
+      },
+      "spf": {
+       "raw": "v=spf1 mx a ~all",
+       "all_qualifier": "~",
+       "mechanisms": [
+        {
+         "qualifier": "+",
+         "kind": "mx"
+        },
+        {
+         "qualifier": "+",
+         "kind": "a"
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "example.test": [
+      "meaning[3]",
+      "meaning[5]",
+      "recommendation[3]"
+     ]
+    },
+    "not_holds": {
+     "example.test": [
+      "meaning[4]",
+      "meaning[6]",
+      "recommendation[4]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "S6b-4n (spec/11 N7, bergersysteme): _dmarc per CNAME delegiert, Adressen eigen und fremd",
+   "facts": {
+    "scan": {
+     "domain": "example.test",
+     "domains": [
+      "example.test"
+     ]
+    },
+    "dns": [
+     {
+      "domain": "example.test",
+      "mx": [
+       "mx01.hornetsecurity.example"
+      ],
+      "dmarc": {
+       "present": true,
+       "p": "none",
+       "raw": "v=DMARC1; p=none; rua=mailto:a.x@reports.hornetdmarc.example; rua=mailto:dmarc@example.test",
+       "rua": [
+        "mailto:a.x@reports.hornetdmarc.example",
+        "mailto:dmarc@example.test"
+       ],
+       "delegated_to": "example.test.dmarc.hornetdmarc.example"
+      },
+      "spf": {
+       "raw": "v=spf1 mx -all",
+       "all_qualifier": "-",
+       "mechanisms": [
+        {
+         "qualifier": "+",
+         "kind": "mx"
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "example.test": [
+      "meaning[4]",
+      "meaning[6]",
+      "recommendation[4]"
+     ]
+    },
+    "not_holds": {
+     "example.test": [
+      "meaning[1]",
+      "meaning[3]",
+      "meaning[5]",
+      "recommendation[0]",
+      "recommendation[3]"
      ]
     }
    }

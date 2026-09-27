@@ -49,12 +49,13 @@ texts:
     angreifbar, bis die fehlerbereinigte Version eingespielt ist.
   recommendation:
     # S6b-4 (spec/11 T12): die Zielversion laut wpscan steht in der Empfehlung.
+    # S6b-4n (spec/11 N9): "fehlerbereinigt ab" und "neueste laut wpscan" getrennt, mit Produktnamen.
     - stage: unverzueglich
       when: software.latest_version is not None
       quantor: eines
       text: >-
-        Erweiterungen auf die fehlerbereinigte Version aktualisieren, laut wpscan mindestens
-        {target_versions}; lässt sich das nicht sofort umsetzen, die Erweiterung deaktivieren.
+        Erweiterungen auf eine fehlerbereinigte Version aktualisieren: {target_versions}; lässt
+        sich das nicht sofort umsetzen, die Erweiterung deaktivieren.
     - stage: unverzueglich
       when: software.latest_version is None
       quantor: eines

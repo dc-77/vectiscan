@@ -19,7 +19,12 @@ Belegregeln je Rolle:
   Weiterleitungs- oder Standardseite, keine Weiterleitung auf einen anderen Host).
 * Datenbank nur mit offenem Datenbankport, Fernzugang nur mit SSH, RDP, VPN oder
   Verwaltungsoberflaeche als Dienst, Dateiaustausch nur mit FTP-Dienst. Auf geteilten
-  Systemen entfallen diese Server-Rollen: sie gehoeren dem Betreiber, nicht dem Kunden.
+  Systemen entfaellt der Fernzugang: er gehoert dem Betreiber, nicht dem Kunden.
+* S6b-4n (spec/11 N4, N14): Mailabruf und Einlieferung aus aktiv bestaetigten Mailports,
+  Datenbanken und Dateiaustausch auch auf geteilten Systemen (die Dienste sind von aussen
+  erreichbar, zustaendig bleibt der Hoster); "Mail-Webzugang laut Passivquelle" aus dem Pfad
+  /owa/ der Passivquelle; Seitentitel an weiteren Webports ("Web Applications Portal" auf 444);
+  ein Name, der auf einen anderen Host weiterleitet, macht die Rolle "Weiterleitung auf <Ziel>".
 """
 from __future__ import annotations
 
@@ -34,7 +39,11 @@ from reporter.facts import systems as SYS
 from reporter.facts.serialize import sort_key
 from reporter.v3 import tables as T
 
-MAX_ROLES = 3
+MAX_ROLES = 5
+# S6b-4n (spec/11 N14): Mailports mit Abruf (POP3, IMAP) und Einlieferung (Submission).
+MAIL_FETCH_PORTS = frozenset({110, 143, 993, 995})
+MAIL_SUBMIT_PORTS = frozenset({465, 587})
+MAIL_SERVICES = re.compile(r"^(?:pop3s?|imaps?|smtps?|submission|ssl/(?:imap|pop3|smtp))\??$", re.I)
 
 TITLE_RULES: list[tuple[str, re.Pattern[str]]] = [
     ("passwort", re.compile(r"bitwarden|vaultwarden|passbolt|psono", re.I)),
@@ -135,11 +144,50 @@ def exchange_evidence(facts: FS.Facts, host: FS.HostFact) -> list[str]:
     return out[:3]
 
 
+def redirect_target(facts: FS.Facts, fq: FS.FqdnFact) -> Optional[str]:
+    """Ziel einer Weiterleitung auf einen anderen Host, laut Inventar oder Weiterleitungspruefung
+    (S6b-4n, spec/11 N4: heuel online endet im Inventar auf sich selbst, die Probe auf www)."""
+    for url in (fq.final_url, getattr(fq, "probe_final_url", None)):
+        final = SYS.clean_name(urlsplit(url or "").hostname or "")
+        if not final or final == SYS.clean_name(fq.name):
+            continue
+        if not any(f.host_ip == fq.host_ip and SYS.clean_name(f.name) == final for f in facts.fqdns):
+            return final
+    return None
+
+
 def _redirects_away(facts: FS.Facts, fq: FS.FqdnFact) -> bool:
-    final = SYS.clean_name(urlsplit(fq.final_url or "").hostname or "")
-    if not final or final == SYS.clean_name(fq.name):
-        return False
-    return not any(f.host_ip == fq.host_ip and SYS.clean_name(f.name) == final for f in facts.fqdns)
+    return redirect_target(facts, fq) is not None
+
+
+def _mail_services(facts: FS.Facts, host: FS.HostFact) -> tuple[list[str], list[str]]:
+    """(Abruf, Einlieferung): aktiv bestaetigte Maildienste des Hosts (spec/11 N14)."""
+    abruf: list[str] = []
+    einlieferung: list[str] = []
+    for s in facts.services:
+        if s.host_ip != host.ip or s.state != "open" or s.foreign:
+            continue
+        erkannt = bool(s.product or s.kennung) and not s.unidentified
+        if not erkannt:
+            continue
+        beleg = f"{s.port}/{s.proto} {s.kennung or s.product or s.service or ''}".strip()
+        if s.port in MAIL_FETCH_PORTS or re.match(r"^(?:ssl/)?(?:pop3|imap)", s.service or "", re.I):
+            abruf.append(beleg)
+        elif s.port in MAIL_SUBMIT_PORTS or re.match(r"^(?:smtps|submission)", s.service or "", re.I):
+            einlieferung.append(beleg)
+    return abruf, einlieferung
+
+
+def _passive_webmail(facts: FS.Facts, host: FS.HostFact) -> list[str]:
+    """Pfad /owa/ laut Passivquelle (bergersysteme 62.217.52.166, vom Pruefstand nicht erreichbar)."""
+    out: list[str] = []
+    for p in facts.passive:
+        if p.host_ip != host.ip or p.port is None:
+            continue
+        ort = str((p.details or {}).get("location") or "")
+        if re.search(r"/owa\b", ort, re.I) or (p.banner_excerpt and re.search(r"/owa\b", p.banner_excerpt, re.I)):
+            out.append(f"Passivquelle Port {p.port}: {ort or 'Pfad /owa/'}")
+    return out
 
 
 def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
@@ -158,6 +206,7 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
     namen: dict[str, str] = {}
     details: dict[str, list[str]] = {}
     domains = list(facts.scan.domains) or [facts.scan.domain]
+    weiterleitungsziele: list[str] = []
 
     empfang, versand = mail_evidence(facts, host)
     if empfang:
@@ -168,6 +217,21 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
     elif versand:
         for b in versand:
             add("mail_versand", b)
+    # S6b-4n (spec/11 N14): Abruf und Einlieferung aus aktiv bestaetigten Mailports, auch ohne MX
+    # (dortmund-beach und junkerwerk: Dovecot und Exim auf dem gemieteten Server).
+    if not empfang:
+        abruf, einlieferung = _mail_services(facts, host)
+        for b in abruf + einlieferung:
+            add("mail_dienste", b)
+        teile = (["Mailabruf"] if abruf else []) + (["Einlieferung"] if einlieferung else [])
+        if teile:
+            namen["mail_dienste"] = " und ".join(teile)
+    # S6b-4n (spec/11 N14): Mail-Webzugang allein laut Passivquelle (Host vom Pruefstand nicht erreichbar).
+    passiv_owa = _passive_webmail(facts, host)
+    if passiv_owa and host.reach is not None and host.reach.status == "unreachable_from_scanner":
+        for b in passiv_owa:
+            add("webmail", b)
+        namen["webmail"] = "Mail-Webzugang laut Passivquelle"
     for fq in sorted(_customer_names(facts, host), key=lambda f: sort_key(f.name)):
         title = (fq.title or "").strip()
         ziel = next((t for t in fq.cname if not SYS.under(t, domains)), None)
@@ -184,8 +248,15 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
             add("plattform", f"{fq.name}: CNAME {ziel}")
             if art:
                 namen.setdefault("plattform", f"{art} ({anbieter}){weiter}")
+            elif weiter:
+                # S6b-4n (spec/11 N4): heuel online leitet laut Weiterleitungspruefung auf www weiter.
+                namen.setdefault("plattform", f"{T.ROLE_DEFS['plattform'][0]} ({anbieter}){weiter}")
             continue
-        if _redirects_away(facts, fq):
+        ziel_host = redirect_target(facts, fq)
+        if ziel_host:
+            # S6b-4n (spec/11 N4): Rolle aus der Antwort dieses Hosts, nicht aus der Zielseite.
+            add("weiterleitung", f"{fq.name}: leitet auf {ziel_host} weiter")
+            weiterleitungsziele.append(ziel_host)
             continue
         rolle = next((key for key, rx in TITLE_RULES if title and rx.search(title)), None)
         if rolle == "anmeldeportal" and fq.name in wordpress:
@@ -200,24 +271,48 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
     for sw in facts.software:
         if sw.host_ip == host.ip and sw.family in SOFTWARE_ROLES:
             add(SOFTWARE_ROLES[sw.family], f"{sw.product} ({', '.join(sw.detection_sources)})")
-    if host.shared is None:
-        for s in facts.services:
-            if s.host_ip != host.ip or s.state != "open":
-                continue
-            beleg = f"{s.port}/{s.proto} {s.service or ''} {s.product or ''}".strip()
-            if s.port in T.DB_PORTS:
-                add("datenbank", beleg)
-            elif _sftp_of_ftp_server(facts, s):
-                # S6b-4 (spec/11 Teil 3 HL): SSH eines FTP-Servers ist SFTP, kein Fernzugang
-                # (20.79.218.75: nmap FortiSSH, Passivquelle SSH-2.0-WingFTPServer).
-                add("dateiaustausch", beleg)
-                details.setdefault("dateiaustausch", []).append("SFTP")
-            elif (s.service or "") in REMOTE_SERVICES or s.port == 3389 \
-                    or REMOTE_PRODUCTS.search(f"{s.product or ''} {s.service or ''}"):
+    # S6b-4n (spec/11 N14): Seitentitel an weiteren Webports (huendgen 444 "Web Applications Portal").
+    for s in facts.services:
+        if s.host_ip != host.ip or s.state != "open" or s.port in (80, 443) or not s.fp_title or s.foreign:
+            continue
+        rolle = next((key for key, rx in TITLE_RULES if rx.search(s.fp_title)), None)
+        if rolle:
+            add(rolle, f"Port {s.port}: Titel „{s.fp_title[:60]}“")
+            fehlerseite.setdefault(rolle, []).append(0)
+            details.setdefault(rolle, []).append(f"Port {s.port}")
+    # Server-Rollen aus den Diensten. S6b-4n (spec/11 N4, N14): auf geteilten Systemen nur die
+    # Dienste, die der Kunde nutzt (Datenbanken, Dateiaustausch); der Fernzugang gehoert dem Betreiber.
+    for s in facts.services:
+        if s.host_ip != host.ip or s.state != "open" or s.foreign:
+            continue
+        beleg = f"{s.port}/{s.proto} {s.service or ''} {s.product or ''}".strip()
+        if s.port in T.DB_PORTS:
+            add("datenbank", beleg)
+        elif _sftp_of_ftp_server(facts, s):
+            # S6b-4 (spec/11 Teil 3 HL): SSH eines FTP-Servers ist SFTP, kein Fernzugang
+            # (20.79.218.75: nmap FortiSSH, Passivquelle SSH-2.0-WingFTPServer).
+            add("dateiaustausch", beleg)
+            details.setdefault("dateiaustausch", []).append("SFTP")
+        elif ((s.service or "") in REMOTE_SERVICES or s.port == 3389
+              or REMOTE_PRODUCTS.search(f"{s.product or ''} {s.service or ''}")):
+            if host.shared is None:
                 add("fernzugang", beleg)
-            elif (s.service or "") == "ftp" or s.port == 21:
-                add("dateiaustausch", beleg)
-                details.setdefault("dateiaustausch", []).insert(0, "FTP")
+        elif (s.service or "") == "ftp" or s.port == 21:
+            add("dateiaustausch", beleg)
+            details.setdefault("dateiaustausch", []).insert(0, "FTP")
+    # S6b-4n (spec/11 N14): Abruf, Einlieferung und Versand laut SPF sind eine Mailrolle; sonst
+    # verdraengt die zweite die uebrigen Rollen (dortmund-beach: SPF a und Dovecot auf demselben Server).
+    if "mail_dienste" in found and "mail_versand" in found:
+        for b in found.pop("mail_versand"):
+            add("mail_dienste", b)
+        teile = namen.get("mail_dienste", T.ROLE_DEFS["mail_dienste"][0]).split(" und ")
+        namen["mail_dienste"] = ", ".join(teile) + " und Versand laut SPF"
+    if weiterleitungsziele and "website" not in found:
+        ziele = list(dict.fromkeys(weiterleitungsziele))
+        namen["weiterleitung"] = "Weiterleitung auf " + (ziele[0] if len(ziele) == 1
+                                                          else ", ".join(ziele[:-1]) + " und " + ziele[-1])
+    else:
+        found.pop("weiterleitung", None)
     # S6b-4 (spec/11 Teil 3 HL ose): eine Anmeldemaske laut Webanalyse ohne Portal- oder
     # Redaktionstitel ist eine Webanwendung mit Anmeldung.
     mit_anmeldung = sorted(h.fqdn for h in facts.http if h.host_ip == host.ip and h.login_form and h.fqdn)
@@ -241,8 +336,10 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
 
     def detail_of(key: str) -> str:
         teile = [d for d in dict.fromkeys(details.get(key) or [])]
-        # Ein einzelner Zusatz sagt nichts, was der Name nicht schon sagt ("Dateiaustausch (FTP)").
-        return ", ".join(teile) if len(teile) > 1 or teile == ["SFTP"] else ""
+        # Ein einzelner Zusatz sagt nichts, was der Name nicht schon sagt ("Dateiaustausch (FTP)");
+        # ein Port schon ("Anmeldeportal (Port 444)").
+        return ", ".join(teile) if len(teile) > 1 or teile == ["SFTP"] or \
+            (teile and teile[0].startswith("Port ")) else ""
 
     return [Role(key=k, evidence=tuple(found[k][:3]), status=status_of(k), variant=variant_of(k),
                  detail=detail_of(k), name=namen.get(k, ""))
@@ -250,8 +347,11 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
 
 
 def _redirects_to_customer(fq: FS.FqdnFact, domains: list[str]) -> bool:
-    ziel = SYS.clean_name(urlsplit(fq.final_url or "").hostname or "")
-    return bool(ziel) and ziel != SYS.clean_name(fq.name) and SYS.under(ziel, domains)
+    for url in (fq.final_url, getattr(fq, "probe_final_url", None)):
+        ziel = SYS.clean_name(urlsplit(url or "").hostname or "")
+        if ziel and ziel != SYS.clean_name(fq.name) and SYS.under(ziel, domains):
+            return True
+    return False
 
 
 _FTP_SERVER = re.compile(r"ftp", re.I)

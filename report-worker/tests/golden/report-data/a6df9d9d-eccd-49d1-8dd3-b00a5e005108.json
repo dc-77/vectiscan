@@ -13,7 +13,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Korrelation hat 57 Einzelmeldungen der Werkzeuge erfasst, davon 14 Doppelmeldungen mehrerer Werkzeuge und Durchgänge. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 11 Befunde und 7 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
+  "filtering": "Die Korrelation hat 57 Einzelmeldungen der Werkzeuge erfasst, davon 14 gleiche Meldungen der Webanalyse zusammengeführt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 11 Befunde und 7 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -45,13 +45,13 @@
     "host": "188.40.3.130",
     "port": "110",
     "ref": "VS-2026-008",
-    "svc": "Courier pop3d, TLS erzwungen"
+    "svc": "Courier pop3d, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "188.40.3.130",
     "port": "143",
     "ref": "VS-2026-008",
-    "svc": "Dovecot imapd, TLS erzwungen"
+    "svc": "Dovecot imapd, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "188.40.3.130",
@@ -69,7 +69,7 @@
     "host": "188.40.3.130",
     "port": "587",
     "ref": "",
-    "svc": "SMTP (Exim), TLS erzwungen"
+    "svc": "SMTP (Exim), Anmeldung erst nach STARTTLS"
    },
    {
     "host": "188.40.3.130",
@@ -297,7 +297,7 @@
    },
    {
     "c": "mittel (Passivquelle, Zeitversatz)",
-    "t": "Shodan, AbuseIPDB, OTX, URLhaus",
+    "t": "Shodan, AbuseIPDB, OTX, URLhaus (ohne Ergebnis)",
     "u": "Passive Dienst- und Reputationsdaten"
    }
   ],
@@ -305,7 +305,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein noch gültiges Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen. Ein am Scantag bereits abgelaufenes Zertifikat an Diensten außerhalb der Webseiten (Mail, Datei, Verwaltung) folgt der Tabelle: Exposition erhöht, Gelb, In Kürze."
    },
    {
     "l": "Gelb",
@@ -325,7 +325,7 @@
   ]
  },
  "architecture": {
-  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 2 Systeme mit folgenden Aufgaben: Anmeldeportal und E-Mail-Versand laut SPF. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 2 Systeme mit folgenden Aufgaben: Anmeldeportal, Dateiaustausch (FTP, SFTP), Datenbanken erreichbar und Mailabruf, Einlieferung und Versand laut SPF. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
    "Beobachtungen ohne Regeltreffer, nicht als Befund bewertet: 188.40.3.130:443 (Apache httpd) laut Passivquelle, vom Portscan nicht bestätigt; 188.40.3.130:80 (Apache httpd) laut Passivquelle, vom Portscan nicht bestätigt."
   ],
@@ -748,10 +748,10 @@
      {
       "c": "Debian GNU/Linux",
       "conf": "hoch",
-      "note": "bis 30.06.2028 laut Debian",
+      "note": "in Langzeitpflege bis 30.06.2028 laut Debian",
       "src": "nmap",
       "st": "gruen",
-      "status": "in Langzeitpflege (LTS)",
+      "status": "LTS",
       "v": "12"
      },
      {
@@ -762,15 +762,6 @@
       "st": "grau",
       "status": "unbekannt",
       "v": "9.2p1"
-     },
-     {
-      "c": "ProFTPD mod_sftp",
-      "conf": "hoch",
-      "note": "",
-      "src": "nmap",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
      }
     ]
    },
@@ -800,13 +791,20 @@
   "observed": [
    {
     "evidence": [
-     "SPF-Eintrag von junkerwerk.hu: a"
+     "3306/tcp mysql MySQL",
+     "5432/tcp postgresql PostgreSQL DB",
+     "21/tcp ftp ProFTPD",
+     "22/tcp ssh ProFTPD mod_sftp",
+     "110/tcp Courier pop3d",
+     "143/tcp Dovecot imapd"
     ],
-    "meaning": "Dieses System darf laut SPF-Eintrag E-Mail im Namen der Domain versenden. Ein Missbrauch trifft die Glaubwürdigkeit der eigenen Absenderadresse.",
+    "meaning": "Datenbestände hinter den Anwendungen. Ein von außen erreichbarer Datenbankdienst ist ein direktes Ziel für Anmeldeversuche.",
     "role_keys": [
-     "mail_versand"
+     "datenbank",
+     "dateiaustausch",
+     "mail_dienste"
     ],
-    "system": "E-Mail-Versand laut SPF (junkerwerk.hu, www.junkerwerk.hu)"
+    "system": "Datenbanken erreichbar, Dateiaustausch (FTP, SFTP), Mailabruf, Einlieferung und Versand laut SPF (junkerwerk.hu, www.junkerwerk.hu)"
    },
    {
     "evidence": [
@@ -1491,13 +1489,13 @@
    "verify": "Verbindung zum gemeldeten Port herstellen und die zurückgegebene Version mit dem aktuellen Patchstand des Herstellers abgleichen."
   },
   {
-   "affected": "junkerwerk.hu (188.40.3.130 beim Hoster Hetzner Online GmbH)",
+   "affected": "junkerwerk.hu (188.40.3.130 beim Hoster Hetzner Online GmbH, laut Passivquelle 1 weitere Domain)",
    "cat": "C",
    "checks": [
     "spf_authorizes_shared_host"
    ],
-   "evidence": "DNS-Abfragen · phase0/dns_records.json\njunkerwerk.hu · SPF: v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all · Mechanismus: a · löst auf: 188.40.3.130 · Server beim Hoster Hetzner Online GmbH · auf demselben Server: 1 weitere Domain laut Passivquelle",
-   "found": "Der SPF-Eintrag der Domain junkerwerk.hu gibt einen Server als Absender frei, auf dem laut Zertifikat oder Passivquelle weitere Domains liegen: junkerwerk.hu (188.40.3.130 beim Hoster Hetzner Online GmbH).",
+   "evidence": "DNS-Abfragen · phase0/dns_records.json\njunkerwerk.hu · SPF: v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all · Mechanismus: a · löst auf: 188.40.3.130 · Server beim Hoster Hetzner Online GmbH · auf demselben Server: laut Passivquelle 1 weitere Domain",
+   "found": "Der SPF-Eintrag der Domain junkerwerk.hu gibt einen Server als Absender frei, auf dem weitere Domains liegen: junkerwerk.hu (188.40.3.130 beim Hoster Hetzner Online GmbH, laut Passivquelle 1 weitere Domain).",
    "id": "VS-2026-006",
    "impact": "Jede Anwendung auf diesem Server darf damit E-Mails im Namen der Domain versenden, auch die Anwendungen der weiteren Domains. Empfänger erkennen solche Mails an SPF nicht als gefälscht.",
    "key": "spf_authorizes_shared_host/scan/kunde",
@@ -1539,7 +1537,7 @@
       "junkerwerk.hu|junkerwerk.hu"
      ],
      "statement": "observation[0]",
-     "text": "Der SPF-Eintrag der Domain junkerwerk.hu gibt einen Server als Absender frei, auf dem laut Zertifikat oder Passivquelle weitere Domains liegen: junkerwerk.hu (188.40.3.130 beim Hoster Hetzner Online GmbH)."
+     "text": "Der SPF-Eintrag der Domain junkerwerk.hu gibt einen Server als Absender frei, auf dem weitere Domains liegen: junkerwerk.hu (188.40.3.130 beim Hoster Hetzner Online GmbH, laut Passivquelle 1 weitere Domain)."
     },
     {
      "check": "spf_authorizes_shared_host",
@@ -1960,7 +1958,7 @@
     "legacy_protocols_present|188.40.3.130:21"
    ],
    "threat": null,
-   "title": "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen) (beim Hoster Hetzner Online GmbH)",
+   "title": "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen; beim Hoster Hetzner Online GmbH)",
    "urgency": "Mittelfristig",
    "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
   },
@@ -2446,8 +2444,8 @@
  "landscape_lead": "11 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 19,
-  "catalog_digest": "bbd6dccec70f05898fcc9e7fbbb77f57bca528dd070683052c467e758681182a",
-  "catalog_version": "2026-09-27.1",
+  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
+  "catalog_version": "2026-09-27.2",
   "classification": "Vertraulich",
   "consolidated": 11,
   "context_fields": [],
@@ -2458,7 +2456,7 @@
    "junkerwerk.hu"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.2.0",
+  "facts_schema_version": "1.3.0",
   "fqdns_total": 3,
   "generated_on": null,
   "generation": null,
@@ -2473,7 +2471,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.1",
+  "policy_version": "2026-09-27.2",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -2772,7 +2770,7 @@
       "188.40.3.130"
      ],
      "statement": "positive.text",
-     "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), beim Hoster Hetzner Online GmbH lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab."
+     "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu; beim Hoster Hetzner Online GmbH) lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab."
     },
     {
      "check": "mail_plaintext",
@@ -2781,7 +2779,7 @@
       "188.40.3.130"
      ],
      "statement": "positive.text",
-     "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), beim Hoster Hetzner Online GmbH lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu."
+     "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu; beim Hoster Hetzner Online GmbH) lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu."
     }
    ],
    "subjects": [
@@ -2790,7 +2788,7 @@
     "188.40.3.130:143",
     "188.40.3.130:21"
    ],
-   "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), beim Hoster Hetzner Online GmbH lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab. Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), beim Hoster Hetzner Online GmbH lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu.",
+   "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu; beim Hoster Hetzner Online GmbH) lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab. Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu; beim Hoster Hetzner Online GmbH) lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu.",
    "title": "Datei- und Mailzugänge erzwingen TLS vor der Anmeldung"
   },
   {
@@ -2862,7 +2860,7 @@
       "188.40.3.130"
      ],
      "statement": "positive.text",
-     "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 188.40.3.130: Debian GNU/Linux 12 (in Langzeitpflege (LTS) bis 30.06.2028 laut Debian)."
+     "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 188.40.3.130: Debian GNU/Linux 12 (in Langzeitpflege bis 30.06.2028 laut Debian)."
     }
    ],
    "subjects": [
@@ -2877,7 +2875,7 @@
     "sw:188.40.3.130:-:proftpd:unknown",
     "sw:188.40.3.130:-:proftpd_sftp:unknown"
    ],
-   "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 188.40.3.130: Debian GNU/Linux 12 (in Langzeitpflege (LTS) bis 30.06.2028 laut Debian).",
+   "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 188.40.3.130: Debian GNU/Linux 12 (in Langzeitpflege bis 30.06.2028 laut Debian).",
    "title": "Serversoftware mit laufender Herstellerpflege"
   },
   {
@@ -3001,7 +2999,7 @@
     "ip": "188.40.3.130",
     "more_ips": [],
     "operator": "Hetzner Online GmbH (dedi2230.your-server.de)",
-    "role": "E-Mail-Versand laut SPF · geteiltes System beim Hoster"
+    "role": "Datenbanken erreichbar, Dateiaustausch (FTP, SFTP), Mailabruf, Einlieferung und Versand laut SPF · geteiltes System beim Hoster"
    },
    {
     "cov": "teil",
@@ -3032,7 +3030,7 @@
      "Mailserver auf Port 25 (Verschlüsselung, Anmeldung)"
     ],
     "code": "e5",
-    "detail": "Betroffen: 217.243.248.30 (openotp.junkerwerk.hu). Laut Passivquelle nimmt dort der Dienst SMTP Verbindungen an (gesehen am 31.08.2026); vom Prüfstand aus ist Port 25 nicht erreichbar, der Mailserver auf diesem Port ist deshalb nicht geprüft.",
+    "detail": "Betroffen: 217.243.248.30 (openotp.junkerwerk.hu). Laut Passivquelle nimmt dort der Dienst SMTP Verbindungen an (Hosteintrag der Passivquelle aktualisiert am 31.08.2026); vom Prüfstand aus ist Port 25 nicht erreichbar, der Mailserver auf diesem Port ist deshalb nicht geprüft.",
     "refs": [],
     "subjects": [
      "217.243.248.30"

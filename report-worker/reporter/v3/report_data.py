@@ -37,6 +37,10 @@ def _counts(facts: FS.Facts, output: CatalogOutput, n_findings: int, n_positives
     raw = int(bilanz.get("total_findings") or 0)
     doppelt = sum(int(v) for k, v in (bilanz.get("fp_by_reason") or {}).items()
                   if "dedup" in str(k).lower() and isinstance(v, int))
+    # S6b-4n (spec/11 N12): Doppelmeldungen je Grund der Korrelation ("Header-Dedup": gleiche
+    # Meldungen der Webanalyse an vielen Adressen, "SSL-Dedup": der TLS-Pruefung).
+    je_grund = {str(k): int(v) for k, v in (bilanz.get("fp_by_reason") or {}).items()
+                if "dedup" in str(k).lower() and isinstance(v, int) and v > 0}
     # Je System eine Zeile in 2.1 (IPv4 und IPv6 mit gleichem rDNS); der Satz ueber
     # Luecken zaehlt dieselben Zeilen, sonst widersprechen sich Satz und Tabelle.
     rows = model.system_rows()
@@ -46,15 +50,20 @@ def _counts(facts: FS.Facts, output: CatalogOutput, n_findings: int, n_positives
     eigene = [h for h in facts.hosts if h.third_party is None]
     eigene_ips = {h.ip for h in eigene}
     # S6b-4 (spec/11 T7): AAAA-Adressen derselben Namen ohne Inventareintrag zaehlen mit.
+    # S6b-4n (spec/11 N5, N13): ebenso weitere A-Eintraege; beide stehen in der Zaehlung als
+    # "nur aus DNS", zusammen mit den Adressen ohne Antwort.
     zusatz = [a for h in eigene for a in h.additional_ips if a.ip not in eigene_ips]
+    ohne_antwort = sum(1 for h in eigene if h.reach is not None
+                       and h.reach.status in ("no_response", "unreachable_from_scanner", "no_ipv6_route"))
     return N.Counts(
         domains=list(facts.scan.domains) or [facts.scan.domain],
         scan_date=C.format_date(facts.scan.finished_at or facts.scan.started_at),
         hosts_total=len(eigene) + len(zusatz),
         systems_total=len(rows),
         gap_addresses=sum(len(ips) for ips, status in zip(rows, cov) if status != "voll"),
-        hosts_ipv4=sum(1 for h in eigene if h.family == 4),
-        hosts_ipv6=sum(1 for h in eigene if h.family == 6) + len(zusatz),
+        hosts_ipv4=sum(1 for h in eigene if h.family == 4) + sum(1 for a in zusatz if a.family == 4),
+        hosts_ipv6=sum(1 for h in eigene if h.family == 6) + sum(1 for a in zusatz if a.family == 6),
+        hosts_dns_only=len({a.ip for a in zusatz}) + ohne_antwort,
         # S6b-4 (spec/11 T8): die Verzeichnis-Enumeration steht nur mit einem belastbaren Lauf in 2.3.
         path_search_ok=any(p.verdict == "reliable" for p in facts.path_search if p.host_ip in eigene_ips),
         path_search_known=bool(facts.path_search),
@@ -69,6 +78,7 @@ def _counts(facts: FS.Facts, output: CatalogOutput, n_findings: int, n_positives
         coverage_partial=cov.count("teil"),
         coverage_none=cov.count("keine") + cov.count("unerreichbar"),
         duplicates=doppelt if raw else 0,
+        duplicates_by=je_grund if raw else {},
         not_testable=output.summary.by_status.get("not_testable", 0),
         names_found=COV.names_found(facts),
         names_checked=COV.names_checked(facts),
@@ -165,10 +175,10 @@ def build_report_data(
     # Leitwerkzeugen des Pakets, nicht an jeder Luecke. Die Abdeckungstabelle
     # in Kapitel 2 zeigt weiterhin jede Luecke.
     # S6b-1: dieselbe Regel wie die Abdeckung in Kapitel 2.1 (coverage.py).
-    glance = C.build_glance(finding_items, finding_list, counts, model.system_gaps(), facts)
+    glance = C.build_glance(finding_items, finding_list, counts, model.system_gaps(), facts, output)
     glance.levers = levers
     business = C.build_business(facts, C.observed_systems(facts))
-    scope = C.build_scope(facts, output, counts, model)
+    scope = C.build_scope(facts, output, counts, model, finding_list)
     architecture = C.build_architecture(facts, output, finding_items, finding_list, model)
 
     package_name, package_label = T.package_labels(facts.scan.package)
