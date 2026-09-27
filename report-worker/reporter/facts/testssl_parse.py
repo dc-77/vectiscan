@@ -92,6 +92,9 @@ class TestsslResult:
     http_headers: dict[str, str] = field(default_factory=dict)
     http_headers_listed: bool = False
     cbc_obsoleted: Optional[bool] = None
+    # S6b-4 (spec/11 T7): Adresse, an der testssl gemessen hat ("-->> 52.59.120.70:443", JSON
+    # "ip": "name/adresse"); die Inventaradresse des Aufrufs ueberschreibt sie nicht.
+    measured_ip: Optional[str] = None
 
     @property
     def has_data(self) -> bool:
@@ -161,6 +164,8 @@ def apply_json(result: TestsslResult, entries: list[dict[str, Any]] | None) -> N
             fq, ip = ipfield.split("/", 1)
             result.fqdn = fq or None
             result.host_ip = result.host_ip or ip or None
+        if ipfield and not result.measured_ip:
+            result.measured_ip = (ipfield.split("/", 1)[1] if "/" in ipfield else ipfield) or None
         try:
             result.port = int(e.get("port") or result.port)
         except (TypeError, ValueError):
@@ -301,6 +306,7 @@ def apply_text(result: TestsslResult, raw: str | None) -> None:
     if m:
         result.started_at = iso_utc(m.group(1).replace(" ", "T"))
         result.host_ip = result.host_ip or m.group(2)
+        result.measured_ip = result.measured_ip or m.group(2)
         try:
             result.port = int(m.group(3))
         except ValueError:

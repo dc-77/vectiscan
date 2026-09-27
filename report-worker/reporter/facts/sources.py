@@ -182,6 +182,8 @@ class HostData:
     zap_spider_summary: Optional[dict[str, Any]] = None
     feroxbuster: Optional[list[dict[str, Any]]] = None
     ffuf: Optional[dict[str, Any]] = None
+    # S6b-4 (spec/11 T8): ffuf je Modus ("sensitive", "param"); ``ffuf`` bleibt die letzte Datei.
+    ffuf_by_mode: dict[str, dict[str, Any]] = field(default_factory=dict)
     wpscan: Optional[dict[str, Any]] = None
     ai_rows: list[ToolRun] = field(default_factory=list)
     refs: dict[str, str] = field(default_factory=dict)
@@ -209,6 +211,9 @@ class ScanBundle:
     passive_by_domain: dict[str, dict[str, Any]] = field(default_factory=dict)
     # S6b-1 (spec/09 Q3): CNAME-Ketten aus phase0/dnsx_validation.json, je Name.
     dns_cnames: dict[str, list[str]] = field(default_factory=dict)
+    # S6b-4 (spec/11 T7): A- und AAAA-Adressen je Name aus derselben Datei.
+    dns_a: dict[str, list[str]] = field(default_factory=dict)
+    dns_aaaa: dict[str, list[str]] = field(default_factory=dict)
     host_strategy: Optional[dict[str, Any]] = None
     ai_prioritization: Optional[dict[str, Any]] = None
     # S6b-3 (spec/10 R5, E13): Teilausgabe der Hostsuche (``fqdn ip[,ip]`` je Zeile) und
@@ -383,10 +388,19 @@ def _load_bundle_from_reader(reader: _Reader, order_id_hint: str, source_kind: s
         if not isinstance(line, dict):
             continue
         name = str(line.get("host") or "").strip().lower().rstrip(".")
+        # dnsx schreibt aufgeloeste Namen mit Adresse im Feld "host" ("eset.x.de 85.22.176.108")
+        # nur bei NXDOMAIN-Zeilen; dort gibt es keine Eintraege.
+        if " " in name:
+            continue
         chain = [str(c).strip().lower().rstrip(".") for c in (line.get("cname") or []) if c]
         if name and chain:
             b.dns_cnames.setdefault(name, chain)
             b.refs.setdefault("dnsx_validation", "phase0/dnsx_validation.json")
+        for key, target in (("a", b.dns_a), ("aaaa", b.dns_aaaa)):
+            ips = sorted({str(x).strip() for x in (line.get(key) or []) if str(x).strip()})
+            if name and ips:
+                target.setdefault(name, ips)
+                b.refs.setdefault("dnsx_validation", "phase0/dnsx_validation.json")
     hs = reader.json("phase0/host_strategy.json")
     if isinstance(hs, dict):
         b.host_strategy = hs
@@ -508,6 +522,8 @@ def _load_bundle_from_reader(reader: _Reader, order_id_hint: str, source_kind: s
             data = reader.json(name)
             if isinstance(data, dict):
                 h.ffuf = data
+                mode = fname[len("ffuf"):-len(".json")].strip("_") or "sensitive"
+                h.ffuf_by_mode.setdefault(mode, data)
         elif fname == "wpscan.json":
             data = reader.json(name)
             if isinstance(data, dict):
@@ -674,6 +690,15 @@ def merge_tool_runs(bundle: ScanBundle, runs: list[ToolRun], *, name: str | None
                 data = run.json()
                 if isinstance(data, dict) and h.ffuf is None and data.get("results") is not None:
                     h.ffuf = data
+                mode = run.tool[len("ffuf"):].strip("_") or "sensitive"
+                if mode not in h.ffuf_by_mode:
+                    # S6b-4 (spec/11 T8): die Zeile traegt die Treffer als JSON-Zeilen (gekuerzt).
+                    if isinstance(data, dict) and data.get("results") is not None:
+                        h.ffuf_by_mode[mode] = data
+                    else:
+                        lines = [x for x in jsonl(raw) if isinstance(x, dict) and "status" in x]
+                        if lines:
+                            h.ffuf_by_mode[mode] = {"results": lines, "truncated": True}
             elif run.tool == "wpscan":
                 data = run.json()
                 if isinstance(data, dict) and h.wpscan is None:

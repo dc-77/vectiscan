@@ -51,6 +51,8 @@ class NmapPort:
     method: Optional[str] = None
     hostname: Optional[str] = None
     servicefp: Optional[str] = None
+    # S6b-4 (spec/11 T15): Betriebssystem laut Dienstkennung ("Service Info: OS: Windows").
+    ostype: Optional[str] = None
     scripts: list[NmapScript] = field(default_factory=list)
 
     def script(self, script_id: str) -> Optional[str]:
@@ -84,6 +86,9 @@ class NmapRun:
     finished_at: Optional[str] = None
     summary: Optional[str] = None
     source_format: str = "xml"
+    # S6b-4 (spec/11 T1): gepruefter Portbereich laut ``<scaninfo services=...>`` (Top 1000).
+    scan_services: Optional[str] = None
+    scan_numservices: Optional[int] = None
 
     @property
     def scanned(self) -> bool:
@@ -115,6 +120,13 @@ def parse_nmap_xml(text: str | bytes | None) -> Optional[NmapRun]:
     if root.tag != "nmaprun":
         return None
     run = NmapRun(version=root.get("version"), args=root.get("args"))
+    si = root.find("scaninfo")
+    if si is not None and si.get("services"):
+        run.scan_services = si.get("services")
+        try:
+            run.scan_numservices = int(si.get("numservices") or 0) or None
+        except ValueError:
+            run.scan_numservices = None
     for target in root.findall("target"):
         if target.get("status") == "skipped":
             run.targets_skipped.append((target.get("specification", ""), target.get("reason", "")))
@@ -159,6 +171,7 @@ def parse_nmap_xml(text: str | bytes | None) -> Optional[NmapRun]:
                     np.method = svc.get("method")
                     np.hostname = svc.get("hostname")
                     np.servicefp = svc.get("servicefp")
+                    np.ostype = svc.get("ostype")
                     conf = svc.get("conf")
                     if conf is not None:
                         try:
@@ -205,6 +218,30 @@ def _script_elems(script: ET.Element) -> dict[str, str]:
             if el.get("key") and el.text:
                 out.setdefault(f"{key}.{el.get('key')}", el.text.strip())
     return out
+
+
+def in_port_range(spec: Optional[str], port: int) -> Optional[bool]:
+    """Liegt ``port`` im Portbereich ``"1,3-4,6-7,..."``? None ohne Angabe."""
+    if not spec:
+        return None
+    for part in spec.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        if "-" in part:
+            lo, _, hi = part.partition("-")
+            try:
+                if int(lo) <= port <= int(hi):
+                    return True
+            except ValueError:
+                continue
+        else:
+            try:
+                if int(part) == port:
+                    return True
+            except ValueError:
+                continue
+    return False
 
 
 # ------------------------------------------------------------------ Text-Fallback

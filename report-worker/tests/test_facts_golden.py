@@ -277,8 +277,11 @@ def test_passive_shodan_unbestaetigt():
     exim = p[("217.243.248.30", 25)]
     assert exim.product == "Exim smtpd" and exim.version == "4.96" and exim.verified is False
     assert p[("188.40.3.130", 3306)].verified is True
-    exim_sw = [s for s in f.software if s.family == "exim"]
+    # S6b-4 (spec/11 T1): Exim aus dem nmap-Gruss ist ein aktiver Fakt ohne Version; die
+    # Shodan-Version 4.96 bleibt passiv.
+    exim_sw = [s for s in f.software if s.family == "exim" and "shodan" in s.detection_sources]
     assert not exim_sw, "Shodan-Versionen bleiben passiv und werden keine Software-Fakten"
+    assert all(s.version_norm is None for s in f.software if s.family == "exim")
 
 
 def test_http_je_vhost_und_x_feserver():

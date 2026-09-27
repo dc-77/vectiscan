@@ -127,6 +127,39 @@ als Messung. `blocked` nur mit belegter Sperre (403, 429 oder Challenge-Marker i
 Rohausgabe), `waf_body_marker` allein reicht nicht (bergersysteme 198.202.211.1). POP3 ohne
 `USER` und mit leerem `SASL` vor `STLS` ist `login_disabled` (wie IMAP `LOGINDISABLED`).
 
+### Seit Schema 1.2.0 (S6b-4, spec/11)
+
+Minor-Bump: neue Felder und eine neue Entitaet (`path_search`), dazu eine geaenderte Bedeutung
+von `services.unidentified` (nur noch ohne Kennung aus Protokollskript, Banner oder Passivquelle)
+und `http.hsts` (nie an 4xx, 429 oder Sicherheitsabfrage, E20).
+
+| Feld | Inhalt | Quelle |
+|---|---|---|
+| `scan.scanned_ports`, `scan.scanned_port_count` | Portbereich des Portscans (`<scaninfo services=...>`), fuer "außerhalb des geprüften Portbereichs" (T1) | nmap XML |
+| `services[].kennung` | Kennung aus `imap-capabilities`, `pop3-capabilities`, `smtp-commands` und dem Banner in `servicefp` ("IMAP über TLS (Dovecot)", "SMTP (Exim)") | nmap, `build.protocol_kennung` |
+| `services[].foreign` | Dienst einer weiteren Domain auf einem Hoster-Server (Zertifikat nur fremd, Shoutcast, Icecast), fällt aus der Auswertung (T9) | `systems._mark_foreign_services` |
+| `passive[].kennung` | Kennung aus Modul und Banner der Passivquelle ("ManageSieve (Dovecot Pigeonhole)") | Shodan |
+| `hosts[].shared.server_operator` | Betreiber des Servers laut rDNS, wenn das keine Hoster-Domain ist (castenow planwerk6.de bei Hetzner) | `systems._shared` |
+| `hosts[].additional_ips` | AAAA-Adressen derselben Namen ohne Inventareintrag (`ip`, `family`, `names`, `source` dnsx); bei Drittanbietern leer (T7) | `phase0/dnsx_validation.json` |
+| `tls[].measured_ip`, `http[].measured_ip` | Adresse, an der testssl oder httpx tatsaechlich gemessen hat (DNS-Rotation, T7) | testssl `ip` und `-->>`, httpx `host` |
+| `tls[].cert.renewal.issuer`, `recent_leads`, `recent_renewals`, `expected_renewal`, `lines` | Erneuerungslinie je SAN-Satz und Aussteller: letzte Vorlaeufe nach der letzten Luecke, erwartetes Datum, Zahl der Linien (T14, E13) | `phase0/crtsh_raw.json` |
+| `tls[].cert.valid_elsewhere`, `valid_elsewhere_not_after` | gültiges Zertifikat desselben Namens an anderen Adressen (castenow 8A:18 auf .4 und .6) | testssl, httpx |
+| `http[].hsts.tool`, `url`, `status_code` | Messung, aus der HSTS stammt (header_check, redirect_probe, testssl) | `build._hsts_measured` |
+| `http[].powered_by` | X-Powered-By der ersten Antwort, mit Versionsangabe von der Endseite (castenow ubb-wiki PHP/8.4.25) | header_check, redirect_probe |
+| `http[].wordpress.findings[].found_by` | Beleg des wpscan-Funds ("Direct Access") | wpscan |
+| `software[].outdated`, `latest_version` | wpscan: veraltet und aktuelle Version je Erweiterung (T15) | wpscan |
+| `software` aus Skript-Adressen | jQuery, jQuery Migrate, Ultimate Member, etracker aus `tech_info.scripts` (zweite Quelle und Version) | redirect_probe |
+| `software[].detection_sources` mit nmap `ostype` | "OS: Windows" bestaetigt ein Windows aus httpx (junkerwerk .29) | nmap XML |
+| `software[].eol.lts_since` | Beginn der Langzeitpflege (Debian 12 seit 11.07.2026), `date` ist dann das Ende der LTS (T11) | `versions.DEBIAN_LTS_START` |
+| `fqdns[].probe_title`, `probe_final_url` | Titel und Endadresse der Seite, die redirect_probe aufgenommen hat (Bildunterschrift) | tech_profile `redirect_data` |
+| `path_search[]` | Pfadsuche je Host: `verdict` (reliable, unreliable, aborted, skipped, not_run), Statuscodes, Sicherheitsabfrage, Abbruchgrund, Urteil je Werkzeug (T8) | feroxbuster `statistics`, ffuf je Modus, header_eval |
+
+Regeln: HSTS gilt an der ersten echten Antwort (header_check ausser 4xx, 5xx und
+Sicherheitsabfrage; sonst redirect_probe mit `location` oder ohne Fehlertitel; sonst testssl
+bei Status unter 400). Eine Pfadsuche ist belastbar, wenn feroxbuster Treffer oder 200 zaehlt
+oder mehr 404 als Weiterleitungen, 401, 403 und 429 zusammen; ffuf je Modus nach den
+Statuscodes seiner Treffer.
+
 ### Bump-Regel (semver)
 
 - Patch: neue optionale Felder mit Default, neue Warnungstexte.

@@ -49,11 +49,66 @@ _INTERNAL_TLDS = frozenset({"local", "localhost", "internal", "lan", "home", "ar
 # ("Hetzner Online AG - Rechenzentrum Haustechnik"). Im Bericht steht nur der Name.
 _OPERATOR_SUFFIX = re.compile(r"\s+[-\u2013\u2014]\s+.*$")
 
+# S6b-4 (spec/11 T2, E17): heutige Firmierung eines Hosters, wenn AbuseIPDB fuer Teile seiner
+# Netze einen alten Namen fuehrt (dieselbe Maschine hiess unter IPv4 "Hetzner Online AG",
+# unter IPv6 "Hetzner Online GmbH").
+OPERATOR_ALIASES: dict[str, str] = {
+    "hetzner online ag": "Hetzner Online GmbH",
+}
+# Betreiber hinter der Domain, die AbuseIPDB zu einer Adresse nennt (Anschlussbetreiber eines
+# Festnetzanschlusses, Konzern hinter einer Tochterfirmierung).
+DOMAIN_OPERATORS: dict[str, str] = {
+    "vodafone-ip.de": "Vodafone", "vodafone.de": "Vodafone", "kabel-deutschland.de": "Vodafone",
+    "telekom.de": "Telekom", "t-ipconnect.de": "Telekom", "dtag.de": "Telekom",
+    "versatel.de": "1&1 Versatel", "1und1.de": "1&1", "o2online.de": "Telef\u00f3nica",
+    "telefonica.de": "Telef\u00f3nica", "netcologne.de": "NetCologne", "m-net.de": "M-net",
+    "amazon.com": "Amazon",
+}
+# Domains, unter denen Hoster ihre Server und Standardzertifikate fuehren (rDNS und
+# Zertifikat eines geteilten Servers). Sie sind keine fremden Domains anderer Nutzer.
+HOSTER_DOMAINS: dict[str, str] = {
+    "your-server.de": "Hetzner", "your-database.de": "Hetzner", "hetzner.com": "Hetzner",
+    "hetzner.de": "Hetzner", "hetzner.cloud": "Hetzner",
+    "secureserver.net": "Host Europe", "hosteurope.de": "Host Europe",
+    "pbiaas.com": "IONOS", "ionos.de": "IONOS", "ionos.com": "IONOS", "kundenserver.de": "IONOS",
+    "1and1.com": "IONOS", "kasserver.com": "All-Inkl", "all-inkl.com": "All-Inkl",
+    "stratoserver.net": "Strato", "strato.de": "Strato", "netcup.net": "netcup",
+    "your-server.com": "Hetzner",
+}
+
 
 def network_operator(isp: object) -> Optional[str]:
-    """Name des Netzbetreibers ohne Zusatz nach einem Strich, None ohne Angabe."""
+    """Name des Netzbetreibers ohne Zusatz nach einem Strich, in heutiger Firmierung."""
     text = _OPERATOR_SUFFIX.sub("", str(isp or "").strip())
-    return text or None
+    return OPERATOR_ALIASES.get(text.lower(), text) or None
+
+
+def network_operator_label(provider: object, *, platform: bool = False,
+                           customer_domains: Iterable[str] = ()) -> Optional[str]:
+    """Netzbetreiber fuer die Tabelle 2.1 (spec/11 T2, E17), Quelle AbuseIPDB.
+
+    Festnetzanschluss: der Anschlussbetreiber aus der Domain in Klammern ("Castenow GmbH
+    (Anschluss Vodafone)"), wenn die Domain einem bekannten Anschlussbetreiber gehoert.
+    Plattform mit Nutzungsart CDN: "(CDN)" ("Webflow, Inc (CDN)"). Nennt die Domain einen
+    Konzern, der im Namen nicht vorkommt, steht er dabei ("A100 ROW GmbH (Amazon)")."""
+    if provider is None:
+        return None
+    name = network_operator(getattr(provider, "isp", None))
+    if not name:
+        return None
+    usage = str(getattr(provider, "usage_type", None) or "").strip().lower()
+    domain = registrable(getattr(provider, "domain", None) or "")
+    konzern = DOMAIN_OPERATORS.get(domain)
+    eigen = bool(domain) and under(domain, list(customer_domains))
+    zusatz: list[str] = []
+    if usage in LINE_USAGES:
+        if konzern and not eigen and konzern.lower() not in name.lower():
+            zusatz.append(f"Anschluss {konzern}")
+    elif konzern and konzern.lower() not in name.lower():
+        zusatz.append(konzern)
+    if platform and "content delivery" in usage:
+        zusatz.append("CDN")
+    return f"{name} ({', '.join(zusatz)})" if zusatz else name
 
 
 def is_dns_name(name: object) -> bool:
@@ -172,13 +227,45 @@ def derive(facts: S.Facts, *, finished: Optional[str]) -> None:
         shared = _shared(facts, members, domains, fq_by_ip)
         for h in members:
             h.shared = shared
+    _mark_foreign_services(facts, domains)
     mail_ips = _customer_mail_ips(facts, domains)
     for h in facts.hosts:
         h.third_party = _third_party(h, fq_by_ip.get(h.ip, []), domains, skipped, facts)
         h.reach = None if h.third_party else _reach(facts, h, finished)
+        if h.third_party is not None:
+            # Weitere Adressen eines Drittanbieters (Microsoft 365) gehoeren nicht zum Auftrag.
+            h.additional_ips = []
         h.betriebsform = betriebsform(h)
         h.serves_customer_mail = h.ip in mail_ips
         h.serves_customer_web = any(fq.real_content is True and not fq.wildcard for fq in fq_by_ip.get(h.ip, []))
+
+
+# Ports, auf denen ein geteilter Server die Dienste aller Nutzer anbietet (Web, Mail, FTP,
+# Verwaltung). Dienste dort sind die des Hosters, auch mit dem Zertifikat eines anderen
+# Nutzers (castenow 92.205.163.53: Mailports mit netscope-media.de).
+HOSTER_SERVICE_PORTS = frozenset({20, 21, 22, 25, 80, 110, 143, 443, 465, 587, 993, 995, 8443, 8880})
+_STREAM_PRODUCTS = re.compile(r"icecast|shoutcast", re.I)
+
+
+def _mark_foreign_services(facts: S.Facts, domains: list[str]) -> None:
+    """Dienste anderer Nutzer eines geteilten Servers (spec/11 T9, E18).
+
+    Auf einem Hoster-Server laufen neben den Diensten des Hosters Dienste anderer Nutzer auf
+    eigenen Ports: ein Audiostream mit fremdem Zertifikat (castenow 8000, 8001: tonausstrom.de),
+    ein Streamingserver (8800, Icecast). Sie sind kein Dienst des Kunden; der Bericht nennt sie
+    als eine Beobachtung beim Betreiber, nicht als Befund."""
+    hoster = {h.ip for h in facts.hosts if h.shared is not None and h.shared.kind == "hoster"}
+    if not hoster:
+        return
+    for s in facts.services:
+        if s.host_ip not in hoster or s.port in HOSTER_SERVICE_PORTS:
+            continue
+        cert_names = [n for n in ([s.cert.cn, *s.cert.san] if s.cert else []) if n and is_dns_name(n)]
+        cert_fremd = bool(cert_names) and all(not under(n, domains)
+                                              and registrable(n) not in HOSTER_DOMAINS for n in cert_names)
+        stream = _STREAM_PRODUCTS.search(" ".join(x for x in (s.product, s.kennung, s.fp_server) if x))
+        if cert_fremd or stream:
+            s.foreign = True
 
 
 def _customer_mail_ips(facts: S.Facts, domains: list[str]) -> set[str]:
@@ -252,7 +339,10 @@ def _shared(facts: S.Facts, members: list[S.HostFact], domains: list[str],
     usages = {(h.provider.usage_type or "").strip().lower() for h in members if h.provider}
     if not rdns_fremd or OWN_LINE_USAGE in usages:
         return None
-    ausgenommen = {registrable(r) for r in reverses}
+    # S6b-4 (spec/11 T9, E18): Domains des Hosters (rDNS, Standardzertifikat) und des
+    # Serverbetreibers laut rDNS zaehlen nicht als fremde Domains ("your-database.de" aus dem
+    # Standardzertifikat stand bei lumbeck-wolter als zweite fremde Domain).
+    ausgenommen = {registrable(r) for r in reverses} | set(HOSTER_DOMAINS)
     names = _names_on(facts, ips)
     fremd = sorted((n for n in names
                     if n and is_dns_name(n) and not under(n, domains) and not is_ip_like(n)
@@ -262,6 +352,9 @@ def _shared(facts: S.Facts, members: list[S.HostFact], domains: list[str],
         return None
     operator = next((network_operator(h.provider.isp) for h in members
                      if h.provider and h.provider.isp), None)
+    # Betreiber des Servers laut rDNS, wenn das keine Hoster-Domain ist (castenow 159.69.143.80:
+    # yak.planwerk6.de mit Standardzertifikat *.planwerk6.de im Netz von Hetzner).
+    betreiber = sorted({registrable(r) for r in rdns_fremd if registrable(r) not in HOSTER_DOMAINS})
     evidence: list[S.Evidence] = []
     seen: set[str] = set()
     for n in fremd:
@@ -278,8 +371,17 @@ def _shared(facts: S.Facts, members: list[S.HostFact], domains: list[str],
     tools = {names[n][0] for n in fremd}
     signals = sorted({"fremde_namen_zertifikat" if t != "shodan" else "fremde_namen_shodan" for t in tools}
                      | {"rdns_betreiber"})
-    return S.SharedSystem(kind="hoster", operator=operator, foreign_names=fremd[:12],
+    return S.SharedSystem(kind="hoster", operator=operator, foreign_names=fremd[:40],
+                          server_operator=betreiber[0] if betreiber else None,
                           signals=signals, evidence=evidence[:6])
+
+
+def foreign_domains(shared: Optional[S.SharedSystem]) -> list[str]:
+    """Registrierbare fremde Domains eines geteilten Servers (spec/11 T9): gezaehlt wird die
+    Domain, nicht jeder Name (erbbauverein.de und www.erbbauverein.de sind eine)."""
+    if shared is None or shared.kind != "hoster":
+        return []
+    return sorted({registrable(n) for n in shared.foreign_names if n}, key=sort_key)
 
 
 def _third_party(h: S.HostFact, fqdns: list[S.FqdnFact], domains: list[str], skipped: set[str],
