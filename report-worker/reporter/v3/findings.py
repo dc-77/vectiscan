@@ -174,6 +174,15 @@ def _clean_labels(labels: list[str]) -> list[str]:
     return merge_affected(out)
 
 
+def mit_zusatz(label: str, zusatz: str) -> str:
+    """"name (+alias)" und "beim Hoster X" werden "name (+alias; beim Hoster X)" (spec/11 N15)."""
+    if not zusatz:
+        return label
+    if label.endswith(")") and "(" in label:
+        return f"{label[:-1]}; {zusatz})"
+    return f"{label} ({zusatz})"
+
+
 def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY,
                 kurz: bool = False, excluded: list[str] | None = None,
                 operator_labels: dict[str, str] | None = None) -> dict[str, Any]:
@@ -193,7 +202,9 @@ def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY,
         affected.extend(r.affected)
         label = r.group_label
         if label and r.group_key in operator_labels:
-            label = f"{kurz_label(label) if kurz else label}, {operator_labels[r.group_key]}"
+            # S6b-4n (spec/11 N15): Zusatz in Klammern hinter dem Namen, nicht als eigenes Glied
+            # der Aufzaehlung ("beim Plattformbetreiber umfrageonline.com" las sich wie ein Ort).
+            label = mit_zusatz(kurz_label(label) if kurz else label, operator_labels[r.group_key])
         if label and label not in groups:
             groups.append(label)
         for name in r.vars.get("fqdn_names") or []:
@@ -209,9 +220,7 @@ def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY,
     passed: list[str] = []
     fehlend: list[str] = []
     anderswo: list[str] = []
-    ziele: list[str] = []
-    rua: list[str] = []
-    mx: list[str] = []
+    gesammelt: dict[str, list[Any]] = {name: [] for name in render.COLLECT_VARS}
     for r in results:
         for x in r.vars.get("passed") or []:
             if x not in passed:
@@ -219,25 +228,15 @@ def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY,
         for x in r.vars.get("missing_header_names") or []:
             if x not in fehlend:
                 fehlend.append(x)
-        for x in r.vars.get("valid_elsewhere") or []:
-            if x not in anderswo:
-                anderswo.append(x)
-        for x in r.vars.get("target_versions") or []:
-            if x not in ziele:
-                ziele.append(x)
-        for x in r.vars.get("dmarc_rua") or []:
-            if x not in rua:
-                rua.append(x)
-        for x in r.vars.get("mx") or []:
-            if x not in mx:
-                mx.append(x)
+        # S6b-4n: alle gesammelten Gruppenvariablen der Engine (render.COLLECT_VARS) je Sachverhalt.
+        for name, werte in gesammelt.items():
+            for x in r.vars.get(name) or []:
+                if x not in werte:
+                    werte.append(x)
     return {
         "passed": passed,
         "missing_header_names": fehlend,
-        "valid_elsewhere": anderswo,
-        "target_versions": ziele,
-        "dmarc_rua": rua,
-        "mx": mx,
+        **gesammelt,
         "affected": affected,
         "count": len(affected),
         "group": group,
@@ -475,6 +474,59 @@ def _passive_after_active(parts: list[Rendered]) -> list[Rendered]:
     return parts
 
 
+# S6b-4n (spec/11 N10): Hinweise der Passivregel, die im Portzusatz des ersten Satzes stehen.
+_PASSIV_HINWEISE: tuple[tuple[str, str], ...] = (
+    ("außerhalb des geprüften Portbereichs", "außerhalb des geprüften Portbereichs"),
+    ("vom Prüfstand aus nicht prüfbar", "vom Prüfstand aus nicht prüfbar"),
+    ("vom Prüfstand aus nicht erreichbar", "Host vom Prüfstand aus nicht erreichbar"),
+)
+_LABEL_PORT = re.compile(r":(\d+)(?:\s|\(|$)")
+_LABEL_KLAMMER = re.compile(r"\(([^,)]+)")
+
+
+def _ports(fails: list[tuple[CheckResult, Member]]) -> list[str]:
+    ports = sorted({m.port for _, m in fails if m.port is not None})
+    return [str(p) for p in ports]
+
+
+def _passive_zusatz(passiv: RuleHit, gerendert: list[Rendered]) -> str:
+    """"und laut Passivquelle 92.205.224.174:8880 (Plesk, gesehen am 17.09.2026, außerhalb des
+    geprüften Portbereichs)" (spec/11 N10): die Passivvariante am selben Produkt als Portzusatz."""
+    hinweise = [h for muster, h in _PASSIV_HINWEISE if any(muster in r.text for r in gerendert)]
+    labels: list[str] = []
+    for _, m in passiv.fails:
+        label = m.label.replace(", laut Passivquelle", "").replace("laut Passivquelle, ", "")
+        if hinweise:
+            label = mit_zusatz(label, ", ".join(hinweise)).replace("; ", ", ", 1) if label.endswith(")") \
+                else f"{label} ({', '.join(hinweise)})"
+        if label not in labels:
+            labels.append(label)
+    return "und laut Passivquelle " + ", ".join(labels)
+
+
+def _satz_mit_zusatz(text: str, zusatz: str) -> str:
+    """Den Portzusatz vor den Schlusspunkt des ersten Satzes setzen (DB VS-012: die Aussage hat
+    zwei Saetze, der Zusatz gehoert zur Liste im ersten)."""
+    ende = text.find(". ")
+    if ende > 0:
+        return f"{text[:ende]} {zusatz}{text[ende:]}"
+    kopf, punkt = (text[:-1], ".") if text.endswith(".") else (text, "")
+    return f"{kopf} {zusatz}{punkt}"
+
+
+def _title_with_ports(aktiv: RuleHit, passiv: RuleHit, text: str) -> str:
+    """"Verwaltungsoberfläche Plesk auf 443, 8443 und laut Passivquelle 8880" (spec/11 N10)."""
+    basis = text
+    if aktiv.check.family == "admin_service_exposed":
+        produkte = {m.group(1).strip() for _, mb in aktiv.fails if (m := _LABEL_KLAMMER.search(mb.label))}
+        basis = "Verwaltungsoberfläche" + (f" {produkte.pop()}" if len(produkte) == 1 else "")
+    aktiv_ports = _ports(aktiv.fails)
+    passiv_ports = _ports(passiv.fails)
+    if not aktiv_ports or not passiv_ports:
+        return text
+    return f"{basis} auf {', '.join(aktiv_ports)} und laut Passivquelle {aufzaehlung(passiv_ports)}"
+
+
 def _join(parts: list[Rendered]) -> str:
     texts: list[str] = []
     for p in parts:
@@ -510,10 +562,31 @@ def compose(item: Consolidated, checks: dict[str, CheckInfo], where: str) -> Com
     wirksam: list[str] = []
     plan: Optional[tuple[str, str, str, str]] = None
     plan_items: list[PlanItem] = []
+    # S6b-4n (spec/11 N10): eine Passivregel, deren aktives Gegenstueck im selben Befund getroffen
+    # hat, steht nur als Portzusatz im ersten Satz; keine eigene Stufe, Verifikation, Auswirkung.
+    ids = {h.check.id for h in hits}
+    zusammen: dict[str, RuleHit] = {}
+    for h in hits:
+        aktiv = next((a for a in hits if a.check.id in PASSIVE_COUNTERPARTS.get(h.check.id, frozenset())), None)
+        if aktiv is not None:
+            zusammen[h.check.id] = aktiv
+    zusaetze: list[tuple[RuleHit, RuleHit, str, list[Rendered]]] = []
+    schluessel: dict[str, set[str]] = {name: set() for name in teile}
     for reihe, hit in enumerate(hits):
         werte = merged_vars(hit.results, item.merge_key)
+        if hit.check.id in zusammen:
+            beob = select_statements(hit, "observation", werte, where)
+            zusaetze.append((zusammen[hit.check.id], hit, _passive_zusatz(hit, beob), beob))
+            continue
         for name in teile:
-            teile[name].extend(select_statements(hit, name, werte, where))
+            for r in select_statements(hit, name, werte, where):
+                # S6b-4n (spec/11 N10): ein Baustein mit Schluessel steht je Befund einmal.
+                key = hit.check.texts.statement_key(name, r.statement)
+                if key and key in schluessel[name]:
+                    continue
+                if key:
+                    schluessel[name].add(key)
+                teile[name].append(r)
         recs = select_statements(hit, "recommendation", werte, where)
         eff = hit.effective_stage([r.stage for r in recs] or None)
         wirksam.append(eff)
@@ -550,6 +623,15 @@ def compose(item: Consolidated, checks: dict[str, CheckInfo], where: str) -> Com
     # S6b-4 (spec/11 T12): die Aussage der Passivregel steht direkt hinter dem ersten Satz ihres
     # aktiven Gegenstuecks ("Laut Passivquelle ist dieselbe Verwaltungsoberflaeche ... zusaetzlich").
     teile["observation"] = _passive_after_active(teile["observation"])
+    # S6b-4n (spec/11 N10): Portzusatz im ersten Satz des aktiven Gegenstuecks.
+    zusatz_prov: list[Provenance] = []
+    for aktiv, passiv, zusatz, beob in zusaetze:
+        erster = next((p for p in teile["observation"] if p.check == aktiv.check.id), None)
+        if erster is None or not beob:
+            continue
+        erster.text = _satz_mit_zusatz(erster.text, zusatz)
+        zusatz_prov.append(Provenance(field="observation_zusatz", check=passiv.check.id,
+                                      statement=beob[0].statement, members=beob[0].members, text=zusatz))
     empfehlungen.sort(key=lambda t: (t[0], t[1]))
     rec_out: list[list[str]] = []
     rec_prov: list[Provenance] = []
@@ -562,12 +644,20 @@ def compose(item: Consolidated, checks: dict[str, CheckInfo], where: str) -> Com
         rec_prov.append(rec.provenance())
 
     if item.is_bundle:
-        kurzformen = [rule_short(hit) for hit in hits]
+        titel_hits = [hit for hit in hits if hit.check.id not in zusammen]
+        kurzformen = [rule_short(hit) for hit in titel_hits]
+        # S6b-4n (spec/11 N10): ein Titelbaustein fuer aktive und passive Variante am selben Produkt.
+        for i, hit in enumerate(titel_hits):
+            passiv = next((p for p, a in zusammen.items() if a is hit), None)
+            if passiv is not None:
+                p_hit = next(h for h in hits if h.check.id == passiv)
+                text, sid, members = kurzformen[i]
+                kurzformen[i] = (_title_with_ports(hit, p_hit, text), sid, members)
         kurz = [k[0] for k in kurzformen]
         titel_werte = dict(alle_werte, rules=aufzaehlung(kurz))
         title = _render(item.title, titel_werte, f"{where}.title")
         titel_prov = [Provenance(field="title", check=hit.check.id, statement=sid, members=members,
-                                 text=text) for hit, (text, sid, members) in zip(hits, kurzformen)]
+                                 text=text) for hit, (text, sid, members) in zip(titel_hits, kurzformen)]
     else:
         # S6b-4: eine zutreffende Titelvariante der Regel ersetzt den Katalogtitel.
         text, sid, members = pick_variant(hits[0], "short_variants", "", "title")
@@ -582,7 +672,7 @@ def compose(item: Consolidated, checks: dict[str, CheckInfo], where: str) -> Com
                                      text=title)]
     urgency_stage = min(wirksam, key=lambda s: L.STAGE_RANK[s]) if wirksam else \
         L.stage_for(item.scale, item.level, [], item.active_proof, item.urgent, item.hint)
-    prov = titel_prov + [p.provenance() for name in teile for p in teile[name]] + rec_prov
+    prov = titel_prov + [p.provenance() for name in teile for p in teile[name]] + zusatz_prov + rec_prov
     action, stage, effect, lever = plan or ("", urgency_stage, "", "")
     return Composed(
         title=title, found=_join(teile["observation"]), impact=_join(teile["meaning"]),
@@ -776,6 +866,8 @@ def build_findings(
                     alert = alerts.get((m.fqdn or "", m.message_id or "", m.message or ""))
                     if alert is not None:
                         note, anzahl = zap_note(alert) or note, max(alert.count, 1)
+                        # S6b-4n (spec/11 N12): Fundort der Meldung.
+                        ort = _mit_fundort(ort, fundort(facts, m.fqdn or "", alert))
                     tool_findings.append(ToolFinding(what=m.label, where=ort, note=note,
                                                      rule=regel, message=m.message, count=anzahl))
             continue
@@ -836,18 +928,18 @@ def build_findings(
                     cve=", ".join(alle) if len(alle) > 1 else t.cve_id,
                     name=T.testssl_name(test_id) if test_id else "",
                     score=score, src=src, ref=fid, note=note))
-        operator_suffix = ""
+        titel = texte.title
         if item.operator:
             # S6b-1: ein Sachverhalt beim Betreiber traegt dessen Zustaendigkeit im Titel;
             # sonst stuende derselbe Katalogtitel zweimal da (Kunde und Hoster getrennt).
-            operator_suffix = (f" ({item.operator.label} {item.operator.name})"
-                               .replace("  ", " ").replace(" )", ")"))
+            # S6b-4n (spec/11 N15): in derselben Klammer, keine Doppelklammer (junkerwerk VS-010).
+            titel = mit_zusatz(titel, f"{item.operator.label} {item.operator.name}".strip())
         findings.append(Finding(
             id=fid,
             cat=item.category,
             status=L.status_for(item.scale, item.level, item.active_proof, item.urgent, item.hint),
             urgency=L.URGENCY_BY_STAGE[texte.urgency_stage],
-            title=texte.title + operator_suffix,
+            title=titel,
             affected=", ".join(values["affected"]),
             source=source_label(item.results),
             scale=item.scale,
@@ -895,6 +987,11 @@ def build_findings(
                                    score="", src="wpscan", ref=f.id,
                                    note="Quelle wpscan, ohne Fremdbewertung."))
     tool_findings.extend(uncovered_zap_messages(output, facts, alerts))
+    # S6b-4n (spec/11 N12): eine Meldung zu einem Header, den ein Befund oder Positivbefund am selben
+    # Namen bewertet, steht nicht noch einmal im Anhang (castenow HSTS an bitwarden neben dem
+    # Positivbefund, X-AspNet-Version an mail und mail2 neben dem Befund).
+    bewertet = bewertete_namen(output)
+    tool_findings = [t for t in tool_findings if not meldung_bewertet(t, bewertet)]
     for ref in cve_refs:
         erste = ref.cve.split(",")[0].strip()
         befunde: list[str] = []
@@ -993,13 +1090,89 @@ def foreign_services_note(facts: FS.Facts, item: Consolidated) -> str:
     (S6b-4, spec/11 T9): Shoutcast und Icecast weiterer Domains auf dem Hoster-Server sind kein
     Kundenbefund und stehen nicht in 3.1."""
     ips = {str(r.vars.get("host_ip")) for r in item.results if r.vars.get("host_ip")}
-    ports = sorted({s.port for s in facts.services if s.foreign and s.host_ip in ips})
-    if not ports:
+    fremd = [s for s in facts.services if s.foreign and s.host_ip in ips]
+    # S6b-4n (spec/11 N11): fremd nur mit Domainfakt; ein Streamingdienst ohne Domain (castenow 8800,
+    # Icecast) steht als "Zuordnung nicht belegt".
+    ports = sorted({s.port for s in fremd if getattr(s, "foreign_domain", None)})
+    offen = sorted({s.port: s for s in fremd if not getattr(s, "foreign_domain", None)}.items())
+    if not ports and not offen:
         return ""
-    liste = ", ".join(str(p) for p in ports)
-    wort = "Port" if len(ports) == 1 else "Ports"
-    return (f" Auf demselben Server laufen außerdem Dienste weiterer Domains ({wort} {liste}); sie "
-            "gehören nicht zu Ihrer Website und sind in diesem Bericht nicht bewertet.")
+    teile: list[str] = []
+    if ports:
+        liste = ", ".join(str(p) for p in ports)
+        wort = "Port" if len(ports) == 1 else "Ports"
+        teile.append(f"Auf demselben Server laufen außerdem Dienste weiterer Domains ({wort} {liste}); sie "
+                     "gehören nicht zu Ihrer Website und sind in diesem Bericht nicht bewertet.")
+    for port, s in offen:
+        name = re.split(r"\s+\d", s.kennung or s.product or "Dienst", maxsplit=1)[0].strip() or "Dienst"
+        teile.append(f"Auf Port {port} läuft {name}; die Zuordnung zu einer Domain ist nicht belegt, der Dienst "
+                     "ist in diesem Bericht nicht bewertet.")
+    return " " + " ".join(teile)
+
+
+# S6b-4n (spec/11 N12): ZAP-Regeln zu Headern und die Katalogregeln, die denselben Header bewerten.
+# Bewertet eine davon den Namen (Befund oder Positivbefund), entfaellt die Meldung im Anhang.
+ZAP_HEADER_RULES: dict[str, frozenset[str]] = {
+    "10035": frozenset({"hsts_missing", "hsts_short"}),
+    "10038": frozenset({"csp_missing"}),
+    "10020": frozenset({"security_headers_incomplete"}),
+    "10021": frozenset({"security_headers_incomplete"}),
+    "10063": frozenset({"security_headers_incomplete"}),
+    "10036": frozenset({"http_header_disclosure"}),
+    "10037": frozenset({"http_header_disclosure"}),
+    "10061": frozenset({"http_header_disclosure"}),
+}
+# Nebenpfade einer Seite: Meldungen nur dort sagen nichts ueber die Seite selbst.
+NEBENPFADE = frozenset({"/robots.txt", "/sitemap.xml", "/sitemap_index.xml", "/wp-sitemap.xml", "/favicon.ico",
+                        "/xmlrpc.php", "/humans.txt", "/.well-known/security.txt", "/security.txt"})
+
+
+def bewertete_namen(output: CatalogOutput) -> set[tuple[str, str]]:
+    """(Regel, Name), an denen eine Regel einen Befund oder Positivbefund traegt."""
+    out: set[tuple[str, str]] = set()
+    for r in output.results:
+        if r.status == "fail":
+            out.update((r.check_id, m.fqdn) for m in r.members if m.status == "fail" and m.fqdn)
+        if r.status == "fail" or (r.status == "pass" and r.positive):
+            name = r.group_key.split("@", 1)[0]
+            out.add((r.check_id, name))
+            out.update((r.check_id, n) for n in r.vars.get("fqdn_names") or [])
+    return out
+
+
+def meldung_bewertet(t: ToolFinding, bewertet: set[tuple[str, str]]) -> bool:
+    kennung = t.rule.split("#", 1)[1] if "#" in t.rule else ""
+    regeln = ZAP_HEADER_RULES.get(kennung)
+    if not regeln:
+        return False
+    name = (t.where or "").split(" (", 1)[0]
+    return any((r, name) in bewertet for r in regeln)
+
+
+def fundort(facts: FS.Facts, fqdn: str, alert: Optional[FS.WebAlert]) -> str:
+    """Wo die Meldung entstand (spec/11 N12): "an der Sicherheitsabfrage" oder "an Nebenpfaden
+    robots.txt, sitemap.xml"; leer, wenn sie die Seite selbst betrifft."""
+    from urllib.parse import urlsplit
+    http = next((h for h in facts.http if h.fqdn == fqdn), None)
+    if http is not None and http.header_eval is not None and http.header_eval.basis == "challenge":
+        return "an der Sicherheitsabfrage"
+    if alert is None:
+        return ""
+    urls = [u for u in (list(alert.urls_sample) or ([alert.url] if alert.url else [])) if u]
+    pfade = []
+    for u in urls:
+        try:
+            pfade.append(urlsplit(u).path or "/")
+        except ValueError:
+            return ""
+    if pfade and all(p in NEBENPFADE or p.startswith("/wp-json/") for p in pfade):
+        namen = sorted({("wp-json" if p.startswith("/wp-json/") else p.rsplit("/", 1)[-1]) for p in pfade})
+        return "an Nebenpfaden " + ", ".join(namen)
+    return ""
+
+
+def _mit_fundort(ort: str, zusatz: str) -> str:
+    return f"{ort} ({zusatz})" if zusatz and ort else ort
 
 
 def _alert_index(facts: FS.Facts) -> dict[tuple[str, str, str], FS.WebAlert]:
@@ -1050,7 +1223,7 @@ def uncovered_zap_messages(output: CatalogOutput, facts: FS.Facts,
             kennung = f"#{alert.plugin_id}" if alert.plugin_id else ""
             out.append(ToolFinding(
                 what=f"{alert.name} auf {fqdn}" if fqdn else alert.name,
-                where=fqdn or item.host_ip or "",
+                where=_mit_fundort(fqdn or item.host_ip or "", fundort(facts, fqdn, alert)),
                 note=zap_note(alert) or "Werkzeugmeldung ohne eigene Einstufung.",
                 rule=f"zap_uncovered{kennung}", message=alert.name, count=max(alert.count, 1)))
     return out

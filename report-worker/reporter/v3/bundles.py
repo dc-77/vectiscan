@@ -206,9 +206,47 @@ HOST_UNREACHABLE_REASONS = frozenset({"no_ipv6_route", "unreachable_from_scanner
 # S6b-4 (spec/11 T4, E20): Buendel, deren Positivbefunde je Regel statt je Host entfallen.
 PER_RULE_POSITIVE_BUNDLES = frozenset({"web_header_hygiene"})
 
+# S6b-4n (spec/11 N1): ein Befund dieser Regeln am selben Host nimmt den Positivbefund der
+# Schluesselregel mit (castenow www: CSP mit unsafe-inline und unsafe-eval ist nicht "gesetzt").
+POSITIVE_BLOCKED_BY: dict[str, frozenset[str]] = {"csp_missing": frozenset({"csp_weak"})}
+
 # S6b-3 (Entscheidung DC 3): HSTS steht in einem Positivbefund. Wo die Gueltigkeitsdauer
 # ausreicht, ist der Header auch gesetzt; "gesetzt" entfaellt fuer diese Dienste.
 POSITIVE_SUBSUMED: dict[str, str] = {"hsts_missing": "hsts_short"}
+
+
+HSTS_CHECKS = frozenset({"hsts_missing", "hsts_short"})
+
+
+def measurement_note(facts: FS.Facts | None, result: CheckResult, scope: str) -> str:
+    """Ort der Messung im Positivbefund (S6b-4n).
+
+    spec/11 N2 (E24): HSTS an einer Weiterleitung oder Fehlerseite ist gueltig, der Positivbefund
+    sagt, wo gemessen wurde (castenow umfrage und mailstore). spec/11 schreibt "gemessen an der
+    Weiterleitung (301)"; der Zusatz steht im Bericht selbst in einer Klammer hinter dem Namen, der
+    Status deshalb ohne zweite Klammer ("gemessen an der Weiterleitung mit Status 301", N15).
+    spec/11 N5: eine TLS-Messung an einer anderen Adresse desselben Namens nennt die Adresse
+    ("gemessen an 52.59.120.70", huendgen)."""
+    if facts is None:
+        return ""
+    name, _, ip = result.group_key.partition("@")
+    if result.check_id in HSTS_CHECKS:
+        http = next((h for h in facts.http if h.fqdn == name and h.host_ip == ip), None)
+        hsts = http.hsts if http is not None else None
+        code = hsts.status_code if hsts is not None else None
+        if code and 300 <= code < 400:
+            return f"gemessen an der Weiterleitung mit Status {code}"
+        if code and 400 <= code < 500:
+            return f"gemessen an der Fehlerseite mit Status {code}"
+        return ""
+    if scope not in TLS_SCOPES:
+        return ""
+    host_ip = str(result.vars.get("host_ip") or ip or "")
+    orte = sorted({m_ip for m in result.members if m.status == "pass"
+                   for t in facts.tls
+                   if t.host_ip == (m.host_ip or host_ip) and (m.port is None or t.port == m.port)
+                   and (m_ip := t.measured_ip) and m_ip != t.host_ip})
+    return ("gemessen an " + ", ".join(orte)) if orte else ""
 
 
 def reputation_reported(facts: FS.Facts | None) -> bool:
@@ -323,6 +361,8 @@ def consolidate(output: CatalogOutput,
         for result in results:
             if je_header and (result.check_id, merge_key) in failed_rules:
                 continue
+            if any((b, merge_key) in failed_rules for b in POSITIVE_BLOCKED_BY.get(result.check_id, ())):
+                continue
             info = by_check[result.check_id]
             if result.check_id in unpruefbar or info.texts.positive is None:
                 continue
@@ -355,9 +395,15 @@ def consolidate(output: CatalogOutput,
         results.sort(key=lambda r: sort_key(r.check_id, r.group_key))
         labels: dict[str, str] = {}
         for r in results:
+            teile: list[str] = []
             op = operator_for(r, by_check[r.check_id].scope, hosts) if hosts else None
             if op is not None:
-                labels[r.group_key] = f"{op.label} {op.name}".strip()
+                teile.append(f"{op.label} {op.name}".strip())
+            ort = measurement_note(facts, r, by_check[r.check_id].scope)
+            if ort:
+                teile.append(ort)
+            if teile:
+                labels[r.group_key] = "; ".join(teile)
         positives.append(Consolidated(
             key=key, is_bundle=is_bundle, merge_key=GLOBAL_KEY, category=category,
             scale="hygiene", level="niedrig", title=title, target="findings", positive=True,

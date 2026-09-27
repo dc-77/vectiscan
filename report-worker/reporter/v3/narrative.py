@@ -52,6 +52,11 @@ class Counts:
     # aelterer Laeufe bleibt der bisherige Text.
     path_search_ok: bool = False
     path_search_known: bool = False
+    # S6b-4n (spec/11 N13): Adressen nur aus DNS (AAAA, weitere A-Eintraege) oder ohne Antwort;
+    # sie zaehlen in der Zahl der Adressen mit, geprueft sind sie nicht.
+    hosts_dns_only: int = 0
+    # S6b-4n (spec/11 N12): Doppelmeldungen je Grund der Korrelation (``fp_by_reason``).
+    duplicates_by: dict[str, int] = field(default_factory=dict)
 
 
 def _join(names: list[str]) -> str:
@@ -68,14 +73,21 @@ def _plural(n: int, one: str, many: str) -> str:
 
 # ---------------------------------------------------------------- Kapitel 1
 
+def adressen(c: Counts) -> str:
+    """"9 IP-Adressen" oder "9 IP-Adressen, davon 3 nur aus DNS oder ohne Antwort" (spec/11 N13)."""
+    text = f"{c.hosts_total} {_plural(c.hosts_total, 'IP-Adresse', 'IP-Adressen')}"
+    if c.hosts_dns_only and c.hosts_total > 1:
+        text += f", davon {c.hosts_dns_only} nur aus DNS oder ohne Antwort"
+    return text
+
+
 def context(c: Counts) -> str:
     runs = (f" Die Ergebnisse aus {c.runs} Scandurchgängen sind zu einem Bericht "
             "zusammengeführt." if c.runs > 1 else "")
     return (
         f"Geprüft wurde die von außen erreichbare Angriffsfläche von {_join(c.domains)} "
         f"am {c.scan_date}: {c.fqdns_total} "
-        f"{_plural(c.fqdns_total, 'Hostname', 'Hostnamen')} auf {c.hosts_total} "
-        f"{_plural(c.hosts_total, 'IP-Adresse', 'IP-Adressen')}."
+        f"{_plural(c.fqdns_total, 'Hostname', 'Hostnamen')} auf {adressen(c)}."
         f"{runs} Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind "
         "nicht Teil dieser Prüfung."
     )
@@ -100,8 +112,9 @@ def coverage_warning(c: Counts, systems: list[list[str]]) -> str:
     S6b-4 (spec/11 Teil 3 LW): gefundene, aber nicht geprüfte Namen stehen mit ihrer Zahl im
     Hinweis; vorher nannte ihn nur Kapitel 2."""
     offen = max(c.names_found - c.names_checked, 0)
-    namen = (f"{offen} weitere gefundene {_plural(offen, 'Name ist', 'Namen sind')} nicht geprüft."
-             if offen else "")
+    # S6b-4n (spec/11 N15): "1 weiterer gefundener Name ist", nicht "1 weitere gefundene Name".
+    namen = ((f"{offen} weiterer gefundener Name ist nicht geprüft." if offen == 1 else
+              f"{offen} weitere gefundene Namen sind nicht geprüft.") if offen else "")
     if not systems:
         return (f"{namen} Die Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind "
                 "entsprechend zu lesen.") if namen else ""
@@ -159,10 +172,11 @@ def scope_lead(c: Counts) -> str:
         if gaps else
         " Alle Systeme konnten aktiv geprüft werden."
     )
+    # Der Einschub "davon m nur aus DNS oder ohne Antwort" schliesst mit Komma vor "und".
+    einschub = "," if ", davon " in adressen(c) else ""
     return (
-        f"Der Scan hat {systems} {_plural(systems, 'System', 'Systeme')} mit {c.hosts_total} "
-        f"{_plural(c.hosts_total, 'IP-Adresse', 'IP-Adressen')} und {c.fqdns_total} "
-        f"{_plural(c.fqdns_total, 'Hostname', 'Hostnamen')} erfasst.{tail}"
+        f"Der Scan hat {systems} {_plural(systems, 'System', 'Systeme')} mit {adressen(c)}{einschub} "
+        f"und {c.fqdns_total} {_plural(c.fqdns_total, 'Hostname', 'Hostnamen')} erfasst.{tail}"
     )
 
 
@@ -207,8 +221,7 @@ def method_phases(c: Counts) -> list[tuple[str, str, str]]:
         ("0", "Aufklärung (passiv)",
          "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, "
          f"Reputationsdienste. Ergebnis: {c.fqdns_total} "
-         f"{_plural(c.fqdns_total, 'Hostname', 'Hostnamen')} auf {c.hosts_total} "
-         f"{_plural(c.hosts_total, 'IP-Adresse', 'IP-Adressen')}."
+         f"{_plural(c.fqdns_total, 'Hostname', 'Hostnamen')} auf {adressen(c)}."
          + names_sentence(c)),
         ("1", "Technologie-Erkennung",
          "Portscan der häufigsten TCP-Ports mit Versionserkennung, Erkennung der "
@@ -330,16 +343,33 @@ PLAN_EFFECT_TOP = "Beseitigt das dringlichste Risiko dieses Berichts"
 
 # ---------------------------------------------------------------- Anhang
 
+# S6b-4n (spec/11 N12): Herkunft der Doppelmeldungen je Grund der Korrelation.
+DEDUP_QUELLEN = {"header-dedup": "der Webanalyse", "ssl-dedup": "der TLS-Prüfung"}
+
+
+def _doppelt(c: Counts) -> str:
+    """", davon 531 gleiche Meldungen der Webanalyse zusammengeführt" (spec/11 N12); vorher stand
+    "Doppelmeldungen mehrerer Werkzeuge und Durchgänge" bei einem Durchgang und nur ZAP-Dubletten."""
+    if not c.duplicates:
+        return ""
+    teile = [(n, DEDUP_QUELLEN.get(k.lower(), "der Werkzeuge")) for k, n in sorted(c.duplicates_by.items())]
+    if not teile:
+        teile = [(c.duplicates, "der Werkzeuge")]
+    erste_n, erste_q = teile[0]
+    text = f"{erste_n} gleiche {_plural(erste_n, 'Meldung', 'Meldungen')} {erste_q}"
+    rest = [f"{n} {q}" for n, q in teile[1:]]
+    if rest:
+        text += " und " + " und ".join(rest)
+    return f", davon {text} zusammengeführt"
+
+
 def filtering(c: Counts) -> str:
     """Anhang D. S6b-3 (spec/10 R12, R14): Zahlen nur aus der Korrelationsbilanz, keine Zusage."""
     bilanz = ""
     if c.raw_findings:
         bilanz = (f"Die Korrelation hat {c.raw_findings} "
                   f"{_plural(c.raw_findings, 'Einzelmeldung', 'Einzelmeldungen')} der Werkzeuge erfasst"
-                  + (f", davon {c.duplicates} "
-                     f"{_plural(c.duplicates, 'Doppelmeldung', 'Doppelmeldungen')} mehrerer "
-                     "Werkzeuge und Durchgänge" if c.duplicates else "")
-                  + ". ")
+                  + _doppelt(c) + ". ")
     return (
         f"{bilanz}Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt "
         f"verbleiben {c.findings} {_plural(c.findings, 'Befund', 'Befunde')} und {c.positives} "

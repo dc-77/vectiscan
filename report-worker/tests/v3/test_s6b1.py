@@ -47,9 +47,11 @@ def _rows(data, ip: str):
 # ---------------------------------------------------------------- Q2 Rollen
 
 def test_lw_hat_keine_mailrolle():
-    # Lumbeck-Wolter: MX und SPF zeigen woanders hin, der Server traegt nur die Website.
+    # Lumbeck-Wolter: MX und SPF zeigen woanders hin, der Server ist kein Mailserver des Kunden.
+    # S6b-4n (spec/11 N14): Rollen aus den eigenen Fakten (Datenbankports, FTP, aktiv bestaetigte
+    # Abrufports); "Mailabruf und Einlieferung" erlaubt keine Mail-Rollenwoerter.
     o = _system(LW, "116.202.77.64")
-    assert o.role_keys == ["website"]
+    assert o.role_keys == ["datenbank", "dateiaustausch", "mail_dienste", "website"]
     assert not {"mail", "mail_versand", "mail_kalender", "webmail"} & set(o.role_keys)
 
 
@@ -154,7 +156,9 @@ def test_befund_beim_betreiber(order, kind, name):
     treffer = [f for f in data.findings if f.operator == f"beim {kind} {name}"]
     assert treffer
     for f in treffer:
-        assert f.title.endswith(f"(beim {kind} {name})")
+        # S6b-4n (spec/11 N15): ein vorhandener Titelzusatz und der Betreiber stehen in einer
+        # Klammer ("(TLS erzwungen; beim Hoster ...)"), nicht in zwei.
+        assert f.title.endswith(f"beim {kind} {name})") and ")(" not in f.title.replace(" ", "")
         assert name in f.operator_note
     plan = [r for r in data.plan if set(r.refs) & {f.id for f in treffer}]
     assert any(r.action.startswith(f"Beim {kind} einfordern:") for r in plan)
@@ -425,8 +429,10 @@ def test_bildschirmfoto_ohne_eigene_probe_wird_nicht_genannt():
 
 
 def test_bildschirmfoto_nennt_weitere_namen_derselben_seite():
+    # S6b-4n (spec/11 N4): webportal liegt auf einem anderen Host (213.133.104.51) und leitet nur
+    # auf ose weiter; das Bild von ose gehoert ose allein, webportal bekommt kein zweites Bild.
     screens = {s.host: s.also for s in data_for(HL).architecture.screens}
-    assert screens["ose.heuel.com"] == ["webportal.heuel.com"]
+    assert screens["ose.heuel.com"] == [] and "webportal.heuel.com" not in screens
 
 
 @pytest.mark.parametrize("order", RUNDE)
@@ -475,12 +481,15 @@ def test_kapitel2_einheit_system_jw():
     data = data_for(JW)
     # S6b-3 (spec/10 R3): 217.243.248.29 ist teilweise geprueft (TLS-Port 8443 ohne testssl,
     # aktive Webanalyse nur an der IIS-Standardseite von cloud.junkerwerk.de).
+    # S6b-4n (spec/11 N13): die IPv6-Adresse steht nur aus DNS in der Zaehlung; 217.243.248.28
+    # ist mit dem 10-Sekunden-Kurzlauf der aktiven Webanalyse nicht mehr "vollstaendig".
     assert data.scope.lead.startswith(
-        "Der Scan hat 3 Systeme mit 4 IP-Adressen und 7 Hostnamen erfasst. Für 2 Systeme "
-        "(3 Adressen) war die aktive Prüfung nur teilweise möglich; diese Lücken sind unten benannt")
+        "Der Scan hat 3 Systeme mit 4 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort, und "
+        "7 Hostnamen erfasst. Für 3 Systeme (4 Adressen) war die aktive Prüfung nur teilweise "
+        "möglich; diese Lücken sind unten benannt")
     assert data.glance.coverage_warning.startswith(
-        "Für 2 Systeme (188.40.3.130 mit 2a01:4f8:d0a:3124::2 und 217.243.248.29) liegt nur "
-        "eine teilweise aktive Prüfung vor.")
+        "Für 3 Systeme (188.40.3.130 mit 2a01:4f8:d0a:3124::2, 217.243.248.28 und 217.243.248.29) "
+        "liegt nur eine teilweise aktive Prüfung vor.")
     assert len([h for h in data.scope.hosts if h.cov != "extern"]) == 3
 
 

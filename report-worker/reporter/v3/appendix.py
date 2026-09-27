@@ -11,6 +11,7 @@ from __future__ import annotations
 from reporter.catalog.schema import CatalogOutput
 from reporter.facts import schema as FS
 from reporter.v3 import chapters as C
+from reporter.v3 import coverage as COV
 from reporter.v3 import levels as L
 from reporter.v3 import narrative as N
 from reporter.v3 import tables as T
@@ -44,10 +45,21 @@ def build_inventory(facts: FS.Facts,
         name = C.service_display(svc)
         if svc.version_norm and svc.version_norm not in name:
             name = f"{name} {svc.version_norm}"
-        if svc.tls_required:
+        # S6b-4n (spec/11 N15): bei STARTTLS ist "TLS erzwungen" die Anmeldung erst nach STARTTLS
+        # (587 bei lumbeck-wolter und castenow).
+        if svc.tls_required and svc.starttls:
+            name = f"{name}, Anmeldung erst nach STARTTLS"
+        elif svc.tls_required:
             name = f"{name}, TLS erzwungen"
         elif svc.starttls:
             name = f"{name}, STARTTLS"
+        if svc.foreign:
+            name = C.foreign_service_label(svc, name)
+        # S6b-4n (spec/11 N5): die Transportverschluesselung dieses Ports ist nur am Namen an einer
+        # anderen Adresse gemessen (huendgen 18.197.248.23:443, testssl an 52.59.120.70).
+        anderswo = COV.tls_only_elsewhere(facts, svc.host_ip)
+        if anderswo and any(t.host_ip == svc.host_ip and t.port == svc.port for t in facts.tls):
+            name = f"{name}, Transportverschlüsselung am Namen gemessen an {', '.join(anderswo)}"
         rows.append(InventoryRow(host=svc.host_ip, port=str(svc.port), svc=name,
                                  ref=ref(svc.host_ip, svc.port)))
     for pv in sorted(facts.passive, key=lambda p: (p.host_ip or "", p.port or 0)):
@@ -78,10 +90,27 @@ def build_tools(facts: FS.Facts) -> list[ToolRow]:
     ran = {c.tool for c in facts.coverage if c.status in ("ok", "empty")}
     if not _anreicherung_gelaufen(facts):
         ran -= set(T.ENRICHMENT_TOOLS)
+    leer = ohne_ergebnis(facts)
     out: list[ToolRow] = []
     for label, purpose, confidence, tools in T.TOOL_ROWS:
         if ran & set(tools):
+            # S6b-4n (spec/11 N12): eine Quelle, die lief, aber keine Daten lieferte, heisst so.
+            for name in leer:
+                label = label.replace(name, f"{name} (ohne Ergebnis)")
             out.append(ToolRow(t=label, u=purpose, c=confidence))
+    return out
+
+
+def ohne_ergebnis(facts: FS.Facts) -> list[str]:
+    """Passivquellen, die gelaufen sind, aber keine Daten geliefert haben (spec/11 N12: URLhaus mit
+    "no_data", SecurityTrails ohne Domaindaten)."""
+    ran = {c.tool for c in facts.coverage if c.status in ("ok", "empty")}
+    out: list[str] = []
+    if "urlhaus" in ran and not any(p.source == "urlhaus" and (p.details or {}).get("compromised") is not None
+                                    for p in facts.passive):
+        out.append("URLhaus")
+    if "securitytrails" in ran and not any(p.source == "securitytrails" for p in facts.passive):
+        out.append("SecurityTrails")
     return out
 
 
