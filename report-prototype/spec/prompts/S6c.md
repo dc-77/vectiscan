@@ -12,8 +12,8 @@ Fixture aus Rohdaten (Timeout-Teilausgabe, Weiterleitung, Challenge, leere nmap-
 Texten mit echten Umlauten, ASCII nur in Bezeichnern, Dateinamen und IDs; keine Gedankenstriche in
 Texten. Arbeite im Plan-Modus, zeige den Plan, warte auf Freigabe. Am Ende: Tests grün, kurze
 Zusammenfassung, Liste offener Fragen.
-Schritt 0: git merge main --no-edit im Worktree (S6b-3 und S6b-4 müssen gemerged sein). Nichts an spec/
-ändern.
+Schritt 0: git merge main --no-edit im Worktree (S6b-3, S6b-4 und der Nachtrag zu S6b-4 müssen gemerged
+sein). Nichts an spec/ ändern.
 Regeln: Jedes Abbild kommt aus der eigenen Registry ghcr.io/dc-77/vectiscan/, Fremdabbilder nur
 gespiegelt und per Digest gepinnt (scripts/ops/mirror-images.sh, tests/test_compose_images.py); ein
 neues Werkzeug im scan-worker-Abbild wird zur Build-Zeit installiert und in Issue #34 vermerkt. Nicht
@@ -67,6 +67,17 @@ bis dahin bleibt „laut AbuseIPDB".
 und ssl-cert als Kennungsfakten je Port exportieren, nicht nur den nmap-Dienstnamen; XML-RPC bei
 castenow: wpscan meldet es dort nicht, deshalb eine eigene Sonde auf /xmlrpc.php (POST system.listMethods)
 als Fakt wordpress_xmlrpc, Fixture DB (aktiv) und CA.
+(7b) Aus spec/11 Teil 6 (Scannerteil): redirect_probe exportiert die Header der Endantwort getrennt von
+der ersten Antwort, auch bei clientseitigen Weiterleitungen (HL ose „Redirector" auf login.seam, HL online
+Vercel auf www, CA mail und mail2 302 auf /owa/); KI #1 und ai_phase2_config wählen Regeln (etwa
+hosted-cms-webflow) nur aus Antworten desselben Hosts, nie aus dem Weiterleitungsziel (BS 92.205.224.174
+bekam die Webflow-Regel und verlor die aktive Webanalyse von ftp und Plesk); zap_spider-URLs fremder
+Hostnamen nicht in tech_profiles.cms übernehmen (JW „Microsoft Exchange" am Hetzner-Host); die
+AXFR-Rohausgabe je Domain und Nameserver in den Export (bisher nur zone_transfer true/false, für
+junkerwerk.hu kein Lauf); Zonentransfer, dnsx und Hostsuche je Zieldomain (junkerwerk.hu); ZAP-Meldungen
+mit URL und Statuscode der Antwort, damit Meldungen an Abwehrseiten (HL online 429) und Nebenpfaden
+(robots.txt, sitemap.xml) zugeordnet werden können; AbuseIPDB maxAgeInDays im Export; feroxbuster und
+ffuf mit Statistik auch bei Timeout, ferner ose.heuel.com als Ziel statt nur edi.
 (8) KI #1 (Host-Strategie) und ai_phase2_config: keine Fremdports in zap_extra_urls (E3), Drittanbieter-
 Skip mit Grund (bleibt), „or later" als Untergrenze (S6a2 bleibt); aiStrategy „veraltete PostgreSQL 9.6"
 darf nicht mehr entstehen (JW).
