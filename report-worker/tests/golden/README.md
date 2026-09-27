@@ -705,7 +705,12 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
   - Drift-Test junkerwerk: "gesehen am" und "vermutlich abgeschwächt" kommen aus den
     Rohdaten des einzelnen Laufs (Shodan-Datum, testssl-Ausgabe) und zählen nicht als Drift
     (`_LAUF_ZUSATZ`).
-  - Seitenerwartung: folgt aus `ops-update-pages` der MR-Pipeline.
+  - Seitenerwartung (ops-update-pages, MR-Pipeline 3221): Scan-Runde 1fbc92b9 28->29,
+    31d67a02 29->30, 68d59573 26->27 (mehr Einschränkungszeilen und Positivbefunde), 1f8bc977
+    35->33, 2e56abe1 24->23 (weniger Befunde und Planzeilen); c3d5724c und 3cf01f8d gleich.
+    Übrige 14272c00 28->29, 176db198 21->23, 2d2d4f39 46->45, 45bb234c 23->22, 4e6b6883 47->44,
+    f77ccff2 45->44. Halbleer vor einem Kapitelanfang nur noch 2d2d4f39 Seite 30; 4e6b6883
+    und f77ccff2 ohne halbleere Seite.
 
 ## Abgleich spec/09 nach S6b-2
 
