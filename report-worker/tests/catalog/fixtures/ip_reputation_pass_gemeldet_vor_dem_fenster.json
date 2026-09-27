@@ -1,0 +1,23 @@
+{
+ "facts": {
+  "hosts": [
+   {
+    "ip": "10.0.0.1",
+    "reputation": {
+     "abuseipdb_score": 0,
+     "otx_pulse_count": 0,
+     "is_tor": false,
+     "abuseipdb_total_reports": 0,
+     "abuseipdb_last_reported_at": "2026-03-01T10:00:00Z"
+    }
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.1",
+  "positive": true
+ },
+ "_note": "S6b-4n (spec/11 N6): Meldung vor dem Abfragefenster; die Adresse gilt als ohne Meldung."
+}

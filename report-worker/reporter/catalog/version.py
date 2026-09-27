@@ -97,13 +97,35 @@ Bump-Historie:
                   seit S3 unveraendert; DB und CA stehen seit 2026-09-25.2 durch E1 und E2
                   (Verwaltungsoberflaeche kritisch, Zertifikat bis sieben Tage rot) auf
                   HOCH, nicht durch den Schritt 2026-09-26.1 auf 2026-09-26.2 (spec/11 T6).
+    2026-09-27.2  Nachtrag S6b-4 (spec/11 N1 bis N15, E24, E25): `csp_missing` schlaegt auch
+                  bei einer Richtlinie ohne script-src und default-src an (Variante "nur mit
+                  frame-ancestors"), positiv nur mit Skriptregel; `ip_reputation` nicht
+                  anwendbar auf CDN- und Plattformadressen, positiv nur ohne Meldung im
+                  Abfragefenster (`ABUSEIPDB_WINDOW_DAYS`); `dmarc_none` trennt Meldeadressen
+                  der eigenen und fremder Domains, der Betreiber-Satz nur bei Delegation per
+                  CNAME oder SPF `mx` (neue Funktionen `rua_own`, `dmarc_delegated`,
+                  `spf_has_mx`); `cert_expiring` "am Berichtsdatum abgelaufen, sofern nicht
+                  erneuert" auch in Hebel, Effekt und Auswirkung; `wordpress_plugin_vulnerable`
+                  mit Produktnamen (`PRODUCT_NAMES`), "fehlerbereinigt ab" getrennt von "neueste
+                  laut wpscan"; Baustein-Schluessel `key` fuer gleiche Aussagen mehrerer Regeln
+                  (Versionspreisgabe in Header und Banner); `http_header_disclosure` nennt
+                  X-FEServer nicht mehr unter "Version"; `service_cert_expired` nennt das
+                  Zertifikat einmal, "Mailclients" und Hebel "fuer die Maildienste" bei
+                  Mailports; `admin_panel_hoster` mit Zahl und Quelle der weiteren Domains und
+                  Satzfolge der Auswirkung; `service_unidentified` Numerus nach Ports;
+                  `security_headers_incomplete` Referrer-Policy nach der Voreinstellung der
+                  Browser; `tls_weakness_reported` nur mit eigenem testssl-Lauf; Passivregeln
+                  "Hosteintrag aktualisiert am" statt "gesehen am" ohne Zeitstempel des Dienstes;
+                  `wordpress_user_enumeration` nur Anzahl und Fundweg der Anmeldenamen (E25);
+                  Lebenszyklus in der LTS-Phase "in Langzeitpflege bis <Datum> laut <Quelle>"
+                  ohne zweite Klammer. Einstufungen unveraendert.
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-27.1"
+CATALOG_VERSION = "2026-09-27.2"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"

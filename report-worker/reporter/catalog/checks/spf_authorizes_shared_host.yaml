@@ -36,9 +36,10 @@ texts:
     effect: "Verhindert, dass andere Anwendungen desselben Servers im Namen der Domain senden"
   # S6b-4 (spec/11 T9, E18): "auch für andere Kunden" ist aus den Rohdaten nicht ableitbar;
   # belegt sind die weiteren Domains auf dem Server laut Zertifikat oder Passivquelle.
+  # S6b-4n (spec/11 N11): Zahl und Quelle der weiteren Domains stehen je Server in {affected}.
   observation: >-
-    Der SPF-Eintrag der Domain {domain} gibt einen Server als Absender frei, auf dem laut
-    Zertifikat oder Passivquelle weitere Domains liegen: {affected}.
+    Der SPF-Eintrag der Domain {domain} gibt einen Server als Absender frei, auf dem weitere
+    Domains liegen: {affected}.
   meaning: >-
     Jede Anwendung auf diesem Server darf damit E-Mails im Namen der Domain versenden, auch
     die Anwendungen der weiteren Domains. Empfänger erkennen solche Mails an SPF nicht als

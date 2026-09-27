@@ -1,5 +1,5 @@
 {
- "_note": "S6b-4 (spec/11 Teil 3 BS): Plattformadressen erzeugen keinen Befund, stehen aber im Positivbefund, wenn keine Meldung vorliegt.",
+ "_note": "S6b-4n (spec/11 N6): die Reputation einer Plattform- oder CDN-Adresse ist nicht kundenbezogen; die Pruefung ist dort nicht anwendbar (weder Befund noch Positivbefund).",
  "facts": {
   "hosts": [
    {
@@ -21,8 +21,8 @@
  },
  "coverage_default": "ok",
  "expect": {
-  "status": "pass",
+  "status": "not_applicable",
   "group_key": "10.0.0.1",
-  "positive": true
+  "positive": false
  }
 }

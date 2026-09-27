@@ -18,7 +18,7 @@ requires:
   tools: [shodan]
 kind: check
 bundle: smtp_commands
-affected_template: "{host_ip}:{port} (laut Passivquelle, gesehen am {seen_date})"
+affected_template: "{host_ip}:{port} (laut Passivquelle, {seen_text})"
 evidence: [passive]
 references: [CWE-200, CWE-204]
 frameworks:

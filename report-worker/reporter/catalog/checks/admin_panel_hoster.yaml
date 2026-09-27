@@ -48,15 +48,21 @@ texts:
         Die Oberfläche erscheint beim Aufruf über die IP-Adresse, also auf der Standardseite
         des Webservers: {affected}.
     # S6b-4 (spec/11 T9, E18): "anderer Kunden" ist aus den Rohdaten nicht ableitbar.
-    - text: >-
-        Auf dem Server liegen laut Zertifikat oder Passivquelle weitere Domains; die Verwaltung
-        betreibt der Hoster.
+    # S6b-4n (spec/11 N10, N11): Zahl und Quelle aus dem Fakt, im richtigen Numerus.
+    - when: host.shared is not None and len(host.shared.foreign_names) > 0
+      quantor: eines
+      text: >-
+        {shared_domains}; die Verwaltung betreibt der Hoster.
+    - when: host.shared is None or len(host.shared.foreign_names) == 0
+      quantor: eines
+      text: >-
+        Die Verwaltung betreibt der Hoster.
   # S6b-3 (spec/10 R9): "Webseiten" und "Postfaecher" nur mit Beleg (Kunden-VHost mit Inhalt,
   # MX, SPF oder Autodiscover auf diesem Host).
+  # S6b-4n (spec/11 N10): "Dazu gehören ..." folgt dem Satz, auf den es sich bezieht (castenow VS-001).
   meaning:
     - text: >-
         Eine Übernahme der Verwaltungsoberfläche beträfe alle Dienste auf diesem Server.
-        Abschalten oder beschränken kann sie nur der Hoster.
     - when: host.serves_customer_web is True
       quantor: eines
       text: >-
@@ -65,6 +71,8 @@ texts:
       quantor: eines
       text: >-
         Dazu gehören die eigenen Postfächer und der Mailversand über diesen Server.
+    - text: >-
+        Abschalten oder beschränken kann sie nur der Hoster.
   recommendation:
     - stage: in_kuerze
       text: >-

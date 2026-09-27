@@ -37,16 +37,18 @@ texts:
   observation:
     - when: has_version(http.server_header) or has_version(http.powered_by) or http.aspnet_version is not None
       quantor: eines
+      # S6b-4n (spec/11 N10): die Versionssatz nennt nur Versionsheader, X-FEServer steht eigen.
       text: >-
         {n:Die Webantwort|Die Webantworten} von {group} {n:nennt|nennen} in ihren Antwortheadern die Version der eingesetzten
-        Serversoftware: {affected}.
+        Serversoftware: {version_headers}.
     - when: http.x_feserver is not None
       quantor: eines
       text: >-
-        Der Antwortheader X-FEServer nennt den internen Namen des Frontend-Servers: {affected}.
+        Der Antwortheader X-FEServer nennt den internen Namen des Frontend-Servers: {feserver_names}.
   meaning:
     - when: has_version(http.server_header) or has_version(http.powered_by) or http.aspnet_version is not None
       quantor: eines
+      key: versionskennung
       text: >-
         Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten
         Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich

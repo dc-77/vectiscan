@@ -34,18 +34,19 @@ texts:
   plan:
     lever: "Zweck offener Dienste ohne Kennung klären"
     effect: "Verkleinert die Angriffsfläche um Dienste ohne erkennbaren Zweck"
+  # S6b-4n (spec/11 N15): Numerus nach der Zahl der Ports, nicht der Hosts.
   observation: >-
-    {n:Der Host|Die Hosts} {group} {n:hat|haben} offene Ports, deren Dienst sich weder mit
+    Auf {group} {m:ist ein Port offen, dessen Dienst|sind Ports offen, deren Dienst} sich weder mit
     Produkt noch mit Titel zu erkennen gibt: {affected}. Der Portscan kennt nur die übliche
-    Belegung dieser Portnummern, nicht den tatsächlichen Dienst.
+    Belegung {m:dieser Portnummer|dieser Portnummern}, nicht den tatsächlichen Dienst.
   meaning: >-
     Ein offener Dienst ohne erkennbaren Zweck vergrößert die Angriffsfläche. Ob er gepflegt
     wird und wer ihn nutzt, ist von außen nicht feststellbar.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Klären, welcher Dienst auf dem Port läuft und ob er aus dem Internet erreichbar sein
-        muss; andernfalls den Port schließen.
+        {m:Klären, welcher Dienst auf dem Port läuft und ob er|Klären, welche Dienste auf den Ports laufen und ob sie} aus dem Internet erreichbar sein
+        {m:muss; andernfalls den Port schließen|müssen; andernfalls die Ports schließen}.
     - stage: mittelfristig
       text: >-
         Benötigte Dienste auf feste Quellnetze beschränken und in die Dokumentation der

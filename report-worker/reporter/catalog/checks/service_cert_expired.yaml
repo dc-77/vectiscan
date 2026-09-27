@@ -18,7 +18,8 @@ requires:
   tools: [nmap]
 kind: check
 bundle: cert_health
-affected_template: "{host_ip}:{port} ({kennung_label}, Zertifikat {cert_cn}, {cert_validity_text})"
+# S6b-4n (spec/11 N10): Kennung je Port; Zertifikat und Ablauf stehen einmal im ersten Satz.
+affected_template: "{host_ip}:{port} ({kennung_label})"
 evidence: [service]
 references: [CWE-295, CWE-298]
 frameworks:
@@ -35,20 +36,35 @@ texts:
   plan:
     lever: "Gültige Zertifikate für alle TLS-Dienste hinterlegen"
     effect: "Verhindert Zertifikatswarnungen an Mail- und Dateiclients"
+    # S6b-4n (spec/11 N10): nur Mailports (bergersysteme VS-003): Hebel und Effekt für die Maildienste.
+    lever_variants:
+      - when: service.port in MAIL_PORTS
+        text: "Gültige Zertifikate für die Maildienste hinterlegen"
+    effect_variants:
+      - when: service.port in MAIL_PORTS
+        text: "Verhindert Zertifikatswarnungen an Mailclients"
   observation:
     - text: >-
-        Auf {group} liefern Dienste außerhalb der Webseiten ein abgelaufenes Zertifikat aus:
-        {affected}.
+        Auf {group} liefern Dienste außerhalb der Webseiten ein abgelaufenes Zertifikat aus
+        ({cert_summary}): {affected}.
     # S6b-4 (spec/11 Teil 3 BS VS-003): die Betroffenenliste steht einmal im ersten Satz.
     - when: service.cert.self_signed is True
       quantor: alle
       text: >-
         Das Zertifikat ist zudem selbst signiert und stammt von keiner anerkannten
         Zertifizierungsstelle.
-  meaning: >-
-    Mail- und Dateiclients warnen bei abgelaufenen Zertifikaten oder brechen die Verbindung
-    ab; wer die Warnung regelmäßig wegklickt, erkennt ein untergeschobenes Zertifikat nicht
-    mehr.
+  meaning:
+    - when: service.port in MAIL_PORTS
+      quantor: alle
+      text: >-
+        Mailclients warnen bei abgelaufenen Zertifikaten oder brechen die Verbindung ab; wer die
+        Warnung regelmäßig wegklickt, erkennt ein untergeschobenes Zertifikat nicht mehr.
+    - when: service.port not in MAIL_PORTS
+      quantor: eines
+      text: >-
+        Mail- und Dateiclients warnen bei abgelaufenen Zertifikaten oder brechen die Verbindung
+        ab; wer die Warnung regelmäßig wegklickt, erkennt ein untergeschobenes Zertifikat nicht
+        mehr.
   recommendation:
     - stage: in_kuerze
       text: >-

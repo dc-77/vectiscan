@@ -68,8 +68,8 @@ texts:
     - when: 'http.security_headers["referrer-policy"].present is False'
       quantor: eines
       text: >-
-        Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige
-        Adresse der Seite samt Parametern.
+        Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim
+        Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter.
     - when: 'http.security_headers["permissions-policy"].present is False and not (http.security_headers["x-frame-options"].present is True and http.security_headers["x-content-type-options"].present is True and http.security_headers["referrer-policy"].present is True)'
       quantor: eines
       text: >-

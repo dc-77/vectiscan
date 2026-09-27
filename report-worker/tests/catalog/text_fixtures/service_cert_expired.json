@@ -2,7 +2,7 @@
  "check": "service_cert_expired",
  "cases": [
   {
-   "name": "Plesk selbstsigniert auf POP3, CA-Zertifikat auf IMAP",
+   "name": "Plesk selbstsigniert auf POP3, CA-Zertifikat auf IMAP; S6b-4n (spec/11 N10): nur Mailports, Auswirkung, Hebel und Effekt für die Maildienste",
    "facts": {
     "services": [
      {
@@ -40,16 +40,66 @@
    "expect": {
     "holds": {
      "10.0.0.9:110": [
-      "observation[1]"
+      "observation[1]",
+      "meaning[0]",
+      "plan.lever_variants[0]",
+      "plan.effect_variants[0]"
+     ],
+     "10.0.0.9:143": [
+      "meaning[0]",
+      "plan.lever_variants[0]",
+      "plan.effect_variants[0]"
      ]
     },
     "not_holds": {
      "10.0.0.9:143": [
-      "observation[1]"
+      "observation[1]",
+      "meaning[1]"
+     ],
+     "10.0.0.9:110": [
+      "meaning[1]"
      ]
     }
    },
    "coverage_default": "ok"
+  },
+  {
+   "name": "S6b-4n (spec/11 N10): Dateidienst ohne Mailport, Auswirkung für Mail- und Dateiclients",
+   "facts": {
+    "services": [
+     {
+      "host_ip": "10.0.0.10",
+      "port": 21,
+      "service": "ftp",
+      "product": "vsftpd",
+      "cert": {
+       "cn": "ftp.example.test",
+       "issuer": "Beispiel CA",
+       "not_before": "2025-03-01T00:00:00Z",
+       "not_after": "2026-03-01T00:00:00Z",
+       "days_left": -184,
+       "expired": true,
+       "self_signed": false
+      }
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "10.0.0.10:21": [
+      "meaning[1]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.10:21": [
+      "meaning[0]",
+      "plan.lever_variants[0]",
+      "plan.effect_variants[0]",
+      "observation[1]"
+     ]
+    }
+   }
   }
  ]
 }

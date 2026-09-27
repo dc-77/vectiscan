@@ -45,12 +45,14 @@ texts:
   plan:
     lever: "Zertifikate vor dem Ablauf erneuern"
     effect: "Verhindert den Ausfall des Dienstes zum Ablaufdatum des Zertifikats"
+    # S6b-4n (spec/11 N8): auch Hebel und Effekt sagen "sofern nicht erneuert"; ob das Zertifikat
+    # nach dem Scan erneuert wurde, belegt keine Messung.
     lever_variants:
       - when: days_until(tls.cert.not_after, report_date) < 0
-        text: "Abgelaufenes Zertifikat ersetzen"
+        text: "Am Berichtsdatum abgelaufenes Zertifikat ersetzen, sofern nicht erneuert"
     effect_variants:
       - when: days_until(tls.cert.not_after, report_date) < 0
-        text: "Beseitigt die Vertrauenswarnung, die seit dem Ablauf beim Aufruf erscheint"
+        text: "Beseitigt die Vertrauenswarnung, die nach dem Ablauf beim Aufruf erscheint, sofern das Zertifikat nicht erneuert ist"
   observation:
     - when: days_until(tls.cert.not_after, report_date) >= 0
       quantor: eines
@@ -63,10 +65,19 @@ texts:
       text: >-
         Für {n:den Dienst|die Dienste} {group} lief das eingesetzte TLS-Zertifikat kurz nach dem Scan ab: {affected}.
         Ist es inzwischen nicht erneuert, sehen alle Nutzer eine Vertrauenswarnung.
-  meaning: >-
-    Läuft das Zertifikat ab, ohne dass eine Erneuerung vorbereitet ist, ist der Dienst für alle
-    Nutzer mit einer Vertrauenswarnung oder einem Verbindungsabbruch konfrontiert. Ein kurzes
-    Zeitfenster reicht oft nicht aus, um eine Erneuerung ungeplant nachzuholen.
+  meaning:
+    - when: days_until(tls.cert.not_after, report_date) >= 0
+      quantor: eines
+      text: >-
+        Läuft das Zertifikat ab, ohne dass eine Erneuerung vorbereitet ist, ist der Dienst für alle
+        Nutzer mit einer Vertrauenswarnung oder einem Verbindungsabbruch konfrontiert. Ein kurzes
+        Zeitfenster reicht oft nicht aus, um eine Erneuerung ungeplant nachzuholen.
+    # S6b-4n (spec/11 N8): am Berichtsdatum abgelaufen, sofern nicht erneuert.
+    - when: days_until(tls.cert.not_after, report_date) < 0
+      quantor: eines
+      text: >-
+        Am Berichtsdatum ist das Zertifikat abgelaufen, sofern es nicht erneuert wurde; dann sehen
+        alle Nutzer des Dienstes eine Vertrauenswarnung oder die Verbindung bricht ab.
   recommendation:
     - stage: in_kuerze
       when: len(tls.cert.valid_elsewhere) > 0

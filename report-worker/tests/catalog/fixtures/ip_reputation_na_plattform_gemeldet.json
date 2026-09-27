@@ -1,5 +1,5 @@
 {
- "_note": "S6b-4 (spec/11 Teil 3 BS): eine gemeldete Plattformadresse ist kein Befund und kein Positivbefund.",
+ "_note": "S6b-4n (spec/11 N6): eine gemeldete Plattformadresse ist nicht anwendbar, kein Befund und kein Positivbefund.",
  "facts": {
   "hosts": [
    {
@@ -20,7 +20,7 @@
  },
  "coverage_default": "ok",
  "expect": {
-  "status": "pass",
+  "status": "not_applicable",
   "group_key": "10.0.0.1",
   "positive": false,
   "affected": []

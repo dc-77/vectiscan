@@ -326,11 +326,20 @@ def _http(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Eviden
             continue
         zeile: list[tuple[str, Any]] = [("", f"{http.fqdn or http.host_ip}")]
         if tool == eval_tool and ev is not None:
-            zeile.append(("bewertet an der Endseite" if end_anders else "Adresse", ev.url))
+            # S6b-4n (spec/11 N3): "bewertet an der Endseite" nur, wenn die Header aus der
+            # Endantwort stammen; Einzelmeldungen der Webanalyse je Adresse heissen so.
+            endantwort = getattr(he, "final_response", None) is not False and he.complete
+            beschriftung = ("bewertet an der Endseite" if end_anders and endantwort
+                            else "Einzelmeldungen an" if end_anders else "Adresse")
+            zeile.append((beschriftung, ev.url))
             zeile.append(("Antwort", ev.status_code))
             if not he.complete:
                 zeile.append(("nur einzelne Header belegt", liste(header_names(
                     [n for n, v in he.headers.items() if v.present is not None]))))
+                if he.unknown:
+                    wo = ("nur an der Weiterleitungsseite gemessen" if getattr(he, "client_redirect", None)
+                          else "an der Endseite nicht gemessen")
+                    zeile.append((wo, liste(header_names(list(he.unknown)))))
         elif tool == hsts_tool and http.hsts is not None:
             zeile.append(("Adresse", http.hsts.url))
             zeile.append(("Antwort", http.hsts.status_code or ("Weiterleitung" if tool == "redirect_probe" else None)))
@@ -377,7 +386,8 @@ def _http_wordpress(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> l
         return []
     paare: list[tuple[str, Any]] = [("", f"{http.fqdn or http.host_ip}")]
     if wp.users and (not paths or _touches(paths, "http.wordpress.users")):
-        paare.append(("Benutzernamen", liste(sorted(wp.users))))
+        # S6b-4n (E25): die Namen stehen in den Rohdaten, nicht im Bericht.
+        paare.append(("Anmeldenamen", f"{len(wp.users)} (Namen in den Rohdaten)"))
         if wp.users_found_by:
             paare.append(("gefunden über", liste(wp.users_found_by, 3)))
     if not paths or _touches(paths, "http.wordpress.version_status", "http.wordpress.core_vulnerabilities"):
@@ -634,8 +644,6 @@ def _dns(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Evidenc
 def _dns_spf_shared(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[EvidenceRef]:
     """SPF-Freigabe eines geteilten Servers (S6b-4, spec/11 T9): Mechanismus, Aufloesung und
     die Zahl weiterer Domains mit ihrer Quelle; die fremden Namen selbst stehen nicht im Text."""
-    from reporter.facts.systems import foreign_domains
-
     dns = item.fact
     out = _dns(item, ictx, frozenset({"dns.spf"}))
     if dns.spf is None:
@@ -648,14 +656,12 @@ def _dns_spf_shared(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> l
             h = hosts.get(ip)
             if h is None or h.shared is None or h.shared.kind != "hoster":
                 continue
-            zahl = len(foreign_domains(h.shared))
-            quelle = ("Passivquelle" if "fremde_namen_shodan" in h.shared.signals
-                      else "Zertifikat" if "fremde_namen_zertifikat" in h.shared.signals else None)
+            from reporter.facts.systems import foreign_domains_text
             mechanismus = f"{mech.kind}:{mech.value}" if mech.value else mech.kind
             betreiber = (f"Server von {h.shared.server_operator}" if h.shared.server_operator
                          else (f"Server beim Hoster {h.shared.operator}" if h.shared.operator else None))
-            weitere = (f"{zahl} weitere {'Domain' if zahl == 1 else 'Domains'}"
-                       + (f" laut {quelle}" if quelle else "")) if zahl else None
+            # S6b-4n (spec/11 N11): Zahl je Quelle.
+            weitere = foreign_domains_text(h.shared)[0] or None
             out.extend(_line(dns, _zeile([("", dns.domain), ("Mechanismus", mechanismus),
                                           ("löst auf", ip), ("", betreiber),
                                           ("auf demselben Server", weitere)]),
@@ -691,9 +697,15 @@ def _software(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Ev
         paare.append(("Beleg", beleg_text(beleg.excerpt)))
     if sw.vulnerabilities:
         paare.append(("bekannte Schwachstellen laut wpscan", len(sw.vulnerabilities)))
-    # S6b-4 (spec/11 T12, T15): aktuelle Version laut wpscan.
+    # S6b-4 (spec/11 T12, T15): neueste Version laut wpscan; S6b-4n (spec/11 N9): die
+    # Fehlerbereinigung getrennt davon.
+    from reporter.catalog.render import fixed_version, wpscan_directory_stale
     if getattr(sw, "latest_version", None):
-        paare.append(("aktuelle Version laut wpscan", sw.latest_version))
+        paare.append(("neueste Version laut wpscan", sw.latest_version))
+    if fixed_version(sw):
+        paare.append(("fehlerbereinigt ab", fixed_version(sw)))
+    if wpscan_directory_stale(sw):
+        paare.append(("Hinweis", "Verzeichnis von wpscan veraltet"))
     out = _line(sw, _zeile(paare))
     # spec/08 Punkt 20 (#16): die Kennungen stehen im Nachweis. S6b-4 (spec/11 T12): alle, nicht
     # nur die ersten sechs; hinter "und 6 weitere" verschwanden die schwersten Luecken

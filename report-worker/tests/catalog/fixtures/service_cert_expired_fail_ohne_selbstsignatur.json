@@ -24,7 +24,7 @@
     "status": "fail",
     "group_key": "10.0.0.10",
     "affected": [
-      "10.0.0.10:21 (vsftpd, Zertifikat ftp.example.test, am Scantag seit 01.03.2026 abgelaufen)"
+      "10.0.0.10:21 (vsftpd)"
     ],
     "positive": false
   }

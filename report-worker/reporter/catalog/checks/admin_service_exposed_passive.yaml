@@ -18,7 +18,7 @@ requires:
 kind: check
 bundle: admin_access
 # S6b-4 (spec/11 Teil 3 JW VS-002): mit dem Datum der Passivquelle.
-affected_template: "{host_ip}:{port} ({product_or_banner}, laut Passivquelle, gesehen am {seen_date})"
+affected_template: "{host_ip}:{port} ({product_or_banner}, laut Passivquelle, {seen_text})"
 evidence: [passive]
 references: [CWE-284, CISA-KEV]
 frameworks:

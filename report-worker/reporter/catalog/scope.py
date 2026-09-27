@@ -529,7 +529,10 @@ def build_groups(index: FactsIndex, scope: str, group_by: str) -> list[Group]:
             if (name, ip) in index.alias_of:
                 continue
             aliases = index.aliases_for(name, ip)
-            ensure("fqdn", _fqdn_key(name, ip), label=name if not aliases else f"{name} (+{', '.join(aliases)})",
+            # S6b-4n (spec/11 N2): im Namen einer Header-Gruppe nur Aliasnamen mit eigener Messung;
+            # bergersysteme cdn hat eigenes Zertifikat und keine Header-Messung ("+cdn" in VS-007).
+            gezeigt = [a for a in aliases if scope != "http" or (a, ip) in index.http_by_key]
+            ensure("fqdn", _fqdn_key(name, ip), label=name if not gezeigt else f"{name} (+{', '.join(gezeigt)})",
                    host=index.host(ip), fqdn_name=name, fqdn_names=[name, *aliases])
         for it in items:
             if it.host_ip is None:
