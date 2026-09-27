@@ -531,9 +531,14 @@ def _hsts_eigene_messung(facts: Any) -> set[str]:
     nicht bewertbar, HSTS schon)."""
     out: set[str] = set()
     for h in getattr(facts, "http", None) or []:
-        tool = getattr(getattr(h, "hsts", None), "tool", None)
+        hsts = getattr(h, "hsts", None)
+        tool = getattr(hsts, "tool", None)
         basis = getattr(getattr(h, "header_eval", None), "basis", None)
-        gueltig = tool in ("testssl", "redirect_probe") or (
+        # S6b-4n (spec/11 N2, E24): ein gesetzter Header an einer Fehlerseite (400, nicht 429) ist
+        # eine gueltige Messung.
+        an_fehlerseite = (tool == "header_check" and basis == "client_error" and getattr(hsts, "present", None)
+                          and getattr(hsts, "status_code", None) not in (None, 429))
+        gueltig = tool in ("testssl", "redirect_probe") or an_fehlerseite or (
             tool == "header_check" and basis not in ("client_error", "server_error", "challenge"))
         if gueltig and h.fqdn:
             out.add(f"{h.fqdn}@{h.host_ip}")
@@ -790,9 +795,28 @@ REGELFAKT: dict[str, re.Pattern[str]] = {
 }
 
 
-def nachweis_ohne_regelfakt(data: Any) -> list[Defect]:
-    """Ein Befund, dessen Nachweis den Fakt seiner Regel nicht enthaelt (spec/11 T3)."""
+_ENDSEITE = re.compile(r"bewertet an der Endseite: (\S+)")
+
+
+def nachweis_ohne_regelfakt(data: Any, facts: Any = None) -> list[Defect]:
+    """Ein Befund, dessen Nachweis den Fakt seiner Regel nicht enthaelt (spec/11 T3).
+
+    S6b-4n (spec/11 N3): ebenso ein Nachweis, der "bewertet an der Endseite" sagt, obwohl die
+    bewerteten Header nicht aus der Endantwort stammen (heuel ose: redirect_probe speicherte die
+    erste Antwort, gleicher ETag wie header_check)."""
     out: list[Defect] = []
+    if facts is not None:
+        auswertung = {h.header_eval.evaluated.url: h.header_eval for h in getattr(facts, "http", None) or []
+                      if h.header_eval is not None and h.header_eval.evaluated is not None
+                      and h.header_eval.evaluated.url}
+        for f in data.findings:
+            for url in _ENDSEITE.findall(f.evidence or ""):
+                he = auswertung.get(url.rstrip("·").strip())
+                if he is not None and (getattr(he, "final_response", None) is False or not he.complete):
+                    out.append(Defect(engine=ENGINE_V3, check="nachweis_ohne_regelfakt", severity=SEVERITY_ERROR,
+                                      finding_id=f.id,
+                                      message=f"{f.id}: Nachweis nennt die Endseite {url} ohne Endantwort",
+                                      detail={"endseite": url, "grund": "endseite_ohne_endantwort"}))
     for f in data.findings:
         text = f.evidence or ""
         for check in getattr(f, "checks", None) or []:
@@ -808,11 +832,14 @@ def nachweis_ohne_regelfakt(data: Any) -> list[Defect]:
 def ipv6_ohne_inventar(facts: Any) -> list[Defect]:
     """AAAA-Adressen der Kundennamen, die der Scanner nicht ins Inventar uebernommen hat
     (spec/11 T7, bis S6c). Der Bericht nennt sie in Kapitel 2; der Hinweis geht an den Admin."""
-    adressen = sorted({a.ip for h in facts.hosts for a in (getattr(h, "additional_ips", None) or [])})
+    adressen = sorted({a.ip for h in facts.hosts for a in (getattr(h, "additional_ips", None) or [])
+                       if getattr(a, "family", 6) == 6})
     if not adressen:
         return []
+    # S6b-4n (spec/11 N13): Kapitel 2.1 fuehrt die Adresse; sie fehlt nur im Scan-Inventar.
     return [Defect(engine=ENGINE_V3, check="ipv6_ohne_inventar", severity=SEVERITY_WARNING,
-                   message=f"{len(adressen)} IPv6-Adresse(n) laut DNS nicht im Inventar: " + ", ".join(adressen[:4]),
+                   message=(f"{len(adressen)} IPv6-Adresse(n) laut DNS nicht im Scan-Inventar, im Bericht als "
+                            "ungeprüft ausgewiesen: " + ", ".join(adressen[:4])),
                    detail={"adressen": adressen})]
 
 
@@ -829,6 +856,69 @@ def messadresse_ausserhalb_inventar(facts: Any) -> list[Defect]:
                    message=f"Messung an {ip} ausserhalb des Inventars ({', '.join(sorted(n for n in namen if n))})",
                    detail={"adresse": ip, "namen": sorted(n for n in namen if n)})
             for ip, namen in sorted(orte.items())]
+
+
+# S6b-4n (spec/11 N6): Regeln, deren Positivbefund je Subjekt einen eigenen Rohfakt braucht, und das
+# Werkzeug, dessen Nachweis am Fakt dieses Subjekts stehen muss.
+ROHFAKT_POSITIV: dict[str, tuple[str, str]] = {
+    "dns_zone_transfer": ("dns", "zone_transfer"),
+}
+
+
+def positiv_ohne_rohfakt(data: Any, facts: Any, output: Any) -> list[Defect]:
+    """Ein Positivbefund nennt ein Subjekt, fuer das die Regel nicht bejaht ist oder dessen Fakt den
+    Rohbeleg nicht traegt (spec/11 N6: Zonentransfer je Domain nur mit eigenem AXFR-Lauf)."""
+    if output is None:
+        return []
+    bejaht = {(r.check_id, r.group_key) for r in output.results
+              if r.status == "pass" and (r.positive or r.affirmed)}
+    dns = {d.domain: d for d in getattr(facts, "dns", None) or []}
+    out: list[Defect] = []
+    for pos in data.positives:
+        for p in pos.provenance or []:
+            if p.statement != "positive.text":
+                continue
+            for check in p.check.split(","):
+                for gruppe in p.members:
+                    if (check, gruppe) not in bejaht:
+                        out.append(Defect(engine=ENGINE_V3, check="positiv_ohne_rohfakt", severity=SEVERITY_ERROR,
+                                          message=f"Positivbefund „{pos.title}“ nennt {gruppe} ohne bejahte Regel {check}",
+                                          detail={"regel": check, "subjekt": gruppe}))
+                        continue
+                    art, werkzeug = ROHFAKT_POSITIV.get(check, ("", ""))
+                    if art == "dns":
+                        fakt = dns.get(gruppe)
+                        if fakt is None or not any(e.tool == werkzeug for e in fakt.evidence):
+                            out.append(Defect(engine=ENGINE_V3, check="positiv_ohne_rohfakt",
+                                              severity=SEVERITY_ERROR,
+                                              message=(f"Positivbefund „{pos.title}“ nennt {gruppe} ohne eigenen "
+                                                       f"Rohbeleg ({werkzeug})"),
+                                              detail={"regel": check, "subjekt": gruppe, "werkzeug": werkzeug}))
+    return out
+
+
+def anmeldename_im_kundentext(data: Any, facts: Any) -> list[Defect]:
+    """Ein Anmeldename in Personenform steht im Kundentext (Entscheidung E25): der Bericht nennt Anzahl
+    und Fundweg, die Namen bleiben in den Rohdaten."""
+    namen = sorted({u for h in getattr(facts, "http", None) or [] if getattr(h, "wordpress", None)
+                    for u in h.wordpress.users if u and len(u) >= 3})
+    if not namen:
+        return []
+    muster = re.compile(r"\b(" + "|".join(re.escape(n) for n in namen) + r")\b")
+    texte: list[tuple[str, str]] = []
+    for f in data.findings:
+        texte += [(f"{f.id}.{feld}", getattr(f, feld) or "")
+                  for feld in ("title", "affected", "found", "evidence", "impact", "verify")]
+        texte += [(f"{f.id}.recommendation", r[1]) for r in f.recommendation if len(r) > 1]
+    texte += [(f"positiv:{p.title}", p.text) for p in data.positives]
+    texte += [(f"anhang:{t.what}", f"{t.what} {t.where} {t.note}") for t in data.appendix.tool_findings]
+    out: list[Defect] = []
+    for wo, text in texte:
+        treffer = sorted(set(muster.findall(text)))
+        if treffer:
+            out.append(Defect(engine=ENGINE_V3, check="anmeldename_im_kundentext", severity=SEVERITY_ERROR,
+                              message=f"Anmeldename im Kundentext ({wo})", detail={"wo": wo, "anzahl": len(treffer)}))
+    return out
 
 
 def firmenname_nicht_bestaetigt(data: Any) -> list[Defect]:
@@ -868,8 +958,11 @@ def run_all(data: Any, facts: Any, output: Any, *, strict: bool = False) -> list
     defects.extend(frist_vor_berichtsdatum(data))
     # S6b-4 (spec/11 T3, T7, E23): Nachweis mit Regelfakt, Adressen ausserhalb des Inventars,
     # Firmenname aus der Recherche.
-    defects.extend(nachweis_ohne_regelfakt(data))
+    defects.extend(nachweis_ohne_regelfakt(data, facts))
     defects.extend(ipv6_ohne_inventar(facts))
     defects.extend(messadresse_ausserhalb_inventar(facts))
     defects.extend(firmenname_nicht_bestaetigt(data))
+    # S6b-4n (spec/11 N6, E25): Positivbefund gegen Rohfakt, Anmeldenamen im Kundentext.
+    defects.extend(positiv_ohne_rohfakt(data, facts, output))
+    defects.extend(anmeldename_im_kundentext(data, facts))
     return defects
