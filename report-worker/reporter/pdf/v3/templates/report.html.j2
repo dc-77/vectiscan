@@ -19,7 +19,7 @@
 *{box-sizing:border-box;}
 @page{size:A4;margin:22mm 18mm 20mm 18mm;
  @top-left{content:element(rhead);vertical-align:bottom;}
- @bottom-left{content:"VectiScan · {{ variant.assessment|css_string }} · {{ m.customer_short|css_string }} · {{ m.report_id|css_string }} · {{ m.classification|css_string }}{% if m.generation %} · Erzeugung {{ m.generation }}{% endif %}";font-family:Inter;font-weight:400;font-size:7.5pt;color:#94A3B8;vertical-align:top;padding-top:2.5mm;}
+ @bottom-left{content:"VectiScan · {{ variant.assessment|css_string }} · {{ m.customer_short|css_string }} · {{ m.report_id|css_string }} · {{ m.classification|css_string }}{% if m.generation %} · Erzeugung {{ m.generation }}{% if m.generated_on %} vom {{ m.generated_on|css_string }}{% endif %}{% endif %}";font-family:Inter;font-weight:400;font-size:7.5pt;color:#94A3B8;vertical-align:top;padding-top:2.5mm;}
  @bottom-right{content:"Seite " counter(page) " von " counter(pages);font-family:Inter;font-weight:400;font-size:7.5pt;color:#94A3B8;vertical-align:top;padding-top:2.5mm;}
 }
 @page:first{margin:0;@top-left{content:none;}@bottom-left{content:none;}@bottom-right{content:none;}}
@@ -243,7 +243,7 @@ tr{break-inside:avoid;}
  <p class="lead">{{ s.lead }}</p>
  <h3>2.1 Prüfungsumfang</h3>
  <table>
-  <thead><tr><th style="width:28mm">IP-Adresse</th><th style="width:54mm">Hostnamen</th><th style="width:42mm">Netzbetreiber (laut RIPE) / Rolle</th><th style="width:44mm">Abdeckung</th></tr></thead>
+  <thead><tr><th style="width:28mm">IP-Adresse</th><th style="width:54mm">Hostnamen</th><th style="width:42mm">Netzbetreiber (laut AbuseIPDB) / Rolle</th><th style="width:44mm">Abdeckung</th></tr></thead>
   {% for h in s.hosts %}
   <tr><td class="mono">{{ h.ip }}{% for a in h.more_ips %}<br>{{ a }}{% endfor %}</td><td class="wrap">{{ h.fqdns }}</td><td class="wrap">{{ h.operator }}<br><span class="small">{{ h.role }}</span></td>
       <td class="wrap"><span class="dot d-{{ {'voll':'gruen','teil':'gelb','keine':'rot','unerreichbar':'rot','extern':'grau'}[h.cov] }}"></span>{{ h.coverage }}</td></tr>
@@ -387,6 +387,7 @@ tr{break-inside:avoid;}
  <h3>A.1 Triage-Modell dieses Berichts</h3>
  <table><thead><tr><th style="width:18mm">Status</th><th style="width:150mm">Bedeutung</th></tr></thead>
  {% for t in ap.triage %}<tr><td><span class="pill p-{{ t.st }}">{{ t.l }}</span></td><td>{{ t.t }}</td></tr>{% endfor %}</table>
+ {% if ap.overall_rule %}<p>{{ ap.overall_rule }}</p>{% endif %}
  <h3>A.2 Eigene Einstufung: Exposition und Hygiene</h3>
  <p>Der Bericht vergibt keine eigenen CVSS-Werte. Erreichbare Dienste werden nach Exposition eingestuft, Konfigurations- und Best-Practice-Abweichungen nach der VectiScan-Hygiene-Skala. Ein CVSS-Basiswert erscheint nur dort, wo eine Fremdbewertung zu einer zitierten CVE vorliegt (A.3); fehlt er, stammt die Schwachstellennummer aus dem Prüfwerkzeug und die Einstufung aus dem zugehörigen Befund.</p>
  <table><thead><tr><th style="width:18mm">Stufe</th><th style="width:150mm">Exposition</th></tr></thead>

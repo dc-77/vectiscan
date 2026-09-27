@@ -93,6 +93,20 @@ URGENT_EXCEPTIONS: dict[str, str] = {
     "cert_expiring": "ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen",
 }
 
+# S6b-4 (spec/11 T11, E22): benannte Ausnahmen in die andere Richtung. Eine Pruefung mit
+# ``hint_when`` wird bei Treffer fuer jedes Mitglied ein blauer Hinweis: ein Passivbefund auf
+# einem Host, der vom Pruefstand aus nicht erreichbar ist, laesst sich nicht bestaetigen
+# (bergersysteme IIS 10.0 auf 62.217.52.166 stand gelb in Kategorie B).
+TRIAGE_HINT = Triage("blau", ("mittelfristig", "strategisch"), "LOW")
+HINT_PHRASE = ("Befunde, die nur eine Passivquelle für einen vom Prüfstand aus nicht erreichbaren "
+               "Host meldet")
+HINT_EXCEPTIONS: dict[str, str] = {
+    "passive_service_version_unverified": HINT_PHRASE,
+    "login_over_http_passive": HINT_PHRASE,
+    "smtp_vrfy_enabled_passive": HINT_PHRASE,
+    "admin_service_exposed_passive": HINT_PHRASE,
+}
+
 # Rueckfall fuer eine Einstufung, die das Schema nicht kennt. Der Selbstcheck
 # meldet sie ohnehin als Defekt; hier wird nur nichts erfunden.
 TRIAGE_UNKNOWN = Triage("blau", ("mittelfristig",), "LOW")
@@ -135,25 +149,31 @@ def worst(pairs: list[tuple[str, str]]) -> tuple[str, str]:
     return min(pairs, key=lambda p: severity_key(*p))
 
 
-def triage_for(scale: str, level: str, active_proof: bool = False, urgent: bool = False) -> Triage:
+def triage_for(scale: str, level: str, active_proof: bool = False, urgent: bool = False,
+               hint: bool = False) -> Triage:
     if active_proof:
         return TRIAGE_ACTIVE_PROOF
     if urgent:
         return TRIAGE_URGENT
-    return TRIAGE_BY_LEVEL.get((scale, level), TRIAGE_UNKNOWN)
+    base = TRIAGE_BY_LEVEL.get((scale, level), TRIAGE_UNKNOWN)
+    if hint and STATUS_RANK.get(base.status, 9) < STATUS_RANK["blau"]:
+        return TRIAGE_HINT
+    return base
 
 
-def status_for(scale: str, level: str, active_proof: bool = False, urgent: bool = False) -> str:
-    return triage_for(scale, level, active_proof, urgent).status
+def status_for(scale: str, level: str, active_proof: bool = False, urgent: bool = False,
+               hint: bool = False) -> str:
+    return triage_for(scale, level, active_proof, urgent, hint).status
 
 
-def severity_for(scale: str, level: str, active_proof: bool = False, urgent: bool = False) -> str:
+def severity_for(scale: str, level: str, active_proof: bool = False, urgent: bool = False,
+                 hint: bool = False) -> str:
     """Stufe fuer die Dashboard-Befundliste (reports.findings_data)."""
-    return triage_for(scale, level, active_proof, urgent).severity
+    return triage_for(scale, level, active_proof, urgent, hint).severity
 
 
 def stage_for(scale: str, level: str, stages: list[str],
-              active_proof: bool = False, urgent: bool = False) -> str:
+              active_proof: bool = False, urgent: bool = False, hint: bool = False) -> str:
     """Wirksame Empfehlungsstufe eines Befunds.
 
     Der Katalog schlaegt mit seiner dringlichsten Stufe vor; zugelassen ist sie
@@ -161,7 +181,7 @@ def stage_for(scale: str, level: str, stages: list[str],
     Tabellenwert. Damit kann keine Empfehlung einen gelben Befund als
     unverzueglich ausweisen.
     """
-    tri = triage_for(scale, level, active_proof, urgent)
+    tri = triage_for(scale, level, active_proof, urgent, hint)
     if not stages:
         return tri.stage
     top = min(stages, key=lambda s: STAGE_RANK.get(s, 9))
@@ -169,8 +189,8 @@ def stage_for(scale: str, level: str, stages: list[str],
 
 
 def urgency_for(scale: str, level: str, stages: list[str],
-                active_proof: bool = False, urgent: bool = False) -> str:
-    return URGENCY_BY_STAGE[stage_for(scale, level, stages, active_proof, urgent)]
+                active_proof: bool = False, urgent: bool = False, hint: bool = False) -> str:
+    return URGENCY_BY_STAGE[stage_for(scale, level, stages, active_proof, urgent, hint)]
 
 
 def relative_stages(stages: list[str], effective: str) -> list[str]:
@@ -283,3 +303,18 @@ def urgent_phrase() -> str:
     faelle = sorted(URGENT_EXCEPTIONS.values())
     return ("Ausnahme: Rot und Unverzüglich gelten auch für "
             + (" und ".join(faelle)) + ".")
+
+
+def hint_phrase() -> str:
+    """Satz fuer Anhang A.1 zu den Hinweisen (S6b-4, E22)."""
+    if not HINT_EXCEPTIONS:
+        return ""
+    faelle = sorted(set(HINT_EXCEPTIONS.values()))
+    return "Als blauer Hinweis stehen außerdem " + " und ".join(faelle) + "."
+
+
+# S6b-4 (spec/11 T6, E16): die Regel der Gesamtbewertung, im Code benannt und in A.1 erklärt.
+# Sie ist seit S3 unverändert: die schlechteste Ampel der fünf Kategorien.
+OVERALL_RULE = ("Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei "
+                "mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei "
+                "nur blauen Befunden und GERING ohne Befund.")

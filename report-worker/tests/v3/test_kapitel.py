@@ -102,10 +102,14 @@ def test_technik_tabelle_ohne_doppelte_zeilen(data):
 
 
 def test_technik_status_und_farbe_passen_zusammen(data):
-    erlaubt = {("aktuell", "gruen"), ("veraltet", "rot"), ("unbekannt", "grau")}
+    # S6b-4 (spec/11 T11, T15): Langzeitpflege mit Quelle ist gruen, eine laut wpscan veraltete
+    # Erweiterung gelb ("veraltet, 12 bekannte Lücken, aktuell 28.5.10"), ein unsicherer Kern rot.
+    erlaubt = {("aktuell", "gruen"), ("veraltet", "rot"), ("unbekannt", "grau"),
+               ("in Langzeitpflege (LTS)", "gruen"), ("unsicher", "rot")}
     for block in data.architecture.tech:
         for row in block.rows:
-            assert (row.status, row.st) in erlaubt, (block.host, row.c, row.status, row.st)
+            ok = (row.status, row.st) in erlaubt or (row.st == "gelb" and row.status.startswith("veraltet"))
+            assert ok, (block.host, row.c, row.status, row.st)
 
 
 def test_dienstkarten_faerben_befundports(data):

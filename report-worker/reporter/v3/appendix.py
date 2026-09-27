@@ -11,6 +11,7 @@ from __future__ import annotations
 from reporter.catalog.schema import CatalogOutput
 from reporter.facts import schema as FS
 from reporter.v3 import chapters as C
+from reporter.v3 import levels as L
 from reporter.v3 import narrative as N
 from reporter.v3 import tables as T
 from reporter.v3.models import (Appendix, CveRef, Finding, InventoryRow, ScaleRow, ToolFinding,
@@ -56,10 +57,12 @@ def build_inventory(facts: FS.Facts,
             continue
         # E5: Dienstname aus dem Passivmodul ("SMTP") statt "unbekannt".
         name = C.passive_service_label(pv)
-        if pv.version:
+        if pv.version and pv.version not in name:
             name = f"{name} {pv.version}"
+        # S6b-4 (spec/11 T1): ein Port ausserhalb des Portbereichs ist nicht "unbestaetigt".
+        wo = ", außerhalb des geprüften Portbereichs" if C.port_outside_range(facts, pv.port) else ""
         rows.append(InventoryRow(host=pv.host_ip, port=str(pv.port),
-                                 svc=f"{name}, laut Passivquelle",
+                                 svc=f"{name}, laut Passivquelle{wo}",
                                  ref=ref(pv.host_ip, pv.port)))
     return rows
 
@@ -113,6 +116,7 @@ def build_appendix(facts: FS.Facts, output: CatalogOutput, findings: list[Findin
         exposure_scale=[ScaleRow(l=label, t=text) for label, text in T.EXPOSURE_SCALE],
         hygiene_scale=[ScaleRow(l=label, t=text) for label, text in T.HYGIENE_SCALE],
         triage=[TriageRow(l=label, st=status, t=text) for label, status, text in T.triage_rows()],
+        overall_rule=L.OVERALL_RULE,
         cve_refs=cve_refs,
         inventory=build_inventory(facts, port_refs),
         tools=build_tools(facts),

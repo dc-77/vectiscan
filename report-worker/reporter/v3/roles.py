@@ -62,14 +62,23 @@ class Role:
     # S6b-3 (spec/10 R9): HTTP-Status, wenn der Name nur eine Fehlerseite liefert
     # (castenow mailstore, Nextcloud mit 400 "Access through untrusted domain").
     status: Optional[int] = None
+    # S6b-4 (spec/11 T10): Bedeutung nach Fakt (T.ROLE_VARIANTS), leer fuer den Standardtext.
+    variant: str = ""
+    # S6b-4 (spec/11 Teil 3): Zusatz im Namen ("Dateiaustausch (FTP, SFTP)") oder ein eigener
+    # Name ("Umfrageplattform (umfrageonline.com), leitet auf die Website weiter").
+    detail: str = ""
+    name: str = ""
 
     @property
     def label(self) -> str:
-        return T.ROLE_DEFS[self.key][0]
+        if self.name:
+            return self.name
+        base = T.ROLE_DEFS[self.key][0]
+        return f"{base} ({self.detail})" if self.detail else base
 
     @property
     def meaning(self) -> str:
-        text = T.ROLE_DEFS[self.key][1]
+        text = T.ROLE_VARIANTS.get((self.key, self.variant)) or T.ROLE_DEFS[self.key][1]
         if self.status and self.status >= 400:
             text += (f" Unter dem geprüften Namen liefert der Dienst nur eine Fehlerseite "
                      f"({self.status}).")
@@ -146,6 +155,10 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
         if beleg not in found[key]:
             found[key].append(beleg)
 
+    namen: dict[str, str] = {}
+    details: dict[str, list[str]] = {}
+    domains = list(facts.scan.domains) or [facts.scan.domain]
+
     empfang, versand = mail_evidence(facts, host)
     if empfang:
         exchange = exchange_evidence(facts, host)
@@ -157,6 +170,21 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
             add("mail_versand", b)
     for fq in sorted(_customer_names(facts, host), key=lambda f: sort_key(f.name)):
         title = (fq.title or "").strip()
+        ziel = next((t for t in fq.cname if not SYS.under(t, domains)), None)
+        # Liefert der Name die eigene Website (huendgen www auf der Mandantenplattform), bleibt es
+        # bei "Website"; ein Plattformdienst ist ein Name, der weiterleitet oder dessen Anbieter
+        # einen bekannten Dienst betreibt (castenow umfrage).
+        anbieter_bekannt = bool(ziel) and SYS.registrable(ziel) in T.PLATFORM_SERVICES
+        if ziel and host.shared is not None and host.shared.kind == "platform" \
+                and (anbieter_bekannt or _redirects_away(facts, fq)):
+            # S6b-4 (spec/11 Teil 3 CA umfrage): Rolle aus dem CNAME, nicht aus der Zielseite.
+            anbieter = SYS.registrable(ziel)
+            art = T.PLATFORM_SERVICES.get(anbieter)
+            weiter = ", leitet auf die Website weiter" if _redirects_to_customer(fq, domains) else ""
+            add("plattform", f"{fq.name}: CNAME {ziel}")
+            if art:
+                namen.setdefault("plattform", f"{art} ({anbieter}){weiter}")
+            continue
         if _redirects_away(facts, fq):
             continue
         rolle = next((key for key, rx in TITLE_RULES if title and rx.search(title)), None)
@@ -179,11 +207,23 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
             beleg = f"{s.port}/{s.proto} {s.service or ''} {s.product or ''}".strip()
             if s.port in T.DB_PORTS:
                 add("datenbank", beleg)
+            elif _sftp_of_ftp_server(facts, s):
+                # S6b-4 (spec/11 Teil 3 HL): SSH eines FTP-Servers ist SFTP, kein Fernzugang
+                # (20.79.218.75: nmap FortiSSH, Passivquelle SSH-2.0-WingFTPServer).
+                add("dateiaustausch", beleg)
+                details.setdefault("dateiaustausch", []).append("SFTP")
             elif (s.service or "") in REMOTE_SERVICES or s.port == 3389 \
                     or REMOTE_PRODUCTS.search(f"{s.product or ''} {s.service or ''}"):
                 add("fernzugang", beleg)
             elif (s.service or "") == "ftp" or s.port == 21:
                 add("dateiaustausch", beleg)
+                details.setdefault("dateiaustausch", []).insert(0, "FTP")
+    # S6b-4 (spec/11 Teil 3 HL ose): eine Anmeldemaske laut Webanalyse ohne Portal- oder
+    # Redaktionstitel ist eine Webanwendung mit Anmeldung.
+    mit_anmeldung = sorted(h.fqdn for h in facts.http if h.host_ip == host.ip and h.login_form and h.fqdn)
+    if mit_anmeldung and not set(found) & {"anmeldeportal", "redaktion", "webmail", "passwort", "kollaboration",
+                                           "mail_kalender"}:
+        add("webanwendung", f"{mit_anmeldung[0]}: Anmeldeformular laut Webanalyse")
     order = {k: i for i, k in enumerate(T.ROLE_ORDER)}
     keys = sorted(found, key=lambda k: order.get(k, len(order)))
     def status_of(key: str) -> Optional[int]:
@@ -192,7 +232,45 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
         werte = fehlerseite.get(key) or []
         return werte[0] if werte and all(werte) else None
 
-    return [Role(key=k, evidence=tuple(found[k][:3]), status=status_of(k)) for k in keys[:MAX_ROLES]]
+    def variant_of(key: str) -> str:
+        if key == "website" and not web_analysis_ran(facts, host):
+            return "ohne_webanalyse"
+        if key == "fernzugang" and host.betriebsform in ("rechenzentrum", "plattform"):
+            return str(host.betriebsform)
+        return ""
+
+    def detail_of(key: str) -> str:
+        teile = [d for d in dict.fromkeys(details.get(key) or [])]
+        # Ein einzelner Zusatz sagt nichts, was der Name nicht schon sagt ("Dateiaustausch (FTP)").
+        return ", ".join(teile) if len(teile) > 1 or teile == ["SFTP"] else ""
+
+    return [Role(key=k, evidence=tuple(found[k][:3]), status=status_of(k), variant=variant_of(k),
+                 detail=detail_of(k), name=namen.get(k, ""))
+            for k in keys[:MAX_ROLES]]
+
+
+def _redirects_to_customer(fq: FS.FqdnFact, domains: list[str]) -> bool:
+    ziel = SYS.clean_name(urlsplit(fq.final_url or "").hostname or "")
+    return bool(ziel) and ziel != SYS.clean_name(fq.name) and SYS.under(ziel, domains)
+
+
+_FTP_SERVER = re.compile(r"ftp", re.I)
+
+
+def _sftp_of_ftp_server(facts: FS.Facts, s: FS.ServiceFact) -> bool:
+    """SSH-Dienst, den ein FTP-Server stellt: Produkt (ProFTPD mod_sftp) oder Passivbanner
+    (SSH-2.0-WingFTPServer) nennt FTP."""
+    if (s.service or "") != "ssh":
+        return False
+    if _FTP_SERVER.search(s.product or ""):
+        return True
+    return any(p.host_ip == s.host_ip and p.port == s.port and _FTP_SERVER.search(p.banner_excerpt or "")
+               for p in facts.passive)
+
+
+def web_analysis_ran(facts: FS.Facts, host: FS.HostFact) -> bool:
+    """Lief die aktive Webanalyse an diesem Host (spec/11 T10)?"""
+    return any(c.tool == "zap_active" and c.status == "ok" and c.host_ip == host.ip for c in facts.coverage)
 
 
 def role_label(roles: list[Role]) -> str:

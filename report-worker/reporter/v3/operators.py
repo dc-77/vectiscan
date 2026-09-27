@@ -18,6 +18,7 @@ from typing import Optional
 from reporter.catalog import tables as CT
 from reporter.catalog.schema import CheckResult
 from reporter.facts import schema as FS
+from reporter.facts import systems as SYS
 from reporter.facts.systems import registrable
 
 KIND_LABEL = {"hoster": "beim Hoster", "platform": "beim Plattformbetreiber"}
@@ -34,6 +35,9 @@ class Operator:
     # Namen selbst bleiben in den Fakten und stehen nicht im Kundentext.
     foreign_count: int = 0
     foreign_source: str = ""
+    # S6b-4 (spec/11 T9): Rechenzentrum, wenn der Server laut rDNS einem anderen Betreiber
+    # gehoert als dem Netzbetreiber (castenow 159.69.143.80: planwerk6.de bei Hetzner).
+    datacenter: str = ""
 
     @property
     def key(self) -> str:
@@ -57,9 +61,15 @@ def operator_for(result: CheckResult, scope: str, hosts: dict[str, FS.HostFact])
         return None
     shared = host.shared
     if shared.kind == "platform" or result.check_id in CT.SHARED_OPERATOR_CHECKS:
-        domains = {registrable(n) for n in shared.foreign_names if n}
+        # S6b-4 (spec/11 T9, E18): gezaehlt wird die registrierbare Domain ohne die Domains
+        # des Hosters (lumbeck-wolter: nur flott.de, nicht your-server.de).
+        domains = SYS.foreign_domains(shared)
         quelle = ("Passivquelle" if "fremde_namen_shodan" in shared.signals
                   else "Zertifikat" if "fremde_namen_zertifikat" in shared.signals else "")
+        if shared.server_operator:
+            return Operator(kind=shared.kind, name=shared.server_operator,
+                            foreign_count=len(domains), foreign_source=quelle,
+                            datacenter=shared.operator or "")
         return Operator(kind=shared.kind, name=shared.operator or "",
                         foreign_count=len(domains), foreign_source=quelle)
     return None
@@ -76,14 +86,21 @@ def sentence(op: Operator) -> str:
     fremd = ""
     if op.foreign_count:
         # Auf demselben Server, nicht "auf derselben Adresse": die Namen stammen auch von der
-        # IPv6-Adresse desselben Systems (junkerwerk toyota-motorsport.com).
-        laut = f" laut {op.foreign_source}" if op.foreign_source else ""
+        # IPv6-Adresse desselben Systems (junkerwerk toyota-motorsport.com). S6b-4 (spec/11 T9,
+        # E18): ohne "anderer Kunden", die Vertragsform ist aus den Rohdaten nicht ableitbar.
+        laut = f"laut {op.foreign_source} " if op.foreign_source else ""
         wort = "weitere Domain" if op.foreign_count == 1 else "weitere Domains"
-        fremd = f" (auf demselben Server{laut} {op.foreign_count} {wort} anderer Kunden)"
-    return (f"Dieser Sachverhalt liegt beim Hoster{name}: der Server wird mit anderen Kunden "
-            f"geteilt{fremd}, der Dienst gehört zum Server und nicht zu Ihrer Website. Die "
-            "Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen "
-            "eigenen Server in Betracht ziehen.")
+        verb = "steht" if op.foreign_count == 1 else "stehen"
+        fremd = f" Auf demselben Server {verb} {laut}{op.foreign_count} {wort}."
+    if op.datacenter:
+        # castenow 159.69.143.80: rDNS yak.planwerk6.de im Netz von Hetzner.
+        return (f"Dieser Sachverhalt liegt beim Betreiber des Servers: laut Reverse-DNS gehört der "
+                f"Server zu {op.name} und steht im Rechenzentrum von {op.datacenter}; der Dienst "
+                f"gehört zum Server und nicht zu Ihrer Website.{fremd} Die Empfehlung richtet sich "
+                "an den Betreiber des Servers; Sie können sie dort einfordern.")
+    return (f"Dieser Sachverhalt liegt beim Hoster{name}: der Dienst gehört zum Server und nicht "
+            f"zu Ihrer Website.{fremd} Die Empfehlung richtet sich an den Hoster; Sie können sie "
+            "dort einfordern oder einen eigenen Server in Betracht ziehen.")
 
 
 __all__ = ["Operator", "KIND_LABEL", "ADDRESSEE", "ASK_AT", "hosts_by_ip", "operator_for", "sentence"]

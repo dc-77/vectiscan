@@ -258,6 +258,9 @@ def triage_rows() -> list[tuple[str, str, str]]:
         # S6b-2 (E2): benannte Ausnahmen der Abbildungstabelle stehen bei Rot.
         if status == L.TRIAGE_URGENT.status and L.urgent_phrase():
             text = f"{text} {L.urgent_phrase()}"
+        # S6b-4 (E22): Passivbefunde ohne erreichbaren Host stehen bei Blau.
+        if status == "blau" and L.hint_phrase():
+            text = f"{text} {L.hint_phrase()}"
         out.append((L.STATUS_LABELS[status], status, text))
     return out
 
@@ -283,7 +286,9 @@ POSTURE_BLOCKS: list[dict[str, object]] = [
         "name": "E-Mail-Authentizität",
         "short": "E-Mail-Authentizität",
         "items": [
-            ("SPF", ("spf_missing", "spf_permissive", "spf_softfail", "mail_spoofing_unprotected")),
+            # S6b-4 (spec/11 T16): die SPF-Freigabe eines geteilten Servers ist ein SPF-Befund.
+            ("SPF", ("spf_missing", "spf_permissive", "spf_softfail", "mail_spoofing_unprotected",
+                     "spf_authorizes_shared_host")),
             ("DKIM", ("dkim_missing",)),
             ("DMARC", ("dmarc_missing", "dmarc_none", "dmarc_quarantine", "mail_spoofing_unprotected")),
             ("MTA-STS", ("mta_sts_missing",)),
@@ -308,6 +313,11 @@ POSTURE_BLOCKS: list[dict[str, object]] = [
         "short": "Transportverschlüsselung",
         "per_host": ("tls_legacy_protocols", "tls_no_13", "tls_weak_ciphers", "tls_weakness",
                      "tls_no_fallback_scsv"),
+        # S6b-4 (spec/11 T16): Zertifikatsbefunde ziehen die Zeile ihres Hosts mit (castenow
+        # 195.50.179.5 und .6 standen "unauffällig" neben Rot VS-003 und Gelb VS-007).
+        "per_host_members": ("cert_expired", "cert_expiring", "cert_expiring_later",
+                             "cert_chain_incomplete", "cert_hostname_mismatch", "cert_self_signed",
+                             "service_cert_expired"),
         "items": [
             ("Zertifikate", ("cert_expired", "cert_expiring", "cert_expiring_later",
                              "cert_chain_incomplete", "cert_hostname_mismatch", "cert_self_signed",
@@ -498,10 +508,12 @@ ROLE_DEFS: dict[str, tuple[str, str]] = {
         "E-Mail-Versand laut SPF",
         "Dieses System darf laut SPF-Eintrag E-Mail im Namen der Domain versenden. Ein Missbrauch "
         "trifft die Glaubwürdigkeit der eigenen Absenderadresse."),
+    # S6b-4 (spec/11 T10): ob ein zweiter Faktor verlangt wird, ist von außen nicht feststellbar.
     "webmail": (
         "Mail-Webzugang",
-        "Webzugang zu den Postfächern. Erbeutete Zugangsdaten öffnen darüber die E-Mail der "
-        "Mitarbeitenden."),
+        "Webzugang zu den Postfächern. Mit erbeuteten Zugangsdaten ist darüber die E-Mail der "
+        "Mitarbeitenden erreichbar, sofern kein zweiter Faktor verlangt wird; ob ein zweiter Faktor "
+        "aktiv ist, ist von außen nicht feststellbar."),
     "passwort": (
         "Passwortverwaltung",
         "Tresor für Zugangsdaten. Ein Zugriff darauf öffnet die Konten, deren Kennwörter dort liegen."),
@@ -515,10 +527,23 @@ ROLE_DEFS: dict[str, tuple[str, str]] = {
         "dahinterliegenden Dienste."),
     # S6b-3 (spec/10 R9): die Anmeldeseite eines Redaktionssystems ist kein zentrales Portal
     # (castenow ubb-wiki, WordPress).
+    # S6b-4 (spec/11 Teil 3 CA ubb-wiki): welche Rechte hinter der Anmeldung liegen, zeigt
+    # die Seite nicht; "Redaktionssystem" ging über den Fakt hinaus.
     "redaktion": (
-        "Redaktionszugang",
-        "Anmeldeseite des Redaktionssystems der Website. Wer hier Zugangsdaten errät oder abgreift, "
-        "kann die Inhalte der Website ändern."),
+        "Anmeldung zur Website",
+        "Anmeldeseite der Website. Wer hier Zugangsdaten errät oder abgreift, erreicht die Bereiche "
+        "hinter der Anmeldung."),
+    # S6b-4 (spec/11 Teil 3 HL 20.79.218.75): eine Anmeldemaske ohne Portaltitel.
+    "webanwendung": (
+        "Webanwendung mit Anmeldung",
+        "Anwendung mit eigener Anmeldung. Wer hier Zugangsdaten errät oder abgreift, erreicht die "
+        "Funktionen hinter der Anmeldung."),
+    # S6b-4 (spec/11 Teil 3 CA umfrage): ein Name des Kunden zeigt per CNAME auf einen Dienst eines
+    # Plattformanbieters.
+    "plattform": (
+        "Dienst eines Plattformanbieters",
+        "Der Name gehört dem Unternehmen, den Dienst dahinter betreibt ein Anbieter. Betroffen wären "
+        "die Inhalte, die dort im Namen des Unternehmens erscheinen."),
     "website": (
         "Website",
         "Außendarstellung des Unternehmens. Betroffen wären vor allem Seiteninhalte und "
@@ -536,10 +561,28 @@ ROLE_DEFS: dict[str, tuple[str, str]] = {
         "Austausch von Dateien mit Dritten. Die Inhalte und die verwendeten Zugangsdaten sind hier "
         "das Schutzgut."),
 }
+# S6b-4 (spec/11 T10): Bedeutung je Rolle nach Fakt. "Formulareingaben" nur, wenn die aktive
+# Webanalyse am Host gelaufen ist (LW und JW: blockiert); "Unternehmensnetz" nur für ein System
+# am Anschluss des Kunden (DB: gemieteter Server im Rechenzentrum).
+ROLE_VARIANTS: dict[tuple[str, str], str] = {
+    ("website", "ohne_webanalyse"): (
+        "Außendarstellung des Unternehmens. Betroffen wären vor allem die Seiteninhalte."),
+    ("fernzugang", "rechenzentrum"): (
+        "Zugang zur Verwaltung dieses Servers. Solche Zugänge sind das bevorzugte Ziel, weil über "
+        "sie der Server selbst und alle Dienste darauf gesteuert werden."),
+    ("fernzugang", "plattform"): (
+        "Zugang zur Verwaltung dieses Systems. Solche Zugänge sind das bevorzugte Ziel, weil über "
+        "sie das System selbst und alle Dienste darauf gesteuert werden."),
+}
 # Reihenfolge, in der Rollen genannt werden; die spezifischere zuerst.
 ROLE_ORDER: tuple[str, ...] = ("mail_kalender", "mail", "webmail", "passwort", "kollaboration",
-                               "anmeldeportal", "redaktion", "fernzugang", "datenbank", "dateiaustausch", "website",
-                               "mail_versand")
+                               "anmeldeportal", "redaktion", "fernzugang", "datenbank", "dateiaustausch",
+                               "plattform", "website", "webanwendung", "mail_versand")
+# S6b-4 (spec/11 Teil 3 CA): Art des Dienstes je Plattform-Domain; ohne Eintrag bleibt es bei
+# "Dienst eines Plattformanbieters".
+PLATFORM_SERVICES: dict[str, str] = {
+    "umfrageonline.com": "Umfrageplattform",
+}
 ROLE_FALLBACK = "Nicht näher bestimmbar"
 ROLE_FALLBACK_MEANING = ("Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte "
                          "intern geklärt werden.")
@@ -570,5 +613,7 @@ ROLE_CATEGORIES: dict[str, frozenset[str]] = {
     "fernzugang": frozenset({"fernzugang"}),
     "datenbank": frozenset({"datenbank"}),
     "dateiaustausch": frozenset(),
+    "webanwendung": frozenset({"anmeldeportal"}),
+    "plattform": frozenset(),
     "website": frozenset(),
 }

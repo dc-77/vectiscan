@@ -208,6 +208,10 @@ def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY,
     group, n = _group_label(results, groups, merge_key, kurz=kurz, excluded=excluded)
     passed: list[str] = []
     fehlend: list[str] = []
+    anderswo: list[str] = []
+    ziele: list[str] = []
+    rua: list[str] = []
+    mx: list[str] = []
     for r in results:
         for x in r.vars.get("passed") or []:
             if x not in passed:
@@ -215,13 +219,31 @@ def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY,
         for x in r.vars.get("missing_header_names") or []:
             if x not in fehlend:
                 fehlend.append(x)
+        for x in r.vars.get("valid_elsewhere") or []:
+            if x not in anderswo:
+                anderswo.append(x)
+        for x in r.vars.get("target_versions") or []:
+            if x not in ziele:
+                ziele.append(x)
+        for x in r.vars.get("dmarc_rua") or []:
+            if x not in rua:
+                rua.append(x)
+        for x in r.vars.get("mx") or []:
+            if x not in mx:
+                mx.append(x)
     return {
         "passed": passed,
         "missing_header_names": fehlend,
+        "valid_elsewhere": anderswo,
+        "target_versions": ziele,
+        "dmarc_rua": rua,
+        "mx": mx,
         "affected": affected,
         "count": len(affected),
         "group": group,
         "n": render.Numerus(n),
+        # S6b-4 (spec/11 T12): Einzahl oder Mehrzahl nach der Zahl der Betroffenen.
+        "m": render.Numerus(len(affected)),
         "fqdn_names": fqdns,
         "domain": domain,
         "host_ip": host_ip,
@@ -337,6 +359,7 @@ class RuleHit:
     fails: list[tuple[CheckResult, Member]] = field(default_factory=list)
     active_proof: bool = False
     urgent: bool = False
+    hint: bool = False
 
     @property
     def stages(self) -> list[str]:
@@ -345,7 +368,7 @@ class RuleHit:
     def effective_stage(self, stages: list[str] | None = None) -> str:
         return L.stage_for(self.check.scale, self.check.level,
                            self.stages if stages is None else stages,
-                           self.active_proof, self.urgent)
+                           self.active_proof, self.urgent, self.hint)
 
 
 def rule_hits(item: Consolidated, checks: dict[str, CheckInfo]) -> list[RuleHit]:
@@ -357,7 +380,8 @@ def rule_hits(item: Consolidated, checks: dict[str, CheckInfo]) -> list[RuleHit]
         fails = [(r, m) for r in results for m in r.members if m.status == "fail"]
         hits.append(RuleHit(check=info, results=results, fails=fails,
                             active_proof=any(r.active_proof for r in results),
-                            urgent=any(r.urgent for r in results)))
+                            urgent=any(r.urgent for r in results),
+                            hint=item.hint and all(r.hint for r in results)))
     return hits
 
 
@@ -409,6 +433,48 @@ def select_statements(hit: RuleHit, name: str, values: dict[str, Any],
     return out
 
 
+def pick_variant(hit: RuleHit, name: str, default: str,
+                 default_id: str) -> tuple[str, str, list[str]]:
+    """(Text, Aussage-ID, Mitglieder) der ersten zutreffenden Variante eines Felds (S6b-4).
+
+    Varianten von Kurzform, Hebel und Effekt ersetzen den Standardtext, wenn ihre Bedingung
+    fuer jedes fehlgeschlagene Mitglied gilt (``alle``) oder fuer mindestens eines (``eines``).
+    Ohne Treffer bleibt der Standardtext mit allen Mitgliedern."""
+    for sid, text, _cond, quantor in hit.check.texts.statements(name):
+        gilt = [(r, m) for r, m in hit.fails if sid in m.holds]
+        if gilt and (quantor == "eines" or len(gilt) == len(hit.fails)):
+            return text, sid, [_member_ref(r, m) for r, m in gilt]
+    return default, default_id, [_member_ref(r, m) for r, m in hit.fails]
+
+
+def rule_short(hit: RuleHit) -> tuple[str, str, list[str]]:
+    """Kurzform einer getroffenen Regel im Sammeltitel, mit Variante (spec/11 T4, T14)."""
+    return pick_variant(hit, "short_variants", hit.check.texts.short or hit.check.title, "short")
+
+
+# S6b-4 (spec/11 T12): Passivregeln und ihre aktiven Gegenstuecke im selben Befund.
+PASSIVE_COUNTERPARTS: dict[str, frozenset[str]] = {
+    "admin_service_exposed_passive": frozenset({"admin_panel_hoster", "admin_service_exposed",
+                                                "admin_portal_exposed", "admin_service_unconfirmed"}),
+    "smtp_vrfy_enabled_passive": frozenset({"smtp_vrfy_enabled"}),
+}
+
+
+def _passive_after_active(parts: list[Rendered]) -> list[Rendered]:
+    """Aussagen einer Passivregel direkt hinter den ersten Satz ihres aktiven Gegenstuecks."""
+    for passiv, aktive in PASSIVE_COUNTERPARTS.items():
+        erste = next((i for i, p in enumerate(parts) if p.check in aktive), None)
+        if erste is None:
+            continue
+        nachzug = [p for p in parts if p.check == passiv]
+        if not nachzug:
+            continue
+        rest = [p for p in parts if p.check != passiv]
+        pos = next(i for i, p in enumerate(rest) if p.check in aktive) + 1
+        parts = rest[:pos] + nachzug + rest[pos:]
+    return parts
+
+
 def _join(parts: list[Rendered]) -> str:
     texts: list[str] = []
     for p in parts:
@@ -457,18 +523,33 @@ def compose(item: Consolidated, checks: dict[str, CheckInfo], where: str) -> Com
         for pos, (rec, stufe) in enumerate(zip(recs, verschoben)):
             rec.stage = stufe
             empfehlungen.append((L.STAGE_RANK[stufe], reihe * 100 + pos, rec.text, rec))
-        if recs:
+        gegenstueck = PASSIVE_COUNTERPARTS.get(hit.check.id, frozenset())
+        if recs and not any(h.check.id in gegenstueck for h in hits):
             # S6b-3 (spec/10 R11, Entscheidung E8): jede getroffene Regel bringt ihre erste
             # Stufe in den Plan, mit dem Effekt genau dieser Stufe. Vorher kam nur die Regel
             # an erster Stelle in den Plan (SPF-Hardfail, TLS-RPT und CSP fehlten).
+            # S6b-4 (spec/11 T12): eine Passivregel, deren aktives Gegenstueck im selben Befund
+            # getroffen hat, bringt keine eigene Zeile (VRFY aktiv und passiv, Plesk 8880).
             erste = min(zip(verschoben, recs), key=lambda p: L.STAGE_RANK[p[0]])[1]
             texte = hit.check.texts.plan
-            effekt = erste.effect or (texte.effect if texte else "")
-            hebel = texte.lever if texte else ""
-            plan_items.append(PlanItem(check=hit.check.id, action=erste.text, stage=erste.stage,
-                                       effect=effekt, lever=hebel))
+            # S6b-4 (spec/11 T12, T14): Hebel und Effekt je Variante der Regel.
+            hebel = pick_variant(hit, "plan.lever_variants", texte.lever, "plan.lever")[0] if texte else ""
+            effekt = erste.effect or (pick_variant(hit, "plan.effect_variants", texte.effect,
+                                                   "plan.effect")[0] if texte else "")
+            if texte is not None and texte.per_rule_action:
+                effekt = texte.effect
+                plan_items.append(PlanItem(
+                    check=hit.check.id, action=texte.per_rule_action, stage=erste.stage, effect=effekt,
+                    lever=hebel, per_rule=True,
+                    detail="; ".join(_clean_labels([m.label for _, m in hit.fails]))))
+            else:
+                plan_items.append(PlanItem(check=hit.check.id, action=erste.text, stage=erste.stage,
+                                           effect=effekt, lever=hebel))
             if plan is None:
-                plan = (erste.text, erste.stage, effekt, hebel)
+                plan = (plan_items[-1].action, erste.stage, effekt, hebel)
+    # S6b-4 (spec/11 T12): die Aussage der Passivregel steht direkt hinter dem ersten Satz ihres
+    # aktiven Gegenstuecks ("Laut Passivquelle ist dieselbe Verwaltungsoberflaeche ... zusaetzlich").
+    teile["observation"] = _passive_after_active(teile["observation"])
     empfehlungen.sort(key=lambda t: (t[0], t[1]))
     rec_out: list[list[str]] = []
     rec_prov: list[Provenance] = []
@@ -481,19 +562,26 @@ def compose(item: Consolidated, checks: dict[str, CheckInfo], where: str) -> Com
         rec_prov.append(rec.provenance())
 
     if item.is_bundle:
-        kurz = [hit.check.texts.short or hit.check.title for hit in hits]
+        kurzformen = [rule_short(hit) for hit in hits]
+        kurz = [k[0] for k in kurzformen]
         titel_werte = dict(alle_werte, rules=aufzaehlung(kurz))
         title = _render(item.title, titel_werte, f"{where}.title")
-        titel_prov = [Provenance(field="title", check=hit.check.id, statement="short",
-                                 members=[_member_ref(r, m) for r, m in hit.fails],
-                                 text=hit.check.texts.short or hit.check.title) for hit in hits]
+        titel_prov = [Provenance(field="title", check=hit.check.id, statement=sid, members=members,
+                                 text=text) for hit, (text, sid, members) in zip(hits, kurzformen)]
     else:
-        title = _render(item.title, alle_werte, f"{where}.title")
-        titel_prov = [Provenance(field="title", check=hits[0].check.id, statement="title",
-                                 members=[_member_ref(r, m) for r, m in hits[0].fails],
-                                 text=title)]
+        # S6b-4: eine zutreffende Titelvariante der Regel ersetzt den Katalogtitel.
+        text, sid, members = pick_variant(hits[0], "short_variants", "", "title")
+        if sid != "title":
+            title = text
+            titel_prov = [Provenance(field="title", check=hits[0].check.id, statement=sid,
+                                     members=members, text=title)]
+        else:
+            title = _render(item.title, alle_werte, f"{where}.title")
+            titel_prov = [Provenance(field="title", check=hits[0].check.id, statement="title",
+                                     members=[_member_ref(r, m) for r, m in hits[0].fails],
+                                     text=title)]
     urgency_stage = min(wirksam, key=lambda s: L.STAGE_RANK[s]) if wirksam else \
-        L.stage_for(item.scale, item.level, [], item.active_proof, item.urgent)
+        L.stage_for(item.scale, item.level, [], item.active_proof, item.urgent, item.hint)
     prov = titel_prov + [p.provenance() for name in teile for p in teile[name]] + rec_prov
     action, stage, effect, lever = plan or ("", urgency_stage, "", "")
     return Composed(
@@ -757,7 +845,7 @@ def build_findings(
         findings.append(Finding(
             id=fid,
             cat=item.category,
-            status=L.status_for(item.scale, item.level, item.active_proof, item.urgent),
+            status=L.status_for(item.scale, item.level, item.active_proof, item.urgent, item.hint),
             urgency=L.URGENCY_BY_STAGE[texte.urgency_stage],
             title=texte.title + operator_suffix,
             affected=", ".join(values["affected"]),
@@ -773,7 +861,8 @@ def build_findings(
             verify=texte.verify,
             policy=policy_label(item.results, checks),
             operator=(f"{item.operator.label} {item.operator.name}".strip() if item.operator else ""),
-            operator_note=operator_sentence(item.operator) if item.operator else "",
+            operator_note=(operator_sentence(item.operator) + foreign_services_note(facts, item)
+                           if item.operator else ""),
             key=item.stable_key,
             provenance=texte.provenance,
             plan_action=texte.plan_action,
@@ -841,13 +930,18 @@ def build_positives(items: list[Consolidated]) -> list[Positive]:
             info_texts = item.positive_texts.get(cid)
             if info_texts is None:
                 continue
-            werte = merged_vars(results, item.merge_key, kurz=True, excluded=item.excluded_hosts,
-                                operator_labels=item.operator_labels)
-            text = _render(info_texts.text, werte, f"{where}.{cid}.positive.text")
-            if text not in texte:
-                texte.append(text)
-            prov.append(Provenance(field="positive", check=cid, statement="positive.text",
-                                   members=[r.group_key for r in results], text=text))
+            # S6b-4 (spec/11 Teil 3 JW): ein Satz "Für die Domain ..." je Domain; vorher nannte
+            # der Positivbefund nur die erste (junkerwerk.de ohne junkerwerk.hu).
+            domains = {str(r.vars.get("domain") or "") for r in results}
+            je_domain = len(domains) > 1 and ("{domain}" in info_texts.text or "{passed}" in info_texts.text)
+            for teil in ([[r] for r in results] if je_domain else [results]):
+                werte = merged_vars(teil, item.merge_key, kurz=True, excluded=item.excluded_hosts,
+                                    operator_labels=item.operator_labels)
+                text = _render(info_texts.text, werte, f"{where}.{cid}.positive.text")
+                if text not in texte:
+                    texte.append(text)
+                prov.append(Provenance(field="positive", check=cid, statement="positive.text",
+                                       members=[r.group_key for r in teil], text=text))
         title = _render(item.title, values, f"{where}.positive.title")
         prov.insert(0, Provenance(field="positive", check=",".join(item.rules),
                                   statement="positive.title",
@@ -893,6 +987,20 @@ def missing_headers(results: list[CheckResult]) -> list[str]:
 
 
 # ---------------------------------------------------------------- Anhang: ZAP-Meldungen
+
+def foreign_services_note(facts: FS.Facts, item: Consolidated) -> str:
+    """Fremde Dienste auf dem Server des Befunds als eine Beobachtung im Zuständigkeitskasten
+    (S6b-4, spec/11 T9): Shoutcast und Icecast weiterer Domains auf dem Hoster-Server sind kein
+    Kundenbefund und stehen nicht in 3.1."""
+    ips = {str(r.vars.get("host_ip")) for r in item.results if r.vars.get("host_ip")}
+    ports = sorted({s.port for s in facts.services if s.foreign and s.host_ip in ips})
+    if not ports:
+        return ""
+    liste = ", ".join(str(p) for p in ports)
+    wort = "Port" if len(ports) == 1 else "Ports"
+    return (f" Auf demselben Server laufen außerdem Dienste weiterer Domains ({wort} {liste}); sie "
+            "gehören nicht zu Ihrer Website und sind in diesem Bericht nicht bewertet.")
+
 
 def _alert_index(facts: FS.Facts) -> dict[tuple[str, str, str], FS.WebAlert]:
     out: dict[tuple[str, str, str], FS.WebAlert] = {}

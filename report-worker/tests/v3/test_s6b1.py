@@ -145,7 +145,8 @@ def test_jede_betreiberpruefung_ist_eine_katalogpruefung():
     (CA, "Plattformbetreiber", "umfrageonline.com"),
     (BS, "Plattformbetreiber", "webflow.com"),
     (HE, "Plattformbetreiber", "eu-multiscreensite.com"),
-    (JW, "Hoster", "Hetzner Online AG"),
+    # S6b-4 (spec/11 T2): heutige Firmierung aus der Alias-Tabelle.
+    (JW, "Hoster", "Hetzner Online GmbH"),
     (LW, "Hoster", "Hetzner Online GmbH"),
 ])
 def test_befund_beim_betreiber(order, kind, name):
@@ -182,7 +183,8 @@ def test_bs_drittanbieter_steht_extern_und_zaehlt_nicht():
     extern = [h for h in data.scope.hosts if h.cov == "extern"]
     assert [h.ip for h in extern] == ["40.99.150.120"]
     assert extern[0].coverage == "Drittanbieter, nicht geprüft"
-    assert data.meta.hosts_total == len(data.scope.hosts) - 1
+    # S6b-4 (spec/11 T7): die AAAA-Adressen stehen als weitere Adressen ihres Systems mit.
+    assert data.meta.hosts_total == len(data.scope.hosts) - 1 + sum(len(h.more_ips) for h in data.scope.hosts)
     texte = [c.host for c in data.architecture.services] + [t.host for t in data.architecture.tech]
     texte += [i.l for b in data.architecture.posture for i in b.items]
     texte += [l.detail for l in data.scope.limitations] + [data.glance.coverage_warning]
