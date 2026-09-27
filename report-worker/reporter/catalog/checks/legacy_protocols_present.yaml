@@ -30,12 +30,25 @@ policy:
   start_level: niedrig
   deviation: null
 texts:
+  # S6b-4 (spec/11 Teil 3 JW VS-010): erzwingt jeder Dienst TLS, widerspricht "veraltet" dem
+  # Befundtext; der Titel nennt dann die Variante.
+  short_variants:
+    - when: service.tls_required is True or service.tunnel_ssl is True
+      text: "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen)"
   plan:
     lever: "Nicht benötigte Altprotokolle abschalten"
     effect: "Verkleinert die Angriffsfläche um selten gepflegte Dienste"
   # S6b-3 (spec/10 R13): "Anschluss" nur bei einer eigenen Leitung des Kunden.
   observation:
-    - text: >-
+    # S6b-4 (spec/11 Teil 3 JW VS-010): "älteres Übertragungsprotokoll" nur, wenn nicht jeder
+    # Dienst TLS erzwingt; sonst passt der Satz zum Titel "zusätzliche Mail- und Dateidienste".
+    - when: service.tls_required is True or service.tunnel_ssl is True
+      quantor: alle
+      text: >-
+        {n:Der Host|Die Hosts} {group} {n:bietet|bieten} zusätzliche Mail- und Dateidienste an: {affected}.
+    - when: not (service.tls_required is True or service.tunnel_ssl is True)
+      quantor: eines
+      text: >-
         {n:Der Host|Die Hosts} {group} {n:bietet|bieten} ein älteres Übertragungsprotokoll an: {affected}.
     - when: service.tls_required is True or service.tunnel_ssl is True
       quantor: eines

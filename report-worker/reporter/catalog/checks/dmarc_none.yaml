@@ -43,16 +43,25 @@ texts:
     - text: >-
         Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte
         E-Mails im Namen der Domain kommen weiterhin beim Empfänger an.
-    - when: len(dns.dmarc.rua) > 0
+    - when: len(dns.dmarc.rua) > 0 and not rua_external(dns, scan.domains)
       text: >-
         Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse.
     - when: len(dns.dmarc.rua) == 0
       text: >-
         Eine Meldeadresse ist nicht hinterlegt; Berichte über fehlgeschlagene Prüfungen
         erreichen Sie deshalb nicht.
+    # S6b-4 (spec/11 Teil 3 DB): Meldeadresse und Mailserver beim Dienstleister benennen.
+    - when: rua_external(dns, scan.domains)
+      text: >-
+        Die Berichte gehen an eine Adresse außerhalb der eigenen Domain: {dmarc_rua}. Sie
+        erreichen damit zunächst den Empfänger dieser Adresse.
+    - when: not mx_in_own_zone(dns, scan.domains)
+      text: >-
+        Eingehende E-Mail nimmt ein Mailserver außerhalb der eigenen Domain an: {mx}. Die
+        Umstellung der Richtlinie betrifft auch dessen Betreiber.
   recommendation:
     - stage: in_kuerze
-      when: len(dns.dmarc.rua) > 0
+      when: len(dns.dmarc.rua) > 0 and not rua_external(dns, scan.domains)
       text: >-
         Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der
         Domain bestätigen.
@@ -67,6 +76,12 @@ texts:
       text: >-
         Die Richtlinie auf Quarantäne und danach auf Zurückweisung anheben, sobald alle
         legitimen Versender erfasst sind.
+    - stage: in_kuerze
+      when: rua_external(dns, scan.domains)
+      text: >-
+        Die Berichte, die an {dmarc_rua} gehen, beim Empfänger dieser Adresse anfordern und
+        auswerten und alle legitimen Versandquellen der Domain bestätigen.
+      effect: "Macht alle legitimen Versandquellen vor der Verschärfung sichtbar"
   verify: >-
     DNS-Abfrage des TXT-Eintrags _dmarc.{domain}; erwartet wird eine Richtlinie p, die nicht
     auf reine Beobachtung gesetzt ist.

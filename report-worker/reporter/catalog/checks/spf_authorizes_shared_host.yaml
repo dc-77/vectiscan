@@ -17,6 +17,8 @@ kind: check
 bundle: null
 affected_template: "{domain} ({spf_shared_hosts})"
 evidence: [dns]
+# S6b-4 (spec/11 T9): Nachweis mit Mechanismus, Aufloesung und Zahl weiterer Domains.
+evidence_detail: dns.spf_shared
 references: [CWE-290]
 frameworks:
   bsi: []
@@ -31,13 +33,16 @@ texts:
   short: "SPF gibt geteilten Server frei"
   plan:
     lever: "Absenderfreigabe auf eigene oder vertraglich gebundene Systeme beschränken"
-    effect: "Verhindert, dass andere Kunden desselben Servers im Namen der Domain senden"
+    effect: "Verhindert, dass andere Anwendungen desselben Servers im Namen der Domain senden"
+  # S6b-4 (spec/11 T9, E18): "auch für andere Kunden" ist aus den Rohdaten nicht ableitbar;
+  # belegt sind die weiteren Domains auf dem Server laut Zertifikat oder Passivquelle.
   observation: >-
-    Der SPF-Eintrag der Domain {domain} gibt einen Server als Absender frei, den der Hoster
-    auch für andere Kunden betreibt: {affected}.
+    Der SPF-Eintrag der Domain {domain} gibt einen Server als Absender frei, auf dem laut
+    Zertifikat oder Passivquelle weitere Domains liegen: {affected}.
   meaning: >-
     Jede Anwendung auf diesem Server darf damit E-Mails im Namen der Domain versenden, auch
-    die anderer Kunden. Empfänger erkennen solche Mails an SPF nicht als gefälscht.
+    die Anwendungen der weiteren Domains. Empfänger erkennen solche Mails an SPF nicht als
+    gefälscht.
   recommendation:
     - stage: mittelfristig
       text: >-
@@ -48,5 +53,5 @@ texts:
         E-Mails der Domain nur über eigene oder vertraglich gebundene Versanddienste senden
         und diese im SPF-Eintrag gezielt freigeben.
   verify: >-
-    SPF-Eintrag der Domain erneut abfragen; erwartet wird, dass kein geteilter Server des
-    Hosters mehr freigegeben ist.
+    SPF-Eintrag der Domain erneut abfragen; erwartet wird, dass kein Server mit weiteren
+    Domains mehr freigegeben ist oder der Versand über ihn belegt ist.

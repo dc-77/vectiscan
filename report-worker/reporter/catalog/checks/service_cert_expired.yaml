@@ -39,11 +39,12 @@ texts:
     - text: >-
         Auf {group} liefern Dienste außerhalb der Webseiten ein abgelaufenes Zertifikat aus:
         {affected}.
+    # S6b-4 (spec/11 Teil 3 BS VS-003): die Betroffenenliste steht einmal im ersten Satz.
     - when: service.cert.self_signed is True
-      quantor: eines
+      quantor: alle
       text: >-
         Das Zertifikat ist zudem selbst signiert und stammt von keiner anerkannten
-        Zertifizierungsstelle: {affected}.
+        Zertifizierungsstelle.
   meaning: >-
     Mail- und Dateiclients warnen bei abgelaufenen Zertifikaten oder brechen die Verbindung
     ab; wer die Warnung regelmäßig wegklickt, erkennt ein untergeschobenes Zertifikat nicht
@@ -57,6 +58,8 @@ texts:
       text: >-
         Die Erneuerung der Zertifikate für alle TLS-Dienste automatisieren und überwachen,
         nicht nur für die Webseiten.
+  # S6b-4 (spec/11 Teil 3 BS): keine festen Portnummern; bergersysteme hat keinen Port 587.
   verify: >-
-    Verbindung zu den genannten Ports mit TLS aufbauen (bei 110, 143 und 587 nach STARTTLS)
-    und das Zertifikat prüfen; erwartet wird ein gültiges, nicht abgelaufenes Zertifikat.
+    Verbindung zu den genannten Ports mit TLS aufbauen (bei Ports mit STARTTLS nach dem
+    STARTTLS-Befehl) und das Zertifikat prüfen; erwartet wird ein gültiges, nicht abgelaufenes
+    Zertifikat.

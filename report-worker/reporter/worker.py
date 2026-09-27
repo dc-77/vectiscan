@@ -573,6 +573,23 @@ def _next_delivery_version(conn: psycopg2.extensions.connection, order_id: str) 
         return 1
 
 
+def _approved_at(conn: psycopg2.extensions.connection, order_id: str) -> Any:
+    """Zeitpunkt der Freigabe (``orders.reviewed_at``) fuer das Berichtsdatum nach E15.
+
+    S6b-4 (spec/11 T5): ein freigegebener Bericht traegt das Datum der Freigabe in
+    Europe/Berlin; ohne Wert bleibt es beim Tag der Erzeugung.
+    """
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT reviewed_at FROM orders WHERE id = %s", (order_id,))
+            row = cur.fetchone()
+            return row[0] if row else None
+    except Exception:
+        conn.rollback()
+        log.warning("approved_at_query_failed", order_id=order_id)
+        return None
+
+
 def _exclusion_keys(conn: psycopg2.extensions.connection, order_id: str,
                     excluded_raw: list) -> set[str]:
     """Stabile Schluessel der ausgeschlossenen Befunde (Issue #28).
@@ -1453,11 +1470,16 @@ def process_job(job_data: dict) -> None:
             # Erzeugungsnummer (reports.version); ausgeschlossene Befunde ueber
             # ihren stabilen Schluessel (Issue #28).
             delivery_version = _next_delivery_version(conn, order_id)
+            # S6b-4 (spec/11 T5, E15): Berichtsdatum einmal bestimmt, Freigabe vor Erzeugung,
+            # beides in Europe/Berlin.
+            from reporter.v3.chapters import report_day
+            report_date = report_day(_approved_at(conn, order_id) if is_approved else None)
             v3_facts, v3_output, v3_data = report_bundle_from_source(
                 scan_data_dir, effective_inventory, effective_profiles,
                 job_data.get("correlatedFindings"), job_data,
                 tool_runs=tool_runs,
                 customer_context=customer_context,
+                report_date=report_date,
                 report_version=str(delivery_version),
                 generation=version,
                 excluded_keys=_exclusion_keys(conn, order_id, excluded_raw),

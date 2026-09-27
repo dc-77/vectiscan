@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-26.2 auf tests/golden/facts/3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7.json",
+ "source": "reporter.catalog 2026-09-27.1 auf tests/golden/facts/3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -380,27 +380,35 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "80.90.145.166 (exchange.huendgen-entsorgung.de)",
+   "group": "18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
    "id": "VS-2026-P19",
-   "check": "rdp_exposed",
-   "family": "rdp_exposed",
-   "cat": "A",
-   "group": "18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de)",
-   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
+   "check": "ip_reputation",
+   "family": "ip_reputation",
+   "cat": "E",
+   "group": "80.90.145.166 (exchange.huendgen-entsorgung.de)",
+   "title": "Keine Einträge in Reputationsquellen"
   },
   {
    "id": "VS-2026-P20",
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "80.90.145.166 (exchange.huendgen-entsorgung.de)",
+   "group": "18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
    "id": "VS-2026-P21",
+   "check": "rdp_exposed",
+   "family": "rdp_exposed",
+   "cat": "A",
+   "group": "80.90.145.166 (exchange.huendgen-entsorgung.de)",
+   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
+  },
+  {
+   "id": "VS-2026-P22",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -408,7 +416,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P22",
+   "id": "VS-2026-P23",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -416,7 +424,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P23",
+   "id": "VS-2026-P24",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
@@ -424,7 +432,7 @@
    "title": "SPF-Eintrag vorhanden"
   },
   {
-   "id": "VS-2026-P24",
+   "id": "VS-2026-P25",
    "check": "spf_softfail",
    "family": "spf_softfail",
    "cat": "C",
@@ -432,7 +440,7 @@
    "title": "SPF-Eintrag mit harter Fehlbehandlung"
   },
   {
-   "id": "VS-2026-P25",
+   "id": "VS-2026-P26",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
@@ -440,31 +448,31 @@
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
-   "id": "VS-2026-P26",
+   "id": "VS-2026-P27",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
    "group": "www.huendgen-entsorgung.de (+huendgen-entsorgung.de)",
    "title": "Nur aktuelle TLS-Protokolle"
-  },
-  {
-   "id": "VS-2026-P27",
-   "check": "tls_no_13",
-   "family": "tls_no_13",
-   "cat": "D",
-   "group": "exchange.huendgen-entsorgung.de",
-   "title": "TLS 1.3 verfügbar"
   },
   {
    "id": "VS-2026-P28",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
-   "group": "www.huendgen-entsorgung.de (+huendgen-entsorgung.de)",
+   "group": "exchange.huendgen-entsorgung.de",
    "title": "TLS 1.3 verfügbar"
   },
   {
    "id": "VS-2026-P29",
+   "check": "tls_no_13",
+   "family": "tls_no_13",
+   "cat": "D",
+   "group": "www.huendgen-entsorgung.de (+huendgen-entsorgung.de)",
+   "title": "TLS 1.3 verfügbar"
+  },
+  {
+   "id": "VS-2026-P30",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",

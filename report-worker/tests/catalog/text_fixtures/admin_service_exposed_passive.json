@@ -35,9 +35,10 @@
    "expect": {
     "holds": {
      "shodan:10.0.0.1:4433": [
-      "observation[0]",
       "meaning[0]",
       "meaning[3]",
+      "observation[0]",
+      "observation[4]",
       "recommendation[0]",
       "recommendation[1]",
       "recommendation[3]"
@@ -45,9 +46,11 @@
     },
     "not_holds": {
      "shodan:10.0.0.1:4433": [
-      "observation[1]",
       "meaning[1]",
       "meaning[2]",
+      "observation[1]",
+      "observation[2]",
+      "observation[3]",
       "recommendation[2]"
      ]
     }
@@ -159,6 +162,88 @@
     }
    },
    "coverage_default": "ok"
+  },
+  {
+   "name": "S6b-4: Verwaltungsport laut Passivquelle auf einem vom Prüfstand aus nicht erreichbaren Host (E4)",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.0.5",
+      "betriebsform": "anschluss",
+      "reach": {
+       "status": "unreachable_from_scanner",
+       "passive_ports": [
+        443
+       ],
+       "passive_seen_at": "2026-09-23T00:00:00Z",
+       "passive_source": "shodan"
+      }
+     }
+    ],
+    "passive": [
+     {
+      "host_ip": "10.0.0.5",
+      "port": 4433,
+      "source": "shodan",
+      "product": "SonicWall",
+      "seen_at": "2026-09-19T17:59:00Z",
+      "verified": false,
+      "confidence": 0.5
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "shodan:10.0.0.5:4433": [
+      "observation[2]"
+     ]
+    },
+    "not_holds": {
+     "shodan:10.0.0.5:4433": [
+      "observation[3]",
+      "observation[4]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "S6b-4: Verwaltungsport ausserhalb des geprüften Portbereichs (junkerwerk 4433, T1)",
+   "facts": {
+    "scan": {
+     "scanned_ports": "1-1000",
+     "scanned_port_count": 1000
+    },
+    "hosts": [
+     {
+      "ip": "10.0.0.6",
+      "betriebsform": "anschluss"
+     }
+    ],
+    "passive": [
+     {
+      "host_ip": "10.0.0.6",
+      "port": 4433,
+      "source": "shodan",
+      "product": "SonicWall",
+      "seen_at": "2026-09-19T17:59:00Z",
+      "verified": false,
+      "confidence": 0.5
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "shodan:10.0.0.6:4433": [
+      "observation[3]"
+     ]
+    },
+    "not_holds": {
+     "shodan:10.0.0.6:4433": [
+      "observation[2]",
+      "observation[4]"
+     ]
+    }
+   }
   }
  ]
 }

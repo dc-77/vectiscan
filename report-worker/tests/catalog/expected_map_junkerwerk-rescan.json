@@ -1,6 +1,7 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/junkerwerk-rescan.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
  "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Positivaussagen: tls_weak_ciphers autodiscover.junkerwerk.de (R6 (CBC-Verfahren angeboten)); tls_weak_ciphers cloud.junkerwerk.de (+team.junkerwerk.de) (R6 (CBC-Verfahren angeboten)); tls_weak_ciphers outlook.junkerwerk.de (R6 (CBC-Verfahren angeboten)); urlhaus_compromise junkerwerk.de, junkerwerk.hu (R6 (URLhaus no_data ist kein Negativergebnis)).",
+ "hinweis_s6b4": "S6b-4 (spec/11): Soll-Liste nach Katalog 2026-09-27.1 und Fakten 1.2.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (T-Nummer oder Teil 3) und warum. entfallene Positivaussagen: spf_missing junkerwerk.de (Teil 3 DB (P05)); spf_missing junkerwerk.hu (Teil 3 DB (P05)).",
  "strict": false,
  "orders": {
   "main": "860d0d5a-1086-4958-a9ac-4650423095f2"
@@ -9,7 +10,9 @@
   "VS-2026-001": {
    "checks": [
     "admin_service_exposed_passive"
-   ]
+   ],
+   "spec11": "T6",
+   "warum": "Datum je Adresse im Betroffenen (Zeitstempel des Dienstes laut Passivquelle)."
   },
   "VS-2026-002": {
    "checks": [
@@ -166,7 +169,9 @@
     "spf_authorizes_shared_host"
    ],
    "spec10": "R19",
-   "warum": "SPF gibt einen Server frei, den der Hoster auch für andere Kunden betreibt; neue Prüfung."
+   "warum": "SPF gibt einen Server frei, den der Hoster auch für andere Kunden betreibt; neue Prüfung.",
+   "spec11": "T2 (E17)",
+   "warum_spec11": "Hoster-Firmierung aus der Alias-Tabelle (Hetzner Online GmbH statt AG)."
   },
   "VS-2026-033": {
    "checks": [
@@ -201,7 +206,9 @@
   "VS-2026-039": {
    "checks": [
     "tls_weakness"
-   ]
+   ],
+   "spec11": "Teil 3 JW",
+   "warum": "BEAST laut testssl vermutlich abgeschwächt (likely mitigated)."
   },
   "VS-2026-040": {
    "checks": [
@@ -393,35 +400,25 @@
   },
   "VS-2026-P34": {
    "checks": [
-    "spf_missing"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P35": {
    "checks": [
-    "spf_missing"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P36": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P37": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P38": {
-   "checks": [
-    "tls_no_13"
-   ]
-  },
-  "VS-2026-P39": {
-   "checks": [
-    "tls_no_13"
-   ]
-  },
-  "VS-2026-P40": {
    "checks": [
     "tls_no_13"
    ]

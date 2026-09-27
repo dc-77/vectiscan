@@ -75,25 +75,25 @@
     "host": "116.202.77.64",
     "port": "465",
     "ref": "",
-    "svc": "SMTP, TLS erzwungen"
+    "svc": "SMTP über TLS (Exim), TLS erzwungen"
    },
    {
     "host": "116.202.77.64",
     "port": "587",
     "ref": "",
-    "svc": "SMTP, TLS erzwungen"
+    "svc": "SMTP (Exim), TLS erzwungen"
    },
    {
     "host": "116.202.77.64",
     "port": "993",
     "ref": "",
-    "svc": "nicht identifiziert (Port 993), TLS erzwungen"
+    "svc": "IMAP über TLS, TLS erzwungen"
    },
    {
     "host": "116.202.77.64",
     "port": "995",
     "ref": "",
-    "svc": "nicht identifiziert (Port 995), TLS erzwungen"
+    "svc": "POP3 über TLS, TLS erzwungen"
    },
    {
     "host": "116.202.77.64",
@@ -111,15 +111,16 @@
     "host": "116.202.77.64",
     "port": "25",
     "ref": "",
-    "svc": "SMTP, laut Passivquelle"
+    "svc": "SMTP (Exim), laut Passivquelle"
    },
    {
     "host": "116.202.77.64",
     "port": "4190",
     "ref": "",
-    "svc": "unbekannt, laut Passivquelle"
+    "svc": "ManageSieve (Dovecot Pigeonhole), laut Passivquelle, außerhalb des geprüften Portbereichs"
    }
   ],
+  "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
   "repeat": [
    "Nachprüfung der Sofortmaßnahmen nach ihrer Umsetzung, gezielt auf die betroffenen Dienste.",
    "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
@@ -179,7 +180,7 @@
    {
     "l": "Blau",
     "st": "blau",
-    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal)."
+    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal). Als blauer Hinweis stehen außerdem Befunde, die nur eine Passivquelle für einen vom Prüfstand aus nicht erreichbaren Host meldet."
    },
    {
     "l": "Grün",
@@ -191,7 +192,7 @@
  "architecture": {
   "lead": "Die geprüfte Angriffsfläche verteilt sich auf 1 System mit folgenden Aufgaben: Website. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
-   "Beobachtung ohne Regeltreffer, nicht als Befund bewertet: 116.202.77.64:4190 laut Passivquelle, vom Portscan nicht bestätigt."
+   "Beobachtung ohne Regeltreffer, nicht als Befund bewertet: 116.202.77.64:4190 (ManageSieve (Dovecot Pigeonhole)) laut Passivquelle, außerhalb des geprüften Portbereichs."
   ],
   "posture": [
    {
@@ -201,14 +202,16 @@
        "spf_missing",
        "spf_permissive",
        "spf_softfail",
-       "mail_spoofing_unprotected"
+       "mail_spoofing_unprotected",
+       "spf_authorizes_shared_host"
       ],
       "l": "SPF",
-      "ok": null,
+      "ok": false,
+      "pulls": [],
       "subjects": [
        "lumbeck-wolter.de"
       ],
-      "v": "softfail"
+      "v": "Handlungsbedarf"
      },
      {
       "checks": [
@@ -216,6 +219,7 @@
       ],
       "l": "DKIM",
       "ok": true,
+      "pulls": [],
       "subjects": [
        "lumbeck-wolter.de"
       ],
@@ -230,6 +234,7 @@
       ],
       "l": "DMARC",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "lumbeck-wolter.de"
       ],
@@ -241,6 +246,7 @@
       ],
       "l": "MTA-STS",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "lumbeck-wolter.de"
       ],
@@ -252,6 +258,7 @@
       ],
       "l": "TLS-RPT",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "lumbeck-wolter.de"
       ],
@@ -263,6 +270,7 @@
       ],
       "l": "DANE",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "lumbeck-wolter.de"
       ],
@@ -280,6 +288,7 @@
       ],
       "l": "DNSSEC",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "lumbeck-wolter.de"
       ],
@@ -291,6 +300,7 @@
       ],
       "l": "CAA",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "lumbeck-wolter.de"
       ],
@@ -302,6 +312,7 @@
       ],
       "l": "Abruf der gesamten Zone",
       "ok": true,
+      "pulls": [],
       "subjects": [
        "lumbeck-wolter.de"
       ],
@@ -312,11 +323,12 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
-      "ok": null,
+      "ok": true,
+      "pulls": [],
       "subjects": [
        "lumbeck-wolter.de"
       ],
-      "v": "entfällt"
+      "v": "unauffällig"
      }
     ],
     "name": "DNS-Hygiene",
@@ -334,8 +346,41 @@
       ],
       "l": "116.202.77.64",
       "ok": null,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "116.202.77.64"
+      ],
+      "v": "nicht prüfbar"
+     },
+     {
+      "checks": [
+       "tls_legacy_protocols",
+       "tls_no_13",
+       "tls_weak_ciphers",
+       "tls_weakness",
+       "tls_no_fallback_scsv"
+      ],
+      "l": "2a01:4f8:d0a:668b::2",
+      "ok": null,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
+      "subjects": [
+       "2a01:4f8:d0a:668b::2"
       ],
       "v": "nicht prüfbar"
      },
@@ -351,6 +396,7 @@
       ],
       "l": "Zertifikate",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "116.202.77.64",
        "www.lumbeck-wolter.de@116.202.77.64"
@@ -374,8 +420,26 @@
       ],
       "l": "116.202.77.64",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "116.202.77.64"
+      ],
+      "v": "nicht prüfbar"
+     },
+     {
+      "checks": [
+       "security_headers_incomplete",
+       "csp_missing",
+       "csp_weak",
+       "hsts_missing",
+       "hsts_short",
+       "header_duplicate"
+      ],
+      "l": "2a01:4f8:d0a:668b::2",
+      "ok": null,
+      "pulls": [],
+      "subjects": [
+       "2a01:4f8:d0a:668b::2"
       ],
       "v": "nicht prüfbar"
      }
@@ -429,22 +493,22 @@
      },
      {
       "p": "465",
-      "s": "SMTP",
+      "s": "SMTP über TLS (Exim)",
       "st": "gruen"
      },
      {
       "p": "587",
-      "s": "SMTP",
+      "s": "SMTP (Exim)",
       "st": "gruen"
      },
      {
       "p": "993",
-      "s": "nicht identifiziert (Port 993)",
+      "s": "IMAP über TLS",
       "st": "gruen"
      },
      {
       "p": "995",
-      "s": "nicht identifiziert (Port 995)",
+      "s": "POP3 über TLS",
       "st": "gruen"
      },
      {
@@ -459,18 +523,18 @@
      },
      {
       "p": "25",
-      "s": "SMTP",
+      "s": "SMTP (Exim)",
       "st": "grau"
      },
      {
       "p": "4190",
-      "s": "unbekannt",
+      "s": "ManageSieve (Dovecot Pigeonhole)",
       "st": "grau"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "116.202.77.64 (dedi5705.your-server.de)",
@@ -521,12 +585,21 @@
       "v": "unbekannt"
      },
      {
-      "c": "Debian GNU/Linux",
+      "c": "Exim",
       "conf": "hoch",
       "note": "",
       "src": "nmap",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Debian GNU/Linux",
+      "conf": "hoch",
+      "note": "bis 30.06.2028 laut Debian",
+      "src": "nmap",
       "st": "gruen",
-      "status": "aktuell",
+      "status": "in Langzeitpflege (LTS)",
       "v": "12"
      },
      {
@@ -571,7 +644,7 @@
     "evidence": [
      "www.lumbeck-wolter.de: Seite „Schneidwerkzeuge für Fleischwölfe | Lumbeck & Wolter“"
     ],
-    "meaning": "Außendarstellung des Unternehmens. Betroffen wären vor allem Seiteninhalte und Formulareingaben.",
+    "meaning": "Außendarstellung des Unternehmens. Betroffen wären vor allem die Seiteninhalte.",
     "role_keys": [
      "website"
     ],
@@ -586,7 +659,7 @@
    "checks": [
     "db_exposed"
    ],
-   "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:3306/tcp · Dienst: mysql · Produkt: MySQL · Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 · Anmeldeverfahren: mysql_native_password · Zertifikat für: *.your-server.de · Aussteller: sql.your-server.de · gültig bis: 10.02.2030, 15:03 UTC · MySQL-Protokoll: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 880965 Capabilities flags: 65534 Some (Auszug)\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:5432/tcp · Dienst: postgresql · Produkt: PostgreSQL DB · Version: 9.6.0 oder neuer (Untergrenze) · Zertifikat für: *.your-server.de · Aussteller: sql.your-server.de · gültig bis: 10.02.2030, 15:08 UTC\n\nShodan\n116.202.77.64:5432 · Abweisung vor der Anmeldung laut Passivquelle",
+   "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:3306/tcp · Dienst: mysql · Produkt: MariaDB · Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 · Anmeldeverfahren: mysql_native_password · Zertifikat für: *.your-server.de · Aussteller: sql.your-server.de · gültig bis: 10.02.2030, 15:03 UTC · 3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1 · MySQL-Protokoll: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 880965 Capabilities flags: 65534 Some (Auszug)\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:5432/tcp · Dienst: postgresql · Produkt: PostgreSQL DB · Version: 9.6.0 oder neuer (Untergrenze) · Zertifikat für: *.your-server.de · Aussteller: sql.your-server.de · gültig bis: 10.02.2030, 15:08 UTC\n\nShodan\n116.202.77.64:5432 · Abweisung vor der Anmeldung laut Passivquelle",
    "found": "Der Host 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) beantwortet Verbindungen auf Datenbankports aus dem gesamten Internet: 116.202.77.64:3306 (MariaDB), 116.202.77.64:5432 (PostgreSQL). Ein Datenbankdienst gehört nicht an das öffentliche Interface.",
    "id": "VS-2026-001",
    "impact": "Ein von außen erreichbarer Datenbankdienst macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar. Wo der Dienst eine Anmeldung von außen entgegennimmt, sind Passwort-Rateangriffe rund um die Uhr möglich: 116.202.77.64:3306 (MariaDB). Laut Passivquelle weist der Dienst fremde Quellen vor der Anmeldung ab; die Erreichbarkeit des Ports bleibt trotzdem eine unnötige Angriffsfläche: 116.202.77.64:5432 (PostgreSQL).",
@@ -602,8 +675,10 @@
     {
      "action": "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken.",
      "check": "db_exposed",
+     "detail": "",
      "effect": "Entzieht Angreifern den direkten Zugriff auf die Datenbanken",
      "lever": "Datenbankdienste vom Internet trennen",
+     "per_rule": false,
      "stage": "unverzueglich"
     }
    ],
@@ -750,15 +825,19 @@
     {
      "action": "Einen DMARC-Eintrag mit p=none und einer Reporting-Adresse (rua) anlegen und vier Wochen die Berichte auswerten.",
      "check": "dmarc_missing",
+     "detail": "",
      "effect": "Macht sichtbar, wer im Namen der Domain E-Mails versendet",
      "lever": "DMARC-Richtlinie veröffentlichen",
+     "per_rule": false,
      "stage": "in_kuerze"
     },
     {
      "action": "Nach einer Beobachtungsphase ohne Fehlmeldungen den Qualifizierer des SPF-Eintrags auf eine harte Fehlbehandlung umstellen, sobald alle legitimen Versandquellen erfasst sind.",
      "check": "spf_softfail",
+     "detail": "",
      "effect": "Lässt Empfänger gefälschte Absender eindeutig ablehnen",
      "lever": "SPF-Eintrag mit harter Fehlbehandlung abschließen",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -898,8 +977,8 @@
    "checks": [
     "legacy_protocols_present"
    ],
-   "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:21/tcp · Dienst: ftp · Produkt: ProFTPD · TLS erzwungen: ja · Zertifikat für: *.your-server.de · Aussteller: Thawte TLS RSA CA G1 · gültig bis: 02.11.2026, 23:59 UTC · 21/tcp open ftp ProFTPD (requires SSL)\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:110/tcp · Dienst: pop3 · Produkt: Courier pop3d · TLS erzwungen: ja · STARTTLS: ja · Anmeldung vor TLS gesperrt: ja · Zertifikat für: *.your-server.de · Aussteller: Thawte TLS RSA CA G1 · gültig bis: 02.11.2026, 23:59 UTC · POP3-Fähigkeiten: TOP UIDL CAPA SASL AUTH-RESP-CODE PIPELINING RESP-CODES STLS\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:143/tcp · Dienst: imap · Produkt: Dovecot imapd · TLS erzwungen: ja · STARTTLS: ja · Anmeldung vor TLS gesperrt: ja · Zertifikat für: *.your-server.de · Aussteller: Thawte TLS RSA CA G1 · gültig bis: 02.11.2026, 23:59 UTC · IMAP-Fähigkeiten: LOGIN-REFERRALS LOGINDISABLED LITERAL+ ID SASL-IR IMAP4rev1 ENABLE IDLE STARTTLS",
-   "found": "Der Host 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) bietet ein älteres Übertragungsprotokoll an: 116.202.77.64:110 (POP3), 116.202.77.64:143 (IMAP), 116.202.77.64:21 (FTP). Eine Anmeldung ist dort nur mit Transportverschlüsselung möglich: 116.202.77.64:110 (POP3), 116.202.77.64:143 (IMAP), 116.202.77.64:21 (FTP).",
+   "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:21/tcp · Dienst: ftp · Produkt: ProFTPD · TLS erzwungen: ja · Zertifikat für: *.your-server.de · Aussteller: Thawte TLS RSA CA G1 · gültig bis: 02.11.2026, 23:59 UTC · 21/tcp open ftp ProFTPD (requires SSL)\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:110/tcp · Dienst: pop3 · Produkt: Courier pop3d · TLS erzwungen: ja · STARTTLS: ja · Anmeldung vor TLS gesperrt: ja · Zertifikat für: *.your-server.de · Aussteller: Thawte TLS RSA CA G1 · gültig bis: 02.11.2026, 23:59 UTC · POP3-Fähigkeiten: TOP UIDL CAPA SASL (leer) AUTH-RESP-CODE PIPELINING RESP-CODES STLS\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:143/tcp · Dienst: imap · Produkt: Dovecot imapd · TLS erzwungen: ja · STARTTLS: ja · Anmeldung vor TLS gesperrt: ja · Zertifikat für: *.your-server.de · Aussteller: Thawte TLS RSA CA G1 · gültig bis: 02.11.2026, 23:59 UTC · IMAP-Fähigkeiten: LOGIN-REFERRALS LOGINDISABLED LITERAL+ ID SASL-IR IMAP4rev1 ENABLE IDLE STARTTLS",
+   "found": "Der Host 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) bietet zusätzliche Mail- und Dateidienste an: 116.202.77.64:110 (POP3), 116.202.77.64:143 (IMAP), 116.202.77.64:21 (FTP). Eine Anmeldung ist dort nur mit Transportverschlüsselung möglich: 116.202.77.64:110 (POP3), 116.202.77.64:143 (IMAP), 116.202.77.64:21 (FTP).",
    "id": "VS-2026-003",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Servers, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "key": "legacy_protocols_present/scan/hoster:Hetzner Online GmbH",
@@ -907,15 +986,17 @@
    "level_label": "niedrig",
    "missing_headers": [],
    "operator": "beim Hoster Hetzner Online GmbH",
-   "operator_note": "Dieser Sachverhalt liegt beim Hoster Hetzner Online GmbH: der Server wird mit anderen Kunden geteilt (auf demselben Server laut Passivquelle 2 weitere Domains anderer Kunden), der Dienst gehört zum Server und nicht zu Ihrer Website. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen.",
+   "operator_note": "Dieser Sachverhalt liegt beim Hoster Hetzner Online GmbH: der Dienst gehört zum Server und nicht zu Ihrer Website. Auf demselben Server steht laut Passivquelle 1 weitere Domain. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen.",
    "plan_action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
    "plan_effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
    "plan_items": [
     {
      "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
      "check": "legacy_protocols_present",
+     "detail": "",
      "effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
      "lever": "Nicht benötigte Altprotokolle abschalten",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -931,8 +1012,8 @@
       "116.202.77.64|116.202.77.64:110",
       "116.202.77.64|116.202.77.64:143"
      ],
-     "statement": "title",
-     "text": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
+     "statement": "short_variants[0]",
+     "text": "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen)"
     },
     {
      "check": "legacy_protocols_present",
@@ -943,7 +1024,7 @@
       "116.202.77.64|116.202.77.64:143"
      ],
      "statement": "observation[0]",
-     "text": "Der Host 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) bietet ein älteres Übertragungsprotokoll an: 116.202.77.64:110 (POP3), 116.202.77.64:143 (IMAP), 116.202.77.64:21 (FTP)."
+     "text": "Der Host 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) bietet zusätzliche Mail- und Dateidienste an: 116.202.77.64:110 (POP3), 116.202.77.64:143 (IMAP), 116.202.77.64:21 (FTP)."
     },
     {
      "check": "legacy_protocols_present",
@@ -953,7 +1034,7 @@
       "116.202.77.64|116.202.77.64:110",
       "116.202.77.64|116.202.77.64:143"
      ],
-     "statement": "observation[1]",
+     "statement": "observation[2]",
      "text": "Eine Anmeldung ist dort nur mit Transportverschlüsselung möglich: 116.202.77.64:110 (POP3), 116.202.77.64:143 (IMAP), 116.202.77.64:21 (FTP)."
     },
     {
@@ -1032,7 +1113,7 @@
     "legacy_protocols_present|116.202.77.64:21"
    ],
    "threat": null,
-   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar (beim Hoster Hetzner Online GmbH)",
+   "title": "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen) (beim Hoster Hetzner Online GmbH)",
    "urgency": "Mittelfristig",
    "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
   },
@@ -1059,15 +1140,19 @@
     {
      "action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
      "check": "mta_sts_missing",
+     "detail": "",
      "effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
      "lever": "MTA-STS für die Domain veröffentlichen",
+     "per_rule": false,
      "stage": "strategisch"
     },
     {
      "action": "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten.",
      "check": "tls_rpt_missing",
+     "detail": "",
      "effect": "Meldet fehlgeschlagene verschlüsselte Zustellungen an Sie zurück",
      "lever": "TLS-RPT für die Domain veröffentlichen",
+     "per_rule": false,
      "stage": "strategisch"
     }
    ],
@@ -1211,15 +1296,19 @@
     {
      "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
      "check": "caa_missing",
+     "detail": "",
      "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
      "lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+     "per_rule": false,
      "stage": "mittelfristig"
     },
     {
      "action": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
      "check": "dnssec_missing",
+     "detail": "",
      "effect": "Schützt DNS-Antworten gegen Verfälschung auf dem Übertragungsweg",
      "lever": "DNS-Zone mit DNSSEC signieren",
+     "per_rule": false,
      "stage": "strategisch"
     }
    ],
@@ -1347,7 +1436,7 @@
     "key": "A",
     "level": 4,
     "name": "Perimeter-Exposition",
-    "note": "Datenbankdienst aus dem Internet erreichbar; Veraltetes Übertragungsprotokoll aus dem Internet erreichbar (beim Hoster Hetzner Online GmbH)",
+    "note": "Datenbankdienst aus dem Internet erreichbar; Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen) (beim Hoster Hetzner Online GmbH)",
     "status": "rot"
    },
    {
@@ -1379,8 +1468,8 @@
     "status": "blau"
    }
   ],
-  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von lumbeck-wolter.de am 20.09.2026: 2 Hostnamen auf 1 IP-Adresse. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 1 System (116.202.77.64) liegt nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von lumbeck-wolter.de am 20.09.2026: 2 Hostnamen auf 2 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
+  "coverage_warning": "Für 1 System (116.202.77.64 mit 2a01:4f8:d0a:668b::2) liegt nur eine teilweise aktive Prüfung vor. 3 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugriff auf die Datenbanken",
@@ -1399,23 +1488,23 @@
     "title": "DMARC-Richtlinie veröffentlichen"
    },
    {
-    "effect": "Lässt Empfänger gefälschte Absender eindeutig ablehnen",
+    "effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
     "n": 3,
     "refs": [
-     "VS-2026-002"
+     "VS-2026-003"
     ],
-    "title": "SPF-Eintrag mit harter Fehlbehandlung abschließen"
+    "title": "Beim Hoster einfordern: Nicht benötigte Altprotokolle abschalten"
    }
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail sowie die Konfiguration."
  },
- "landscape_lead": "5 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "5 Befunde in 3 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 8,
-  "catalog_digest": "004a04598e2072c37701db55752e05f8f2b155bf6ec91f987217067547919206",
-  "catalog_version": "2026-09-26.2",
+  "catalog_digest": "bbd6dccec70f05898fcc9e7fbbb77f57bca528dd070683052c467e758681182a",
+  "catalog_version": "2026-09-27.1",
   "classification": "Vertraulich",
   "consolidated": 5,
   "context_fields": [],
@@ -1426,12 +1515,13 @@
    "lumbeck-wolter.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.1.0",
+  "facts_schema_version": "1.2.0",
   "fqdns_total": 2,
+  "generated_on": null,
   "generation": null,
   "hosts_ipv4": 1,
-  "hosts_ipv6": 0,
-  "hosts_total": 1,
+  "hosts_ipv6": 1,
+  "hosts_total": 2,
   "orders": [
    {
     "id": "57b3ac85-a1da-47e9-b783-d28ad9a9fa35",
@@ -1440,7 +1530,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-26.2",
+  "policy_version": "2026-09-27.1",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1712,7 +1802,7 @@
       "116.202.77.64"
      ],
      "statement": "positive.text",
-     "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 116.202.77.64: Debian GNU/Linux 12 (Herstellerpflege bis 30.06.2028 laut Debian LTS)."
+     "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 116.202.77.64: Debian GNU/Linux 12 (in Langzeitpflege (LTS) bis 30.06.2028 laut Debian)."
     }
    ],
    "subjects": [
@@ -1721,14 +1811,46 @@
     "sw:116.202.77.64:-:courier:unknown",
     "sw:116.202.77.64:-:debian:12",
     "sw:116.202.77.64:-:dovecot:unknown",
+    "sw:116.202.77.64:-:exim:unknown",
     "sw:116.202.77.64:-:mariadb:10.11.18",
     "sw:116.202.77.64:-:openssh:9.2p1",
     "sw:116.202.77.64:-:postgresql:unknown",
     "sw:116.202.77.64:-:proftpd:unknown",
     "sw:116.202.77.64:-:proftpd_sftp:unknown"
    ],
-   "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 116.202.77.64: Debian GNU/Linux 12 (Herstellerpflege bis 30.06.2028 laut Debian LTS).",
+   "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 116.202.77.64: Debian GNU/Linux 12 (in Langzeitpflege (LTS) bis 30.06.2028 laut Debian).",
    "title": "Serversoftware mit laufender Herstellerpflege"
+  },
+  {
+   "cat": "C",
+   "checks": [
+    "dkim_missing"
+   ],
+   "provenance": [
+    {
+     "check": "dkim_missing",
+     "field": "positive",
+     "members": [
+      "lumbeck-wolter.de"
+     ],
+     "statement": "positive.title",
+     "text": "DKIM vorhanden"
+    },
+    {
+     "check": "dkim_missing",
+     "field": "positive",
+     "members": [
+      "lumbeck-wolter.de"
+     ],
+     "statement": "positive.text",
+     "text": "Für die Domain lumbeck-wolter.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+    }
+   ],
+   "subjects": [
+    "lumbeck-wolter.de"
+   ],
+   "text": "Für die Domain lumbeck-wolter.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+   "title": "DKIM vorhanden"
   },
   {
    "cat": "C",
@@ -1760,48 +1882,6 @@
    ],
    "text": "Für die Domain lumbeck-wolter.de weisen die Nameserver einen vollständigen Zonentransfer ab.",
    "title": "Zonentransfer abgewiesen"
-  },
-  {
-   "cat": "C",
-   "checks": [
-    "spf_missing",
-    "dkim_missing"
-   ],
-   "provenance": [
-    {
-     "check": "spf_missing,dkim_missing",
-     "field": "positive",
-     "members": [
-      "lumbeck-wolter.de",
-      "lumbeck-wolter.de"
-     ],
-     "statement": "positive.title",
-     "text": "Absender-Authentizität mit SPF und DKIM hinterlegt"
-    },
-    {
-     "check": "spf_missing",
-     "field": "positive",
-     "members": [
-      "lumbeck-wolter.de"
-     ],
-     "statement": "positive.text",
-     "text": "Für die Domain lumbeck-wolter.de ist ein SPF-Eintrag veröffentlicht."
-    },
-    {
-     "check": "dkim_missing",
-     "field": "positive",
-     "members": [
-      "lumbeck-wolter.de"
-     ],
-     "statement": "positive.text",
-     "text": "Für die Domain lumbeck-wolter.de ist eine DKIM-Signatur veröffentlicht."
-    }
-   ],
-   "subjects": [
-    "lumbeck-wolter.de"
-   ],
-   "text": "Für die Domain lumbeck-wolter.de ist ein SPF-Eintrag veröffentlicht. Für die Domain lumbeck-wolter.de ist eine DKIM-Signatur veröffentlicht.",
-   "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
   },
   {
    "cat": "E",
@@ -1854,10 +1934,12 @@
   "hosts": [
    {
     "cov": "teil",
-    "coverage": "Portscan vollständig; danach hat der Host weitere Verbindungen abgewiesen, Transportverschlüsselung und Webanalyse waren nicht möglich.",
+    "coverage": "Portscan vollständig; danach hat der Host weitere Verbindungen abgewiesen, Transportverschlüsselung und Webanalyse waren nicht möglich. 2a01:4f8:d0a:668b::2: IPv6-Adresse laut DNS, vom Prüfstand aus nicht geprüft.",
     "fqdns": "lumbeck-wolter.de, www.lumbeck-wolter.de",
     "ip": "116.202.77.64",
-    "more_ips": [],
+    "more_ips": [
+     "2a01:4f8:d0a:668b::2"
+    ],
     "operator": "Hetzner Online GmbH (dedi5705.your-server.de)",
     "role": "Website · geteiltes System beim Hoster"
    },
@@ -1871,14 +1953,25 @@
     "role": "Drittanbieter"
    }
   ],
-  "lead": "Der Scan hat 1 System mit 1 IP-Adresse und 2 Hostnamen erfasst. Für 1 System (1 Adresse) war die aktive Prüfung nur teilweise möglich; diese Lücke ist unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 1 System mit 2 IP-Adressen und 2 Hostnamen erfasst. Für 1 System (2 Adressen) war die aktive Prüfung nur teilweise möglich; diese Lücke ist unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [
-     "Sicherheits-Header",
-     "Suche nach nicht verlinkten Pfaden",
-     "Transportverschlüsselung",
-     "Webanalyse"
+     "Portscan und Diensterkennung über IPv6",
+     "Transportverschlüsselung über IPv6",
+     "Webanalyse über IPv6"
+    ],
+    "code": "ipv6_not_scanned",
+    "detail": "Betroffen: 2a01:4f8:d0a:668b::2 (lumbeck-wolter.de, www.lumbeck-wolter.de). Die Adressen stehen als AAAA-Eintrag derselben Namen im DNS; der Scanner hat sie nicht in die Prüfung übernommen. Geprüft wurde die IPv4-Adresse desselben Systems.",
+    "refs": [],
+    "subjects": [
+     "2a01:4f8:d0a:668b::2"
+    ],
+    "what": "IPv6-Adresse vom Prüfstand aus nicht geprüft"
+   },
+   {
+    "checks": [
+     "Web-, Header- und TLS-Prüfungen"
     ],
     "code": "blocked",
     "detail": "Betroffen: 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de).",
@@ -1916,6 +2009,18 @@
    },
    {
     "checks": [
+     "Abgleich mit Schwachstellendatenbanken"
+    ],
+    "code": "no_enrichment",
+    "detail": "Betroffen: 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de).",
+    "refs": [],
+    "subjects": [
+     "116.202.77.64"
+    ],
+    "what": "Keine Fremdbewertung aus Schwachstellendatenbanken zu den erkannten Versionen"
+   },
+   {
+    "checks": [
      "Ermittlung der Hostnamen"
     ],
     "code": "timeout",
@@ -1931,7 +2036,7 @@
    {
     "n": "0",
     "name": "Aufklärung (passiv)",
-    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 2 Hostnamen auf 1 IP-Adresse. Geprüft wurden 2 von 5 ermittelten Namen; die übrigen stehen in Kapitel 2 unter den Einschränkungen."
+    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 2 Hostnamen auf 2 IP-Adressen. Geprüft wurden 2 von 5 ermittelten Namen; die übrigen stehen in Kapitel 2 unter den Einschränkungen."
    },
    {
     "n": "1",
@@ -1941,7 +2046,7 @@
    {
     "n": "2",
     "name": "Tiefenprüfung",
-    "text": "Analyse der Transportverschlüsselung, der Sicherheits-Header und der HTTP-Antworten je virtuellem Host, Verzeichnis-Enumeration und passive Webanalyse."
+    "text": "Analyse der Transportverschlüsselung, der Sicherheits-Header und der HTTP-Antworten je virtuellem Host, passive Webanalyse; die Suche nach nicht verlinkten Pfaden war nicht belastbar (siehe Einschränkungen)."
    },
    {
     "n": "3",

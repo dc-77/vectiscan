@@ -19,7 +19,13 @@
        ]
       }
      }
-    ]
+    ],
+    "scan": {
+     "domain": "example.test",
+     "domains": [
+      "example.test"
+     ]
+    }
    },
    "expect": {
     "holds": {
@@ -31,7 +37,10 @@
     "not_holds": {
      "example.test": [
       "meaning[2]",
-      "recommendation[1]"
+      "meaning[3]",
+      "meaning[4]",
+      "recommendation[1]",
+      "recommendation[3]"
      ]
     }
    },
@@ -52,7 +61,13 @@
        "raw": "v=DMARC1; p=none"
       }
      }
-    ]
+    ],
+    "scan": {
+     "domain": "example.test",
+     "domains": [
+      "example.test"
+     ]
+    }
    },
    "expect": {
     "holds": {
@@ -69,6 +84,49 @@
     }
    },
    "coverage_default": "ok"
+  },
+  {
+   "name": "S6b-4: Meldeadresse und MX beim Dienstleister (dortmund-beach, spec/11 Teil 3)",
+   "facts": {
+    "scan": {
+     "domain": "example.test",
+     "domains": [
+      "example.test"
+     ]
+    },
+    "dns": [
+     {
+      "domain": "example.test",
+      "mx": [
+       "mail1.provider.example"
+      ],
+      "dmarc": {
+       "present": true,
+       "p": "none",
+       "raw": "v=DMARC1; p=none; rua=mailto:postmaster@provider.example;",
+       "rua": [
+        "mailto:postmaster@provider.example"
+       ]
+      }
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "example.test": [
+      "meaning[3]",
+      "meaning[4]",
+      "recommendation[3]"
+     ]
+    },
+    "not_holds": {
+     "example.test": [
+      "meaning[1]",
+      "recommendation[0]"
+     ]
+    }
+   }
   }
  ]
 }

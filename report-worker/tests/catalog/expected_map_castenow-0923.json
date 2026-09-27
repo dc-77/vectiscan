@@ -4,6 +4,7 @@
  "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben.",
  "hinweis_s6b2": "S6b-2 hat neun Markierungen aufgeloest: Q13 Plesk 8443 als admin_panel_hoster und 8880 (sw-cp-server) im selben Befund admin_access mit Kennung Plesk; Q14 csrf_token_missing (Konfidenz Low) als Werkzeugmeldung; Q18 mailstore mit einem Tag Restlaufzeit Rot und Unverzueglich (urgent_when, E2); Q4 dane_missing und BREACH (bitwarden, umfrage) entfallen, BREACH als Hinweis im Anhang ohne CVE; Teil 2 kein Positivbefund fuer Exchange SE ohne Patchstand; Q12 waf_present nur mit benanntem Produkt. Es bleiben vier Q8-Markierungen (S6c).",
  "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Befunde: csp_missing ubb-wiki.castenow.de (R1); csp_missing umfrage.castenow.de (R1); csp_weak mailstore.castenow.de (R1); security_headers_incomplete mailstore.castenow.de (R1); security_headers_incomplete umfrage.castenow.de (R1); entfallene Positivaussagen: csp_missing mailstore.castenow.de (R1); tls_weak_ciphers mail.castenow.de (R6 (CBC-Verfahren angeboten)); tls_weak_ciphers mail2.castenow.de (R6 (CBC-Verfahren angeboten)); tls_weak_ciphers owa.castenow.de (R6 (CBC-Verfahren angeboten)); urlhaus_compromise castenow.de (R6 (URLhaus no_data ist kein Negativergebnis)). Q8 nach Entscheidung DC 1 aufgelöst (R1, Messung an der Endseite oder nicht prüfbar): csp_missing ubb-wiki.castenow.de; csp_missing umfrage.castenow.de; csp_weak mailstore.castenow.de; security_headers_incomplete mailstore.castenow.de; security_headers_incomplete umfrage.castenow.de.",
+ "hinweis_s6b4": "S6b-4 (spec/11): Soll-Liste nach Katalog 2026-09-27.1 und Fakten 1.2.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (T-Nummer oder Teil 3) und warum. entfallene Befunde: http_alt_port 92.205.163.53 (ubb-wiki.castenow.de) (T9 (E18)); service_banner_version 92.205.163.53 (ubb-wiki.castenow.de) (T9 (E18)). entfallene Positivaussagen: spf_missing castenow.de (Teil 3 DB (P05)).",
  "strict": false,
  "orders": {
   "main": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52"
@@ -17,7 +18,9 @@
   "VS-2026-002": {
    "checks": [
     "admin_service_exposed_passive"
-   ]
+   ],
+   "spec11": "T6",
+   "warum": "Datum je Adresse im Betroffenen (Zeitstempel des Dienstes laut Passivquelle)."
   },
   "VS-2026-003": {
    "checks": [
@@ -76,7 +79,7 @@
   },
   "VS-2026-014": {
    "checks": [
-    "http_alt_port"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-015": {
@@ -92,7 +95,9 @@
   "VS-2026-017": {
    "checks": [
     "http_header_disclosure"
-   ]
+   ],
+   "spec11": "Teil 3 CA",
+   "warum": "X-Powered-By mit Version (PHP/8.4.25) an der Endseite der Anmeldung."
   },
   "VS-2026-018": {
    "checks": [
@@ -208,31 +213,33 @@
   },
   "VS-2026-040": {
    "checks": [
-    "service_banner_version"
-   ]
-  },
-  "VS-2026-041": {
-   "checks": [
     "smtp_vrfy_enabled_passive"
    ],
    "spec10": "R19",
    "warum": "VRFY im SMTP-Banner laut Shodan; neue Prüfung."
   },
-  "VS-2026-042": {
+  "VS-2026-041": {
    "checks": [
     "spf_authorizes_shared_host"
    ],
    "spec10": "R19",
-   "warum": "SPF gibt einen Server frei, den der Hoster auch für andere Kunden betreibt; neue Prüfung."
+   "warum": "SPF gibt einen Server frei, den der Hoster auch für andere Kunden betreibt; neue Prüfung.",
+   "spec11": "T9 (E18)",
+   "warum_spec11": "Betreiber des Servers aus rDNS (planwerk6.de), Hetzner nur als Rechenzentrum."
   },
-  "VS-2026-043": {
+  "VS-2026-042": {
    "checks": [
     "spf_softfail"
    ]
   },
-  "VS-2026-044": {
+  "VS-2026-043": {
    "checks": [
     "tls_rpt_missing"
+   ]
+  },
+  "VS-2026-044": {
+   "checks": [
+    "tls_weakness_reported"
    ]
   },
   "VS-2026-045": {
@@ -257,15 +264,10 @@
   },
   "VS-2026-049": {
    "checks": [
-    "tls_weakness_reported"
-   ]
-  },
-  "VS-2026-050": {
-   "checks": [
     "web_vulnerability_reported"
    ]
   },
-  "VS-2026-051": {
+  "VS-2026-050": {
    "checks": [
     "wordpress_user_enumeration"
    ]
@@ -580,11 +582,13 @@
   "VS-2026-P58": {
    "checks": [
     "ip_reputation"
-   ]
+   ],
+   "spec11": "Teil 3 BS",
+   "warum": "Plattform- und CDN-Adressen ohne Meldung stehen im Positivbefund; einen Befund erzeugen sie nicht."
   },
   "VS-2026-P59": {
    "checks": [
-    "rdp_exposed"
+    "ip_reputation"
    ]
   },
   "VS-2026-P60": {
@@ -614,7 +618,7 @@
   },
   "VS-2026-P65": {
    "checks": [
-    "smb_exposed"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P66": {
@@ -644,7 +648,7 @@
   },
   "VS-2026-P71": {
    "checks": [
-    "spf_missing"
+    "smb_exposed"
    ]
   },
   "VS-2026-P72": {

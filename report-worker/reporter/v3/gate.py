@@ -45,7 +45,10 @@ MITARBEITER = re.compile(
     r"\b(?:\d+|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn|elf|zwölf)\s+"
     r"(?:Mitarbeite\w*|Beschäftigte\w*)", re.I)
 MFA = re.compile(r"\bMFA\b|Mehrfaktor\w*|(?:zusätzliche|zweite)[nrms]? Faktor", re.I)
-BEDINGUNG = re.compile(r"\b(?:sofern|falls|wenn|soweit)\b", re.I)
+# S6b-4 (spec/11 T10): "ob ... aktiv ist, ist von außen nicht feststellbar" ist eine Bedingung.
+BEDINGUNG = re.compile(r"\b(?:sofern|falls|wenn|soweit|ob)\b|nicht feststellbar", re.I)
+# S6b-4 (spec/11 T10): Formulareingaben setzen eine gelaufene Webanalyse voraus.
+FORMULAR = re.compile(r"Formulareingabe\w*|Formulardaten", re.I)
 RELATIVE_FRIST = re.compile(
     r"\bin (?:\d+|einem|einer|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn|elf|zwölf) "
     r"(?:Tag|Tagen|Woche|Wochen|Monat|Monaten)\b", re.I)
@@ -97,6 +100,8 @@ def context_claims(text: str, haystack: str) -> list[str]:
     out: list[str] = []
     if ANSCHLUSS.search(text) and '"anschluss"' not in haystack:
         out.append("Unternehmensnetz oder Anschluss ohne System am Anschluss des Kunden")
+    if FORMULAR.search(text) and "formulareingaben" not in haystack:
+        out.append("Formulareingaben ohne gelaufene Webanalyse")
     if MITARBEITER.search(text) and '"mitarbeiter":' not in haystack:
         out.append("Mitarbeiterzahl ohne Quelle Kunde oder Admin")
     for satz in SATZ.findall(text):

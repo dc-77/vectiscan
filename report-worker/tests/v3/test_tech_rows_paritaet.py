@@ -36,11 +36,21 @@ DORTMUND_BEACH_S0B = "14272c00-1145-4675-9b4c-19ce2ead403b"
 CASTENOW = "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52"
 
 
+def _status(status: str, farbe: str) -> str:
+    """S6b-4 (spec/11 T11, T15): Langzeitpflege ist gepflegt, eine laut wpscan veraltete
+    Erweiterung (gelb) "outdated", das Ende der Herstellerpflege (rot) "eol"."""
+    if status == "in Langzeitpflege (LTS)":
+        return "current"
+    if status == "unsicher" or (farbe == "gelb" and status.startswith("veraltet")):
+        return "outdated"
+    return BERICHT_ZU_DASHBOARD[status]
+
+
 def _bericht(order_id: str) -> dict[str, list[tuple[str, str, str]]]:
     out: dict[str, list[tuple[str, str, str]]] = {}
     for block in data_for(order_id).architecture.tech:
         ip = block.host.split(" ", 1)[0]
-        out[ip] = [(r.c, r.v, BERICHT_ZU_DASHBOARD[r.status]) for r in block.rows]
+        out[ip] = [(r.c, r.v, _status(r.status, r.st)) for r in block.rows]
     return out
 
 

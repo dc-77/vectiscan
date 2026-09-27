@@ -63,25 +63,25 @@
     "host": "188.40.3.130",
     "port": "465",
     "ref": "",
-    "svc": "SMTP, TLS erzwungen"
+    "svc": "SMTP über TLS (Exim), TLS erzwungen"
    },
    {
     "host": "188.40.3.130",
     "port": "587",
     "ref": "",
-    "svc": "SMTP, TLS erzwungen"
+    "svc": "SMTP (Exim), TLS erzwungen"
    },
    {
     "host": "188.40.3.130",
     "port": "993",
     "ref": "",
-    "svc": "nicht identifiziert (Port 993), TLS erzwungen"
+    "svc": "IMAP über TLS, TLS erzwungen"
    },
    {
     "host": "188.40.3.130",
     "port": "995",
     "ref": "",
-    "svc": "nicht identifiziert (Port 995), TLS erzwungen"
+    "svc": "POP3 über TLS, TLS erzwungen"
    },
    {
     "host": "188.40.3.130",
@@ -120,6 +120,7 @@
     "svc": "Exim smtpd 4.96, laut Passivquelle"
    }
   ],
+  "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
   "repeat": [
    "Nachprüfung der Sofortmaßnahmen nach ihrer Umsetzung, gezielt auf die betroffenen Dienste.",
    "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
@@ -314,7 +315,7 @@
    {
     "l": "Blau",
     "st": "blau",
-    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal)."
+    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal). Als blauer Hinweis stehen außerdem Befunde, die nur eine Passivquelle für einen vom Prüfstand aus nicht erreichbaren Host meldet."
    },
    {
     "l": "Grün",
@@ -336,14 +337,16 @@
        "spf_missing",
        "spf_permissive",
        "spf_softfail",
-       "mail_spoofing_unprotected"
+       "mail_spoofing_unprotected",
+       "spf_authorizes_shared_host"
       ],
       "l": "SPF",
-      "ok": null,
+      "ok": false,
+      "pulls": [],
       "subjects": [
        "junkerwerk.hu"
       ],
-      "v": "softfail"
+      "v": "Handlungsbedarf"
      },
      {
       "checks": [
@@ -351,6 +354,7 @@
       ],
       "l": "DKIM",
       "ok": true,
+      "pulls": [],
       "subjects": [
        "junkerwerk.hu"
       ],
@@ -365,6 +369,7 @@
       ],
       "l": "DMARC",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "junkerwerk.hu"
       ],
@@ -376,6 +381,7 @@
       ],
       "l": "MTA-STS",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "junkerwerk.hu"
       ],
@@ -387,6 +393,7 @@
       ],
       "l": "TLS-RPT",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "junkerwerk.hu"
       ],
@@ -398,6 +405,7 @@
       ],
       "l": "DANE",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "junkerwerk.hu"
       ],
@@ -415,6 +423,7 @@
       ],
       "l": "DNSSEC",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "junkerwerk.hu"
       ],
@@ -426,6 +435,7 @@
       ],
       "l": "CAA",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "junkerwerk.hu"
       ],
@@ -437,6 +447,7 @@
       ],
       "l": "Abruf der gesamten Zone",
       "ok": true,
+      "pulls": [],
       "subjects": [
        "junkerwerk.hu"
       ],
@@ -447,11 +458,12 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
-      "ok": null,
+      "ok": true,
+      "pulls": [],
       "subjects": [
        "junkerwerk.hu"
       ],
-      "v": "entfällt"
+      "v": "unauffällig"
      }
     ],
     "name": "DNS-Hygiene",
@@ -469,6 +481,15 @@
       ],
       "l": "188.40.3.130",
       "ok": null,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "188.40.3.130"
       ],
@@ -484,6 +505,15 @@
       ],
       "l": "217.243.248.30",
       "ok": false,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "217.243.248.30"
       ],
@@ -501,6 +531,7 @@
       ],
       "l": "Zertifikate",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "188.40.3.130",
        "217.243.248.30",
@@ -527,6 +558,7 @@
       ],
       "l": "188.40.3.130",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "188.40.3.130"
       ],
@@ -543,6 +575,7 @@
       ],
       "l": "217.243.248.30",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "217.243.248.30"
       ],
@@ -596,22 +629,22 @@
      },
      {
       "p": "465",
-      "s": "SMTP",
+      "s": "SMTP über TLS (Exim)",
       "st": "gruen"
      },
      {
       "p": "587",
-      "s": "SMTP",
+      "s": "SMTP (Exim)",
       "st": "gruen"
      },
      {
       "p": "993",
-      "s": "nicht identifiziert (Port 993)",
+      "s": "IMAP über TLS",
       "st": "gruen"
      },
      {
       "p": "995",
-      "s": "nicht identifiziert (Port 995)",
+      "s": "POP3 über TLS",
       "st": "gruen"
      },
      {
@@ -648,12 +681,12 @@
      {
       "p": "25",
       "s": "Exim smtpd",
-      "st": "grau"
+      "st": "gelb"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "188.40.3.130 (dedi2230.your-server.de)",
@@ -704,12 +737,21 @@
       "v": "unbekannt"
      },
      {
-      "c": "Debian GNU/Linux",
+      "c": "Exim",
       "conf": "hoch",
       "note": "",
       "src": "nmap",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Debian GNU/Linux",
+      "conf": "hoch",
+      "note": "bis 30.06.2028 laut Debian",
+      "src": "nmap",
       "st": "gruen",
-      "status": "aktuell",
+      "status": "in Langzeitpflege (LTS)",
       "v": "12"
      },
      {
@@ -785,7 +827,7 @@
    "checks": [
     "db_exposed"
    ],
-   "evidence": "nmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:3306/tcp · Dienst: mysql · Produkt: MySQL · Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 · Anmeldeverfahren: mysql_native_password · Zertifikat für: *.your-server.de · Aussteller: sql.your-server.de · gültig bis: 10.02.2030, 15:03 UTC · MySQL-Protokoll: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 3636798 Capabilities flags: 65534 Some (Auszug)\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:5432/tcp · Dienst: postgresql · Produkt: PostgreSQL DB · Version: 9.6.0 oder neuer (Untergrenze) · Zertifikat für: *.your-server.de · Aussteller: sql.your-server.de · gültig bis: 10.02.2030, 15:08 UTC\n\nShodan\n188.40.3.130:5432 · Abweisung vor der Anmeldung laut Passivquelle",
+   "evidence": "nmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:3306/tcp · Dienst: mysql · Produkt: MariaDB · Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 · Anmeldeverfahren: mysql_native_password · Zertifikat für: *.your-server.de · Aussteller: sql.your-server.de · gültig bis: 10.02.2030, 15:03 UTC · 3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1 · MySQL-Protokoll: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 3636798 Capabilities flags: 65534 Some (Auszug)\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:5432/tcp · Dienst: postgresql · Produkt: PostgreSQL DB · Version: 9.6.0 oder neuer (Untergrenze) · Zertifikat für: *.your-server.de · Aussteller: sql.your-server.de · gültig bis: 10.02.2030, 15:08 UTC\n\nShodan\n188.40.3.130:5432 · Abweisung vor der Anmeldung laut Passivquelle",
    "found": "Der Host 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) beantwortet Verbindungen auf Datenbankports aus dem gesamten Internet: 188.40.3.130:3306 (MariaDB), 188.40.3.130:5432 (PostgreSQL). Ein Datenbankdienst gehört nicht an das öffentliche Interface.",
    "id": "VS-2026-001",
    "impact": "Ein von außen erreichbarer Datenbankdienst macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar. Wo der Dienst eine Anmeldung von außen entgegennimmt, sind Passwort-Rateangriffe rund um die Uhr möglich: 188.40.3.130:3306 (MariaDB). Laut Passivquelle weist der Dienst fremde Quellen vor der Anmeldung ab; die Erreichbarkeit des Ports bleibt trotzdem eine unnötige Angriffsfläche: 188.40.3.130:5432 (PostgreSQL).",
@@ -801,8 +843,10 @@
     {
      "action": "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken.",
      "check": "db_exposed",
+     "detail": "",
      "effect": "Entzieht Angreifern den direkten Zugriff auf die Datenbanken",
      "lever": "Datenbankdienste vom Internet trennen",
+     "per_rule": false,
      "stage": "unverzueglich"
     }
    ],
@@ -949,15 +993,19 @@
     {
      "action": "Einen DMARC-Eintrag mit p=none und einer Reporting-Adresse (rua) anlegen und vier Wochen die Berichte auswerten.",
      "check": "dmarc_missing",
+     "detail": "",
      "effect": "Macht sichtbar, wer im Namen der Domain E-Mails versendet",
      "lever": "DMARC-Richtlinie veröffentlichen",
+     "per_rule": false,
      "stage": "in_kuerze"
     },
     {
      "action": "Nach einer Beobachtungsphase ohne Fehlmeldungen den Qualifizierer des SPF-Eintrags auf eine harte Fehlbehandlung umstellen, sobald alle legitimen Versandquellen erfasst sind.",
      "check": "spf_softfail",
+     "detail": "",
      "effect": "Lässt Empfänger gefälschte Absender eindeutig ablehnen",
      "lever": "SPF-Eintrag mit harter Fehlbehandlung abschließen",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -1113,8 +1161,10 @@
     {
      "action": "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält.",
      "check": "cert_hostname_mismatch",
+     "detail": "",
      "effect": "Beendet die Namenswarnung beim Aufruf des Dienstes",
      "lever": "Zertifikate auf alle aufgerufenen Namen ausstellen",
+     "per_rule": false,
      "stage": "in_kuerze"
     }
    ],
@@ -1208,25 +1258,27 @@
    "evidence": "Webabruf · phase0/host_inventory.json\nopenotp.junkerwerk.hu · Status: 200 · Titel: Junkerwerk Linder GmbH & Co.KG Web Applications Portal · Zieladresse: https://openotp.junkerwerk.hu · erreichbar: ja",
    "found": "Die Webseite openotp.junkerwerk.hu zeigt ein Anmeldeportal, das aus dem gesamten Internet erreichbar ist: openotp.junkerwerk.hu (Junkerwerk Linder GmbH & Co.KG Web Applications Portal). Die Erreichbarkeit selbst ist beabsichtigt, wenn das Portal für den externen Zugriff vorgesehen ist.",
    "id": "VS-2026-004",
-   "impact": "Ein öffentlich erreichbares Anmeldeportal ist ein häufiges Ziel für automatisierte Anmeldeversuche mit gestohlenen oder erratenen Zugangsdaten. Ohne zusätzliche Absicherung genügt ein einzelnes bekanntes Passwort für den Zugriff.",
+   "impact": "Ein öffentlich erreichbares Anmeldeportal ist ein häufiges Ziel für automatisierte Anmeldeversuche mit gestohlenen oder erratenen Zugangsdaten. Ohne zusätzliche Absicherung genügt ein einzelnes bekanntes Passwort für den Zugriff. Ob ein zweiter Faktor aktiv ist, ist von außen nicht feststellbar.",
    "key": "login_portal_exposed/scan/kunde",
    "level": "mittel",
    "level_label": "mittel",
    "missing_headers": [],
    "operator": "",
    "operator_note": "",
-   "plan_action": "Die Anmeldung am Portal um einen zusätzlichen Faktor ergänzen, etwa eine Authentifizierungs-App oder ein Einmalkennwort.",
+   "plan_action": "Prüfen, ob die Anmeldung am Portal einen zusätzlichen Faktor verlangt, etwa eine Authentifizierungs-App oder ein Einmalkennwort, und ihn andernfalls ergänzen.",
    "plan_effect": "Erschwert die Übernahme von Konten durch Rateangriffe",
    "plan_items": [
     {
-     "action": "Die Anmeldung am Portal um einen zusätzlichen Faktor ergänzen, etwa eine Authentifizierungs-App oder ein Einmalkennwort.",
+     "action": "Prüfen, ob die Anmeldung am Portal einen zusätzlichen Faktor verlangt, etwa eine Authentifizierungs-App oder ein Einmalkennwort, und ihn andernfalls ergänzen.",
      "check": "login_portal_exposed",
+     "detail": "",
      "effect": "Erschwert die Übernahme von Konten durch Rateangriffe",
-     "lever": "Anmeldeportale mit zweiter Anmeldestufe schützen",
+     "lever": "Zweite Anmeldestufe an Anmeldeportalen prüfen",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
-   "plan_lever": "Anmeldeportale mit zweiter Anmeldestufe schützen",
+   "plan_lever": "Zweite Anmeldestufe an Anmeldeportalen prüfen",
    "plan_stage": "mittelfristig",
    "policy": "login_portal_exposed",
    "provenance": [
@@ -1255,7 +1307,7 @@
       "openotp.junkerwerk.hu@217.243.248.30|openotp.junkerwerk.hu@217.243.248.30"
      ],
      "statement": "meaning[0]",
-     "text": "Ein öffentlich erreichbares Anmeldeportal ist ein häufiges Ziel für automatisierte Anmeldeversuche mit gestohlenen oder erratenen Zugangsdaten. Ohne zusätzliche Absicherung genügt ein einzelnes bekanntes Passwort für den Zugriff."
+     "text": "Ein öffentlich erreichbares Anmeldeportal ist ein häufiges Ziel für automatisierte Anmeldeversuche mit gestohlenen oder erratenen Zugangsdaten. Ohne zusätzliche Absicherung genügt ein einzelnes bekanntes Passwort für den Zugriff. Ob ein zweiter Faktor aktiv ist, ist von außen nicht feststellbar."
     },
     {
      "check": "login_portal_exposed",
@@ -1273,7 +1325,7 @@
       "openotp.junkerwerk.hu@217.243.248.30|openotp.junkerwerk.hu@217.243.248.30"
      ],
      "statement": "recommendation[0]",
-     "text": "Die Anmeldung am Portal um einen zusätzlichen Faktor ergänzen, etwa eine Authentifizierungs-App oder ein Einmalkennwort."
+     "text": "Prüfen, ob die Anmeldung am Portal einen zusätzlichen Faktor verlangt, etwa eine Authentifizierungs-App oder ein Einmalkennwort, und ihn andernfalls ergänzen."
     },
     {
      "check": "login_portal_exposed",
@@ -1297,7 +1349,7 @@
    "recommendation": [
     [
      "Mittelfristig",
-     "Die Anmeldung am Portal um einen zusätzlichen Faktor ergänzen, etwa eine Authentifizierungs-App oder ein Einmalkennwort."
+     "Prüfen, ob die Anmeldung am Portal einen zusätzlichen Faktor verlangt, etwa eine Authentifizierungs-App oder ein Einmalkennwort, und ihn andernfalls ergänzen."
     ],
     [
      "Mittelfristig",
@@ -1326,9 +1378,9 @@
     "passive_service_version_unverified"
    ],
    "evidence": "Shodan · phase0a/shodan_hosts.json\nQuelle: shodan · 217.243.248.30:25 · Produkt: Exim smtpd · Version: 4.96 · Banner (Auszug): 220 archiv.junkerwerk.de ESMTP Exim 4.96 Sun, 30 Aug 2026 14:48:52 +0200 250-archiv.junkerwerk.de Hello wsf6og5mfz.net [224.55.142.174] 250-SIZE 52428800",
-   "found": "Für 217.243.248.30 (openotp.junkerwerk.hu) meldet eine Passivquelle eine Dienstversion, die der Portscan nicht bestätigen konnte: 217.243.248.30:25 (Exim smtpd 4.96, laut Passivquelle).",
+   "found": "Für 217.243.248.30 (openotp.junkerwerk.hu) meldet eine Passivquelle eine Dienstversion: 217.243.248.30:25 (Exim smtpd 4.96, laut Passivquelle). Der Portscan hat den Port nicht bestätigt.",
    "id": "VS-2026-005",
-   "impact": "Ohne aktive Bestätigung ist unklar, ob der gemeldete Dienst und die genannte Version noch aktuell sind. Ein veralteter Patchstand bleibt so unentdeckt, und der Dienst kann außerhalb der eigentlich vorgesehenen Zustellwege erreichbar sein.",
+   "impact": "Ohne aktive Bestätigung ist unklar, ob der gemeldete Dienst und die genannte Version noch zutreffen. Eine Versionsangabe allein sagt nichts über den Patchstand; ein veralteter Stand bliebe so unentdeckt.",
    "key": "passive_service_version_unverified/scan/kunde",
    "level": "mittel",
    "level_label": "mittel",
@@ -1341,8 +1393,10 @@
     {
      "action": "Anhand einer aktiven Prüfung feststellen, ob Dienst und Version aus der Passivquelle noch zutreffen, und den Patchstand mit den Sicherheitshinweisen des Herstellers abgleichen.",
      "check": "passive_service_version_unverified",
+     "detail": "",
      "effect": "Klärt, ob ein ungepflegter Dienst erreichbar ist",
      "lever": "Von der Passivquelle gemeldete Dienste prüfen",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -1366,7 +1420,16 @@
       "217.243.248.30|shodan:217.243.248.30:25"
      ],
      "statement": "observation[0]",
-     "text": "Für 217.243.248.30 (openotp.junkerwerk.hu) meldet eine Passivquelle eine Dienstversion, die der Portscan nicht bestätigen konnte: 217.243.248.30:25 (Exim smtpd 4.96, laut Passivquelle)."
+     "text": "Für 217.243.248.30 (openotp.junkerwerk.hu) meldet eine Passivquelle eine Dienstversion: 217.243.248.30:25 (Exim smtpd 4.96, laut Passivquelle)."
+    },
+    {
+     "check": "passive_service_version_unverified",
+     "field": "observation",
+     "members": [
+      "217.243.248.30|shodan:217.243.248.30:25"
+     ],
+     "statement": "observation[3]",
+     "text": "Der Portscan hat den Port nicht bestätigt."
     },
     {
      "check": "passive_service_version_unverified",
@@ -1375,7 +1438,7 @@
       "217.243.248.30|shodan:217.243.248.30:25"
      ],
      "statement": "meaning[0]",
-     "text": "Ohne aktive Bestätigung ist unklar, ob der gemeldete Dienst und die genannte Version noch aktuell sind. Ein veralteter Patchstand bleibt so unentdeckt, und der Dienst kann außerhalb der eigentlich vorgesehenen Zustellwege erreichbar sein."
+     "text": "Ohne aktive Bestätigung ist unklar, ob der gemeldete Dienst und die genannte Version noch zutreffen. Eine Versionsangabe allein sagt nichts über den Patchstand; ein veralteter Stand bliebe so unentdeckt."
     },
     {
      "check": "passive_service_version_unverified",
@@ -1402,7 +1465,7 @@
       "217.243.248.30|shodan:217.243.248.30:25"
      ],
      "statement": "recommendation[1]",
-     "text": "Zugriff auf den Dienst auf die Netze beschränken, aus denen eine Zustellung tatsächlich erfolgen muss."
+     "text": "Zugriff auf den Dienst auf die Netze beschränken, aus denen er tatsächlich erreichbar sein muss."
     }
    ],
    "recommendation": [
@@ -1412,7 +1475,7 @@
     ],
     [
      "Strategisch",
-     "Zugriff auf den Dienst auf die Netze beschränken, aus denen eine Zustellung tatsächlich erfolgen muss."
+     "Zugriff auf den Dienst auf die Netze beschränken, aus denen er tatsächlich erreichbar sein muss."
     ]
    ],
    "scale": "hygiene",
@@ -1428,15 +1491,15 @@
    "verify": "Verbindung zum gemeldeten Port herstellen und die zurückgegebene Version mit dem aktuellen Patchstand des Herstellers abgleichen."
   },
   {
-   "affected": "junkerwerk.hu (188.40.3.130 beim Hoster Hetzner Online AG)",
+   "affected": "junkerwerk.hu (188.40.3.130 beim Hoster Hetzner Online GmbH)",
    "cat": "C",
    "checks": [
     "spf_authorizes_shared_host"
    ],
-   "evidence": "DNS-Abfragen · phase0/dns_records.json\njunkerwerk.hu · SPF: v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all",
-   "found": "Der SPF-Eintrag der Domain junkerwerk.hu gibt einen Server als Absender frei, den der Hoster auch für andere Kunden betreibt: junkerwerk.hu (188.40.3.130 beim Hoster Hetzner Online AG).",
+   "evidence": "DNS-Abfragen · phase0/dns_records.json\njunkerwerk.hu · SPF: v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all · Mechanismus: a · löst auf: 188.40.3.130 · Server beim Hoster Hetzner Online GmbH · auf demselben Server: 1 weitere Domain laut Passivquelle",
+   "found": "Der SPF-Eintrag der Domain junkerwerk.hu gibt einen Server als Absender frei, auf dem laut Zertifikat oder Passivquelle weitere Domains liegen: junkerwerk.hu (188.40.3.130 beim Hoster Hetzner Online GmbH).",
    "id": "VS-2026-006",
-   "impact": "Jede Anwendung auf diesem Server darf damit E-Mails im Namen der Domain versenden, auch die anderer Kunden. Empfänger erkennen solche Mails an SPF nicht als gefälscht.",
+   "impact": "Jede Anwendung auf diesem Server darf damit E-Mails im Namen der Domain versenden, auch die Anwendungen der weiteren Domains. Empfänger erkennen solche Mails an SPF nicht als gefälscht.",
    "key": "spf_authorizes_shared_host/scan/kunde",
    "level": "mittel",
    "level_label": "mittel",
@@ -1444,13 +1507,15 @@
    "operator": "",
    "operator_note": "",
    "plan_action": "Prüfen, ob über den genannten Server tatsächlich E-Mails der Domain versendet werden; andernfalls den Mechanismus aus dem SPF-Eintrag entfernen.",
-   "plan_effect": "Verhindert, dass andere Kunden desselben Servers im Namen der Domain senden",
+   "plan_effect": "Verhindert, dass andere Anwendungen desselben Servers im Namen der Domain senden",
    "plan_items": [
     {
      "action": "Prüfen, ob über den genannten Server tatsächlich E-Mails der Domain versendet werden; andernfalls den Mechanismus aus dem SPF-Eintrag entfernen.",
      "check": "spf_authorizes_shared_host",
-     "effect": "Verhindert, dass andere Kunden desselben Servers im Namen der Domain senden",
+     "detail": "",
+     "effect": "Verhindert, dass andere Anwendungen desselben Servers im Namen der Domain senden",
      "lever": "Absenderfreigabe auf eigene oder vertraglich gebundene Systeme beschränken",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -1474,7 +1539,7 @@
       "junkerwerk.hu|junkerwerk.hu"
      ],
      "statement": "observation[0]",
-     "text": "Der SPF-Eintrag der Domain junkerwerk.hu gibt einen Server als Absender frei, den der Hoster auch für andere Kunden betreibt: junkerwerk.hu (188.40.3.130 beim Hoster Hetzner Online AG)."
+     "text": "Der SPF-Eintrag der Domain junkerwerk.hu gibt einen Server als Absender frei, auf dem laut Zertifikat oder Passivquelle weitere Domains liegen: junkerwerk.hu (188.40.3.130 beim Hoster Hetzner Online GmbH)."
     },
     {
      "check": "spf_authorizes_shared_host",
@@ -1483,7 +1548,7 @@
       "junkerwerk.hu|junkerwerk.hu"
      ],
      "statement": "meaning[0]",
-     "text": "Jede Anwendung auf diesem Server darf damit E-Mails im Namen der Domain versenden, auch die anderer Kunden. Empfänger erkennen solche Mails an SPF nicht als gefälscht."
+     "text": "Jede Anwendung auf diesem Server darf damit E-Mails im Namen der Domain versenden, auch die Anwendungen der weiteren Domains. Empfänger erkennen solche Mails an SPF nicht als gefälscht."
     },
     {
      "check": "spf_authorizes_shared_host",
@@ -1492,7 +1557,7 @@
       "junkerwerk.hu|junkerwerk.hu"
      ],
      "statement": "verify[0]",
-     "text": "SPF-Eintrag der Domain erneut abfragen; erwartet wird, dass kein geteilter Server des Hosters mehr freigegeben ist."
+     "text": "SPF-Eintrag der Domain erneut abfragen; erwartet wird, dass kein Server mit weiteren Domains mehr freigegeben ist oder der Versand über ihn belegt ist."
     },
     {
      "check": "spf_authorizes_shared_host",
@@ -1532,7 +1597,7 @@
    "threat": null,
    "title": "SPF gibt geteilten Server frei",
    "urgency": "Mittelfristig",
-   "verify": "SPF-Eintrag der Domain erneut abfragen; erwartet wird, dass kein geteilter Server des Hosters mehr freigegeben ist."
+   "verify": "SPF-Eintrag der Domain erneut abfragen; erwartet wird, dass kein Server mit weiteren Domains mehr freigegeben ist oder der Versand über ihn belegt ist."
   },
   {
    "affected": "openotp.junkerwerk.hu:443 (3des, cbc; SWEET32)",
@@ -1558,22 +1623,28 @@
     {
      "action": "Schwache Cipher-Suiten in der Serverkonfiguration deaktivieren und ausschließlich moderne AEAD-Suiten mit Forward Secrecy anbieten.",
      "check": "tls_weak_ciphers",
+     "detail": "",
      "effect": "Schützt Verbindungen gegen das Brechen schwacher Verfahren",
      "lever": "Schwache Verschlüsselungsverfahren abschalten",
+     "per_rule": false,
      "stage": "mittelfristig"
     },
     {
      "action": "TLS 1.3 auf dem Dienst aktivieren, sobald die eingesetzte TLS-Bibliothek und alle angebundenen Clients dies unterstützen.",
      "check": "tls_no_13",
+     "detail": "",
      "effect": "Nutzt das aktuelle Protokoll mit kleinerer Angriffsfläche",
      "lever": "TLS 1.3 aktivieren",
+     "per_rule": false,
      "stage": "strategisch"
     },
     {
      "action": "Die betroffenen Verfahren in der Serverkonfiguration deaktivieren, sofern die eingesetzte Softwareversion dies zulässt.",
      "check": "tls_weakness",
+     "detail": "",
      "effect": "Schützt Verbindungen gegen bekannte Angriffe",
      "lever": "Bekannte Schwächen der TLS-Konfiguration beheben",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -1753,24 +1824,26 @@
    "checks": [
     "legacy_protocols_present"
    ],
-   "evidence": "nmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:21/tcp · Dienst: ftp · Produkt: ProFTPD · TLS erzwungen: ja · Zertifikat für: *.your-server.de · Aussteller: Thawte TLS RSA CA G1 · gültig bis: 02.11.2026, 23:59 UTC · 21/tcp open ftp ProFTPD (requires SSL)\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:110/tcp · Dienst: pop3 · Produkt: Courier pop3d · TLS erzwungen: ja · STARTTLS: ja · Anmeldung vor TLS gesperrt: ja · Zertifikat für: *.your-server.de · Aussteller: Thawte TLS RSA CA G1 · gültig bis: 02.11.2026, 23:59 UTC · POP3-Fähigkeiten: SASL TOP STLS UIDL CAPA AUTH-RESP-CODE PIPELINING RESP-CODES\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:143/tcp · Dienst: imap · Produkt: Dovecot imapd · TLS erzwungen: ja · STARTTLS: ja · Anmeldung vor TLS gesperrt: ja · Zertifikat für: *.your-server.de · Aussteller: Thawte TLS RSA CA G1 · gültig bis: 02.11.2026, 23:59 UTC · IMAP-Fähigkeiten: IDLE IMAP4rev1 ENABLE LOGIN-REFERRALS LOGINDISABLED STARTTLS ID LITERAL+ SASL-IR",
-   "found": "Der Host 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) bietet ein älteres Übertragungsprotokoll an: 188.40.3.130:110 (POP3), 188.40.3.130:143 (IMAP), 188.40.3.130:21 (FTP). Eine Anmeldung ist dort nur mit Transportverschlüsselung möglich: 188.40.3.130:110 (POP3), 188.40.3.130:143 (IMAP), 188.40.3.130:21 (FTP).",
+   "evidence": "nmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:21/tcp · Dienst: ftp · Produkt: ProFTPD · TLS erzwungen: ja · Zertifikat für: *.your-server.de · Aussteller: Thawte TLS RSA CA G1 · gültig bis: 02.11.2026, 23:59 UTC · 21/tcp open ftp ProFTPD (requires SSL)\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:110/tcp · Dienst: pop3 · Produkt: Courier pop3d · TLS erzwungen: ja · STARTTLS: ja · Anmeldung vor TLS gesperrt: ja · Zertifikat für: *.your-server.de · Aussteller: Thawte TLS RSA CA G1 · gültig bis: 02.11.2026, 23:59 UTC · POP3-Fähigkeiten: SASL (leer) TOP STLS UIDL CAPA AUTH-RESP-CODE PIPELINING RESP-CODES\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n188.40.3.130:143/tcp · Dienst: imap · Produkt: Dovecot imapd · TLS erzwungen: ja · STARTTLS: ja · Anmeldung vor TLS gesperrt: ja · Zertifikat für: *.your-server.de · Aussteller: Thawte TLS RSA CA G1 · gültig bis: 02.11.2026, 23:59 UTC · IMAP-Fähigkeiten: IDLE IMAP4rev1 ENABLE LOGIN-REFERRALS LOGINDISABLED STARTTLS ID LITERAL+ SASL-IR",
+   "found": "Der Host 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) bietet zusätzliche Mail- und Dateidienste an: 188.40.3.130:110 (POP3), 188.40.3.130:143 (IMAP), 188.40.3.130:21 (FTP). Eine Anmeldung ist dort nur mit Transportverschlüsselung möglich: 188.40.3.130:110 (POP3), 188.40.3.130:143 (IMAP), 188.40.3.130:21 (FTP).",
    "id": "VS-2026-008",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Servers, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
-   "key": "legacy_protocols_present/scan/hoster:Hetzner Online AG",
+   "key": "legacy_protocols_present/scan/hoster:Hetzner Online GmbH",
    "level": "niedrig",
    "level_label": "niedrig",
    "missing_headers": [],
-   "operator": "beim Hoster Hetzner Online AG",
-   "operator_note": "Dieser Sachverhalt liegt beim Hoster Hetzner Online AG: der Server wird mit anderen Kunden geteilt (auf demselben Server laut Passivquelle 2 weitere Domains anderer Kunden), der Dienst gehört zum Server und nicht zu Ihrer Website. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen.",
+   "operator": "beim Hoster Hetzner Online GmbH",
+   "operator_note": "Dieser Sachverhalt liegt beim Hoster Hetzner Online GmbH: der Dienst gehört zum Server und nicht zu Ihrer Website. Auf demselben Server steht laut Passivquelle 1 weitere Domain. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen.",
    "plan_action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
    "plan_effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
    "plan_items": [
     {
      "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
      "check": "legacy_protocols_present",
+     "detail": "",
      "effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
      "lever": "Nicht benötigte Altprotokolle abschalten",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -1786,8 +1859,8 @@
       "188.40.3.130|188.40.3.130:110",
       "188.40.3.130|188.40.3.130:143"
      ],
-     "statement": "title",
-     "text": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
+     "statement": "short_variants[0]",
+     "text": "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen)"
     },
     {
      "check": "legacy_protocols_present",
@@ -1798,7 +1871,7 @@
       "188.40.3.130|188.40.3.130:143"
      ],
      "statement": "observation[0]",
-     "text": "Der Host 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) bietet ein älteres Übertragungsprotokoll an: 188.40.3.130:110 (POP3), 188.40.3.130:143 (IMAP), 188.40.3.130:21 (FTP)."
+     "text": "Der Host 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) bietet zusätzliche Mail- und Dateidienste an: 188.40.3.130:110 (POP3), 188.40.3.130:143 (IMAP), 188.40.3.130:21 (FTP)."
     },
     {
      "check": "legacy_protocols_present",
@@ -1808,7 +1881,7 @@
       "188.40.3.130|188.40.3.130:110",
       "188.40.3.130|188.40.3.130:143"
      ],
-     "statement": "observation[1]",
+     "statement": "observation[2]",
      "text": "Eine Anmeldung ist dort nur mit Transportverschlüsselung möglich: 188.40.3.130:110 (POP3), 188.40.3.130:143 (IMAP), 188.40.3.130:21 (FTP)."
     },
     {
@@ -1887,7 +1960,7 @@
     "legacy_protocols_present|188.40.3.130:21"
    ],
    "threat": null,
-   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar (beim Hoster Hetzner Online AG)",
+   "title": "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen) (beim Hoster Hetzner Online GmbH)",
    "urgency": "Mittelfristig",
    "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
   },
@@ -1914,15 +1987,19 @@
     {
      "action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
      "check": "mta_sts_missing",
+     "detail": "",
      "effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
      "lever": "MTA-STS für die Domain veröffentlichen",
+     "per_rule": false,
      "stage": "strategisch"
     },
     {
      "action": "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten.",
      "check": "tls_rpt_missing",
+     "detail": "",
      "effect": "Meldet fehlgeschlagene verschlüsselte Zustellungen an Sie zurück",
      "lever": "TLS-RPT für die Domain veröffentlichen",
+     "per_rule": false,
      "stage": "strategisch"
     }
    ],
@@ -2049,7 +2126,7 @@
    "checks": [
     "header_duplicate"
    ],
-   "evidence": "header_check\nopenotp.junkerwerk.hu · Adresse: https://openotp.junkerwerk.hu · doppelt gesetzt: x-frame-options, cache-control",
+   "evidence": "header_check\nopenotp.junkerwerk.hu · Adresse: https://openotp.junkerwerk.hu\n\ntestssl.sh\nopenotp.junkerwerk.hu · doppelt gesetzt: x-frame-options, cache-control",
    "found": "Die Webantwort von openotp.junkerwerk.hu enthält denselben Antwortheader mehrfach mit unterschiedlichen Werten: openotp.junkerwerk.hu (x-frame-options, cache-control).",
    "id": "VS-2026-010",
    "impact": "Browser und vorgelagerte Systeme werten mehrfach gesetzte Header uneinheitlich aus, manche nehmen den ersten, andere den letzten Wert. Damit ist nicht sichergestellt, welche der gesetzten Schutzwirkungen tatsächlich beim Browser ankommt.",
@@ -2065,8 +2142,10 @@
     {
      "action": "Die Webserver- und Anwendungskonfiguration darauf prüfen, an welcher Stelle der doppelte Header gesetzt wird, und den Header nur noch an einer Stelle mit einem eindeutigen Wert ausliefern.",
      "check": "header_duplicate",
+     "detail": "",
      "effect": "Sorgt für eindeutige Anweisungen an den Browser",
      "lever": "Doppelt gesetzte Header bereinigen",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -2127,7 +2206,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check)",
+   "source": "aktiv (header_check, testssl.sh)",
    "status": "blau",
    "subjects": [
     "header_duplicate|openotp.junkerwerk.hu@217.243.248.30"
@@ -2160,15 +2239,19 @@
     {
      "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
      "check": "caa_missing",
+     "detail": "",
      "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
      "lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+     "per_rule": false,
      "stage": "mittelfristig"
     },
     {
      "action": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
      "check": "dnssec_missing",
+     "detail": "",
      "effect": "Schützt DNS-Antworten gegen Verfälschung auf dem Übertragungsweg",
      "lever": "DNS-Zone mit DNSSEC signieren",
+     "per_rule": false,
      "stage": "strategisch"
     }
    ],
@@ -2358,13 +2441,13 @@
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration."
  },
- "landscape_lead": "11 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "11 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 19,
-  "catalog_digest": "004a04598e2072c37701db55752e05f8f2b155bf6ec91f987217067547919206",
-  "catalog_version": "2026-09-26.2",
+  "catalog_digest": "bbd6dccec70f05898fcc9e7fbbb77f57bca528dd070683052c467e758681182a",
+  "catalog_version": "2026-09-27.1",
   "classification": "Vertraulich",
   "consolidated": 11,
   "context_fields": [],
@@ -2375,8 +2458,9 @@
    "junkerwerk.hu"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.1.0",
+  "facts_schema_version": "1.2.0",
   "fqdns_total": 3,
+  "generated_on": null,
   "generation": null,
   "hosts_ipv4": 2,
   "hosts_ipv6": 0,
@@ -2389,7 +2473,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-26.2",
+  "policy_version": "2026-09-27.1",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -2464,9 +2548,9 @@
    "st": "gelb"
   },
   {
-   "action": "Die Anmeldung am Portal um einen zusätzlichen Faktor ergänzen, etwa eine Authentifizierungs-App oder ein Einmalkennwort.",
+   "action": "Prüfen, ob die Anmeldung am Portal einen zusätzlichen Faktor verlangt, etwa eine Authentifizierungs-App oder ein Einmalkennwort, und ihn andernfalls ergänzen.",
    "effect": "Erschwert die Übernahme von Konten durch Rateangriffe",
-   "lever": "Anmeldeportale mit zweiter Anmeldestufe schützen",
+   "lever": "Zweite Anmeldestufe an Anmeldeportalen prüfen",
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
@@ -2493,7 +2577,7 @@
   },
   {
    "action": "Prüfen, ob über den genannten Server tatsächlich E-Mails der Domain versendet werden; andernfalls den Mechanismus aus dem SPF-Eintrag entfernen.",
-   "effect": "Verhindert, dass andere Kunden desselben Servers im Namen der Domain senden",
+   "effect": "Verhindert, dass andere Anwendungen desselben Servers im Namen der Domain senden",
    "lever": "Absenderfreigabe auf eigene oder vertraglich gebundene Systeme beschränken",
    "operator": "",
    "prio": "Mittelfristig",
@@ -2688,7 +2772,7 @@
       "188.40.3.130"
      ],
      "statement": "positive.text",
-     "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), beim Hoster Hetzner Online AG lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab."
+     "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), beim Hoster Hetzner Online GmbH lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab."
     },
     {
      "check": "mail_plaintext",
@@ -2697,7 +2781,7 @@
       "188.40.3.130"
      ],
      "statement": "positive.text",
-     "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), beim Hoster Hetzner Online AG lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu."
+     "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), beim Hoster Hetzner Online GmbH lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu."
     }
    ],
    "subjects": [
@@ -2706,7 +2790,7 @@
     "188.40.3.130:143",
     "188.40.3.130:21"
    ],
-   "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), beim Hoster Hetzner Online AG lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab. Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), beim Hoster Hetzner Online AG lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu.",
+   "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), beim Hoster Hetzner Online GmbH lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab. Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), beim Hoster Hetzner Online GmbH lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu.",
    "title": "Datei- und Mailzugänge erzwingen TLS vor der Anmeldung"
   },
   {
@@ -2778,7 +2862,7 @@
       "188.40.3.130"
      ],
      "statement": "positive.text",
-     "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 188.40.3.130: Debian GNU/Linux 12 (Herstellerpflege bis 30.06.2028 laut Debian LTS)."
+     "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 188.40.3.130: Debian GNU/Linux 12 (in Langzeitpflege (LTS) bis 30.06.2028 laut Debian)."
     }
    ],
    "subjects": [
@@ -2786,14 +2870,46 @@
     "sw:188.40.3.130:-:courier:unknown",
     "sw:188.40.3.130:-:debian:12",
     "sw:188.40.3.130:-:dovecot:unknown",
+    "sw:188.40.3.130:-:exim:unknown",
     "sw:188.40.3.130:-:mariadb:10.11.18",
     "sw:188.40.3.130:-:openssh:9.2p1",
     "sw:188.40.3.130:-:postgresql:unknown",
     "sw:188.40.3.130:-:proftpd:unknown",
     "sw:188.40.3.130:-:proftpd_sftp:unknown"
    ],
-   "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 188.40.3.130: Debian GNU/Linux 12 (Herstellerpflege bis 30.06.2028 laut Debian LTS).",
+   "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 188.40.3.130: Debian GNU/Linux 12 (in Langzeitpflege (LTS) bis 30.06.2028 laut Debian).",
    "title": "Serversoftware mit laufender Herstellerpflege"
+  },
+  {
+   "cat": "C",
+   "checks": [
+    "dkim_missing"
+   ],
+   "provenance": [
+    {
+     "check": "dkim_missing",
+     "field": "positive",
+     "members": [
+      "junkerwerk.hu"
+     ],
+     "statement": "positive.title",
+     "text": "DKIM vorhanden"
+    },
+    {
+     "check": "dkim_missing",
+     "field": "positive",
+     "members": [
+      "junkerwerk.hu"
+     ],
+     "statement": "positive.text",
+     "text": "Für die Domain junkerwerk.hu (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+    }
+   ],
+   "subjects": [
+    "junkerwerk.hu"
+   ],
+   "text": "Für die Domain junkerwerk.hu (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+   "title": "DKIM vorhanden"
   },
   {
    "cat": "C",
@@ -2825,48 +2941,6 @@
    ],
    "text": "Für die Domain junkerwerk.hu weisen die Nameserver einen vollständigen Zonentransfer ab.",
    "title": "Zonentransfer abgewiesen"
-  },
-  {
-   "cat": "C",
-   "checks": [
-    "spf_missing",
-    "dkim_missing"
-   ],
-   "provenance": [
-    {
-     "check": "spf_missing,dkim_missing",
-     "field": "positive",
-     "members": [
-      "junkerwerk.hu",
-      "junkerwerk.hu"
-     ],
-     "statement": "positive.title",
-     "text": "Absender-Authentizität mit SPF und DKIM hinterlegt"
-    },
-    {
-     "check": "spf_missing",
-     "field": "positive",
-     "members": [
-      "junkerwerk.hu"
-     ],
-     "statement": "positive.text",
-     "text": "Für die Domain junkerwerk.hu ist ein SPF-Eintrag veröffentlicht."
-    },
-    {
-     "check": "dkim_missing",
-     "field": "positive",
-     "members": [
-      "junkerwerk.hu"
-     ],
-     "statement": "positive.text",
-     "text": "Für die Domain junkerwerk.hu ist eine DKIM-Signatur veröffentlicht."
-    }
-   ],
-   "subjects": [
-    "junkerwerk.hu"
-   ],
-   "text": "Für die Domain junkerwerk.hu ist ein SPF-Eintrag veröffentlicht. Für die Domain junkerwerk.hu ist eine DKIM-Signatur veröffentlicht.",
-   "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
   },
   {
    "cat": "E",
@@ -2926,7 +3000,7 @@
     "fqdns": "junkerwerk.hu, www.junkerwerk.hu",
     "ip": "188.40.3.130",
     "more_ips": [],
-    "operator": "Hetzner Online AG (dedi2230.your-server.de)",
+    "operator": "Hetzner Online GmbH (dedi2230.your-server.de)",
     "role": "E-Mail-Versand laut SPF · geteiltes System beim Hoster"
    },
    {
@@ -2943,10 +3017,7 @@
   "limitations": [
    {
     "checks": [
-     "Sicherheits-Header",
-     "Suche nach nicht verlinkten Pfaden",
-     "Transportverschlüsselung",
-     "Webanalyse"
+     "Web-, Header- und TLS-Prüfungen"
     ],
     "code": "blocked",
     "detail": "Betroffen: 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu).",
@@ -2970,18 +3041,27 @@
    },
    {
     "checks": [
-     "Bekannte Schwachstellen der erkannten Versionen"
+     "Abgleich mit Schwachstellendatenbanken"
     ],
     "code": "no_enrichment",
-    "detail": "Betroffen: 217.243.248.30 (openotp.junkerwerk.hu).",
-    "refs": [
-     "cve_kev_listed|217.243.248.30",
-     "cve_known_version|217.243.248.30"
+    "detail": "Betroffen: 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu).",
+    "refs": [],
+    "subjects": [
+     "188.40.3.130"
     ],
+    "what": "Keine Fremdbewertung aus Schwachstellendatenbanken zu den erkannten Versionen"
+   },
+   {
+    "checks": [
+     "Suche nach nicht verlinkten Pfaden"
+    ],
+    "code": "path_aborted",
+    "detail": "Betroffen: openotp.junkerwerk.hu (keine Verbindung).",
+    "refs": [],
     "subjects": [
      "217.243.248.30"
     ],
-    "what": "Keine Fremdbewertung aus Schwachstellendatenbanken zu den erkannten Versionen"
+    "what": "Suche nach nicht verlinkten Pfaden abgebrochen"
    },
    {
     "checks": [
@@ -3016,18 +3096,6 @@
    },
    {
     "checks": [
-     "Suche nach sensiblen Dateien"
-    ],
-    "code": "wordlist_missing",
-    "detail": "Betroffen: 217.243.248.30 (openotp.junkerwerk.hu).",
-    "refs": [],
-    "subjects": [
-     "217.243.248.30"
-    ],
-    "what": "Wortliste im Scanner fehlte"
-   },
-   {
-    "checks": [
      "Ermittlung der Hostnamen"
     ],
     "code": "timeout",
@@ -3053,7 +3121,7 @@
    {
     "n": "2",
     "name": "Tiefenprüfung",
-    "text": "Analyse der Transportverschlüsselung, der Sicherheits-Header und der HTTP-Antworten je virtuellem Host, Verzeichnis-Enumeration und passive Webanalyse."
+    "text": "Analyse der Transportverschlüsselung, der Sicherheits-Header und der HTTP-Antworten je virtuellem Host, passive Webanalyse; die Suche nach nicht verlinkten Pfaden war nicht belastbar (siehe Einschränkungen)."
    },
    {
     "n": "3",

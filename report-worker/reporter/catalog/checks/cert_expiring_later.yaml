@@ -47,15 +47,37 @@ texts:
       text: >-
         Für {n:den Dienst|die Dienste} {group} lief das eingesetzte TLS-Zertifikat nach dem Scan ab: {affected}.
         Ist es inzwischen nicht erneuert, sehen alle Nutzer eine Vertrauenswarnung.
+    # S6b-4 (spec/11 T14, R18): zwischen Scantag und Berichtsdatum faellt die Restlaufzeit unter
+    # die Grenze fuer eine kurzfristige Erneuerung (huendgen: am Scantag 17, am Berichtsdatum
+    # hoechstens 14 Tage).
+    - when: days_until(tls.cert.not_after, report_date) >= 0 and days_until(tls.cert.not_after, report_date) <= CERT_SOON_DAYS
+      quantor: eines
+      text: >-
+        Am Berichtsdatum liegt der Ablauf höchstens zwei Wochen entfernt; die Dringlichkeit dieses
+        Befunds bezieht sich auf den Scantag.
+    - when: tls.cert.renewal is not None and len(tls.cert.renewal.recent_leads) > 0
+      quantor: eines
+      text: >-
+        Laut den öffentlichen Zertifikatsprotokollen (CT-Logs) wird dieses Zertifikat regelmäßig
+        erneuert; das zuletzt beobachtete Muster und das danach erwartete Datum stehen im Nachweis.
   meaning: >-
     Läuft das Zertifikat ab, ohne dass eine Erneuerung vorbereitet ist, sehen alle Nutzer eine
     Vertrauenswarnung oder einen Verbindungsabbruch. Mit dem verbleibenden Vorlauf lässt sich die
     Erneuerung planmäßig erledigen.
   recommendation:
+    - stage: in_kuerze
+      when: days_until(tls.cert.not_after, report_date) <= CERT_SOON_DAYS
+      quantor: eines
+      text: >-
+        Prüfen, ob die Erneuerung inzwischen erfolgt ist, und sie andernfalls vor dem Ablaufdatum
+        durchführen.
     - stage: mittelfristig
+      when: days_until(tls.cert.not_after, report_date) > CERT_SOON_DAYS
+      quantor: eines
       text: >-
         Die Erneuerung des Zertifikats vor dem Ablaufdatum einplanen und durchführen.
     - stage: strategisch
+      when: tls.cert.renewal is None or len(tls.cert.renewal.recent_leads) == 0
       text: >-
         Eine automatisierte Erneuerung mit ausreichendem zeitlichem Vorlauf einrichten.
   verify: >-

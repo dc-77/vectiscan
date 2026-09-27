@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-26.2 auf tests/golden/facts/14272c00-1145-4675-9b4c-19ce2ead403b.json",
+ "source": "reporter.catalog 2026-09-27.1 auf tests/golden/facts/14272c00-1145-4675-9b4c-19ce2ead403b.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -183,7 +183,7 @@
     "88.99.35.112:465 (SMTPS)",
     "88.99.35.112:587 (Submission)"
    ],
-   "title": "Mailserver beantwortet den Befehl VRFY"
+   "title": "Mailserver bietet den Befehl VRFY an"
   },
   {
    "id": "VS-2026-014",
@@ -294,7 +294,7 @@
     "88.99.35.112: complianz-gdpr 7.1.0 (laut wpscan bekannte Schwachstellen: 6)",
     "88.99.35.112: revslider 6.7.11 (laut wpscan bekannte Schwachstellen: 4)"
    ],
-   "title": "WordPress-Erweiterung mit bekannten Schwachstellen"
+   "title": "WordPress-Erweiterungen mit bekannten Schwachstellen"
   },
   {
    "id": "VS-2026-022",
@@ -414,14 +414,6 @@
   },
   {
    "id": "VS-2026-P12",
-   "check": "spf_missing",
-   "family": "spf_missing",
-   "cat": "C",
-   "group": "dortmund-beach.com",
-   "title": "SPF-Eintrag vorhanden"
-  },
-  {
-   "id": "VS-2026-P13",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",

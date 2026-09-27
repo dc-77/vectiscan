@@ -590,6 +590,128 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
     75338c97 gleich. Halbleer vor einem Kapitelanfang: 2d2d4f39 Seite 30 (vorher 28),
     4e6b6883 Seite 29 (vorher 27), neu f77ccff2 Seite 28 (Merkposten S7).
 
+- S6b-4 (spec/11 T1 bis T16, Teil 3, Entscheidungen E15 bis E23): Faktenschema 1.2.0,
+  Katalog 2026-09-27.1. Neu gebaut: Golden-Fakten aller 21 Aufträge, Reportdaten, HTML-
+  Schnappschuss und die elf abgeleiteten Soll-Listen; geänderte oder neue Einträge tragen
+  `spec11` und `warum`, jede Liste `hinweis_s6b4` mit den entfallenen Einträgen. Die
+  kuratierte `junkerwerk.json` behält ihre Liste; P04 in `expected_map.json` nur noch mit
+  `dkim_missing` (Teil 3 DB P05). Abweichungen je T-Nummer:
+  - T1: Kennung aus `imap-capabilities`, `pop3-capabilities`, `smtp-commands` und dem Banner
+    in `servicefp` ("IMAP über TLS (Dovecot)", "SMTP (Exim)"), aus der Passivquelle
+    ("ManageSieve (Dovecot Pigeonhole)"); "nicht identifiziert" nur noch an huendgen 1000 bis
+    1002 (Regel `service_unidentified`, Karte nach Ampel gelb). Passivports außerhalb der
+    Top 1000 heißen "außerhalb des geprüften Portbereichs" (lumbeck-wolter 4190, junkerwerk
+    SonicWall 4433, bergersysteme und castenow Plesk 8880).
+  - T2: Spaltenkopf "Netzbetreiber (laut AbuseIPDB)", Alias "Hetzner Online GmbH", Anschluss
+    "(Anschluss Vodafone)" bei castenow, Plattformen mit "(CDN)" und Konzern ("A100 ROW GmbH
+    (Amazon, CDN)"); Soll-Liste `spf_authorizes_shared_host` junkerwerk und rescan mit GmbH.
+  - T3: Nachweis je Werkzeuglauf (header_check erste Antwort, Weiterleitungsprüfung,
+    testssl, wpscan, ZAP je eigene Zeile, "bewertet an der Endseite" nur bei anderer
+    Endantwort); XML-RPC mit Adresse und "belegt durch"; VRFY "in der EHLO-Liste"; Gate
+    `nachweis_ohne_regelfakt`.
+  - T4 (E20): `hsts_missing` nicht prüfbar an Fehlerseite und Sicherheitsabfrage; entfallen
+    bergersysteme ftp (403), heuel edi (403) und online (429), die drei letzten
+    Q8-Markierungen (`test_nach_s6b4_keine_q8_markierung_mehr`). heuel online bekommt aus
+    redirect_probe die Positivaussagen HSTS gesetzt und ausreichend (max-age=63072000), der
+    frühere heuel-Lauf 176db198 dagegen einen Befund "HSTS fehlt": dort lieferte die erste
+    echte Antwort (Weiterleitung hinter Cloudflare) keinen Header. Titel "HSTS fehlt" oder
+    "HSTS abgeschaltet (max-age=0)" (dortmund-beach), Verifikation "max-age über null";
+    HSTS-Empfehlung aus `tls_legacy_protocols` entfernt; Positivbefund je Header statt je
+    Port (castenow www, bitwarden, ubb-wiki, mailstore über redirect_probe und umfrage an der
+    301; bergersysteme www; 75338c97 neu); ein nicht prüfbares HSTS an einer Fehlerseite hebt
+    den Positivbefund anderer Namen nicht auf; Gate auf dieselbe Messung. In den API-Snapshot-
+    Läufen ohne `reachable` gilt eine Antwort mit Headern auch für HSTS als Messung (Regel aus
+    Schema 1.1.0): neue HSTS-Befunde in 176db198 (20.79.218.75), 45bb234c, ae8d1d70 und
+    fb13a98f, der HSTS-Positivbefund kommt dort und in 4e6b6883 zurück.
+  - T5 (E15): Berichtsdatum aus `orders.reviewed_at` in Europe/Berlin, sonst Tag der
+    Erzeugung in Berliner Zeit; Fußzeile "Erzeugung n vom …". Die Golden-Reportdaten laufen
+    weiter mit dem festen Stichtag 19.09.2026; `tests/v3/test_s6b4.py` baut die Fälle mit
+    dem 27.09.2026.
+  - T6 (E16): Datum je Adresse in der E5-Zeile (junkerwerk .130 23.09., .28 19.09.) und im
+    Betroffenen der Passivbefunde ("gesehen am"); Regel der Gesamtbewertung unter A.1
+    (`levels.OVERALL_RULE`), unverändert seit S3. Der Vorschlag aus E16 ist nicht umgesetzt,
+    weil er huendgen auf HOCH höbe; alle sieben Gesamtbewertungen unverändert (DB, LW, JW, CA
+    HOCH; HE, BS, HL MITTEL).
+  - T7: Messadresse je Lauf (huendgen 52.59.120.70, heuel 216.150.1.129 und 216.150.16.65,
+    castenow 3.174.98.123 und 18.239.50.54) mit Einschränkungszeile "DNS-Rotation"; AAAA
+    derselben Namen im System und in der Zählung (lumbeck-wolter 1->2 Adressen,
+    bergersysteme 6->8, 57b3ac85 und 176db198 ebenso); Gate-Warnungen
+    `ipv6_ohne_inventar` (4 Aufträge) und `messadresse_ausserhalb_inventar` (9 Meldungen).
+  - T8: Einschränkung je Host aus der Pfadsuche ("nur gegen Weiterleitung, Fehlerseite oder
+    Sicherheitsabfrage, nicht belastbar", "abgebrochen" mit Abwehrmerkmal bei bergersysteme
+    198.202.211.1); Phase 2 nennt die Enumeration nur bei einem belastbaren Lauf
+    (dortmund-beach, junkerwerk .29, castenow bitwarden).
+  - T9 (E18): Zählung nach registrierbarer Domain ohne Hoster-Domains (lumbeck-wolter 2->1
+    flott.de, junkerwerk 3->2); Wortlaut "Auf demselben Server stehen laut Passivquelle n
+    weitere Domains" ohne "anderer Kunden"; castenow 159.69.143.80 "Server von planwerk6.de
+    im Rechenzentrum Hetzner Online GmbH"; Fremdnamen als "Fremddomain"; Shoutcast und
+    Icecast auf dem Hoster-Server fallen aus der Auswertung (castenow `http_alt_port` und
+    `service_banner_version` entfallen) und stehen als Satz im Zuständigkeitskasten.
+  - T10: Kategoriesatz aus den getroffenen Regeln ("preisgegebene Angaben" nur mit
+    Offenlegungsbefund), "n Befunde in m von 5 Kategorien", Rollentexte am Fakt
+    ("Formulareingaben" nur mit gelaufener aktiver Webanalyse, "Unternehmensnetz" nur am
+    Anschluss), MFA mit Bedingung und "prüfen, sonst ergänzen"; Prosa-Gate `FORMULAR`.
+  - T11 (E22): Debian 12 "in Langzeitpflege (LTS) bis 30.06.2028 laut Debian" in 3.1 und im
+    Positivbefund (junkerwerk jetzt mit Positivbefund; eine nicht erreichbare IPv6-Adresse
+    hebt Positivbefunde anderer Hosts nicht mehr auf, deshalb auch RDP/SMB für junkerwerk);
+    Passivbefunde auf E4-Hosts blau mit "vom Prüfstand aus nicht erreichbar" und Rolle aus
+    dem Pfad (bergersysteme IIS 10.0 "Mail-Webzugang (/owa/)").
+  - T12: Hebel je Befund höchstens einmal, Rangfolge bei gleicher Stufe (huendgen: Exchange
+    vor "Zweck klären", Produkt im Hebeltitel), Header-Planzeile je Regel mit allen
+    Befunden, VRFY "angeboten", `dmarc_quarantine` ohne `rua` zuerst "Meldeadresse", DB
+    VS-004 mit allen CVE, Zielversionen und Plural (Soll-Listen: Titel geändert).
+  - T13: Sammelbegriffe, Ursache aus der Scan-Steuerung ("Regel hosted-cms-webflow"), SNI nur
+    aus eigenen testssl-Läufen, Vertrauenskette nur für den eigenen Namen (heuel www),
+    Zeile für Webports ohne Web- und Header-Analyse, Fremdbewertungszeile nur mit Version
+    ohne Abgleich (junkerwerk .130 dazu, castenow .53 heraus).
+  - T14: Erneuerungslinie je SAN-Satz und Aussteller ("zuletzt 7 Tage vor Ablauf erneuert
+    …, nächste Erneuerung nach diesem Muster um den 04.10.2026"); `cert_expiring` mit
+    Variante "am Berichtsdatum abgelaufen, sofern nicht erneuert" in Titel, Hebel, Plan und
+    Nachweis und dem gültigen Zertifikat an 195.50.179.4 und .6; Hinweis, wenn am
+    Berichtsdatum höchstens zwei Wochen bleiben (Stufe bleibt nach E2 am Scantag).
+  - T15: eine Zeile je Produkt über `TECH_ALIASES`, Patch-Status aus wpscan ("veraltet, 12
+    bekannte Lücken, aktuell 28.5.10"), WordPress-Kern aus wpscan, Skript-URLs als zweite
+    Quelle (jQuery Migrate huendgen, Ultimate Member 2.13.1 castenow), nmap `ostype` für
+    Windows (junkerwerk .29), kein Cookiebot und kein Icecast; Anhang C: dortmund-beach
+    17->14, huendgen 5->2 Werkzeugmeldungen.
+  - T16: Posture aus denselben Regeln (castenow SPF Handlungsbedarf, Transport .5 und .6 mit
+    den Zertifikatsbefunden über `pulls`), "Verwaiste Einträge" unauffällig bei gelaufener
+    Abfrage; Service-Karte nach Ampel auch für `service_unidentified` und für Passivports mit
+    Befund (junkerwerk 4433 gelb), Softwarebefunde am Port ihres Belegs (dortmund-beach 30000
+    gelb); Gate auf alle Karten.
+  - Teil 3: junkerwerk BEAST "vermutlich abgeschwächt", Titel "Zusätzliche Mail- und
+    Dateidienste erreichbar (TLS erzwungen)" mit passendem ersten Satz, P04 mit .hu und den
+    Selektoren; huendgen 8443 als Plattformhinweis ohne "Port schließen"; castenow Rollen
+    "Anmeldung zur Website" und "Umfrageplattform (umfrageonline.com), leitet auf die Website
+    weiter", X-Powered-By PHP/8.4.25 als neuer Befund an ubb-wiki, "liesmich.html"; heuel
+    Rolle "Dateiaustausch (FTP, SFTP), Webanwendung mit Anmeldung", Bildunterschriften aus
+    redirect_probe; lumbeck-wolter "SASL (leer)", "Produkt: MariaDB", Hinweiskasten mit den
+    nicht geprüften Namen; bergersysteme VS-003 Betroffene einmal, Verifikation ohne Port 587,
+    Reputation mit der CDN-Adresse; dortmund-beach DMARC mit Meldeadresse und Mailserver beim
+    Dienstleister, SPF-Positivbefund nur bei `-all` oder `redirect=` (entfällt bei ~all in
+    dortmund-beach, lumbeck-wolter, junkerwerk, castenow, heuel).
+  - Zahlen je Auftrag (Befunde, Positivbefunde, Planzeilen, Anhangzeilen, Einschränkungen,
+    IP-Adressen): dortmund-beach 1fbc92b9 14->14, 6->5, 20->19, 17->14, 6->6, 1->1;
+    lumbeck-wolter c3d5724c 5->5, 7->7, 8->8, 0->0, 4->6, 1->2; junkerwerk 31d67a02 16->16,
+    5->7, 22->21, 6->6, 9->10, 4->4; huendgen 3cf01f8d 12->12, 6->8, 16->16, 5->2, 6->8, 2->2;
+    bergersysteme 68d59573 12->12, 5->6, 16->15, 2->1, 12->16, 6->8; castenow 1f8bc977
+    20->18, 12->13, 24->20, 20->18, 12->14, 6->6 (neu "Content-Security-Policy gesetzt"); heuel 2e56abe1 10->9, 6->7, 16->15, 16->17,
+    12->15, 6->6. Übrige: 0bf16342 17->17, 3->3, 30->28; 14272c00 14->14, 6->5, 20->19;
+    176db198 7->8, 4->5, 13->15; 2572eebc 17->17, 5->6, 30->28; 2d2d4f39 29->27, 7->7, 33->28;
+    45bb234c 11->11, 4->4, 15->15; 4e6b6883 29->27, 6->6, 32->28; 57b3ac85 5->5, 7->7, 8->8;
+    75338c97 8->8, 1->2, 11->11; 860d0d5a 16->16, 5->7, 22->21; a6df9d9d 11->11, 7->7,
+    16->16; ae8d1d70 18->18, 4->5, 27->25; f77ccff2 29->27, 8->8, 32->28; fb13a98f 13->13,
+    4->5, 18->18. Gesamtbewertung überall unverändert.
+  - Drift-Test junkerwerk: "gesehen am" und "vermutlich abgeschwächt" kommen aus den
+    Rohdaten des einzelnen Laufs (Shodan-Datum, testssl-Ausgabe) und zählen nicht als Drift
+    (`_LAUF_ZUSATZ`).
+  - Seitenerwartung (ops-update-pages, MR-Pipeline 3221): Scan-Runde 1fbc92b9 28->29,
+    31d67a02 29->30, 68d59573 26->27 (mehr Einschränkungszeilen und Positivbefunde), 1f8bc977
+    35->33, 2e56abe1 24->23 (weniger Befunde und Planzeilen); c3d5724c und 3cf01f8d gleich.
+    Übrige 14272c00 28->29, 176db198 21->23, 2d2d4f39 46->45, 45bb234c 23->22, 4e6b6883 47->44,
+    f77ccff2 45->44. Halbleer vor einem Kapitelanfang nur noch 2d2d4f39 Seite 30; 4e6b6883
+    und f77ccff2 ohne halbleere Seite.
+
 ## Abgleich spec/09 nach S6b-2
 
 Jede in spec/09 als falsch belegte Aussage der sieben Auftraege mit ihrem Stand. "Erledigt"
@@ -726,6 +848,135 @@ Jede Aussage aus spec/10 Teil 1 und Teil 2 mit ihrem Stand. "Erledigt" nennt Ste
 | Teil 2 HL | Java/Servlet an 213.133.104.51, Neos CMS im Anhang, SRI auf `latest`, Fremdbewertungszeile | offen, S7 |
 | Teil 2 HL | help-ev.de "auf derselben Adresse" | erledigt (R17) |
 | Teil 2 HL | "(insgesamt 4 Einträge)" mit drei Namen | erledigt (R6) |
+
+## Abgleich spec/11 nach S6b-4
+
+Jede Aussage aus spec/11 Teil 1 (Reste), Teil 2, Teil 3 und Teil 5 mit ihrem Stand. "Erledigt"
+nennt Stelle und Test (Tests ohne Pfad in `tests/v3/test_s6b4.py`, `tests/test_facts_s6b4.py`,
+`tests/gate/test_v3_checks_s6b4.py`), "offen" den Grund und die Session. Die Aussagen gelten
+den sieben Aufträgen der Scan-Runde; Golden-Stichtag 19.09.2026, Fälle mit Berichtsdatum am
+27.09.2026.
+
+| Stelle | Aussage | Stand |
+|---|---|---|
+| R1 | Nachweisquelle `header_check` bei Werten aus redirect_probe oder ZAP | erledigt (T3) |
+| R1 | HL VS-003 HSTS an der Vercel-429 | erledigt (T4, Soll-Liste heuel-0923) |
+| R1 | HL VS-002 "bewertet an login.seam" ohne Messung dort | erledigt (T3, Zeile je Werkzeuglauf) |
+| R3 | Messung an zweiter Adresse | erledigt (T7) |
+| R3 | JW .28 "vollständig" bei 10 s ZAP | offen: die Laufzeit ist kein Fakt für die Tiefe; ZAP-Konfidenz und -Umfang kommen mit S6c |
+| R3 | CA umfrage "aktive Webanalyse vollständig" an einer 301 | erledigt ("nur an …, einer Weiterleitung auf einen anderen Namen (Status 301)") |
+| R3 | SNI-Listen aus fremden VHosts, BS Scan-Steuerung | erledigt (T13) |
+| R4 | CA bitwarden "Webdienst antwortete nicht" | erledigt (Zeile "Erste Header-Messung ohne Antwort; Seite über die TLS-Prüfung bewertet") |
+| R4 | HL Vertrauenskette nennt heuel.com mit | erledigt (`test_vertrauenskette_nur_fuer_den_eigenen_namen`) |
+| R4 | BS E4-Hosts "der Portscan fand keinen offenen Port" | erledigt ("der Portscan erhielt keine Antwort") |
+| R5 | Numerus bei einem gefundenen Namen (JW) | erledigt (`coverage` Zeile "Gefunden, nicht geprüft") |
+| R5 | LW Hinweiskasten ohne die ungeprüften Namen | erledigt (`test_lw_nachweis_und_hinweiskasten`) |
+| R5 | eset im SPF-Netz des Kunden | offen: Nachscan nach E19 (S6c, zweite Scan-Runde) |
+| R6 | JW Kategorie B grün ohne Quelle | erledigt (T11) |
+| R6 | CDN-Adressen fehlen in der Reputationsliste (CA, BS) | erledigt (`ip_reputation` ohne `applicable_when`, `test_bs_zertifikatsliste_einmal_und_reputation_mit_cdn`) |
+| R6 | P05 "SPF vorhanden" neben Softfail (DB, LW) | erledigt (`spf_missing` positiv nur bei `-all` oder `redirect=`) |
+| R6 | Zonentransfer-Positiv ohne AXFR-Rohausgabe | offen: Rohausgabe im Export (S6c) |
+| R7 | LW "SASL" ohne "(leer)" | erledigt |
+| R8 | CA SPF softfail, Transport unauffällig, HL Header an der 429, Gate | erledigt (T16) |
+| R8 | HL "✔ 217.72.203.132" neben der Vertrauensketten-Einschränkung | erledigt (Zertifikatsregeln ziehen die Zeile nur auf Handlungsbedarf, `pulls`; die Kette steht als Einschränkung) |
+| R9 | 993 und 995 "nicht identifiziert" | erledigt (T1) |
+| R9 | HSTS-Titelbaustein ohne Variante, HSTS in zwei Regeln (JW VS-005 und VS-009) | erledigt (T4; HSTS-Empfehlung aus `tls_legacy_protocols` entfernt) |
+| R9 | Auswirkungs-Dubletten `admin_panel_hoster` und `admin_service_exposed_passive` | erledigt (T12) |
+| R9 | CA ubb-wiki "Redaktionszugang" | erledigt (Rolle "Anmeldung zur Website") |
+| R9 | HE VS-011 erster Satz führt X-FEServer unter "Version" | offen, S7: die Betroffenenliste steht je Befund, nicht je Aussage |
+| R10 | JW .28 mit dem Datum von .130 | erledigt (T6) |
+| R11 | Header-Planzeile je Befund, VRFY zwei Zeilen, Hebel 1 und 2 aus einem Befund, DMARC ohne `rua` | erledigt (T12) |
+| R13 | "Unternehmensnetz" bei DB und BS, MFA ohne Bedingung, "Formulareingaben" ohne Webanalyse | erledigt (T10) |
+| R13 | Firmennamen mit Quelle `recherche` | Gate-Warnung erledigt (E23); Namen setzt Claude nach dem Merge (Admin-API) |
+| R14 | `Webabruf · argument:host_inventory` | erledigt (Nachweis nennt `phase0/host_inventory.json`) |
+| R14 | "Capabilities flags: 65534 Some (Auszug)" | offen, S7 (Kürzung an Wortgrenze, der Rest des nmap-Skripts ist abgeschnitten) |
+| R14 | `AUTH=CRAM-MD5A0001` (BS, CA) | erledigt (Antwortmarke nach Ziffer) |
+| R14 | rohe Quellennamen in 3.1 (`cms_fingerprint`, `redirect_probe`, `zap_spider`) | offen, S7 (Anzeigenamen der Quellen) |
+| R14 | "Keine Fremdbewertung" trotz wpscan (CA) und ohne .130 (JW) | erledigt (T13) |
+| R14 | BEAST-Rohtext englisch (JW) | erledigt für das Urteil ("laut testssl vermutlich abgeschwächt"); die Ausgabezeile bleibt wörtlich |
+| R14 | roher nmap-Rest `10000/tcp open snet-sensor-mgmt`, `1000/tcp open cadlock` | offen, S7 (Werkzeugzeile unter der Detailzeile) |
+| R15 | BREACH und LUCKY13 mit Sammelsatz, ZAP-Unterregeln unter einem Titel | offen, S7 |
+| R15 | "Konfidenz niedrig" und Anzahlen | offen, S6c (Export) |
+| R15 | "ohne zweite Quelle" bei Skript-URLs und JW Windows | erledigt (T15) |
+| R15 | X-AspNet-Version doppelt bewertet und "nicht eingeflossen" (JW) | offen, S7 |
+| R16 | "laut RIPE" | erledigt (T2, E17) |
+| R17 | Zählung mit your-server.de, Fremdnamen in Nachweisen | erledigt (T9) |
+| R18 | CA VS-003 widersprüchlich, HE VS-004 ohne Hinweis, Berichtsdatum vom Vortag | erledigt (T14, T5) |
+| R19 | DB VS-014 Nachweis, VS-012 "beantwortet", liesmich.html, Ultimate Member, 993/995 | erledigt (T3, T12, Teil 3, T15, T1) |
+| R20 | Darstellung | offen, S7 |
+| T1 | Kennung aus Capabilities, `smtp-commands`, Banner und Shodan-Modul | erledigt (`test_kennung_aus_protokollskript_und_banner`, `test_imaps_und_pop3s_mit_kennung_statt_nicht_identifiziert`) |
+| T1 | "nicht identifiziert" nur mit Regel, Farbe nach Ampel | erledigt (`test_nicht_identifiziert_nur_mit_regel_und_nach_ampel`) |
+| T1 | "außerhalb des geprüften Portbereichs" | erledigt (`test_passivport_ausserhalb_des_portbereichs`) |
+| T1 | `-sV --version-all` für `?`-Ports | offen, Scanner (S6c) |
+| T2 | "laut AbuseIPDB", Alias Hetzner, Anschlussbetreiber | erledigt (`test_netzbetreiber_in_2_1`) |
+| T2 | RDAP als Fakt | offen, Scanner (S6c, #35) |
+| T3 | Nachweis je Werkzeuglauf, "bewertet an der Endseite" nur bei Endantwort | erledigt (`evidence._http`) |
+| T3 | XML-RPC mit wpscan-Beleg, VRFY in der EHLO-Liste, Gate | erledigt (`nachweis_ohne_regelfakt`) |
+| T4 | HSTS nicht an 4xx, 429, Challenge; erste echte Antwort aus redirect_probe | erledigt (`build._hsts_measured`, Soll-Listen) |
+| T4 | Titel je Variante, Verifikation `max-age` über null | erledigt (`test_hsts_titel_je_variante`, Text-Fixtures) |
+| T4 | HSTS in einer Regel, Positiv je Header (E20) | erledigt (`PER_RULE_POSITIVE_BUNDLES`) |
+| T4 | Gate auf dieselbe Messung | erledigt (`test_hsts_neben_header_an_der_sicherheitsabfrage_greift`) |
+| T5 | Berichtsdatum nach E15, Erzeugungsdatum in der Fußzeile | erledigt (`test_berichtsdatum_in_berliner_zeit`, `test_worker_berichtsdatum.py`) |
+| T6 | E5-Datum je Adresse | erledigt (`test_e5_datum_je_adresse`) |
+| T6 | Gesamtbewertungsregel dokumentiert und in A.1 | erledigt (`levels.OVERALL_RULE`, Katalog-Changelog 2026-09-27.1); Regel unverändert, siehe E16 |
+| T7 | Messadresse je Fakt, Zeile DNS-Rotation | erledigt (`test_tls_messadresse_je_lauf`, `test_dns_rotation_als_einschraenkung`) |
+| T7 | AAAA ins Inventar, Gate-Warnung | erledigt im Bericht (`test_aaaa_im_system_und_in_der_zaehlung`, `ipv6_ohne_inventar`); aktive Prüfung über IPv6 offen, Scanner (S6c) |
+| T7 | Werkzeuge an die Inventar-IP binden | offen, Scanner (S6c) |
+| T8 | Einschränkungszeile aus feroxbuster- und ffuf-Statistik, "übersprungen" nur bei `ai_skip` beider | erledigt (`test_urteil_der_pfadsuche`, `test_pfadsuche_mit_urteil`) |
+| T8 | Pfadsuche auf die `final_url` | offen, Scanner (S6c) |
+| T9 | Zählung, Wortlaut, Betreiber aus rDNS, Fremdnamen maskiert | erledigt (`test_zaehlung_und_wortlaut_ohne_andere_kunden`, `test_fremdnamen_im_bericht_maskiert`) |
+| T9 | "Server der Webagentur planwerk6.de" | teilweise: "Server von planwerk6.de im Rechenzentrum Hetzner Online GmbH"; "Webagentur" ist aus den Rohdaten nicht belegt |
+| T9 | Vertragsform LW, JW, HL | offen, DC mit dem Kunden (E18) |
+| T10 | Sätze aus getroffenen Kategorien, Rollen- und Auswirkungstexte am Fakt, MFA bedingt | erledigt (`test_kategorien_nur_aus_getroffenen_regeln`, `test_rollentexte_am_fakt`) |
+| T11 | Lebenszyklusquelle sichtbar, "in Langzeitpflege bis" | erledigt (`test_langzeitpflege_mit_quelle_in_3_1`) |
+| T11 | E22 für BS | erledigt (`test_passivbefund_auf_e4_host_als_blauer_hinweis`) |
+| T12 | Dubletten, Hebel je Befund, VRFY, Header-Planzeile, DMARC ohne `rua`, E4-Wortlaut | erledigt (`test_hebel_je_befund_hoechstens_einmal` und folgende) |
+| T13 | Sammelbegriffe, Ursache aus der Steuerung, SNI, Fremdbewertungszeile | erledigt (`test_ursache_aus_der_scan_steuerung`, `test_fremdbewertungszeile_nur_mit_version_ohne_abgleich`) |
+| T14 | E13 je Linie mit erwartetem Datum | erledigt (`test_erneuerungslinie_je_aussteller`, `test_erneuerungsmuster_im_nachweis`) |
+| T14 | `cert_expiring` "am Berichtsdatum abgelaufen", gültiges Zertifikat an .4 und .6 | erledigt (`test_am_berichtsdatum_abgelaufen_sofern_nicht_erneuert`) |
+| T14 | Hinweis bei unterschrittener Grenze | erledigt als Hinweis im Befund; die Stufe bleibt nach E2 am Scantag (`test_stufenwechsel_bis_zum_berichtsdatum`) |
+| T15 | Alias, Patch-Status aus wpscan, Skript-URLs, Fremddienste | erledigt (`test_eine_zeile_je_produkt_mit_wpscan_status`, `test_fremde_und_eingebundene_dienste_nicht_in_3_1`) |
+| T16 | Posture je Regel, Service-Karte, Gate auf alle Karten | erledigt (`test_posture_aus_denselben_regeln`, `test_service_karte_ueber_den_softwareport`, `test_softfail_neben_gelbem_befund_greift`) |
+| Teil 3 DB | Dubletten in 3.1, WordPress "aktuell" | erledigt (T15) |
+| Teil 3 DB | Webmin und froxlor fehlen in 3.1 | offen, S7: ohne Version keine Technikzeile nach der Regel vom 26.09.; beide stehen als Befund VS-001 |
+| Teil 3 DB | VS-004 alle CVE, Zielversionen, Plural | erledigt (`test_wordpress_erweiterungen_alle_cves_und_zielversionen`) |
+| Teil 3 DB | MX und `rua` beim Dienstleister, P05 nur bei `-all` | erledigt (`test_db_dmarc_beim_dienstleister_und_p05_nur_bei_hardfail`) |
+| Teil 3 DB | E5-Datum `last_update`, 30000 grün | erledigt (T6, T16) |
+| Teil 3 DB | VS-014, VS-012, pflege-Zeile | erledigt (T3, T12, T13) |
+| Teil 3 DB | Anhang C URLhaus trotz `no_data`, VS-010 "interne Servernamen", Anhang D "Doppelmeldungen" | offen, S7 |
+| Teil 3 DB | Betriebsform "kunde" für den Hetzner-Server | offen, DC (E23, Kundenkontext) |
+| Teil 3 LW | IPv6, Zählung, 993/995/Exim/4190, Kategorien, Hinweiskasten, LTS, SASL, MariaDB | erledigt (T7, T9, T1, T10, Teil 3, T11) |
+| Teil 3 LW | P06 "SPF und DKIM hinterlegt" neben Softfail | erledigt (Positivbefund nur noch "DKIM vorhanden") |
+| Teil 3 LW | VS-004 Auswirkung nennt DANE neben "DANE entfällt"; Posture "Zertifikate nicht prüfbar" trotz nmap-Mailport-Zertifikaten; autodiscover doppelt; Kürzung im Wort | offen, S7 |
+| Teil 3 JW | VS-002 Datum und Portbereich, VS-010 Variante, P04 .hu und Selektoren, BEAST, Posture Verwaiste Einträge | erledigt (`test_jw_*`) |
+| Teil 3 JW | Service-Karte 4433 grau trotz Gelb | erledigt (Passivport mit Befund nach Ampel, `test_jw_sonicwall_mit_datum_und_portbereich`) |
+| Teil 3 JW | RDP/SMB-Positiv für .28 und .29 | erledigt (nicht erreichbare IPv6-Adresse hebt ihn nicht mehr auf) |
+| Teil 3 JW | `tech_profiles[0]` intern, junkerwerk.hu ohne Hostsuche, "Tiefenprüfung (7 Hostnamen)", LUCKY13 ohne team | offen, S6c und S7 |
+| Teil 3 JW | X-AspNet-Version doppelt, SPF `a` für .hu nie aufgelöst | offen, S7 und S6c |
+| Teil 3 HE | 52.59.120.70, 8443 Plattformhinweis, Hebelreihung, Cookiebot, A100 ROW mit Amazon | erledigt (T7, `test_he_8443_als_plattformhinweis`, `test_he_hebelreihung_lebenszyklus_vor_zweck`, T15, T2) |
+| Teil 3 HE | stille Ausfälle, `/ecp` und `/EWS` | Einschränkung erledigt (T8); Pfade offen, Scanner (S6c) |
+| Teil 3 HE | P01 bis P03 "wie drei Orte", "Keine Fremdbewertung" für .23 ohne Version | erledigt für die Fremdbewertungszeile (T13); P01 bis P03 offen, S7 |
+| Teil 3 HE | 444 blau ohne Rolle, `Outlook Web App:15.2.1748` roh, Anhang D Satz | offen, S7 |
+| Teil 3 BS | IIS E4 (E22), Kategorien, IPv6, Cloudflare, jQuery, Scan-Steuerung, SNI, Pfadsuche, HSTS-Positiv www, Netzbetreiber, VS-001 Dubletten, VS-003 einmal und ohne 587, Reputation mit CDN | erledigt |
+| Teil 3 BS | CDN-Standardports 2052 bis 2096 und 8880 ohne Hinweis auf die Kante | offen, S7 |
+| Teil 3 BS | "Formulareingaben" bei übersprungener Webanalyse | erledigt (T10) |
+| Teil 3 CA | VS-003 mit Wildcard-Zertifikat, Vodafone, T8, T7, T9, T3, T12, T16, T15 | erledigt |
+| Teil 3 CA | bitwarden (R4), ubb-wiki-Rolle, umfrage-Rolle, X-Powered-By an der Endseite, liesmich.html, VS-011 und VS-016 | erledigt (`test_ca_rollen_und_liesmich`, `test_fremde_dienste_im_zustaendigkeitskasten`) |
+| Teil 3 CA | BREACH an der 301, drei OWA-Fotos, umfrage-Foto, Hinweiskasten "4 statt 3 Systeme", VS-003-Kopf am Seitenfuß | offen, S7 |
+| Teil 3 CA | Vorabmeldung mailstore (E21) | offen, DC |
+| Teil 3 HL | VS-003 an der 429, VS-002 Nachweis, 216.150.1.65, Vertrauenskette nur www, 993/995, Netzbetreiber, Rolle 20.79.218.75, Kategorien, HSTS-Titel, Pfadsuche, SNI, Bildunterschriften, Posture | erledigt |
+| Teil 3 HL | VS-005 ohne Host im Titel, Java/Servlet an 213.133.104.51, Neos, SRI auf `latest`, Fremdbewertungszeile mit OpenSSH 9.2p1 | offen, S7 |
+| Teil 3 HL | E5-Datum als Host-`last_update` | erledigt (T6, Zeitstempel des Dienstes) |
+| Teil 3 HL | control.heuel.com "liegen nicht vor", Port-21-Zeile, P02 ohne "beim Hoster", CSP und Timestamp an online | offen, S7 |
+| E15 | Berichtsdatum | erledigt (T5) |
+| E16 | Gesamtbewertung | Regel benannt und in A.1, Changelog; der Vorschlag (HOCH auch bei Gelb In Kürze am Kundensystem) ist nicht umgesetzt, weil er huendgen auf HOCH höbe; offene Frage an DC |
+| E17 | Netzbetreiber laut AbuseIPDB | erledigt (T2) |
+| E18 | Zählung und Wortlaut | erledigt (T9); Vertragsform offen, DC |
+| E19 | Nachscan | offen, zweite Scan-Runde nach S6c |
+| E20 | HSTS-Positiv je Header | erledigt (T4) |
+| E21 | Vorabmeldung CA mailstore | offen, DC |
+| E22 | Passivbefunde auf E4-Hosts blau | erledigt (T11) |
+| E23 | Firmenname aus der Recherche | Gate-Warnung erledigt; bestätigte Namen setzt Claude nach dem Merge |
 
 ## Golden-Facts (S1)
 

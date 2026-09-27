@@ -8,6 +8,8 @@ group_by: host
 scope: passive
 applicable_when: null
 when: passive.source == "shodan" and passive.verified is False and admin_fp(passive) and not is_cdn(host, services)
+# S6b-4 (spec/11 T11, E22): blauer Hinweis auf Hosts, die vom Pruefstand aus nicht erreichbar sind.
+hint_when: host.reach is not None and host.reach.status in ["unreachable_from_scanner", "no_response"]
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
@@ -15,7 +17,8 @@ requires:
   tools: [shodan]
 kind: check
 bundle: admin_access
-affected_template: "{host_ip}:{port} ({product_or_banner}, laut Passivquelle)"
+# S6b-4 (spec/11 Teil 3 JW VS-002): mit dem Datum der Passivquelle.
+affected_template: "{host_ip}:{port} ({product_or_banner}, laut Passivquelle, gesehen am {seen_date})"
 evidence: [passive]
 references: [CWE-284, CISA-KEV]
 frameworks:
@@ -44,14 +47,26 @@ texts:
     - when: not any_admin_fp(services)
       quantor: eines
       text: >-
-        Eine Passivquelle meldet für {group} eine Verwaltungsoberfläche, die der Portscan nicht
-        bestätigen konnte: {affected}. Der Port liegt außerhalb der geprüften Ports oder war vom
-        Scanner aus gefiltert.
+        Eine Passivquelle meldet für {group} eine Verwaltungsoberfläche: {affected}.
     - when: any_admin_fp(services)
       quantor: eines
       text: >-
-        Eine Passivquelle meldet auf {group} einen weiteren Port derselben Verwaltungsoberfläche,
-        den der Portscan nicht bestätigen konnte: {affected}.
+        Laut Passivquelle ist dieselbe Verwaltungsoberfläche auf {group} zusätzlich über einen
+        weiteren Port erreichbar: {affected}.
+    # S6b-4 (spec/11 T1, T11): warum der Portscan den Port nicht bestaetigt, je Fall.
+    - when: host.reach is not None and host.reach.status in ["unreachable_from_scanner", "no_response"]
+      quantor: eines
+      text: >-
+        Der Host ist vom Prüfstand aus nicht erreichbar; die Angabe der Passivquelle ist deshalb
+        nicht bestätigt.
+    - when: (host.reach is None or host.reach.status not in ["unreachable_from_scanner", "no_response"]) and port_scanned(scan, passive.port) is False
+      quantor: eines
+      text: >-
+        Der Port liegt außerhalb des geprüften Portbereichs; der Portscan hat ihn nicht erfasst.
+    - when: (host.reach is None or host.reach.status not in ["unreachable_from_scanner", "no_response"]) and port_scanned(scan, passive.port) is not False
+      quantor: eines
+      text: >-
+        Der Portscan hat den Port nicht bestätigt.
   meaning:
     - when: host.shared is None and host.betriebsform == "anschluss"
       quantor: eines
@@ -63,7 +78,9 @@ texts:
       text: >-
         Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft
         das gesamte System und alle Dienste darauf.
-    - when: host.shared is not None
+    # S6b-4 (spec/11 T12): ist die Oberflaeche auf dem Host aktiv erkannt, traegt die aktive Regel
+    # die Auswirkung; der Satz stand bei bergersysteme und castenow zweimal im selben Befund.
+    - when: host.shared is not None and not any_admin_fp(services)
       quantor: eines
       text: >-
         Eine Übernahme der Verwaltungsoberfläche beträfe alle Dienste auf diesem geteilten

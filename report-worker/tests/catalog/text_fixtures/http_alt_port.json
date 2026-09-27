@@ -18,12 +18,17 @@
     "holds": {
      "10.0.0.1:8000": [
       "observation[1]",
-      "recommendation[0]"
+      "recommendation[0]",
+      "recommendation[2]",
+      "verify[0]"
      ]
     },
     "not_holds": {
      "10.0.0.1:8000": [
-      "recommendation[1]"
+      "observation[2]",
+      "recommendation[1]",
+      "recommendation[3]",
+      "verify[1]"
      ]
     }
    }
@@ -45,13 +50,62 @@
    "expect": {
     "holds": {
      "10.0.0.1:8000": [
-      "recommendation[1]"
+      "recommendation[1]",
+      "recommendation[2]",
+      "verify[0]"
      ]
     },
     "not_holds": {
      "10.0.0.1:8000": [
       "observation[1]",
-      "recommendation[0]"
+      "observation[2]",
+      "recommendation[0]",
+      "recommendation[3]",
+      "verify[1]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "S6b-4: Port 8443 auf einer Mandantenplattform (huendgen), Plattformhinweis ohne Port schliessen",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.0.1",
+      "shared": {
+       "kind": "platform",
+       "operator": "Plattform AG",
+       "signals": [
+        "fremde_namen_zertifikat"
+       ]
+      }
+     }
+    ],
+    "services": [
+     {
+      "host_ip": "10.0.0.1",
+      "port": 8443,
+      "service": "https-alt",
+      "unidentified": false,
+      "kennung": "Webserver der Plattform"
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "10.0.0.1:8443": [
+      "observation[2]",
+      "recommendation[3]",
+      "verify[1]"
+     ]
+    },
+    "not_holds": {
+     "10.0.0.1:8443": [
+      "recommendation[0]",
+      "recommendation[1]",
+      "recommendation[2]",
+      "verify[0]"
      ]
     }
    }

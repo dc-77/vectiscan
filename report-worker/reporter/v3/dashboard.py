@@ -34,7 +34,8 @@ def severity_of(finding: Finding) -> str:
     """Stufe eines Befunds fuer das Dashboard, aus derselben Tabelle wie die Farbe."""
     if finding.status == "rot":
         return "CRITICAL"
-    return L.severity_for(finding.scale, finding.level)
+    # S6b-4 (E22): ein blauer Hinweis steht auch im Dashboard als niedrige Stufe.
+    return L.severity_for(finding.scale, finding.level, hint=finding.status == "blau")
 
 
 def _finding(finding: Finding, severity: str) -> dict[str, Any]:
@@ -127,6 +128,10 @@ _TECH_STATUS: dict[str, tuple[str, str]] = {
     "eol": ("eol", "eol"),
     "supported": ("current", "aktuell"),
     "unknown": ("unbekannt", "unbekannt"),
+    # S6b-4 (spec/11 T11, T15): derselbe Patch-Status wie die Technologietabelle.
+    "lts": ("current", "Langzeitpflege"),
+    "outdated": ("outdated", "veraltet"),
+    "insecure": ("outdated", "unsicher"),
 }
 
 # Faktenart -> Kategorie im Vokabular des alten Builders.
@@ -155,7 +160,8 @@ def tech_row(line: TechLine) -> dict[str, Any]:
     Status eol (TechTable.tsx zeigt jedes gesetzte Datum als "EOL <Datum>"), kein
     Patchstand, keine CVE-Zuordnung.
     """
-    status, patch_status = _TECH_STATUS.get(line.eol_status, _TECH_STATUS["unknown"])
+    status, patch_status = _TECH_STATUS.get(line.patch, _TECH_STATUS["unknown"])
+    patch_status = line.status_text or patch_status
     return {
         "name": line.product,
         "version": "" if line.version == UNKNOWN else line.version,

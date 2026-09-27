@@ -19,7 +19,8 @@ requires:
   tools: [testssl]
 kind: check
 bundle: tls_hardening
-affected_template: "{target} ({name})"
+# S6b-4 (spec/11 Teil 3 JW): BEAST "vermutlich abgeschwächt", wenn testssl das so meldet.
+affected_template: "{target} ({name_label})"
 evidence: [tls]
 references: [CWE-327]
 frameworks:

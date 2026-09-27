@@ -30,12 +30,20 @@
    "expect": {
     "holds": {
      "www.example.test@10.0.0.1": [
-      "observation[0]"
+      "observation[0]",
+      "meaning[0]",
+      "recommendation[0]",
+      "verify[0]",
+      "short_variants[1]"
      ]
     },
     "not_holds": {
      "www.example.test@10.0.0.1": [
-      "observation[1]"
+      "observation[1]",
+      "meaning[1]",
+      "recommendation[1]",
+      "verify[1]",
+      "short_variants[0]"
      ]
     }
    }
@@ -71,12 +79,20 @@
    "expect": {
     "holds": {
      "www.example.test@10.0.0.1": [
-      "observation[1]"
+      "observation[1]",
+      "meaning[1]",
+      "recommendation[1]",
+      "verify[1]",
+      "short_variants[0]"
      ]
     },
     "not_holds": {
      "www.example.test@10.0.0.1": [
-      "observation[0]"
+      "observation[0]",
+      "meaning[0]",
+      "recommendation[0]",
+      "verify[0]",
+      "short_variants[1]"
      ]
     }
    }

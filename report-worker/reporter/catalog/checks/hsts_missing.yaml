@@ -11,9 +11,19 @@ item_when: null
 # S6b-3 (spec/10 R1, R9, Entscheidung DC 3): HSTS gilt an jeder Antwort, auch an einer
 # Weiterleitung. max-age=0 schaltet HSTS ab und steht hier als eigene Variante, nicht als
 # "kurze Gueltigkeit".
+# S6b-4 (spec/11 T4, E20): gemessen wird an der ersten echten Antwort (header_check, sonst
+# redirect_probe). Eine Fehlerseite (4xx) oder Sicherheitsabfrage der Plattform (429,
+# Challenge) wird nie bewertet; ohne echte Antwort ist HSTS nicht pruefbar (heuel online:
+# Befund an der Vercel-Abwehrseite gegen die eigene Einschraenkung).
 when: http.hsts.present is False or http.hsts.max_age == 0
 positive_when: http.hsts.present is True and http.hsts.max_age != 0
 not_testable_when:
+  - when: http.hsts is None and http.header_eval.basis in ["client_error", "server_error"]
+    reason_code: headers_error_only
+    context: item
+  - when: http.hsts is None and http.header_eval.basis == "challenge"
+    reason_code: headers_challenge_only
+    context: item
   - when: http.hsts is None
     reason_code: unreachable
     context: item
@@ -38,7 +48,14 @@ policy:
     Downgrade-Schutz betrifft jeden Aufruf des Hosts ueber HTTP gleichermassen, daher fuehrt die
     Simulation die Pruefung als Hygiene mittel (catalog_sim, S2-Auftrag).
 texts:
+  # S6b-4 (spec/11 T4): Kurzform je Variante; die Standardform gilt nur, wenn beide Varianten
+  # im selben Befund vorkommen.
   short: "HSTS fehlt oder ist abgeschaltet"
+  short_variants:
+    - when: http.hsts.present is True and http.hsts.max_age == 0
+      text: "HSTS abgeschaltet (max-age=0)"
+    - when: http.hsts.present is False
+      text: "HSTS fehlt"
   plan:
     lever: "HTTP Strict Transport Security setzen"
     effect: "Verhindert unverschlüsselte Aufrufe der Webseite"
@@ -54,17 +71,42 @@ texts:
         HSTS abgeschaltet: {n:der Dienst|die Dienste} {group} {n:setzt|setzen} den Header
         Strict-Transport-Security mit max-age=0 und {n:hebt|heben} die Festlegung auf die
         verschlüsselte Verbindung damit auf: {affected}.
-  meaning: >-
-    Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine
-    unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift.
+  meaning:
+    - when: http.hsts.present is False
+      quantor: eines
+      text: >-
+        Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine
+        unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift.
+    - when: http.hsts.present is True and http.hsts.max_age == 0
+      quantor: eines
+      text: >-
+        Mit max-age=0 löscht der Browser eine bestehende Festlegung auf die verschlüsselte
+        Verbindung; jeder spätere Aufruf über HTTP kann wieder unbemerkt abgefangen oder auf eine
+        unverschlüsselte Verbindung heruntergestuft werden.
   recommendation:
     - stage: mittelfristig
+      when: http.hsts.present is False
+      quantor: eines
       text: >-
         Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen,
         sobald der Hostname dauerhaft über HTTPS erreichbar ist.
-  verify: >-
-    HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header
-    Strict-Transport-Security.
+    - stage: mittelfristig
+      when: http.hsts.present is True and http.hsts.max_age == 0
+      quantor: eines
+      text: >-
+        Im Header Strict-Transport-Security einen Wert max-age über null setzen, empfohlen
+        mindestens ein Jahr (max-age=31536000).
+  verify:
+    - when: http.hsts.present is False
+      quantor: eines
+      text: >-
+        HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header
+        Strict-Transport-Security.
+    - when: http.hsts.present is True and http.hsts.max_age == 0
+      quantor: eines
+      text: >-
+        HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein max-age über null,
+        empfohlen mindestens ein Jahr.
   positive:
     title: HTTP Strict Transport Security gesetzt
     text: >-

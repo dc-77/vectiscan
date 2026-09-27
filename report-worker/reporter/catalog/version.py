@@ -82,13 +82,28 @@ Bump-Historie:
                   Berichtstag als Bezug fuer Fristen (`report_date`), Effekt je Empfehlungsstufe
                   (`Recommendation.effect`), Ignorierliste mit `covered_by`, Texte nach
                   Betriebsform statt "Anschluss" (R13).
+    2026-09-27.1  S6b-4 (spec/11 T1 bis T16): Varianten fuer Kurztitel, Hebel und Effekt
+                  (`texts.short_variants`, `plan.lever_variants`, `plan.effect_variants`),
+                  Planzeile je Regel (`plan.per_rule_action`), blauer Hinweis fuer
+                  Passivbefunde ohne erreichbaren Host (`hint_when`, E22), gesammelte
+                  Gruppenvariablen `valid_elsewhere` und `target_versions`, Numerus
+                  `{m:Einzahl|Mehrzahl}` nach der Zahl der Betroffenen, Bindung
+                  `port_scanned`. `hsts_missing` nicht pruefbar an Fehlerseite und
+                  Sicherheitsabfrage, Titel "HSTS fehlt" oder "HSTS abgeschaltet
+                  (max-age=0)" (E20); `cert_expiring` "am Berichtsdatum abgelaufen, sofern
+                  nicht erneuert" (T14); VRFY "angeboten"; `http_alt_port` auf einer
+                  Mandantenplattform ohne "Port schliessen". Die Regel der Gesamtbewertung
+                  (schlechteste Kategorieampel, `reporter/v3/levels.py::OVERALL_RULE`) ist
+                  seit S3 unveraendert; DB und CA stehen seit 2026-09-25.2 durch E1 und E2
+                  (Verwaltungsoberflaeche kritisch, Zertifikat bis sieben Tage rot) auf
+                  HOCH, nicht durch den Schritt 2026-09-26.1 auf 2026-09-26.2 (spec/11 T6).
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-26.2"
+CATALOG_VERSION = "2026-09-27.1"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"

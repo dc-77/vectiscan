@@ -1,6 +1,7 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/dortmund-beach.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
  "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Befunde: hsts_short dortmund-beach.com (+www.dortmund-beach.com) (R9 (Entscheidung DC 3)); entfallene Positivaussagen: hsts_missing dortmund-beach.com (+www.dortmund-beach.com) (R9 (Entscheidung DC 3)); tls_weak_ciphers dortmund-beach.com (+www.dortmund-beach.com) (R6 (CBC-Verfahren angeboten)); urlhaus_compromise dortmund-beach.com (R6 (URLhaus no_data ist kein Negativergebnis)).",
+ "hinweis_s6b4": "S6b-4 (spec/11): Soll-Liste nach Katalog 2026-09-27.1 und Fakten 1.2.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (T-Nummer oder Teil 3) und warum. entfallene Positivaussagen: spf_missing dortmund-beach.com (Teil 3 DB (P05)).",
  "strict": false,
  "orders": {
   "main": "14272c00-1145-4675-9b4c-19ce2ead403b"
@@ -73,7 +74,9 @@
     "smtp_vrfy_enabled"
    ],
    "spec10": "R19",
-   "warum": "VRFY in smtp-commands auf 465 und 587; neue Prüfung."
+   "warum": "VRFY in smtp-commands auf 465 und 587; neue Prüfung.",
+   "spec11": "T12",
+   "warum_spec11": "VRFY in der EHLO-Liste angeboten; der Scan hat VRFY nicht gesendet, also nicht beantwortet."
   },
   "VS-2026-014": {
    "checks": [
@@ -115,7 +118,9 @@
   "VS-2026-021": {
    "checks": [
     "wordpress_plugin_vulnerable"
-   ]
+   ],
+   "spec11": "T12 (Teil 3 DB VS-004)",
+   "warum": "Titel im Plural bei mehreren Erweiterungen."
   },
   "VS-2026-022": {
    "checks": [
@@ -187,11 +192,6 @@
    ]
   },
   "VS-2026-P12": {
-   "checks": [
-    "spf_missing"
-   ]
-  },
-  "VS-2026-P13": {
    "checks": [
     "tls_legacy_protocols"
    ]

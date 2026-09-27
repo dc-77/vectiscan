@@ -61,8 +61,10 @@ def report_bundle_from_source(source: str | Path,
     # stammen, steht in den exportierten Fakten, nicht nur in der Datenbank.
     facts.context = context_from_customer_context(customer_context)
     from reporter.v3.chapters import iso_date, today
-    # S6b-3 (spec/10 R18): Fristen im Text beziehen sich auf den Berichtstag.
-    output = evaluate(facts, report_date=iso_date(report_date or today()))
+    # S6b-3 (spec/10 R18): Fristen im Text beziehen sich auf den Berichtstag. S6b-4 (spec/11 T5,
+    # E15): einmal bestimmt und an Katalog und Reportdaten durchgereicht.
+    report_date = report_date or today()
+    output = evaluate(facts, report_date=iso_date(report_date))
     data = build_report_data(facts, output, order=order,
                              customer_context=customer_context,
                              report_version=report_version, report_date=report_date,

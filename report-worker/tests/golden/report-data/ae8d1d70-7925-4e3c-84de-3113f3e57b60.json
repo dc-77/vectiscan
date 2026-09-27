@@ -13,7 +13,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Korrelation hat 49 Einzelmeldungen der Werkzeuge erfasst. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 18 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
+  "filtering": "Die Korrelation hat 49 Einzelmeldungen der Werkzeuge erfasst. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 18 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -32,7 +32,7 @@
    {
     "host": "212.227.60.78",
     "port": "21",
-    "ref": "VS-2026-008",
+    "ref": "VS-2026-010",
     "svc": "ProFTPD, TLS erzwungen"
    },
    {
@@ -74,7 +74,7 @@
    {
     "host": "212.227.60.78",
     "port": "443",
-    "ref": "VS-2026-004, VS-2026-012",
+    "ref": "VS-2026-004, VS-2026-014",
     "svc": "Apache httpd, TLS erzwungen"
    },
    {
@@ -110,7 +110,7 @@
    {
     "host": "51.116.154.224",
     "port": "443",
-    "ref": "VS-2026-013",
+    "ref": "VS-2026-015",
     "svc": "Titel „Microsoft Azure Web App - Error 404“, TLS erzwungen"
    },
    {
@@ -134,14 +134,14 @@
    {
     "host": "85.22.47.39",
     "port": "443",
-    "ref": "VS-2026-014, VS-2026-016",
+    "ref": "VS-2026-008, VS-2026-016",
     "svc": "Apache httpd 2.4.67, TLS erzwungen"
    },
    {
     "host": "85.22.47.39",
     "port": "465",
     "ref": "",
-    "svc": "SMTP, TLS erzwungen"
+    "svc": "SMTP über TLS, TLS erzwungen"
    },
    {
     "host": "85.22.47.39",
@@ -164,13 +164,13 @@
    {
     "host": "85.22.47.41",
     "port": "80",
-    "ref": "",
+    "ref": "VS-2026-003",
     "svc": "nginx 1.22.1"
    },
    {
     "host": "85.22.47.41",
     "port": "443",
-    "ref": "VS-2026-003, VS-2026-015, VS-2026-016",
+    "ref": "VS-2026-003, VS-2026-009, VS-2026-016",
     "svc": "nginx 1.22.1, TLS erzwungen"
    },
    {
@@ -183,13 +183,13 @@
     "host": "212.227.60.78",
     "port": "8880",
     "ref": "VS-2026-001",
-    "svc": "HTTPS, laut Passivquelle"
+    "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "212.227.60.78",
     "port": "18018",
     "ref": "",
-    "svc": "unbekannt, laut Passivquelle"
+    "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "85.22.47.42",
@@ -216,6 +216,7 @@
     "svc": "Outlook Web App, laut Passivquelle"
    }
   ],
+  "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
   "repeat": [
    "Nachprüfung der Sofortmaßnahmen nach ihrer Umsetzung, gezielt auf die betroffenen Dienste.",
    "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
@@ -255,12 +256,12 @@
     "where": "51.116.154.224, 85.22.47.39, connect.securess.de"
    },
    {
-    "count": 4,
+    "count": 3,
     "message": "jQuery",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
-    "what": "Technik „jQuery“, 4 Meldungen",
-    "where": "51.116.154.224, 85.22.47.39, 85.22.47.41, connect.securess.de"
+    "what": "Technik „jQuery“, 3 Meldungen",
+    "where": "85.22.47.39, 85.22.47.41, connect.securess.de"
    },
    {
     "count": 1,
@@ -474,14 +475,6 @@
    },
    {
     "count": 1,
-    "message": "jQuery",
-    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
-    "rule": "technik",
-    "what": "Technik „jQuery“",
-    "where": "51.116.154.224"
-   },
-   {
-    "count": 1,
     "message": "jQuery UI",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
@@ -586,7 +579,7 @@
    {
     "l": "Blau",
     "st": "blau",
-    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal)."
+    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal). Als blauer Hinweis stehen außerdem Befunde, die nur eine Passivquelle für einen vom Prüfstand aus nicht erreichbaren Host meldet."
    },
    {
     "l": "Grün",
@@ -596,9 +589,9 @@
   ]
  },
  "architecture": {
-  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 12 Systeme mit folgenden Aufgaben: Dateiaustausch, E-Mail-Server, E-Mail-Versand laut SPF und Fernzugang und Verwaltung. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 12 Systeme mit folgenden Aufgaben: Dateiaustausch, E-Mail-Server, E-Mail-Versand laut SPF, Fernzugang und Verwaltung und Webanwendung mit Anmeldung. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
-   "Beobachtungen ohne Regeltreffer, nicht als Befund bewertet: 212.227.60.78:18018 laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.42:443 laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.42:5060 (STARFACE PBX) laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.42:80 laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.43:443 (Outlook Web App) laut Passivquelle, vom Portscan nicht bestätigt; Anmeldung vor STARTTLS angeboten (212.227.60.78:25, laut Passivquelle); Anmeldung vor STARTTLS angeboten (212.227.60.78:25); Anmeldung vor STARTTLS angeboten (85.22.47.39:587)."
+   "Beobachtungen ohne Regeltreffer, nicht als Befund bewertet: 212.227.60.78:18018 laut Passivquelle, außerhalb des geprüften Portbereichs; 85.22.47.42:443 laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.42:5060 (STARFACE PBX) laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.42:80 laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.43:443 (Outlook Web App) laut Passivquelle, vom Portscan nicht bestätigt; Anmeldung vor STARTTLS angeboten (212.227.60.78:25, laut Passivquelle); Anmeldung vor STARTTLS angeboten (212.227.60.78:25); Anmeldung vor STARTTLS angeboten (85.22.47.39:587)."
   ],
   "posture": [
    {
@@ -608,10 +601,12 @@
        "spf_missing",
        "spf_permissive",
        "spf_softfail",
-       "mail_spoofing_unprotected"
+       "mail_spoofing_unprotected",
+       "spf_authorizes_shared_host"
       ],
       "l": "SPF",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "securess.de"
       ],
@@ -623,6 +618,7 @@
       ],
       "l": "DKIM",
       "ok": true,
+      "pulls": [],
       "subjects": [
        "securess.de"
       ],
@@ -637,6 +633,7 @@
       ],
       "l": "DMARC",
       "ok": true,
+      "pulls": [],
       "subjects": [
        "securess.de"
       ],
@@ -648,6 +645,7 @@
       ],
       "l": "MTA-STS",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "securess.de"
       ],
@@ -659,6 +657,7 @@
       ],
       "l": "TLS-RPT",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "securess.de"
       ],
@@ -670,6 +669,7 @@
       ],
       "l": "DANE",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "securess.de"
       ],
@@ -687,6 +687,7 @@
       ],
       "l": "DNSSEC",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "securess.de"
       ],
@@ -698,6 +699,7 @@
       ],
       "l": "CAA",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "securess.de"
       ],
@@ -709,6 +711,7 @@
       ],
       "l": "Abruf der gesamten Zone",
       "ok": true,
+      "pulls": [],
       "subjects": [
        "securess.de"
       ],
@@ -719,11 +722,12 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
-      "ok": null,
+      "ok": true,
+      "pulls": [],
       "subjects": [
        "securess.de"
       ],
-      "v": "entfällt"
+      "v": "unauffällig"
      }
     ],
     "name": "DNS-Hygiene",
@@ -740,11 +744,20 @@
        "tls_no_fallback_scsv"
       ],
       "l": "212.227.60.78",
-      "ok": null,
+      "ok": false,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "212.227.60.78"
       ],
-      "v": "teilweise geprüft"
+      "v": "Handlungsbedarf"
      },
      {
       "checks": [
@@ -756,6 +769,15 @@
       ],
       "l": "51.116.154.224",
       "ok": true,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "51.116.154.224"
       ],
@@ -771,6 +793,15 @@
       ],
       "l": "85.22.47.36",
       "ok": null,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "85.22.47.36"
       ],
@@ -786,6 +817,15 @@
       ],
       "l": "85.22.47.38",
       "ok": false,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "85.22.47.38"
       ],
@@ -801,6 +841,15 @@
       ],
       "l": "85.22.47.39",
       "ok": null,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "85.22.47.39"
       ],
@@ -816,6 +865,15 @@
       ],
       "l": "85.22.47.40",
       "ok": null,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "85.22.47.40"
       ],
@@ -831,6 +889,15 @@
       ],
       "l": "85.22.47.41",
       "ok": null,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "85.22.47.41"
       ],
@@ -846,6 +913,15 @@
       ],
       "l": "85.22.47.42",
       "ok": null,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "85.22.47.42"
       ],
@@ -861,6 +937,15 @@
       ],
       "l": "85.22.47.43",
       "ok": null,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "85.22.47.43"
       ],
@@ -876,6 +961,15 @@
       ],
       "l": "85.22.47.45",
       "ok": null,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "85.22.47.45"
       ],
@@ -891,6 +985,15 @@
       ],
       "l": "85.22.47.46",
       "ok": false,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "85.22.47.46"
       ],
@@ -906,6 +1009,15 @@
       ],
       "l": "85.22.47.47",
       "ok": null,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "85.22.47.47"
       ],
@@ -923,6 +1035,7 @@
       ],
       "l": "Zertifikate",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "212.227.60.78",
        "51.116.154.224",
@@ -982,6 +1095,7 @@
       ],
       "l": "212.227.60.78",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "212.227.60.78"
       ],
@@ -998,6 +1112,7 @@
       ],
       "l": "51.116.154.224",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "51.116.154.224"
       ],
@@ -1014,6 +1129,7 @@
       ],
       "l": "85.22.47.36",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "85.22.47.36"
       ],
@@ -1030,6 +1146,7 @@
       ],
       "l": "85.22.47.38",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "85.22.47.38"
       ],
@@ -1046,6 +1163,7 @@
       ],
       "l": "85.22.47.39",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "85.22.47.39"
       ],
@@ -1062,6 +1180,7 @@
       ],
       "l": "85.22.47.40",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "85.22.47.40"
       ],
@@ -1078,6 +1197,7 @@
       ],
       "l": "85.22.47.41",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "85.22.47.41"
       ],
@@ -1094,6 +1214,7 @@
       ],
       "l": "85.22.47.42",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "85.22.47.42"
       ],
@@ -1110,6 +1231,7 @@
       ],
       "l": "85.22.47.43",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "85.22.47.43"
       ],
@@ -1126,6 +1248,7 @@
       ],
       "l": "85.22.47.45",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "85.22.47.45"
       ],
@@ -1142,6 +1265,7 @@
       ],
       "l": "85.22.47.46",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "85.22.47.46"
       ],
@@ -1158,6 +1282,7 @@
       ],
       "l": "85.22.47.47",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "85.22.47.47"
       ],
@@ -1175,91 +1300,91 @@
     "file": "212.227.60.78__connect.securess.de.png",
     "host": "connect.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__connect.securess.de.png",
-    "what": "Antwort von connect.securess.de"
+    "what": "SECURESS|connect: SECURESS"
    },
    {
     "also": [],
     "file": "85.22.47.38__eset.securess.de.png",
     "host": "eset.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.38__eset.securess.de.png",
-    "what": "Antwort von eset.securess.de"
+    "what": "403 Forbidden"
    },
    {
     "also": [],
     "file": "85.22.47.41__ftp.securess.de.png",
     "host": "ftp.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__ftp.securess.de.png",
-    "what": "Antwort von ftp.securess.de"
+    "what": "NinjaFirewall 403 Forbidden"
    },
    {
     "also": [],
     "file": "51.116.154.224__login-kundenportal.securess.de.png",
     "host": "login-kundenportal.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/51.116.154.224__login-kundenportal.securess.de.png",
-    "what": "Antwort von login-kundenportal.securess.de"
+    "what": "Login Kundenportal (login-kundenportal.securess.de/Account/Login)"
    },
    {
     "also": [],
     "file": "85.22.47.39__mailcleaner.securess.de.png",
     "host": "mailcleaner.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailcleaner.securess.de.png",
-    "what": "Antwort von mailcleaner.securess.de"
+    "what": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
    },
    {
     "also": [],
     "file": "85.22.47.39__mailin.securess.de.png",
     "host": "mailin.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailin.securess.de.png",
-    "what": "Antwort von mailin.securess.de"
+    "what": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
    },
    {
     "also": [],
     "file": "85.22.47.39__mailout.securess.de.png",
     "host": "mailout.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailout.securess.de.png",
-    "what": "Antwort von mailout.securess.de"
+    "what": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
    },
    {
     "also": [],
     "file": "85.22.47.39__mx1.securess.de.png",
     "host": "mx1.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mx1.securess.de.png",
-    "what": "Antwort von mx1.securess.de"
+    "what": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
    },
    {
     "also": [],
     "file": "85.22.47.38__openotp.securess.de.png",
     "host": "openotp.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.38__openotp.securess.de.png",
-    "what": "Antwort von openotp.securess.de"
+    "what": "403 Forbidden"
    },
    {
     "also": [],
     "file": "212.227.60.78__partner.securess.de.png",
     "host": "partner.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__partner.securess.de.png",
-    "what": "Antwort von partner.securess.de"
+    "what": "Page Not Found"
    },
    {
     "also": [],
     "file": "85.22.47.41__securess.de.png",
     "host": "securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__securess.de.png",
-    "what": "Antwort von securess.de"
+    "what": "NinjaFirewall 403 Forbidden"
    },
    {
     "also": [],
     "file": "212.227.60.78__vermittler.securess.de.png",
     "host": "vermittler.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__vermittler.securess.de.png",
-    "what": "Antwort von vermittler.securess.de"
+    "what": "Page Not Found"
    },
    {
     "also": [],
     "file": "85.22.47.41__www.securess.de.png",
     "host": "www.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__www.securess.de.png",
-    "what": "Antwort von www.securess.de"
+    "what": "NinjaFirewall 403 Forbidden"
    }
   ],
   "screens_lead": "Sichtprüfung der erreichbaren Web-Oberflächen der geprüften Hosts.",
@@ -1331,7 +1456,7 @@
      {
       "p": "8880",
       "s": "HTTPS",
-      "st": "grau"
+      "st": "rot"
      },
      {
       "p": "18018",
@@ -1384,11 +1509,11 @@
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "blau"
+      "st": "gelb"
      },
      {
       "p": "465",
-      "s": "SMTP",
+      "s": "SMTP über TLS",
       "st": "gruen"
      },
      {
@@ -1415,7 +1540,7 @@
      {
       "p": "80",
       "s": "nginx",
-      "st": "gruen"
+      "st": "gelb"
      },
      {
       "p": "443",
@@ -1468,7 +1593,7 @@
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "212.227.60.78",
@@ -1544,6 +1669,20 @@
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
+     }
+    ]
+   },
+   {
+    "host": "51.116.154.224",
+    "rows": [
+     {
+      "c": "jQuery",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx, redirect_probe",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "2.2.4"
      }
     ]
    },
@@ -1635,10 +1774,10 @@
      {
       "c": "Debian GNU/Linux",
       "conf": "hoch",
-      "note": "",
+      "note": "bis 30.06.2028 laut Debian",
       "src": "nmap",
       "st": "gruen",
-      "status": "aktuell",
+      "status": "in Langzeitpflege (LTS)",
       "v": "12"
      },
      {
@@ -1671,7 +1810,7 @@
      {
       "c": "nginx",
       "conf": "hoch",
-      "note": "Herstellerpflege endete am 11.04.2023",
+      "note": "Herstellerpflege endete am 11.04.2023 laut endoflife_date",
       "src": "header_check, httpx, nmap",
       "st": "rot",
       "status": "veraltet",
@@ -1710,7 +1849,7 @@
      "8443/tcp https-alt sw-cp-server",
      "21/tcp ftp ProFTPD"
     ],
-    "meaning": "Der Weg von außen in das Unternehmensnetz. Solche Zugänge sind das bevorzugte Ziel, weil hinter ihnen alles Weitere liegt.",
+    "meaning": "Zugang zur Verwaltung dieses Servers. Solche Zugänge sind das bevorzugte Ziel, weil über sie der Server selbst und alle Dienste darauf gesteuert werden.",
     "role_keys": [
      "fernzugang",
      "dateiaustausch"
@@ -1718,10 +1857,14 @@
     "system": "Fernzugang und Verwaltung, Dateiaustausch (connect.securess.de, partner.securess.de, vermittler.securess.de)"
    },
    {
-    "evidence": [],
-    "meaning": "Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte intern geklärt werden.",
-    "role_keys": [],
-    "system": "Nicht näher bestimmbar (login-kundenportal.securess.de)"
+    "evidence": [
+     "login-kundenportal.securess.de: Anmeldeformular laut Webanalyse"
+    ],
+    "meaning": "Anwendung mit eigener Anmeldung. Wer hier Zugangsdaten errät oder abgreift, erreicht die Funktionen hinter der Anmeldung.",
+    "role_keys": [
+     "webanwendung"
+    ],
+    "system": "Webanwendung mit Anmeldung (login-kundenportal.securess.de)"
    },
    {
     "evidence": [],
@@ -1797,14 +1940,14 @@
  },
  "findings": [
   {
-   "affected": "212.227.60.78:8443 (Plesk), 212.227.60.78:8880 (Plesk, laut Passivquelle)",
+   "affected": "212.227.60.78:8443 (Plesk), 212.227.60.78:8880 (Plesk, laut Passivquelle, gesehen am 03.07.2026)",
    "cat": "A",
    "checks": [
     "admin_service_exposed",
     "admin_service_exposed_passive"
    ],
    "evidence": "nmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:8443/tcp · Dienst: https-alt · Produkt: sw-cp-server · Server-Kennung: sw-cp-server · Seitentitel: Plesk Obsidian 18.0.78 · Anmeldung verlangt: ja · TLS erzwungen: ja · Zertifikat für: cool-khorana.212-227-60-78.plesk.page · Aussteller: YR2 · gültig bis: 14.10.2026, 12:16 UTC\n\nShodan · phase0a/shodan_hosts.json\nQuelle: shodan · 212.227.60.78:8880 · Dienst gesehen am: 03.07.2026 · Banner (Auszug): HTTP/1.1 303 See Other Server: sw-cp-server Date: Fri, 03 Jul 2026 05:08:45 GMT Content-Type: text/html; charset=UTF-8",
-   "found": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 212.227.60.78:8443 (Plesk). Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung: 212.227.60.78:8443 (Plesk). Eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar. Eine Passivquelle meldet auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) einen weiteren Port derselben Verwaltungsoberfläche, den der Portscan nicht bestätigen konnte: 212.227.60.78:8880 (Plesk, laut Passivquelle).",
+   "found": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 212.227.60.78:8443 (Plesk). Laut Passivquelle ist dieselbe Verwaltungsoberfläche auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) zusätzlich über einen weiteren Port erreichbar: 212.227.60.78:8880 (Plesk, laut Passivquelle, gesehen am 03.07.2026). Der Port liegt außerhalb des geprüften Portbereichs; der Portscan hat ihn nicht erfasst. Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung: 212.227.60.78:8443 (Plesk). Eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar.",
    "id": "VS-2026-001",
    "impact": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft das gesamte System und alle Dienste darauf. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen. Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft das gesamte System und alle Dienste darauf.",
    "key": "admin_access/212.227.60.78/kunde",
@@ -1819,16 +1962,11 @@
     {
      "action": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.",
      "check": "admin_service_exposed",
+     "detail": "",
      "effect": "Entzieht Angreifern den direkten Zugang zur Verwaltung der Systeme",
      "lever": "Verwaltungsoberflächen vom Internet trennen",
+     "per_rule": false,
      "stage": "unverzueglich"
-    },
-    {
-     "action": "Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand.",
-     "check": "admin_service_exposed_passive",
-     "effect": "Klärt, ob eine Verwaltungsoberfläche offen im Internet steht",
-     "lever": "Gemeldete Verwaltungszugänge prüfen und beschränken",
-     "stage": "in_kuerze"
     }
    ],
    "plan_lever": "Verwaltungsoberflächen vom Internet trennen",
@@ -1863,6 +2001,24 @@
      "text": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 212.227.60.78:8443 (Plesk)."
     },
     {
+     "check": "admin_service_exposed_passive",
+     "field": "observation",
+     "members": [
+      "212.227.60.78|shodan:212.227.60.78:8880"
+     ],
+     "statement": "observation[1]",
+     "text": "Laut Passivquelle ist dieselbe Verwaltungsoberfläche auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) zusätzlich über einen weiteren Port erreichbar: 212.227.60.78:8880 (Plesk, laut Passivquelle, gesehen am 03.07.2026)."
+    },
+    {
+     "check": "admin_service_exposed_passive",
+     "field": "observation",
+     "members": [
+      "212.227.60.78|shodan:212.227.60.78:8880"
+     ],
+     "statement": "observation[3]",
+     "text": "Der Port liegt außerhalb des geprüften Portbereichs; der Portscan hat ihn nicht erfasst."
+    },
+    {
      "check": "admin_service_exposed",
      "field": "observation",
      "members": [
@@ -1879,15 +2035,6 @@
      ],
      "statement": "observation[4]",
      "text": "Eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar."
-    },
-    {
-     "check": "admin_service_exposed_passive",
-     "field": "observation",
-     "members": [
-      "212.227.60.78|shodan:212.227.60.78:8880"
-     ],
-     "statement": "observation[1]",
-     "text": "Eine Passivquelle meldet auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) einen weiteren Port derselben Verwaltungsoberfläche, den der Portscan nicht bestätigen konnte: 212.227.60.78:8880 (Plesk, laut Passivquelle)."
     },
     {
      "check": "admin_service_exposed",
@@ -1950,7 +2097,7 @@
       "212.227.60.78|212.227.60.78:8443"
      ],
      "statement": "recommendation[2]",
-     "text": "Mehrfaktor-Anmeldung für die Verwaltungsoberfläche aktivieren und Standardkonten deaktivieren oder umbenennen."
+     "text": "Prüfen, ob die Verwaltungsoberfläche eine Mehrfaktor-Anmeldung verlangt, und sie andernfalls aktivieren; Standardkonten deaktivieren oder umbenennen."
     },
     {
      "check": "admin_service_exposed_passive",
@@ -1996,7 +2143,7 @@
     ],
     [
      "In Kürze",
-     "Mehrfaktor-Anmeldung für die Verwaltungsoberfläche aktivieren und Standardkonten deaktivieren oder umbenennen."
+     "Prüfen, ob die Verwaltungsoberfläche eine Mehrfaktor-Anmeldung verlangt, und sie andernfalls aktivieren; Standardkonten deaktivieren oder umbenennen."
     ],
     [
      "In Kürze",
@@ -2035,7 +2182,7 @@
    "checks": [
     "mail_plaintext"
    ],
-   "evidence": "nmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:110/tcp · Dienst: pop3 · Produkt: Dovecot pop3d · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · Anmeldeverfahren: CRAM-MD5, LOGIN, PLAIN · Zertifikat für: cool-khorana.212-227-60-78.plesk.page · Aussteller: YR2 · gültig bis: 14.10.2026, 12:16 UTC · POP3-Fähigkeiten: TOP AUTH-RESP-CODE USER CAPA RESP-CODES PIPELINING UIDL SASL(PLAIN LOGIN CRAM-MD5) STLS APOP\n\nnmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:143/tcp · Dienst: imap · Produkt: Dovecot imapd · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · Anmeldeverfahren: CRAM-MD5, LOGIN, PLAIN · Zertifikat für: cool-khorana.212-227-60-78.plesk.page · Aussteller: YR2 · gültig bis: 14.10.2026, 12:16 UTC · IMAP-Fähigkeiten: STARTTLS LOGIN-REFERRALS LITERAL+ AUTH=CRAM-MD5A0001 IMAP4rev1 SASL-IR AUTH=LOGIN IDLE ENABLE ID AUTH=PLAIN",
+   "evidence": "nmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:110/tcp · Dienst: pop3 · Produkt: Dovecot pop3d · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · Anmeldeverfahren: CRAM-MD5, LOGIN, PLAIN · Zertifikat für: cool-khorana.212-227-60-78.plesk.page · Aussteller: YR2 · gültig bis: 14.10.2026, 12:16 UTC · POP3-Fähigkeiten: TOP AUTH-RESP-CODE USER CAPA RESP-CODES PIPELINING UIDL SASL(PLAIN LOGIN CRAM-MD5) STLS APOP\n\nnmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:143/tcp · Dienst: imap · Produkt: Dovecot imapd · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · Anmeldeverfahren: CRAM-MD5, LOGIN, PLAIN · Zertifikat für: cool-khorana.212-227-60-78.plesk.page · Aussteller: YR2 · gültig bis: 14.10.2026, 12:16 UTC · IMAP-Fähigkeiten: STARTTLS LOGIN-REFERRALS LITERAL+ AUTH=CRAM-MD5 IMAP4rev1 SASL-IR AUTH=LOGIN IDLE ENABLE ID AUTH=PLAIN",
    "found": "Auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet der Mailabrufdienst zwar STARTTLS an, nimmt eine Anmeldung aber schon vor dem Aufbau der Verschlüsselung entgegen: 212.227.60.78:110 (POP3 mit Anmeldung vor STARTTLS), 212.227.60.78:143 (IMAP mit Anmeldung vor STARTTLS).",
    "id": "VS-2026-002",
    "impact": "STARTTLS wird angeboten, aber nicht verlangt: Ein Angreifer auf dem Übertragungsweg kann das Angebot unterdrücken und die Anmeldedaten dann im Klartext mitlesen.",
@@ -2051,8 +2198,10 @@
     {
      "action": "Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten.",
      "check": "mail_plaintext",
+     "detail": "",
      "effect": "Schützt Zugangsdaten und Nachrichten auf dem Übertragungsweg",
      "lever": "TLS für POP3 und IMAP erzwingen",
+     "per_rule": false,
      "stage": "in_kuerze"
     }
    ],
@@ -2166,8 +2315,10 @@
     {
      "action": "Die Ablösung durch eine vom Hersteller gepflegte Version planen und bis dahin den Zugang aus dem Internet auf das Nötige einschränken.",
      "check": "software_eol",
+     "detail": "",
      "effect": "Begrenzt den Zugriff auf Software ohne Sicherheitsupdates bis zur Ablösung",
      "lever": "Serversoftware ohne Herstellerpflege ersetzen",
+     "per_rule": false,
      "stage": "in_kuerze"
     }
    ],
@@ -2295,8 +2446,10 @@
     {
      "action": "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält.",
      "check": "cert_hostname_mismatch",
+     "detail": "",
      "effect": "Beendet die Namenswarnung beim Aufruf des Dienstes",
      "lever": "Zertifikate auf alle aufgerufenen Namen ausstellen",
+     "per_rule": false,
      "stage": "in_kuerze"
     }
    ],
@@ -2405,22 +2558,28 @@
     {
      "action": "TLS 1.0 und 1.1 serverseitig deaktivieren und die Cipher-Reihenfolge auf AEAD-Suiten mit Forward Secrecy setzen.",
      "check": "tls_legacy_protocols",
+     "detail": "",
      "effect": "Schützt Verbindungen gegen bekannte Angriffe auf alte Protokolle",
      "lever": "Veraltete TLS-Versionen abschalten",
+     "per_rule": false,
      "stage": "in_kuerze"
     },
     {
      "action": "Fallback SCSV in der TLS-Konfiguration aktivieren oder, alternativ, die veralteten Protokollversionen vollständig abschalten.",
      "check": "tls_no_fallback_scsv",
+     "detail": "",
      "effect": "Verhindert, dass ein Angreifer eine ältere Protokollversion erzwingt",
      "lever": "Schutz gegen erzwungene Rückstufung aktivieren",
+     "per_rule": false,
      "stage": "mittelfristig"
     },
     {
      "action": "Die betroffenen Verfahren in der Serverkonfiguration deaktivieren, sofern die eingesetzte Softwareversion dies zulässt.",
      "check": "tls_weakness",
+     "detail": "",
      "effect": "Schützt Verbindungen gegen bekannte Angriffe",
      "lever": "Bekannte Schwächen der TLS-Konfiguration beheben",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -2546,15 +2705,6 @@
      "text": "TLS 1.0 und 1.1 serverseitig deaktivieren und die Cipher-Reihenfolge auf AEAD-Suiten mit Forward Secrecy setzen."
     },
     {
-     "check": "tls_legacy_protocols",
-     "field": "recommendation",
-     "members": [
-      "rdgw.securess.de@85.22.47.46|rdgw.securess.de:443@85.22.47.46"
-     ],
-     "statement": "recommendation[1]",
-     "text": "HSTS aktivieren, sobald alle Hostnamen dauerhaft HTTPS liefern."
-    },
-    {
      "check": "tls_no_fallback_scsv",
      "field": "recommendation",
      "members": [
@@ -2577,10 +2727,6 @@
     [
      "In Kürze",
      "TLS 1.0 und 1.1 serverseitig deaktivieren und die Cipher-Reihenfolge auf AEAD-Suiten mit Forward Secrecy setzen."
-    ],
-    [
-     "In Kürze",
-     "HSTS aktivieren, sobald alle Hostnamen dauerhaft HTTPS liefern."
     ],
     [
      "Mittelfristig",
@@ -2631,22 +2777,28 @@
     {
      "action": "Schwache Cipher-Suiten in der Serverkonfiguration deaktivieren und ausschließlich moderne AEAD-Suiten mit Forward Secrecy anbieten.",
      "check": "tls_weak_ciphers",
+     "detail": "",
      "effect": "Schützt Verbindungen gegen das Brechen schwacher Verfahren",
      "lever": "Schwache Verschlüsselungsverfahren abschalten",
+     "per_rule": false,
      "stage": "mittelfristig"
     },
     {
      "action": "TLS 1.3 auf dem Dienst aktivieren, sobald die eingesetzte TLS-Bibliothek und alle angebundenen Clients dies unterstützen.",
      "check": "tls_no_13",
+     "detail": "",
      "effect": "Nutzt das aktuelle Protokoll mit kleinerer Angriffsfläche",
      "lever": "TLS 1.3 aktivieren",
+     "per_rule": false,
      "stage": "strategisch"
     },
     {
      "action": "Die betroffenen Verfahren in der Serverkonfiguration deaktivieren, sofern die eingesetzte Softwareversion dies zulässt.",
      "check": "tls_weakness",
+     "detail": "",
      "effect": "Schützt Verbindungen gegen bekannte Angriffe",
      "lever": "Bekannte Schwächen der TLS-Konfiguration beheben",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -2849,7 +3001,7 @@
     "header_duplicate",
     "security_headers_incomplete"
    ],
-   "evidence": "header_check\neset.securess.de · Adresse: https://eset.securess.de · Antwort: 200 · Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: www.google.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com maps.googleapis.com maps.gstatic.com unpkg.com · doppelt gesetzt: x-frame-options, cache-control · fehlende Header: Permissions-Policy\n\nheader_check\nopenotp.securess.de · Adresse: https://openotp.securess.de · Antwort: 200 · Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: www.google.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com maps.googleapis.com maps.gstatic.com unpkg.com · fehlende Header: Permissions-Policy",
+   "evidence": "header_check\neset.securess.de · Adresse: https://eset.securess.de · Antwort: 200 · Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: www.google.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com maps.googleapis.com maps.gstatic.com unpkg.com · fehlende Header: Permissions-Policy\n\nheader_check\nopenotp.securess.de · Adresse: https://openotp.securess.de · Antwort: 200 · Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: www.google.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com maps.googleapis.com maps.gstatic.com unpkg.com · fehlende Header: Permissions-Policy\n\ntestssl.sh\neset.securess.de · doppelt gesetzt: x-frame-options, cache-control",
    "found": "Auf 85.22.47.38 ist eine Content-Security-Policy gesetzt, die einzelne Direktiven wieder lockert: eset.securess.de (unsafe-inline für Skripte, unsafe-eval für Skripte), openotp.securess.de (unsafe-inline für Skripte, unsafe-eval für Skripte). Die Webantwort von eset.securess.de enthält denselben Antwortheader mehrfach mit unterschiedlichen Werten: eset.securess.de (x-frame-options, cache-control). Auf 85.22.47.38 fehlen einzelne Sicherheits-Header der Webseite: eset.securess.de (fehlend: Permissions-Policy), openotp.securess.de (fehlend: Permissions-Policy).",
    "id": "VS-2026-007",
    "impact": "Die Freigabe unsafe-inline für Skripte erlaubt eingebettete Skripte in der Seite und hebt damit den Schutz gegen eingeschleuste Skripte weitgehend auf. Die Freigabe unsafe-eval erlaubt Skripte, die zur Laufzeit aus Zeichenketten erzeugt werden. Browser und vorgelagerte Systeme werten mehrfach gesetzte Header uneinheitlich aus, manche nehmen den ersten, andere den letzten Wert. Damit ist nicht sichergestellt, welche der gesetzten Schutzwirkungen tatsächlich beim Browser ankommt. Es fehlt nur die Permissions-Policy, die festlegt, welche Browserfunktionen wie Kamera, Mikrofon oder Standort eingebettete Inhalte nutzen dürfen. Die Auswirkung ist gering; die übrigen grundlegenden Sicherheits-Header sind gesetzt.",
@@ -2867,22 +3019,28 @@
     {
      "action": "Die Freigaben unsafe-inline und unsafe-eval für Skripte aus der Content-Security-Policy entfernen und eingebettete Skripte über Nonces oder Hashes freigeben.",
      "check": "csp_weak",
+     "detail": "",
      "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
      "lever": "Unsichere Freigaben aus der Inhaltsrichtlinie entfernen",
+     "per_rule": false,
      "stage": "mittelfristig"
     },
     {
      "action": "Die Webserver- und Anwendungskonfiguration darauf prüfen, an welcher Stelle der doppelte Header gesetzt wird, und den Header nur noch an einer Stelle mit einem eindeutigen Wert ausliefern.",
      "check": "header_duplicate",
+     "detail": "",
      "effect": "Sorgt für eindeutige Anweisungen an den Browser",
      "lever": "Doppelt gesetzte Header bereinigen",
+     "per_rule": false,
      "stage": "mittelfristig"
     },
     {
-     "action": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet.",
+     "action": "Die fehlenden Sicherheits-Header setzen",
      "check": "security_headers_incomplete",
-     "effect": "Begrenzt die Browserfunktionen, die eingebettete Inhalte nutzen dürfen",
+     "detail": "eset.securess.de (fehlend: Permissions-Policy); openotp.securess.de (fehlend: Permissions-Policy)",
+     "effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
      "lever": "Fehlende Sicherheits-Header ergänzen",
+     "per_rule": true,
      "stage": "mittelfristig"
     }
    ],
@@ -3081,7 +3239,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check)",
+   "source": "aktiv (header_check, testssl.sh)",
    "status": "gelb",
    "subjects": [
     "csp_weak|eset.securess.de@85.22.47.38",
@@ -3096,14 +3254,797 @@
    "verify": "HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird eine Content-Security-Policy ohne unsafe-inline und unsafe-eval für Skripte. HTTP-Antwortheader der genannten Adresse von außen abrufen; erwartet wird jeder Header genau einmal mit einem eindeutigen Wert. Erwartet wird eine Permissions-Policy."
   },
   {
+   "affected": "mailcleaner.securess.de (SERVERID: Secure, HttpOnly, SameSite; fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailin.securess.de (SERVERID: Secure, HttpOnly, SameSite; fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailout.securess.de (SERVERID: Secure, HttpOnly, SameSite; fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mx1.securess.de (SERVERID: Secure, HttpOnly, SameSite; fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy)",
+   "cat": "D",
+   "checks": [
+    "hsts_missing",
+    "cookie_flags",
+    "csp_missing",
+    "security_headers_incomplete"
+   ],
+   "evidence": "header_check\nmailcleaner.securess.de · Cookie: SERVERID · ohne: Secure, HttpOnly, SameSite · Adresse: https://mailcleaner.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options\n\nheader_check\nmailin.securess.de · Cookie: SERVERID · ohne: Secure, HttpOnly, SameSite · Adresse: https://mailin.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options\n\nheader_check\nmailout.securess.de · Cookie: SERVERID · ohne: Secure, HttpOnly, SameSite · Adresse: https://mailout.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options\n\nheader_check\nmx1.securess.de · Cookie: SERVERID · ohne: Secure, HttpOnly, SameSite · Adresse: https://mx1.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options",
+   "found": "Der Dienst 85.22.47.39 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mx1.securess.de. Auf 85.22.47.39 setzen Cookies nicht alle Sicherheits-Attribute: mailcleaner.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailin.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailout.securess.de (SERVERID: Secure, HttpOnly, SameSite), mx1.securess.de (SERVERID: Secure, HttpOnly, SameSite). Auf 85.22.47.39 ist keine Content-Security-Policy gesetzt: mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mx1.securess.de. Auf 85.22.47.39 fehlen einzelne Sicherheits-Header der Webseite: mailcleaner.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailin.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailout.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mx1.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "id": "VS-2026-008",
+   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne das Attribut Secure kann ein Cookie auch über eine unverschlüsselte Verbindung übertragen werden. Ohne HttpOnly kann clientseitiges Skript auf das Cookie zugreifen, etwa nach einer erfolgreichen Einschleusung von Fremdinhalten. Ohne SameSite kann das Cookie bei Anfragen von anderen Seiten mitgesendet werden. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+   "key": "web_header_hygiene/85.22.47.39/kunde",
+   "level": "mittel",
+   "level_label": "mittel",
+   "missing_headers": [
+    "X-Content-Type-Options",
+    "Referrer-Policy",
+    "Permissions-Policy"
+   ],
+   "operator": "",
+   "operator_note": "",
+   "plan_action": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
+   "plan_effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+   "plan_items": [
+    {
+     "action": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
+     "check": "hsts_missing",
+     "detail": "",
+     "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+     "lever": "HTTP Strict Transport Security setzen",
+     "per_rule": false,
+     "stage": "mittelfristig"
+    },
+    {
+     "action": "Die Attribute Secure, HttpOnly und SameSite für alle Cookies setzen, die eine Sitzung oder eine Anmeldung betreffen.",
+     "check": "cookie_flags",
+     "detail": "",
+     "effect": "Erschwert das Abgreifen von Sitzungen über unverschlüsselte Aufrufe und Skripte",
+     "lever": "Sicherheitsattribute für Cookies setzen",
+     "per_rule": false,
+     "stage": "mittelfristig"
+    },
+    {
+     "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
+     "check": "csp_missing",
+     "detail": "",
+     "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+     "lever": "Inhaltsrichtlinie für die Webseiten einführen",
+     "per_rule": false,
+     "stage": "mittelfristig"
+    },
+    {
+     "action": "Die fehlenden Sicherheits-Header setzen",
+     "check": "security_headers_incomplete",
+     "detail": "mailcleaner.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy); mailin.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy); mailout.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy); mx1.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy)",
+     "effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
+     "lever": "Fehlende Sicherheits-Header ergänzen",
+     "per_rule": true,
+     "stage": "mittelfristig"
+    }
+   ],
+   "plan_lever": "HTTP Strict Transport Security setzen",
+   "plan_stage": "mittelfristig",
+   "policy": "cookie_flags, csp_missing, hsts_missing, security_headers_incomplete",
+   "provenance": [
+    {
+     "check": "hsts_missing",
+     "field": "title",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "short_variants[1]",
+     "text": "HSTS fehlt"
+    },
+    {
+     "check": "cookie_flags",
+     "field": "title",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39#SERVERID",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39#SERVERID",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39#SERVERID",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39#SERVERID"
+     ],
+     "statement": "short",
+     "text": "Cookies ohne Sicherheitsattribute"
+    },
+    {
+     "check": "csp_missing",
+     "field": "title",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "short",
+     "text": "Inhaltsrichtlinie fehlt"
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "title",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "short",
+     "text": "Sicherheits-Header unvollständig"
+    },
+    {
+     "check": "hsts_missing",
+     "field": "observation",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Dienst 85.22.47.39 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mx1.securess.de."
+    },
+    {
+     "check": "cookie_flags",
+     "field": "observation",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39#SERVERID",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39#SERVERID",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39#SERVERID",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39#SERVERID"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf 85.22.47.39 setzen Cookies nicht alle Sicherheits-Attribute: mailcleaner.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailin.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailout.securess.de (SERVERID: Secure, HttpOnly, SameSite), mx1.securess.de (SERVERID: Secure, HttpOnly, SameSite)."
+    },
+    {
+     "check": "csp_missing",
+     "field": "observation",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf 85.22.47.39 ist keine Content-Security-Policy gesetzt: mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mx1.securess.de."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "observation",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf 85.22.47.39 fehlen einzelne Sicherheits-Header der Webseite: mailcleaner.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailin.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailout.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mx1.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy)."
+    },
+    {
+     "check": "hsts_missing",
+     "field": "meaning",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift."
+    },
+    {
+     "check": "cookie_flags",
+     "field": "meaning",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39#SERVERID",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39#SERVERID",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39#SERVERID",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39#SERVERID"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne das Attribut Secure kann ein Cookie auch über eine unverschlüsselte Verbindung übertragen werden. Ohne HttpOnly kann clientseitiges Skript auf das Cookie zugreifen, etwa nach einer erfolgreichen Einschleusung von Fremdinhalten. Ohne SameSite kann das Cookie bei Anfragen von anderen Seiten mitgesendet werden."
+    },
+    {
+     "check": "csp_missing",
+     "field": "meaning",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "meaning[1]",
+     "text": "Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "meaning[2]",
+     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "meaning[3]",
+     "text": "Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen."
+    },
+    {
+     "check": "hsts_missing",
+     "field": "verify",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security."
+    },
+    {
+     "check": "cookie_flags",
+     "field": "verify",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39#SERVERID",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39#SERVERID",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39#SERVERID",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39#SERVERID"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader Set-Cookie der Startseite von außen abrufen; erwartet werden die Attribute Secure, HttpOnly und SameSite bei jedem Cookie."
+    },
+    {
+     "check": "csp_missing",
+     "field": "verify",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Endseite von außen abrufen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "verify[2]",
+     "text": "Erwartet wird X-Content-Type-Options mit dem Wert nosniff."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "verify[3]",
+     "text": "Erwartet wird eine Referrer-Policy."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "verify[4]",
+     "text": "Erwartet wird eine Permissions-Policy."
+    },
+    {
+     "check": "hsts_missing",
+     "field": "recommendation",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist."
+    },
+    {
+     "check": "cookie_flags",
+     "field": "recommendation",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39#SERVERID",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39#SERVERID",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39#SERVERID",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39#SERVERID"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Attribute Secure, HttpOnly und SameSite für alle Cookies setzen, die eine Sitzung oder eine Anmeldung betreffen."
+    },
+    {
+     "check": "csp_missing",
+     "field": "recommendation",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "recommendation[1]",
+     "text": "X-Content-Type-Options mit dem Wert nosniff setzen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "recommendation[2]",
+     "text": "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
+      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
+      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
+      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
+     ],
+     "statement": "recommendation[3]",
+     "text": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
+    }
+   ],
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist."
+    ],
+    [
+     "Mittelfristig",
+     "Die Attribute Secure, HttpOnly und SameSite für alle Cookies setzen, die eine Sitzung oder eine Anmeldung betreffen."
+    ],
+    [
+     "Mittelfristig",
+     "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt."
+    ],
+    [
+     "Mittelfristig",
+     "X-Content-Type-Options mit dem Wert nosniff setzen."
+    ],
+    [
+     "Mittelfristig",
+     "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
+    ],
+    [
+     "Mittelfristig",
+     "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (header_check)",
+   "status": "gelb",
+   "subjects": [
+    "cookie_flags|mailcleaner.securess.de@85.22.47.39",
+    "cookie_flags|mailcleaner.securess.de@85.22.47.39#SERVERID",
+    "cookie_flags|mailin.securess.de@85.22.47.39",
+    "cookie_flags|mailin.securess.de@85.22.47.39#SERVERID",
+    "cookie_flags|mailout.securess.de@85.22.47.39",
+    "cookie_flags|mailout.securess.de@85.22.47.39#SERVERID",
+    "cookie_flags|mx1.securess.de@85.22.47.39",
+    "cookie_flags|mx1.securess.de@85.22.47.39#SERVERID",
+    "csp_missing|mailcleaner.securess.de@85.22.47.39",
+    "csp_missing|mailin.securess.de@85.22.47.39",
+    "csp_missing|mailout.securess.de@85.22.47.39",
+    "csp_missing|mx1.securess.de@85.22.47.39",
+    "hsts_missing|mailcleaner.securess.de@85.22.47.39",
+    "hsts_missing|mailin.securess.de@85.22.47.39",
+    "hsts_missing|mailout.securess.de@85.22.47.39",
+    "hsts_missing|mx1.securess.de@85.22.47.39",
+    "security_headers_incomplete|mailcleaner.securess.de@85.22.47.39",
+    "security_headers_incomplete|mailin.securess.de@85.22.47.39",
+    "security_headers_incomplete|mailout.securess.de@85.22.47.39",
+    "security_headers_incomplete|mx1.securess.de@85.22.47.39"
+   ],
+   "threat": null,
+   "title": "Absicherung der Webdienste auf 85.22.47.39: HSTS fehlt, Cookies ohne Sicherheitsattribute, Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
+   "urgency": "Mittelfristig",
+   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security. HTTP-Antwortheader Set-Cookie der Startseite von außen abrufen; erwartet werden die Attribute Secure, HttpOnly und SameSite bei jedem Cookie. HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird X-Content-Type-Options mit dem Wert nosniff. Erwartet wird eine Referrer-Policy. Erwartet wird eine Permissions-Policy."
+  },
+  {
+   "affected": "www.securess.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy), ftp.securess.de, securess.de",
+   "cat": "D",
+   "checks": [
+    "hsts_missing",
+    "csp_missing",
+    "security_headers_incomplete"
+   ],
+   "evidence": "header_check\nwww.securess.de · Adresse: https://www.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options\n\nheader_check\nftp.securess.de · Adresse: https://ftp.securess.de · Antwort: 301 (Weiterleitung) · weitergeleitet auf: https://www.securess.de/ · Strict-Transport-Security: nicht gesetzt\n\nheader_check\nsecuress.de · Adresse: https://securess.de · Antwort: 301 (Weiterleitung) · weitergeleitet auf: https://www.securess.de/ · Strict-Transport-Security: nicht gesetzt",
+   "found": "Der Dienst 85.22.47.41 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: ftp.securess.de, securess.de, www.securess.de. Auf www.securess.de ist keine Content-Security-Policy gesetzt: www.securess.de. Auf www.securess.de fehlen einzelne Sicherheits-Header der Webseite: www.securess.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "id": "VS-2026-009",
+   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+   "key": "web_header_hygiene/85.22.47.41/kunde",
+   "level": "mittel",
+   "level_label": "mittel",
+   "missing_headers": [
+    "X-Frame-Options",
+    "X-Content-Type-Options",
+    "Referrer-Policy",
+    "Permissions-Policy"
+   ],
+   "operator": "",
+   "operator_note": "",
+   "plan_action": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
+   "plan_effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+   "plan_items": [
+    {
+     "action": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
+     "check": "hsts_missing",
+     "detail": "",
+     "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+     "lever": "HTTP Strict Transport Security setzen",
+     "per_rule": false,
+     "stage": "mittelfristig"
+    },
+    {
+     "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
+     "check": "csp_missing",
+     "detail": "",
+     "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+     "lever": "Inhaltsrichtlinie für die Webseiten einführen",
+     "per_rule": false,
+     "stage": "mittelfristig"
+    },
+    {
+     "action": "Die fehlenden Sicherheits-Header setzen",
+     "check": "security_headers_incomplete",
+     "detail": "www.securess.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)",
+     "effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
+     "lever": "Fehlende Sicherheits-Header ergänzen",
+     "per_rule": true,
+     "stage": "mittelfristig"
+    }
+   ],
+   "plan_lever": "HTTP Strict Transport Security setzen",
+   "plan_stage": "mittelfristig",
+   "policy": "csp_missing, hsts_missing, security_headers_incomplete",
+   "provenance": [
+    {
+     "check": "hsts_missing",
+     "field": "title",
+     "members": [
+      "ftp.securess.de@85.22.47.41|ftp.securess.de@85.22.47.41",
+      "securess.de@85.22.47.41|securess.de@85.22.47.41",
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "short_variants[1]",
+     "text": "HSTS fehlt"
+    },
+    {
+     "check": "csp_missing",
+     "field": "title",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "short",
+     "text": "Inhaltsrichtlinie fehlt"
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "title",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "short",
+     "text": "Sicherheits-Header unvollständig"
+    },
+    {
+     "check": "hsts_missing",
+     "field": "observation",
+     "members": [
+      "ftp.securess.de@85.22.47.41|ftp.securess.de@85.22.47.41",
+      "securess.de@85.22.47.41|securess.de@85.22.47.41",
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Dienst 85.22.47.41 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: ftp.securess.de, securess.de, www.securess.de."
+    },
+    {
+     "check": "csp_missing",
+     "field": "observation",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf www.securess.de ist keine Content-Security-Policy gesetzt: www.securess.de."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "observation",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "observation[0]",
+     "text": "Auf www.securess.de fehlen einzelne Sicherheits-Header der Webseite: www.securess.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)."
+    },
+    {
+     "check": "hsts_missing",
+     "field": "meaning",
+     "members": [
+      "ftp.securess.de@85.22.47.41|ftp.securess.de@85.22.47.41",
+      "securess.de@85.22.47.41|securess.de@85.22.47.41",
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift."
+    },
+    {
+     "check": "csp_missing",
+     "field": "meaning",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "meaning[0]",
+     "text": "Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "meaning[1]",
+     "text": "Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "meaning[2]",
+     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "meaning",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "meaning[3]",
+     "text": "Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen."
+    },
+    {
+     "check": "hsts_missing",
+     "field": "verify",
+     "members": [
+      "ftp.securess.de@85.22.47.41|ftp.securess.de@85.22.47.41",
+      "securess.de@85.22.47.41|securess.de@85.22.47.41",
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security."
+    },
+    {
+     "check": "csp_missing",
+     "field": "verify",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "verify[0]",
+     "text": "HTTP-Antwortheader der Endseite von außen abrufen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "verify[1]",
+     "text": "Erwartet wird X-Frame-Options oder frame-ancestors in der Content-Security-Policy."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "verify[2]",
+     "text": "Erwartet wird X-Content-Type-Options mit dem Wert nosniff."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "verify[3]",
+     "text": "Erwartet wird eine Referrer-Policy."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "verify",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "verify[4]",
+     "text": "Erwartet wird eine Permissions-Policy."
+    },
+    {
+     "check": "hsts_missing",
+     "field": "recommendation",
+     "members": [
+      "ftp.securess.de@85.22.47.41|ftp.securess.de@85.22.47.41",
+      "securess.de@85.22.47.41|securess.de@85.22.47.41",
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist."
+    },
+    {
+     "check": "csp_missing",
+     "field": "recommendation",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "recommendation[0]",
+     "text": "X-Frame-Options oder frame-ancestors in der Content-Security-Policy setzen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "recommendation[1]",
+     "text": "X-Content-Type-Options mit dem Wert nosniff setzen."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "recommendation[2]",
+     "text": "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
+    },
+    {
+     "check": "security_headers_incomplete",
+     "field": "recommendation",
+     "members": [
+      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
+     ],
+     "statement": "recommendation[3]",
+     "text": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
+    }
+   ],
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist."
+    ],
+    [
+     "Mittelfristig",
+     "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt."
+    ],
+    [
+     "Mittelfristig",
+     "X-Frame-Options oder frame-ancestors in der Content-Security-Policy setzen."
+    ],
+    [
+     "Mittelfristig",
+     "X-Content-Type-Options mit dem Wert nosniff setzen."
+    ],
+    [
+     "Mittelfristig",
+     "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
+    ],
+    [
+     "Mittelfristig",
+     "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (header_check)",
+   "status": "gelb",
+   "subjects": [
+    "csp_missing|www.securess.de@85.22.47.41",
+    "hsts_missing|ftp.securess.de@85.22.47.41",
+    "hsts_missing|securess.de@85.22.47.41",
+    "hsts_missing|www.securess.de@85.22.47.41",
+    "security_headers_incomplete|www.securess.de@85.22.47.41"
+   ],
+   "threat": null,
+   "title": "Absicherung der Webdienste auf 85.22.47.41: HSTS fehlt, Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
+   "urgency": "Mittelfristig",
+   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security. HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird X-Frame-Options oder frame-ancestors in der Content-Security-Policy. Erwartet wird X-Content-Type-Options mit dem Wert nosniff. Erwartet wird eine Referrer-Policy. Erwartet wird eine Permissions-Policy."
+  },
+  {
    "affected": "212.227.60.78:21 (FTP)",
    "cat": "A",
    "checks": [
     "legacy_protocols_present"
    ],
    "evidence": "nmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:21/tcp · Dienst: ftp · Produkt: ProFTPD · TLS erzwungen: ja · Zertifikat für: cool-khorana.212-227-60-78.plesk.page · Aussteller: YR2 · gültig bis: 14.10.2026, 12:16 UTC · 21/tcp open ftp ProFTPD (requires SSL)",
-   "found": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet ein älteres Übertragungsprotokoll an: 212.227.60.78:21 (FTP). Eine Anmeldung ist dort nur mit Transportverschlüsselung möglich: 212.227.60.78:21 (FTP).",
-   "id": "VS-2026-008",
+   "found": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet zusätzliche Mail- und Dateidienste an: 212.227.60.78:21 (FTP). Eine Anmeldung ist dort nur mit Transportverschlüsselung möglich: 212.227.60.78:21 (FTP).",
+   "id": "VS-2026-010",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Servers, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "key": "legacy_protocols_present/scan/kunde",
    "level": "niedrig",
@@ -3117,8 +4058,10 @@
     {
      "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
      "check": "legacy_protocols_present",
+     "detail": "",
      "effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
      "lever": "Nicht benötigte Altprotokolle abschalten",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -3132,8 +4075,8 @@
      "members": [
       "212.227.60.78|212.227.60.78:21"
      ],
-     "statement": "title",
-     "text": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
+     "statement": "short_variants[0]",
+     "text": "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen)"
     },
     {
      "check": "legacy_protocols_present",
@@ -3142,7 +4085,7 @@
       "212.227.60.78|212.227.60.78:21"
      ],
      "statement": "observation[0]",
-     "text": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet ein älteres Übertragungsprotokoll an: 212.227.60.78:21 (FTP)."
+     "text": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet zusätzliche Mail- und Dateidienste an: 212.227.60.78:21 (FTP)."
     },
     {
      "check": "legacy_protocols_present",
@@ -3150,7 +4093,7 @@
      "members": [
       "212.227.60.78|212.227.60.78:21"
      ],
-     "statement": "observation[1]",
+     "statement": "observation[2]",
      "text": "Eine Anmeldung ist dort nur mit Transportverschlüsselung möglich: 212.227.60.78:21 (FTP)."
     },
     {
@@ -3217,7 +4160,7 @@
     "legacy_protocols_present|212.227.60.78:21"
    ],
    "threat": null,
-   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+   "title": "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen)",
    "urgency": "Mittelfristig",
    "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
   },
@@ -3229,7 +4172,7 @@
    ],
    "evidence": "Webabruf · phase0/host_inventory.json\nrdgw-2016.securess.de",
    "found": "Der Hostname von rdgw-2016.securess.de enthält eine Zahlenfolge, die einem gängigen Produktjahr entspricht: rdgw-2016.securess.de (Produktjahr im Hostnamen). Der Hostname allein belegt keine installierte Version, gibt aber einen Anlass für eine Prüfung des Lebenszyklus der zugrunde liegenden Plattform.",
-   "id": "VS-2026-009",
+   "id": "VS-2026-011",
    "impact": "Hostnamen mit einem Produktjahr weisen häufig auf das Beschaffungsjahr oder die Produktgeneration einer Plattform hin. Ist die Plattform tatsächlich so alt wie der Hostname vermuten lässt, kann die Herstellerpflege bereits beendet sein. Ohne eine Versionsprüfung vor Ort bleibt dies ein Verdachtsmoment.",
    "key": "software_lifecycle_hint/scan/kunde",
    "level": "niedrig",
@@ -3243,8 +4186,10 @@
     {
      "action": "Anhand des Hostnamens prüfen, welche Plattform und Version tatsächlich im Einsatz ist, und den Lebenszyklusstatus beim Hersteller abgleichen.",
      "check": "software_lifecycle_hint",
+     "detail": "",
      "effect": "Klärt, ob hinter dem Namen ein Produkt ohne Herstellerpflege steht",
      "lever": "Produktstand hinter Namen mit Jahreszahl prüfen",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -3336,7 +4281,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0/dns_records.json\nsecuress.de · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere · SPF: v=spf1 a mx ip4:85.22.47.37 include:spf-de.emailsignatures365.com include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all",
    "found": "Der SPF-Eintrag der Domain securess.de setzt bei nicht autorisierten Versendern nur auf eine weiche oder neutrale Fehlbehandlung: securess.de (~all). Empfangende Mailserver dürfen die E-Mail trotzdem zustellen.",
-   "id": "VS-2026-010",
+   "id": "VS-2026-012",
    "impact": "Eine weiche oder neutrale Fehlbehandlung markiert eine E-Mail lediglich als verdächtig, lehnt sie aber nicht ab. Empfangssysteme, die diese Markierung nicht auswerten, stellen gefälschte E-Mails im Namen der Domain trotzdem zu.",
    "key": "mail_policy/securess.de/kunde",
    "level": "niedrig",
@@ -3350,8 +4295,10 @@
     {
      "action": "Nach einer Beobachtungsphase ohne Fehlmeldungen den Qualifizierer des SPF-Eintrags auf eine harte Fehlbehandlung umstellen, sobald alle legitimen Versandquellen erfasst sind.",
      "check": "spf_softfail",
+     "detail": "",
      "effect": "Lässt Empfänger gefälschte Absender eindeutig ablehnen",
      "lever": "SPF-Eintrag mit harter Fehlbehandlung abschließen",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -3431,7 +4378,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0/dns_records.json\nsecuress.de · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere\n\nDNS-Abfragen · phase0a/dns_security.json\nsecuress.de · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
    "found": "Für securess.de ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain securess.de fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten. Für securess.de ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain securess.de fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können.",
-   "id": "VS-2026-011",
+   "id": "VS-2026-013",
    "impact": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen. Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.",
    "key": "mail_transport_enforcement/securess.de/kunde",
    "level": "niedrig",
@@ -3445,15 +4392,19 @@
     {
      "action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
      "check": "mta_sts_missing",
+     "detail": "",
      "effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
      "lever": "MTA-STS für die Domain veröffentlichen",
+     "per_rule": false,
      "stage": "strategisch"
     },
     {
      "action": "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten.",
      "check": "tls_rpt_missing",
+     "detail": "",
      "effect": "Meldet fehlgeschlagene verschlüsselte Zustellungen an Sie zurück",
      "lever": "TLS-RPT für die Domain veröffentlichen",
+     "per_rule": false,
      "stage": "strategisch"
     }
    ],
@@ -3583,7 +4534,7 @@
    ],
    "evidence": "header_check\nconnect.securess.de · Adresse: https://connect.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Frame-Options",
    "found": "Auf connect.securess.de ist keine Content-Security-Policy gesetzt: connect.securess.de. Auf connect.securess.de fehlen einzelne Sicherheits-Header der Webseite: connect.securess.de (fehlend: X-Frame-Options, Referrer-Policy, Permissions-Policy).",
-   "id": "VS-2026-012",
+   "id": "VS-2026-014",
    "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/212.227.60.78/kunde",
    "level": "niedrig",
@@ -3601,15 +4552,19 @@
     {
      "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
      "check": "csp_missing",
+     "detail": "",
      "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
      "lever": "Inhaltsrichtlinie für die Webseiten einführen",
+     "per_rule": false,
      "stage": "mittelfristig"
     },
     {
-     "action": "X-Frame-Options oder frame-ancestors in der Content-Security-Policy setzen.",
+     "action": "Die fehlenden Sicherheits-Header setzen",
      "check": "security_headers_incomplete",
-     "effect": "Verhindert das Einbetten der Seite in fremde Seiten",
+     "detail": "connect.securess.de (fehlend: X-Frame-Options, Referrer-Policy, Permissions-Policy)",
+     "effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
      "lever": "Fehlende Sicherheits-Header ergänzen",
+     "per_rule": true,
      "stage": "mittelfristig"
     }
    ],
@@ -3809,7 +4764,7 @@
    ],
    "evidence": "header_check\nlogin-kundenportal.securess.de · Adresse: https://login-kundenportal.securess.de · Antwort: 302 (Weiterleitung) · weitergeleitet auf: https://login-kundenportal.securess.de/Account/Login?ReturnUrl=%2F · Strict-Transport-Security: max-age=86400",
    "found": "Der Dienst login-kundenportal.securess.de setzt den HTTP Strict Transport Security Header mit einer Gültigkeitsdauer, die unter dem empfohlenen Richtwert liegt: login-kundenportal.securess.de (max-age 86400).",
-   "id": "VS-2026-013",
+   "id": "VS-2026-015",
    "impact": "Eine kurze Gültigkeitsdauer lässt den Schutz vor Downgrade-Angriffen bereits nach kurzer Zeit ohne erneuten Seitenaufruf ablaufen; wiederkehrende Besucher sind dann für einen Zeitraum wieder ungeschützt.",
    "key": "web_header_hygiene/51.116.154.224/platform:assfinetcloud.de",
    "level": "niedrig",
@@ -3823,8 +4778,10 @@
     {
      "action": "Die Gültigkeitsdauer des Strict-Transport-Security-Headers auf mindestens sechs Monate anheben.",
      "check": "hsts_short",
+     "detail": "",
      "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
      "lever": "Gültigkeitsdauer von HSTS verlängern",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -3896,629 +4853,6 @@
    "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein gesetzter Strict-Transport-Security-Header mit einer Gültigkeitsdauer von mindestens sechs Monaten."
   },
   {
-   "affected": "mailcleaner.securess.de (SERVERID: Secure, HttpOnly, SameSite; fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailin.securess.de (SERVERID: Secure, HttpOnly, SameSite; fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailout.securess.de (SERVERID: Secure, HttpOnly, SameSite; fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mx1.securess.de (SERVERID: Secure, HttpOnly, SameSite; fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy)",
-   "cat": "D",
-   "checks": [
-    "cookie_flags",
-    "csp_missing",
-    "security_headers_incomplete"
-   ],
-   "evidence": "header_check\nmailcleaner.securess.de · Cookie: SERVERID · ohne: Secure, HttpOnly, SameSite · Adresse: https://mailcleaner.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options\n\nheader_check\nmailin.securess.de · Cookie: SERVERID · ohne: Secure, HttpOnly, SameSite · Adresse: https://mailin.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options\n\nheader_check\nmailout.securess.de · Cookie: SERVERID · ohne: Secure, HttpOnly, SameSite · Adresse: https://mailout.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options\n\nheader_check\nmx1.securess.de · Cookie: SERVERID · ohne: Secure, HttpOnly, SameSite · Adresse: https://mx1.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options",
-   "found": "Auf 85.22.47.39 setzen Cookies nicht alle Sicherheits-Attribute: mailcleaner.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailin.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailout.securess.de (SERVERID: Secure, HttpOnly, SameSite), mx1.securess.de (SERVERID: Secure, HttpOnly, SameSite). Auf 85.22.47.39 ist keine Content-Security-Policy gesetzt: mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mx1.securess.de. Auf 85.22.47.39 fehlen einzelne Sicherheits-Header der Webseite: mailcleaner.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailin.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailout.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mx1.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
-   "id": "VS-2026-014",
-   "impact": "Ohne das Attribut Secure kann ein Cookie auch über eine unverschlüsselte Verbindung übertragen werden. Ohne HttpOnly kann clientseitiges Skript auf das Cookie zugreifen, etwa nach einer erfolgreichen Einschleusung von Fremdinhalten. Ohne SameSite kann das Cookie bei Anfragen von anderen Seiten mitgesendet werden. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
-   "key": "web_header_hygiene/85.22.47.39/kunde",
-   "level": "niedrig",
-   "level_label": "niedrig",
-   "missing_headers": [
-    "X-Content-Type-Options",
-    "Referrer-Policy",
-    "Permissions-Policy"
-   ],
-   "operator": "",
-   "operator_note": "",
-   "plan_action": "Die Attribute Secure, HttpOnly und SameSite für alle Cookies setzen, die eine Sitzung oder eine Anmeldung betreffen.",
-   "plan_effect": "Erschwert das Abgreifen von Sitzungen über unverschlüsselte Aufrufe und Skripte",
-   "plan_items": [
-    {
-     "action": "Die Attribute Secure, HttpOnly und SameSite für alle Cookies setzen, die eine Sitzung oder eine Anmeldung betreffen.",
-     "check": "cookie_flags",
-     "effect": "Erschwert das Abgreifen von Sitzungen über unverschlüsselte Aufrufe und Skripte",
-     "lever": "Sicherheitsattribute für Cookies setzen",
-     "stage": "mittelfristig"
-    },
-    {
-     "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
-     "check": "csp_missing",
-     "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
-     "lever": "Inhaltsrichtlinie für die Webseiten einführen",
-     "stage": "mittelfristig"
-    },
-    {
-     "action": "X-Content-Type-Options mit dem Wert nosniff setzen.",
-     "check": "security_headers_incomplete",
-     "effect": "Verhindert Fehldeutungen ausgelieferter Inhalte im Browser",
-     "lever": "Fehlende Sicherheits-Header ergänzen",
-     "stage": "mittelfristig"
-    }
-   ],
-   "plan_lever": "Sicherheitsattribute für Cookies setzen",
-   "plan_stage": "mittelfristig",
-   "policy": "cookie_flags, csp_missing, security_headers_incomplete",
-   "provenance": [
-    {
-     "check": "cookie_flags",
-     "field": "title",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39#SERVERID",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39#SERVERID",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39#SERVERID",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39#SERVERID"
-     ],
-     "statement": "short",
-     "text": "Cookies ohne Sicherheitsattribute"
-    },
-    {
-     "check": "csp_missing",
-     "field": "title",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "short",
-     "text": "Inhaltsrichtlinie fehlt"
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "title",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "short",
-     "text": "Sicherheits-Header unvollständig"
-    },
-    {
-     "check": "cookie_flags",
-     "field": "observation",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39#SERVERID",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39#SERVERID",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39#SERVERID",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39#SERVERID"
-     ],
-     "statement": "observation[0]",
-     "text": "Auf 85.22.47.39 setzen Cookies nicht alle Sicherheits-Attribute: mailcleaner.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailin.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailout.securess.de (SERVERID: Secure, HttpOnly, SameSite), mx1.securess.de (SERVERID: Secure, HttpOnly, SameSite)."
-    },
-    {
-     "check": "csp_missing",
-     "field": "observation",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "observation[0]",
-     "text": "Auf 85.22.47.39 ist keine Content-Security-Policy gesetzt: mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mx1.securess.de."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "observation",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "observation[0]",
-     "text": "Auf 85.22.47.39 fehlen einzelne Sicherheits-Header der Webseite: mailcleaner.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailin.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mailout.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mx1.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy)."
-    },
-    {
-     "check": "cookie_flags",
-     "field": "meaning",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39#SERVERID",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39#SERVERID",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39#SERVERID",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39#SERVERID"
-     ],
-     "statement": "meaning[0]",
-     "text": "Ohne das Attribut Secure kann ein Cookie auch über eine unverschlüsselte Verbindung übertragen werden. Ohne HttpOnly kann clientseitiges Skript auf das Cookie zugreifen, etwa nach einer erfolgreichen Einschleusung von Fremdinhalten. Ohne SameSite kann das Cookie bei Anfragen von anderen Seiten mitgesendet werden."
-    },
-    {
-     "check": "csp_missing",
-     "field": "meaning",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "meaning[0]",
-     "text": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "meaning",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "meaning[1]",
-     "text": "Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "meaning",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "meaning[2]",
-     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "meaning",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "meaning[3]",
-     "text": "Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen."
-    },
-    {
-     "check": "cookie_flags",
-     "field": "verify",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39#SERVERID",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39#SERVERID",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39#SERVERID",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39#SERVERID"
-     ],
-     "statement": "verify[0]",
-     "text": "HTTP-Antwortheader Set-Cookie der Startseite von außen abrufen; erwartet werden die Attribute Secure, HttpOnly und SameSite bei jedem Cookie."
-    },
-    {
-     "check": "csp_missing",
-     "field": "verify",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "verify[0]",
-     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "verify",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "verify[0]",
-     "text": "HTTP-Antwortheader der Endseite von außen abrufen."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "verify",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "verify[2]",
-     "text": "Erwartet wird X-Content-Type-Options mit dem Wert nosniff."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "verify",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "verify[3]",
-     "text": "Erwartet wird eine Referrer-Policy."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "verify",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "verify[4]",
-     "text": "Erwartet wird eine Permissions-Policy."
-    },
-    {
-     "check": "cookie_flags",
-     "field": "recommendation",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39#SERVERID",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39#SERVERID",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39#SERVERID",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39#SERVERID"
-     ],
-     "statement": "recommendation[0]",
-     "text": "Die Attribute Secure, HttpOnly und SameSite für alle Cookies setzen, die eine Sitzung oder eine Anmeldung betreffen."
-    },
-    {
-     "check": "csp_missing",
-     "field": "recommendation",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "recommendation[0]",
-     "text": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "recommendation",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "recommendation[1]",
-     "text": "X-Content-Type-Options mit dem Wert nosniff setzen."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "recommendation",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "recommendation[2]",
-     "text": "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "recommendation",
-     "members": [
-      "mailcleaner.securess.de@85.22.47.39|mailcleaner.securess.de@85.22.47.39",
-      "mailin.securess.de@85.22.47.39|mailin.securess.de@85.22.47.39",
-      "mailout.securess.de@85.22.47.39|mailout.securess.de@85.22.47.39",
-      "mx1.securess.de@85.22.47.39|mx1.securess.de@85.22.47.39"
-     ],
-     "statement": "recommendation[3]",
-     "text": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
-    }
-   ],
-   "recommendation": [
-    [
-     "Mittelfristig",
-     "Die Attribute Secure, HttpOnly und SameSite für alle Cookies setzen, die eine Sitzung oder eine Anmeldung betreffen."
-    ],
-    [
-     "Mittelfristig",
-     "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt."
-    ],
-    [
-     "Mittelfristig",
-     "X-Content-Type-Options mit dem Wert nosniff setzen."
-    ],
-    [
-     "Mittelfristig",
-     "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
-    ],
-    [
-     "Mittelfristig",
-     "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
-    ]
-   ],
-   "scale": "hygiene",
-   "source": "aktiv (header_check)",
-   "status": "blau",
-   "subjects": [
-    "cookie_flags|mailcleaner.securess.de@85.22.47.39",
-    "cookie_flags|mailcleaner.securess.de@85.22.47.39#SERVERID",
-    "cookie_flags|mailin.securess.de@85.22.47.39",
-    "cookie_flags|mailin.securess.de@85.22.47.39#SERVERID",
-    "cookie_flags|mailout.securess.de@85.22.47.39",
-    "cookie_flags|mailout.securess.de@85.22.47.39#SERVERID",
-    "cookie_flags|mx1.securess.de@85.22.47.39",
-    "cookie_flags|mx1.securess.de@85.22.47.39#SERVERID",
-    "csp_missing|mailcleaner.securess.de@85.22.47.39",
-    "csp_missing|mailin.securess.de@85.22.47.39",
-    "csp_missing|mailout.securess.de@85.22.47.39",
-    "csp_missing|mx1.securess.de@85.22.47.39",
-    "security_headers_incomplete|mailcleaner.securess.de@85.22.47.39",
-    "security_headers_incomplete|mailin.securess.de@85.22.47.39",
-    "security_headers_incomplete|mailout.securess.de@85.22.47.39",
-    "security_headers_incomplete|mx1.securess.de@85.22.47.39"
-   ],
-   "threat": null,
-   "title": "Absicherung der Webdienste auf 85.22.47.39: Cookies ohne Sicherheitsattribute, Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
-   "urgency": "Mittelfristig",
-   "verify": "HTTP-Antwortheader Set-Cookie der Startseite von außen abrufen; erwartet werden die Attribute Secure, HttpOnly und SameSite bei jedem Cookie. HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird X-Content-Type-Options mit dem Wert nosniff. Erwartet wird eine Referrer-Policy. Erwartet wird eine Permissions-Policy."
-  },
-  {
-   "affected": "www.securess.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)",
-   "cat": "D",
-   "checks": [
-    "csp_missing",
-    "security_headers_incomplete"
-   ],
-   "evidence": "header_check\nwww.securess.de · Adresse: https://www.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options",
-   "found": "Auf www.securess.de ist keine Content-Security-Policy gesetzt: www.securess.de. Auf www.securess.de fehlen einzelne Sicherheits-Header der Webseite: www.securess.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
-   "id": "VS-2026-015",
-   "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
-   "key": "web_header_hygiene/85.22.47.41/kunde",
-   "level": "niedrig",
-   "level_label": "niedrig",
-   "missing_headers": [
-    "X-Frame-Options",
-    "X-Content-Type-Options",
-    "Referrer-Policy",
-    "Permissions-Policy"
-   ],
-   "operator": "",
-   "operator_note": "",
-   "plan_action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
-   "plan_effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
-   "plan_items": [
-    {
-     "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
-     "check": "csp_missing",
-     "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
-     "lever": "Inhaltsrichtlinie für die Webseiten einführen",
-     "stage": "mittelfristig"
-    },
-    {
-     "action": "X-Frame-Options oder frame-ancestors in der Content-Security-Policy setzen.",
-     "check": "security_headers_incomplete",
-     "effect": "Verhindert das Einbetten der Seite in fremde Seiten",
-     "lever": "Fehlende Sicherheits-Header ergänzen",
-     "stage": "mittelfristig"
-    }
-   ],
-   "plan_lever": "Inhaltsrichtlinie für die Webseiten einführen",
-   "plan_stage": "mittelfristig",
-   "policy": "csp_missing, security_headers_incomplete",
-   "provenance": [
-    {
-     "check": "csp_missing",
-     "field": "title",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "short",
-     "text": "Inhaltsrichtlinie fehlt"
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "title",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "short",
-     "text": "Sicherheits-Header unvollständig"
-    },
-    {
-     "check": "csp_missing",
-     "field": "observation",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "observation[0]",
-     "text": "Auf www.securess.de ist keine Content-Security-Policy gesetzt: www.securess.de."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "observation",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "observation[0]",
-     "text": "Auf www.securess.de fehlen einzelne Sicherheits-Header der Webseite: www.securess.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)."
-    },
-    {
-     "check": "csp_missing",
-     "field": "meaning",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "meaning[0]",
-     "text": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "meaning",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "meaning[0]",
-     "text": "Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "meaning",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "meaning[1]",
-     "text": "Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "meaning",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "meaning[2]",
-     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "meaning",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "meaning[3]",
-     "text": "Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen."
-    },
-    {
-     "check": "csp_missing",
-     "field": "verify",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "verify[0]",
-     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "verify",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "verify[0]",
-     "text": "HTTP-Antwortheader der Endseite von außen abrufen."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "verify",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "verify[1]",
-     "text": "Erwartet wird X-Frame-Options oder frame-ancestors in der Content-Security-Policy."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "verify",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "verify[2]",
-     "text": "Erwartet wird X-Content-Type-Options mit dem Wert nosniff."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "verify",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "verify[3]",
-     "text": "Erwartet wird eine Referrer-Policy."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "verify",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "verify[4]",
-     "text": "Erwartet wird eine Permissions-Policy."
-    },
-    {
-     "check": "csp_missing",
-     "field": "recommendation",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "recommendation[0]",
-     "text": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "recommendation",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "recommendation[0]",
-     "text": "X-Frame-Options oder frame-ancestors in der Content-Security-Policy setzen."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "recommendation",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "recommendation[1]",
-     "text": "X-Content-Type-Options mit dem Wert nosniff setzen."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "recommendation",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "recommendation[2]",
-     "text": "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "recommendation",
-     "members": [
-      "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
-     ],
-     "statement": "recommendation[3]",
-     "text": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
-    }
-   ],
-   "recommendation": [
-    [
-     "Mittelfristig",
-     "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt."
-    ],
-    [
-     "Mittelfristig",
-     "X-Frame-Options oder frame-ancestors in der Content-Security-Policy setzen."
-    ],
-    [
-     "Mittelfristig",
-     "X-Content-Type-Options mit dem Wert nosniff setzen."
-    ],
-    [
-     "Mittelfristig",
-     "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
-    ],
-    [
-     "Mittelfristig",
-     "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
-    ]
-   ],
-   "scale": "hygiene",
-   "source": "aktiv (header_check)",
-   "status": "blau",
-   "subjects": [
-    "csp_missing|www.securess.de@85.22.47.41",
-    "security_headers_incomplete|www.securess.de@85.22.47.41"
-   ],
-   "threat": null,
-   "title": "Absicherung der Webdienste auf 85.22.47.41: Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
-   "urgency": "Mittelfristig",
-   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird X-Frame-Options oder frame-ancestors in der Content-Security-Policy. Erwartet wird X-Content-Type-Options mit dem Wert nosniff. Erwartet wird eine Referrer-Policy. Erwartet wird eine Permissions-Policy."
-  },
-  {
    "affected": "ftp.securess.de (Server: nginx/1.22.1), mailcleaner.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), mailin.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), mailout.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), mx1.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), securess.de (Server: nginx/1.22.1), www.securess.de (Server: nginx/1.22.1)",
    "cat": "E",
    "checks": [
@@ -4545,8 +4879,10 @@
     {
      "action": "Versionskennungen und interne Servernamen in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert setzen.",
      "check": "http_header_disclosure",
+     "detail": "",
      "effect": "Erschwert die gezielte Suche nach passenden Schwachstellen",
      "lever": "Versionsangaben aus den Antwort-Headern entfernen",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -4676,15 +5012,19 @@
     {
      "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
      "check": "caa_missing",
+     "detail": "",
      "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
      "lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+     "per_rule": false,
      "stage": "mittelfristig"
     },
     {
      "action": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
      "check": "dnssec_missing",
+     "detail": "",
      "effect": "Schützt DNS-Antworten gegen Verfälschung auf dem Übertragungsweg",
      "lever": "DNS-Zone mit DNSSEC signieren",
+     "per_rule": false,
      "stage": "strategisch"
     }
    ],
@@ -4811,10 +5151,10 @@
    "checks": [
     "smtp_vrfy_enabled"
    ],
-   "evidence": "nmap · hosts/85.22.47.39/phase1/nmap.xml\n85.22.47.39:25/tcp · Dienst: smtp · Produkt: Postfix smtpd · TLS erzwungen: ja · STARTTLS: ja · Anmeldung vor TLS gesperrt: ja · Zertifikat für: *.securess.de · Aussteller: Sectigo Public Server Authentication CA DV R36 · gültig bis: 12.09.2026, 23:59 UTC · SMTP-Befehle: mx1.securess.de, PIPELINING, SIZE 102400000, VRFY, STARTTLS, ENHANCEDSTATUSCODES, 8BITMIME, CHUNKING",
-   "found": "Der Mailserver auf 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de) beantwortet den Befehl VRFY: 85.22.47.39:25 (SMTP). Damit lässt sich von außen prüfen, ob ein Postfach existiert.",
+   "evidence": "nmap · hosts/85.22.47.39/phase1/nmap.xml\n85.22.47.39:25/tcp · Dienst: smtp · Produkt: Postfix smtpd · TLS erzwungen: ja · STARTTLS: ja · Anmeldung vor TLS gesperrt: ja · VRFY in der EHLO-Liste: ja · Zertifikat für: *.securess.de · Aussteller: Sectigo Public Server Authentication CA DV R36 · gültig bis: 12.09.2026, 23:59 UTC · SMTP-Befehle: mx1.securess.de, PIPELINING, SIZE 102400000, VRFY, STARTTLS, ENHANCEDSTATUSCODES, 8BITMIME, CHUNKING",
+   "found": "Der Mailserver auf 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de) nennt den Befehl VRFY in seiner Antwort auf EHLO: 85.22.47.39:25 (SMTP). Ob er Anfragen zu Postfachnamen beantwortet, hat der Scan nicht geprüft.",
    "id": "VS-2026-018",
-   "impact": "Mit VRFY lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte Phishing-Mails und Rateangriffe auf Zugangsdaten.",
+   "impact": "Beantwortet der Mailserver VRFY, lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte Phishing-Mails und Rateangriffe auf Zugangsdaten.",
    "key": "smtp_commands/85.22.47.39/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -4827,8 +5167,10 @@
     {
      "action": "Den Befehl VRFY in der Konfiguration des Mailservers abschalten, bei Postfix über disable_vrfy_command.",
      "check": "smtp_vrfy_enabled",
+     "detail": "",
      "effect": "Verhindert die Abfrage gültiger Postfachnamen",
      "lever": "Befehl VRFY am Mailserver abschalten",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -4843,7 +5185,7 @@
       "85.22.47.39|85.22.47.39:25"
      ],
      "statement": "short",
-     "text": "VRFY beantwortet"
+     "text": "VRFY angeboten (laut EHLO)"
     },
     {
      "check": "smtp_vrfy_enabled",
@@ -4852,7 +5194,7 @@
       "85.22.47.39|85.22.47.39:25"
      ],
      "statement": "observation[0]",
-     "text": "Der Mailserver auf 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de) beantwortet den Befehl VRFY: 85.22.47.39:25 (SMTP). Damit lässt sich von außen prüfen, ob ein Postfach existiert."
+     "text": "Der Mailserver auf 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de) nennt den Befehl VRFY in seiner Antwort auf EHLO: 85.22.47.39:25 (SMTP). Ob er Anfragen zu Postfachnamen beantwortet, hat der Scan nicht geprüft."
     },
     {
      "check": "smtp_vrfy_enabled",
@@ -4861,7 +5203,7 @@
       "85.22.47.39|85.22.47.39:25"
      ],
      "statement": "meaning[0]",
-     "text": "Mit VRFY lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte Phishing-Mails und Rateangriffe auf Zugangsdaten."
+     "text": "Beantwortet der Mailserver VRFY, lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte Phishing-Mails und Rateangriffe auf Zugangsdaten."
     },
     {
      "check": "smtp_vrfy_enabled",
@@ -4896,7 +5238,7 @@
     "smtp_vrfy_enabled|85.22.47.39:25"
    ],
    "threat": null,
-   "title": "Mailserver auf 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de): VRFY beantwortet",
+   "title": "Mailserver auf 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de): VRFY angeboten (laut EHLO)",
    "urgency": "Mittelfristig",
    "verify": "Verbindung zum Mailserver aufbauen und VRFY mit einem bekannten Postfachnamen senden; erwartet wird eine Ablehnung ohne Aussage über das Postfach."
   }
@@ -4940,7 +5282,7 @@
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von securess.de am 19.07.2026: 26 Hostnamen auf 12 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 12 Systeme (212.227.60.78, 51.116.154.224, 85.22.47.36, 85.22.47.38, 85.22.47.39, 85.22.47.40, 85.22.47.41, 85.22.47.42, 85.22.47.43, 85.22.47.45, 85.22.47.46 und 85.22.47.47) liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "coverage_warning": "Für 12 Systeme (212.227.60.78, 51.116.154.224, 85.22.47.36, 85.22.47.38, 85.22.47.39, 85.22.47.40, 85.22.47.41, 85.22.47.42, 85.22.47.43, 85.22.47.45, 85.22.47.46 und 85.22.47.47) liegt keine oder nur eine teilweise aktive Prüfung vor. 3 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugang zur Verwaltung der Systeme",
@@ -4951,12 +5293,12 @@
     "title": "Verwaltungsoberflächen vom Internet trennen"
    },
    {
-    "effect": "Klärt, ob eine Verwaltungsoberfläche offen im Internet steht",
+    "effect": "Begrenzt den Zugriff auf Software ohne Sicherheitsupdates bis zur Ablösung",
     "n": 2,
     "refs": [
-     "VS-2026-001"
+     "VS-2026-003"
     ],
-    "title": "Gemeldete Verwaltungszugänge prüfen und beschränken"
+    "title": "Serversoftware ohne Herstellerpflege ersetzen"
    },
    {
     "effect": "Schützt Zugangsdaten und Nachrichten auf dem Übertragungsweg",
@@ -4971,11 +5313,11 @@
   "overall_status": "rot",
   "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
- "landscape_lead": "18 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "18 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 60,
-  "catalog_digest": "004a04598e2072c37701db55752e05f8f2b155bf6ec91f987217067547919206",
-  "catalog_version": "2026-09-26.2",
+  "after_fp": 67,
+  "catalog_digest": "bbd6dccec70f05898fcc9e7fbbb77f57bca528dd070683052c467e758681182a",
+  "catalog_version": "2026-09-27.1",
   "classification": "Vertraulich",
   "consolidated": 18,
   "context_fields": [],
@@ -4986,8 +5328,9 @@
    "securess.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.1.0",
+  "facts_schema_version": "1.2.0",
   "fqdns_total": 26,
+  "generated_on": null,
   "generation": null,
   "hosts_ipv4": 12,
   "hosts_ipv6": 0,
@@ -5000,8 +5343,8 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-26.2",
-  "positives": 4,
+  "policy_version": "2026-09-27.1",
+  "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
@@ -5033,18 +5376,18 @@
    "st": "rot"
   },
   {
-   "action": "Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand.",
-   "effect": "Klärt, ob eine Verwaltungsoberfläche offen im Internet steht",
-   "lever": "Gemeldete Verwaltungszugänge prüfen und beschränken",
+   "action": "Die Ablösung durch eine vom Hersteller gepflegte Version planen und bis dahin den Zugang aus dem Internet auf das Nötige einschränken.",
+   "effect": "Begrenzt den Zugriff auf Software ohne Sicherheitsupdates bis zur Ablösung",
+   "lever": "Serversoftware ohne Herstellerpflege ersetzen",
    "operator": "",
    "prio": "In Kürze",
    "refs": [
-    "VS-2026-001"
+    "VS-2026-003"
    ],
    "sources": [
-    "VS-2026-001:admin_service_exposed_passive"
+    "VS-2026-003:software_eol"
    ],
-   "st": "rot"
+   "st": "gelb"
   },
   {
    "action": "Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten.",
@@ -5057,20 +5400,6 @@
    ],
    "sources": [
     "VS-2026-002:mail_plaintext"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Die Ablösung durch eine vom Hersteller gepflegte Version planen und bis dahin den Zugang aus dem Internet auf das Nötige einschränken.",
-   "effect": "Begrenzt den Zugriff auf Software ohne Sicherheitsupdates bis zur Ablösung",
-   "lever": "Serversoftware ohne Herstellerpflege ersetzen",
-   "operator": "",
-   "prio": "In Kürze",
-   "refs": [
-    "VS-2026-003"
-   ],
-   "sources": [
-    "VS-2026-003:software_eol"
    ],
    "st": "gelb"
   },
@@ -5175,16 +5504,70 @@
    "st": "gelb"
   },
   {
-   "action": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet.",
-   "effect": "Begrenzt die Browserfunktionen, die eingebettete Inhalte nutzen dürfen",
+   "action": "Die fehlenden Sicherheits-Header setzen: eset.securess.de (fehlend: Permissions-Policy); openotp.securess.de (fehlend: Permissions-Policy); mailcleaner.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy); mailin.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy); mailout.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy); mx1.securess.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy); www.securess.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy); connect.securess.de (fehlend: X-Frame-Options, Referrer-Policy, Permissions-Policy)",
+   "effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
    "lever": "Fehlende Sicherheits-Header ergänzen",
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-007"
+    "VS-2026-007",
+    "VS-2026-008",
+    "VS-2026-009",
+    "VS-2026-014"
    ],
    "sources": [
-    "VS-2026-007:security_headers_incomplete"
+    "VS-2026-007:security_headers_incomplete",
+    "VS-2026-008:security_headers_incomplete",
+    "VS-2026-009:security_headers_incomplete",
+    "VS-2026-014:security_headers_incomplete"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
+   "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+   "lever": "HTTP Strict Transport Security setzen",
+   "operator": "",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-008",
+    "VS-2026-009"
+   ],
+   "sources": [
+    "VS-2026-008:hsts_missing",
+    "VS-2026-009:hsts_missing"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Die Attribute Secure, HttpOnly und SameSite für alle Cookies setzen, die eine Sitzung oder eine Anmeldung betreffen.",
+   "effect": "Erschwert das Abgreifen von Sitzungen über unverschlüsselte Aufrufe und Skripte",
+   "lever": "Sicherheitsattribute für Cookies setzen",
+   "operator": "",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-008"
+   ],
+   "sources": [
+    "VS-2026-008:cookie_flags"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
+   "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+   "lever": "Inhaltsrichtlinie für die Webseiten einführen",
+   "operator": "",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-008",
+    "VS-2026-009",
+    "VS-2026-014"
+   ],
+   "sources": [
+    "VS-2026-008:csp_missing",
+    "VS-2026-009:csp_missing",
+    "VS-2026-014:csp_missing"
    ],
    "st": "gelb"
   },
@@ -5195,10 +5578,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-008"
+    "VS-2026-010"
    ],
    "sources": [
-    "VS-2026-008:legacy_protocols_present"
+    "VS-2026-010:legacy_protocols_present"
    ],
    "st": "blau"
   },
@@ -5209,10 +5592,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-009"
+    "VS-2026-011"
    ],
    "sources": [
-    "VS-2026-009:software_lifecycle_hint"
+    "VS-2026-011:software_lifecycle_hint"
    ],
    "st": "blau"
   },
@@ -5223,44 +5606,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-010"
+    "VS-2026-012"
    ],
    "sources": [
-    "VS-2026-010:spf_softfail"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
-   "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
-   "lever": "Inhaltsrichtlinie für die Webseiten einführen",
-   "operator": "",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-012",
-    "VS-2026-014",
-    "VS-2026-015"
-   ],
-   "sources": [
-    "VS-2026-012:csp_missing",
-    "VS-2026-014:csp_missing",
-    "VS-2026-015:csp_missing"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "X-Frame-Options oder frame-ancestors in der Content-Security-Policy setzen.",
-   "effect": "Verhindert das Einbetten der Seite in fremde Seiten",
-   "lever": "Fehlende Sicherheits-Header ergänzen",
-   "operator": "",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-012",
-    "VS-2026-015"
-   ],
-   "sources": [
-    "VS-2026-012:security_headers_incomplete",
-    "VS-2026-015:security_headers_incomplete"
+    "VS-2026-012:spf_softfail"
    ],
    "st": "blau"
   },
@@ -5271,38 +5620,10 @@
    "operator": "platform",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-013"
+    "VS-2026-015"
    ],
    "sources": [
-    "VS-2026-013:hsts_short"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Die Attribute Secure, HttpOnly und SameSite für alle Cookies setzen, die eine Sitzung oder eine Anmeldung betreffen.",
-   "effect": "Erschwert das Abgreifen von Sitzungen über unverschlüsselte Aufrufe und Skripte",
-   "lever": "Sicherheitsattribute für Cookies setzen",
-   "operator": "",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-014"
-   ],
-   "sources": [
-    "VS-2026-014:cookie_flags"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "X-Content-Type-Options mit dem Wert nosniff setzen.",
-   "effect": "Verhindert Fehldeutungen ausgelieferter Inhalte im Browser",
-   "lever": "Fehlende Sicherheits-Header ergänzen",
-   "operator": "",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-014"
-   ],
-   "sources": [
-    "VS-2026-014:security_headers_incomplete"
+    "VS-2026-015:hsts_short"
    ],
    "st": "blau"
   },
@@ -5369,10 +5690,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-011"
+    "VS-2026-013"
    ],
    "sources": [
-    "VS-2026-011:mta_sts_missing"
+    "VS-2026-013:mta_sts_missing"
    ],
    "st": "blau"
   },
@@ -5383,10 +5704,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-011"
+    "VS-2026-013"
    ],
    "sources": [
-    "VS-2026-011:tls_rpt_missing"
+    "VS-2026-013:tls_rpt_missing"
    ],
    "st": "blau"
   },
@@ -5455,6 +5776,37 @@
   {
    "cat": "C",
    "checks": [
+    "dkim_missing"
+   ],
+   "provenance": [
+    {
+     "check": "dkim_missing",
+     "field": "positive",
+     "members": [
+      "securess.de"
+     ],
+     "statement": "positive.title",
+     "text": "DKIM vorhanden"
+    },
+    {
+     "check": "dkim_missing",
+     "field": "positive",
+     "members": [
+      "securess.de"
+     ],
+     "statement": "positive.text",
+     "text": "Für die Domain securess.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+    }
+   ],
+   "subjects": [
+    "securess.de"
+   ],
+   "text": "Für die Domain securess.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+   "title": "DKIM vorhanden"
+  },
+  {
+   "cat": "C",
+   "checks": [
     "dns_zone_transfer"
    ],
    "provenance": [
@@ -5484,46 +5836,41 @@
    "title": "Zonentransfer abgewiesen"
   },
   {
-   "cat": "C",
+   "cat": "D",
    "checks": [
-    "spf_missing",
-    "dkim_missing"
+    "hsts_short"
    ],
    "provenance": [
     {
-     "check": "spf_missing,dkim_missing",
+     "check": "hsts_short",
      "field": "positive",
      "members": [
-      "securess.de",
-      "securess.de"
+      "connect.securess.de@212.227.60.78",
+      "eset.securess.de@85.22.47.38",
+      "openotp.securess.de@85.22.47.38"
      ],
      "statement": "positive.title",
-     "text": "Absender-Authentizität mit SPF und DKIM hinterlegt"
+     "text": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
     },
     {
-     "check": "spf_missing",
+     "check": "hsts_short",
      "field": "positive",
      "members": [
-      "securess.de"
+      "connect.securess.de@212.227.60.78",
+      "eset.securess.de@85.22.47.38",
+      "openotp.securess.de@85.22.47.38"
      ],
      "statement": "positive.text",
-     "text": "Für die Domain securess.de ist ein SPF-Eintrag veröffentlicht."
-    },
-    {
-     "check": "dkim_missing",
-     "field": "positive",
-     "members": [
-      "securess.de"
-     ],
-     "statement": "positive.text",
-     "text": "Für die Domain securess.de ist eine DKIM-Signatur veröffentlicht."
+     "text": "Die Dienste connect.securess.de, eset.securess.de und openotp.securess.de setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer."
     }
    ],
    "subjects": [
-    "securess.de"
+    "connect.securess.de@212.227.60.78",
+    "eset.securess.de@85.22.47.38",
+    "openotp.securess.de@85.22.47.38"
    ],
-   "text": "Für die Domain securess.de ist ein SPF-Eintrag veröffentlicht. Für die Domain securess.de ist eine DKIM-Signatur veröffentlicht.",
-   "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
+   "text": "Die Dienste connect.securess.de, eset.securess.de und openotp.securess.de setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer.",
+   "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   },
   {
    "cat": "D",
@@ -5582,7 +5929,7 @@
   "hosts": [
    {
     "cov": "teil",
-    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI connect.securess.de, vermittler.securess.de) geprüft, nicht für Port 21, 25, 110, 143, 465, 993, 995, 8443; nicht geprüft: aktive Webanalyse.",
+    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI connect.securess.de) geprüft, nicht für Port 21, 25, 110, 143, 465, 993, 995, 8443; nicht geprüft: aktive Webanalyse.",
     "fqdns": "connect.securess.de, partner.securess.de, vermittler.securess.de",
     "ip": "212.227.60.78",
     "more_ips": [],
@@ -5596,7 +5943,7 @@
     "ip": "51.116.154.224",
     "more_ips": [],
     "operator": "Microsoft Limited",
-    "role": "Nicht näher bestimmbar · Plattform assfinetcloud.de"
+    "role": "Webanwendung mit Anmeldung · Plattform assfinetcloud.de"
    },
    {
     "cov": "keine",
@@ -5609,7 +5956,7 @@
    },
    {
     "cov": "teil",
-    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI eset.securess.de, openotp.securess.de) geprüft, nicht für Port 25; nicht geprüft: aktive Webanalyse.",
+    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI eset.securess.de) geprüft, nicht für Port 25; nicht geprüft: aktive Webanalyse.",
     "fqdns": "eset.securess.de, openotp.securess.de",
     "ip": "85.22.47.38",
     "more_ips": [],
@@ -5618,7 +5965,7 @@
    },
    {
     "cov": "teil",
-    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI mailcleaner.securess.de, mx1.securess.de) geprüft, nicht für Port 25, 465, 587, 993; nicht geprüft: aktive Webanalyse.",
+    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI mailcleaner.securess.de) geprüft, nicht für Port 25, 465, 587, 993; nicht geprüft: aktive Webanalyse.",
     "fqdns": "imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de",
     "ip": "85.22.47.39",
     "more_ips": [],
@@ -5739,28 +6086,14 @@
    },
    {
     "checks": [
-     "Bekannte Schwachstellen der erkannten Versionen"
+     "Abgleich mit Schwachstellendatenbanken"
     ],
     "code": "no_enrichment",
-    "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de), 85.22.47.41 (ftp.securess.de, securess.de, www.securess.de), 85.22.47.46 (rdgw.securess.de).",
-    "refs": [
-     "cve_kev_listed|212.227.60.78",
-     "cve_kev_listed|51.116.154.224",
-     "cve_kev_listed|85.22.47.38",
-     "cve_kev_listed|85.22.47.39",
-     "cve_kev_listed|85.22.47.41",
-     "cve_kev_listed|85.22.47.46",
-     "cve_known_version|212.227.60.78",
-     "cve_known_version|51.116.154.224",
-     "cve_known_version|85.22.47.38",
-     "cve_known_version|85.22.47.39",
-     "cve_known_version|85.22.47.41",
-     "cve_known_version|85.22.47.46"
-    ],
+    "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de und 4 weitere), 85.22.47.41 (ftp.securess.de, securess.de, www.securess.de), 85.22.47.46 (rdgw.securess.de).",
+    "refs": [],
     "subjects": [
      "212.227.60.78",
      "51.116.154.224",
-     "85.22.47.38",
      "85.22.47.39",
      "85.22.47.41",
      "85.22.47.46"
@@ -5769,25 +6102,13 @@
    },
    {
     "checks": [
-     "Aktive Prüfung der Webanwendung",
+     "Web-, Mail- und Dienst-Prüfungen",
      "Anmeldung über unverschlüsselte Verbindungen",
-     "Befehle der Mailserver",
-     "Dienste laut Passivquelle",
      "Einträge in Schadcode-Listen",
-     "Freigaben für fremde Ursprünge (CORS)",
-     "Integrität eingebundener Skripte",
-     "JavaScript-Bibliotheken",
-     "Meldungen der Webanalyse",
-     "Preisgegebene Angaben",
-     "Reputation der Adressen",
-     "Schutz der Formulare",
-     "Sensible Pfade und Dateien",
-     "Sitzungskennungen in Adressen",
-     "Verwaltungsoberflächen",
-     "Verzeichnisauflistung"
+     "Reputation der Adressen"
     ],
     "code": "no_coverage_rows",
-    "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de), 85.22.47.41 (ftp.securess.de, securess.de, www.securess.de), 85.22.47.46 (rdgw.securess.de), login-kundenportal.securess.de und 1 weitere.",
+    "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de), 85.22.47.41 (ftp.securess.de, securess.de, www.securess.de), 85.22.47.46 (rdgw.securess.de) und 1 weitere.",
     "refs": [
      "admin_port_passive_unidentified|85.22.47.39",
      "admin_service_exposed_passive|85.22.47.39",
@@ -5860,6 +6181,7 @@
      "info_disclosure|webmail.securess.de@85.22.47.39",
      "info_disclosure|www.securess.de@85.22.47.41",
      "ip_reputation|212.227.60.78",
+     "ip_reputation|51.116.154.224",
      "ip_reputation|85.22.47.38",
      "ip_reputation|85.22.47.39",
      "ip_reputation|85.22.47.41",
@@ -5998,9 +6320,8 @@
    },
    {
     "checks": [
-     "ftp.securess.de",
-     "login-kundenportal.securess.de",
-     "securess.de"
+     "Content-Security-Policy",
+     "Sicherheits-Header"
     ],
     "code": "headers_redirect_only",
     "detail": "Betroffen: ftp.securess.de (301 auf www.securess.de), login-kundenportal.securess.de (302 auf /Account/Login), securess.de (301 auf www.securess.de).",
@@ -6045,9 +6366,9 @@
      "cert_chain_incomplete|vermittler.securess.de@212.227.60.78"
     ],
     "subjects": [
-     "212.227.60.78",
-     "85.22.47.38",
-     "85.22.47.39"
+     "mx1.securess.de@85.22.47.39",
+     "openotp.securess.de@85.22.47.38",
+     "vermittler.securess.de@212.227.60.78"
     ],
     "what": "Vertrauenskette des Zertifikats nicht geprüft"
    },
@@ -6058,43 +6379,40 @@
      "Sicherheits-Header"
     ],
     "code": "unreachable",
-    "detail": "Betroffen: ftp.securess.de, mailcleaner.securess.de, rdgw.securess.de, vermittler.securess.de.",
+    "detail": "Betroffen: rdgw.securess.de, vermittler.securess.de.",
     "refs": [
      "csp_missing|partner.securess.de@212.227.60.78",
      "csp_missing|rdgw.securess.de@85.22.47.46",
      "csp_missing|vermittler.securess.de@212.227.60.78",
-     "hsts_missing|ftp.securess.de@85.22.47.41",
-     "hsts_missing|mailcleaner.securess.de@85.22.47.39",
-     "hsts_missing|mailin.securess.de@85.22.47.39",
-     "hsts_missing|mailout.securess.de@85.22.47.39",
-     "hsts_missing|mx1.securess.de@85.22.47.39",
      "hsts_missing|partner.securess.de@212.227.60.78",
      "hsts_missing|rdgw.securess.de@85.22.47.46",
-     "hsts_missing|securess.de@85.22.47.41",
      "hsts_missing|vermittler.securess.de@212.227.60.78",
-     "hsts_missing|www.securess.de@85.22.47.41",
      "security_headers_incomplete|partner.securess.de@212.227.60.78",
      "security_headers_incomplete|rdgw.securess.de@85.22.47.46",
      "security_headers_incomplete|vermittler.securess.de@212.227.60.78"
     ],
     "subjects": [
      "212.227.60.78",
-     "85.22.47.39",
-     "85.22.47.41",
      "85.22.47.46"
     ],
     "what": "Webdienst antwortete nicht"
    },
    {
     "checks": [
-     "Content-Security-Policy",
-     "Gültigkeit der Zertifikate",
-     "HSTS",
-     "Namen im Zertifikat",
      "Sicherheits-Header",
-     "TLS 1.3",
-     "TLS-Protokollversionen",
-     "Zertifikatskette"
+     "Webanalyse"
+    ],
+    "code": "webport_unanalysed",
+    "detail": "Betroffen: 212.227.60.78 (Port 8443).",
+    "refs": [],
+    "subjects": [
+     "212.227.60.78"
+    ],
+    "what": "Webdienst auf weiterem Port ohne Web- und Header-Analyse"
+   },
+   {
+    "checks": [
+     "Web-, Header- und TLS-Prüfungen"
     ],
     "code": "insufficient_facts",
     "detail": "Betroffen: ftp.securess.de, mailstore.securess.de, partner.securess.de.",
@@ -6188,7 +6506,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 18 Befunde und 4 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 18 Befunde und 5 positive Feststellungen."
    }
   ],
   "numbers": [

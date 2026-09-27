@@ -64,6 +64,20 @@ Historie:
   ``TargetFact.discovered`` (gefundene, nicht im Inventar angekommene Namen),
   ``CoverageFact.target``, ``SoftwareFact.conflicts``. URLhaus ohne Daten heisst
   ``compromised=None`` (Ausfall), nicht "nicht kompromittiert".
+- 1.2.0 (S6b-4, spec/11 T1 bis T15): neue Entitaet ``path_search`` (Pfadsuche je Host aus
+  feroxbuster-Statistik und ffuf-Treffern, T8). Neue optionale Felder: ``ScanFact.scanned_ports``
+  (Portbereich des Portscans laut nmap ``scaninfo``, T1), ``TlsFact.measured_ip`` und
+  ``HttpFact.measured_ip`` (tatsaechlich gemessene Adresse laut testssl ``-->>`` und httpx
+  ``host``, T7), ``HostFact.additional_ips`` (AAAA aus dnsx ohne Inventareintrag, T7),
+  ``HstsInfo.tool``, ``url``, ``status_code`` (Antwort, an der HSTS gemessen ist, T3, T4),
+  ``PassiveFact.kennung`` (Dienstkennung aus Modul und Banner, T1), ``ServiceFact.foreign``
+  (Dienst eines anderen Kunden auf einem geteilten Server, T9), ``SharedSystem.server_operator``
+  (Betreiber des Servers laut rDNS und Standardzertifikat, T9), ``SoftwareFact.outdated`` und
+  ``latest_version`` (wpscan, T15), ``WpFinding.found_by`` (T3). Bedeutung geaendert:
+  ``ServiceFact.kennung`` entsteht auch aus Protokollskripten (IMAP, POP3, SMTP) und dem
+  Passivbanner desselben Ports; ``CertRenewal`` beschreibt die Zertifikatslinie (gleiches
+  Namensset und gleicher Aussteller) statt aller Zertifikate eines Namens (T14); ``HttpFact.hsts``
+  wertet keine 4xx-, 429- oder Challenge-Antwort (T4).
 """
 from __future__ import annotations
 
@@ -71,7 +85,7 @@ from typing import Any, ClassVar, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-FACTS_SCHEMA_VERSION = "1.1.0"
+FACTS_SCHEMA_VERSION = "1.2.0"
 
 Mode = Literal["active", "passive"]
 
@@ -132,6 +146,10 @@ class ScanFact(Fact):
     hosts_scanned: Optional[int] = None
     counts: ScanCounts = Field(default_factory=ScanCounts)
     policy_version: Optional[str] = None
+    # S6b-4 (spec/11 T1): Portbereich des Portscans laut nmap ``scaninfo`` ("1,3-4,6-7,..."),
+    # Grundlage fuer "ausserhalb des geprueften Portbereichs" bei Ports aus einer Passivquelle.
+    scanned_ports: Optional[str] = None
+    scanned_port_count: Optional[int] = None
 
 
 class Whois(Base):
@@ -227,6 +245,9 @@ class SharedSystem(Base):
     """
     kind: SharedKind
     operator: Optional[str] = None
+    # S6b-4 (spec/11 T9, E18): Betreiber des Servers laut rDNS und Standardzertifikat, wenn
+    # das nicht der Netzbetreiber ist ("planwerk6.de" auf einem Server im Netz von Hetzner).
+    server_operator: Optional[str] = None
     foreign_names: list[str] = Field(default_factory=list)
     signals: list[str] = Field(default_factory=list)
     evidence: list[Evidence] = Field(default_factory=list)
@@ -258,6 +279,18 @@ class Reach(Base):
     passive_source: Optional[str] = None
 
 
+class AdditionalIp(Base):
+    """Weitere Adresse eines Systems laut DNS, die nicht im Host-Inventar steht (spec/11 T7).
+
+    dnsx loest die Namen des Auftrags auch nach AAAA auf; der Scanner uebernimmt nur die
+    A-Eintraege. Die Adresse gehoert zum System der IPv4-Adresse derselben Namen und ist
+    vom Pruefstand aus nicht geprueft."""
+    ip: str
+    family: Literal[4, 6]
+    names: list[str] = Field(default_factory=list)
+    source: str = "dnsx"
+
+
 class HostFact(Fact):
     ip: str
     family: Literal[4, 6]
@@ -286,6 +319,8 @@ class HostFact(Fact):
     # "Postfaecher" und "Webseiten" in Zustaendigkeits- und Auswirkungstexten.
     serves_customer_mail: Optional[bool] = None
     serves_customer_web: Optional[bool] = None
+    # S6b-4 (spec/11 T7): AAAA-Adressen derselben Namen ohne Inventareintrag.
+    additional_ips: list[AdditionalIp] = Field(default_factory=list)
 
 
 class Alias(Base):
@@ -323,6 +358,10 @@ class FqdnFact(Fact):
     real_content: Optional[bool] = None
     # S6b-3 (spec/10 R4): nicht eingerichteter Name ("parking"), vom Scanner uebersprungen.
     skipped: Optional[str] = None
+    # S6b-4 (spec/11 Teil 3 HL): Titel und Endadresse der Seite, die redirect_probe aufgenommen
+    # hat; das Bildschirmfoto zeigt diese Seite, nicht die erste Antwort.
+    probe_title: Optional[str] = None
+    probe_final_url: Optional[str] = None
 
 
 # ---------------------------------------------------------------- service / tls
@@ -378,6 +417,10 @@ class ServiceFact(Fact):
     # S6b-3 (spec/10 R19): SMTP-Faehigkeiten vor STARTTLS laut nmap smtp-commands.
     smtp_vrfy: Optional[bool] = None
     auth_before_starttls: Optional[bool] = None
+    # S6b-4 (spec/11 T9, E18): Dienst eines anderen Nutzers desselben geteilten Servers
+    # (Zertifikat oder Stream-Kennung einer fremden Domain). Kein Dienst des Kunden; er
+    # erscheint als Beobachtung beim Betreiber, nicht als Befund.
+    foreign: Optional[bool] = None
 
 
 class TlsCert(Base):
@@ -396,14 +439,23 @@ class TlsCert(Base):
     fingerprint_sha256: Optional[str] = None
     # S6b-3 (E13): Erneuerungshistorie des Namens aus den CT-Logs (crt.sh).
     renewal: Optional["CertRenewal"] = None
+    # S6b-4 (spec/11 T14): Adressen (``ip:port``), an denen derselbe Name bereits ein gueltiges,
+    # spaeter ablaufendes Zertifikat traegt (castenow mailstore: das erneuerte Wildcard-Zertifikat
+    # laeuft schon auf .4 und .6), mit dessen Ablauf.
+    valid_elsewhere: list[str] = Field(default_factory=list)
+    valid_elsewhere_not_after: Optional[str] = None
 
 
 class CertRenewal(Base):
-    """Erneuerungshistorie eines Namens laut Certificate Transparency (crt.sh, E13).
+    """Erneuerungshistorie einer Zertifikatslinie laut Certificate Transparency (crt.sh, E13).
 
-    ``certificates``: Zahl der Zertifikate fuer genau diesen Namen; ``interval_days``: typischer
-    Abstand zwischen zwei Ausstellungen (Median); ``lead_days``: typischer Vorlauf der
-    Neuausstellung vor dem Ablauf des Vorgaengers (Median). Noch ohne Regel."""
+    S6b-4 (spec/11 T14): eine Linie sind die Zertifikate mit gleichem Namensset und gleichem
+    Aussteller (die Let's-Encrypt-Linie eines Namens, nicht dazu die Wildcard-Linie eines
+    anderen Ausstellers). ``certificates``: Zahl der Zertifikate der Linie;
+    ``recent_leads``: Vorlauf der letzten (hoechstens drei) Erneuerungen vor dem Ablauf des
+    Vorgaengers in Tagen, aelteste zuerst; ``recent_renewals``: Datum dieser Erneuerungen;
+    ``expected_renewal``: Ablauf des juengsten Zertifikats minus juengster Vorlauf.
+    ``interval_days`` und ``lead_days`` sind die Mediane der Linie."""
     name: str
     certificates: int
     interval_days: Optional[int] = None
@@ -411,6 +463,11 @@ class CertRenewal(Base):
     last_not_before: Optional[str] = None
     last_not_after: Optional[str] = None
     source: str = "crtsh"
+    issuer: Optional[str] = None
+    recent_leads: list[int] = Field(default_factory=list)
+    recent_renewals: list[str] = Field(default_factory=list)
+    expected_renewal: Optional[str] = None
+    lines: int = 1
 
 
 class TlsVuln(Base):
@@ -441,6 +498,10 @@ class HstsInfo(Base):
     include_subdomains: Optional[bool] = None
     preload: Optional[bool] = None
     raw: Optional[str] = None
+    # S6b-4 (spec/11 T3, T4): die Antwort, an der HSTS gemessen ist (Werkzeug, Adresse, Status).
+    tool: Optional[str] = None
+    url: Optional[str] = None
+    status_code: Optional[int] = None
 
 
 class TlsFact(Fact):
@@ -466,6 +527,9 @@ class TlsFact(Fact):
     cert_assigned_from: Optional[str] = None
     # S6b-3 (spec/10 R6): testssl ``cipherlist_OBSOLETED`` ("Obsoleted CBC ciphers").
     cbc_obsoleted_offered: Optional[bool] = None
+    # S6b-4 (spec/11 T7): die Adresse, an der testssl tatsaechlich gemessen hat ("-->>"); bei
+    # DNS-Rotation weicht sie von der Inventaradresse ab (huendgen 52.59.120.70).
+    measured_ip: Optional[str] = None
 
 
 # ---------------------------------------------------------------- http
@@ -546,6 +610,8 @@ class WpFinding(Base):
     type: str
     url: Optional[str] = None
     note: Optional[str] = None
+    # S6b-4 (spec/11 T3): wie wpscan den Fund belegt ("Direct Access", "Headers").
+    found_by: Optional[str] = None
 
 
 HeaderBasis = Literal["final", "redirect", "client_error", "server_error", "challenge",
@@ -617,6 +683,8 @@ class HttpFact(Fact):
     spider_url_count: Optional[int] = None
     wordpress: Optional[WordPressInfo] = None
     header_eval: Optional[HeaderMeasurement] = None
+    # S6b-4 (spec/11 T7): Adresse, die httpx fuer den Namen aufgeloest und gemessen hat.
+    measured_ip: Optional[str] = None
 
 
 # ---------------------------------------------------------------- dns
@@ -728,6 +796,9 @@ class Eol(Base):
     source: Optional[str] = None
     latest_patch: Optional[str] = None
     upstream_eol_date: Optional[str] = None
+    # S6b-4 (spec/11 T11): Beginn der Langzeitpflege, wenn das Release am Scantag nur noch
+    # LTS-Updates erhaelt (Debian 12 seit 11.07.2026); ``date`` ist dann das Ende der LTS.
+    lts_since: Optional[str] = None
 
 
 class VulnRef(Base):
@@ -759,6 +830,9 @@ class SoftwareFact(Fact):
     # S6b-3 (spec/10 R19): widersprechende Kennung einer anderen Quelle am selben Ort
     # (heuel 20.79.218.75:22 nmap FortiSSH, Shodan SSH-2.0-WingFTPServer).
     conflicts: list[str] = Field(default_factory=list)
+    # S6b-4 (spec/11 T15): wpscan ``outdated`` und ``latest_version`` je Erweiterung.
+    outdated: Optional[bool] = None
+    latest_version: Optional[str] = None
 
 
 # ---------------------------------------------------------------- passive
@@ -780,6 +854,37 @@ class PassiveFact(Fact):
     verified: Optional[bool] = None
     hostnames: list[str] = Field(default_factory=list)
     details: dict[str, Any] = Field(default_factory=dict)
+    # S6b-4 (spec/11 T1): Kennung des Dienstes aus Modul und Banner ("ManageSieve (Dovecot
+    # Pigeonhole)" bei Modul "auto"), ohne den Zusatz "laut Passivquelle".
+    kennung: Optional[str] = None
+
+
+# ---------------------------------------------------------------- path search
+
+PathVerdict = Literal["reliable", "unreliable", "aborted", "skipped", "not_run"]
+
+
+class PathSearchFact(Fact):
+    """Suche nach nicht verlinkten Pfaden je Host (spec/11 T8).
+
+    feroxbuster schreibt eine Statistikzeile mit den Statuscodes aller Anfragen; ffuf nennt
+    nur Treffer mit Status 200, 301, 302 und 307. Laeuft die Suche gegen eine Weiterleitung
+    (Apex auf www), eine Fehlerseite (403) oder eine Sicherheitsabfrage, sagt sie nichts ueber
+    die Seite aus. ``verdict`` fasst beide Werkzeuge zusammen: ``reliable`` ein Lauf lieferte
+    Inhaltsantworten; ``unreliable`` jede Antwort war eine Weiterleitung oder Fehlerseite
+    (``status_codes``, ``challenge`` bei einer Sicherheitsabfrage der Plattform); ``aborted``
+    die Laeufe brachen ab (``abort_reason``: Zeitlimit, keine Verbindung, Abwehrmerkmal);
+    ``skipped`` die Scan-Steuerung liess beide Werkzeuge aus. ``tools`` nennt das Urteil je
+    Werkzeug."""
+    host_ip: str
+    target_url: Optional[str] = None
+    verdict: PathVerdict
+    status_codes: list[int] = Field(default_factory=list)
+    challenge: bool = False
+    abort_reason: Optional[str] = None
+    tools: dict[str, str] = Field(default_factory=dict)
+    requests: Optional[int] = None
+    hits: Optional[int] = None
 
 
 # ---------------------------------------------------------------- coverage
@@ -907,12 +1012,13 @@ class Facts(Base):
     threats: list[ThreatFact] = Field(default_factory=list)
     unprocessed: list[UnprocessedFact] = Field(default_factory=list)
     decisions: list[DecisionFact] = Field(default_factory=list)
+    path_search: list[PathSearchFact] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
     context: Optional[CustomerContext] = None
 
     ENTITY_FIELDS: ClassVar[tuple[str, ...]] = (
         "targets", "hosts", "fqdns", "services", "tls", "http", "dns", "software",
-        "passive", "coverage", "threats", "unprocessed", "decisions",
+        "passive", "coverage", "threats", "unprocessed", "decisions", "path_search",
     )
 
     def all_facts(self) -> list[Fact]:

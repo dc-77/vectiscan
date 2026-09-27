@@ -28,7 +28,7 @@
     "not_holds": {
      "example.test": [
       "meaning[1]",
-      "recommendation[1]"
+      "recommendation[0]"
      ]
     }
    },
@@ -55,7 +55,7 @@
     "holds": {
      "example.test": [
       "meaning[1]",
-      "recommendation[1]"
+      "recommendation[0]"
      ]
     },
     "not_holds": {

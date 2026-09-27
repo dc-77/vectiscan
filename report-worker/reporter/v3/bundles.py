@@ -67,6 +67,7 @@ class Consolidated:
     positive: bool
     active_proof: bool = False     # aktiv nachgewiesen (S6, siehe levels.py)
     urgent: bool = False           # benannte Ausnahme der Tabelle (S6b-2, E2)
+    hint: bool = False             # blauer Hinweis, benannte Ausnahme (S6b-4, E22)
     results: list[CheckResult] = field(default_factory=list)
     # S6a: Hosts, die wegen positive_conflicts aus dem Positivbefund herausfallen.
     excluded_hosts: list[str] = field(default_factory=list)
@@ -195,6 +196,16 @@ def rule_order(results: Iterable[CheckResult]) -> list[str]:
 
 POSITIVE_ALL_OR_NOTHING = frozenset({"ip_reputation"})
 
+# S6b-4 (spec/11 T11, E20): Gruende "nicht pruefbar", die nur ihr Subjekt betreffen (eine
+# nicht erreichbare Adresse, eine Fehlerseite oder Sicherheitsabfrage als einzige Antwort eines
+# Namens); Kapitel 2 nennt sie, und sie heben den Positivbefund anderer Hosts nicht auf
+# (castenow: HSTS an mailstore nicht pruefbar, www setzt ihn ausreichend lang).
+HOST_UNREACHABLE_REASONS = frozenset({"no_ipv6_route", "unreachable_from_scanner", "headers_error_only",
+                                      "headers_challenge_only", "headers_redirect_only"})
+
+# S6b-4 (spec/11 T4, E20): Buendel, deren Positivbefunde je Regel statt je Host entfallen.
+PER_RULE_POSITIVE_BUNDLES = frozenset({"web_header_hygiene"})
+
 # S6b-3 (Entscheidung DC 3): HSTS steht in einem Positivbefund. Wo die Gueltigkeitsdauer
 # ausreicht, ist der Header auch gesetzt; "gesetzt" entfaellt fuer diese Dienste.
 POSITIVE_SUBSUMED: dict[str, str] = {"hsts_missing": "hsts_short"}
@@ -251,7 +262,11 @@ def consolidate(output: CatalogOutput,
                 operators[op_key] = op
             fails.setdefault((owner, _merge_key(result, merge_by), op_key), []).append(result)
         elif result.status == "not_testable":
-            unpruefbar.add(result.check_id)
+            # S6b-4 (spec/11 T11): eine Adresse, die vom Pruefstand aus gar nicht erreichbar ist
+            # (IPv6 ohne Route, E4), nimmt den Positivbefund der gemessenen Hosts nicht mit
+            # (junkerwerk: Debian 12 mit Quelle fehlte wegen 2a01:4f8:d0a:3124::2).
+            if result.reason_code not in HOST_UNREACHABLE_REASONS:
+                unpruefbar.add(result.check_id)
         elif result.positive:
             # Positivbefunde laufen global zusammen; die Gruppe merken wir uns, um
             # Gruppen mit einem Fehlschlag im selben Buendel auszuschliessen.
@@ -264,21 +279,31 @@ def consolidate(output: CatalogOutput,
         scale, level, category = _worst(results)
         aktiv = any(r.active_proof for r in results)
         dringend = any(r.urgent for r in results)
+        # S6b-4 (E22): Hinweis nur, wenn jede getroffene Regel es fuer jedes Mitglied ist oder
+        # ohnehin blau waere; ein gelbes Mitglied ohne Hinweis haelt den Sachverhalt gelb.
+        hinweis = any(r.hint for r in results) and all(
+            r.hint or L.status_for(r.scale, r.level) == "blau" for r in results)
         if bundle is not None:
             findings.append(Consolidated(
                 key=owner, is_bundle=True, merge_key=merge_key, category=category, scale=scale,
                 level=level, title=bundle.title, target=bundle.target, positive=False,
-                active_proof=aktiv, urgent=dringend, results=results,
+                active_proof=aktiv, urgent=dringend, hint=hinweis, results=results,
                 operator=operators.get(op_key), rules=rule_order(results)))
         else:
             info = by_check[owner]
             findings.append(Consolidated(
                 key=owner, is_bundle=False, merge_key=merge_key, category=info.category,
                 scale=info.scale, level=info.level, title=info.title, target="findings",
-                positive=False, active_proof=aktiv, urgent=dringend, results=results,
+                positive=False, active_proof=aktiv, urgent=dringend, hint=hinweis, results=results,
                 operator=operators.get(op_key), rules=[owner]))
 
     failed_groups = {(owner, merge_key) for owner, merge_key, _ in fails}
+    # S6b-4 (spec/11 T4, E20): im Header-Buendel unterdrueckt ein Befund nur den Positivbefund
+    # derselben Regel am selben Host; eine fehlende Permissions-Policy nimmt HSTS nicht mit
+    # (castenow www, bitwarden, ubb-wiki; bergersysteme www).
+    failed_rules = {(r.check_id, _merge_key(r, bundles[bundle_of[r.check_id]].merge_by))
+                    for r in output.results if r.kind == "check" and r.status == "fail"
+                    and bundle_of.get(r.check_id) in PER_RULE_POSITIVE_BUNDLES}
     konflikt: dict[str, set[str]] = {
         bid: _conflict_hosts(output, bundle) for bid, bundle in bundles.items()
         if bundle.positive_conflicts}
@@ -292,9 +317,12 @@ def consolidate(output: CatalogOutput,
     if reputation_reported(facts):
         unvollstaendig.add("ip_reputation")
     for (owner, merge_key), results in passes.items():
-        if (owner, merge_key) in failed_groups:
+        je_header = owner in PER_RULE_POSITIVE_BUNDLES
+        if (owner, merge_key) in failed_groups and not je_header:
             continue
         for result in results:
+            if je_header and (result.check_id, merge_key) in failed_rules:
+                continue
             info = by_check[result.check_id]
             if result.check_id in unpruefbar or info.texts.positive is None:
                 continue

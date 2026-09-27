@@ -1886,6 +1886,8 @@
    "mode": "active",
    "name": "exchange.huendgen-entsorgung.de",
    "observed_at": "2026-09-23T19:32:39Z",
+   "probe_final_url": "https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0",
+   "probe_title": "Outlook",
    "real_content": true,
    "screenshot_key": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/80.90.145.166__exchange.huendgen-entsorgung.de.png",
    "skipped": null,
@@ -1915,6 +1917,8 @@
    "mode": "active",
    "name": "huendgen-entsorgung.de",
    "observed_at": "2026-09-23T19:32:39Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/18.197.248.23__www.huendgen-entsorgung.de.png",
    "skipped": null,
@@ -1952,6 +1956,8 @@
    "mode": "active",
    "name": "www.huendgen-entsorgung.de",
    "observed_at": "2026-09-23T19:32:39Z",
+   "probe_final_url": "https://www.huendgen-entsorgung.de/",
+   "probe_title": "Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn",
    "real_content": true,
    "screenshot_key": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/18.197.248.23__www.huendgen-entsorgung.de.png",
    "skipped": null,
@@ -1989,6 +1995,7 @@
  },
  "hosts": [
   {
+   "additional_ips": [],
    "betriebsform": "plattform",
    "blocked": {
     "detected": false,
@@ -2059,6 +2066,7 @@
     "foreign_names": [],
     "kind": "platform",
     "operator": "eu-multiscreensite.com",
+    "server_operator": null,
     "signals": [
      "cname_fremd"
     ]
@@ -2067,6 +2075,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -2248,10 +2257,14 @@
     "max_age": null,
     "preload": null,
     "present": false,
-    "raw": null
+    "raw": null,
+    "status_code": 302,
+    "tool": "header_check",
+    "url": "https://exchange.huendgen-entsorgung.de"
    },
    "id": "http:exchange.huendgen-entsorgung.de",
    "login_form": true,
+   "measured_ip": "80.90.145.166",
    "mode": "active",
    "observed_at": "2026-09-23T19:45:24Z",
    "paths": [
@@ -3423,10 +3436,14 @@
     "max_age": 31536000,
     "preload": true,
     "present": true,
-    "raw": "max-age=31536000; preload"
+    "raw": "max-age=31536000; preload",
+    "status_code": 200,
+    "tool": "header_check",
+    "url": "https://www.huendgen-entsorgung.de"
    },
    "id": "http:www.huendgen-entsorgung.de",
    "login_form": null,
+   "measured_ip": "52.59.120.70",
    "mode": "active",
    "observed_at": "2026-09-23T19:39:10Z",
    "paths": [],
@@ -3504,6 +3521,7 @@
    "host_ip": null,
    "hostnames": [],
    "id": "passive:otx:huendgen-entsorgung.de",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T19:29:04Z",
    "port": null,
@@ -3536,6 +3554,7 @@
     "www.bunzel-transporte.de"
    ],
    "id": "passive:shodan:18.197.248.23:80",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T15:23:40Z",
    "port": 80,
@@ -3568,6 +3587,7 @@
     "www.bunzel-transporte.de"
    ],
    "id": "passive:shodan:18.197.248.23:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T15:23:40Z",
    "port": 443,
@@ -3600,6 +3620,7 @@
     "www.bunzel-transporte.de"
    ],
    "id": "passive:shodan:18.197.248.23:8443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T15:23:40Z",
    "port": 8443,
@@ -3630,6 +3651,7 @@
     "huendgen-entsorgung.de"
    ],
    "id": "passive:shodan:80.90.145.166:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-21T01:27:54Z",
    "port": 443,
@@ -3660,6 +3682,7 @@
     "huendgen-entsorgung.de"
    ],
    "id": "passive:shodan:80.90.145.166:444",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-21T01:27:54Z",
    "port": 444,
@@ -3689,6 +3712,7 @@
    "host_ip": null,
    "hostnames": [],
    "id": "passive:urlhaus:huendgen-entsorgung.de",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T19:29:03Z",
    "port": null,
@@ -3700,6 +3724,76 @@
    "transport": null,
    "verified": null,
    "version": null
+  }
+ ],
+ "path_search": [
+  {
+   "abort_reason": null,
+   "challenge": false,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "ziel=https://huendgen-entsorgung.de urteil=unreliable status=301, 403 anfragen=140",
+     "ref": "hosts/18.197.248.23/phase2/feroxbuster.json",
+     "tool": "feroxbuster"
+    },
+    {
+     "excerpt": "ziel=https://huendgen-entsorgung.de urteil=reliable treffer=1",
+     "ref": "hosts/18.197.248.23/phase2/ffuf_sensitive.json",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "hits": 1,
+   "host_ip": "18.197.248.23",
+   "id": "paths:18.197.248.23",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:43:07Z",
+   "requests": 140,
+   "source": "feroxbuster",
+   "status_codes": [
+    301,
+    403
+   ],
+   "target_url": "https://huendgen-entsorgung.de",
+   "tools": {
+    "feroxbuster": "unreliable",
+    "ffuf_sensitive": "reliable"
+   },
+   "verdict": "unreliable"
+  },
+  {
+   "abort_reason": null,
+   "challenge": false,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "ziel=https://exchange.huendgen-entsorgung.de urteil=unreliable status=301",
+     "ref": "hosts/80.90.145.166/phase2/feroxbuster.json",
+     "tool": "feroxbuster"
+    },
+    {
+     "excerpt": "ziel=https://exchange.huendgen-entsorgung.de urteil=unreliable status=302 treffer=11265",
+     "ref": "hosts/80.90.145.166/phase2/ffuf_sensitive.json",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "hits": 11265,
+   "host_ip": "80.90.145.166",
+   "id": "paths:80.90.145.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T19:49:36Z",
+   "requests": null,
+   "source": "feroxbuster",
+   "status_codes": [
+    301,
+    302
+   ],
+   "target_url": "https://exchange.huendgen-entsorgung.de",
+   "tools": {
+    "feroxbuster": "unreliable",
+    "ffuf_sensitive": "unreliable"
+   },
+   "verdict": "unreliable"
   }
  ],
  "scan": {
@@ -3729,6 +3823,8 @@
   "order_id": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7",
   "package": "perimeter",
   "policy_version": null,
+  "scanned_port_count": 1000,
+  "scanned_ports": "1,3-4,6-7,9,13,17,19-26,30,32-33,37,42-43,49,53,70,79-85,88-90,99-100,106,109-111,113,119,125,135,139,143-144,146,161,163,179,199,211-212,222,254-256,259,264,280,301,306,311,340,366,389,406-407,416-417,425,427,443-445,458,464-465,481,497,500,512-515,524,541,543-545,548,554-555,563,587,593,616-617,625,631,636,646,648,666-668,683,687,691,700,705,711,714,720,722,726,749,765,777,783,787,800-801,808,843,873,880,888,898,900-903,911-912,981,987,990,992-993,995,999-1002,1007,1009-1011,1021-1100,1102,1104-1108,1110-1114,1117,1119,1121-1124,1126,1130-1132,1137-1138,1141,1145,1147-1149,1151-1152,1154,1163-1166,1169,1174-1175,1183,1185-1187,1192,1198-1199,1201,1213,1216-1218,1233-1234,1236,1244,1247-1248,1259,1271-1272,1277,1287,1296,1300-1301,1309-1311,1322,1328,1334,1352,1417,1433-1434,1443,1455,1461,1494,1500-1501,1503,1521,1524,1533,1556,1580,1583,1594,1600,1641,1658,1666,1687-1688,1700,1717-1721,1723,1755,1761,1782-1783,1801,1805,1812,1839-1840,1862-1864,1875,1900,1914,1935,1947,1971-1972,1974,1984,1998-2010,2013,2020-2022,2030,2033-2035,2038,2040-2043,2045-2049,2065,2068,2099-2100,2103,2105-2107,2111,2119,2121,2126,2135,2144,2160-2161,2170,2179,2190-2191,2196,2200,2222,2251,2260,2288,2301,2323,2366,2381-2383,2393-2394,2399,2401,2492,2500,2522,2525,2557,2601-2602,2604-2605,2607-2608,2638,2701-2702,2710,2717-2718,2725,2800,2809,2811,2869,2875,2909-2910,2920,2967-2968,2998,3000-3001,3003,3005-3007,3011,3013,3017,3030-3031,3052,3071,3077,3128,3168,3211,3221,3260-3261,3268-3269,3283,3300-3301,3306,3322-3325,3333,3351,3367,3369-3372,3389-3390,3404,3476,3493,3517,3527,3546,3551,3580,3659,3689-3690,3703,3737,3766,3784,3800-3801,3809,3814,3826-3828,3851,3869,3871,3878,3880,3889,3905,3914,3918,3920,3945,3971,3986,3995,3998,4000-4006,4045,4111,4125-4126,4129,4224,4242,4279,4321,4343,4443-4446,4449,4550,4567,4662,4848,4899-4900,4998,5000-5004,5009,5030,5033,5050-5051,5054,5060-5061,5080,5087,5100-5102,5120,5190,5200,5214,5221-5222,5225-5226,5269,5280,5298,5357,5405,5414,5431-5432,5440,5500,5510,5544,5550,5555,5560,5566,5631,5633,5666,5678-5679,5718,5730,5800-5802,5810-5811,5815,5822,5825,5850,5859,5862,5877,5900-5904,5906-5907,5910-5911,5915,5922,5925,5950,5952,5959-5963,5987-5989,5998-6007,6009,6025,6059,6100-6101,6106,6112,6123,6129,6156,6346,6389,6502,6510,6543,6547,6565-6567,6580,6646,6666-6669,6689,6692,6699,6779,6788-6789,6792,6839,6881,6901,6969,7000-7002,7004,7007,7019,7025,7070,7100,7103,7106,7200-7201,7402,7435,7443,7496,7512,7625,7627,7676,7741,7777-7778,7800,7911,7920-7921,7937-7938,7999-8002,8007-8011,8021-8022,8031,8042,8045,8080-8090,8093,8099-8100,8180-8181,8192-8194,8200,8222,8254,8290-8292,8300,8333,8383,8400,8402,8443,8500,8600,8649,8651-8652,8654,8701,8800,8873,8888,8899,8994,9000-9003,9009-9011,9040,9050,9071,9080-9081,9090-9091,9099-9103,9110-9111,9200,9207,9220,9290,9415,9418,9485,9500,9502-9503,9535,9575,9593-9595,9618,9666,9876-9878,9898,9900,9917,9929,9943-9944,9968,9998-10004,10009-10010,10012,10024-10025,10082,10180,10215,10243,10566,10616-10617,10621,10626,10628-10629,10778,11110-11111,11967,12000,12174,12265,12345,13456,13722,13782-13783,14000,14238,14441-14442,15000,15002-15004,15660,15742,16000-16001,16012,16016,16018,16080,16113,16992-16993,17877,17988,18040,18101,18988,19101,19283,19315,19350,19780,19801,19842,20000,20005,20031,20221-20222,20828,21571,22939,23502,24444,24800,25734-25735,26214,27000,27352-27353,27355-27356,27715,28201,30000,30718,30951,31038,31337,32768-32785,33354,33899,34571-34573,35500,38292,40193,40911,41511,42510,44176,44442-44443,44501,45100,48080,49152-49161,49163,49165,49167,49175-49176,49400,49999-50003,50006,50300,50389,50500,50636,50800,51103,51493,52673,52822,52848,52869,54045,54328,55055-55056,55555,55600,56737-56738,57294,57797,58080,60020,60443,61532,61900,62078,63331,64623,64680,65000,65129,65389",
   "scanner_egress": null,
   "source": "meta",
   "started_at": "2026-09-23T19:29:03Z",
@@ -3779,7 +3875,7 @@
    }
   ]
  },
- "schema_version": "1.1.0",
+ "schema_version": "1.2.0",
  "services": [
   {
    "auth_before_starttls": null,
@@ -3796,6 +3892,7 @@
     }
    ],
    "family": "nginx",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": "403 Forbidden",
@@ -3837,6 +3934,7 @@
     }
    ],
    "family": null,
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -3897,6 +3995,7 @@
     }
    ],
    "family": "nginx",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": "403 Forbidden",
@@ -3951,6 +4050,7 @@
     }
    ],
    "family": null,
+   "foreign": null,
    "fp_login": null,
    "fp_server": "Microsoft-IIS/10.0",
    "fp_title": "Outlook",
@@ -4005,6 +4105,7 @@
     }
    ],
    "family": "apache",
+   "foreign": null,
    "fp_login": null,
    "fp_server": "Apache",
    "fp_title": "Hündgen Entsorgungs GmbH & Co. KG Web Applications Portal",
@@ -4046,6 +4147,7 @@
     }
    ],
    "family": null,
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -4087,6 +4189,7 @@
     }
    ],
    "family": null,
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -4128,6 +4231,7 @@
     }
    ],
    "family": null,
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -4168,6 +4272,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4185,9 +4290,11 @@
    "host_ip": "18.197.248.23",
    "id": "sw:18.197.248.23:-:cookiebot:unknown",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:34:00Z",
+   "outdated": null,
    "product": "Cookiebot",
    "release_date": null,
    "source": "webtech",
@@ -4208,6 +4315,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4225,9 +4333,11 @@
    "host_ip": "18.197.248.23",
    "id": "sw:18.197.248.23:-:etracker:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
+   "outdated": null,
    "product": "Etracker",
    "release_date": null,
    "source": "httpx",
@@ -4248,6 +4358,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4265,9 +4376,11 @@
    "host_ip": "18.197.248.23",
    "id": "sw:18.197.248.23:-:jquery:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
    "source": "httpx",
@@ -4288,6 +4401,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4305,9 +4419,11 @@
    "host_ip": "18.197.248.23",
    "id": "sw:18.197.248.23:-:jquery_migrate:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
+   "outdated": null,
    "product": "jQuery Migrate",
    "release_date": null,
    "source": "httpx",
@@ -4328,6 +4444,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4360,9 +4477,11 @@
    "host_ip": "18.197.248.23",
    "id": "sw:18.197.248.23:-:nginx:unknown",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:33:53Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "nmap",
@@ -4383,6 +4502,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4400,9 +4520,11 @@
    "host_ip": "18.197.248.23",
    "id": "sw:18.197.248.23:www.huendgen-entsorgung.de:cookiebot:unknown",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
+   "outdated": null,
    "product": "Cookiebot",
    "release_date": null,
    "source": "httpx",
@@ -4416,13 +4538,15 @@
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
-    "httpx"
+    "httpx",
+    "redirect_probe"
    ],
    "distro": null,
    "edition": null,
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4432,6 +4556,11 @@
      "excerpt": "tech: Etracker",
      "ref": "hosts/18.197.248.23/phase2/httpx_www.huendgen-entsorgung.de.json",
      "tool": "httpx"
+    },
+    {
+     "excerpt": "Skript: https://code.etracker.com/code/e.js",
+     "ref": "hosts/18.197.248.23/phase1/tech_profile.json",
+     "tool": "redirect_probe"
     }
    ],
    "family": "etracker",
@@ -4440,9 +4569,11 @@
    "host_ip": "18.197.248.23",
    "id": "sw:18.197.248.23:www.huendgen-entsorgung.de:etracker:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
+   "outdated": null,
    "product": "Etracker",
    "release_date": null,
    "source": "httpx",
@@ -4456,13 +4587,15 @@
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
-    "httpx"
+    "httpx",
+    "redirect_probe"
    ],
    "distro": null,
    "edition": null,
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4472,22 +4605,29 @@
      "excerpt": "tech: jQuery",
      "ref": "hosts/18.197.248.23/phase2/httpx_www.huendgen-entsorgung.de.json",
      "tool": "httpx"
+    },
+    {
+     "excerpt": "Skript: https://static.cdn-website.com/libs/jquery/jquery-3.7.0.min.js",
+     "ref": "hosts/18.197.248.23/phase1/tech_profile.json",
+     "tool": "redirect_probe"
     }
    ],
    "family": "jquery",
    "fqdn": "www.huendgen-entsorgung.de",
    "hints": [],
    "host_ip": "18.197.248.23",
-   "id": "sw:18.197.248.23:www.huendgen-entsorgung.de:jquery:unknown",
+   "id": "sw:18.197.248.23:www.huendgen-entsorgung.de:jquery:3.7.0",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-23T19:39:11Z",
+   "observed_at": "2026-09-23T19:51:42Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
+   "source": "redirect_probe",
+   "version_norm": "3.7.0",
+   "version_raw": "3.7.0",
    "vulnerabilities": [],
    "vulnerabilities_count": null
   },
@@ -4496,13 +4636,15 @@
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
-    "httpx"
+    "httpx",
+    "redirect_probe"
    ],
    "distro": null,
    "edition": null,
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4512,6 +4654,11 @@
      "excerpt": "tech: jQuery Migrate",
      "ref": "hosts/18.197.248.23/phase2/httpx_www.huendgen-entsorgung.de.json",
      "tool": "httpx"
+    },
+    {
+     "excerpt": "Skript: https://static.cdn-website.com/mnlt/production/6792/_dm/s/rt/dist/scripts/d-js-jquery-migrate.min.js",
+     "ref": "hosts/18.197.248.23/phase1/tech_profile.json",
+     "tool": "redirect_probe"
     }
    ],
    "family": "jquery_migrate",
@@ -4520,9 +4667,11 @@
    "host_ip": "18.197.248.23",
    "id": "sw:18.197.248.23:www.huendgen-entsorgung.de:jquery_migrate:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
+   "outdated": null,
    "product": "jQuery Migrate",
    "release_date": null,
    "source": "httpx",
@@ -4544,6 +4693,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4566,9 +4716,11 @@
    "host_ip": "18.197.248.23",
    "id": "sw:18.197.248.23:www.huendgen-entsorgung.de:nginx:unknown",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:39:11Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "httpx",
@@ -4589,6 +4741,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4616,9 +4769,11 @@
    "host_ip": "80.90.145.166",
    "id": "sw:80.90.145.166:-:apache:unknown",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:34:59Z",
+   "outdated": null,
    "product": "Apache httpd",
    "release_date": null,
    "source": "nmap",
@@ -4640,6 +4795,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4662,9 +4818,11 @@
    "host_ip": "80.90.145.166",
    "id": "sw:80.90.145.166:-:aspnet:unknown",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:35:07Z",
+   "outdated": null,
    "product": "ASP.NET",
    "release_date": null,
    "source": "webtech",
@@ -4688,6 +4846,7 @@
    "eol": {
     "date": "2025-10-14",
     "latest_patch": null,
+    "lts_since": null,
     "source": "Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2019",
     "status": "eol",
     "upstream_eol_date": null
@@ -4723,9 +4882,11 @@
    "host_ip": "80.90.145.166",
    "id": "sw:80.90.145.166:-:exchange:2019",
    "kind": "mail",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:51:42Z",
+   "outdated": null,
    "product": "Microsoft Exchange",
    "release_date": null,
    "source": "cms_fingerprint",
@@ -4747,6 +4908,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4769,9 +4931,11 @@
    "host_ip": "80.90.145.166",
    "id": "sw:80.90.145.166:-:iis:10.0",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:35:07Z",
+   "outdated": null,
    "product": "Microsoft IIS",
    "release_date": null,
    "source": "webtech",
@@ -4792,6 +4956,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4809,9 +4974,11 @@
    "host_ip": "80.90.145.166",
    "id": "sw:80.90.145.166:-:windows_server:unknown",
    "kind": "os",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:45:25Z",
+   "outdated": null,
    "product": "Windows Server",
    "release_date": null,
    "source": "httpx",
@@ -4832,6 +4999,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4849,9 +5017,11 @@
    "host_ip": "80.90.145.166",
    "id": "sw:80.90.145.166:exchange.huendgen-entsorgung.de:aspnet:unknown",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:45:25Z",
+   "outdated": null,
    "product": "ASP.NET",
    "release_date": null,
    "source": "httpx",
@@ -4872,6 +5042,7 @@
    "eol": {
     "date": "2025-10-14",
     "latest_patch": null,
+    "lts_since": null,
     "source": "Microsoft Lifecycle, https://learn.microsoft.com/lifecycle/products/exchange-server-2019",
     "status": "eol",
     "upstream_eol_date": null
@@ -4891,9 +5062,11 @@
    "host_ip": "80.90.145.166",
    "id": "sw:80.90.145.166:exchange.huendgen-entsorgung.de:exchange:2019",
    "kind": "mail",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:45:25Z",
+   "outdated": null,
    "product": "Microsoft Exchange",
    "release_date": null,
    "source": "httpx",
@@ -4915,6 +5088,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4937,9 +5111,11 @@
    "host_ip": "80.90.145.166",
    "id": "sw:80.90.145.166:exchange.huendgen-entsorgung.de:iis:10.0",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:45:25Z",
+   "outdated": null,
    "product": "Microsoft IIS",
    "release_date": null,
    "source": "httpx",
@@ -4960,6 +5136,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -4977,9 +5154,11 @@
    "host_ip": "80.90.145.166",
    "id": "sw:80.90.145.166:exchange.huendgen-entsorgung.de:windows_server:unknown",
    "kind": "os",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:45:25Z",
+   "outdated": null,
    "product": "Windows Server",
    "release_date": null,
    "source": "httpx",
@@ -5086,12 +5265,25 @@
     "not_after": "2026-10-11T03:14:00Z",
     "not_before": "2026-07-13T03:14:00Z",
     "renewal": {
-     "certificates": 66,
-     "interval_days": 57,
+     "certificates": 60,
+     "expected_renewal": "2026-10-04",
+     "interval_days": 58,
+     "issuer": "Let's Encrypt",
      "last_not_after": "2026-10-11T03:14:37Z",
      "last_not_before": "2026-07-13T03:14:38Z",
      "lead_days": 32,
+     "lines": 5,
      "name": "huendgen-entsorgung.de",
+     "recent_leads": [
+      30,
+      7,
+      7
+     ],
+     "recent_renewals": [
+      "2026-01-28T04:54:48Z",
+      "2026-04-21T04:04:41Z",
+      "2026-07-13T03:14:38Z"
+     ],
      "source": "crtsh"
     },
     "san": [
@@ -5099,6 +5291,10 @@
      "www.huendgen-entsorgung.de"
     ],
     "self_signed": null,
+    "valid_elsewhere": [
+     "80.90.145.166:443"
+    ],
+    "valid_elsewhere_not_after": "2027-01-03T23:59:59Z",
     "wildcard": false
    },
    "cert_assigned_from": null,
@@ -6358,10 +6554,14 @@
     "max_age": 31536000,
     "preload": true,
     "present": true,
-    "raw": "365 days (=31536000 seconds) > 15552000 seconds"
+    "raw": "365 days (=31536000 seconds) > 15552000 seconds",
+    "status_code": null,
+    "tool": null,
+    "url": null
    },
    "id": "tls:huendgen-entsorgung.de:443@18.197.248.23",
    "json_filtered": false,
+   "measured_ip": "52.59.120.70",
    "mode": "active",
    "observed_at": "2026-09-23T19:39:19Z",
    "port": 443,
@@ -6390,12 +6590,25 @@
     "not_after": "2026-10-11T03:14:37Z",
     "not_before": "2026-07-13T03:14:38Z",
     "renewal": {
-     "certificates": 61,
+     "certificates": 60,
+     "expected_renewal": "2026-10-04",
      "interval_days": 58,
+     "issuer": "Let's Encrypt",
      "last_not_after": "2026-10-11T03:14:37Z",
      "last_not_before": "2026-07-13T03:14:38Z",
      "lead_days": 32,
+     "lines": 2,
      "name": "www.huendgen-entsorgung.de",
+     "recent_leads": [
+      30,
+      7,
+      7
+     ],
+     "recent_renewals": [
+      "2026-01-28T04:54:48Z",
+      "2026-04-21T04:04:41Z",
+      "2026-07-13T03:14:38Z"
+     ],
      "source": "crtsh"
     },
     "san": [
@@ -6403,6 +6616,10 @@
      "www.huendgen-entsorgung.de"
     ],
     "self_signed": null,
+    "valid_elsewhere": [
+     "80.90.145.166:443"
+    ],
+    "valid_elsewhere_not_after": "2027-01-03T23:59:59Z",
     "wildcard": false
    },
    "cert_assigned_from": "huendgen-entsorgung.de:443",
@@ -6433,6 +6650,7 @@
    "hsts": null,
    "id": "tls:www.huendgen-entsorgung.de:443@18.197.248.23",
    "json_filtered": false,
+   "measured_ip": "52.59.120.70",
    "mode": "active",
    "observed_at": "2026-09-23T19:39:11Z",
    "port": 443,
@@ -6461,12 +6679,23 @@
     "not_after": "2027-01-03T23:59:59Z",
     "not_before": "2025-12-04T00:00:00Z",
     "renewal": {
-     "certificates": 66,
-     "interval_days": 57,
-     "last_not_after": "2026-10-11T03:14:37Z",
-     "last_not_before": "2026-07-13T03:14:38Z",
-     "lead_days": 32,
+     "certificates": 3,
+     "expected_renewal": "2026-09-06",
+     "interval_days": 180,
+     "issuer": "Sectigo Limited",
+     "last_not_after": "2027-01-03T23:59:59Z",
+     "last_not_before": "2025-12-04T00:00:00Z",
+     "lead_days": 207,
+     "lines": 5,
      "name": "huendgen-entsorgung.de",
+     "recent_leads": [
+      295,
+      119
+     ],
+     "recent_renewals": [
+      "2025-03-19T00:00:00Z",
+      "2025-12-04T00:00:00Z"
+     ],
      "source": "crtsh"
     },
     "san": [
@@ -6474,6 +6703,8 @@
      "huendgen-entsorgung.de"
     ],
     "self_signed": null,
+    "valid_elsewhere": [],
+    "valid_elsewhere_not_after": null,
     "wildcard": true
    },
    "cert_assigned_from": null,
@@ -7682,10 +7913,14 @@
     "max_age": null,
     "preload": null,
     "present": false,
-    "raw": "not offered"
+    "raw": "not offered",
+    "status_code": null,
+    "tool": null,
+    "url": null
    },
    "id": "tls:exchange.huendgen-entsorgung.de:443@80.90.145.166",
    "json_filtered": false,
+   "measured_ip": "80.90.145.166",
    "mode": "active",
    "observed_at": "2026-09-23T19:45:29Z",
    "port": 443,

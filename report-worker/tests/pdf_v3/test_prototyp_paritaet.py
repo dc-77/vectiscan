@@ -78,7 +78,7 @@ ERLAUBT: tuple[tuple[str, str], ...] = (
     ("IP-Adresse Hostnamen Betrieb / Rolle", "Spalte heisst jetzt Netzbetreiber / Rolle"),
     ("IP-Adresse Hostnamen Netzbetreiber / Rolle", "Spalte heisst jetzt Netzbetreiber / Rolle"),
     # S6b-3 (spec/10 R16): die Quelle des Netzbetreibers steht im Spaltenkopf.
-    ("IP-Adresse Hostnamen Netzbetreiber (laut RIPE) / Rolle", "Spalte nennt die Quelle RIPE"),
+    ("IP-Adresse Hostnamen Netzbetreiber (laut AbuseIPDB) / Rolle", "Spalte nennt die Quelle AbuseIPDB (spec/11 T2, E17)"),
     ("Einschränkung Auswirkung auf die Ergebnisse", "neue Spalte Betroffene Pruefungen"),
     ("Einschränkung Betroffene Prüfungen Auswirkung", "neue Spalte Betroffene Pruefungen"),
 )

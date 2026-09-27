@@ -48,6 +48,10 @@ class Counts:
     names_checked: int = 0
     # S6b-3 (spec/10 R13): Betriebsformen der eigenen Systeme (rechenzentrum, anschluss, plattform).
     betriebsformen: list[str] = field(default_factory=list)
+    # S6b-4 (spec/11 T8): mindestens eine belastbare Pfadsuche; ``path_search_known`` ohne Fakten
+    # aelterer Laeufe bleibt der bisherige Text.
+    path_search_ok: bool = False
+    path_search_known: bool = False
 
 
 def _join(names: list[str]) -> str:
@@ -91,15 +95,22 @@ def _gap_kind(c: Counts) -> tuple[str, str]:
 
 
 def coverage_warning(c: Counts, systems: list[list[str]]) -> str:
-    """Hinweis auf Seite 2: je System mit seinen Adressen (Nachtrag 3, Q16)."""
+    """Hinweis auf Seite 2: je System mit seinen Adressen (Nachtrag 3, Q16).
+
+    S6b-4 (spec/11 Teil 3 LW): gefundene, aber nicht geprüfte Namen stehen mit ihrer Zahl im
+    Hinweis; vorher nannte ihn nur Kapitel 2."""
+    offen = max(c.names_found - c.names_checked, 0)
+    namen = (f"{offen} weitere gefundene {_plural(offen, 'Name ist', 'Namen sind')} nicht geprüft."
+             if offen else "")
     if not systems:
-        return ""
+        return (f"{namen} Die Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind "
+                "entsprechend zu lesen.") if namen else ""
     _, art = _gap_kind(c)
     labels = _join([_system_label(ips) for ips in systems])
     return (
         f"Für {len(systems)} {_plural(len(systems), 'System', 'Systeme')} ({labels}) liegt "
-        f"{art} vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse "
-        "dieses Berichts sind entsprechend zu lesen."
+        f"{art} vor." + (f" {namen}" if namen else "") + " Die Einschränkungen und ihre Gründe "
+        "stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen."
     )
 
 
@@ -204,8 +215,12 @@ def method_phases(c: Counts) -> list[tuple[str, str, str]]:
          "Web-Technologien und vorgelagerter Schutzsysteme."),
         ("2", "Tiefenprüfung",
          "Analyse der Transportverschlüsselung, der Sicherheits-Header und der "
-         "HTTP-Antworten je virtuellem Host, Verzeichnis-Enumeration und passive "
-         "Webanalyse."),
+         "HTTP-Antworten je virtuellem Host, "
+         + ("Verzeichnis-Enumeration und passive Webanalyse."
+            if c.path_search_ok or not c.path_search_known else
+            # S6b-4 (spec/11 T8): ohne belastbaren Lauf steht die Enumeration nicht als durchgeführt.
+            "passive Webanalyse; die Suche nach nicht verlinkten Pfaden war nicht belastbar "
+            "(siehe Einschränkungen).")),
         ("3", "Auswertung",
          "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu "
          f"Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: {c.findings} "
@@ -258,7 +273,7 @@ def architecture_lead(systems: int, roles: list[str]) -> str:
 # vorher "Altprotokoll" und stand auch an Webports mit niedrigem Befund.
 SERVICES_NOTE = (
     "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · "
-    "Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt."
+    "Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund."
 )
 
 SCREENS_LEAD = "Sichtprüfung der erreichbaren Web-Oberflächen der geprüften Hosts."
@@ -297,8 +312,9 @@ def reputation_line(clean: bool, sources: list[str], not_rated: list[str] | None
 # ---------------------------------------------------------------- Befundlandschaft
 
 def landscape_lead(c: Counts) -> str:
+    # S6b-4 (spec/11 T10): die Zahl der Kategorien mit Befund, nicht immer fünf (LW: drei).
     return (
-        f"{c.findings} {_plural(c.findings, 'Befund', 'Befunde')} in {c.categories} "
+        f"{c.findings} {_plural(c.findings, 'Befund', 'Befunde')} in {c.categories} von 5 "
         "Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt "
         "der Einstufung, nicht der Reihenfolge der Entdeckung."
     )

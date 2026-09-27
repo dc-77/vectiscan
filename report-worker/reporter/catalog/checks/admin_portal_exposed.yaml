@@ -61,8 +61,8 @@ texts:
         über die Firewall des Hosters, eine Zugriffsliste oder ein VPN.
     - stage: in_kuerze
       text: >-
-        Mehrfaktor-Anmeldung für die Verwaltungsoberfläche aktivieren und Standardkonten
-        deaktivieren oder umbenennen.
+        Prüfen, ob die Verwaltungsoberfläche eine Mehrfaktor-Anmeldung verlangt, und sie
+        andernfalls aktivieren; Standardkonten deaktivieren oder umbenennen.
     - stage: mittelfristig
       text: >-
         Softwarestand der Verwaltungsoberfläche gegen die Sicherheitshinweise des Herstellers

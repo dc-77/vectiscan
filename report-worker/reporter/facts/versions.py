@@ -220,6 +220,10 @@ _DEBIAN_RELEASE_RE = re.compile(r"deb(\d{1,2})u\d+", re.I)
 DEBIAN_LTS_END: dict[str, str] = {"9": "2022-06-30", "10": "2024-06-30", "11": "2026-08-31",
                                   "12": "2028-06-30"}
 DEBIAN_LTS_SOURCE = "Debian LTS, https://wiki.debian.org/LTS"
+# S6b-4 (spec/11 T11): Ende der regulaeren Sicherheitsunterstuetzung, danach Langzeitpflege.
+# Debian 12: volle Unterstuetzung bis 10.07.2026, LTS ab 11.07.2026 (debian.org, spec/11 Teil 3).
+DEBIAN_LTS_START: dict[str, str] = {"9": "2020-07-06", "10": "2022-09-10", "11": "2024-08-15",
+                                    "12": "2026-07-11"}
 
 
 def debian_release(*texts: str | None) -> Optional[str]:
@@ -238,7 +242,9 @@ def debian_eol(release: str, scan_date: str | None) -> Eol:
     if not scan_date:
         return Eol(status="unknown", date=date, source=DEBIAN_LTS_SOURCE)
     status = "eol" if date <= str(scan_date)[:10] else "supported"
-    return Eol(status=status, date=date, source=DEBIAN_LTS_SOURCE)
+    lts = DEBIAN_LTS_START.get(release)
+    lts_since = lts if status == "supported" and lts and lts <= str(scan_date)[:10] else None
+    return Eol(status=status, date=date, source=DEBIAN_LTS_SOURCE, lts_since=lts_since)
 
 
 def detect_distro(text: str | None) -> Optional[str]:

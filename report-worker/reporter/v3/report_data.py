@@ -45,14 +45,19 @@ def _counts(facts: FS.Facts, output: CatalogOutput, n_findings: int, n_positives
     # Drittanbieter-Adressen und ihre Namen sind kein Host des Kunden.
     eigene = [h for h in facts.hosts if h.third_party is None]
     eigene_ips = {h.ip for h in eigene}
+    # S6b-4 (spec/11 T7): AAAA-Adressen derselben Namen ohne Inventareintrag zaehlen mit.
+    zusatz = [a for h in eigene for a in h.additional_ips if a.ip not in eigene_ips]
     return N.Counts(
         domains=list(facts.scan.domains) or [facts.scan.domain],
         scan_date=C.format_date(facts.scan.finished_at or facts.scan.started_at),
-        hosts_total=len(eigene),
+        hosts_total=len(eigene) + len(zusatz),
         systems_total=len(rows),
         gap_addresses=sum(len(ips) for ips, status in zip(rows, cov) if status != "voll"),
         hosts_ipv4=sum(1 for h in eigene if h.family == 4),
-        hosts_ipv6=sum(1 for h in eigene if h.family == 6),
+        hosts_ipv6=sum(1 for h in eigene if h.family == 6) + len(zusatz),
+        # S6b-4 (spec/11 T8): die Verzeichnis-Enumeration steht nur mit einem belastbaren Lauf in 2.3.
+        path_search_ok=any(p.verdict == "reliable" for p in facts.path_search if p.host_ip in eigene_ips),
+        path_search_known=bool(facts.path_search),
         fqdns_total=len({f.name.lower() for f in facts.fqdns if not f.wildcard and f.host_ip in eigene_ips}),
         runs=runs,
         # S6b-3 (spec/10 R3): nur gelaufene Werkzeuge, ohne uebersprungene und KI-Schritte.
@@ -149,6 +154,8 @@ def build_report_data(
     runs = len(orders)
     model = C.coverage_model(facts)
     counts = _counts(facts, output, len(finding_list), len(positives), runs, model)
+    # S6b-4 (spec/11 T10): "n Befunde in m von 5 Kategorien" aus den Befunden dieses Berichts.
+    counts.categories = len({f.cat for f in finding_list if f.cat})
 
     pairs = list(zip(finding_items, finding_list))
     plan = P.build_plan(pairs)
@@ -197,6 +204,7 @@ def build_report_data(
         report_date=report_date or C.today(),
         report_version=report_version,
         generation=generation,
+        generated_on=C.report_day() if generation else None,
         excluded_ids=excluded_ids,
         report_id=IDS.report_id(facts.scan.order_id or orders[0].get("id"), year, month_day),
         orders=[OrderRef(label=str(o.get("label", "Lauf")), id=str(o.get("id", ""))) for o in orders],
@@ -238,4 +246,7 @@ def build_report_data(
         from reporter.v3.prose import apply_prose
 
         apply_prose(data, prose)
-    return data
+    # S6b-4 (spec/11 T9, E11): Fremddomains stehen nicht im Kundentext.
+    from reporter.v3.foreign import mask_report
+
+    return mask_report(data, facts)

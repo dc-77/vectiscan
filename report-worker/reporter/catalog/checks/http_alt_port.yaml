@@ -44,28 +44,52 @@ texts:
       quantor: eines
       text: >-
         Der Zweck dieses Dienstes ist von außen nicht erkennbar.
+    # S6b-4 (spec/11 Teil 3 HE): auf einer Mandantenplattform gehoert der Port dem Anbieter
+    # (huendgen 8443 mit Zertifikat der Plattform); "Port schliessen" laeuft dort ins Leere.
+    - when: host.shared is not None and host.shared.kind == "platform"
+      quantor: eines
+      text: >-
+        Die Adresse gehört zur Plattform eines Anbieters; den Port stellt der Plattformbetreiber
+        bereit.
   meaning: >-
     Ein Webdienst auf einem unüblichen Port bleibt bei einer Prüfung der Standardports leicht
     unbemerkt und vergrößert die Angriffsfläche um eine Anwendung, deren Pflegezustand von
     außen nicht erkennbar ist.
   recommendation:
     - stage: in_kuerze
-      when: service.kennung is None
+      when: service.kennung is None and (host.shared is None or host.shared.kind != "platform")
       quantor: eines
       text: >-
         Klären, welche Anwendung den Dienst bereitstellt und ob ein Zugriff aus dem gesamten
         Internet dafür erforderlich ist.
       effect: "Klärt, ob der Dienst aus dem Internet erreichbar sein muss"
     - stage: in_kuerze
-      when: service.kennung is not None
+      when: service.kennung is not None and (host.shared is None or host.shared.kind != "platform")
       quantor: eines
       text: >-
         Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss.
       effect: "Klärt, ob der Dienst aus dem Internet erreichbar sein muss"
     - stage: mittelfristig
+      when: host.shared is None or host.shared.kind != "platform"
+      quantor: eines
       text: >-
         Nicht mehr benötigte Dienste abschalten und den zugehörigen Port schließen;
         weiterhin benötigte Dienste auf feste Quellnetze beschränken.
-  verify: >-
-    Portscan des Hosts von einer externen Adresse wiederholen; erwartet wird, dass der Port nur
-    noch für berechtigte Quellnetze erreichbar oder vollständig geschlossen ist.
+    - stage: mittelfristig
+      when: host.shared is not None and host.shared.kind == "platform"
+      quantor: eines
+      text: >-
+        Beim Plattformbetreiber erfragen, wozu der Port dient und ob er für die eigene Website
+        erreichbar sein muss.
+      effect: "Klärt, ob der Plattformdienst für die eigene Website nötig ist"
+  verify:
+    - when: host.shared is None or host.shared.kind != "platform"
+      quantor: eines
+      text: >-
+        Portscan des Hosts von einer externen Adresse wiederholen; erwartet wird, dass der Port nur
+        noch für berechtigte Quellnetze erreichbar oder vollständig geschlossen ist.
+    - when: host.shared is not None and host.shared.kind == "platform"
+      quantor: eines
+      text: >-
+        Die Auskunft des Plattformbetreibers zum Zweck des Ports festhalten; erwartet wird eine
+        Aussage, ob die eigene Website den Port nutzt.

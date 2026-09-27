@@ -52,7 +52,8 @@ def service(order: str, ip: str, port: int) -> S.ServiceFact:
 
 
 def test_schema_1_1_0():
-    assert S.FACTS_SCHEMA_VERSION == "1.1.0"
+    # S6b-4 hebt auf 1.2.0; die Felder aus 1.1.0 bleiben.
+    assert tuple(int(x) for x in S.FACTS_SCHEMA_VERSION.split(".")) >= (1, 1, 0)
 
 
 # ---------------------------------------------------------------- R1 Messbasis der Header
@@ -228,8 +229,9 @@ def test_ca_8000_shoutcast_und_db_webmin():
 
 
 def test_imaps_mit_protokollskript_braucht_keine_kennung():
+    # S6b-4 (spec/11 T1): die Protokollskripte geben die Kennung, "nicht identifiziert" entfaellt.
     s = service(HL, "213.133.104.51", 995)
-    assert s.unidentified is None and s.kennung is None
+    assert s.unidentified is False and s.kennung.startswith("POP3 über TLS")
 
 
 def test_he_444_voller_titel():

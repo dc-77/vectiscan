@@ -43,6 +43,8 @@ class Meta(Base):
     # Erzeugungsnummer aus reports.version (nur am Ende der Fusszeile).
     report_version: str
     generation: Optional[int] = None
+    # S6b-4 (spec/11 T5, E15): Tag der Erzeugung in Europe/Berlin, nur in der Fusszeile.
+    generated_on: Optional[str] = None
     report_id: str
     orders: list[OrderRef] = Field(default_factory=list)
     # S6b-2 (#28): Nummern der ausgeschlossenen Befunde; genau dort darf die Folge Luecken haben.
@@ -217,6 +219,9 @@ class PostureItem(Base):
     # Subjekt (Host oder Domain), auf das er sich bezieht.
     checks: list[str] = Field(default_factory=list)
     subjects: list[str] = Field(default_factory=list)
+    # S6b-4 (spec/11 T16): Regeln, die den Eintrag nur auf Handlungsbedarf ziehen koennen
+    # (Zertifikatsregeln an der Transportzeile eines Hosts); "unauffaellig" sagt ueber sie nichts.
+    pulls: list[str] = Field(default_factory=list)
 
 
 class PostureBlock(Base):
@@ -300,6 +305,10 @@ class PlanItem(Base):
     stage: str
     effect: str = ""
     lever: str = ""
+    # S6b-4 (spec/11 T12): Planzeile je Regel ueber alle Befunde; ``detail`` nennt die Betroffenen
+    # dieses Befunds.
+    per_rule: bool = False
+    detail: str = ""
 
 
 class Threat(Base):
@@ -403,6 +412,8 @@ class Appendix(Base):
     exposure_scale: list[ScaleRow] = Field(default_factory=list)
     hygiene_scale: list[ScaleRow] = Field(default_factory=list)
     triage: list[TriageRow] = Field(default_factory=list)
+    # S6b-4 (spec/11 T6, E16): die Regel der Gesamtbewertung unter der Tabelle A.1.
+    overall_rule: str = ""
     cve_refs: list[CveRef] = Field(default_factory=list)
     inventory: list[InventoryRow] = Field(default_factory=list)
     tools: list[ToolRow] = Field(default_factory=list)

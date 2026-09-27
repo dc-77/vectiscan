@@ -18,6 +18,8 @@ kind: check
 bundle: null
 affected_template: "{fqdn}"
 evidence: [http]
+# S6b-4 (spec/11 T3): der Nachweis kommt aus wpscan, nicht aus der Header-Messung.
+evidence_detail: http.wordpress
 references: [CWE-307]
 frameworks:
   bsi: []

@@ -10,7 +10,7 @@ dorthin, wo der Admin sie sieht.
 | Datei | Inhalt |
 |---|---|
 | `defects.py` | `Defect` (Engine, Prüfung, Stufe, Meldung, Befund-ID) und die Adapter für beide Engines; `payload()` baut den Inhalt von `orders.report_defects`. |
-| `v3_checks.py` | Die Prüfungen, die über das Datenmodell hinausgehen (S5 bis S6b-3). |
+| `v3_checks.py` | Die Prüfungen, die über das Datenmodell hinausgehen (S5 bis S6b-4). |
 | `__main__.py` | Das Gate von Hand fahren, mit gezielter Beschädigung für die Abnahme. |
 
 Die inhaltlichen Prüfungen des Datenmodells stehen weiter in
@@ -40,10 +40,19 @@ nicht zwei; woher ein Eintrag kommt, steht deshalb am Eintrag (`engine`).
 | Kein Werkzeuglauf mit Ergebnis | Fehler | Fällt der Lader aus, steht jede Zeile auf `empty` oder `unknown`; der Bericht liest sich dann wie eine unauffällige Prüfung (S6, offener Punkt nach S5b). |
 | Mehr als fünf Beobachtungen ohne Regel | Warnung | Ein Hinweis auf fehlende Prüfungen, kein Fehler im Bericht. |
 | Auftraggeber fehlt | Fehler unter `strict`, sonst Warnung | Bis S6 immer nur Warnung: der WebCheck-Bericht `75338c97` trug deshalb 39-mal „Auftraggeber“ und ging mit 0 Fehlern durch (spec/08 Punkt 8). Rückweg ist das Kundenkontext-Feld im Admin. |
+| Einschränkungszeile ohne betroffene Prüfung (`einschraenkung_ohne_pruefung`) | Fehler | S6b-1 (spec/09 Q9): eine Zeile in 2.2 nennt, welche Prüfungen ausfielen. |
+| Werkzeugname im Kundentext (`werkzeugname_im_kundentext`) | Fehler | S6b-1 (spec/09 Q10): Einschränkungen und Posture in Kundensprache, ohne „zap_active“ oder „testssl“. |
+| Rolle ohne Fakt (`rolle_ohne_fakt`) | Fehler | S6b-1 (spec/09 Q2): Zusammenfassung, Kontext und Systemsätze nennen nur belegte Rollen. |
+| Aussage ohne erfüllte Fakten-Bedingung (`aussage_ohne_fakt`) | Fehler | S6b-2 (spec/09 Q4): jede Aussage eines Befunds stammt aus einer fehlgeschlagenen Prüfung, deren Bedingung für die genannten Mitglieder gilt; seit S6b-4 auch Titelvarianten. |
+| Zahl mit Zähleinheit widerspricht 2.1 (`zaehlung_widerspruch`) | Fehler | S6b-2 (Nachtrag S6b-1): „4 Hosts“ bei 3 Systemen. |
 | Header im Befundtext, der laut Messung nicht fehlt (`header_nicht_fehlend`) | Fehler | S6b-3 (spec/10 R2): castenow VS-007/009 und huendgen VS-009 nannten X-Frame-Options, obwohl die Endseite ihn setzte. |
-| Einschränkung neben Befund oder „unauffällig“ derselben Faktenfamilie (`einschraenkung_widerspricht_befund`) | Fehler | S6b-3 (spec/10 R4): „nicht prüfbar“ und Befund zum selben Subjekt (DMARC, Zertifikat, Header). Familien in `catalog/families.py`. |
+| Einschränkung neben Befund oder „unauffällig“ derselben Messung (`einschraenkung_widerspricht_befund`) | Fehler | S6b-3 (spec/10 R4): „nicht prüfbar“ und Befund zum selben Subjekt (DMARC, Zertifikat, Header). Familien in `catalog/families.py`. S6b-4 (spec/11 T4): an Fehlerseite und Sicherheitsabfrage sind HSTS und die übrigen Header dieselbe Messung (heuel online: HSTS-Befund an der 429 neben „nur an einer Sicherheitsabfrage gemessen“); HSTS aus testssl oder von der Endseite ist eine eigene Messung. |
 | Positivbefund und Befund am selben Host:Port (`positiv_widerspricht_befund`) | Fehler | S6b-3 (spec/10 R7): POP3 110 bei lumbeck-wolter, junkerwerk und heuel stand im Positivbefund und als „ließ sich nicht feststellen“. |
-| Posture widerspricht den Befunden (`posture_widerspricht_befund`) | Fehler | S6b-3 (spec/10 R8): „unauffällig“ neben einem Befund derselben Regel oder „Handlungsbedarf“ ohne Befund (DANE bei MX beim Dienstleister). |
+| Posture widerspricht den Befunden (`posture_widerspricht_befund`) | Fehler | S6b-3 (spec/10 R8): „unauffällig“ neben einem Befund derselben Regel oder „Handlungsbedarf“ ohne Befund (DANE bei MX beim Dienstleister). S6b-4 (spec/11 T16): alle vier Karten, jeder neutrale Zustand („softfail“, „teilweise geprüft“, „nicht prüfbar“, „entfällt“) neben einem gelben oder roten Befund, Zertifikatsregeln an der Transportzeile je Host (`pulls`). |
+| Nachweis ohne Regelfakt (`nachweis_ohne_regelfakt`) | Fehler | S6b-4 (spec/11 T3): der Nachweis nennt den Fakt der Regel (Header mit Wert, XML-RPC-Adresse, „VRFY in der EHLO-Liste“); dortmund-beach VS-014 nannte nur „Antwort: 200“. Muster in `REGELFAKT`. |
+| IPv6-Adresse laut DNS nicht im Inventar (`ipv6_ohne_inventar`) | Warnung | S6b-4 (spec/11 T7): bis S6c übernimmt der Scanner AAAA-Adressen nicht; Kapitel 2 nennt sie als nicht geprüft. |
+| Messung an einer Adresse außerhalb des Inventars (`messadresse_ausserhalb_inventar`) | Warnung | S6b-4 (spec/11 T7): DNS-Rotation (huendgen testssl an 52.59.120.70, heuel an 216.150.1.129); Kapitel 2 nennt die Messadresse. |
+| Firmenname nicht bestätigt (`firmenname_nicht_bestaetigt`) | Warnung | S6b-4 (Entscheidung E23): Firmenname oder Kurzname mit Quelle `recherche`; der Admin bestätigt ihn vor der Freigabe. |
 | Passivport 25 ohne Einschränkungszeile (`e5_fehlt`) | Fehler | S6b-3 (spec/10 R10): E5 je Adresse, nicht nur für Hosts ohne andere Ursache. |
 | Zusage im Kundentext (`zusage_im_kundentext`) | Fehler | S6b-3 (spec/10 R12): „wir prüfen sie und nehmen … auf“, „auf Anfrage bereitgestellt“. |
 | CVE im Befund ohne Zeile in A.3 (`cve_ohne_a3`) | Fehler | S6b-3 (spec/10 R14): dortmund-beach zitierte 17 CVE aus wpscan bei leerem A.3. |

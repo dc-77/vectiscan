@@ -48,6 +48,9 @@ texts:
   plan:
     lever: "Fehlende Sicherheits-Header ergänzen"
     effect: "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen"
+    # S6b-4 (spec/11 T12): eine Planzeile fuer die Regel mit allen Befunden und den fehlenden
+    # Headern je Host (junkerwerk nannte nur nosniff aus VS-008, dortmund-beach nur X-Frame-Options).
+    per_rule_action: "Die fehlenden Sicherheits-Header setzen"
   # S6b-3 (spec/10 R2): jede Aussage nennt nur einen Header, der tatsächlich fehlt.
   observation: >-
     Auf {group} fehlen einzelne Sicherheits-Header der Webseite: {affected}.

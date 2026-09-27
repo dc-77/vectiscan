@@ -22,6 +22,7 @@ Regeln:
 """
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Optional
@@ -53,6 +54,10 @@ HOST_CAUSES: dict[str, tuple[str, tuple[str, ...]]] = {
         ("Portscan und Diensterkennung", "Transportverschlüsselung", "Sicherheits-Header", "Webanalyse")),
     "no_ipv6_route": (
         "IPv6-Adresse vom Prüfstand aus nicht erreichbar",
+        ("Portscan und Diensterkennung über IPv6", "Transportverschlüsselung über IPv6", "Webanalyse über IPv6")),
+    # S6b-4 (spec/11 T7): AAAA-Eintrag laut DNS, vom Scanner nicht ins Inventar uebernommen.
+    "ipv6_not_scanned": (
+        "IPv6-Adresse vom Prüfstand aus nicht geprüft",
         ("Portscan und Diensterkennung über IPv6", "Transportverschlüsselung über IPv6", "Webanalyse über IPv6")),
     "blocked": (
         "Verbindungen nach dem Portscan abgewiesen",
@@ -120,6 +125,23 @@ HEADER_REASONS: dict[str, str] = {
 TLS_PARTIAL_CAUSE = "Transportverschlüsselung nur für einen Teil der TLS-Dienste geprüft"
 ZAP_PARTIAL_CAUSE = "Aktive Webanalyse nur teilweise"
 DISCOVERED_CAUSE = "Gefunden, nicht geprüft"
+# S6b-4 (spec/11 T7, T8, T13): Ursachen dieser Session.
+ROTATION_CAUSE = "Messung an einer anderen Adresse desselben Namens (DNS-Rotation)"
+PATH_UNRELIABLE_CAUSE = ("Suche nach nicht verlinkten Pfaden nur gegen Weiterleitung, Fehlerseite oder "
+                         "Sicherheitsabfrage, nicht belastbar")
+PATH_ABORTED_CAUSE = "Suche nach nicht verlinkten Pfaden abgebrochen"
+WEBPORT_CAUSE = "Webdienst auf weiterem Port ohne Web- und Header-Analyse"
+PATH_TOOLS = frozenset({"feroxbuster", "ffuf_sensitive"})
+PATH_FAMILIES = frozenset({"sensitive_path_exposed", "directory_listing"})
+STEUERUNG_CODES = frozenset({"zap_no_alerts", "passive_only_policy", "no_zap_context", "no_urls_spidered"})
+PATH_ABORT_TEXT = {"timeout": "Zeitlimit", "connect": "keine Verbindung", "waf_body_marker": "Abwehrmerkmal der Seite",
+                   "blocked": "Abwehrmerkmal der Seite"}
+
+
+def steuerung_text(regel: str) -> str:
+    """Ursache aus dem skipReason der Scan-Steuerung (spec/11 T13)."""
+    return ("Von der Scan-Steuerung übersprungen: aktive Webanalyse"
+            + (f", Regel {regel}" if regel else ""))
 # Ports mit TLS von Anfang an (implizit), dazu Dienste mit STARTTLS oder Zertifikat im Portscan.
 TLS_IMPLICIT_PORTS = frozenset({443, 465, 636, 853, 990, 993, 995, 8443})
 
@@ -271,6 +293,50 @@ def tls_untested_ports(facts: FS.Facts) -> dict[str, list[int]]:
     return out
 
 
+def tls_sni(facts: FS.Facts, ip: str) -> dict[int, list[str]]:
+    """Port -> Namen, die testssl selbst geprueft hat (spec/11 T13); ohne die zugeordneten VHosts."""
+    out: dict[int, list[str]] = defaultdict(list)
+    for t in facts.tls:
+        if t.host_ip == ip and t.source == "testssl" and t.fqdn and t.fqdn not in out[t.port]:
+            out[t.port].append(t.fqdn)
+    return dict(out)
+
+
+def measured_elsewhere(facts: FS.Facts, ip: str) -> dict[str, list[str]]:
+    """Adressen ausserhalb des Systems, an denen testssl ("tls") und httpx ("http") fuer die Namen
+    dieses Hosts gemessen haben (spec/11 T7, DNS-Rotation)."""
+    system = set(SYS.system_of(facts.hosts).get(ip, [ip]))
+    tls = sorted({t.measured_ip for t in facts.tls if t.host_ip == ip and t.measured_ip
+                  and t.measured_ip not in system}, key=sort_key)
+    http = sorted({h.measured_ip for h in facts.http if h.host_ip == ip and h.measured_ip
+                   and h.measured_ip not in system and h.measured_ip not in tls}, key=sort_key)
+    out: dict[str, list[str]] = {}
+    if tls:
+        out["tls"] = tls
+    if http:
+        out["http"] = http
+    return out
+
+
+_RULE_RE = re.compile(r"rule:([\w.-]+)")
+
+
+def scan_control_skip(facts: FS.Facts, ip: str, rows: list[FS.CoverageFact]) -> Optional[str]:
+    """Regel der Scan-Steuerung, die die aktive Webanalyse ausgelassen hat (spec/11 T13).
+
+    None: nicht ausgelassen; "": ausgelassen ohne benannte Regel."""
+    za = [c for c in rows if c.tool == "zap_active" and c.status == "skipped"
+          and _code(c) in ("passive_only_policy", "ai_skip")]
+    if not za:
+        return None
+    for d in facts.decisions:
+        if d.host_ip == ip and d.source in ("ai_phase2_config", "ai_phase2_config_rule_based"):
+            m = _RULE_RE.search(str((d.payload or {}).get("reasoning") or ""))
+            if m:
+                return m.group(1)
+    return ""
+
+
 def _zap_active_state(facts: FS.Facts, ip: str, rows: list[FS.CoverageFact]) -> tuple[str, list[str]]:
     """(Einschraenkung, ungepruefte Anwendungen) der aktiven Webanalyse (spec/10 R3).
 
@@ -286,7 +352,17 @@ def _zap_active_state(facts: FS.Facts, ip: str, rows: list[FS.CoverageFact]) -> 
     names = [f for f in facts.fqdns if f.host_ip == ip and not f.wildcard]
     ziel = next((f for f in names if f.name.lower() == target), None)
     apps = sorted({f.name for f in names if f.real_content is True and f.name.lower() != target}, key=sort_key)
-    if target and (ziel is None or ziel.real_content is not True):
+    # S6b-4 (spec/11 R3-Rest): das Ziel ist eine reine Weiterleitung (castenow umfrage: 301 auf www);
+    # der Inhalt dahinter liegt auf einem anderen Host und ist nicht dieses Ziel.
+    ziel_http = next((h for h in facts.http if h.host_ip == ip and (h.fqdn or "").lower() == target), None)
+    he = ziel_http.header_eval if ziel_http is not None else None
+    weiterleitung = he is not None and he.basis == "redirect" and he.evaluated is None \
+        and he.first is not None and he.first.location \
+        and (urlsplit(he.first.location).hostname or target).lower() != target
+    if target and weiterleitung:
+        status = f" (Status {he.first.status_code})" if he.first.status_code else ""
+        notes.append(f"aktive Webanalyse nur an {target}, einer Weiterleitung auf einen anderen Namen{status}")
+    elif target and (ziel is None or ziel.real_content is not True):
         status = f" (Status {ziel.http_status})" if ziel is not None and ziel.http_status else ""
         notes.append(f"aktive Webanalyse nur an {target} ohne Seiteninhalt{status}")
     else:
@@ -325,8 +401,12 @@ def host_coverage(facts: FS.Facts, host: FS.HostFact) -> HostCoverage:
     reach = host.reach.status if host.reach else None
     if reach == "unreachable_from_scanner":
         ports = ", ".join(str(p) for p in host.reach.passive_ports)
+        # S6b-4 (spec/11 T11): ohne Hostbericht von nmap heisst es "ohne Antwort", auch wenn die
+        # Passivquelle Dienste meldet (bergersysteme 62.217.52.162, .166, .171).
+        portscan = ("der Portscan erhielt keine Antwort" if host.nmap_host_report is False
+                    else "der Portscan fand keinen offenen Port")
         return HostCoverage(ip=ip, cov="unerreichbar", cause=reach, text=(
-            "Vom Prüfstand aus nicht erreichbar: der Portscan fand keinen offenen Port, eine "
+            f"Vom Prüfstand aus nicht erreichbar: {portscan}, eine "
             f"Passivquelle meldet dort Dienste (Port {ports}, gesehen am "
             f"{_datum(host.reach.passive_seen_at)})."))
     if reach == "no_ipv6_route":
@@ -378,16 +458,34 @@ def host_coverage(facts: FS.Facts, host: FS.HostFact) -> HostCoverage:
     tested = tls_tested(facts, ip)
     offen = [p for p in tls_service_ports(facts, ip) if p not in tested] if tested else []
     tls_name = LEAD_IN_SENTENCE["testssl"]
+    # S6b-4 (spec/11 T7): testssl und httpx haben bei DNS-Rotation eine andere Adresse desselben
+    # Namens gemessen (huendgen 52.59.120.70 statt 18.197.248.23); der Text nennt sie.
+    gemessen = measured_elsewhere(facts, ip)
+    if gemessen.get("tls") and tls_name in done:
+        tls_label = f"{tls_name} (geprüft an {aufzaehlung(gemessen['tls'])})"
+        done[done.index(tls_name)] = tls_label
+        tls_name = tls_label
     if offen and tls_name in done:
         done.remove(tls_name)
-        geprueft = ", ".join(f"{p} (SNI {', '.join(n for n in tested[p][:2])})" for p in sorted(tested))
-        teilweise.append(f"Transportverschlüsselung nur für {geprueft} geprüft, nicht für "
-                         f"{'Port' if len(offen) == 1 else 'Port'} {', '.join(str(p) for p in offen)}")
+        # S6b-4 (spec/11 T13): SNI nur fuer Namen, die testssl selbst geprueft hat.
+        sni = tls_sni(facts, ip)
+        geprueft = ", ".join((f"{p} (SNI {', '.join(sni[p][:2])})" if sni.get(p) else str(p)) for p in sorted(tested))
+        an = f" an {aufzaehlung(gemessen['tls'])}" if gemessen.get("tls") else ""
+        teilweise.append(f"Transportverschlüsselung nur für {geprueft}{an} geprüft, nicht für "
+                         f"Port {', '.join(str(p) for p in offen)}")
+    if gemessen.get("http"):
+        teilweise.append(f"Webabruf an {aufzaehlung(gemessen['http'])}")
     zap_note, apps = _zap_active_state(facts, ip, rows)
     zap_name = LEAD_IN_SENTENCE["zap_active"]
     if zap_note and zap_name in done:
         done.remove(zap_name)
         teilweise.append(zap_note + (f"; Anwendung {aufzaehlung(apps)} nicht aktiv geprüft" if apps else ""))
+    # S6b-4 (spec/11 T13): die Scan-Steuerung hat die aktive Webanalyse ausgelassen (bergersysteme:
+    # Regel hosted-cms-webflow, nur passive Analyse); 2.1 sagt das statt zu schweigen.
+    regel = scan_control_skip(facts, ip, rows)
+    if regel is not None and web:
+        teilweise.append("aktive Webanalyse von der Scan-Steuerung übersprungen"
+                         + (f" (Regel {regel})" if regel else ""))
     teile = ([f"{aufzaehlung(done)} vollständig"] if done else []) + teilweise
     if missing:
         teile.append(f"nicht geprüft: {aufzaehlung(missing)}")
@@ -404,8 +502,27 @@ def host_coverage(facts: FS.Facts, host: FS.HostFact) -> HostCoverage:
 
 def build_model(facts: FS.Facts) -> Model:
     hosts = {h.ip: host_coverage(facts, h) for h in facts.hosts}
-    return Model(hosts=hosts, systems=SYS.system_of(h for h in facts.hosts if h.third_party is None),
+    systems = SYS.system_of(h for h in facts.hosts if h.third_party is None)
+    # S6b-4 (spec/11 T7): AAAA-Adressen derselben Namen gehoeren zum System ihrer IPv4-Adresse
+    # und zaehlen mit; geprueft sind sie nicht.
+    for h in facts.hosts:
+        if h.third_party is not None:
+            continue
+        for extra in h.additional_ips:
+            if extra.ip in hosts:
+                continue
+            hosts[extra.ip] = HostCoverage(ip=extra.ip, cov="keine", cause="ipv6_not_scanned",
+                                           text="IPv6-Adresse laut DNS, vom Prüfstand aus nicht geprüft.")
+            mitglieder = systems.get(h.ip, [h.ip]) + [extra.ip]
+            for ip in mitglieder:
+                systems[ip] = mitglieder
+    return Model(hosts=hosts, systems=systems,
                  third_party=[h.ip for h in facts.hosts if h.third_party is not None])
+
+
+def additional_ips(facts: FS.Facts) -> dict[str, FS.AdditionalIp]:
+    """AAAA-Adressen ohne Inventareintrag, je Adresse (spec/11 T7)."""
+    return {a.ip: a for h in facts.hosts if h.third_party is None for a in h.additional_ips}
 
 
 def names_checked(facts: FS.Facts) -> int:
@@ -443,6 +560,10 @@ def _host_label(facts: FS.Facts, ip: str) -> str:
     host = next((h for h in facts.hosts if h.ip == ip), None)
     # S6b-2: ein Wildcard-Eintrag ist kein Hostname (spec/09 Teil 2 DB).
     names = sorted((n for n in host.fqdns if not n.startswith("*.")), key=sort_key) if host else []
+    if host is None:
+        # S6b-4 (spec/11 T7): AAAA-Adresse ohne Inventareintrag, mit den Namen aus dem DNS.
+        extra = additional_ips(facts).get(ip)
+        names = list(extra.names) if extra is not None else []
     return kurz_label(f"{ip} ({', '.join(names)})") if names else ip
 
 
@@ -470,10 +591,21 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
     if unerreichbar:
         seen = sorted({h.reach.passive_seen_at[:10] for h in unerreichbar if h.reach.passive_seen_at})
         spanne = _datum(seen[0]) if len(seen) == 1 else f"{_datum(seen[0])} bis {_datum(seen[-1])}"
+        # S6b-4 (spec/11 T11): ohne Hostbericht "keine Antwort", nicht "kein offener Port".
+        ohne_bericht = [h for h in unerreichbar if h.nmap_host_report is False]
+        if len(ohne_bericht) == len(unerreichbar):
+            portscan = "der Portscan erhielt keine Antwort"
+        elif ohne_bericht:
+            portscan = "der Portscan erhielt keine Antwort oder fand keinen offenen Port"
+        else:
+            portscan = "der Portscan fand keinen offenen Port"
         row(HOST_CAUSES["unreachable_from_scanner"][0]).zusatz.append(
             "Eine Passivquelle meldet dort Dienste (gesehen " + ("am " if len(seen) == 1 else "vom ")
-            + spanne + "); der Portscan fand keinen offenen Port. Ergebnisse zu diesen Hosts liegen "
-            "deshalb nicht vor.")
+            + spanne + f"); {portscan}. Ergebnisse zu diesen Hosts liegen deshalb nicht vor.")
+    if any(h.cause == "ipv6_not_scanned" for h in model.hosts.values()):
+        row(HOST_CAUSES["ipv6_not_scanned"][0]).zusatz.append(
+            "Die Adressen stehen als AAAA-Eintrag derselben Namen im DNS; der Scanner hat sie nicht in "
+            "die Prüfung übernommen. Geprüft wurde die IPv4-Adresse desselben Systems.")
     ipv6 = [h for h in facts.hosts if h.reach and h.reach.status == "no_ipv6_route"]
     for h in ipv6:
         partner = [ip for ip in model.systems.get(h.ip, []) if ip != h.ip]
@@ -490,12 +622,21 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
     # andere Quelle die Endseite geliefert hat (castenow bitwarden ueber testssl).
     ersetzt = {(h.host_ip, h.fqdn) for h in facts.http
                if h.header_eval is not None and h.header_eval.evaluated is not None}
+    # S6b-4 (spec/11 T8, T13): Pfadsuche und Scan-Steuerung haben eigene Zeilen (Abschnitt 7).
+    pfade = {p.host_ip: p for p in facts.path_search if p.verdict != "skipped"}
+    steuerung = {ip: regel for ip in model.hosts
+                 if (regel := scan_control_skip(facts, ip, [c for c in facts.coverage if c.host_ip == ip]))
+                 is not None and not host_cause.get(ip)}
     for c in facts.coverage:
         if c.status not in ("failed", "blocked", "empty", "skipped"):
             continue
         if c.tool in T.OUT_OF_PRODUCT_TOOLS or c.tool in NO_LIMITATION_TOOLS or c.tool == "nmap":
             continue
         if c.host_ip and host_cause.get(c.host_ip):
+            continue
+        if c.tool in PATH_TOOLS and c.host_ip in pfade:
+            continue
+        if c.tool in ZAP_TOOLS and c.host_ip in steuerung:
             continue
         if c.tool == "header_check" and (c.host_ip, c.fqdn) in ersetzt:
             continue
@@ -525,9 +666,13 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
     # entfaellt, wenn dasselbe Subjekt fuer dieselbe Faktenfamilie gemessen ist.
     checks = {ci.id: ci for ci in output.checks}
     gemessen = FAM.measured(output.results)
-    abgleich = any(sw.vulnerabilities for sw in facts.software)
     http_by = {(h.host_ip, h.fqdn): h for h in facts.http}
     header_rows: dict[str, dict] = {}
+    zusatz_checks: dict[str, set[str]] = {}
+    for ip, regel in steuerung.items():
+        r = row(steuerung_text(regel), "scan_control")
+        r.checks.add("Aktive Webanalyse")
+        r.ort(ip, _host_label(facts, ip))
     for res in output.results:
         if res.status != "not_testable" or not res.reason_code:
             continue
@@ -540,23 +685,38 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
         if status != "not_testable" or not text:
             continue
         ip = str(res.vars.get("host_ip") or "")
+        if code == "no_enrichment":
+            # S6b-4 (spec/11 T13): je Host mit erkannter Version und ohne Abgleich (Abschnitt 7).
+            continue
         if ip and host_cause.get(ip):
             continue
         if code in HOST_CAUSES:
             continue
-        if code == "no_enrichment" and abgleich:
-            # S6b-3 (spec/10 R14): nur ohne jeden Abgleich; wpscan hat Kennungen geliefert.
-            continue
         info = checks.get(res.check_id)
         name = family_check_name(info.family if info else res.family)
+        if ip in pfade and (info.family if info else res.family) in PATH_FAMILIES:
+            # S6b-4 (spec/11 T8): die Pfadsuche hat eine eigene Zeile mit ihrem Urteil.
+            continue
+        if ip in steuerung and code in STEUERUNG_CODES:
+            r = row(steuerung_text(steuerung[ip]), "scan_control")
+            r.checks.add(name)
+            r.refs.add(f"{res.check_id}|{res.group_key}")
+            r.ort(ip, _host_label(facts, ip))
+            continue
+        if code == "zap_no_alerts" and ip and model.hosts.get(ip) is not None and model.hosts[ip].zap_note:
+            # S6b-4 (spec/11 T13): eine Ursache, eine Zeile; die Pruefungen stehen in der Zeile
+            # "Aktive Webanalyse nur teilweise" (huendgen: zwei Zeilen fuer ZAP ohne Meldung).
+            zusatz_checks.setdefault(ip, set()).add(name)
+            continue
         key = ip or str(res.vars.get("domain") or "") or res.group_key
         if code in HEADER_REASONS:
             fq = str(res.vars.get("fqdn_names") and res.group_label or res.group_label)
             # Gruppe "name@adresse": exakt der Name, nicht als Teilstring (ftp.bergersysteme.com
-            # enthaelt bergersysteme.com).
-            name = res.group_key.split("@", 1)[0]
-            hf = http_by.get((ip, name)) or next(
-                (h for (hip, hfq), h in http_by.items() if hfq == name and (not ip or hip == ip)), None)
+            # enthaelt bergersysteme.com). S6b-4: eigener Name der Variablen; vorher stand der
+            # Hostname unter "Betroffene Pruefungen".
+            vhost = res.group_key.split("@", 1)[0]
+            hf = http_by.get((ip, vhost)) or next(
+                (h for (hip, hfq), h in http_by.items() if hfq == vhost and (not ip or hip == ip)), None)
             first = hf.header_eval.first if hf is not None and hf.header_eval is not None else None
             entry = header_rows.setdefault(code, {"codes": set(), "orte": {}, "refs": set(), "checks": set()})
             if first is not None and first.status_code:
@@ -576,11 +736,21 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
             continue
         if code == "dkim_selector_unknown" and dkim_text is not None:
             what = dkim_text(res)
+        elif code == "unreachable" and (ip, res.group_key.split("@", 1)[0]) in ersetzt:
+            # S6b-4 (spec/11 R4-Rest): castenow bitwarden antwortete, nur die erste Header-Messung
+            # nicht; die Seite ist ueber die TLS-Pruefung bewertet.
+            what = ("Erste Header-Messung ohne Antwort; Seite über die TLS-Prüfung bewertet, "
+                    "Cookie-Attribute nicht bewertet")
         else:
             what = TOOL_CAUSES.get(code) or text.rstrip(".")
         r = row(what, code)
         r.checks.add(name)
         r.refs.add(f"{res.check_id}|{res.group_key}")
+        if code == "cert_chain_unknown" and res.group_by == "fqdn":
+            # S6b-4 (spec/11 T13): nur der Name mit eigenem, ungeprueftem Zertifikat, nicht seine
+            # Aliasnamen (heuel: heuel.com hat testssl geprueft, jobs ist nur Weiterleitung).
+            r.ort(res.group_key, res.group_key.split("@", 1)[0])
+            continue
         r.ort(key, res.group_label)
     for code, entry in sorted(header_rows.items()):
         codes = ", ".join(str(c) for c in sorted(entry["codes"]))
@@ -604,11 +774,23 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
         r.checks.add(E5_CHECK)
         for p in e5:
             r.ort(p.host_ip, _host_label(facts, p.host_ip))
-        seen = sorted({(p.seen_at or "")[:10] for p in e5 if p.seen_at})
         dienst = sorted({name for p in e5 if (name := passive_module_name(p))})
+        # S6b-4 (spec/11 T6): das Datum je Adresse, der Zeitstempel des Dienstes vor dem der
+        # letzten Aktualisierung des Hosts (junkerwerk: .130 am 23.09., .28 am 19.09.).
+        gesehen = {}
+        for p in sorted(e5, key=lambda p: sort_key(p.host_ip)):
+            ts = p.service_seen_at or p.seen_at
+            if ts and p.host_ip not in gesehen:
+                gesehen[p.host_ip] = _datum(ts)
+        if len(set(gesehen.values())) == 1 and len(gesehen) == len({p.host_ip for p in e5}):
+            wann = f" (gesehen am {next(iter(gesehen.values()))})"
+        elif gesehen:
+            wann = " (" + ", ".join(f"{ip} gesehen am {d}" for ip, d in gesehen.items()) + ")"
+        else:
+            wann = ""
         r.zusatz.append(
             f"Laut Passivquelle nimmt dort der Dienst {aufzaehlung(dienst) or 'auf Port 25'} Verbindungen an"
-            + (f" (gesehen am {_datum(seen[-1])})" if seen else "")
+            + wann
             + "; vom Prüfstand aus ist Port 25 nicht erreichbar, der Mailserver auf diesem Port ist "
               "deshalb nicht geprüft.")
 
@@ -623,6 +805,7 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
         if h.zap_note:
             r = row(ZAP_PARTIAL_CAUSE, "zap_partial")
             r.checks.add("Aktive Webanalyse")
+            r.checks.update(zusatz_checks.get(ip, set()))
             label = _host_label(facts, ip)
             if h.apps_untested:
                 label = f"{label}: Anwendung {aufzaehlung(h.apps_untested)} nicht aktiv geprüft"
@@ -641,8 +824,74 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
             adressen = ", ".join(d.ips[:2]) + (" und weitere" if len(d.ips) > 2 else "")
             zusatz = f"Drittanbieter {d.third_party}, " if d.third_party else ""
             r.ort(d.fqdn, f"{d.fqdn} ({zusatz}{adressen})" if adressen or zusatz else d.fqdn)
-        r.zusatz.append("Die Hostsuche hat diese Namen gefunden, sie sind aber nicht in die Prüfung "
-                        "übernommen worden; Ergebnisse zu ihnen liegen nicht vor.")
+        # S6b-4 (spec/11 Teil 1 R5): Numerus bei einem Namen (junkerwerk archiv).
+        if len({d.fqdn for _dom, d in gefunden}) == 1:
+            r.zusatz.append("Die Hostsuche hat diesen Namen gefunden, er ist aber nicht in die Prüfung "
+                            "übernommen worden; Ergebnisse zu ihm liegen nicht vor.")
+        else:
+            r.zusatz.append("Die Hostsuche hat diese Namen gefunden, sie sind aber nicht in die Prüfung "
+                            "übernommen worden; Ergebnisse zu ihnen liegen nicht vor.")
+
+    # 7 S6b-4 (spec/11 T7): Messung an einer anderen Adresse desselben Namens.
+    for ip, h in sorted(model.hosts.items(), key=lambda kv: sort_key(kv[0])):
+        if h.cause:
+            continue
+        anders = measured_elsewhere(facts, ip)
+        if not anders:
+            continue
+        teile = []
+        if anders.get("tls"):
+            teile.append(f"Transportverschlüsselung an {aufzaehlung(anders['tls'])}")
+        if anders.get("http"):
+            teile.append(f"Webabruf an {aufzaehlung(anders['http'])}")
+        r = row(ROTATION_CAUSE, "dns_rotation")
+        r.checks.update(["Transportverschlüsselung"] if anders.get("tls") else [])
+        r.checks.update(["Webabruf"] if anders.get("http") else [])
+        r.ort(ip, f"{_host_label(facts, ip)}: {'; '.join(teile)}")
+        r.zusatz.append(f"Das Ergebnis gilt für den Namen, nicht für die Inventaradresse {ip}.")
+
+    # 8 S6b-4 (spec/11 T8): Pfadsuche je Host aus feroxbuster-Statistik und ffuf-Treffern.
+    for p in facts.path_search:
+        if host_cause.get(p.host_ip) or p.verdict not in ("unreliable", "aborted"):
+            continue
+        ziel = (urlsplit(p.target_url).hostname if p.target_url else None) or p.host_ip
+        if p.verdict == "unreliable":
+            arten = []
+            weiter = [c for c in p.status_codes if 300 <= c < 400]
+            fehler = [c for c in p.status_codes if c in (401, 403)]
+            if weiter:
+                arten.append(f"Weiterleitung {', '.join(str(c) for c in weiter)}")
+            if p.challenge:
+                arten.append("Sicherheitsabfrage der Plattform")
+            elif fehler:
+                arten.append(f"Fehlerseite {', '.join(str(c) for c in fehler)}")
+            if 429 in p.status_codes and not p.challenge:
+                arten.append("Sicherheitsabfrage 429")
+            r = row(PATH_UNRELIABLE_CAUSE, "path_unreliable")
+            r.checks.add("Suche nach nicht verlinkten Pfaden")
+            r.ort(p.host_ip, f"{ziel} ({', '.join(arten) or 'ohne Inhaltsantwort'})")
+        else:
+            r = row(PATH_ABORTED_CAUSE, "path_aborted")
+            r.checks.add("Suche nach nicht verlinkten Pfaden")
+            grund = PATH_ABORT_TEXT.get(p.abort_reason or "", "")
+            if not grund and (p.abort_reason or "").startswith("timeout"):
+                grund = "Zeitlimit"
+            r.ort(p.host_ip, f"{ziel} ({grund})" if grund else ziel)
+
+    # 9 S6b-4 (spec/11 T13): Webdienste auf weiteren Ports ohne Web- und Header-Analyse (huendgen 444).
+    for ip, ports in sorted(web_ports_unanalysed(facts).items(), key=lambda kv: sort_key(kv[0])):
+        if host_cause.get(ip):
+            continue
+        r = row(WEBPORT_CAUSE, "webport_unanalysed")
+        r.checks.update(("Sicherheits-Header", "Webanalyse"))
+        r.ort(ip, f"{ip} (Port {', '.join(str(x) for x in ports)})")
+
+    # 10 S6b-4 (spec/11 T13): Fremdbewertung je Host mit erkannter Version und ohne jeden Abgleich,
+    # unabhaengig von Folgeausfaellen (junkerwerk .130 dazu, castenow .53 mit wpscan-Abgleich nicht).
+    for ip in sorted(hosts_without_lookup(facts), key=sort_key):
+        r = row(TOOL_CAUSES["no_enrichment"], "no_enrichment")
+        r.checks.add("Abgleich mit Schwachstellendatenbanken")
+        r.ort(ip, _host_label(facts, ip))
 
     out: list[Limitation] = []
     order = [v[0] for v in HOST_CAUSES.values()] + [E5_CAUSE]
@@ -654,9 +903,93 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
         detail = f"Betroffen: {shown}." if shown else ""
         if r.zusatz:
             detail = (detail + " " + " ".join(r.zusatz)).strip()
-        out.append(Limitation(what=r.what.rstrip("."), checks=sorted(r.checks), detail=detail,
+        out.append(Limitation(what=r.what.rstrip("."), checks=sammelbegriffe(r.checks), detail=detail,
                               code=r.code, refs=sorted(r.refs), subjects=sorted(r.subjects, key=sort_key)))
     return out
+
+
+# S6b-4 (spec/11 T13): Pruefnamen zu Sammelbegriffen, wenn eine Zeile mehr als drei Pruefungen
+# nennt (dortmund-beach pflege: 24 Pruefnamen unter "Betroffene Pruefungen").
+SAMMEL_MAX = 3
+SAMMELBEGRIFFE: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("Web", ("web", "cookie", "pfad", "wordpress", "anmelde", "formular", "cms", "bibliothek", "skript",
+             "technik", "verzeichnis", "entwicklung", "standardseite", "sitzung", "cors", "trace", "http",
+             "preisgegeben", "angaben", "version")),
+    ("Header", ("header", "content-security", "inhaltsrichtlinie", "hsts", "strict-transport", "sicherheits-header")),
+    ("TLS", ("tls", "zertifikat", "verschlüsselung", "vertrauenskette", "protokoll", "cipher", "verfahren")),
+    ("Mail", ("mail", "smtp", "spf", "dkim", "dmarc", "mta-sts", "dane", "imap", "pop3")),
+    ("DNS", ("dns", "caa", "zone", "cname", "domain")),
+    ("Dienst", ("dienst", "port", "portscan", "verwaltung", "datenbank", "fernwartung", "ftp", "ssh")),
+)
+SAMMEL_NAMEN = {"Web": "Web-", "Header": "Header-", "TLS": "TLS-", "Mail": "Mail-", "DNS": "DNS-",
+                "Dienst": "Dienst-"}
+
+
+def sammelbegriffe(checks: set[str] | list[str]) -> list[str]:
+    """Bis zu drei Pruefnamen wie bisher, darueber Sammelbegriffe ("Web-, Header- und TLS-Pruefungen")."""
+    namen = sorted(checks)
+    if len(namen) <= SAMMEL_MAX:
+        return namen
+    gruppen: list[str] = []
+    rest: list[str] = []
+    for name in namen:
+        low = name.lower()
+        gruppe = next((g for g, stichworte in SAMMELBEGRIFFE if any(s in low for s in stichworte)), None)
+        if gruppe is None:
+            rest.append(name)
+        elif gruppe not in gruppen:
+            gruppen.append(gruppe)
+    reihenfolge = [g for g, _ in SAMMELBEGRIFFE if g in gruppen]
+    teile = [SAMMEL_NAMEN[g] for g in reihenfolge]
+    if teile:
+        teile[-1] = teile[-1].rstrip("-") + "-Prüfungen" if len(teile) == 1 else teile[-1] + "Prüfungen"
+        text = teile[0] if len(teile) == 1 else ", ".join(teile[:-1]) + " und " + teile[-1]
+        return [text] + rest
+    return namen
+
+
+def web_ports_unanalysed(facts: FS.Facts) -> dict[str, list[int]]:
+    """Offene Webdienste auf weiteren Ports, an denen keine Header- und Webanalyse lief (spec/11 T13).
+
+    Header-Messung und Webanalyse laufen je Name auf dem Standardport; ein Webdienst auf 444
+    (huendgen "Web Applications Portal") blieb ohne beides. Plattformen und CDN-Kanten
+    (Standardports der Anbieter) und Dienste anderer Nutzer eines geteilten Servers zaehlen nicht."""
+    gemessen: set[tuple[str, int]] = set()
+    for h in facts.http:
+        # Die Adresse der Messung und die Adressen der ZAP-Meldungen (zusaetzliche URLs der
+        # Webanalyse) zaehlen als analysiert.
+        for url in [h.url, *[a.url for a in h.alerts], *[u for a in h.alerts for u in a.urls_sample]]:
+            try:
+                parts = urlsplit(url or "")
+                port = parts.port or (443 if parts.scheme == "https" else 80)
+            except ValueError:
+                continue
+            if url:
+                gemessen.add((h.host_ip, port))
+    plattform = {h.ip for h in facts.hosts if h.cdn_provider or (h.shared is not None and h.shared.kind == "platform")
+                 or h.third_party is not None}
+    out: dict[str, list[int]] = defaultdict(list)
+    for s in facts.services:
+        if s.state != "open" or s.port in (80, 443) or s.host_ip in plattform or s.foreign:
+            continue
+        webdienst = (s.service or "") in WEB_SERVICES or (s.service or "").startswith(("http", "https"))
+        if not webdienst or (s.host_ip, s.port) in gemessen:
+            continue
+        out[s.host_ip].append(s.port)
+    return {ip: sorted(set(p)) for ip, p in out.items()}
+
+
+def hosts_without_lookup(facts: FS.Facts) -> list[str]:
+    """Eigene Hosts mit erkannter Version, zu denen kein Abgleich mit Schwachstellendaten vorliegt.
+
+    Ein Abgleich ist eine Fremdbewertung aus der Anreicherung oder der Lauf von wpscan (auch mit
+    null Treffern); ohne erkannte Version gibt es nichts abzugleichen (spec/11 T13)."""
+    eigene = {h.ip for h in facts.hosts if h.third_party is None}
+    mit_version = {sw.host_ip for sw in facts.software if sw.host_ip in eigene and sw.version_norm}
+    abgleich = {sw.host_ip for sw in facts.software if sw.vulnerabilities or sw.vulnerabilities_count is not None}
+    abgleich |= {t.host_ip for t in facts.threats if t.host_ip and (
+        (t.cvss_nvd is not None and t.cvss_nvd.score is not None) or (t.kev is not None and t.kev.listed))}
+    return sorted(mit_version - abgleich, key=sort_key)
 
 
 # ---------------------------------------------------------------- Pruefumfang je Domain

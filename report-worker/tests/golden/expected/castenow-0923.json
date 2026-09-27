@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-26.2 auf tests/golden/facts/1f8bc977-39a7-47c7-b4ad-7b05dbac2d52.json",
+ "source": "reporter.catalog 2026-09-27.1 auf tests/golden/facts/1f8bc977-39a7-47c7-b4ad-7b05dbac2d52.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -33,7 +33,7 @@
    "level": "erhoeht",
    "group": "92.205.163.53 (ubb-wiki.castenow.de)",
    "affected": [
-    "92.205.163.53:8880 (Plesk, laut Passivquelle)"
+    "92.205.163.53:8880 (Plesk, laut Passivquelle, gesehen am 17.09.2026)"
    ],
    "title": "Verwaltungsoberfläche laut Passivquelle erreichbar",
    "zustaendig": "hoster"
@@ -183,21 +183,6 @@
   },
   {
    "id": "VS-2026-014",
-   "check": "http_alt_port",
-   "family": "http_alt_port",
-   "cat": "A",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "92.205.163.53 (ubb-wiki.castenow.de)",
-   "affected": [
-    "92.205.163.53:8000 (Shoutcast DNAS 2.6.1.777, Stream tonausstrom.de)",
-    "92.205.163.53:8800 (Icecast streaming media server 2.4.4)"
-   ],
-   "title": "Webdienst auf unüblichem Port erreichbar",
-   "zustaendig": "hoster"
-  },
-  {
-   "id": "VS-2026-015",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -210,7 +195,7 @@
    "title": "Webdienst gibt Versionskennung oder internen Servernamen preis"
   },
   {
-   "id": "VS-2026-016",
+   "id": "VS-2026-015",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -223,7 +208,7 @@
    "title": "Webdienst gibt Versionskennung oder internen Servernamen preis"
   },
   {
-   "id": "VS-2026-017",
+   "id": "VS-2026-016",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -232,6 +217,19 @@
    "group": "owa.castenow.de",
    "affected": [
     "owa.castenow.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-SE)"
+   ],
+   "title": "Webdienst gibt Versionskennung oder internen Servernamen preis"
+  },
+  {
+   "id": "VS-2026-017",
+   "check": "http_header_disclosure",
+   "family": "banner_version_disclosure",
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "ubb-wiki.castenow.de",
+   "affected": [
+    "ubb-wiki.castenow.de (Server: nginx, X-Powered-By: PHP/8.4.25, PleskLin)"
    ],
    "title": "Webdienst gibt Versionskennung oder internen Servernamen preis"
   },
@@ -534,20 +532,6 @@
   },
   {
    "id": "VS-2026-040",
-   "check": "service_banner_version",
-   "family": "banner_version_disclosure",
-   "cat": "E",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "92.205.163.53 (ubb-wiki.castenow.de)",
-   "affected": [
-    "92.205.163.53:8800 (Icecast 2.4.4)"
-   ],
-   "title": "Dienst gibt Versionskennung preis",
-   "zustaendig": "hoster"
-  },
-  {
-   "id": "VS-2026-041",
    "check": "smtp_vrfy_enabled_passive",
    "family": "smtp_vrfy",
    "cat": "E",
@@ -560,7 +544,7 @@
    "title": "Mailserver beantwortet den Befehl VRFY laut Passivquelle"
   },
   {
-   "id": "VS-2026-042",
+   "id": "VS-2026-041",
    "check": "spf_authorizes_shared_host",
    "family": "spf_shared_host",
    "cat": "C",
@@ -568,12 +552,12 @@
    "level": "mittel",
    "group": "castenow.de",
    "affected": [
-    "castenow.de (159.69.143.80 beim Hoster Hetzner Online GmbH)"
+    "castenow.de (159.69.143.80, Server von planwerk6.de im Rechenzentrum Hetzner Online GmbH)"
    ],
    "title": "SPF gibt geteilten Server frei"
   },
   {
-   "id": "VS-2026-043",
+   "id": "VS-2026-042",
    "check": "spf_softfail",
    "family": "spf_softfail",
    "cat": "C",
@@ -586,7 +570,7 @@
    "title": "SPF-Eintrag ohne konsequente Durchsetzung"
   },
   {
-   "id": "VS-2026-044",
+   "id": "VS-2026-043",
    "check": "tls_rpt_missing",
    "family": "tls_rpt_missing",
    "cat": "C",
@@ -599,7 +583,7 @@
    "title": "TLS-RPT nicht eingerichtet"
   },
   {
-   "id": "VS-2026-045",
+   "id": "VS-2026-044",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -612,7 +596,7 @@
    "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-046",
+   "id": "VS-2026-045",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -625,7 +609,7 @@
    "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-047",
+   "id": "VS-2026-046",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -638,7 +622,7 @@
    "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-048",
+   "id": "VS-2026-047",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -651,7 +635,7 @@
    "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-049",
+   "id": "VS-2026-048",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -665,7 +649,7 @@
    "zustaendig": "platform"
   },
   {
-   "id": "VS-2026-050",
+   "id": "VS-2026-049",
    "check": "web_vulnerability_reported",
    "family": "web_vulnerability_reported",
    "cat": "E",
@@ -680,7 +664,7 @@
    "title": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-051",
+   "id": "VS-2026-050",
    "check": "wordpress_user_enumeration",
    "family": "user_enumeration",
    "cat": "E",
@@ -1155,23 +1139,23 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "92.205.163.53 (ubb-wiki.castenow.de)",
+   "group": "3.174.98.120 (umfrage.castenow.de)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
    "id": "VS-2026-P59",
-   "check": "rdp_exposed",
-   "family": "rdp_exposed",
-   "cat": "A",
-   "group": "159.69.143.80 (castenow.de, www.castenow.de)",
-   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
+   "check": "ip_reputation",
+   "family": "ip_reputation",
+   "cat": "E",
+   "group": "92.205.163.53 (ubb-wiki.castenow.de)",
+   "title": "Keine Einträge in Reputationsquellen"
   },
   {
    "id": "VS-2026-P60",
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "195.50.179.4 (mail.castenow.de, mail2.castenow.de, owa.castenow.de)",
+   "group": "159.69.143.80 (castenow.de, www.castenow.de)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
@@ -1179,7 +1163,7 @@
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "195.50.179.5 (mailstore.castenow.de)",
+   "group": "195.50.179.4 (mail.castenow.de, mail2.castenow.de, owa.castenow.de)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
@@ -1187,7 +1171,7 @@
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "195.50.179.6 (bitwarden.castenow.de)",
+   "group": "195.50.179.5 (mailstore.castenow.de)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
@@ -1195,7 +1179,7 @@
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "3.174.98.120 (umfrage.castenow.de)",
+   "group": "195.50.179.6 (bitwarden.castenow.de)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
@@ -1203,11 +1187,19 @@
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "92.205.163.53 (ubb-wiki.castenow.de)",
+   "group": "3.174.98.120 (umfrage.castenow.de)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
    "id": "VS-2026-P65",
+   "check": "rdp_exposed",
+   "family": "rdp_exposed",
+   "cat": "A",
+   "group": "92.205.163.53 (ubb-wiki.castenow.de)",
+   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
+  },
+  {
+   "id": "VS-2026-P66",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -1215,7 +1207,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P66",
+   "id": "VS-2026-P67",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -1223,7 +1215,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P67",
+   "id": "VS-2026-P68",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -1231,7 +1223,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P68",
+   "id": "VS-2026-P69",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -1239,7 +1231,7 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P69",
+   "id": "VS-2026-P70",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
@@ -1247,20 +1239,12 @@
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P70",
+   "id": "VS-2026-P71",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
    "group": "92.205.163.53 (ubb-wiki.castenow.de)",
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P71",
-   "check": "spf_missing",
-   "family": "spf_missing",
-   "cat": "C",
-   "group": "castenow.de",
-   "title": "SPF-Eintrag vorhanden"
   },
   {
    "id": "VS-2026-P72",

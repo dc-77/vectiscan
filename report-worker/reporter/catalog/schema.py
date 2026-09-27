@@ -108,14 +108,31 @@ class PlanText(Base):
 
     ``lever`` ist ein Titel ohne Hostnamen, weil ein Hebel alle Befunde seiner Zeile
     adressiert; ``effect`` sagt, was die Massnahme bewirkt, und gilt nur fuer diese Regel.
+
+    S6b-4 (spec/11 T12, T14): ``lever_variants`` und ``effect_variants`` ersetzen Hebel und
+    Effekt, wenn ihre Fakten-Bedingung gilt ("Abgelaufenes Zertifikat ersetzen" statt
+    "Zertifikate vor dem Ablauf erneuern"). Es gilt die erste zutreffende Variante.
     """
     lever: str
     effect: str
+    lever_variants: list[Statement] = Field(default_factory=list)
+    effect_variants: list[Statement] = Field(default_factory=list)
+    # S6b-4 (spec/11 T12): eine Planzeile fuer die ganze Regel ueber alle Befunde, mit der Liste
+    # der Betroffenen je Host ("Die fehlenden Sicherheits-Header setzen: www.x.de (fehlend: ...)").
+    # Ohne Angabe gilt je Befund die erste Stufe.
+    per_rule_action: Optional[str] = None
+
+
+# S6b-4 (spec/11 T4, T14): Felder mit Varianten, deren erste zutreffende den Standardtext ersetzt.
+VARIANT_FIELDS: tuple[str, ...] = ("short_variants", "plan.lever_variants", "plan.effect_variants")
 
 
 class Texts(Base):
     # Kurzform der Regel im Sammeltitel eines Buendels ("kein TLS 1.3").
     short: Optional[str] = None
+    # S6b-4 (spec/11 T4, T14): Kurzform je Variante ("HSTS abgeschaltet (max-age=0)",
+    # "Zertifikat am Berichtsdatum abgelaufen, sofern nicht erneuert").
+    short_variants: list[Statement] = Field(default_factory=list)
     observation: list[Statement] = Field(min_length=1)
     meaning: list[Statement] = Field(min_length=1)
     recommendation: list[Recommendation] = Field(min_length=1)
@@ -139,12 +156,21 @@ class Texts(Base):
         if name == "recommendation":
             return [(f"recommendation[{i}]", r.text, r.when, r.quantor)
                     for i, r in enumerate(self.recommendation)]
+        if name == "short_variants":
+            return [(f"short_variants[{i}]", s.text, s.when, s.quantor)
+                    for i, s in enumerate(self.short_variants)]
+        if name in ("plan.lever_variants", "plan.effect_variants"):
+            if self.plan is None:
+                return []
+            attr = name.split(".", 1)[1]
+            return [(f"{name}[{i}]", s.text, s.when, s.quantor)
+                    for i, s in enumerate(getattr(self.plan, attr))]
         return [(f"{name}[{i}]", s.text, s.when, s.quantor)
                 for i, s in enumerate(getattr(self, name))]
 
     def all_statements(self) -> list[tuple[str, str, Optional[str], str]]:
         out: list[tuple[str, str, Optional[str], str]] = []
-        for name in (*STATEMENT_FIELDS, "recommendation"):
+        for name in (*STATEMENT_FIELDS, "recommendation", *VARIANT_FIELDS):
             out.extend(self.statements(name))
         return out
 
@@ -191,6 +217,11 @@ class CheckSpec(Base):
     # fehlgeschlagenes Mitglied, wird der Sachverhalt rot mit Unverzueglich, obwohl die
     # Einstufung Hygiene ist. Zulaessig nur fuer Pruefungen in levels.URGENT_EXCEPTIONS.
     urgent_when: Optional[str] = None
+    # S6b-4 (spec/11 T11, E22): Gegenstueck zu ``urgent_when``. Trifft der Ausdruck fuer jedes
+    # fehlgeschlagene Mitglied, steht der Sachverhalt als blauer Hinweis, obwohl seine
+    # Einstufung gelb waere (Passivbefund auf einem Host, der vom Pruefstand aus nicht
+    # erreichbar ist). Zulaessig nur fuer Pruefungen in levels.HINT_EXCEPTIONS.
+    hint_when: Optional[str] = None
     positive_when: str = "absent"
     not_testable_when: list[NotTestableRule] = Field(default_factory=list)
     not_applicable_reasons: list[NotApplicableReason] = Field(default_factory=list)
@@ -385,6 +416,7 @@ class Member(Base):
     # stehen immer darin. Das Gate prueft jede Aussage des Berichts gegen diese Liste.
     holds: list[str] = Field(default_factory=list)
     urgent: bool = False
+    hint: bool = False
     # Nachtrag S6b-2 (Entscheidung DC 26.09.): Name und Kennung der Werkzeugmeldung (ZAP-Regel,
     # testssl-Test), damit der Anhang eine Zeile je Meldung zusammenfassen kann.
     message: Optional[str] = None
@@ -439,6 +471,8 @@ class CheckResult(Base):
     affirmed: bool = False
     active_proof: bool = False
     urgent: bool = False
+    # S6b-4 (E22): jedes fehlgeschlagene Mitglied erfuellt ``hint_when``.
+    hint: bool = False
     verified: Optional[bool] = None
     source_mode: SourceMode = "none"
     affected: list[str] = Field(default_factory=list)

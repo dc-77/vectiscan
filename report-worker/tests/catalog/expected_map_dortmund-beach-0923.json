@@ -4,6 +4,7 @@
  "hinweis_s6b1": "S6b-1 (25.09.2026): Q3 aufgeloest ueber das Feld zustaendig in tests/golden/expected/<slug>.json (hoster oder platform, siehe reporter/v3/operators.py); Q9 aufgeloest, weil Hosts ohne offenen Port kein Messergebnis mehr liefern (die Positiveintraege entfallen); Teil 2 zu 40.99.150.120 aufgeloest, weil Drittanbieter-Adressen aus dem Katalog fallen. Bei castenow waren sechs Q9-Markierungen falsch begruendet: bitwarden (195.50.179.6) und umfrage (3.174.98.120) haben ein Messergebnis (nmap: 443 bzw. 80 und 443 offen, 997 bis 998 gefiltert); die Markierung ist aufgehoben.",
  "hinweis_s6b2": "S6b-2 hat sechs Markierungen aufgeloest: Q13 Webmin (Server MiniServ, session_login) als admin_service_exposed kritisch; Q14 csrf_token_missing als Werkzeugmeldung; Q4 dane_missing entfaellt; Q18 WordPress 6.5.12 ohne Kern-Schwachstelle weder veraltet noch ohne Herstellerpflege (Release nach dem EOL-Datum des Zweigs); Q12 der Positivbefund zu verwaisten CNAME-Eintraegen steht im Bericht nicht mehr (entfaellt zaehlt nicht als bestanden).",
  "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Befunde: hsts_short dortmund-beach.com (+www.dortmund-beach.com) (R9 (Entscheidung DC 3)); entfallene Positivaussagen: hsts_missing dortmund-beach.com (+www.dortmund-beach.com) (R9 (Entscheidung DC 3)); tls_weak_ciphers dortmund-beach.com (+www.dortmund-beach.com) (R6 (CBC-Verfahren angeboten)); urlhaus_compromise dortmund-beach.com (R6 (URLhaus no_data ist kein Negativergebnis)).",
+ "hinweis_s6b4": "S6b-4 (spec/11): Soll-Liste nach Katalog 2026-09-27.1 und Fakten 1.2.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (T-Nummer oder Teil 3) und warum. entfallene Positivaussagen: spf_missing dortmund-beach.com (Teil 3 DB (P05)).",
  "strict": false,
  "orders": {
   "main": "1fbc92b9-34ab-414e-8843-a1f1e9f15431"
@@ -76,7 +77,9 @@
     "smtp_vrfy_enabled"
    ],
    "spec10": "R19",
-   "warum": "VRFY in smtp-commands auf 465 und 587; neue Prüfung."
+   "warum": "VRFY in smtp-commands auf 465 und 587; neue Prüfung.",
+   "spec11": "T12",
+   "warum_spec11": "VRFY in der EHLO-Liste angeboten; der Scan hat VRFY nicht gesendet, also nicht beantwortet."
   },
   "VS-2026-014": {
    "checks": [
@@ -118,7 +121,9 @@
   "VS-2026-021": {
    "checks": [
     "wordpress_plugin_vulnerable"
-   ]
+   ],
+   "spec11": "T12 (Teil 3 DB VS-004)",
+   "warum": "Titel im Plural bei mehreren Erweiterungen."
   },
   "VS-2026-022": {
    "checks": [
@@ -190,11 +195,6 @@
    ]
   },
   "VS-2026-P12": {
-   "checks": [
-    "spf_missing"
-   ]
-  },
-  "VS-2026-P13": {
    "checks": [
     "tls_legacy_protocols"
    ]

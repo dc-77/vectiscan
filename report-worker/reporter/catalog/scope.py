@@ -14,6 +14,7 @@ dangling ``domain#fqdn``, software ``sw-id``, passive ``quelle:ip:port``, threat
 """
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
@@ -104,16 +105,35 @@ def without_third_party(facts: FS.Facts) -> FS.Facts:
     Positivbefunde; der Bericht nennt sie als "Drittanbieter, nicht geprueft".
     """
     fremd = {h.ip for h in facts.hosts if h.third_party is not None}
-    if not fremd:
+    # S6b-4 (spec/11 T9, E18): Dienste anderer Nutzer eines geteilten Servers (Shoutcast und
+    # Icecast auf dem Hoster-Server von castenow) sind kein Dienst des Kunden. Mit ihnen fallen
+    # die Passiveintraege und die Software desselben Ports aus der Auswertung; der Bericht nennt
+    # sie als eine Beobachtung beim Betreiber.
+    fremde_ports = {(s.host_ip, s.port) for s in facts.services if getattr(s, "foreign", None)}
+    if not fremd and not fremde_ports:
         return facts
 
     def keep(items: list, attr: str = "host_ip") -> list:
         return [x for x in items if getattr(x, attr, None) not in fremd]
 
+    def software_fremd(sw: Any) -> bool:
+        # Fremd, wenn ein Beleg an einem fremden Port steht und keiner an einem anderen Port
+        # des Hosts; Belege ohne Port ("technologies: Icecast ...") entscheiden nicht.
+        belege = [e.excerpt or "" for e in sw.evidence]
+        ports = [port for ip, port in fremde_ports if ip == sw.host_ip]
+        if not ports:
+            return False
+        am_port = [b for b in belege if re.match(r"\d+/", b)]
+        return bool(am_port) and all(any(b.startswith(f"{p}/") for p in ports) for b in am_port)
+
     return facts.model_copy(update={
         "hosts": [h for h in facts.hosts if h.ip not in fremd],
-        "fqdns": keep(facts.fqdns), "services": keep(facts.services), "tls": keep(facts.tls),
-        "http": keep(facts.http), "software": keep(facts.software), "passive": keep(facts.passive),
+        "fqdns": keep(facts.fqdns),
+        "services": [s for s in keep(facts.services) if (s.host_ip, s.port) not in fremde_ports],
+        "tls": [t for t in keep(facts.tls) if (t.host_ip, t.port) not in fremde_ports],
+        "http": keep(facts.http),
+        "software": [sw for sw in keep(facts.software) if not software_fremd(sw)],
+        "passive": [p for p in keep(facts.passive) if (p.host_ip, p.port) not in fremde_ports],
         "threats": keep(facts.threats), "coverage": keep(facts.coverage),
         "unprocessed": keep(facts.unprocessed),
     })

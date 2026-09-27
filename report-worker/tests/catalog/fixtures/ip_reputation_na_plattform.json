@@ -1,5 +1,5 @@
 {
- "_note": "Plattformadressen werden nicht bewertet, Kapitel 3 nennt sie.",
+ "_note": "S6b-4 (spec/11 Teil 3 BS): Plattformadressen erzeugen keinen Befund, stehen aber im Positivbefund, wenn keine Meldung vorliegt.",
  "facts": {
   "hosts": [
    {
@@ -13,15 +13,16 @@
     },
     "reputation": {
      "abuseipdb_score": 0,
-     "abuseipdb_total_reports": 0
+     "abuseipdb_total_reports": 0,
+     "otx_pulse_count": 0
     }
    }
   ]
  },
  "coverage_default": "ok",
  "expect": {
-  "status": "not_applicable",
+  "status": "pass",
   "group_key": "10.0.0.1",
-  "positive": false
+  "positive": true
  }
 }

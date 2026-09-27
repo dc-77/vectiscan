@@ -49,13 +49,12 @@ texts:
     TLS 1.0 und 1.1 sind bekannte Angriffe auf die Verschlüsselung möglich; bei Zugangsportalen
     betrifft das die Sitzungen der Mitarbeitenden von außen.
   recommendation:
+    # S6b-4 (spec/11 T4): HSTS steht nur noch unter hsts_missing, mit einer Dringlichkeit je
+    # Host (junkerwerk .29 stand in VS-005 In Kürze und in VS-009 Mittelfristig).
     - stage: mittelfristig
       text: >-
         TLS 1.0 und 1.1 serverseitig deaktivieren und die Cipher-Reihenfolge auf AEAD-Suiten mit
         Forward Secrecy setzen.
-    - stage: mittelfristig
-      text: >-
-        HSTS aktivieren, sobald alle Hostnamen dauerhaft HTTPS liefern.
   verify: >-
     Verbindungsversuch mit erzwungenem TLS 1.0 und TLS 1.1 gegen den Dienst; erwartet wird jeweils
     ein Handshake-Fehler.
