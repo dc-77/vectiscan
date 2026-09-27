@@ -18,6 +18,7 @@ from typing import Any
 from reporter.catalog import tables as T
 from reporter.catalog.schema import IgnoredItem, IgnoreEntry, IgnoreList, Unprocessed
 from reporter.catalog.scope import FactsIndex
+from reporter.facts.nmap_parse import in_port_range
 from reporter.facts.serialize import ip_token, sort_key
 
 _RX: dict[str, re.Pattern[str]] = {}
@@ -139,7 +140,10 @@ def run_catchalls(index: FactsIndex, claimed: set[str], ignore: IgnoreList) -> t
             continue
         is_cdn = index.is_cdn_host(p.host_ip)
         entry = passive_ignored(p.port, is_cdn, entries)
-        what = f"{ip_token(p.host_ip) if p.host_ip else '-'}:{p.port}" + (f" ({p.product})" if p.product else "")
+        # S6b-4 (spec/11 T1): Kennung der Passivquelle ("ManageSieve (Dovecot Pigeonhole)"), wenn
+        # sie kein Produkt nennt.
+        label = p.product or p.kennung
+        what = f"{ip_token(p.host_ip) if p.host_ip else '-'}:{p.port}" + (f" ({label})" if label else "")
         if entry is not None:
             add_ignored("passive_port", what, entry.reason, host_ip=p.host_ip)
             continue
@@ -147,8 +151,15 @@ def run_catchalls(index: FactsIndex, claimed: set[str], ignore: IgnoreList) -> t
         if explained is not None:
             add_ignored("passive_port", what, explained, host_ip=p.host_ip)
             continue
-        note = ("Laut Passivquelle gemeldet, vom Portscan nicht bestaetigt." if p.verified is False
-                else "Laut Passivquelle gemeldet; Host wurde nicht aktiv gescannt.")
+        # S6b-4 (spec/11 T1): ein Port ausserhalb des Portbereichs ist nicht "unbestaetigt",
+        # der Portscan hat ihn nicht erfasst (LW 4190 ausserhalb der Top 1000).
+        in_range = in_port_range(f.scan.scanned_ports, p.port) if f.scan is not None else None
+        if in_range is False:
+            note = "Laut Passivquelle gemeldet, ausserhalb des geprueften Portbereichs."
+        elif p.verified is False:
+            note = "Laut Passivquelle gemeldet, vom Portscan nicht bestaetigt."
+        else:
+            note = "Laut Passivquelle gemeldet; Host wurde nicht aktiv gescannt."
         add_unprocessed("passive_port_unverified", what, host_ip=p.host_ip, port=p.port, fact_id=p.id, note=note)
 
     return list(unprocessed.values()), list(ignored.values())

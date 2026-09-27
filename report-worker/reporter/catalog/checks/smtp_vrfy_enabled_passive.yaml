@@ -9,6 +9,8 @@ scope: passive
 applicable_when: null
 item_when: null
 when: passive.source == "shodan" and passive.verified is not True and passive.details["smtp_vrfy"] is True
+# S6b-4 (spec/11 T11, E22): blauer Hinweis auf Hosts, die vom Pruefstand aus nicht erreichbar sind.
+hint_when: host.reach is not None and host.reach.status in ["unreachable_from_scanner", "no_response"]
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
@@ -29,13 +31,29 @@ policy:
   start_level: niedrig
   deviation: null
 texts:
-  short: "VRFY laut Passivquelle"
+  short: "VRFY angeboten laut Passivquelle"
   plan:
     lever: "Befehl VRFY am Mailserver abschalten"
     effect: "Verhindert die Abfrage gültiger Postfachnamen"
-  observation: >-
-    Laut Passivquelle bietet der Mailserver auf {group} den Befehl VRFY an: {affected}. Der
-    Portscan hat den Port nicht bestätigt.
+  observation:
+    - text: >-
+        Laut Passivquelle nennt der Mailserver auf {group} den Befehl VRFY in seiner Antwort auf
+        EHLO: {affected}.
+    # S6b-4 (spec/11 T1, T11): warum der Portscan den Port nicht bestaetigt, je Fall.
+    - when: host.reach is not None and host.reach.status in ["unreachable_from_scanner", "no_response"]
+      quantor: eines
+      text: >-
+        Der Host ist vom Prüfstand aus nicht erreichbar; die Angabe der Passivquelle ist deshalb
+        nicht bestätigt.
+    - when: (host.reach is None or host.reach.status not in ["unreachable_from_scanner", "no_response"]) and passive.port == 25
+      quantor: eines
+      text: >-
+        Port 25 ist vom Prüfstand aus nicht prüfbar; die Angabe der Passivquelle ist deshalb nicht
+        bestätigt.
+    - when: (host.reach is None or host.reach.status not in ["unreachable_from_scanner", "no_response"]) and passive.port != 25
+      quantor: eines
+      text: >-
+        Der Portscan hat den Port nicht bestätigt.
   meaning: >-
     Mit VRFY lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte
     Phishing-Mails und Rateangriffe auf Zugangsdaten.

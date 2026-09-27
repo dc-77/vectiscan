@@ -395,7 +395,30 @@ nach E1, ZAP nur ab Konfidenz High, Lebenszyklus nach Q18 (S6b-2), `2026-09-26.1
 Hosting-Panels als Fingerabdruck mit Anmeldeseite, Meldungsname am Mitglied (Nachtrag S6b-2),
 `2026-09-26.2` Messbasis der Header, neue Pruefungen fuer Zertifikate an Diensten, Dienste ohne
 Kennung, SMTP VRFY, XML-RPC, Anmeldung ueber HTTP und SPF auf geteilten Servern,
-Positivaussagen nur mit tragendem Fakt, Faktenfamilien, Berichtstag, Effekt je Stufe (S6b-3).
+Positivaussagen nur mit tragendem Fakt, Faktenfamilien, Berichtstag, Effekt je Stufe (S6b-3),
+`2026-09-27.1` Varianten fuer Kurztitel und Hebel, Planzeile je Regel, Hinweise nach E22,
+HSTS nach E20, Zertifikat am Berichtsdatum, VRFY "angeboten" (S6b-4).
+
+**Gesamtbewertung** (spec/11 T6, E16): die schlechteste Ampel der fuenf Kategorien, rot ist
+HOCH, gelb MITTEL, blau NIEDRIG, ohne Befund GERING (`reporter/v3/levels.py::OVERALL_RULE`,
+Anhang A.1). Die Regel ist seit S3 unveraendert. DB und CA stiegen mit `2026-09-25.2` auf HOCH,
+weil E1 eine erreichbare Verwaltungsoberflaeche auf einem Kundensystem kritisch einstuft und E2
+ein Zertifikat mit hoechstens sieben Tagen Restlaufzeit rot macht; die Tabelle in spec/10
+("die uebrigen MITTEL") war an dieser Stelle falsch. Der Vorschlag aus spec/11 E16 (HOCH auch
+bei Gelb In Kuerze auf einem Kundensystem) ist nicht umgesetzt, weil er HE auf HOCH hebt.
+
+### S6b-4 (spec/11)
+
+- **Varianten** (`texts.short_variants`, `plan.lever_variants`, `plan.effect_variants`): die
+  erste Variante, deren `when` fuer die Betroffenen gilt, ersetzt Kurztitel, Hebel oder
+  Effekt. Varianten tragen keine Variablen und immer ein `when`.
+- **Planzeile je Regel** (`plan.per_rule_action`): eine Zeile fuer alle Befunde der Regel mit
+  den Betroffenen je Befund (Header-Planzeile, spec/11 T12).
+- **Hinweis** (`hint_when`, E22): trifft die Bedingung fuer alle Mitglieder, steht der Befund
+  blau mit Stufe Mittelfristig. Die Pruefungen mit `hint_when` stehen in
+  `reporter/v3/levels.py::HINT_EXCEPTIONS`; ein Test haelt beide gleich.
+- **Gesammelte Gruppenvariablen** `valid_elsewhere` (gueltiges Zertifikat desselben Namens an
+  anderer Adresse) und `target_versions` (Zielversion je Erweiterung aus wpscan).
 
 ### S6b-3 (spec/10)
 

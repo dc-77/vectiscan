@@ -52,6 +52,7 @@ class CompiledCheck:
     item_filter: Optional[Expr] = None
     active_proof: Optional[Expr] = None
     urgent: Optional[Expr] = None
+    hint: Optional[Expr] = None
     path: Optional[Path] = None
     # S6b-2: (Aussage-ID, Bedingung) aller Textaussagen; ohne eigene Bedingung None.
     statements: list[tuple[str, Optional[Expr]]] = field(default_factory=list)
@@ -183,6 +184,7 @@ def compile_check(spec: CheckSpec, path: Path | None = None) -> CompiledCheck:
     item_filter = comp(spec.item_when, "item_when")
     active_proof = comp(spec.active_proof_when, "active_proof_when")
     urgent = comp(spec.urgent_when, "urgent_when")
+    hint = comp(spec.hint_when, "hint_when")
     nt_group: list[tuple[NotTestableRule, Expr]] = []
     nt_item: list[tuple[NotTestableRule, Expr]] = []
     for i, rule in enumerate(spec.not_testable_when):
@@ -201,6 +203,8 @@ def compile_check(spec: CheckSpec, path: Path | None = None) -> CompiledCheck:
     if spec.texts.plan is not None:
         render.validate_template(spec.texts.plan.lever, (), f"{where} texts.plan.lever")
         render.validate_template(spec.texts.plan.effect, (), f"{where} texts.plan.effect")
+        if spec.texts.plan.per_rule_action is not None:
+            render.validate_template(spec.texts.plan.per_rule_action, (), f"{where} texts.plan.per_rule_action")
     for i, rec in enumerate(spec.texts.recommendation):
         if rec.effect is not None:
             render.validate_template(rec.effect, (), f"{where} recommendation[{i}].effect")
@@ -208,7 +212,11 @@ def compile_check(spec: CheckSpec, path: Path | None = None) -> CompiledCheck:
     # nicht kennt, ist ein Ladefehler und kein stilles Weglassen im Bericht.
     statements: list[tuple[str, Optional[Expr]]] = []
     for sid, text, cond, _quantor in spec.texts.all_statements():
-        render.validate_template(text, render.OBSERVATION_VARS, f"{where} {sid}")
+        # S6b-4: Varianten von Kurzform, Hebel und Effekt tragen wie diese keine Variablen.
+        erlaubt = () if sid.startswith(("short_variants", "plan.")) else render.OBSERVATION_VARS
+        render.validate_template(text, erlaubt, f"{where} {sid}")
+        if sid.startswith(("short_variants", "plan.")) and cond is None:
+            raise CatalogSpecError(f"{where} {sid}: eine Variante braucht eine Bedingung (when)")
         statements.append((sid, comp(cond, sid)))
     paths: set[str] = set()
     for ex in (when, applicable, item_filter):
@@ -223,7 +231,7 @@ def compile_check(spec: CheckSpec, path: Path | None = None) -> CompiledCheck:
         na_reasons.append((rule.reason_code, ex))
     return CompiledCheck(spec=spec, when=when, positive=positive, applicable=applicable, nt_group=nt_group,
                          nt_item=nt_item, item_filter=item_filter, active_proof=active_proof, urgent=urgent,
-                         path=path, statements=statements, evidence_paths=frozenset(paths),
+                         hint=hint, path=path, statements=statements, evidence_paths=frozenset(paths),
                          na_reasons=na_reasons)
 
 
@@ -302,7 +310,7 @@ def _source_mode(modes: list[str]) -> str:
 
 
 def _member(item: Item, label: str, status: str, *, reason_code: str | None = None,
-            holds: list[str] | None = None, urgent: bool = False,
+            holds: list[str] | None = None, urgent: bool = False, hint: bool = False,
             message: tuple[str | None, str | None] = (None, None)) -> Member:
     reason = None
     if reason_code:
@@ -310,7 +318,7 @@ def _member(item: Item, label: str, status: str, *, reason_code: str | None = No
     return Member(key=item.key, host_ip=item.host_ip, fqdn=item.fqdn, port=item.port, label=label, status=status,
                   reason_code=reason_code, reason=reason, fact_ids=[item.fact.id], source_mode=item.source_mode,
                   verified=item.verified, via_cdn=item.via_cdn, alias_of=item.alias_of,
-                  holds=list(holds or []), urgent=urgent, message=message[0], message_id=message[1])
+                  holds=list(holds or []), urgent=urgent, hint=hint, message=message[0], message_id=message[1])
 
 
 # Bereiche, deren Items eine benannte Werkzeugmeldung sind (ZAP-Regel, testssl-Test).
@@ -368,6 +376,7 @@ class _Eval:
         active_proof = False
         urgent = False
         fehlend: list[str] = []
+        gesammelt: dict[str, list[str]] = {}
         for item in g.items:
             ictx = {**gctx, **item.ctx}
             if self.cc.item_filter is not None and not self.cc.item_filter.test(ictx):
@@ -384,12 +393,18 @@ class _Eval:
                 else:
                     holds = [sid for sid, cond in self.cc.statements if cond is None or cond.test(ictx)]
                     dringend = self.cc.urgent is not None and self.cc.urgent.test(ictx)
-                    members.append(_member(item, label, "fail", holds=holds, urgent=dringend,
+                    hinweis = self.cc.hint is not None and self.cc.hint.test(ictx)
+                    members.append(_member(item, label, "fail", holds=holds, urgent=dringend, hint=hinweis,
                                            message=_message_of(spec.scope, ivars)))
                     # S6b-3 (spec/10 R2): die tatsaechlich fehlenden Header dieses Mitglieds.
                     for name in ivars.get("missing_headers_basic") or []:
                         if name not in fehlend:
                             fehlend.append(name)
+                    # S6b-4 (spec/11 T14): Werte der Mitglieder als Gruppenvariable.
+                    for var in render.COLLECT_VARS:
+                        for wert in ivars.get(var) or []:
+                            if wert not in gesammelt.setdefault(var, []):
+                                gesammelt[var].append(wert)
                     evidence.extend(self.evidence(item, ictx))
                     # S6: aktiver Nachweis. Trifft der Ausdruck fuer ein
                     # fehlgeschlagenes Mitglied, ist der ganze Sachverhalt
@@ -421,7 +436,7 @@ class _Eval:
         if fails:
             return self.result(g, "fail", members=members, evidence=evidence, notes=notes,
                                seen=seen_ok, active_proof=active_proof, urgent=urgent, affirmed=True,
-                               extra={"missing_header_names": fehlend})
+                               extra={"missing_header_names": fehlend, **gesammelt})
         nts = [m for m in members if m.status == "not_testable"]
         if nts:
             return self.result(g, "not_testable", members=members, reason_code=nts[0].reason_code, notes=notes, seen=seen_ok)
@@ -568,10 +583,13 @@ class _Eval:
                 "text": render.format_strict(spec.texts.positive.text, gvars, f"check {spec.id} positive.text"),
             })
         return CheckResult(
-            check_id=spec.id, family=spec.family, bundle=spec.bundle, kind=spec.kind, title=spec.title,
+            check_id=spec.id, family=spec.family, bundle=spec.bundle, kind=spec.kind,
+            # S6b-4 (spec/11 T12): Titel mit Numerus nach der Zahl der Betroffenen ({m:...}).
+            title=render.format_strict(spec.title, gvars, f"check {spec.id} title"),
             category=spec.category, scale=spec.scale, level=spec.level, group_by=spec.group_by, group_key=g.key,
             group_label=g.label, status=status, positive=positive, affirmed=affirmed, active_proof=active_proof,
-            urgent=urgent, verified=verified, source_mode=source_mode,
+            urgent=urgent, hint=bool(fails) and all(m.hint for m in fails),
+            verified=verified, source_mode=source_mode,
             affected=labels, affected_fact_ids=fact_ids, members=members, items_seen=seen + len(members), evidence=ev,
             reason_code=reason_code, reason=reason_text, notes=sorted(set(notes), key=sort_key),
             vars={k: (v if isinstance(v, (int, list)) else render._s(v)) for k, v in gvars.items()

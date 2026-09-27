@@ -38,12 +38,19 @@
    "expect": {
     "holds": {
      "www.example.test:443@10.0.0.1": [
-      "observation[0]"
+      "observation[0]",
+      "recommendation[1]",
+      "recommendation[3]"
      ]
     },
     "not_holds": {
      "www.example.test:443@10.0.0.1": [
-      "observation[1]"
+      "observation[1]",
+      "recommendation[0]",
+      "recommendation[2]",
+      "short_variants[0]",
+      "plan.lever_variants[0]",
+      "plan.effect_variants[0]"
      ]
     }
    },
@@ -87,12 +94,91 @@
    "expect": {
     "holds": {
      "www.example.test:443@10.0.0.1": [
-      "observation[1]"
+      "observation[1]",
+      "recommendation[2]",
+      "recommendation[3]",
+      "short_variants[0]",
+      "plan.lever_variants[0]",
+      "plan.effect_variants[0]"
      ]
     },
     "not_holds": {
      "www.example.test:443@10.0.0.1": [
-      "observation[0]"
+      "observation[0]",
+      "recommendation[0]",
+      "recommendation[1]"
+     ]
+    }
+   },
+   "coverage_default": "ok"
+  },
+  {
+   "name": "abgelaufen am Berichtsdatum, gültiges Zertifikat an anderer Adresse, CT-Muster (castenow mailstore)",
+   "report_date": "2026-09-26",
+   "facts": {
+    "tls": [
+     {
+      "host_ip": "10.0.0.1",
+      "fqdn": "www.example.test",
+      "port": 443,
+      "source": "testssl",
+      "protocols": {
+       "SSLv2": false,
+       "SSLv3": false,
+       "TLS1.0": false,
+       "TLS1.1": false,
+       "TLS1.2": true,
+       "TLS1.3": true
+      },
+      "cert": {
+       "cn": "www.example.test",
+       "san": [
+        "www.example.test"
+       ],
+       "issuer": "Beispiel CA",
+       "not_before": "2026-06-13T12:00:00Z",
+       "not_after": "2026-09-11T12:00:00Z",
+       "days_left": 10,
+       "expired": false,
+       "mismatch": false,
+       "chain_ok": true,
+       "self_signed": null,
+       "valid_elsewhere": [
+        "10.0.0.2:443",
+        "10.0.0.3:443"
+       ],
+       "valid_elsewhere_not_after": "2027-03-14T23:59:59Z",
+       "renewal": {
+        "name": "www.example.test",
+        "certificates": 6,
+        "recent_leads": [
+         32,
+         31,
+         27
+        ],
+        "recent_renewals": [
+         "2024-08-26T00:00:00Z",
+         "2025-08-25T00:00:00Z",
+         "2026-08-28T00:00:00Z"
+        ],
+        "expected_renewal": "2027-02-15"
+       }
+      }
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "www.example.test:443@10.0.0.1": [
+      "recommendation[0]",
+      "short_variants[0]"
+     ]
+    },
+    "not_holds": {
+     "www.example.test:443@10.0.0.1": [
+      "recommendation[1]",
+      "recommendation[2]",
+      "recommendation[3]"
      ]
     }
    },

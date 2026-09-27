@@ -9,9 +9,12 @@ scope: dns
 # S6b-2 (spec/08 Punkt 6): Domains ohne MX bewertet mail_spoofing_unprotected.
 applicable_when: len(dns.mx) > 0
 when: dns.spf is None
-positive_when: dns.spf is not None
+# S6b-4 (spec/11 Teil 3 DB P05): positiv nur mit harter Fehlbehandlung (-all) oder einer
+# Weiterleitung (redirect=) auf einen fremden Eintrag; ein Softfail steht im Befund spf_softfail
+# und ist kein Positivbefund.
+positive_when: dns.spf is not None and (dns.spf.all_qualifier == "-all" or (dns.spf.all_qualifier is None and any_attr(dns.spf.mechanisms, "kind", ["redirect"])))
 not_testable_when: []
-undetermined: not_testable
+undetermined: pass_silent
 requires:
   tools: [dns_records]
 kind: check

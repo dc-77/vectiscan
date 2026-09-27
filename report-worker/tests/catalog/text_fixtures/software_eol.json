@@ -83,11 +83,13 @@
    "expect": {
     "holds": {
      "sw:10_0_0_6:-:debian:11": [
+      "plan.lever_variants[1]",
       "recommendation[2]"
      ]
     },
     "not_holds": {
      "sw:10_0_0_6:-:debian:11": [
+      "plan.lever_variants[0]",
       "recommendation[0]",
       "recommendation[1]"
      ]
@@ -161,12 +163,50 @@
     "not_holds": {
      "sw:10_0_0_6:-:nginx:1.18": [
       "meaning[1]",
+      "plan.lever_variants[0]",
+      "plan.lever_variants[1]",
       "recommendation[0]",
       "recommendation[2]"
      ]
     }
    },
    "coverage_default": "ok"
+  },
+  {
+   "name": "S6b-4: Exchange 2019 ohne Herstellerpflege, Produkt im Hebeltitel (huendgen)",
+   "facts": {
+    "software": [
+     {
+      "host_ip": "10.0.0.7",
+      "product": "Microsoft Exchange 2019",
+      "family": "exchange",
+      "kind": "mail",
+      "version_norm": "15.2.1748",
+      "build": "15.2.1748",
+      "eol": {
+       "status": "eol",
+       "date": "2025-10-14",
+       "source": "endoflife_date"
+      },
+      "detection_sources": [
+       "httpx"
+      ]
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "sw:10.0.0.7:-:exchange:15.2.1748": [
+      "plan.lever_variants[0]"
+     ]
+    },
+    "not_holds": {
+     "sw:10.0.0.7:-:exchange:15.2.1748": [
+      "plan.lever_variants[1]"
+     ]
+    }
+   }
   }
  ]
 }

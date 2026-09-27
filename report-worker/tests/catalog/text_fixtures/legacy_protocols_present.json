@@ -23,18 +23,24 @@
    "expect": {
     "holds": {
      "10.0.0.3:21": [
-      "observation[1]"
+      "observation[0]",
+      "observation[2]",
+      "short_variants[0]"
      ],
      "10.0.0.4:21": [
-      "observation[2]"
+      "observation[1]",
+      "observation[3]"
      ]
     },
     "not_holds": {
      "10.0.0.3:21": [
-      "observation[2]"
+      "observation[1]",
+      "observation[3]"
      ],
      "10.0.0.4:21": [
-      "observation[1]"
+      "observation[0]",
+      "observation[2]",
+      "short_variants[0]"
      ]
     }
    },

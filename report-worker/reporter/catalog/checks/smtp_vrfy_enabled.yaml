@@ -1,5 +1,5 @@
 id: smtp_vrfy_enabled
-title: Mailserver beantwortet den Befehl VRFY
+title: Mailserver bietet den Befehl VRFY an
 family: smtp_vrfy
 category: E
 scale: hygiene
@@ -29,16 +29,18 @@ policy:
   start_level: niedrig
   deviation: null
 texts:
-  short: "VRFY beantwortet"
+  # S6b-4 (spec/11 T12): nmap und Shodan zeigen VRFY nur in der EHLO-Liste; ein VRFY hat der
+  # Scan nicht gesendet (dortmund-beach VS-012 hiess "VRFY beantwortet").
+  short: "VRFY angeboten (laut EHLO)"
   plan:
     lever: "Befehl VRFY am Mailserver abschalten"
     effect: "Verhindert die Abfrage gültiger Postfachnamen"
   observation: >-
-    Der Mailserver auf {group} beantwortet den Befehl VRFY: {affected}. Damit lässt sich von
-    außen prüfen, ob ein Postfach existiert.
+    Der Mailserver auf {group} nennt den Befehl VRFY in seiner Antwort auf EHLO: {affected}. Ob er
+    Anfragen zu Postfachnamen beantwortet, hat der Scan nicht geprüft.
   meaning: >-
-    Mit VRFY lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte
-    Phishing-Mails und Rateangriffe auf Zugangsdaten.
+    Beantwortet der Mailserver VRFY, lassen sich gültige Postfachnamen ermitteln. Das erleichtert
+    gezielte Phishing-Mails und Rateangriffe auf Zugangsdaten.
   recommendation:
     - stage: mittelfristig
       text: >-

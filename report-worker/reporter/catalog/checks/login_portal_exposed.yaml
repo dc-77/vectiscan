@@ -31,7 +31,8 @@ policy:
     zusaetzlichen Absicherung, nicht der Erreichbarkeit selbst (catalog_sim R-LOGIN-PORTAL).
 texts:
   plan:
-    lever: "Anmeldeportale mit zweiter Anmeldestufe schützen"
+    # S6b-4 (spec/11 T10): ob ein zweiter Faktor aktiv ist, ist von außen nicht feststellbar.
+    lever: "Zweite Anmeldestufe an Anmeldeportalen prüfen"
     effect: "Erschwert die Übernahme von Konten durch Rateangriffe"
   observation: >-
     {n:Die Webseite|Die Webseiten} {group} {n:zeigt|zeigen} ein Anmeldeportal, das aus dem gesamten Internet erreichbar ist:
@@ -40,12 +41,13 @@ texts:
   meaning: >-
     Ein öffentlich erreichbares Anmeldeportal ist ein häufiges Ziel für automatisierte
     Anmeldeversuche mit gestohlenen oder erratenen Zugangsdaten. Ohne zusätzliche Absicherung
-    genügt ein einzelnes bekanntes Passwort für den Zugriff.
+    genügt ein einzelnes bekanntes Passwort für den Zugriff. Ob ein zweiter Faktor aktiv ist, ist
+    von außen nicht feststellbar.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Die Anmeldung am Portal um einen zusätzlichen Faktor ergänzen, etwa eine
-        Authentifizierungs-App oder ein Einmalkennwort.
+        Prüfen, ob die Anmeldung am Portal einen zusätzlichen Faktor verlangt, etwa eine
+        Authentifizierungs-App oder ein Einmalkennwort, und ihn andernfalls ergänzen.
     - stage: in_kuerze
       text: >-
         Zugriff auf bekannte Quellnetze beschränken, soweit die Nutzung des Portals das

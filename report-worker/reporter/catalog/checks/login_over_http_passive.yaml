@@ -9,6 +9,8 @@ scope: passive
 applicable_when: null
 item_when: null
 when: passive.source == "shodan" and passive.details["login_over_http"] is not None
+# S6b-4 (spec/11 T11, E22): blauer Hinweis auf Hosts, die vom Pruefstand aus nicht erreichbar sind.
+hint_when: host.reach is not None and host.reach.status in ["unreachable_from_scanner", "no_response"]
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
@@ -34,9 +36,19 @@ texts:
   plan:
     lever: "Anmeldeseiten nur über HTTPS ausliefern"
     effect: "Schützt Zugangsdaten auf dem Übertragungsweg"
-  observation: >-
-    Laut Passivquelle leitet {group} auf eine Anmeldeseite über eine unverschlüsselte Verbindung
-    weiter: {affected}. Der Portscan konnte das nicht bestätigen.
+  observation:
+    - text: >-
+        Laut Passivquelle leitet {group} auf eine Anmeldeseite über eine unverschlüsselte Verbindung
+        weiter: {affected}.
+    - when: host.reach is not None and host.reach.status in ["unreachable_from_scanner", "no_response"]
+      quantor: eines
+      text: >-
+        Der Host ist vom Prüfstand aus nicht erreichbar; die Angabe der Passivquelle ist deshalb
+        nicht bestätigt.
+    - when: host.reach is None or host.reach.status not in ["unreachable_from_scanner", "no_response"]
+      quantor: eines
+      text: >-
+        Der Portscan hat das nicht bestätigt.
   meaning: >-
     Über HTTP gesendete Zugangsdaten lassen sich auf dem Übertragungsweg mitlesen.
   recommendation:
@@ -46,7 +58,7 @@ texts:
         ausschließlich über HTTPS ausliefern.
     - stage: mittelfristig
       text: >-
-        Unverschlüsselte Aufrufe der Anwendung auf HTTPS umleiten und HSTS setzen.
+        Unverschlüsselte Aufrufe der Anwendung auf HTTPS umleiten.
   verify: >-
     Die genannte Adresse von außen über HTTP aufrufen; erwartet wird eine Weiterleitung auf
     HTTPS vor jeder Anmeldung.

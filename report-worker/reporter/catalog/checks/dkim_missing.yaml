@@ -26,7 +26,8 @@ requires:
   tools: [dns_records]
 kind: check
 bundle: mail_records
-affected_template: "{domain}"
+# S6b-4 (spec/11 Teil 3 JW): der Positivbefund nennt die gefundenen Selektoren.
+affected_template: "{domain} {dkim_selector_note}"
 evidence: [dns]
 references: [CWE-290, RFC-6376]
 frameworks:
@@ -70,4 +71,4 @@ texts:
   positive:
     title: DKIM vorhanden
     text: >-
-      Für die Domain {domain} ist eine DKIM-Signatur veröffentlicht.
+      Für die Domain {passed} ist eine DKIM-Signatur veröffentlicht.

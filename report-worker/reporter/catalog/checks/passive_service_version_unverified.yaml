@@ -9,6 +9,9 @@ scope: passive
 applicable_when: null
 item_when: null
 when: passive.source == "shodan" and passive.verified is False and passive.version is not None and passive.port not in ADMIN_PORTS and not matches(passive.product, ADMIN_PRODUCTS)
+# S6b-4 (spec/11 T11, E22): auf einem Host, der vom Pruefstand aus nicht erreichbar ist,
+# laesst sich die Angabe nicht bestaetigen; der Befund steht als blauer Hinweis.
+hint_when: host.reach is not None and host.reach.status in ["unreachable_from_scanner", "no_response"]
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
@@ -35,13 +38,32 @@ texts:
   plan:
     lever: "Von der Passivquelle gemeldete Dienste prüfen"
     effect: "Klärt, ob ein ungepflegter Dienst erreichbar ist"
-  observation: >-
-    Für {group} meldet eine Passivquelle eine Dienstversion, die der Portscan nicht bestätigen
-    konnte: {affected}.
+  # S6b-4 (spec/11 T1, T11): warum die Angabe nicht bestaetigt ist, je Fall; die Versionsangabe
+  # eines Webservers sagt nichts ueber seinen Patchstand.
+  observation:
+    - text: >-
+        Für {group} meldet eine Passivquelle eine Dienstversion: {affected}.
+    - when: host.reach is not None and host.reach.status in ["unreachable_from_scanner", "no_response"]
+      quantor: eines
+      text: >-
+        Der Host ist vom Prüfstand aus nicht erreichbar; die Angabe der Passivquelle ist deshalb
+        nicht bestätigt.
+    - when: (host.reach is None or host.reach.status not in ["unreachable_from_scanner", "no_response"]) and port_scanned(scan, passive.port) is False
+      quantor: eines
+      text: >-
+        Der Port liegt außerhalb des geprüften Portbereichs; der Portscan hat ihn nicht erfasst.
+    - when: (host.reach is None or host.reach.status not in ["unreachable_from_scanner", "no_response"]) and port_scanned(scan, passive.port) is not False
+      quantor: eines
+      text: >-
+        Der Portscan hat den Port nicht bestätigt.
+    - when: contains(passive.details["location"], "/owa/")
+      quantor: eines
+      text: >-
+        Laut Passivquelle leitet der Dienst auf den Mail-Webzugang (/owa/) weiter.
   meaning: >-
     Ohne aktive Bestätigung ist unklar, ob der gemeldete Dienst und die genannte Version noch
-    aktuell sind. Ein veralteter Patchstand bleibt so unentdeckt, und der Dienst kann außerhalb
-    der eigentlich vorgesehenen Zustellwege erreichbar sein.
+    zutreffen. Eine Versionsangabe allein sagt nichts über den Patchstand; ein veralteter Stand
+    bliebe so unentdeckt.
   recommendation:
     - stage: in_kuerze
       text: >-
@@ -49,8 +71,8 @@ texts:
         zutreffen, und den Patchstand mit den Sicherheitshinweisen des Herstellers abgleichen.
     - stage: mittelfristig
       text: >-
-        Zugriff auf den Dienst auf die Netze beschränken, aus denen eine Zustellung tatsächlich
-        erfolgen muss.
+        Zugriff auf den Dienst auf die Netze beschränken, aus denen er tatsächlich erreichbar
+        sein muss.
   verify: >-
     Verbindung zum gemeldeten Port herstellen und die zurückgegebene Version mit dem aktuellen
     Patchstand des Herstellers abgleichen.

@@ -48,7 +48,8 @@ def test_erklaerte_passivports_sind_keine_offene_beobachtung(order):
 def test_port_25_und_ipv6_bei_junkerwerk():
     out = output(JW)
     ignored = {i.what: i.reason for i in out.ignored if i.kind == "passive_port"}
-    assert ignored["188.40.3.130:25"] == PASSIVE_EXPLAINED["smtp_25"]
+    # S6b-4 (spec/11 T1): die Kennung der Passivquelle steht hinter dem Port ("SMTP (Exim)").
+    assert ignored["188.40.3.130:25 (SMTP (Exim))"] == PASSIVE_EXPLAINED["smtp_25"]
     assert ignored["[2a01:4f8:d0a:3124::2]:443 (Apache httpd)"] == PASSIVE_EXPLAINED["no_ipv6_route"]
 
 

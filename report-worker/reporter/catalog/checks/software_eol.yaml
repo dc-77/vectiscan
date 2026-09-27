@@ -41,6 +41,12 @@ texts:
   plan:
     lever: "Serversoftware ohne Herstellerpflege ersetzen"
     effect: "Schließt Lücken, für die der Hersteller keine Updates mehr liefert"
+    # S6b-4 (spec/11 Teil 3 HE): das Produkt steht im Hebeltitel.
+    lever_variants:
+      - when: software.family == "exchange"
+        text: "Microsoft Exchange ohne Herstellerpflege ablösen"
+      - when: software.family == "debian"
+        text: "Betriebssystem ohne Herstellerpflege aktualisieren"
   observation: >-
     Auf {group} läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist:
     {affected}.

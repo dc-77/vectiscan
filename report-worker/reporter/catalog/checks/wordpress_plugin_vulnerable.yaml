@@ -1,5 +1,6 @@
 id: wordpress_plugin_vulnerable
-title: WordPress-Erweiterung mit bekannten Schwachstellen
+# S6b-4 (spec/11 T12): Mehrzahl nach der Zahl der Erweiterungen (dortmund-beach: vier).
+title: "{m:WordPress-Erweiterung|WordPress-Erweiterungen} mit bekannten Schwachstellen"
 family: wordpress_plugin_vulnerable
 category: B
 scale: exposure
@@ -40,13 +41,23 @@ texts:
     lever: "Verwundbare WordPress-Erweiterungen aktualisieren"
     effect: "Schließt bekannte Lücken in Erweiterungen"
   observation: >-
-    Auf {group} ist eine WordPress-Erweiterung mit bekannten Schwachstellen im Einsatz: {affected}.
+    Auf {group} {m:ist eine WordPress-Erweiterung|sind WordPress-Erweiterungen} mit bekannten
+    Schwachstellen im Einsatz: {affected}.
   meaning: >-
     Bekannte Schwachstellen in Plugins oder Themes sind öffentlich dokumentiert und lassen sich
     ohne Zugriff auf den Server nachvollziehen. Eine veraltete Erweiterung bleibt so lange
     angreifbar, bis die fehlerbereinigte Version eingespielt ist.
   recommendation:
+    # S6b-4 (spec/11 T12): die Zielversion laut wpscan steht in der Empfehlung.
     - stage: unverzueglich
+      when: software.latest_version is not None
+      quantor: eines
+      text: >-
+        Erweiterungen auf die fehlerbereinigte Version aktualisieren, laut wpscan mindestens
+        {target_versions}; lässt sich das nicht sofort umsetzen, die Erweiterung deaktivieren.
+    - stage: unverzueglich
+      when: software.latest_version is None
+      quantor: eines
       text: >-
         Erweiterung auf die vom Hersteller freigegebene, fehlerbereinigte Version aktualisieren;
         lässt sich das nicht sofort umsetzen, die Erweiterung deaktivieren.

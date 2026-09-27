@@ -1,0 +1,121 @@
+{
+ "check": "smtp_vrfy_enabled_passive",
+ "cases": [
+  {
+   "name": "S6b-4: VRFY laut Passivquelle auf einem E4-Host (bergersysteme VS-012)",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.3.1",
+      "reach": {
+       "status": "unreachable_from_scanner",
+       "passive_ports": [
+        443
+       ],
+       "passive_seen_at": "2026-09-23T00:00:00Z",
+       "passive_source": "shodan"
+      }
+     }
+    ],
+    "passive": [
+     {
+      "source": "shodan",
+      "seen_at": "2026-09-23T00:00:00Z",
+      "verified": false,
+      "confidence": 0.5,
+      "details": {
+       "smtp_vrfy": true
+      },
+      "host_ip": "10.0.3.1",
+      "port": 25
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "shodan:10.0.3.1:25": [
+      "observation[1]"
+     ]
+    },
+    "not_holds": {
+     "shodan:10.0.3.1:25": [
+      "observation[2]",
+      "observation[3]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "S6b-4: VRFY laut Passivquelle auf Port 25 (E5)",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.3.2"
+     }
+    ],
+    "passive": [
+     {
+      "source": "shodan",
+      "seen_at": "2026-09-23T00:00:00Z",
+      "verified": false,
+      "confidence": 0.5,
+      "details": {
+       "smtp_vrfy": true
+      },
+      "host_ip": "10.0.3.2",
+      "port": 25
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "shodan:10.0.3.2:25": [
+      "observation[2]"
+     ]
+    },
+    "not_holds": {
+     "shodan:10.0.3.2:25": [
+      "observation[1]",
+      "observation[3]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "S6b-4: VRFY laut Passivquelle auf einem anderen Port",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.3.3"
+     }
+    ],
+    "passive": [
+     {
+      "source": "shodan",
+      "seen_at": "2026-09-23T00:00:00Z",
+      "verified": false,
+      "confidence": 0.5,
+      "details": {
+       "smtp_vrfy": true
+      },
+      "host_ip": "10.0.3.3",
+      "port": 587
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "shodan:10.0.3.3:587": [
+      "observation[3]"
+     ]
+    },
+    "not_holds": {
+     "shodan:10.0.3.3:587": [
+      "observation[1]",
+      "observation[2]"
+     ]
+    }
+   }
+  }
+ ]
+}

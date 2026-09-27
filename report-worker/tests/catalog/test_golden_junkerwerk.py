@@ -114,13 +114,18 @@ def test_alle_familien_der_soll_liste_gemappt():
 
 # ------------------------------------------------------------------ Drift
 
+# S6b-4 (spec/11 T6, Teil 3 JW): Zusaetze, die aus den Rohdaten des einzelnen Laufs stammen
+# (Shodan-Datum je Lauf, testssl "likely mitigated" nur im Nachscan), sind keine Drift der Regel.
+_LAUF_ZUSATZ = re.compile(r", gesehen am \d{2}\.\d{2}\.\d{4}|, vermutlich abgeschwächt")
+
+
 def _member_table(out: CatalogOutput) -> dict[tuple[str, str], tuple[str, str]]:
     """(check_id, member_key) -> (status, label) fuer fail/pass-Member; Gruppen ohne Member als (check, group_key)."""
     table: dict[tuple[str, str], tuple[str, str]] = {}
     for r in out.results:
         if r.members:
             for m in r.members:
-                table[(r.check_id, m.key)] = (m.status, m.label)
+                table[(r.check_id, m.key)] = (m.status, _LAUF_ZUSATZ.sub("", m.label))
         else:
             table[(r.check_id, "group:" + r.group_key)] = (r.status, r.reason_code or "")
     return table

@@ -1,0 +1,34 @@
+{
+ "facts": {
+  "dns": [
+   {
+    "domain": "example.test",
+    "mx": [
+     "mx1.example.test"
+    ],
+    "spf": {
+     "raw": "v=spf1 include:spf.example.net redirect=example.test.spf.example.net",
+     "all_qualifier": null,
+     "mechanisms": [
+      {
+       "kind": "include",
+       "value": "spf.example.net"
+      },
+      {
+       "kind": "redirect",
+       "value": "example.test.spf.example.net"
+      }
+     ]
+    }
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "_note": "S6b-4 (spec/11 Teil 3 BS P03): eine Weiterleitung auf einen fremden SPF-Eintrag traegt den Positivbefund.",
+ "expect": {
+  "status": "pass",
+  "group_key": "example.test",
+  "affected": [],
+  "positive": true
+ }
+}

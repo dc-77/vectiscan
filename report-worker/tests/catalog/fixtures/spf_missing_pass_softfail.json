@@ -1,0 +1,24 @@
+{
+ "facts": {
+  "dns": [
+   {
+    "domain": "example.test",
+    "mx": [
+     "mx1.example.test"
+    ],
+    "spf": {
+     "raw": "v=spf1 mx ~all",
+     "all_qualifier": "~all"
+    }
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "_note": "S6b-4 (spec/11 Teil 3 DB P05): Softfail ist kein Positivbefund; der Befund steht unter spf_softfail.",
+ "expect": {
+  "status": "pass",
+  "group_key": "example.test",
+  "affected": [],
+  "positive": false
+ }
+}

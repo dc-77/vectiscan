@@ -1,0 +1,28 @@
+{
+ "_note": "S6b-4 (spec/11 Teil 3 BS): eine gemeldete Plattformadresse ist kein Befund und kein Positivbefund.",
+ "facts": {
+  "hosts": [
+   {
+    "ip": "10.0.0.1",
+    "shared": {
+     "kind": "platform",
+     "operator": "vercel.app",
+     "signals": [
+      "cname_fremd"
+     ]
+    },
+    "reputation": {
+     "abuseipdb_score": 80,
+     "abuseipdb_total_reports": 12
+    }
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.1",
+  "positive": false,
+  "affected": []
+ }
+}

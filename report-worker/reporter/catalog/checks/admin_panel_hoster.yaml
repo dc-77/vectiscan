@@ -47,8 +47,9 @@ texts:
       text: >-
         Die Oberfläche erscheint beim Aufruf über die IP-Adresse, also auf der Standardseite
         des Webservers: {affected}.
+    # S6b-4 (spec/11 T9, E18): "anderer Kunden" ist aus den Rohdaten nicht ableitbar.
     - text: >-
-        Der Server gehört dem Hoster und trägt auch Namen anderer Kunden; die Verwaltung
+        Auf dem Server liegen laut Zertifikat oder Passivquelle weitere Domains; die Verwaltung
         betreibt der Hoster.
   # S6b-3 (spec/10 R9): "Webseiten" und "Postfaecher" nur mit Beleg (Kunden-VHost mit Inhalt,
   # MX, SPF oder Autodiscover auf diesem Host).

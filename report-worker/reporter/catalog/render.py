@@ -36,14 +36,15 @@ ITEM_VARS: dict[str, tuple[str, ...]] = {
     "http.paths": ("fqdn", "host_ip", "url_path", "status", "host_label"),
     "http.cookies": ("fqdn", "host_ip", "name", "flags_missing", "host_label"),
     "tls": ("fqdn", "host_ip", "port", "legacy_protocols", "ciphers_weak", "vulns", "cert_cn", "days_left", "not_after",
-            "issuer", "grade", "hsts_max_age", "host_label", "target", "days_left_text", "validity_text"),
-    "tls.vulns": ("fqdn", "host_ip", "port", "name", "status", "host_label", "target"),
+            "issuer", "grade", "hsts_max_age", "host_label", "target", "days_left_text", "validity_text",
+            "valid_elsewhere"),
+    "tls.vulns": ("fqdn", "host_ip", "port", "name", "status", "host_label", "target", "name_label"),
     "dns": ("domain", "spf_raw", "spf_qualifier", "dmarc_p", "dmarc_raw", "mx", "mx_count", "ns", "dkim_selectors",
-            "spf_shared_hosts"),
+            "spf_shared_hosts", "dkim_selector_note", "dmarc_rua"),
     "dns.dangling_cnames": ("domain", "fqdn", "cname_target", "takeover_risk"),
     "software": ("host_ip", "fqdn", "product", "family", "kind", "version", "build", "edition", "eol_date", "eol_status",
                  "lifecycle_text",
-                 "host_label", "vulnerabilities_count"),
+                 "host_label", "vulnerabilities_count", "target_versions"),
     "passive": ("host_ip", "port", "product", "version", "source", "seen_at", "domain", "host_label",
                 "product_or_banner", "login_url", "seen_date"),
     "threat": ("cve_id", "host_ip", "port", "cvss", "epss", "kev", "product", "version", "host_label"),
@@ -52,7 +53,11 @@ ITEM_VARS: dict[str, tuple[str, ...]] = {
 
 # Variablen fuer texts.observation (Gruppenebene).
 OBSERVATION_VARS: tuple[str, ...] = ("affected", "count", "group", "fqdn_names", "domain", "host_ip", "notes",
-                                     "n", "missing_header_names", "passed")
+                                     "n", "m", "missing_header_names", "passed", "valid_elsewhere",
+                                     "target_versions", "dmarc_rua", "mx")
+# S6b-4 (spec/11 T12, T14): Item-Werte, die die Engine ueber die fehlgeschlagenen Mitglieder einer
+# Gruppe sammelt und als Gruppenvariable in Texte gibt.
+COLLECT_VARS: tuple[str, ...] = ("valid_elsewhere", "target_versions", "dmarc_rua", "mx")
 
 # S6b-3 (spec/10 R2): Anzeigenamen der Sicherheits-Header im Kundentext.
 HEADER_NAMES = {
@@ -279,16 +284,23 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
                   # S6b-3 (spec/10 R18): absolutes Datum statt relativer Frist; liegt der
                   # Ablauf vor dem Berichtsdatum, sagt der Text das.
                   "validity_text": validity_text(cert, index.report_date),
+                  "valid_elsewhere": valid_elsewhere_text(cert),
                   "issuer": cert.issuer if cert else None, "grade": o.grade,
                   "hsts_max_age": o.hsts.max_age if o.hsts else None, "target": f"{o.fqdn or ip}:{o.port}"})
     elif scope == "tls.vulns":
         parent = item.ctx.get("tls")
-        v.update({"name": o.name, "status": o.status, "target": f"{parent.fqdn or ip}:{parent.port}" if parent else UNKNOWN})
+        v.update({"name": o.name, "status": o.status, "target": f"{parent.fqdn or ip}:{parent.port}" if parent else UNKNOWN,
+                  # S6b-4 (spec/11 Teil 3 JW): testssl "VULNERABLE ... (likely mitigated)" bei BEAST.
+                  "name_label": o.name + (", vermutlich abgeschwächt" if likely_mitigated(parent, o.name) else "")})
     elif scope == "dns":
         v.update({"domain": o.domain, "spf_raw": o.spf.raw if o.spf else None,
                   "spf_qualifier": o.spf.all_qualifier if o.spf else None, "dmarc_p": o.dmarc.p if o.dmarc else None,
                   "dmarc_raw": o.dmarc.raw if o.dmarc else None, "mx": o.mx, "mx_count": len(o.mx), "ns": o.ns,
                   "dkim_selectors": o.dkim.selectors if o.dkim else [],
+                  # S6b-4 (spec/11 Teil 3 DB): Meldeadressen ohne "mailto:".
+                  "dmarc_rua": [str(a).split(":", 1)[-1] for a in (o.dmarc.rua if o.dmarc else [])],
+                  # S6b-4 (spec/11 Teil 3 JW): die gefundenen Selektoren im Positivbefund.
+                  "dkim_selector_note": _selector_note(o.dkim.selectors if o.dkim else []),
                   # S6b-3 (spec/10 R19): freigegebene geteilte Server mit Betreiber.
                   "spf_shared_hosts": _spf_shared_label(o, index)})
     elif scope == "dns.dangling_cnames":
@@ -298,7 +310,10 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
                   "build": o.build, "edition": o.edition, "eol_date": date_de(o.eol.date) if o.eol.date else o.eol.date, "eol_status": o.eol.status,
                   # S6b-3 (spec/10 R6): Lebenszyklus mit Datum und Quelle je Produkt.
                   "lifecycle_text": lifecycle_text(o.eol),
-                  "vulnerabilities_count": o.vulnerabilities_count})
+                  "vulnerabilities_count": o.vulnerabilities_count,
+                  # S6b-4 (spec/11 T12): Zielversion laut wpscan (aktuelle Version, mindestens die
+                  # hoechste "behoben in"-Version der genannten Schwachstellen).
+                  "target_versions": [f"{o.product} {z}"] if (z := target_version(o)) else []})
     elif scope == "passive":
         v.update({"product": o.product, "version": o.version, "source": o.source, "seen_at": (o.seen_at or "")[:10] or None,
                   "domain": o.domain, "product_or_banner": o.product or banner_product(o.banner_excerpt),
@@ -319,12 +334,32 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
     return v
 
 
+def likely_mitigated(tls: Any, name: str) -> bool:
+    """testssl haelt die Schwaeche fuer abgeschwaecht ("likely mitigated", BEAST neben TLS 1.1
+    und 1.2)."""
+    eintrag = next((e for e in (getattr(tls, "entries", None) or []) if e.id == name), None)
+    return bool(eintrag and eintrag.finding and "likely mitigated" in eintrag.finding.lower())
+
+
+def _selector_note(selectors: list[str]) -> str:
+    if not selectors:
+        return ""
+    wort = "Selektor" if len(selectors) == 1 else "Selektoren"
+    return f"({wort} {', '.join(selectors)})"
+
+
 def _spf_shared_label(dns: Any, index: FactsIndex) -> list[str]:
     from reporter.catalog.expr import f_spf_shared_ips
     out = []
     for ip in f_spf_shared_ips(dns, index.hosts):
         h = index.hosts_by_ip.get(ip)
-        op = h.shared.operator if h is not None and h.shared is not None else None
+        shared = h.shared if h is not None else None
+        # S6b-4 (spec/11 T9): Betreiber des Servers laut rDNS vor dem Netzbetreiber.
+        if shared is not None and shared.server_operator:
+            dc = f" im Rechenzentrum {shared.operator}" if shared.operator else ""
+            out.append(f"{ip}, Server von {shared.server_operator}{dc}")
+            continue
+        op = shared.operator if shared is not None else None
         out.append(f"{ip} beim Hoster {op}" if op else ip)
     return out
 
@@ -341,6 +376,10 @@ def lifecycle_text(eol: Any) -> Optional[str]:
             return "Herstellerpflege beendet"
         return f"Herstellerpflege beendet {datum}" + (f" laut {quelle}" if quelle else "")
     if eol.status == "supported":
+        if datum and quelle and getattr(eol, "lts_since", None):
+            # S6b-4 (spec/11 T11): in der LTS-Phase nicht "aktuell", sondern Langzeitpflege.
+            herausgeber = quelle.replace(" LTS", "")
+            return f"in Langzeitpflege (LTS) bis {datum} laut {herausgeber}"
         if datum and quelle:
             return f"Herstellerpflege bis {datum} laut {quelle}"
         return f"gepflegt laut {quelle}" if quelle else "gepflegt"
@@ -351,6 +390,31 @@ def mariadb_label(o: Any) -> Optional[str]:
     if getattr(o, "family", None) != "mariadb":
         return None
     return f"MariaDB {o.version_norm}" if getattr(o, "version_norm", None) else "MariaDB"
+
+
+def _vkey(v: str) -> tuple:
+    import re as _re
+    return tuple(int(x) if x.isdigit() else 0 for x in _re.split(r"[.\-+]", str(v)) if x)
+
+
+def target_version(sw: Any) -> Optional[str]:
+    """Zielversion einer Erweiterung laut wpscan: die aktuelle Version, mindestens aber die
+    hoechste Version, in der eine genannte Schwachstelle behoben ist (spec/11 T12)."""
+    kandidaten = [v for v in [getattr(sw, "latest_version", None),
+                              *[x.fixed_in for x in (getattr(sw, "vulnerabilities", None) or []) if x.fixed_in]] if v]
+    if not kandidaten:
+        return None
+    return max(kandidaten, key=_vkey)
+
+
+def valid_elsewhere_text(cert: Any) -> list[str]:
+    """ "195.50.179.4:443 und 195.50.179.6:443 (gültig bis 14.03.2027)" (spec/11 T14)."""
+    orte = list(getattr(cert, "valid_elsewhere", None) or []) if cert is not None else []
+    if not orte:
+        return []
+    bis = date_de(getattr(cert, "valid_elsewhere_not_after", None))
+    text = (", ".join(orte[:-1]) + " und " + orte[-1]) if len(orte) > 1 else orte[0]
+    return [f"{text} (gültig bis {bis})" if bis else text]
 
 
 def validity_text(cert: Any, report_date: Optional[str]) -> Optional[str]:
@@ -374,7 +438,8 @@ def group_vars(group: Group, labels: list[str], notes: list[str],
                extra: Optional[dict[str, Any]] = None) -> dict[str, Any]:
     out = {"affected": labels, "count": len(labels), "group": group.label, "fqdn_names": group.fqdn_names,
            "domain": group.domain or "", "host_ip": group.host.ip if group.host else "", "notes": notes,
-           "n": Numerus(1), "missing_header_names": [], "passed": []}
+           "n": Numerus(1), "m": Numerus(len(labels)), "missing_header_names": [], "passed": [],
+           "valid_elsewhere": [], "target_versions": [], "dmarc_rua": [], "mx": []}
     out.update(extra or {})
     return out
 

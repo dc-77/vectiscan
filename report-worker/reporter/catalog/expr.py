@@ -112,6 +112,17 @@ def f_days_until(date: Any, ref: Any) -> int | None:
     return days_between(date, ref)
 
 
+def f_port_scanned(scan: Any, port: Any) -> bool | None:
+    """Lag der Port im Portbereich des Portscans (spec/11 T1)? None ohne Angabe."""
+    from reporter.facts.nmap_parse import in_port_range
+    if scan is None or port is None:
+        return None
+    try:
+        return in_port_range(getattr(scan, "scanned_ports", None), int(port))
+    except (TypeError, ValueError):
+        return None
+
+
 def f_has_version(text: Any) -> bool:
     return bool(text) and bool(re.search(r"\d+\.\d+", str(text)))
 
@@ -272,6 +283,20 @@ def f_mx_in_own_zone(dns: Any, domains: Any) -> bool:
     return all(any(m == d or m.endswith("." + d) for d in doms) for m in mx)
 
 
+def f_rua_external(dns: Any, domains: Any) -> bool:
+    """Geht eine DMARC-Meldeadresse an eine Domain ausserhalb des Auftrags (S6b-4, spec/11
+    Teil 3 DB: rua=mailto:postmaster@spacekoeln.de beim Dienstleister)?"""
+    dmarc = getattr(dns, "dmarc", None)
+    doms = [str(d).rstrip(".").lower() for d in (domains or [])]
+    if dmarc is None or not doms:
+        return False
+    for addr in getattr(dmarc, "rua", None) or []:
+        host = str(addr).split("@")[-1].rstrip(".").lower()
+        if host and not any(host == d or host.endswith("." + d) for d in doms):
+            return True
+    return False
+
+
 def f_redirects_elsewhere(fqdn: Any) -> bool:
     """Endet der Aufruf eines Namens auf einem anderen Host (Weiterleitung)?"""
     if fqdn is None:
@@ -287,11 +312,12 @@ def f_redirects_elsewhere(fqdn: Any) -> bool:
 
 FUNCS: dict[str, Callable[..., Any]] = {
     "admin_fp": f_admin_fp, "any_admin_fp": f_any_admin_fp, "hosting_panel": f_hosting_panel, "panel_title": f_panel_title, "mx_in_own_zone": f_mx_in_own_zone,
-    "redirects_elsewhere": f_redirects_elsewhere,
+    "redirects_elsewhere": f_redirects_elsewhere, "rua_external": f_rua_external,
     "has_enrichment": f_has_enrichment,
     "len": f_len, "count": f_count, "any_in": f_any_in, "matches": f_matches, "any_match": f_any_match, "startswith": f_startswith,
     "contains": f_contains, "lower": f_lower, "ports": f_ports, "has_port": f_has_port,
     "days_until": f_days_until, "has_version": f_has_version, "is_cdn": f_is_cdn, "any_attr": f_any_attr,
+    "port_scanned": f_port_scanned,
     "all_attr": f_all_attr, "get": f_get, "first": f_first, "zap_match": f_zap_match,
     "spf_shared_ips": f_spf_shared_ips,
 }

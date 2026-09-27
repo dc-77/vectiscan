@@ -37,9 +37,20 @@ policy:
     cert_expiring_later.
 texts:
   short: "Zertifikat läuft in Kürze ab"
+  # S6b-4 (spec/11 T14): liegt der Ablauf vor dem Berichtsdatum, sagen Titel, Hebel und Plan
+  # das (castenow mailstore: Ablauf 24.09.2026, Berichtsdatum danach).
+  short_variants:
+    - when: days_until(tls.cert.not_after, report_date) < 0
+      text: "Zertifikat am Berichtsdatum abgelaufen, sofern nicht erneuert"
   plan:
     lever: "Zertifikate vor dem Ablauf erneuern"
     effect: "Verhindert den Ausfall des Dienstes zum Ablaufdatum des Zertifikats"
+    lever_variants:
+      - when: days_until(tls.cert.not_after, report_date) < 0
+        text: "Abgelaufenes Zertifikat ersetzen"
+    effect_variants:
+      - when: days_until(tls.cert.not_after, report_date) < 0
+        text: "Beseitigt die Vertrauenswarnung, die seit dem Ablauf beim Aufruf erscheint"
   observation:
     - when: days_until(tls.cert.not_after, report_date) >= 0
       quantor: eines
@@ -58,10 +69,25 @@ texts:
     Zeitfenster reicht oft nicht aus, um eine Erneuerung ungeplant nachzuholen.
   recommendation:
     - stage: in_kuerze
+      when: len(tls.cert.valid_elsewhere) > 0
+      quantor: eines
+      text: >-
+        Für denselben Namen ist an {valid_elsewhere} bereits ein gültiges Zertifikat eingesetzt;
+        dieses Zertifikat auch hier einspielen.
+    - stage: in_kuerze
+      when: days_until(tls.cert.not_after, report_date) >= 0 and len(tls.cert.valid_elsewhere) == 0
+      quantor: eines
       text: >-
         Ein neues Zertifikat für den betroffenen Dienst rechtzeitig vor dem Ablaufdatum
         ausstellen und einspielen.
+    - stage: in_kuerze
+      when: days_until(tls.cert.not_after, report_date) < 0 and len(tls.cert.valid_elsewhere) == 0
+      quantor: eines
+      text: >-
+        Prüfen, ob das Zertifikat seit dem Ablauf erneuert wurde, und es andernfalls durch ein
+        gültiges ersetzen.
     - stage: strategisch
+      when: tls.cert.renewal is None or len(tls.cert.renewal.recent_leads) == 0
       text: >-
         Eine automatisierte Erneuerung des Zertifikats mit ausreichendem zeitlichem Vorlauf vor
         dem Ablauf einrichten.

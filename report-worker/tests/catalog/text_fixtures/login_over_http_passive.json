@@ -1,0 +1,83 @@
+{
+ "check": "login_over_http_passive",
+ "cases": [
+  {
+   "name": "S6b-4: Anmeldung über HTTP laut Passivquelle auf einem E4-Host (bergersysteme VS-006)",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.2.1",
+      "reach": {
+       "status": "unreachable_from_scanner",
+       "passive_ports": [
+        443
+       ],
+       "passive_seen_at": "2026-09-23T00:00:00Z",
+       "passive_source": "shodan"
+      }
+     }
+    ],
+    "passive": [
+     {
+      "source": "shodan",
+      "seen_at": "2026-09-23T00:00:00Z",
+      "verified": false,
+      "confidence": 0.5,
+      "details": {
+       "login_over_http": "http://10.0.2.1/bstasks/login.cfm"
+      },
+      "host_ip": "10.0.2.1",
+      "port": 80
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "shodan:10.0.2.1:80": [
+      "observation[1]"
+     ]
+    },
+    "not_holds": {
+     "shodan:10.0.2.1:80": [
+      "observation[2]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "S6b-4: Anmeldung über HTTP laut Passivquelle, Host erreichbar",
+   "facts": {
+    "hosts": [
+     {
+      "ip": "10.0.2.2"
+     }
+    ],
+    "passive": [
+     {
+      "source": "shodan",
+      "seen_at": "2026-09-23T00:00:00Z",
+      "verified": false,
+      "confidence": 0.5,
+      "details": {
+       "login_over_http": "http://10.0.2.1/bstasks/login.cfm"
+      },
+      "host_ip": "10.0.2.2",
+      "port": 80
+     }
+    ]
+   },
+   "expect": {
+    "holds": {
+     "shodan:10.0.2.2:80": [
+      "observation[2]"
+     ]
+    },
+    "not_holds": {
+     "shodan:10.0.2.2:80": [
+      "observation[1]"
+     ]
+    }
+   }
+  }
+ ]
+}

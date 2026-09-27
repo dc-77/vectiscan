@@ -1,0 +1,92 @@
+{
+ "check": "wordpress_plugin_vulnerable",
+ "cases": [
+  {
+   "name": "S6b-4: Erweiterung mit aktueller Version laut wpscan (dortmund-beach betheme 28.5.10)",
+   "facts": {
+    "software": [
+     {
+      "host_ip": "10.0.4.1",
+      "fqdn": "www.example.test",
+      "product": "betheme",
+      "family": "betheme",
+      "kind": "theme",
+      "version_norm": "27.5.3",
+      "version_raw": "27.5.3",
+      "vulnerabilities_count": 1,
+      "vulnerabilities": [
+       {
+        "title": "Betheme <= 28.5.7 - Remote Code Execution",
+        "cves": [
+         "CVE-2026-65548"
+        ],
+        "fixed_in": "28.5.8"
+       }
+      ],
+      "detection_sources": [
+       "wpscan"
+      ],
+      "source": "wpscan",
+      "latest_version": "28.5.10"
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "sw:10.0.4.1:www.example.test:betheme:27.5.3": [
+      "recommendation[0]"
+     ]
+    },
+    "not_holds": {
+     "sw:10.0.4.1:www.example.test:betheme:27.5.3": [
+      "recommendation[1]"
+     ]
+    }
+   }
+  },
+  {
+   "name": "S6b-4: Erweiterung ohne aktuelle Version laut wpscan",
+   "facts": {
+    "software": [
+     {
+      "host_ip": "10.0.4.1",
+      "fqdn": "www.example.test",
+      "product": "betheme",
+      "family": "betheme",
+      "kind": "theme",
+      "version_norm": "27.5.3",
+      "version_raw": "27.5.3",
+      "vulnerabilities_count": 1,
+      "vulnerabilities": [
+       {
+        "title": "Betheme <= 28.5.7 - Remote Code Execution",
+        "cves": [
+         "CVE-2026-65548"
+        ],
+        "fixed_in": "28.5.8"
+       }
+      ],
+      "detection_sources": [
+       "wpscan"
+      ],
+      "source": "wpscan"
+     }
+    ]
+   },
+   "coverage_default": "ok",
+   "expect": {
+    "holds": {
+     "sw:10.0.4.1:www.example.test:betheme:27.5.3": [
+      "recommendation[1]"
+     ]
+    },
+    "not_holds": {
+     "sw:10.0.4.1:www.example.test:betheme:27.5.3": [
+      "recommendation[0]"
+     ]
+    }
+   }
+  }
+ ]
+}

@@ -45,15 +45,18 @@ texts:
         Eine Meldeadresse ist nicht hinterlegt; Berichte über fehlgeschlagene Prüfungen
         erreichen Sie deshalb nicht.
   recommendation:
-    - stage: mittelfristig
-      text: >-
-        Nach einer Beobachtungsphase ohne Fehlmeldungen die Richtlinie auf Zurückweisung
-        anheben, sobald alle legitimen Versandquellen der Domain erfasst sind.
+    # S6b-4 (spec/11 T12): ohne Meldeadresse ist sie die erste Stufe; eine Beobachtungsphase
+    # ohne Berichte gibt es nicht (huendgen VS-008).
     - stage: mittelfristig
       when: len(dns.dmarc.rua) == 0
       text: >-
         Eine Meldeadresse (rua) in den DMARC-Eintrag aufnehmen und die Berichte vor der
         Umstellung auswerten.
+      effect: "Macht fehlgeschlagene Prüfungen und Missbrauch der Domain sichtbar"
+    - stage: mittelfristig
+      text: >-
+        Nach einer Beobachtungsphase ohne Fehlmeldungen die Richtlinie auf Zurückweisung
+        anheben, sobald alle legitimen Versandquellen der Domain erfasst sind.
   verify: >-
     DNS-Abfrage des TXT-Eintrags _dmarc.{domain}; erwartet wird eine Richtlinie p mit
     Zurückweisung.
