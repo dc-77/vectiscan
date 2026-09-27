@@ -401,7 +401,10 @@ def aussage_ohne_fakt(data: Any, output: Any) -> list[Defect]:
                     fehler(f.id, f"{f.id}: {p.check} ist fuer {ref} nicht fehlgeschlagen",
                            {"aussage": p.statement, "mitglied": ref})
                     continue
-                if p.field != "title" and p.statement not in m.holds:
+                # S6b-4: eine Titelvariante (spec/11 T4, T14) traegt wie jede Aussage eine
+                # Bedingung; die Standardkurzform ist die Regel selbst.
+                variante = p.statement.startswith("short_variants")
+                if (p.field != "title" or variante) and p.statement not in m.holds:
                     fehler(f.id, f"{f.id}: Bedingung von {p.check}.{p.statement} gilt nicht fuer {ref}",
                            {"aussage": p.statement, "mitglied": ref})
     for pos in data.positives:
@@ -505,15 +508,51 @@ def header_nicht_fehlend(data: Any) -> list[Defect]:
     return out
 
 
-def einschraenkung_widerspricht_befund(data: Any) -> list[Defect]:
+# S6b-4 (spec/11 T4): Familien, die aus derselben Antwort gemessen werden. HSTS und die uebrigen
+# Header stammen aus derselben HTTP-Antwort; heuel online trug "nur an einer Sicherheitsabfrage
+# gemessen" (Header) neben dem HSTS-Befund an derselben 429. Das gilt fuer Fehlerseite und
+# Sicherheitsabfrage; an einer Weiterleitung misst die HSTS-Regel nach E20 bewusst die erste
+# Antwort, die uebrigen Header die Endseite.
+MESSUNG: dict[str, str] = {"http_headers": "http_antwort", "hsts": "http_antwort"}
+MESSUNG_CODES = frozenset({"headers_error_only", "headers_challenge_only"})
+
+
+def _messung(check_id: str, code: str = "") -> Optional[str]:
+    fam = _family(check_id)
+    if not fam:
+        return None
+    return MESSUNG.get(fam, fam) if code in MESSUNG_CODES else fam
+
+
+def _hsts_eigene_messung(facts: Any) -> set[str]:
+    """Subjekte ("name@adresse"), deren HSTS aus einer eigenen gueltigen Messung stammt: testssl,
+    die Endseite laut redirect_probe oder eine erste Antwort, die weder Fehlerseite noch
+    Sicherheitsabfrage ist (krause filebrowser: 200 als text/plain, die uebrigen Header sind dort
+    nicht bewertbar, HSTS schon)."""
+    out: set[str] = set()
+    for h in getattr(facts, "http", None) or []:
+        tool = getattr(getattr(h, "hsts", None), "tool", None)
+        basis = getattr(getattr(h, "header_eval", None), "basis", None)
+        gueltig = tool in ("testssl", "redirect_probe") or (
+            tool == "header_check" and basis not in ("client_error", "server_error", "challenge"))
+        if gueltig and h.fqdn:
+            out.add(f"{h.fqdn}@{h.host_ip}")
+    return out
+
+
+def einschraenkung_widerspricht_befund(data: Any, facts: Any = None) -> list[Defect]:
     """Eine Einschraenkung "nicht pruefbar" neben einem Befund oder "unauffaellig" derselben
-    Faktenfamilie am selben Subjekt (spec/10 R4: DMARC, Zertifikat, Header)."""
+    Messung am selben Subjekt (spec/10 R4: DMARC, Zertifikat, Header; S6b-4, spec/11 T4: HSTS
+    und Header aus derselben Antwort)."""
+    eigene = _hsts_eigene_messung(facts) if facts is not None else set()
     befund: set[tuple[str, str]] = set()
     for f in data.findings:
         for eintrag in getattr(f, "subjects", None) or []:
             check, _, sub = eintrag.partition("|")
-            fam = _family(check)
-            if fam:
+            familien = {_messung(check)}
+            if not (_family(check) == "hsts" and sub in eigene):
+                familien.add(_messung(check, "headers_error_only"))
+            for fam in familien - {None}:
                 befund.add((fam, sub))
     ruhig: set[tuple[str, str]] = set()
     for block in data.architecture.posture:
@@ -530,7 +569,7 @@ def einschraenkung_widerspricht_befund(data: Any) -> list[Defect]:
     for lim in data.scope.limitations:
         for ref in getattr(lim, "refs", None) or []:
             check, _, gruppe = ref.partition("|")
-            fam = _family(check)
+            fam = _messung(check, getattr(lim, "code", "") or "")
             if not fam:
                 continue
             if (fam, gruppe) in befund:
@@ -579,26 +618,37 @@ def positiv_widerspricht_befund(data: Any) -> list[Defect]:
 
 def posture_widerspricht_befund(data: Any) -> list[Defect]:
     """Posture "unauffällig" neben einem Befund derselben Regel oder "Handlungsbedarf" ohne
-    Befund (spec/10 R8: DANE als Handlungsbedarf neben "MX beim Dienstleister")."""
+    Befund (spec/10 R8: DANE als Handlungsbedarf neben "MX beim Dienstleister").
+
+    S6b-4 (spec/11 T16): alle vier Karten und jeder neutrale Zustand ("softfail", "teilweise
+    geprüft", "nicht prüfbar", "entfällt") neben einem gelben oder roten Befund derselben Regel
+    (castenow SPF softfail neben Gelb VS-005, Transport unauffällig neben dem Zertifikatsbefund)."""
     befunde: list[tuple[str, str]] = []
+    ampel: list[tuple[str, str, str]] = []
     for f in data.findings:
         for eintrag in getattr(f, "subjects", None) or []:
             check, _, sub = eintrag.partition("|")
             befunde.append((check, sub))
+            ampel.append((check, sub, f.status))
     out: list[Defect] = []
     for block in data.architecture.posture:
         for item in block.items:
-            checks = set(getattr(item, "checks", None) or [])
+            checks = set(getattr(item, "checks", None) or []) | set(getattr(item, "pulls", None) or [])
             if not checks:
                 continue
             subs = set(getattr(item, "subjects", None) or [])
             subs |= {_ip_of(s) for s in subs}
             passend = [c for c, sub in befunde
                        if c in checks and (not subs or sub in subs or _ip_of(sub) in subs)]
+            schwer = [c for c, sub, st in ampel
+                      if st in ("rot", "gelb") and c in checks
+                      and (not subs or sub in subs or _ip_of(sub) in subs)]
             if item.v == "unauffällig" and passend:
                 grund = "unauffällig neben einem Befund"
             elif item.v == "Handlungsbedarf" and not passend:
                 grund = "Handlungsbedarf ohne Befund"
+            elif getattr(item, "ok", None) is None and schwer:
+                grund = f"„{item.v}“ neben einem gelben oder roten Befund"
             else:
                 continue
             out.append(Defect(engine=ENGINE_V3, check="posture_widerspricht_befund", severity=SEVERITY_ERROR,
@@ -722,6 +772,77 @@ def frist_vor_berichtsdatum(data: Any) -> list[Defect]:
     return out
 
 
+# ---------------------------------------------------------------- S6b-4 (spec/11)
+
+# S6b-4 (spec/11 T3): der Nachweis eines Befunds nennt den Fakt seiner Regel. DB VS-014 nannte
+# "Antwort: 200" statt des wpscan-Funds; der VRFY-Befund stand ohne "VRFY in der EHLO-Liste".
+REGELFAKT: dict[str, re.Pattern[str]] = {
+    "hsts_missing": re.compile(r"Strict-Transport-Security"),
+    "hsts_short": re.compile(r"Strict-Transport-Security"),
+    "csp_missing": re.compile(r"Content-Security-Policy"),
+    "security_headers_incomplete": re.compile(r"fehlende Header"),
+    "http_header_disclosure": re.compile(r"Server:|X-Powered-By|X-AspNet-Version|X-FEServer"),
+    "wordpress_xmlrpc_enabled": re.compile(r"XML-RPC"),
+    "smtp_vrfy_enabled": re.compile(r"VRFY in der EHLO-Liste"),
+    "smtp_vrfy_enabled_passive": re.compile(r"VRFY in der EHLO-Antwort"),
+    "cert_expiring": re.compile(r"gültig bis"),
+    "cert_expiring_later": re.compile(r"gültig bis"),
+}
+
+
+def nachweis_ohne_regelfakt(data: Any) -> list[Defect]:
+    """Ein Befund, dessen Nachweis den Fakt seiner Regel nicht enthaelt (spec/11 T3)."""
+    out: list[Defect] = []
+    for f in data.findings:
+        text = f.evidence or ""
+        for check in getattr(f, "checks", None) or []:
+            muster = REGELFAKT.get(check)
+            if muster is not None and not muster.search(text):
+                out.append(Defect(engine=ENGINE_V3, check="nachweis_ohne_regelfakt", severity=SEVERITY_ERROR,
+                                  finding_id=f.id,
+                                  message=f"{f.id}: Nachweis ohne Regelfakt von {check}",
+                                  detail={"regel": check, "muster": muster.pattern}))
+    return out
+
+
+def ipv6_ohne_inventar(facts: Any) -> list[Defect]:
+    """AAAA-Adressen der Kundennamen, die der Scanner nicht ins Inventar uebernommen hat
+    (spec/11 T7, bis S6c). Der Bericht nennt sie in Kapitel 2; der Hinweis geht an den Admin."""
+    adressen = sorted({a.ip for h in facts.hosts for a in (getattr(h, "additional_ips", None) or [])})
+    if not adressen:
+        return []
+    return [Defect(engine=ENGINE_V3, check="ipv6_ohne_inventar", severity=SEVERITY_WARNING,
+                   message=f"{len(adressen)} IPv6-Adresse(n) laut DNS nicht im Inventar: " + ", ".join(adressen[:4]),
+                   detail={"adressen": adressen})]
+
+
+def messadresse_ausserhalb_inventar(facts: Any) -> list[Defect]:
+    """Eine Messung lief an einer Adresse ausserhalb des Inventars (spec/11 T7: DNS-Rotation,
+    huendgen testssl an 52.59.120.70 fuer den Inventar-Host 18.197.248.23)."""
+    inventar = {h.ip for h in facts.hosts}
+    orte: dict[str, set[str]] = {}
+    for fact in list(facts.tls) + list(facts.http):
+        ip = getattr(fact, "measured_ip", None)
+        if ip and ip not in inventar:
+            orte.setdefault(ip, set()).add(getattr(fact, "fqdn", None) or getattr(fact, "host_ip", ""))
+    return [Defect(engine=ENGINE_V3, check="messadresse_ausserhalb_inventar", severity=SEVERITY_WARNING,
+                   message=f"Messung an {ip} ausserhalb des Inventars ({', '.join(sorted(n for n in namen if n))})",
+                   detail={"adresse": ip, "namen": sorted(n for n in namen if n)})
+            for ip, namen in sorted(orte.items())]
+
+
+def firmenname_nicht_bestaetigt(data: Any) -> list[Defect]:
+    """Firmenname oder Kurzname stammen aus der Recherche-KI (Entscheidung E23): der Admin
+    bestaetigt sie vor der Freigabe."""
+    quellen = dict(getattr(data.meta, "context_sources", None) or {})
+    felder = [f for f in ("firmenname", "kurzname") if quellen.get(f) == "recherche"]
+    if not felder:
+        return []
+    return [Defect(engine=ENGINE_V3, check="firmenname_nicht_bestaetigt", severity=SEVERITY_WARNING,
+                   message="Firmenname nicht bestätigt: " + " und ".join(felder) + " stammen aus der Recherche",
+                   detail={"felder": felder})]
+
+
 def run_all(data: Any, facts: Any, output: Any, *, strict: bool = False) -> list[Defect]:
     """Alle Pruefungen in fester Reihenfolge."""
     defects: list[Defect] = []
@@ -737,7 +858,7 @@ def run_all(data: Any, facts: Any, output: Any, *, strict: bool = False) -> list
     defects.extend(zaehlung_widerspruch(data))
     # S6b-3 (spec/10): Widersprueche zwischen Teilen des Berichts, Zusagen, Fristen.
     defects.extend(header_nicht_fehlend(data))
-    defects.extend(einschraenkung_widerspricht_befund(data))
+    defects.extend(einschraenkung_widerspricht_befund(data, facts))
     defects.extend(positiv_widerspricht_befund(data))
     defects.extend(posture_widerspricht_befund(data))
     defects.extend(e5_fehlt(data, facts))
@@ -745,4 +866,10 @@ def run_all(data: Any, facts: Any, output: Any, *, strict: bool = False) -> list
     defects.extend(cve_ohne_a3(data))
     defects.extend(namen_nicht_geprueft(facts))
     defects.extend(frist_vor_berichtsdatum(data))
+    # S6b-4 (spec/11 T3, T7, E23): Nachweis mit Regelfakt, Adressen ausserhalb des Inventars,
+    # Firmenname aus der Recherche.
+    defects.extend(nachweis_ohne_regelfakt(data))
+    defects.extend(ipv6_ohne_inventar(facts))
+    defects.extend(messadresse_ausserhalb_inventar(facts))
+    defects.extend(firmenname_nicht_bestaetigt(data))
     return defects
