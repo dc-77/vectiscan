@@ -239,6 +239,8 @@ def build_from_bundle(bundle: ScanBundle) -> S.Facts:
     # S6b-1: geteiltes System, Drittanbieter und Erreichbarkeit brauchen alle
     # Entitaeten; nmap ohne offenen Port wird danach "empty" (spec/09 Q9).
     SYS.derive(facts, finished=ctx.finished)
+    # S6b-4n (spec/11 N8): braucht Zustaendigkeit und Betriebsform aus derive.
+    _valid_elsewhere(facts.tls, facts.hosts)
     SYS.adjust_nmap_coverage(facts)
     _check_ids(facts)
     return facts
@@ -578,7 +580,12 @@ def _additional_ips(ctx: _Ctx, hosts: list[S.HostFact]) -> None:
     Der Scanner uebernimmt nur A-Eintraege; dnsx hat die AAAA-Eintraege derselben Namen aber
     aufgeloest (lumbeck-wolter 2a01:4f8:d0a:668b::2, bergersysteme 2a00:1169:118:23d0:: und
     2620:cb:2000::1). Die Adresse gehoert zum System der IPv4-Adresse, auf die dieselben Namen
-    zeigen; zeigen sie auf mehrere, bleibt die Zuordnung offen und die Adresse draussen."""
+    zeigen; zeigen sie auf mehrere, bleibt die Zuordnung offen und die Adresse draussen.
+
+    S6b-4n (spec/11 N5, Entscheidung DC 27.09.): ebenso weitere A-Eintraege derselben Namen
+    (huendgen 52.59.120.70 neben 18.197.248.23, heuel online 216.150.16.65, castenow umfrage);
+    der Bericht fuehrt sie als "weitere Adresse laut DNS, nicht geprueft" mit den Messungen, die
+    dort liefen. Drittanbieter-Adressen bleiben draussen."""
     by_ip = {h.ip: h for h in hosts}
     extra: dict[tuple[str, str], set[str]] = defaultdict(set)
     for name, v6s in ctx.b.dns_aaaa.items():
@@ -589,8 +596,17 @@ def _additional_ips(ctx: _Ctx, hosts: list[S.HostFact]) -> None:
         for v6 in v6s:
             if v6 not in by_ip and ":" in v6:
                 extra[(v4[0], v6)].add(SYS.clean_name(name))
-    for (ip, v6), names in sorted(extra.items(), key=lambda kv: sort_key(kv[0][0], kv[0][1])):
-        by_ip[ip].additional_ips.append(S.AdditionalIp(ip=v6, family=6, names=sorted(names, key=sort_key)))
+    for name, v4s in ctx.b.dns_a.items():
+        inventar = sorted({ip for ip in ctx.fqdn_ips.get(SYS.clean_name(name), set())
+                           if ":" not in ip and ip in by_ip and by_ip[ip].third_party is None}, key=sort_key)
+        if len(inventar) != 1:
+            continue
+        for v4 in v4s:
+            if v4 not in by_ip and ":" not in v4 and re.fullmatch(r"\d{1,3}(?:\.\d{1,3}){3}", v4 or ""):
+                extra[(inventar[0], v4)].add(SYS.clean_name(name))
+    for (ip, weitere), names in sorted(extra.items(), key=lambda kv: sort_key(kv[0][0], kv[0][1])):
+        by_ip[ip].additional_ips.append(S.AdditionalIp(ip=weitere, family=6 if ":" in weitere else 4,
+                                                       names=sorted(names, key=sort_key)))
 
 
 def _int_or_none(v: Any) -> Optional[int]:
@@ -726,7 +742,10 @@ def _build_services(ctx: _Ctx, ips: list[str]) -> list[S.ServiceFact]:
                 continue
             flags = derive_service_flags(p)
             norm = normalize(p.product, p.version, context=p.extrainfo) if (p.product or p.version) else None
-            line = f"{p.port}/{p.proto} {p.state} {p.service or ''} {p.product or ''} {p.version or ''}" \
+            # S6b-4n (spec/11 N15): ein nur aus der Porttabelle geratener Dienstname traegt wie in der
+            # nmap-Ausgabe ein "?" ("8443/tcp open https-alt?").
+            geraten = "?" if p.method == "table" and p.service and not p.product else ""
+            line = f"{p.port}/{p.proto} {p.state} {p.service or ''}{geraten} {p.product or ''} {p.version or ''}" \
                    + (f" ({p.extrainfo})" if p.extrainfo else "") + (" tunnel=ssl" if p.tunnel == "ssl" else "")
             ev = [S.Evidence(tool="nmap", ref=ref or "", excerpt=excerpt(line, 200))]
             for sid in ("pop3-capabilities", "imap-capabilities", "smtp-commands", "mysql-info", "ftp-anon", "http-methods"):
@@ -1023,6 +1042,45 @@ def _redirected_vhosts(ctx: _Ctx, ip: str, h: Any) -> set[str]:
     return out
 
 
+def _redirect_target(ctx: _Ctx, ip: str, h: Any) -> Optional[tuple[str, str]]:
+    """(Name, Adresse) des Ziels, wenn jeder Webname dieser Adresse dorthin weiterleitet.
+
+    S6b-4n (spec/11 N4): die Technik, die webtech und die CMS-Erkennung einer solchen Adresse
+    melden, stammt von der Seite des Ziels (heuel 216.150.1.65: Google Tag Manager und Facebook
+    Pixel von www, 213.133.104.51: Java/Servlet von ose). Namen, die nur eine Fehlerseite liefern
+    (heuel dl: 403), haben keine eigene Seite und zaehlen nicht. Nur bei genau einem Ziel im
+    Auftrag."""
+    def seite(status: Any) -> bool:
+        # Status 0 heisst keine Antwort (heuel dl in der Weiterleitungspruefung).
+        return 0 < (_int_or_none(status) or 0) < 400
+
+    namen = {_line_vhost(line) for line in _httpx_lines(h) if seite(line.get("status_code"))}
+    tp = h.tech_profile if isinstance(h.tech_profile, dict) else {}
+    ziele: set[str] = set()
+    for fq, rd in (tp.get("redirect_data") or {}).items():
+        if isinstance(rd, dict) and seite(rd.get("status_code")):
+            namen.add(SYS.clean_name(fq))
+    namen.discard("")
+    namen.discard(ip)
+    if not namen:
+        return None
+    for line in _httpx_lines(h):
+        z = _foreign_final_host(ctx, ip, _line_vhost(line), line.get("final_url"))
+        if z:
+            ziele.add(z)
+    for fq, rd in (tp.get("redirect_data") or {}).items():
+        if isinstance(rd, dict):
+            final = rd.get("final_url") or (f"https://{rd['final_domain']}/" if rd.get("final_domain") else None)
+            z = _foreign_final_host(ctx, ip, SYS.clean_name(fq), final)
+            if z:
+                ziele.add(z)
+    if not namen <= _redirected_vhosts(ctx, ip, h) or len(ziele) != 1:
+        return None
+    ziel = next(iter(ziele))
+    adressen = sorted(ctx.fqdn_ips.get(ziel, set()), key=sort_key)
+    return (ziel, adressen[0]) if adressen else None
+
+
 def _own_host(ctx: _Ctx, ip: str, host: Optional[str]) -> bool:
     """Gehoert der Name in einer URL zu dieser Adresse? (Spider-URLs, Issue #33)"""
     name = SYS.clean_name(host or "")
@@ -1034,7 +1092,7 @@ def _own_owa_urls(ctx: _Ctx, ip: str, h: Any) -> list[str]:
             if _OWA_BUILD_RE.search(str(u)) and _own_host(ctx, ip, urlsplit(str(u)).hostname)]
 
 
-def _profile_tech_sources(ctx: _Ctx, ip: str, h: Any) -> dict[str, set[str]]:
+def _profile_tech_sources(ctx: _Ctx, ip: str, h: Any, weiterleitung: bool = False) -> dict[str, set[str]]:
     """Je Werkzeug die Namen, die es fuer diesen Host geliefert hat (spec/09 Q11:
     als Quelle steht das Werkzeug, das die Zeile geliefert hat, nicht pauschal webtech).
 
@@ -1092,6 +1150,12 @@ def _profile_tech_sources(ctx: _Ctx, ip: str, h: Any) -> dict[str, set[str]]:
         # Das Profil traegt Exchange nur, weil der Spider fremde OWA-URLs gesehen hat.
         src["cms_fingerprint"].discard("microsoft exchange")
         src[REDIRECT_BUCKET].add("microsoft exchange")
+    if weiterleitung:
+        # S6b-4n (spec/11 N4): jeder Webname leitet auf einen anderen Host weiter; was webtech und
+        # die CMS-Erkennung hier sahen, ist die Seite des Ziels.
+        for tool in ("webtech", "cms_fingerprint"):
+            src[REDIRECT_BUCKET] |= src[tool]
+            src[tool] = set()
     return src
 
 
@@ -1116,11 +1180,21 @@ def _non_software(name: Any) -> bool:
 
 
 def _add_profile_software(ctx: _Ctx, ip: str, sources: dict[str, set[str]], name: Any, version: Any,
-                          ref: str, evidence_text: str) -> None:
+                          ref: str, evidence_text: str,
+                          ziel: Optional[tuple[str, str, dict[str, set[str]]]] = None) -> None:
     if _non_software(name):
         return
     tool = _profile_tool(sources, name)
     if tool is None:
+        # S6b-4n (spec/11 N4): Eintrag der Zielseite einer Weiterleitung; er gehoert dem Ziel,
+        # wenn es im Auftrag liegt (Werkzeug wie vor der Umlenkung).
+        if ziel is not None:
+            ziel_fq, ziel_ip, vorher = ziel
+            key = _tech_key(name)
+            quelle = next((t for t in ("webtech", "cms_fingerprint") if key in vorher.get(t, set())), None)
+            if quelle is not None:
+                _add_software(ctx, ziel_ip, None, name, version, quelle, ref,
+                              f"{evidence_text} (Weiterleitung auf {ziel_fq})", S.CONFIDENCE_DERIVED)
         return
     _add_software(ctx, ip, None, name, version, tool, ref, evidence_text, S.CONFIDENCE_DERIVED)
 
@@ -1134,7 +1208,9 @@ def _software_from_profiles(ctx: _Ctx, ips: list[str]) -> None:
         tp = h.tech_profile
         ref = h.refs.get("tech_profile.json", "")
         if isinstance(tp, dict):
-            sources = _profile_tech_sources(ctx, ip, h)
+            ziel_host = _redirect_target(ctx, ip, h)
+            sources = _profile_tech_sources(ctx, ip, h, weiterleitung=ziel_host is not None)
+            ziel = (ziel_host[0], ziel_host[1], _profile_tech_sources(ctx, ip, h)) if ziel_host else None
             details = tp.get("cms_details") if isinstance(tp.get("cms_details"), dict) else {}
             raw = details.get("details", {}).get("raw") if isinstance(details.get("details"), dict) else None
             if isinstance(raw, dict) and raw.get("name"):
@@ -1150,10 +1226,10 @@ def _software_from_profiles(ctx: _Ctx, ips: list[str]) -> None:
             for t in tp.get("technologies") or []:
                 if isinstance(t, dict) and t.get("name"):
                     _add_profile_software(ctx, ip, sources, t.get("name"), t.get("version"), ref,
-                                          f"technologies: {t.get('name')} {t.get('version') or ''}")
+                                          f"technologies: {t.get('name')} {t.get('version') or ''}", ziel)
             server = tp.get("server")
             if isinstance(server, str) and server:
-                _add_profile_software(ctx, ip, sources, server, None, ref, f"server: {server}")
+                _add_profile_software(ctx, ip, sources, server, None, ref, f"server: {server}", ziel)
             for fq, rd in (tp.get("redirect_data") or {}).items():
                 if not isinstance(rd, dict):
                     continue
@@ -1178,6 +1254,7 @@ def _software_from_profiles(ctx: _Ctx, ips: list[str]) -> None:
         _software_from_scripts(ctx, ip, h)
         _software_from_wpscan(ctx, ip, h)
         _os_from_nmap(ctx, ip)
+        _os_from_shodan(ctx, ip)
 
 
 def _powered_by(first: Optional[str], final: Optional[str]) -> Optional[str]:
@@ -1209,6 +1286,23 @@ def _os_from_nmap(ctx: _Ctx, ip: str) -> None:
                 sw.evidence.append(ev)
 
 
+def _os_from_shodan(ctx: _Ctx, ip: str) -> None:
+    """Shodan ``os`` des Hosteintrags als zweite Quelle fuer ein erkanntes Windows (S6b-4n,
+    spec/11 N12: huendgen und castenow "ohne zweite Quelle" trotz ``os Windows``). Wie bei nmap
+    entsteht daraus kein eigenes Produkt."""
+    shodan = ctx.b.passive.get("shodan_hosts")
+    entry = shodan.get(ip) if isinstance(shodan, dict) else None
+    os_name = str((entry or {}).get("os") or "").strip() if isinstance(entry, dict) else ""
+    if not os_name.lower().startswith("windows"):
+        return
+    ev = S.Evidence(tool="shodan", ref=ctx.b.refs.get("shodan_hosts", ""), excerpt=f"{ip}: os={os_name}")
+    for sw in ctx.software.values():
+        if sw.host_ip == ip and sw.family in ("windows_server", "windows") and "shodan" not in sw.detection_sources:
+            sw.detection_sources.append("shodan")
+            if len(sw.evidence) < MAX_EVIDENCE:
+                sw.evidence.append(ev)
+
+
 # S6b-4 (spec/11 T15): Bibliotheken in den Skript-Adressen der Seite (redirect_probe
 # ``tech_info.scripts``) als zweite Quelle und Versionsquelle ("jquery-3.7.0.min.js",
 # "jquery.min.js?ver=3.7.1"). Nur Muster mit eindeutigem Namen; der Hash im Dateinamen
@@ -1223,6 +1317,15 @@ _SCRIPT_LIBS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"/wp-content/plugins/ultimate-member/assets/(?:js|css)/[^/?]+\?ver=(\d+\.\d+(?:\.\d+)?)\b",
                 re.I), "Ultimate Member"),
     (re.compile(r"//code\.etracker\.com/", re.I), "etracker"),
+    # S6b-4n (spec/11 N12): Anbieter-Skripte als zweite Quelle der webtech-Erkennung (heuel www).
+    (re.compile(r"//www\.googletagmanager\.com/gtm\.js", re.I), "Google Tag Manager"),
+    (re.compile(r"//connect\.facebook\.net/[^/]+/fbevents\.js", re.I), "Facebook Pixel"),
+)
+# S6b-4n (spec/11 N12): Sitzungs-Cookies der Seite (redirect_probe ``tech_info.cookies``) als zweite Quelle
+# der Technik (heuel ose: JSESSIONID neben webtech "Java/Servlet"). Die Cookie-Fakten mit ihren
+# Attributen bleiben unberuehrt; der Cookie-Text aus redirect_probe traegt keine Attribute.
+_COOKIE_TECH: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"(?:^|[;\s])JSESSIONID=", re.I), "Java/Servlet"),
 )
 
 
@@ -1241,6 +1344,13 @@ def _software_from_scripts(ctx: _Ctx, ip: str, h: Any) -> None:
                 continue
             sw_ip, sw_vh = ziel[0], final
         seen: set[tuple[str, Optional[str]]] = set()
+        cookies = str(rd["tech_info"].get("cookies") or "")
+        for rx, product in _COOKIE_TECH:
+            m = rx.search(cookies)
+            if m:
+                name = m.group(0).strip(" ;=")
+                _add_software(ctx, sw_ip, sw_vh, product, None, "redirect_probe", ref,
+                              f"Sitzungs-Cookie der Seite: {name}", S.CONFIDENCE_DERIVED)
         for url in rd["tech_info"].get("scripts") or []:
             for rx, product in _SCRIPT_LIBS:
                 m = rx.search(str(url))
@@ -1346,6 +1456,29 @@ def _software_from_wpscan(ctx: _Ctx, ip: str, h) -> None:
                              vuln_count=len(th.get("vulnerabilities") or []),
                              vulns=_wp_vulns(th.get("vulnerabilities")))
         _wp_currency(fact, th)
+        if fact is not None:
+            fact.child_of = _wp_parent_theme(str(slug), th, themes)
+
+
+def _wp_parent_theme(slug: str, entry: dict, themes: dict) -> Optional[str]:
+    """Elterntheme eines Kindthemes (spec/11 N9): laut wpscan (``parents``, ``template``), sonst
+    Slug mit Endung ``-child``, wenn das Elterntheme im selben Lauf steht (dortmund-beach
+    ``betheme-child``: wpscan kennt keine neueste Version, ``parents`` ist leer)."""
+    for key in ("parents", "parent_theme"):
+        val = entry.get(key)
+        if isinstance(val, list) and val:
+            first = val[0]
+            name = first.get("slug") if isinstance(first, dict) else first
+            if name:
+                return str(name)
+        elif isinstance(val, dict) and val.get("slug"):
+            return str(val["slug"])
+    tpl = entry.get("template")
+    if isinstance(tpl, str) and tpl.strip() and tpl.strip() != slug:
+        return tpl.strip()
+    if slug.lower().endswith("-child") and slug[:-6] in themes:
+        return slug[:-6]
+    return None
 
 
 def _wp_currency(fact: Optional[S.SoftwareFact], entry: dict) -> None:
@@ -1556,33 +1689,68 @@ def _build_tls(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S.
         fact.evidence = fact.evidence[:MAX_EVIDENCE]
         out.append(fact)
     out.sort(key=lambda f: sort_key(f.host_ip, f.fqdn, f.port))
-    _valid_elsewhere(out)
     for f in out:
         ctx.id_seen.add(f.id)
     return out
 
 
-def _valid_elsewhere(tls: list[S.TlsFact]) -> None:
+def _linie(cert: S.TlsCert) -> tuple[frozenset[str], str]:
+    """Zertifikatslinie: Namensset und Aussteller-Organisation ("YR2 (Let's Encrypt from US)"
+    und "YR2" sind dieselbe Linie; Sectigo-Wildcard und Let's Encrypt nicht)."""
+    namen = frozenset(n.lower() for n in [cert.cn, *cert.san] if n)
+    text = str(cert.issuer or "")
+    m = re.search(r"\((.+?) from [A-Z]{2}\)", text)
+    aussteller = m.group(1) if m else _issuer_org(text)
+    aussteller = re.sub(r"\s*\(.*\)$", "", aussteller).strip().lower()
+    return namen, aussteller
+
+
+def _zustaendigkeit(host: Optional[S.HostFact]) -> tuple[Any, ...]:
+    if host is None:
+        return (None,)
+    shared = host.shared
+    return (shared.kind if shared else None, (shared.operator or "").lower() if shared else None,
+            host.betriebsform)
+
+
+def _valid_elsewhere(tls: list[S.TlsFact], hosts: list[S.HostFact]) -> None:
     """Gueltiges Zertifikat desselben Namens an einer anderen Adresse (spec/11 T14).
 
     castenow mailstore (.5) lieferte am Scantag das Wildcard-Zertifikat mit Ablauf 24.09.2026;
-    das erneuerte Zertifikat bis 14.03.2027 lief schon auf .4 und .6. Die Empfehlung nennt es."""
+    das erneuerte Zertifikat bis 14.03.2027 lief schon auf .4. Die Empfehlung nennt es.
+
+    S6b-4n (spec/11 N8): nur Zertifikate derselben Linie (Namensset und Aussteller), unter
+    derselben Zustaendigkeit und nur aus einem testssl-Lauf mit vollstaendiger Kette. Die
+    Sectigo-Wildcard des Exchange-Servers ist keine Vorlage fuer das Let's-Encrypt-Zertifikat
+    der Plattform (huendgen), und .6 liefert die Kette unvollstaendig (castenow bitwarden)."""
+    by_ip = {h.ip: h for h in hosts}
     for t in tls:
-        if t.cert is None or not t.cert.not_after or not t.fqdn:
+        t_cert = t.cert
+        if t_cert is None:
             continue
+        t_cert.valid_elsewhere = []
+        t_cert.valid_elsewhere_not_after = None
+        if not t_cert.not_after or not t.fqdn:
+            continue
+        linie = _linie(t_cert)
+        zust = _zustaendigkeit(by_ip.get(t.host_ip))
         orte: list[tuple[str, str]] = []
         for o in tls:
             if o is t or o.host_ip == t.host_ip or o.cert is None or not o.cert.not_after:
                 continue
+            if o.source != "testssl" or o.cert.chain_ok is not True:
+                continue
             if o.cert.expired or (o.cert.days_left is not None and o.cert.days_left < 0):
                 continue
-            if o.cert.not_after[:10] <= t.cert.not_after[:10]:
+            if o.cert.not_after[:10] <= t_cert.not_after[:10]:
+                continue
+            if _linie(o.cert) != linie or _zustaendigkeit(by_ip.get(o.host_ip)) != zust:
                 continue
             if any(SYS.covers(n, t.fqdn) for n in [o.cert.cn, *o.cert.san] if n):
                 orte.append((f"{o.host_ip}:{o.port}", o.cert.not_after))
         if orte:
-            t.cert.valid_elsewhere = sorted({a for a, _ in orte}, key=sort_key)
-            t.cert.valid_elsewhere_not_after = max(na for _, na in orte)
+            t_cert.valid_elsewhere = sorted({a for a, _ in orte}, key=sort_key)
+            t_cert.valid_elsewhere_not_after = max(na for _, na in orte)
 
 
 def _assign_testssl_by_san(ctx: _Ctx, facts: dict[tuple[str, str, int], S.TlsFact]) -> None:
@@ -1873,9 +2041,12 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
             paths = paths_by_host.get(vh, [])[:MAX_PATHS]
             final_url = (line or {}).get("final_url") or (line or {}).get("url") or (rd or {}).get("final_url")
             login = None
+            # S6b-4n (spec/11 N4): eine Anmeldeseite hinter einer Weiterleitung auf einen anderen
+            # Host gehoert dem Ziel (heuel webportal leitet auf ose weiter), nicht diesem Namen.
+            eigene_final = bool(final_url) and (urlsplit(str(final_url)).hostname or "").lower() in ("", vh.lower())
             if any(a.plugin_id == "10111" for a in alerts):
                 login = True
-            elif final_url and _LOGIN_URL_RE.search(str(final_url)):
+            elif final_url and eigene_final and _LOGIN_URL_RE.search(str(final_url)):
                 login = True
             elif any(_LOGIN_URL_RE.search(a.url or "") for a in alerts):
                 login = True
@@ -1930,6 +2101,18 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
                 ev.append(S.Evidence(tool="redirect_probe", ref=h.refs.get("tech_profile.json", ""), excerpt=kv([
                     ("", f"{vh}:"), ("final_url", rd.get("final_url")),
                     ("status", rd.get("status_code"))], 200)))
+            # S6b-4n (spec/11 N12): X-AspNet-Version aus der Antwort, sonst aus der httpx-Kennung
+            # desselben Namens ("Microsoft ASP.NET:4.0.30319", castenow mail und mail2 hinter der 302).
+            aspnet = headers.get("x-aspnet-version") or final_headers.get("x-aspnet-version")
+            aspnet_quelle = ("header_check" if headers.get("x-aspnet-version") and res is not None
+                             else (header_eval.evaluated.tool if aspnet and header_eval and header_eval.evaluated
+                                   else None))
+            if not aspnet and line and sw_ip == ip:
+                for t in line.get("tech") or []:
+                    name, ver = _split_httpx_tech(str(t))
+                    if re.search(r"\basp\.net\b", name, re.I) and ver:
+                        aspnet, aspnet_quelle = ver, "httpx"
+                        break
             observed = ctx.run_time("header_check", ip, vh) or iso_utc((line or {}).get("timestamp")) \
                 or ctx.run_time("httpx", ip) or ctx.finished
             reachable = res.get("reachable") if isinstance(res, dict) and isinstance(res.get("reachable"), bool) else (
@@ -1942,7 +2125,7 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
                 score=(res or {}).get("score"), csp=csp, hsts=hsts, cookies=cookies, server_header=server,
                 powered_by=_powered_by(powered, final_headers.get("x-powered-by")),
                 x_feserver=headers.get("x-feserver") or final_headers.get("x-feserver"),
-                aspnet_version=headers.get("x-aspnet-version") or final_headers.get("x-aspnet-version"),
+                aspnet_version=aspnet, aspnet_source=aspnet_quelle,
                 duplicate_headers=list(ts.duplicate_headers) if ts and (ts.fqdn == vh or not ts.fqdn) else [],
                 technologies=technologies, forms=[], login_form=login, alerts=alerts, paths=paths,
                 spider_url_count=spider_by_host.get(vh), wordpress=wordpress, header_eval=header_eval,
@@ -2024,28 +2207,41 @@ _HSTS_NOT_EVALUATED = frozenset({"client_error", "server_error", "challenge"})
 
 def _hsts_measured(vh: str, res: Any, headers: dict[str, str], header_eval: Optional[S.HeaderMeasurement],
                    rd: Optional[dict[str, Any]], ts: Any) -> Optional[S.HstsInfo]:
-    """HSTS an der ersten echten Antwort des Namens (spec/11 T4).
+    """HSTS an der ersten echten Antwort des Namens (spec/11 T4, N2 nach E24).
 
     1. header_check, wenn die erste Antwort eine Endseite oder Weiterleitung ist.
-    2. Sonst die erste Antwort laut redirect_probe (Kopfzeilen mit ``location`` oder eine
-       Seite ohne Fehlertitel und ohne Abwehrmerkmal): heuel online lieferte header_check eine
-       429-Sicherheitsabfrage, redirect_probe die Weiterleitung auf www mit
-       ``strict-transport-security: max-age=63072000``.
-    3. Sonst der HTTP-Abschnitt von testssl fuer genau diesen Namen.
+    2. header_check an einer Fehlerseite (4xx ausser 429), nur wenn der Header gesetzt ist.
+    3. Sonst bei Fehlerseiten die erste Antwort laut redirect_probe (Kopfzeilen mit
+       ``location`` oder eine Seite ohne Fehlertitel und ohne Abwehrmerkmal); nie hinter einer
+       Sicherheitsabfrage (heuel online: 429, die Probe sah dort nur die Weiterleitung auf www).
+    4. Sonst der HTTP-Abschnitt von testssl fuer genau diesen Namen.
     Ohne solche Antwort ist HSTS nicht pruefbar (None); an einer 4xx-, 429- oder
-    Challenge-Antwort entsteht kein Befund mehr."""
+    Challenge-Antwort entsteht kein Befund."""
     first = header_eval.first if header_eval is not None else None
     basis = header_eval.basis if header_eval is not None else None
     # Im API-Snapshot fehlt ``reachable`` in der header_check-Zeile; eine Antwort mit Headern gilt
     # dann als Messung (README, Schema 1.1.0).
     antwort = isinstance(res, dict) and (res.get("reachable") or (res.get("reachable") is None and bool(headers)))
+    status = first.status_code if first else None
     if antwort and basis not in _HSTS_NOT_EVALUATED:
         info = _hsts_from_header(headers.get("strict-transport-security"), {"reachable": True})
         if info is not None:
             return info.model_copy(update={"tool": "header_check",
                                            "url": (first.url if first else None) or str(res.get("url") or "") or None,
-                                           "status_code": first.status_code if first else None})
-    if isinstance(rd, dict) and basis in _HSTS_NOT_EVALUATED:
+                                           "status_code": status})
+    # S6b-4n (spec/11 N2, E24): HSTS gilt nach RFC 6797 an jeder HTTPS-Antwort des Namens, also
+    # auch an einer Fehlerseite (castenow mailstore 400). Dort zaehlt nur der gesetzte Header (der
+    # Positivbefund nennt den Ort); ein fehlender bleibt nicht pruefbar. Sicherheitsabfragen (429,
+    # Challenge) zaehlen nie.
+    if antwort and basis == "client_error" and status is not None and status != 429:
+        info = _hsts_from_header(headers.get("strict-transport-security"), {"reachable": True})
+        if info is not None and info.present:
+            return info.model_copy(update={"tool": "header_check",
+                                           "url": (first.url if first else None) or str(res.get("url") or "") or None,
+                                           "status_code": status})
+    # Hinter einer Sicherheitsabfrage auch nicht aus der ersten Antwort der Weiterleitungspruefung
+    # (heuel online: Vercel 429, die Probe sah die Weiterleitung auf www mit HSTS; N2).
+    if isinstance(rd, dict) and basis in _HSTS_NOT_EVALUATED and basis != "challenge" and status != 429:
         rh = {str(k).lower(): str(v) for k, v in (rd.get("response_headers") or {}).items()}
         title = str(rd.get("page_title") or "")
         echt = bool(rh) and HH._challenge(rh, title if not rh.get("location") else None) is None and (
@@ -2299,7 +2495,9 @@ def _build_path_search(ctx: _Ctx, ips: list[str], http: list[S.HttpFact]) -> lis
             id=f"paths:{ip_token(ip)}", source="feroxbuster" if (fr is not None or records) else "ffuf_sensitive",
             mode="active", observed_at=ctx.run_time("feroxbuster", ip) or ctx.finished,
             confidence=S.CONFIDENCE_TOOL, evidence=ev, host_ip=ip, target_url=target, verdict=verdict,
-            status_codes=codes, challenge=challenge, abort_reason=reason, tools=tools, requests=freq, hits=hits))
+            status_codes=codes, challenge=challenge, abort_reason=reason, tools=tools, requests=freq, hits=hits,
+            tool_reasons={k: v for k, v in (("feroxbuster", freason), ("ffuf_sensitive", sreason)) if v},
+            statistics=fstats if (fr is not None or records) else None))
     return sorted(out, key=lambda p: sort_key(p.host_ip))
 
 
@@ -2334,6 +2532,7 @@ def _build_dns(ctx: _Ctx, domains: list[Optional[str]]) -> list[S.DnsFact]:
                 zone_txt=b.zone_transfer_txt,
                 ref_dr=b.refs.get("dns_records", ""),
                 ref_ds=b.refs.get("dns_security", ""),
+                ref_zt="phase0/zone_transfer.txt" if b.zone_transfer_txt else "",
             )
         else:
             fact = _dns_fact(
@@ -2344,6 +2543,7 @@ def _build_dns(ctx: _Ctx, domains: list[Optional[str]]) -> list[S.DnsFact]:
                 zone_txt=b.zone_transfer_by_domain.get(domain),
                 ref_dr=b.refs.get(f"dns_records:{domain}", ""),
                 ref_ds=b.refs.get(f"dns_security:{domain}", ""),
+                ref_zt=b.refs.get(f"zone_transfer:{domain}", ""),
             )
         if fact is not None:
             out.append(fact)
@@ -2392,7 +2592,7 @@ def _dkim_probed(dr: dict, ds: dict) -> tuple[Optional[list[str]], Optional[str]
 
 
 def _dns_fact(ctx: _Ctx, domain: str, *, dr: dict, ds: dict, dnsf: dict,
-              zone_txt: Optional[str], ref_dr: str, ref_ds: str) -> Optional[S.DnsFact]:
+              zone_txt: Optional[str], ref_dr: str, ref_ds: str, ref_zt: str = "") -> Optional[S.DnsFact]:
     b = ctx.b
     if not dr and not dnsf and not ds:
         return None
@@ -2408,6 +2608,10 @@ def _dns_fact(ctx: _Ctx, domain: str, *, dr: dict, ds: dict, dnsf: dict,
     dmarc = _dmarc(dr.get("dmarc_policy") if isinstance(dr.get("dmarc_policy"), dict) else None,
                    dr.get("dmarc") if dr.get("dmarc") is not None else dnsf.get("dmarc"),
                    ds.get("dmarc") if isinstance(ds.get("dmarc"), dict) else None)
+    if dmarc is not None and dmarc.present:
+        ziel = _dmarc_delegation(ctx, domain)
+        if ziel:
+            dmarc = dmarc.model_copy(update={"delegated_to": ziel})
     dkim_present = dr.get("dkim") if isinstance(dr.get("dkim"), bool) else _bool_or_none(dnsf.get("dkim"))
     probed, probed_basis = _dkim_probed(dr, ds)
     dkim = S.Dkim(present=dkim_present, selectors=sorted(str(s) for s in (dr.get("dkim_selectors") or [])),
@@ -2447,6 +2651,15 @@ def _dns_fact(ctx: _Ctx, domain: str, *, dr: dict, ds: dict, dnsf: dict,
             zt_allowed = False
     if zt_allowed is not None or ns_tested:
         zt = S.ZoneTransfer(allowed=zt_allowed, ns_tested=sorted(set(ns_tested)))
+    zt_ev: Optional[S.Evidence] = None
+    if ns_tested and ref_zt:
+        # S6b-4n (spec/11 N6): der Positivbefund zum Zonentransfer zitiert den AXFR-Lauf je Domain
+        # (junkerwerk.hu hat eine eigene Datei mit drei Nameservern, "Transfer failed").
+        antworten = sorted({m.group(0).strip() for m in re.finditer(r"Transfer failed|REFUSED|NOTAUTH|\sIN\s+SOA\s",
+                                                                       zone_txt or "")})
+        zt_ev = S.Evidence(tool="zone_transfer", ref=ref_zt, excerpt=kv([
+            ("", f"{domain} AXFR"), ("nameserver", sorted(set(ns_tested))),
+            ("antwort", antworten)], 240))
     dangling = []
     for dc in dnsf.get("dangling_cnames") or []:
         if isinstance(dc, dict) and dc.get("fqdn"):
@@ -2466,6 +2679,8 @@ def _dns_fact(ctx: _Ctx, domain: str, *, dr: dict, ds: dict, dnsf: dict,
             ("dnssec_signiert", (ds.get("dnssec") or {}).get("dnssec_signed")),
             ("caa", (ds.get("caa") or {}).get("has_caa")),
             ("mta_sts", (ds.get("mta_sts") or {}).get("has_policy"))], 200)))
+    if zt_ev is not None:
+        ev.append(zt_ev)
     fact = S.DnsFact(
         id=f"dns:{domain}", source="dns_records", mode="active",
         observed_at=ctx.run_time("dns_records") or ctx.run_time("dns_security") or ctx.started or ctx.finished,
@@ -2523,6 +2738,23 @@ def _spf_ips(ctx: _Ctx, domain: str, mech: S.SpfMechanism, mx_names: list[str]) 
         if prefix in (None, "32", "128") and any(value == ip for ips_ in ctx.fqdn_ips.values() for ip in ips_):
             ips.add(value)
     return sorted(ips, key=sort_key)
+
+
+def _dmarc_delegation(ctx: _Ctx, domain: str) -> Optional[str]:
+    """CNAME-Ziel von ``_dmarc.<domain>`` (spec/11 N7): aus der dnsx-Kette, sonst aus den
+    DNS-Eintraegen der Passivquelle (Shodan-Domaindaten, Typ CNAME)."""
+    name = f"_dmarc.{domain}".lower()
+    kette = ctx.b.dns_cnames.get(name)
+    if kette:
+        return str(kette[0]).lower().rstrip(".") or None
+    sd = ctx.b.passive.get("shodan_domain")
+    records = sd.get("records") if isinstance(sd, dict) else None
+    for rec in records or []:
+        if isinstance(rec, dict) and str(rec.get("subdomain") or "").lower() == "_dmarc" \
+                and str(rec.get("type") or "").upper() == "CNAME" and rec.get("value") \
+                and str(sd.get("domain") or domain).lower() == domain.lower():
+            return str(rec["value"]).lower().rstrip(".") or None
+    return None
 
 
 def _dmarc(policy: Optional[dict], raw: Any, sec: Optional[dict]) -> Optional[S.Dmarc]:

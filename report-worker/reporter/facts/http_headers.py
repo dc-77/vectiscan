@@ -147,6 +147,7 @@ def parse_csp(value: Optional[str]) -> Optional[S.Csp]:
         style_unsafe_inline="'unsafe-inline'" in [t.lower() for t in style],
         nonce_or_hash=nonce_hash, wildcard_directives=wild,
         frame_ancestors=" ".join(fa) if fa is not None else None,
+        script_rule="script-src" in directives or "default-src" in directives,
     )
 
 
@@ -167,8 +168,48 @@ def _status_of_first(vh: str, res: dict, headers: dict[str, str], line: Optional
     return None, None
 
 
+_ENCODING_SUFFIX = re.compile(r"-(?:gzip|br|deflate|zstd)$", re.I)
+_REDIRECTOR_TITLE = re.compile(r"^\s*redirect(?:or|ing)?\b", re.I)
+
+
+def _etag(value: Optional[str]) -> Optional[str]:
+    """ETag ohne Schwach-Kennung, Anfuehrungszeichen und Kompressionssuffix (Apache haengt
+    ``-gzip`` an, wenn es komprimiert ausliefert: heuel ose ``8f-5f6f0769ae580-gzip``)."""
+    if not value:
+        return None
+    v = value.strip()
+    if v[:2].upper() == "W/":
+        v = v[2:]
+    v = _ENCODING_SUFFIX.sub("", v.strip().strip('"'))
+    return v or None
+
+
+def same_response(a: dict[str, str], b: dict[str, str]) -> bool:
+    """Beschreiben zwei Header-Saetze dieselbe Antwort (spec/11 N3)?
+
+    Gleicher ETag (normalisiert), sonst gleiches Last-Modified, sonst gleiche Content-Length bei
+    gleicher Kodierung. redirect_probe speichert bei einer clientseitigen Weiterleitung die
+    Header der ersten Antwort und vom Ziel nur Adresse und Titel; dann ist das keine Endantwort."""
+    if not a or not b:
+        return False
+    ea, eb = _etag(a.get("etag")), _etag(b.get("etag"))
+    if ea and eb:
+        return ea == eb
+    la, lb = a.get("last-modified"), b.get("last-modified")
+    if la and lb:
+        return la.strip() == lb.strip()
+    ca, cb = a.get("content-length"), b.get("content-length")
+    if ca and cb and (a.get("content-encoding") or "") == (b.get("content-encoding") or ""):
+        return ca.strip() == cb.strip()
+    return False
+
+
 def _rd_final(vh: str, rd: Optional[dict], hc_headers: dict[str, str]) -> Optional[dict[str, str]]:
-    """Header der Endseite laut redirect_probe, wenn die Probe sie belegt (sonst None)."""
+    """Header der Endseite laut redirect_probe, wenn die Probe sie belegt (sonst None).
+
+    S6b-4n (spec/11 N3): nur eine echte Endantwort gilt, nicht die erste Antwort unter der
+    Adresse des Ziels (gleicher ETag, gleiches Last-Modified oder gleiche Laenge wie header_check,
+    ``location`` im Satz, Titel "Redirector")."""
     if not isinstance(rd, dict):
         return None
     rh = _lower(rd.get("response_headers"))
@@ -176,10 +217,10 @@ def _rd_final(vh: str, rd: Optional[dict], hc_headers: dict[str, str]) -> Option
         return None
     if rd.get("is_cross_domain") or _host(rd.get("final_url")) != vh.lower():
         return None
-    if _ERROR_TITLE_RE.search(str(rd.get("page_title") or "")):
+    if _ERROR_TITLE_RE.search(str(rd.get("page_title") or "")) or _REDIRECTOR_TITLE.search(str(rd.get("page_title") or "")):
         return None
     stable = lambda h: {k: v for k, v in h.items() if k not in _VOLATILE}  # noqa: E731
-    if hc_headers and stable(rh) == stable(hc_headers):
+    if hc_headers and (stable(rh) == stable(hc_headers) or same_response(rh, hc_headers)):
         return None
     return rh
 
@@ -251,6 +292,7 @@ def measure(vh: str, res: Optional[dict], line: Optional[dict], rd: Optional[dic
                            content_type=hc_headers.get("content-type") or None,
                            challenge=_challenge(hc_headers, title))
     basis = _basis_of(first)
+    client_redirect = False
     if basis == "final":
         # Clientseitige Weiterleitung: header_check sah 200, die Probe endet auf einer
         # anderen Seite desselben Hosts mit anderem Titel (heuel ose "Redirector").
@@ -258,6 +300,7 @@ def measure(vh: str, res: Optional[dict], line: Optional[dict], rd: Optional[dic
                 and _path(rd.get("final_url")) != _path(first.url) \
                 and title and rd.get("page_title") and str(rd.get("page_title")) != str(title):
             basis = "redirect"
+            client_redirect = True
             first = first.model_copy(update={"location": str(rd.get("final_url"))[:300]})
         else:
             return _complete(first, first, hc_headers, "final")
@@ -278,8 +321,9 @@ def measure(vh: str, res: Optional[dict], line: Optional[dict], rd: Optional[dic
         if values and tool:
             ev = S.HttpResponse(tool=tool, url=final_url[:300] if final_url else None,
                                 status_code=None, status_basis="claimed")
-            return _partial_result(ev, first, values)
-    return Measured(measurement=S.HeaderMeasurement(basis=basis, first=first))
+            return _partial_result(ev, first, values, client_redirect=client_redirect)
+    return Measured(measurement=S.HeaderMeasurement(basis=basis, first=first,
+                                                    client_redirect=client_redirect or None))
 
 
 def _complete(evaluated: S.HttpResponse, first: Optional[S.HttpResponse], headers: dict[str, str],
@@ -294,16 +338,18 @@ def _complete(evaluated: S.HttpResponse, first: Optional[S.HttpResponse], header
 
 
 def _partial_result(evaluated: S.HttpResponse, first: S.HttpResponse,
-                    values: dict[str, S.HeaderValue]) -> Measured:
+                    values: dict[str, S.HeaderValue], *, client_redirect: bool = False) -> Measured:
     cv = values.get("content-security-policy")
     csp = None
     if cv is not None:
         csp = parse_csp(cv.value) if cv.present and cv.value else S.Csp(present=bool(cv.present))
-    return _finish(evaluated, first, values, "final", complete=False, csp=csp, headers={})
+    return _finish(evaluated, first, values, "final", complete=False, csp=csp, headers={},
+                   client_redirect=client_redirect)
 
 
 def _finish(evaluated: S.HttpResponse, first: Optional[S.HttpResponse], values: dict[str, S.HeaderValue],
-            basis: S.HeaderBasis, *, complete: bool, csp: Optional[S.Csp], headers: dict[str, str]) -> Measured:
+            basis: S.HeaderBasis, *, complete: bool, csp: Optional[S.Csp], headers: dict[str, str],
+            client_redirect: bool = False) -> Measured:
     framing = None
     xfo = values.get("x-frame-options")
     if xfo is not None and xfo.present:
@@ -329,7 +375,8 @@ def _finish(evaluated: S.HttpResponse, first: Optional[S.HttpResponse], values: 
                and not (n in sec and sec[n].present)
                and not (n == "content-security-policy" and csp is not None and csp.present)]
     m = S.HeaderMeasurement(basis=basis, first=first, evaluated=evaluated, complete=complete,
-                            headers=values, missing=missing, unknown=unknown, framing_protected=framing)
+                            headers=values, missing=missing, unknown=unknown, framing_protected=framing,
+                            final_response=complete, client_redirect=client_redirect or None)
     return Measured(measurement=m, headers=headers, security_headers=sec, csp=csp)
 
 

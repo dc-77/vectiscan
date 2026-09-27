@@ -245,6 +245,7 @@ def derive(facts: S.Facts, *, finished: Optional[str]) -> None:
 # Nutzers (castenow 92.205.163.53: Mailports mit netscope-media.de).
 HOSTER_SERVICE_PORTS = frozenset({20, 21, 22, 25, 80, 110, 143, 443, 465, 587, 993, 995, 8443, 8880})
 _STREAM_PRODUCTS = re.compile(r"icecast|shoutcast", re.I)
+_NAME_IN_TEXT = re.compile(r"\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}\b")
 
 
 def _mark_foreign_services(facts: S.Facts, domains: list[str]) -> None:
@@ -263,9 +264,16 @@ def _mark_foreign_services(facts: S.Facts, domains: list[str]) -> None:
         cert_names = [n for n in ([s.cert.cn, *s.cert.san] if s.cert else []) if n and is_dns_name(n)]
         cert_fremd = bool(cert_names) and all(not under(n, domains)
                                               and registrable(n) not in HOSTER_DOMAINS for n in cert_names)
-        stream = _STREAM_PRODUCTS.search(" ".join(x for x in (s.product, s.kennung, s.fp_server) if x))
+        text = " ".join(x for x in (s.product, s.kennung, s.fp_server) if x)
+        stream = _STREAM_PRODUCTS.search(text)
         if cert_fremd or stream:
             s.foreign = True
+            # S6b-4n (spec/11 N11): die fremde Domain nur mit Fakt (Zertifikat oder Kennung);
+            # ein Stream ohne Domain (castenow 8800, Icecast) ist "Zuordnung nicht belegt".
+            kandidaten = cert_names + [m.group(0) for m in _NAME_IN_TEXT.finditer(text.lower())]
+            fremde = [n for n in kandidaten if is_dns_name(n) and not under(n, domains)
+                      and registrable(n) not in HOSTER_DOMAINS]
+            s.foreign_domain = registrable(fremde[0]) if fremde else None
 
 
 def _customer_mail_ips(facts: S.Facts, domains: list[str]) -> set[str]:
@@ -371,9 +379,14 @@ def _shared(facts: S.Facts, members: list[S.HostFact], domains: list[str],
     tools = {names[n][0] for n in fremd}
     signals = sorted({"fremde_namen_zertifikat" if t != "shodan" else "fremde_namen_shodan" for t in tools}
                      | {"rdns_betreiber"})
+    # S6b-4n (spec/11 N11): Quelle je registrierbarer Domain; die Zaehlung im Bericht nennt sie
+    # ("laut Passivquelle 2 weitere Domains"; castenow .53: tonausstrom.de steht nur im Zertifikat).
+    passiv = sorted({registrable(n) for n in fremd if names[n][0] == "shodan"}, key=sort_key)
+    zertifikat = sorted({registrable(n) for n in fremd if names[n][0] != "shodan"} - set(passiv), key=sort_key)
+    quellen = {k: v for k, v in (("passive", passiv), ("certificate", zertifikat)) if v}
     return S.SharedSystem(kind="hoster", operator=operator, foreign_names=fremd[:40],
                           server_operator=betreiber[0] if betreiber else None,
-                          signals=signals, evidence=evidence[:6])
+                          signals=signals, evidence=evidence[:6], foreign_sources=quellen)
 
 
 def foreign_domains(shared: Optional[S.SharedSystem]) -> list[str]:
@@ -382,6 +395,34 @@ def foreign_domains(shared: Optional[S.SharedSystem]) -> list[str]:
     if shared is None or shared.kind != "hoster":
         return []
     return sorted({registrable(n) for n in shared.foreign_names if n}, key=sort_key)
+
+
+def foreign_domain_counts(shared: Optional[S.SharedSystem]) -> list[tuple[str, int]]:
+    """(Quelle, Zahl) der fremden Domains eines geteilten Servers (spec/11 N11): "Passivquelle"
+    fuer Hostnamen laut Shodan, "Zertifikat" fuer Namen nur aus Zertifikaten."""
+    if shared is None or shared.kind != "hoster":
+        return []
+    quellen = shared.foreign_sources or {}
+    if quellen:
+        return [(q, len(quellen.get(k) or [])) for k, q in (("passive", "Passivquelle"), ("certificate", "Zertifikat"))
+                if quellen.get(k)]
+    n = len(foreign_domains(shared))
+    if not n:
+        return []
+    quelle = ("Passivquelle" if "fremde_namen_shodan" in shared.signals
+              else "Zertifikat" if "fremde_namen_zertifikat" in shared.signals else "")
+    return [(quelle, n)]
+
+
+def foreign_domains_text(shared: Optional[S.SharedSystem]) -> tuple[str, int]:
+    """("laut Passivquelle 2 weitere Domains und laut Zertifikat 1 weitere Domain", Gesamtzahl)."""
+    teile: list[str] = []
+    gesamt = 0
+    for quelle, n in foreign_domain_counts(shared):
+        gesamt += n
+        laut = f"laut {quelle} " if quelle else ""
+        teile.append(f"{laut}{n} weitere {'Domain' if n == 1 else 'Domains'}")
+    return " und ".join(teile), gesamt
 
 
 def _third_party(h: S.HostFact, fqdns: list[S.FqdnFact], domains: list[str], skipped: set[str],

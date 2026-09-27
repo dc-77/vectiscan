@@ -160,6 +160,32 @@ bei Status unter 400). Eine Pfadsuche ist belastbar, wenn feroxbuster Treffer od
 oder mehr 404 als Weiterleitungen, 401, 403 und 429 zusammen; ffuf je Modus nach den
 Statuscodes seiner Treffer.
 
+### Seit Schema 1.3.0 (Nachtrag S6b-4, spec/11 N1 bis N15)
+
+Minor-Bump ohne neue Entitaet, weil sich Bedeutungen aendern: `hosts[].additional_ips` fuehrt
+auch weitere A-Eintraege (N5), `http.hsts` gilt nach E24 auch an einer Fehlerseite (nur als
+gesetzt, nie an 429 oder hinter einer Sicherheitsabfrage, auch nicht aus der ersten Antwort von
+redirect_probe, N2), `header_eval.evaluated` ist redirect_probe nur mit eigener Endantwort (N3),
+`http.login_form` nur fuer Anmeldeseiten desselben Namens und Technik aus webtech und
+CMS-Erkennung einer nur weiterleitenden Adresse gehoert dem Ziel (N4), `tls.cert.valid_elsewhere`
+nur fuer dieselbe Linie, dieselbe Zustaendigkeit und aus testssl mit vollstaendiger Kette (N8).
+
+| Feld | Inhalt | Quelle |
+|---|---|---|
+| `http[].csp.script_rule` | die Richtlinie regelt Skriptquellen (script-src oder default-src) (N1) | header_check, redirect_probe |
+| `http[].header_eval.final_response`, `client_redirect` | bewertete Header aus der Endantwort; erste Antwort ist eine clientseitige Weiterleitung (N3) | `http_headers.measure`, ETag ohne `-gzip`, Last-Modified, Content-Length |
+| `dns[].dmarc.delegated_to` | Ziel eines CNAME auf `_dmarc.<domain>` (bergersysteme hornetdmarc.com) (N7) | dnsx-Ketten, Shodan-Domaindaten |
+| `dns[].evidence` mit Werkzeug `zone_transfer` | AXFR-Lauf je Domain mit Nameservern und Antwort (N6, junkerwerk.hu) | `phase0/zone_transfer[_<domain>].txt` |
+| `software[].child_of` | Elterntheme eines Kindthemes (dortmund-beach betheme-child) (N9) | wpscan `parents`, `template`, Slug `-child` |
+| `hosts[].shared.foreign_sources` | fremde Domains je Quelle (`passive`, `certificate`) fuer "laut Passivquelle 2 weitere Domains" (N11) | `systems._shared` |
+| `services[].foreign_domain` | fremde Domain eines fremden Dienstes; ohne sie "Zuordnung nicht belegt" (castenow 8800) (N11) | Zertifikat, Kennung |
+| `http[].aspnet_version`, `aspnet_source` | X-AspNet-Version auch aus der httpx-Kennung (castenow mail, mail2) (N12) | header_check, redirect_probe, httpx |
+| `software[].detection_sources` mit `shodan` | Shodan `os` bestaetigt ein Windows (huendgen, castenow) (N12) | Shodan-Hosteintrag |
+| `software[].detection_sources` mit `redirect_probe` | Skript-Adressen der Seite (`gtm.js`, `fbevents.js`) und der Sitzungs-Cookie `JSESSIONID` als zweite Quelle der webtech-Erkennung (heuel GTM, Facebook Pixel, Java/Servlet) (N12); die Cookie-Fakten mit Attributen bleiben unberuehrt | redirect_probe `tech_info.scripts`, `tech_info.cookies` |
+| `coverage[].run_status` | Abschluss von zap_active laut Rohausgabe (`complete`) (N13) | `scan_results` |
+| `path_search[].tool_reasons`, `statistics` | Abbruchgrund je Werkzeug, feroxbuster mit Abschlussstatistik (N13) | feroxbuster, ffuf |
+| nmap-Nachweis mit `?` | geratener Dienstname wie in der nmap-Ausgabe ("8443/tcp open https-alt?") (N15) | nmap XML `method="table"` |
+
 ### Bump-Regel (semver)
 
 - Patch: neue optionale Felder mit Default, neue Warnungstexte.

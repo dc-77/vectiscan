@@ -21,6 +21,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -47,6 +48,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -73,6 +75,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -99,6 +102,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -125,6 +129,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -151,6 +156,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -177,6 +183,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": "timeout",
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "failed",
@@ -203,6 +210,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -229,6 +237,7 @@
    "phase": 0,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -255,6 +264,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -281,6 +291,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -307,6 +318,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -333,6 +345,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -359,6 +372,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -385,6 +399,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -411,6 +426,7 @@
    "phase": 1,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -437,6 +453,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -463,6 +480,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -489,6 +507,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -515,6 +534,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -541,6 +561,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
@@ -567,6 +588,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -593,6 +615,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -619,6 +642,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -645,6 +669,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -671,6 +696,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -697,6 +723,7 @@
    "phase": 2,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "host",
    "source": "scan_results",
    "status": "ok",
@@ -723,6 +750,7 @@
    "phase": 3,
    "raw_status": null,
    "reason": null,
+   "run_status": null,
    "scope": "scan",
    "source": "scan_results",
    "status": "ok",
@@ -994,6 +1022,7 @@
    "dmarc": {
     "adkim": "r",
     "aspf": "r",
+    "delegated_to": null,
     "p": "none",
     "pct": 100,
     "present": true,
@@ -1020,6 +1049,11 @@
      "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security.json",
      "tool": "dns_security"
+    },
+    {
+     "excerpt": "trunk-immobilien.de AXFR nameserver=ns.publishsoft.de, ns2.publishsoft.de antwort=Transfer failed",
+     "ref": "phase0/zone_transfer.txt",
+     "tool": "zone_transfer"
     }
    ],
    "id": "dns:trunk-immobilien.de",
@@ -1348,6 +1382,11 @@
      "herzogin-luisen-residenz.de",
      "www.herzogin-luisen-residenz.de"
     ],
+    "foreign_sources": {
+     "passive": [
+      "herzogin-luisen-residenz.de"
+     ]
+    },
     "kind": "hoster",
     "operator": "WIIT AG",
     "server_operator": "publishsoft.de",
@@ -1363,6 +1402,7 @@
  "http": [
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -1371,6 +1411,7 @@
     "frame_ancestors": null,
     "nonce_or_hash": null,
     "present": false,
+    "script_rule": null,
     "script_unsafe_eval": null,
     "script_unsafe_inline": null,
     "style_unsafe_inline": null,
@@ -1397,6 +1438,7 @@
    "fqdn": "dev.trunk-immobilien.de",
    "header_eval": {
     "basis": "final",
+    "client_redirect": null,
     "complete": true,
     "evaluated": {
      "challenge": null,
@@ -1407,6 +1449,7 @@
      "tool": "header_check",
      "url": "https://dev.trunk-immobilien.de"
     },
+    "final_response": true,
     "first": {
      "challenge": null,
      "content_type": "text/html; charset=UTF-8",
@@ -1561,6 +1604,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -1582,8 +1626,10 @@
    "fqdn": "ftp.trunk-immobilien.de",
    "header_eval": {
     "basis": "unreachable",
+    "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final_response": null,
     "first": null,
     "framing_protected": null,
     "headers": {},
@@ -1619,6 +1665,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -1640,8 +1687,10 @@
    "fqdn": "trunk-immobilien.de",
    "header_eval": {
     "basis": "redirect",
+    "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final_response": null,
     "first": {
      "challenge": null,
      "content_type": "text/html",
@@ -1740,6 +1789,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -1761,8 +1811,10 @@
    "fqdn": "webmail.trunk-immobilien.de",
    "header_eval": {
     "basis": "unreachable",
+    "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final_response": null,
     "first": null,
     "framing_protected": null,
     "headers": {},
@@ -1798,6 +1850,7 @@
   },
   {
    "alerts": [],
+   "aspnet_source": null,
    "aspnet_version": null,
    "confidence": 1.0,
    "cookies": [],
@@ -1806,6 +1859,7 @@
     "frame_ancestors": null,
     "nonce_or_hash": null,
     "present": false,
+    "script_rule": null,
     "script_unsafe_eval": null,
     "script_unsafe_inline": null,
     "style_unsafe_inline": null,
@@ -1832,6 +1886,7 @@
    "fqdn": "www.trunk-immobilien.de",
    "header_eval": {
     "basis": "final",
+    "client_redirect": null,
     "complete": true,
     "evaluated": {
      "challenge": null,
@@ -1842,6 +1897,7 @@
      "tool": "header_check",
      "url": "https://www.trunk-immobilien.de"
     },
+    "final_response": true,
     "first": {
      "challenge": null,
      "content_type": "text/html; charset=UTF-8",
@@ -2495,7 +2551,7 @@
    }
   ]
  },
- "schema_version": "1.2.0",
+ "schema_version": "1.3.0",
  "services": [
   {
    "auth_before_starttls": null,
@@ -2525,6 +2581,7 @@
    ],
    "family": "proftpd",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -2567,6 +2624,7 @@
    ],
    "family": "openssh",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -2642,6 +2700,7 @@
    ],
    "family": "postfix",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -2684,6 +2743,7 @@
    ],
    "family": "nginx",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": "Default Parallels Plesk Page",
@@ -2759,6 +2819,7 @@
    ],
    "family": "dovecot",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -2836,6 +2897,7 @@
    ],
    "family": "dovecot",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -2890,6 +2952,7 @@
    ],
    "family": "nginx",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": "Default Parallels Plesk Page",
@@ -2964,6 +3027,7 @@
    ],
    "family": "postfix",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -3033,6 +3097,7 @@
    ],
    "family": "postfix",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -3109,6 +3174,7 @@
    ],
    "family": "dovecot",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -3183,6 +3249,7 @@
    ],
    "family": "dovecot",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -3232,6 +3299,7 @@
    ],
    "family": "mariadb",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -3286,6 +3354,7 @@
    ],
    "family": "plesk",
    "foreign": null,
+   "foreign_domain": null,
    "fp_login": true,
    "fp_server": "sw-cp-server",
    "fp_title": "publishsoft LINUX Kundenserver",
@@ -3316,6 +3385,7 @@
  "software": [
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -3379,6 +3449,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -3427,6 +3498,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -3485,6 +3557,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -3533,6 +3606,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -3576,6 +3650,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -3630,6 +3705,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -3688,6 +3764,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -3736,6 +3813,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -3785,6 +3863,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -3828,6 +3907,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -3871,6 +3951,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -3920,6 +4001,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -3969,6 +4051,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4012,6 +4095,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -4061,6 +4145,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4104,6 +4189,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -4153,6 +4239,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4196,6 +4283,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4239,6 +4327,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4287,6 +4376,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4330,6 +4420,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4373,6 +4464,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4422,6 +4514,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4471,6 +4564,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4514,6 +4608,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -4563,6 +4658,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4606,6 +4702,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4649,6 +4746,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4692,6 +4790,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4740,6 +4839,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4783,6 +4883,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4826,6 +4927,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4875,6 +4977,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4924,6 +5027,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -4967,6 +5071,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -5016,6 +5121,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -5059,6 +5165,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 1.0,
    "conflicts": [],
    "detection_sources": [
@@ -5102,6 +5209,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
@@ -5145,6 +5253,7 @@
   },
   {
    "build": null,
+   "child_of": null,
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
