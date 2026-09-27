@@ -857,7 +857,12 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
     18->21; 57b3ac85 unverändert; 75338c97 unverändert; 860d0d5a 16->16, 7->7, 21->21, 6->5,
     10->12; a6df9d9d, ae8d1d70 und fb13a98f unverändert; f77ccff2 27->27, 8->8, 28->29,
     15->14, 14->16. Gesamtbewertung überall unverändert.
-  - Seitenerwartung: aus ops-update-pages der MR-Pipeline, siehe Commit `test(pdf-v3)`.
+  - Seitenerwartung (ops-update-pages, MR-Pipeline 3225): Scan-Runde 1f8bc977 33->35,
+    2e56abe1 23->24, 3cf01f8d 23->24, c3d5724c 16->17 (Einschränkungszeilen, Rollen, weitere
+    Adressen laut DNS); 1fbc92b9, 31d67a02 und 68d59573 gleich. Übrige 176db198 23->22,
+    4e6b6883 44->47, 57b3ac85 16->17, 860d0d5a 30->31, f77ccff2 44->45, fb13a98f 26->27.
+    Halbleer vor einem Kapitelanfang: 2d2d4f39 Seite 30 wie bisher, neu f77ccff2 Seite 30
+    (Merkposten S7).
 
 ## Abgleich spec/09 nach S6b-2
 
