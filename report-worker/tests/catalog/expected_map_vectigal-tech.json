@@ -1,6 +1,7 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/vectigal-tech.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
  "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Befunde: csp_missing crm.vectigal.tech (R1); security_headers_incomplete crm.vectigal.tech (R1); entfallene Positivaussagen: tls_weak_ciphers vectigal.tech (R6 (CBC-Verfahren angeboten)); urlhaus_compromise vectigal.tech, vectiscan.de (R6 (URLhaus no_data ist kein Negativergebnis)). Q8 nach Entscheidung DC 1 aufgelöst (R1, Messung an der Endseite oder nicht prüfbar): csp_missing crm.vectigal.tech; security_headers_incomplete crm.vectigal.tech.",
+ "hinweis_s6b4": "S6b-4 (spec/11): Soll-Liste nach Katalog 2026-09-27.1 und Fakten 1.2.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (T-Nummer oder Teil 3) und warum. Keine Abweichung gegenüber S6b-3.",
  "strict": false,
  "orders": {
   "main": "75338c97-6707-4d11-92bf-bb3cd2e02cde"

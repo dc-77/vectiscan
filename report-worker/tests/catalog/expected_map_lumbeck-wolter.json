@@ -1,6 +1,7 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/lumbeck-wolter.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
  "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Positivaussagen: urlhaus_compromise lumbeck-wolter.de (R6 (URLhaus no_data ist kein Negativergebnis)).",
+ "hinweis_s6b4": "S6b-4 (spec/11): Soll-Liste nach Katalog 2026-09-27.1 und Fakten 1.2.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (T-Nummer oder Teil 3) und warum. entfallene Positivaussagen: spf_missing lumbeck-wolter.de (Teil 3 DB (P05)).",
  "strict": false,
  "orders": {
   "main": "57b3ac85-a1da-47e9-b783-d28ad9a9fa35"
@@ -96,11 +97,6 @@
   "VS-2026-P10": {
    "checks": [
     "software_eol"
-   ]
-  },
-  "VS-2026-P11": {
-   "checks": [
-    "spf_missing"
    ]
   }
  },

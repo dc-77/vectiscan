@@ -1,5 +1,6 @@
 {
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/junkerwerk.json zu Pruefungen des Katalogs. strict schaltet den Teil 'kein fehlschlagender Check ausserhalb Mapping' scharf, sobald der Katalog vollstaendig ist. Jede Subsumption traegt einen Satz Begruendung.",
+ "hinweis_s6b4": "S6b-4 (spec/11): P04 ohne spf_missing, weil der SPF-Positivbefund nur noch bei -all oder redirect= entsteht (Teil 3 DB P05). Die Liste ist kuratiert (Prototyp-Bericht), nicht abgeleitet.",
  "strict": true,
  "orders": {
   "multi": "0bf16342-ed96-4b0e-a596-05aee3a62cb5",
@@ -165,9 +166,10 @@
   },
   "VS-2026-P04": {
    "checks": [
-    "spf_missing",
     "dkim_missing"
-   ]
+   ],
+   "spec11": "Teil 3 DB (P05)",
+   "warum": "SPF-Positivbefund nur bei -all oder redirect=; junkerwerk setzt ~all, der Softfail steht im Befund spf_softfail. P04 bleibt fuer DKIM."
   },
   "VS-2026-P05": {
    "checks": [

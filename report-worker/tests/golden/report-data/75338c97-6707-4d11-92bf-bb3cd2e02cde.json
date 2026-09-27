@@ -76,7 +76,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Korrelation hat 6 Einzelmeldungen der Werkzeuge erfasst. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 8 Befunde und 1 positive Feststellung. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
+  "filtering": "Die Korrelation hat 6 Einzelmeldungen der Werkzeuge erfasst. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 8 Befunde und 2 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -105,6 +105,7 @@
     "svc": "Golang net/http server, TLS erzwungen"
    }
   ],
+  "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
   "repeat": [
    "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
    "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall."
@@ -207,7 +208,7 @@
    {
     "l": "Blau",
     "st": "blau",
-    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal)."
+    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal). Als blauer Hinweis stehen außerdem Befunde, die nur eine Passivquelle für einen vom Prüfstand aus nicht erreichbaren Host meldet."
    },
    {
     "l": "Grün",
@@ -227,10 +228,12 @@
        "spf_missing",
        "spf_permissive",
        "spf_softfail",
-       "mail_spoofing_unprotected"
+       "mail_spoofing_unprotected",
+       "spf_authorizes_shared_host"
       ],
       "l": "SPF",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "vectigal.tech",
        "vectiscan.de"
@@ -243,6 +246,7 @@
       ],
       "l": "DKIM",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "vectigal.tech",
        "vectiscan.de"
@@ -258,6 +262,7 @@
       ],
       "l": "DMARC",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "vectigal.tech",
        "vectiscan.de"
@@ -270,6 +275,7 @@
       ],
       "l": "MTA-STS",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "vectigal.tech",
        "vectiscan.de"
@@ -282,6 +288,7 @@
       ],
       "l": "TLS-RPT",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "vectigal.tech",
        "vectiscan.de"
@@ -294,6 +301,7 @@
       ],
       "l": "DANE",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "vectigal.tech",
        "vectiscan.de"
@@ -312,6 +320,7 @@
       ],
       "l": "DNSSEC",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "vectigal.tech",
        "vectiscan.de"
@@ -324,6 +333,7 @@
       ],
       "l": "CAA",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "vectigal.tech",
        "vectiscan.de"
@@ -336,6 +346,7 @@
       ],
       "l": "Abruf der gesamten Zone",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "vectigal.tech",
        "vectiscan.de"
@@ -347,12 +358,13 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
-      "ok": null,
+      "ok": true,
+      "pulls": [],
       "subjects": [
        "vectigal.tech",
        "vectiscan.de"
       ],
-      "v": "entfällt"
+      "v": "unauffällig"
      }
     ],
     "name": "DNS-Hygiene",
@@ -369,11 +381,20 @@
        "tls_no_fallback_scsv"
       ],
       "l": "62.217.52.165",
-      "ok": null,
+      "ok": false,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "62.217.52.165"
       ],
-      "v": "teilweise geprüft"
+      "v": "Handlungsbedarf"
      },
      {
       "checks": [
@@ -385,6 +406,15 @@
       ],
       "l": "62.217.52.177",
       "ok": null,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
       "subjects": [
        "62.217.52.177"
       ],
@@ -402,6 +432,7 @@
       ],
       "l": "Zertifikate",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "10finance.vectigal.tech@62.217.52.165",
        "62.217.52.165",
@@ -456,6 +487,7 @@
       ],
       "l": "62.217.52.165",
       "ok": false,
+      "pulls": [],
       "subjects": [
        "62.217.52.165"
       ],
@@ -472,6 +504,7 @@
       ],
       "l": "62.217.52.177",
       "ok": null,
+      "pulls": [],
       "subjects": [
        "62.217.52.177"
       ],
@@ -496,14 +529,14 @@
     "file": "62.217.52.165__board.vectigal.tech.png",
     "host": "board.vectigal.tech",
     "key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__board.vectigal.tech.png",
-    "what": "Paperclip"
+    "what": "Paperclip (board.vectigal.tech/auth)"
    },
    {
     "also": [],
     "file": "62.217.52.165__crm.vectigal.tech.png",
     "host": "crm.vectigal.tech",
     "key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__crm.vectigal.tech.png",
-    "what": "Twenty"
+    "what": "Sign in or Create an account (crm.vectigal.tech/welcome)"
    },
    {
     "also": [],
@@ -539,7 +572,7 @@
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "62.217.52.165",
@@ -579,7 +612,7 @@
      "board.vectigal.tech: Seite „Paperclip“",
      "crm.vectigal.tech: Seite „Twenty“"
     ],
-    "meaning": "Außendarstellung des Unternehmens. Betroffen wären vor allem Seiteninhalte und Formulareingaben.",
+    "meaning": "Außendarstellung des Unternehmens. Betroffen wären vor allem die Seiteninhalte.",
     "role_keys": [
      "website"
     ],
@@ -616,8 +649,10 @@
     {
      "action": "Einen SPF-Eintrag veröffentlichen, der alle legitimen Versandquellen der Domain aufführt, und die Fehlbehandlung zunächst weich einstellen.",
      "check": "spf_missing",
+     "detail": "",
      "effect": "Schützt die Authentizität der eigenen E-Mail",
      "lever": "SPF-Eintrag veröffentlichen",
+     "per_rule": false,
      "stage": "in_kuerze"
     }
    ],
@@ -724,15 +759,19 @@
     {
      "action": "Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer Antragstellername den tatsächlich aufgerufenen Hostnamen enthält.",
      "check": "cert_hostname_mismatch",
+     "detail": "",
      "effect": "Beendet die Namenswarnung beim Aufruf des Dienstes",
      "lever": "Zertifikate auf alle aufgerufenen Namen ausstellen",
+     "per_rule": false,
      "stage": "in_kuerze"
     },
     {
      "action": "Die vollständige Zertifikatskette einschließlich aller Zwischenzertifikate auf dem Dienst hinterlegen, so wie es die ausstellende Stelle vorgibt.",
      "check": "cert_chain_incomplete",
+     "detail": "",
      "effect": "Vermeidet Verbindungsfehler bei Clients, denen ein Zwischenzertifikat fehlt",
      "lever": "Vollständige Zertifikatsketten hinterlegen",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -890,7 +929,7 @@
    "evidence": "DNS-Abfragen · phase0/dns_records_vectiscan.de.json\nvectiscan.de · MX-Einträge: mx00.udag.de, mx01.udag.de · DMARC: v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de",
    "found": "Die DMARC-Richtlinie der Domain vectiscan.de ist auf reine Beobachtung gesetzt: vectiscan.de (p=none). E-Mails, die SPF oder DKIM nicht bestehen, werden dadurch nicht zurückgewiesen oder unter Quarantäne gestellt.",
    "id": "VS-2026-003",
-   "impact": "Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte E-Mails im Namen der Domain kommen weiterhin beim Empfänger an. Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse.",
+   "impact": "Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte E-Mails im Namen der Domain kommen weiterhin beim Empfänger an. Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse. Eingehende E-Mail nimmt ein Mailserver außerhalb der eigenen Domain an: mx00.udag.de, mx01.udag.de. Die Umstellung der Richtlinie betrifft auch dessen Betreiber.",
    "key": "mail_policy/vectiscan.de/kunde",
    "level": "mittel",
    "level_label": "mittel",
@@ -903,8 +942,10 @@
     {
      "action": "Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen.",
      "check": "dmarc_none",
+     "detail": "",
      "effect": "Macht alle legitimen Versandquellen vor der Verschärfung sichtbar",
      "lever": "DMARC-Richtlinie durchsetzen",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -947,6 +988,15 @@
      ],
      "statement": "meaning[1]",
      "text": "Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse."
+    },
+    {
+     "check": "dmarc_none",
+     "field": "meaning",
+     "members": [
+      "vectiscan.de|vectiscan.de"
+     ],
+     "statement": "meaning[4]",
+     "text": "Eingehende E-Mail nimmt ein Mailserver außerhalb der eigenen Domain an: mx00.udag.de, mx01.udag.de. Die Umstellung der Richtlinie betrifft auch dessen Betreiber."
     },
     {
      "check": "dmarc_none",
@@ -1019,8 +1069,10 @@
     {
      "action": "Für die Domain den SPF-Eintrag v=spf1 -all und einen DMARC-Eintrag mit p=reject veröffentlichen.",
      "check": "mail_spoofing_unprotected",
+     "detail": "",
      "effect": "Lässt Empfänger gefälschte E-Mails mit dieser Domain als Absender ablehnen",
      "lever": "Domains ohne Mailbetrieb gegen Absenderfälschung sperren",
+     "per_rule": false,
      "stage": "mittelfristig"
     }
    ],
@@ -1132,15 +1184,19 @@
     {
      "action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
      "check": "mta_sts_missing",
+     "detail": "",
      "effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
      "lever": "MTA-STS für die Domain veröffentlichen",
+     "per_rule": false,
      "stage": "strategisch"
     },
     {
      "action": "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten.",
      "check": "tls_rpt_missing",
+     "detail": "",
      "effect": "Meldet fehlgeschlagene verschlüsselte Zustellungen an Sie zurück",
      "lever": "TLS-RPT für die Domain veröffentlichen",
+     "per_rule": false,
      "stage": "strategisch"
     }
    ],
@@ -1286,15 +1342,19 @@
     {
      "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
      "check": "csp_missing",
+     "detail": "",
      "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
      "lever": "Inhaltsrichtlinie für die Webseiten einführen",
+     "per_rule": false,
      "stage": "mittelfristig"
     },
     {
-     "action": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet.",
+     "action": "Die fehlenden Sicherheits-Header setzen",
      "check": "security_headers_incomplete",
-     "effect": "Begrenzt die Browserfunktionen, die eingebettete Inhalte nutzen dürfen",
+     "detail": "10finance.vectigal.tech (fehlend: Permissions-Policy); board.vectigal.tech (fehlend: Permissions-Policy); crmviewer.vectigal.tech (fehlend: Permissions-Policy); gutachter.vectigal.tech (fehlend: Permissions-Policy)",
+     "effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
      "lever": "Fehlende Sicherheits-Header ergänzen",
+     "per_rule": true,
      "stage": "mittelfristig"
     }
    ],
@@ -1486,15 +1546,19 @@
     {
      "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
      "check": "caa_missing",
+     "detail": "",
      "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
      "lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+     "per_rule": false,
      "stage": "mittelfristig"
     },
     {
      "action": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
      "check": "dnssec_missing",
+     "detail": "",
      "effect": "Schützt DNS-Antworten gegen Verfälschung auf dem Übertragungsweg",
      "lever": "DNS-Zone mit DNSSEC signieren",
+     "per_rule": false,
      "stage": "strategisch"
     }
    ],
@@ -1638,15 +1702,19 @@
     {
      "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
      "check": "caa_missing",
+     "detail": "",
      "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
      "lever": "Ausstellung von Zertifikaten im DNS eingrenzen",
+     "per_rule": false,
      "stage": "mittelfristig"
     },
     {
      "action": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
      "check": "dnssec_missing",
+     "detail": "",
      "effect": "Schützt DNS-Antworten gegen Verfälschung auf dem Übertragungsweg",
      "lever": "DNS-Zone mit DNSSEC signieren",
+     "per_rule": false,
      "stage": "strategisch"
     }
    ],
@@ -1826,23 +1894,23 @@
     "title": "Zertifikate auf alle aufgerufenen Namen ausstellen"
    },
    {
-    "effect": "Vermeidet Verbindungsfehler bei Clients, denen ein Zwischenzertifikat fehlt",
+    "effect": "Macht alle legitimen Versandquellen vor der Verschärfung sichtbar",
     "n": 3,
     "refs": [
-     "VS-2026-002"
+     "VS-2026-003"
     ],
-    "title": "Vollständige Zertifikatsketten hinterlegen"
+    "title": "DMARC-Richtlinie durchsetzen"
    }
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
-  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration."
  },
- "landscape_lead": "8 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "8 Befunde in 3 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 19,
-  "catalog_digest": "004a04598e2072c37701db55752e05f8f2b155bf6ec91f987217067547919206",
-  "catalog_version": "2026-09-26.2",
+  "catalog_digest": "bbd6dccec70f05898fcc9e7fbbb77f57bca528dd070683052c467e758681182a",
+  "catalog_version": "2026-09-27.1",
   "classification": "Vertraulich",
   "consolidated": 8,
   "context_fields": [],
@@ -1854,8 +1922,9 @@
    "vectiscan.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.1.0",
+  "facts_schema_version": "1.2.0",
   "fqdns_total": 31,
+  "generated_on": null,
   "generation": null,
   "hosts_ipv4": 2,
   "hosts_ipv6": 0,
@@ -1868,8 +1937,8 @@
   ],
   "package": "WebCheck",
   "package_label": "WEBCHECK",
-  "policy_version": "2026-09-26.2",
-  "positives": 1,
+  "policy_version": "2026-09-27.1",
+  "positives": 2,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
@@ -1957,6 +2026,20 @@
    "st": "gelb"
   },
   {
+   "action": "Die fehlenden Sicherheits-Header setzen: 10finance.vectigal.tech (fehlend: Permissions-Policy); board.vectigal.tech (fehlend: Permissions-Policy); crmviewer.vectigal.tech (fehlend: Permissions-Policy); gutachter.vectigal.tech (fehlend: Permissions-Policy)",
+   "effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
+   "lever": "Fehlende Sicherheits-Header ergänzen",
+   "operator": "",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-006"
+   ],
+   "sources": [
+    "VS-2026-006:security_headers_incomplete"
+   ],
+   "st": "blau"
+  },
+  {
    "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
    "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
    "lever": "Inhaltsrichtlinie für die Webseiten einführen",
@@ -1967,20 +2050,6 @@
    ],
    "sources": [
     "VS-2026-006:csp_missing"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet.",
-   "effect": "Begrenzt die Browserfunktionen, die eingebettete Inhalte nutzen dürfen",
-   "lever": "Fehlende Sicherheits-Header ergänzen",
-   "operator": "",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-006"
-   ],
-   "sources": [
-    "VS-2026-006:security_headers_incomplete"
    ],
    "st": "blau"
   },
@@ -2076,6 +2145,49 @@
    ],
    "text": "Der Host 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und 27 weitere) bietet seinen Webdienst über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
+  },
+  {
+   "cat": "D",
+   "checks": [
+    "hsts_short"
+   ],
+   "provenance": [
+    {
+     "check": "hsts_short",
+     "field": "positive",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "positive.title",
+     "text": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
+    },
+    {
+     "check": "hsts_short",
+     "field": "positive",
+     "members": [
+      "10finance.vectigal.tech@62.217.52.165",
+      "board.vectigal.tech@62.217.52.165",
+      "crm.vectigal.tech@62.217.52.165",
+      "crmviewer.vectigal.tech@62.217.52.165",
+      "gutachter.vectigal.tech@62.217.52.165"
+     ],
+     "statement": "positive.text",
+     "text": "Die Dienste 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech und gutachter.vectigal.tech setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer."
+    }
+   ],
+   "subjects": [
+    "10finance.vectigal.tech@62.217.52.165",
+    "board.vectigal.tech@62.217.52.165",
+    "crm.vectigal.tech@62.217.52.165",
+    "crmviewer.vectigal.tech@62.217.52.165",
+    "gutachter.vectigal.tech@62.217.52.165"
+   ],
+   "text": "Die Dienste 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech und gutachter.vectigal.tech setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer.",
+   "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   }
  ],
  "scope": {
@@ -2127,10 +2239,7 @@
   "limitations": [
    {
     "checks": [
-     "Portscan und Diensterkennung",
-     "Sicherheits-Header",
-     "Transportverschlüsselung",
-     "Webanalyse"
+     "Web-, Header-, TLS- und Dienst-Prüfungen"
     ],
     "code": "no_response",
     "detail": "Betroffen: 62.217.52.177 (test.vectigal.tech).",
@@ -2156,22 +2265,8 @@
    },
    {
     "checks": [
-     "Bekannte Schwachstellen der erkannten Versionen"
-    ],
-    "code": "no_enrichment",
-    "detail": "Betroffen: 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, feedgenerator.vectigal.tech, gutachter-api.vectigal.tech, gutachter.vectigal.tech, id.vectigal.tech, ki-check-10finance.vectigal.tech, ki-check.vectigal.tech, logs.vectigal.tech, mcp-test.vectigal.tech, monitoring.vectigal.tech, page.vectigal.tech, protokoll-assist.vectigal.tech, rankingcoach.vectigal.tech, saferouter-admin.vectigal.tech, saferouter-api.vectigal.tech, saferouter-app.vectigal.tech, saferouter-auth.vectigal.tech, saferouter-www.vectigal.tech, scan-api.vectigal.tech, scan.vectigal.tech, shopify.vectigal.tech, status.vectigal.tech, traefik.vectigal.tech, vectigal.tech, webcheck.vectigal.tech).",
-    "refs": [
-     "cve_kev_listed|62.217.52.165",
-     "cve_known_version|62.217.52.165"
-    ],
-    "subjects": [
-     "62.217.52.165"
-    ],
-    "what": "Keine Fremdbewertung aus Schwachstellendatenbanken zu den erkannten Versionen"
-   },
-   {
-    "checks": [
-     "crm.vectigal.tech"
+     "Content-Security-Policy",
+     "Sicherheits-Header"
     ],
     "code": "headers_redirect_only",
     "detail": "Betroffen: crm.vectigal.tech (200 auf /welcome).",
@@ -2189,7 +2284,7 @@
      "Zertifikatskette"
     ],
     "code": "cert_chain_unknown",
-    "detail": "Betroffen: 10finance.vectigal.tech.",
+    "detail": "Betroffen: 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech.",
     "refs": [
      "cert_chain_incomplete|10finance.vectigal.tech@62.217.52.165",
      "cert_chain_incomplete|board.vectigal.tech@62.217.52.165",
@@ -2198,7 +2293,11 @@
      "cert_chain_incomplete|gutachter.vectigal.tech@62.217.52.165"
     ],
     "subjects": [
-     "62.217.52.165"
+     "10finance.vectigal.tech@62.217.52.165",
+     "board.vectigal.tech@62.217.52.165",
+     "crm.vectigal.tech@62.217.52.165",
+     "crmviewer.vectigal.tech@62.217.52.165",
+     "gutachter.vectigal.tech@62.217.52.165"
     ],
     "what": "Vertrauenskette des Zertifikats nicht geprüft"
    },
@@ -2216,15 +2315,7 @@
    },
    {
     "checks": [
-     "Abruf der gesamten DNS-Zone",
-     "Content-Security-Policy",
-     "Gültigkeit der Zertifikate",
-     "HSTS",
-     "Namen im Zertifikat",
-     "Sicherheits-Header",
-     "TLS 1.3",
-     "TLS-Protokollversionen",
-     "Zertifikatskette"
+     "Web-, Header-, TLS- und DNS-Prüfungen"
     ],
     "code": "insufficient_facts",
     "detail": "Betroffen: ki-check-10finance.vectigal.tech, vectiscan.de.",
@@ -2447,12 +2538,12 @@
    {
     "n": "2",
     "name": "Tiefenprüfung",
-    "text": "Analyse der Transportverschlüsselung, der Sicherheits-Header und der HTTP-Antworten je virtuellem Host, Verzeichnis-Enumeration und passive Webanalyse."
+    "text": "Analyse der Transportverschlüsselung, der Sicherheits-Header und der HTTP-Antworten je virtuellem Host, passive Webanalyse; die Suche nach nicht verlinkten Pfaden war nicht belastbar (siehe Einschränkungen)."
    },
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 8 Befunde und 1 positive Feststellung."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 8 Befunde und 2 positive Feststellungen."
    }
   ],
   "numbers": [

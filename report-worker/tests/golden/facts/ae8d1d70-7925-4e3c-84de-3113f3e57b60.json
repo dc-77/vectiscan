@@ -3163,6 +3163,8 @@
    "mode": "active",
    "name": "apache01.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3194,6 +3196,8 @@
    "mode": "active",
    "name": "autodiscover.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3223,6 +3227,8 @@
    "mode": "active",
    "name": "connect.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": "https://connect.securess.de/",
+   "probe_title": "SECURESS|connect: SECURESS",
    "real_content": true,
    "screenshot_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__connect.securess.de.png",
    "skipped": null,
@@ -3256,6 +3262,8 @@
    "mode": "active",
    "name": "eset.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": "https://eset.securess.de/",
+   "probe_title": "403 Forbidden",
    "real_content": true,
    "screenshot_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.38__eset.securess.de.png",
    "skipped": null,
@@ -3289,6 +3297,8 @@
    "mode": "active",
    "name": "ftp.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": "https://ftp.securess.de/",
+   "probe_title": "NinjaFirewall 403 Forbidden",
    "real_content": true,
    "screenshot_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__ftp.securess.de.png",
    "skipped": null,
@@ -3322,6 +3332,8 @@
    "mode": "active",
    "name": "imap.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3356,6 +3368,8 @@
    "mode": "active",
    "name": "login-kundenportal.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": "https://login-kundenportal.securess.de/Account/Login?ReturnUrl=%2F",
+   "probe_title": "Login Kundenportal",
    "real_content": true,
    "screenshot_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/51.116.154.224__login-kundenportal.securess.de.png",
    "skipped": null,
@@ -3389,6 +3403,8 @@
    "mode": "active",
    "name": "mailcleaner.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": "https://mailcleaner.securess.de/",
+   "probe_title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)",
    "real_content": true,
    "screenshot_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailcleaner.securess.de.png",
    "skipped": null,
@@ -3422,6 +3438,8 @@
    "mode": "active",
    "name": "mailin.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": "https://mailin.securess.de/",
+   "probe_title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)",
    "real_content": true,
    "screenshot_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailin.securess.de.png",
    "skipped": null,
@@ -3455,6 +3473,8 @@
    "mode": "active",
    "name": "mailout.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": "https://mailout.securess.de/",
+   "probe_title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)",
    "real_content": true,
    "screenshot_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailout.securess.de.png",
    "skipped": null,
@@ -3488,6 +3508,8 @@
    "mode": "active",
    "name": "mailstore.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3517,6 +3539,8 @@
    "mode": "active",
    "name": "mx1.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": "https://mx1.securess.de/",
+   "probe_title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)",
    "real_content": true,
    "screenshot_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mx1.securess.de.png",
    "skipped": null,
@@ -3550,6 +3574,8 @@
    "mode": "active",
    "name": "openotp.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": "https://openotp.securess.de/",
+   "probe_title": "403 Forbidden",
    "real_content": true,
    "screenshot_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.38__openotp.securess.de.png",
    "skipped": null,
@@ -3583,6 +3609,8 @@
    "mode": "active",
    "name": "owa.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3612,6 +3640,8 @@
    "mode": "active",
    "name": "partner.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": "https://partner.securess.de/",
+   "probe_title": "Page Not Found",
    "real_content": true,
    "screenshot_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__partner.securess.de.png",
    "skipped": null,
@@ -3645,6 +3675,8 @@
    "mode": "active",
    "name": "portal.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3674,6 +3706,8 @@
    "mode": "active",
    "name": "rdgw-2016.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3703,6 +3737,8 @@
    "mode": "active",
    "name": "rdgw.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3732,6 +3768,8 @@
    "mode": "active",
    "name": "securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": "https://securess.de/",
+   "probe_title": "NinjaFirewall 403 Forbidden",
    "real_content": true,
    "screenshot_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__securess.de.png",
    "skipped": null,
@@ -3765,6 +3803,8 @@
    "mode": "active",
    "name": "sma.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3794,6 +3834,8 @@
    "mode": "active",
    "name": "ssi.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3823,6 +3865,8 @@
    "mode": "active",
    "name": "starface.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3852,6 +3896,8 @@
    "mode": "active",
    "name": "vermittler.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": "https://vermittler.securess.de/",
+   "probe_title": "Page Not Found",
    "real_content": true,
    "screenshot_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__vermittler.securess.de.png",
    "skipped": null,
@@ -3885,6 +3931,8 @@
    "mode": "active",
    "name": "vpn01.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3914,6 +3962,8 @@
    "mode": "active",
    "name": "webmail.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3943,6 +3993,8 @@
    "mode": "active",
    "name": "www.securess.de",
    "observed_at": "2026-07-19T21:09:18Z",
+   "probe_final_url": "https://www.securess.de/",
+   "probe_title": "NinjaFirewall 403 Forbidden",
    "real_content": true,
    "screenshot_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__www.securess.de.png",
    "skipped": null,
@@ -3980,6 +4032,7 @@
  },
  "hosts": [
   {
+   "additional_ips": [],
    "betriebsform": "rechenzentrum",
    "blocked": {
     "detected": false,
@@ -4045,6 +4098,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "plattform",
    "blocked": {
     "detected": false,
@@ -4114,6 +4168,7 @@
     "foreign_names": [],
     "kind": "platform",
     "operator": "assfinetcloud.de",
+    "server_operator": null,
     "signals": [
      "cname_fremd"
     ]
@@ -4122,6 +4177,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4180,6 +4236,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4244,6 +4301,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4313,6 +4371,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4373,6 +4432,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4438,6 +4498,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4496,6 +4557,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4555,6 +4617,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4613,6 +4676,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4676,6 +4740,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4856,10 +4921,14 @@
     "max_age": 63072000,
     "preload": false,
     "present": true,
-    "raw": "max-age=63072000; includeSubDomains"
+    "raw": "max-age=63072000; includeSubDomains",
+    "status_code": 200,
+    "tool": "header_check",
+    "url": "https://connect.securess.de"
    },
    "id": "http:connect.securess.de",
    "login_form": null,
+   "measured_ip": "212.227.60.78",
    "mode": "active",
    "observed_at": "2026-07-19T21:24:50Z",
    "paths": [],
@@ -5047,10 +5116,14 @@
     "max_age": 31536000,
     "preload": false,
     "present": true,
-    "raw": "max-age=31536000; includeSubDomains"
+    "raw": "max-age=31536000; includeSubDomains",
+    "status_code": 200,
+    "tool": "header_check",
+    "url": "https://eset.securess.de"
    },
    "id": "http:eset.securess.de",
    "login_form": null,
+   "measured_ip": "85.22.47.38",
    "mode": "active",
    "observed_at": "2026-07-19T21:30:11Z",
    "paths": [],
@@ -5141,9 +5214,19 @@
     "x-redirect-by": "WordPress"
    },
    "host_ip": "85.22.47.41",
-   "hsts": null,
+   "hsts": {
+    "include_subdomains": null,
+    "max_age": null,
+    "preload": null,
+    "present": false,
+    "raw": null,
+    "status_code": 301,
+    "tool": "header_check",
+    "url": "https://ftp.securess.de"
+   },
    "id": "http:ftp.securess.de",
    "login_form": null,
+   "measured_ip": "85.22.47.41",
    "mode": "active",
    "observed_at": "2026-07-19T21:23:16Z",
    "paths": [],
@@ -5255,10 +5338,14 @@
     "max_age": 86400,
     "preload": false,
     "present": true,
-    "raw": "max-age=86400"
+    "raw": "max-age=86400",
+    "status_code": 302,
+    "tool": "header_check",
+    "url": "https://login-kundenportal.securess.de"
    },
    "id": "http:login-kundenportal.securess.de",
    "login_form": true,
+   "measured_ip": "51.116.154.224",
    "mode": "active",
    "observed_at": "2026-07-19T21:25:54Z",
    "paths": [],
@@ -5414,9 +5501,19 @@
     "x-powered-by": "PHP/8.4.22"
    },
    "host_ip": "85.22.47.39",
-   "hsts": null,
+   "hsts": {
+    "include_subdomains": null,
+    "max_age": null,
+    "preload": null,
+    "present": false,
+    "raw": null,
+    "status_code": 200,
+    "tool": "header_check",
+    "url": "https://mailcleaner.securess.de"
+   },
    "id": "http:mailcleaner.securess.de",
    "login_form": null,
+   "measured_ip": "85.22.47.39",
    "mode": "active",
    "observed_at": "2026-07-19T21:28:37Z",
    "paths": [],
@@ -5589,9 +5686,19 @@
     "x-powered-by": "PHP/8.4.22"
    },
    "host_ip": "85.22.47.39",
-   "hsts": null,
+   "hsts": {
+    "include_subdomains": null,
+    "max_age": null,
+    "preload": null,
+    "present": false,
+    "raw": null,
+    "status_code": 200,
+    "tool": "header_check",
+    "url": "https://mailin.securess.de"
+   },
    "id": "http:mailin.securess.de",
    "login_form": null,
+   "measured_ip": "85.22.47.39",
    "mode": "active",
    "observed_at": "2026-07-19T21:28:38Z",
    "paths": [],
@@ -5764,9 +5871,19 @@
     "x-powered-by": "PHP/8.4.22"
    },
    "host_ip": "85.22.47.39",
-   "hsts": null,
+   "hsts": {
+    "include_subdomains": null,
+    "max_age": null,
+    "preload": null,
+    "present": false,
+    "raw": null,
+    "status_code": 200,
+    "tool": "header_check",
+    "url": "https://mailout.securess.de"
+   },
    "id": "http:mailout.securess.de",
    "login_form": null,
+   "measured_ip": "85.22.47.39",
    "mode": "active",
    "observed_at": "2026-07-19T21:28:38Z",
    "paths": [],
@@ -5939,9 +6056,19 @@
     "x-powered-by": "PHP/8.4.22"
    },
    "host_ip": "85.22.47.39",
-   "hsts": null,
+   "hsts": {
+    "include_subdomains": null,
+    "max_age": null,
+    "preload": null,
+    "present": false,
+    "raw": null,
+    "status_code": 200,
+    "tool": "header_check",
+    "url": "https://mx1.securess.de"
+   },
    "id": "http:mx1.securess.de",
    "login_form": null,
+   "measured_ip": "85.22.47.39",
    "mode": "active",
    "observed_at": "2026-07-19T21:28:38Z",
    "paths": [],
@@ -6122,10 +6249,14 @@
     "max_age": 31536000,
     "preload": false,
     "present": true,
-    "raw": "max-age=31536000; includeSubDomains"
+    "raw": "max-age=31536000; includeSubDomains",
+    "status_code": 200,
+    "tool": "header_check",
+    "url": "https://openotp.securess.de"
    },
    "id": "http:openotp.securess.de",
    "login_form": null,
+   "measured_ip": "85.22.47.38",
    "mode": "active",
    "observed_at": "2026-07-19T21:30:11Z",
    "paths": [],
@@ -6204,6 +6335,7 @@
    "hsts": null,
    "id": "http:partner.securess.de",
    "login_form": null,
+   "measured_ip": "212.227.60.78",
    "mode": "active",
    "observed_at": "2026-07-19T21:24:51Z",
    "paths": [],
@@ -6264,6 +6396,7 @@
    "hsts": null,
    "id": "http:rdgw.securess.de",
    "login_form": null,
+   "measured_ip": null,
    "mode": "active",
    "observed_at": "2026-07-19T21:27:25Z",
    "paths": [],
@@ -6328,9 +6461,19 @@
     "x-redirect-by": "WordPress"
    },
    "host_ip": "85.22.47.41",
-   "hsts": null,
+   "hsts": {
+    "include_subdomains": null,
+    "max_age": null,
+    "preload": null,
+    "present": false,
+    "raw": null,
+    "status_code": 301,
+    "tool": "header_check",
+    "url": "https://securess.de"
+   },
    "id": "http:securess.de",
    "login_form": null,
+   "measured_ip": "85.22.47.41",
    "mode": "active",
    "observed_at": "2026-07-19T21:23:16Z",
    "paths": [],
@@ -6424,6 +6567,7 @@
    "hsts": null,
    "id": "http:vermittler.securess.de",
    "login_form": null,
+   "measured_ip": "212.227.60.78",
    "mode": "active",
    "observed_at": "2026-07-19T21:24:51Z",
    "paths": [],
@@ -6558,9 +6702,19 @@
     "server": "nginx/1.22.1"
    },
    "host_ip": "85.22.47.41",
-   "hsts": null,
+   "hsts": {
+    "include_subdomains": null,
+    "max_age": null,
+    "preload": null,
+    "present": false,
+    "raw": null,
+    "status_code": 200,
+    "tool": "header_check",
+    "url": "https://www.securess.de"
+   },
    "id": "http:www.securess.de",
    "login_form": null,
+   "measured_ip": "85.22.47.41",
    "mode": "active",
    "observed_at": "2026-07-19T21:23:16Z",
    "paths": [],
@@ -6654,6 +6808,7 @@
    "host_ip": null,
    "hostnames": [],
    "id": "passive:otx:securess.de",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-19T21:31:37Z",
    "port": null,
@@ -6700,6 +6855,7 @@
    "host_ip": null,
    "hostnames": [],
    "id": "passive:securitytrails:securess.de",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-19T21:31:37Z",
    "port": null,
@@ -6729,6 +6885,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:21",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 21,
@@ -6760,6 +6917,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:22",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 22,
@@ -6792,6 +6950,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:25",
+   "kennung": "SMTP (Postfix)",
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 25,
@@ -6807,7 +6966,9 @@
   {
    "banner_excerpt": "HTTP/1.1 301 Moved Permanently Date: Fri, 17 Jul 2026 23:32:14 GMT Server: Apache Location: https://212.227.60.78/ Content-Length: 293 Content-Type: text/htm...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "location": "https://212.227.60.78/"
+   },
    "domain": null,
    "evidence": [
     {
@@ -6821,6 +6982,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:80",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 80,
@@ -6850,6 +7012,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:106",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 106,
@@ -6879,6 +7042,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:110",
+   "kennung": "POP3 (Dovecot)",
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 110,
@@ -6908,6 +7072,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:143",
+   "kennung": "IMAP (Dovecot)",
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 143,
@@ -6937,6 +7102,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 443,
@@ -6968,6 +7134,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:465",
+   "kennung": "SMTP über TLS (Postfix)",
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 465,
@@ -6997,6 +7164,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:993",
+   "kennung": "IMAP über TLS (Dovecot)",
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 993,
@@ -7026,6 +7194,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:995",
+   "kennung": "POP3 über TLS (Dovecot)",
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 995,
@@ -7055,6 +7224,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:8443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 8443,
@@ -7084,6 +7254,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:8880",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 8880,
@@ -7113,6 +7284,7 @@
     "cool-khorana.212-227-60-78.plesk.page"
    ],
    "id": "passive:shodan:212.227.60.78:18018",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-18T15:23:41Z",
    "port": 18018,
@@ -7128,7 +7300,9 @@
   {
    "banner_excerpt": "HTTP/1.1 301 Moved Permanently Content-Length: 0 Date: Sun, 19 Jul 2026 17:31:30 GMT Location: https://login.tegut.com/",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "location": "https://login.tegut.com/"
+   },
    "domain": null,
    "evidence": [
     {
@@ -7142,6 +7316,7 @@
     "login.tegut.com"
    ],
    "id": "passive:shodan:51.116.154.224:80",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-19T19:12:36Z",
    "port": 80,
@@ -7157,7 +7332,9 @@
   {
    "banner_excerpt": "HTTP/1.1 302 Found Content-Length: 0 Date: Sun, 19 Jul 2026 19:12:35 GMT Server: Microsoft-IIS/10.0 Location: https://tegut.com Set-Cookie: ARRAffinity=df88e...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "location": "https://tegut.com"
+   },
    "domain": null,
    "evidence": [
     {
@@ -7171,6 +7348,7 @@
     "login.tegut.com"
    ],
    "id": "passive:shodan:51.116.154.224:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-19T19:12:36Z",
    "port": 443,
@@ -7200,6 +7378,7 @@
     "85-22-47-38.ip.dokom21.de"
    ],
    "id": "passive:shodan:85.22.47.38:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-10T21:17:21Z",
    "port": 443,
@@ -7229,6 +7408,7 @@
     "85-22-47-41.ip.dokom21.de"
    ],
    "id": "passive:shodan:85.22.47.41:80",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-19T18:27:55Z",
    "port": 80,
@@ -7258,6 +7438,7 @@
     "85-22-47-41.ip.dokom21.de"
    ],
    "id": "passive:shodan:85.22.47.41:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-19T18:27:55Z",
    "port": 443,
@@ -7287,6 +7468,7 @@
     "85-22-47-42.ip.dokom21.de"
    ],
    "id": "passive:shodan:85.22.47.42:80",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-18T22:53:29Z",
    "port": 80,
@@ -7316,6 +7498,7 @@
     "85-22-47-42.ip.dokom21.de"
    ],
    "id": "passive:shodan:85.22.47.42:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-18T22:53:29Z",
    "port": 443,
@@ -7345,6 +7528,7 @@
     "85-22-47-42.ip.dokom21.de"
    ],
    "id": "passive:shodan:85.22.47.42:5060",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-07-18T22:53:29Z",
    "port": 5060,
@@ -7375,6 +7559,7 @@
     "securess.de"
    ],
    "id": "passive:shodan:85.22.47.43:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-06-21T02:05:23Z",
    "port": 443,
@@ -7405,6 +7590,7 @@
     "securess.de"
    ],
    "id": "passive:shodan:85.22.47.46:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-06-30T14:52:43Z",
    "port": 443,
@@ -7418,6 +7604,7 @@
    "version": "10.0"
   }
  ],
+ "path_search": [],
  "scan": {
   "confidence": 1.0,
   "counts": {
@@ -7445,6 +7632,8 @@
   "order_id": "ae8d1d70-7925-4e3c-84de-3113f3e57b60",
   "package": "perimeter",
   "policy_version": null,
+  "scanned_port_count": 1000,
+  "scanned_ports": "1,3-4,6-7,9,13,17,19-26,30,32-33,37,42-43,49,53,70,79-85,88-90,99-100,106,109-111,113,119,125,135,139,143-144,146,161,163,179,199,211-212,222,254-256,259,264,280,301,306,311,340,366,389,406-407,416-417,425,427,443-445,458,464-465,481,497,500,512-515,524,541,543-545,548,554-555,563,587,593,616-617,625,631,636,646,648,666-668,683,687,691,700,705,711,714,720,722,726,749,765,777,783,787,800-801,808,843,873,880,888,898,900-903,911-912,981,987,990,992-993,995,999-1002,1007,1009-1011,1021-1100,1102,1104-1108,1110-1114,1117,1119,1121-1124,1126,1130-1132,1137-1138,1141,1145,1147-1149,1151-1152,1154,1163-1166,1169,1174-1175,1183,1185-1187,1192,1198-1199,1201,1213,1216-1218,1233-1234,1236,1244,1247-1248,1259,1271-1272,1277,1287,1296,1300-1301,1309-1311,1322,1328,1334,1352,1417,1433-1434,1443,1455,1461,1494,1500-1501,1503,1521,1524,1533,1556,1580,1583,1594,1600,1641,1658,1666,1687-1688,1700,1717-1721,1723,1755,1761,1782-1783,1801,1805,1812,1839-1840,1862-1864,1875,1900,1914,1935,1947,1971-1972,1974,1984,1998-2010,2013,2020-2022,2030,2033-2035,2038,2040-2043,2045-2049,2065,2068,2099-2100,2103,2105-2107,2111,2119,2121,2126,2135,2144,2160-2161,2170,2179,2190-2191,2196,2200,2222,2251,2260,2288,2301,2323,2366,2381-2383,2393-2394,2399,2401,2492,2500,2522,2525,2557,2601-2602,2604-2605,2607-2608,2638,2701-2702,2710,2717-2718,2725,2800,2809,2811,2869,2875,2909-2910,2920,2967-2968,2998,3000-3001,3003,3005-3007,3011,3013,3017,3030-3031,3052,3071,3077,3128,3168,3211,3221,3260-3261,3268-3269,3283,3300-3301,3306,3322-3325,3333,3351,3367,3369-3372,3389-3390,3404,3476,3493,3517,3527,3546,3551,3580,3659,3689-3690,3703,3737,3766,3784,3800-3801,3809,3814,3826-3828,3851,3869,3871,3878,3880,3889,3905,3914,3918,3920,3945,3971,3986,3995,3998,4000-4006,4045,4111,4125-4126,4129,4224,4242,4279,4321,4343,4443-4446,4449,4550,4567,4662,4848,4899-4900,4998,5000-5004,5009,5030,5033,5050-5051,5054,5060-5061,5080,5087,5100-5102,5120,5190,5200,5214,5221-5222,5225-5226,5269,5280,5298,5357,5405,5414,5431-5432,5440,5500,5510,5544,5550,5555,5560,5566,5631,5633,5666,5678-5679,5718,5730,5800-5802,5810-5811,5815,5822,5825,5850,5859,5862,5877,5900-5904,5906-5907,5910-5911,5915,5922,5925,5950,5952,5959-5963,5987-5989,5998-6007,6009,6025,6059,6100-6101,6106,6112,6123,6129,6156,6346,6389,6502,6510,6543,6547,6565-6567,6580,6646,6666-6669,6689,6692,6699,6779,6788-6789,6792,6839,6881,6901,6969,7000-7002,7004,7007,7019,7025,7070,7100,7103,7106,7200-7201,7402,7435,7443,7496,7512,7625,7627,7676,7741,7777-7778,7800,7911,7920-7921,7937-7938,7999-8002,8007-8011,8021-8022,8031,8042,8045,8080-8090,8093,8099-8100,8180-8181,8192-8194,8200,8222,8254,8290-8292,8300,8333,8383,8400,8402,8443,8500,8600,8649,8651-8652,8654,8701,8800,8873,8888,8899,8994,9000-9003,9009-9011,9040,9050,9071,9080-9081,9090-9091,9099-9103,9110-9111,9200,9207,9220,9290,9415,9418,9485,9500,9502-9503,9535,9575,9593-9595,9618,9666,9876-9878,9898,9900,9917,9929,9943-9944,9968,9998-10004,10009-10010,10012,10024-10025,10082,10180,10215,10243,10566,10616-10617,10621,10626,10628-10629,10778,11110-11111,11967,12000,12174,12265,12345,13456,13722,13782-13783,14000,14238,14441-14442,15000,15002-15004,15660,15742,16000-16001,16012,16016,16018,16080,16113,16992-16993,17877,17988,18040,18101,18988,19101,19283,19315,19350,19780,19801,19842,20000,20005,20031,20221-20222,20828,21571,22939,23502,24444,24800,25734-25735,26214,27000,27352-27353,27355-27356,27715,28201,30000,30718,30951,31038,31337,32768-32785,33354,33899,34571-34573,35500,38292,40193,40911,41511,42510,44176,44442-44443,44501,45100,48080,49152-49161,49163,49165,49167,49175-49176,49400,49999-50003,50006,50300,50389,50500,50636,50800,51103,51493,52673,52822,52848,52869,54045,54328,55055-55056,55555,55600,56737-56738,57294,57797,58080,60020,60443,61532,61900,62078,63331,64623,64680,65000,65129,65389",
   "scanner_egress": "62.217.52.174",
   "source": "meta",
   "started_at": "2026-07-19T21:05:03Z",
@@ -7495,7 +7684,7 @@
    }
   ]
  },
- "schema_version": "1.1.0",
+ "schema_version": "1.2.0",
  "services": [
   {
    "auth_before_starttls": null,
@@ -7524,6 +7713,7 @@
     }
    ],
    "family": "proftpd",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7565,6 +7755,7 @@
     }
    ],
    "family": "openssh",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7639,6 +7830,7 @@
     }
    ],
    "family": "postfix",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7680,6 +7872,7 @@
     }
    ],
    "family": "apache",
+   "foreign": null,
    "fp_login": null,
    "fp_server": "Apache",
    "fp_title": null,
@@ -7721,6 +7914,7 @@
     }
    ],
    "family": null,
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7794,6 +7988,7 @@
     }
    ],
    "family": "dovecot",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7868,6 +8063,7 @@
     }
    ],
    "family": "dovecot",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -7921,6 +8117,7 @@
     }
    ],
    "family": "apache",
+   "foreign": null,
    "fp_login": null,
    "fp_server": "Apache",
    "fp_title": "Page Not Found",
@@ -7994,6 +8191,7 @@
     }
    ],
    "family": "postfix",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8067,6 +8265,7 @@
     }
    ],
    "family": "dovecot",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8139,6 +8338,7 @@
     }
    ],
    "family": "dovecot",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8192,6 +8392,7 @@
     }
    ],
    "family": "plesk",
+   "foreign": null,
    "fp_login": true,
    "fp_server": "sw-cp-server",
    "fp_title": "Plesk Obsidian 18.0.78",
@@ -8233,6 +8434,7 @@
     }
    ],
    "family": null,
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": "Microsoft Azure Web App - Error 404",
@@ -8315,6 +8517,7 @@
     }
    ],
    "family": null,
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": "Microsoft Azure Web App - Error 404",
@@ -8380,12 +8583,13 @@
     }
    ],
    "family": null,
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
    "host_ip": "85.22.47.38",
    "id": "svc:85.22.47.38:25/tcp",
-   "kennung": null,
+   "kennung": "SMTP",
    "login_disabled": true,
    "method": "probed",
    "mode": "active",
@@ -8402,7 +8606,7 @@
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": false,
-   "unidentified": null,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
@@ -8434,6 +8638,7 @@
     }
    ],
    "family": "apache",
+   "foreign": null,
    "fp_login": null,
    "fp_server": "Apache",
    "fp_title": "Securess Versicherungsmakler GmbH Web Applications Portal",
@@ -8502,6 +8707,7 @@
     }
    ],
    "family": "postfix",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8556,6 +8762,7 @@
     }
    ],
    "family": "apache",
+   "foreign": null,
    "fp_login": null,
    "fp_server": "nginx/1.31.2",
    "fp_title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)",
@@ -8628,12 +8835,13 @@
     }
    ],
    "family": null,
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
    "host_ip": "85.22.47.39",
    "id": "svc:85.22.47.39:465/tcp",
-   "kennung": null,
+   "kennung": "SMTP über TLS",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -8650,7 +8858,7 @@
    "state": "open",
    "tls_required": true,
    "tunnel_ssl": true,
-   "unidentified": null,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
@@ -8701,12 +8909,13 @@
     }
    ],
    "family": null,
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
    "host_ip": "85.22.47.39",
    "id": "svc:85.22.47.39:587/tcp",
-   "kennung": null,
+   "kennung": "SMTP",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -8723,7 +8932,7 @@
    "state": "open",
    "tls_required": null,
    "tunnel_ssl": false,
-   "unidentified": null,
+   "unidentified": false,
    "version_norm": null,
    "version_raw": null
   },
@@ -8773,6 +8982,7 @@
     }
    ],
    "family": "dovecot",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8814,6 +9024,7 @@
     }
    ],
    "family": "openssh",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8855,6 +9066,7 @@
     }
    ],
    "family": "nginx",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8909,6 +9121,7 @@
     }
    ],
    "family": "nginx",
+   "foreign": null,
    "fp_login": null,
    "fp_server": "nginx/1.22.1",
    "fp_title": null,
@@ -8963,6 +9176,7 @@
     }
    ],
    "family": "microsoft_httpapi_httpd",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -9005,6 +9219,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9042,9 +9257,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:-:apache:unknown",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:10:44Z",
+   "outdated": null,
    "product": "Apache httpd",
    "release_date": null,
    "source": "nmap",
@@ -9065,6 +9282,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9102,9 +9320,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:-:dovecot:unknown",
    "kind": "mail",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:10:44Z",
+   "outdated": null,
    "product": "Dovecot",
    "release_date": null,
    "source": "nmap",
@@ -9125,6 +9345,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9147,9 +9368,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:-:openssh:9.6p1",
    "kind": "ssh",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:10:44Z",
+   "outdated": null,
    "product": "OpenSSH",
    "release_date": null,
    "source": "nmap",
@@ -9170,6 +9393,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9192,9 +9416,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:-:php:8.3.32",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:11:21Z",
+   "outdated": null,
    "product": "PHP",
    "release_date": null,
    "source": "webtech",
@@ -9215,6 +9441,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9242,9 +9469,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:-:plesk:18.0.78",
    "kind": "control_panel",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:10:44Z",
+   "outdated": null,
    "product": "Plesk",
    "release_date": null,
    "source": "nmap",
@@ -9265,6 +9494,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9292,9 +9522,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:-:postfix:unknown",
    "kind": "mail",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:10:44Z",
+   "outdated": null,
    "product": "Postfix",
    "release_date": null,
    "source": "nmap",
@@ -9315,6 +9547,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9337,9 +9570,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:-:proftpd:unknown",
    "kind": "ftp",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:10:44Z",
+   "outdated": null,
    "product": "ProFTPD",
    "release_date": null,
    "source": "nmap",
@@ -9361,6 +9596,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9383,9 +9619,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:-:typo3:unknown",
    "kind": "cms_core",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:31:37Z",
+   "outdated": null,
    "product": "TYPO3",
    "release_date": null,
    "source": "cms_fingerprint",
@@ -9407,6 +9645,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9429,9 +9668,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:connect.securess.de:apache:unknown",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:24:52Z",
+   "outdated": null,
    "product": "Apache httpd",
    "release_date": null,
    "source": "httpx",
@@ -9452,6 +9693,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9469,9 +9711,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:connect.securess.de:bootstrap:1771057841",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:24:52Z",
+   "outdated": null,
    "product": "Bootstrap",
    "release_date": null,
    "source": "httpx",
@@ -9492,6 +9736,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9509,9 +9754,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:connect.securess.de:datatables:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:24:52Z",
+   "outdated": null,
    "product": "DataTables",
    "release_date": null,
    "source": "httpx",
@@ -9532,6 +9779,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9549,9 +9797,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:connect.securess.de:jquery:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:24:52Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
    "source": "httpx",
@@ -9572,6 +9822,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9589,9 +9840,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:connect.securess.de:php:8.3.32",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:24:52Z",
+   "outdated": null,
    "product": "PHP",
    "release_date": null,
    "source": "httpx",
@@ -9612,6 +9865,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9629,9 +9883,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:connect.securess.de:plesk:unknown",
    "kind": "control_panel",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:24:50Z",
+   "outdated": null,
    "product": "Plesk",
    "release_date": null,
    "source": "header_check",
@@ -9652,6 +9908,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9674,9 +9931,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:partner.securess.de:apache:unknown",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:24:52Z",
+   "outdated": null,
    "product": "Apache httpd",
    "release_date": null,
    "source": "httpx",
@@ -9697,6 +9956,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9714,9 +9974,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:partner.securess.de:php:8.3.32",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:24:52Z",
+   "outdated": null,
    "product": "PHP",
    "release_date": null,
    "source": "httpx",
@@ -9737,6 +9999,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9759,9 +10022,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:vermittler.securess.de:apache:unknown",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:24:52Z",
+   "outdated": null,
    "product": "Apache httpd",
    "release_date": null,
    "source": "httpx",
@@ -9782,6 +10047,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9799,9 +10065,11 @@
    "host_ip": "212.227.60.78",
    "id": "sw:212.227.60.78:vermittler.securess.de:php:8.3.32",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:24:52Z",
+   "outdated": null,
    "product": "PHP",
    "release_date": null,
    "source": "httpx",
@@ -9822,6 +10090,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9839,9 +10108,11 @@
    "host_ip": "51.116.154.224",
    "id": "sw:51.116.154.224:-:aspnet:unknown",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:25:55Z",
+   "outdated": null,
    "product": "ASP.NET",
    "release_date": null,
    "source": "httpx",
@@ -9862,6 +10133,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9879,9 +10151,11 @@
    "host_ip": "51.116.154.224",
    "id": "sw:51.116.154.224:-:blazor:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:25:55Z",
+   "outdated": null,
    "product": "Blazor",
    "release_date": null,
    "source": "httpx",
@@ -9902,6 +10176,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9919,9 +10194,11 @@
    "host_ip": "51.116.154.224",
    "id": "sw:51.116.154.224:-:bootstrap:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:25:55Z",
+   "outdated": null,
    "product": "Bootstrap",
    "release_date": null,
    "source": "httpx",
@@ -9942,6 +10219,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9959,9 +10237,11 @@
    "host_ip": "51.116.154.224",
    "id": "sw:51.116.154.224:-:jquery:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:25:55Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
    "source": "httpx",
@@ -9982,6 +10262,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9999,9 +10280,11 @@
    "host_ip": "51.116.154.224",
    "id": "sw:51.116.154.224:login-kundenportal.securess.de:aspnet:unknown",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:25:55Z",
+   "outdated": null,
    "product": "ASP.NET",
    "release_date": null,
    "source": "httpx",
@@ -10022,6 +10305,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10039,9 +10323,11 @@
    "host_ip": "51.116.154.224",
    "id": "sw:51.116.154.224:login-kundenportal.securess.de:blazor:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:25:55Z",
+   "outdated": null,
    "product": "Blazor",
    "release_date": null,
    "source": "httpx",
@@ -10062,6 +10348,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10079,9 +10366,11 @@
    "host_ip": "51.116.154.224",
    "id": "sw:51.116.154.224:login-kundenportal.securess.de:bootstrap:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:25:55Z",
+   "outdated": null,
    "product": "Bootstrap",
    "release_date": null,
    "source": "httpx",
@@ -10095,13 +10384,15 @@
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
-    "httpx"
+    "httpx",
+    "redirect_probe"
    ],
    "distro": null,
    "edition": null,
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10111,22 +10402,29 @@
      "excerpt": "tech: jQuery",
      "ref": "hosts/51.116.154.224/phase2/httpx.json",
      "tool": "httpx"
+    },
+    {
+     "excerpt": "Skript: https://login-kundenportal.securess.de/Scripts/jquery-2.2.4.js",
+     "ref": "hosts/51.116.154.224/phase1/tech_profile.json",
+     "tool": "redirect_probe"
     }
    ],
    "family": "jquery",
    "fqdn": "login-kundenportal.securess.de",
    "hints": [],
    "host_ip": "51.116.154.224",
-   "id": "sw:51.116.154.224:login-kundenportal.securess.de:jquery:unknown",
+   "id": "sw:51.116.154.224:login-kundenportal.securess.de:jquery:2.2.4",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-19T21:25:55Z",
+   "observed_at": "2026-07-19T21:31:37Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
+   "source": "redirect_probe",
+   "version_norm": "2.2.4",
+   "version_raw": "2.2.4",
    "vulnerabilities": [],
    "vulnerabilities_count": null
   },
@@ -10144,6 +10442,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10181,9 +10480,11 @@
    "host_ip": "85.22.47.38",
    "id": "sw:85.22.47.38:-:apache:unknown",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:13:20Z",
+   "outdated": null,
    "product": "Apache httpd",
    "release_date": null,
    "source": "nmap",
@@ -10205,6 +10506,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10227,9 +10529,11 @@
    "host_ip": "85.22.47.38",
    "id": "sw:85.22.47.38:eset.securess.de:apache:unknown",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:30:12Z",
+   "outdated": null,
    "product": "Apache httpd",
    "release_date": null,
    "source": "httpx",
@@ -10251,6 +10555,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10273,9 +10578,11 @@
    "host_ip": "85.22.47.38",
    "id": "sw:85.22.47.38:openotp.securess.de:apache:unknown",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:30:12Z",
+   "outdated": null,
    "product": "Apache httpd",
    "release_date": null,
    "source": "httpx",
@@ -10296,6 +10603,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10323,9 +10631,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:-:apache:2.4.67",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:13:09Z",
+   "outdated": null,
    "product": "Apache httpd",
    "release_date": null,
    "source": "nmap",
@@ -10346,6 +10656,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10363,9 +10674,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:-:bootstrap:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "Bootstrap",
    "release_date": null,
    "source": "httpx",
@@ -10386,6 +10699,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10408,9 +10722,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:-:dovecot:unknown",
    "kind": "mail",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:13:09Z",
+   "outdated": null,
    "product": "Dovecot",
    "release_date": null,
    "source": "nmap",
@@ -10431,6 +10747,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10448,9 +10765,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:-:jquery:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
    "source": "httpx",
@@ -10471,6 +10790,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10488,9 +10808,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:-:jquery_ui:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "jQuery UI",
    "release_date": null,
    "source": "httpx",
@@ -10511,6 +10833,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10528,9 +10851,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:-:nginx:1.31.2",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:14:15Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "webtech",
@@ -10551,6 +10876,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10568,9 +10894,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:-:php:8.4.22",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:14:15Z",
+   "outdated": null,
    "product": "PHP",
    "release_date": null,
    "source": "webtech",
@@ -10591,6 +10919,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10613,9 +10942,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:-:postfix:unknown",
    "kind": "mail",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:13:09Z",
+   "outdated": null,
    "product": "Postfix",
    "release_date": null,
    "source": "nmap",
@@ -10636,6 +10967,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10653,9 +10985,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailcleaner.securess.de:bootstrap:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "Bootstrap",
    "release_date": null,
    "source": "httpx",
@@ -10676,6 +11010,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10693,9 +11028,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailcleaner.securess.de:jquery:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
    "source": "httpx",
@@ -10716,6 +11053,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10733,9 +11071,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailcleaner.securess.de:jquery_ui:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "jQuery UI",
    "release_date": null,
    "source": "httpx",
@@ -10757,6 +11097,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10779,9 +11120,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailcleaner.securess.de:nginx:1.31.2",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "httpx",
@@ -10803,6 +11146,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10825,9 +11169,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailcleaner.securess.de:php:8.4.22",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "PHP",
    "release_date": null,
    "source": "httpx",
@@ -10848,6 +11194,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10865,9 +11212,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailin.securess.de:bootstrap:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "Bootstrap",
    "release_date": null,
    "source": "httpx",
@@ -10888,6 +11237,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10905,9 +11255,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailin.securess.de:jquery:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
    "source": "httpx",
@@ -10928,6 +11280,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10945,9 +11298,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailin.securess.de:jquery_ui:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "jQuery UI",
    "release_date": null,
    "source": "httpx",
@@ -10969,6 +11324,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10991,9 +11347,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailin.securess.de:nginx:1.31.2",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "httpx",
@@ -11015,6 +11373,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11037,9 +11396,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailin.securess.de:php:8.4.22",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "PHP",
    "release_date": null,
    "source": "httpx",
@@ -11060,6 +11421,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11077,9 +11439,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailout.securess.de:bootstrap:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "Bootstrap",
    "release_date": null,
    "source": "httpx",
@@ -11100,6 +11464,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11117,9 +11482,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailout.securess.de:jquery:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
    "source": "httpx",
@@ -11140,6 +11507,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11157,9 +11525,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailout.securess.de:jquery_ui:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "jQuery UI",
    "release_date": null,
    "source": "httpx",
@@ -11181,6 +11551,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11203,9 +11574,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailout.securess.de:nginx:1.31.2",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "httpx",
@@ -11227,6 +11600,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11249,9 +11623,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mailout.securess.de:php:8.4.22",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "PHP",
    "release_date": null,
    "source": "httpx",
@@ -11272,6 +11648,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11289,9 +11666,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mx1.securess.de:bootstrap:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "Bootstrap",
    "release_date": null,
    "source": "httpx",
@@ -11312,6 +11691,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11329,9 +11709,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mx1.securess.de:jquery:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
    "source": "httpx",
@@ -11352,6 +11734,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11369,9 +11752,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mx1.securess.de:jquery_ui:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "jQuery UI",
    "release_date": null,
    "source": "httpx",
@@ -11393,6 +11778,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11415,9 +11801,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mx1.securess.de:nginx:1.31.2",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "httpx",
@@ -11439,6 +11827,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11461,9 +11850,11 @@
    "host_ip": "85.22.47.39",
    "id": "sw:85.22.47.39:mx1.securess.de:php:8.4.22",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:28:38Z",
+   "outdated": null,
    "product": "PHP",
    "release_date": null,
    "source": "httpx",
@@ -11484,6 +11875,7 @@
    "eol": {
     "date": "2028-06-30",
     "latest_patch": null,
+    "lts_since": "2026-07-11",
     "source": "Debian LTS, https://wiki.debian.org/LTS",
     "status": "supported",
     "upstream_eol_date": null
@@ -11506,9 +11898,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:-:debian:12",
    "kind": "os",
+   "latest_version": null,
    "mode": "active",
    "note": "Release aus dem Paketsuffix eines Dienstes abgeleitet",
    "observed_at": "2026-07-19T21:10:54Z",
+   "outdated": null,
    "product": "Debian GNU/Linux",
    "release_date": null,
    "source": "nmap",
@@ -11529,6 +11923,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11546,9 +11941,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:-:elementor:4.1.3",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "Elementor",
    "release_date": null,
    "source": "httpx",
@@ -11569,6 +11966,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11586,9 +11984,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:-:jquery:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
    "source": "httpx",
@@ -11609,6 +12009,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11626,9 +12027,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:-:jquery_migrate:3.4.1",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "jQuery Migrate",
    "release_date": null,
    "source": "httpx",
@@ -11649,6 +12052,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11666,9 +12070,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:-:mysql:unknown",
    "kind": "database",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "MySQL",
    "release_date": null,
    "source": "httpx",
@@ -11689,6 +12095,7 @@
    "eol": {
     "date": "2023-04-11",
     "latest_patch": "1.22.1",
+    "lts_since": null,
     "source": "endoflife_date",
     "status": "eol",
     "upstream_eol_date": null
@@ -11721,9 +12128,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:-:nginx:1.22.1",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:10:54Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "nmap",
@@ -11744,6 +12153,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11766,9 +12176,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:-:openssh:9.2p1",
    "kind": "ssh",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:10:54Z",
+   "outdated": null,
    "product": "OpenSSH",
    "release_date": null,
    "source": "nmap",
@@ -11789,6 +12201,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11806,9 +12219,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:-:php:unknown",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "PHP",
    "release_date": null,
    "source": "httpx",
@@ -11829,6 +12244,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11846,9 +12262,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:-:swiper:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "Swiper",
    "release_date": null,
    "source": "httpx",
@@ -11869,6 +12287,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11891,9 +12310,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:-:wordpress:7.0.2",
    "kind": "cms_core",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:31:37Z",
+   "outdated": null,
    "product": "WordPress",
    "release_date": null,
    "source": "cms_fingerprint",
@@ -11914,6 +12335,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11931,9 +12353,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:-:wp_rocket:unknown",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "WP Rocket",
    "release_date": null,
    "source": "httpx",
@@ -11954,6 +12378,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -11971,9 +12396,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:-:yoast_seo:28.0",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "Yoast SEO",
    "release_date": null,
    "source": "httpx",
@@ -11994,6 +12421,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12011,9 +12439,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:ftp.securess.de:elementor:4.1.3",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "Elementor",
    "release_date": null,
    "source": "httpx",
@@ -12034,6 +12464,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12051,9 +12482,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:ftp.securess.de:jquery:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
    "source": "httpx",
@@ -12074,6 +12507,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12091,9 +12525,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:ftp.securess.de:jquery_migrate:3.4.1",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "jQuery Migrate",
    "release_date": null,
    "source": "httpx",
@@ -12114,6 +12550,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12131,9 +12568,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:ftp.securess.de:mysql:unknown",
    "kind": "database",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "MySQL",
    "release_date": null,
    "source": "httpx",
@@ -12155,6 +12594,7 @@
    "eol": {
     "date": "2023-04-11",
     "latest_patch": "1.22.1",
+    "lts_since": null,
     "source": "endoflife_date",
     "status": "eol",
     "upstream_eol_date": null
@@ -12177,9 +12617,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:ftp.securess.de:nginx:1.22.1",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "httpx",
@@ -12200,6 +12642,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12217,9 +12660,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:ftp.securess.de:php:unknown",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "PHP",
    "release_date": null,
    "source": "httpx",
@@ -12240,6 +12685,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12257,9 +12703,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:ftp.securess.de:swiper:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "Swiper",
    "release_date": null,
    "source": "httpx",
@@ -12280,6 +12728,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12297,9 +12746,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:ftp.securess.de:wordpress:7.0.2",
    "kind": "cms_core",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "WordPress",
    "release_date": null,
    "source": "httpx",
@@ -12320,6 +12771,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12337,9 +12789,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:ftp.securess.de:wp_rocket:unknown",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "WP Rocket",
    "release_date": null,
    "source": "httpx",
@@ -12360,6 +12814,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12377,9 +12832,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:ftp.securess.de:yoast_seo:28.0",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "Yoast SEO",
    "release_date": null,
    "source": "httpx",
@@ -12400,6 +12857,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12417,9 +12875,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:securess.de:elementor:4.1.3",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "Elementor",
    "release_date": null,
    "source": "httpx",
@@ -12440,6 +12900,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12457,9 +12918,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:securess.de:jquery:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
    "source": "httpx",
@@ -12480,6 +12943,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12497,9 +12961,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:securess.de:jquery_migrate:3.4.1",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "jQuery Migrate",
    "release_date": null,
    "source": "httpx",
@@ -12520,6 +12986,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12537,9 +13004,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:securess.de:mysql:unknown",
    "kind": "database",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "MySQL",
    "release_date": null,
    "source": "httpx",
@@ -12561,6 +13030,7 @@
    "eol": {
     "date": "2023-04-11",
     "latest_patch": "1.22.1",
+    "lts_since": null,
     "source": "endoflife_date",
     "status": "eol",
     "upstream_eol_date": null
@@ -12583,9 +13053,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:securess.de:nginx:1.22.1",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "httpx",
@@ -12606,6 +13078,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12623,9 +13096,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:securess.de:php:unknown",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "PHP",
    "release_date": null,
    "source": "httpx",
@@ -12646,6 +13121,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12663,9 +13139,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:securess.de:swiper:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "Swiper",
    "release_date": null,
    "source": "httpx",
@@ -12686,6 +13164,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12703,9 +13182,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:securess.de:wordpress:7.0.2",
    "kind": "cms_core",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "WordPress",
    "release_date": null,
    "source": "httpx",
@@ -12726,6 +13207,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12743,9 +13225,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:securess.de:wp_rocket:unknown",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "WP Rocket",
    "release_date": null,
    "source": "httpx",
@@ -12766,6 +13250,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12783,9 +13268,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:securess.de:yoast_seo:28.0",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "Yoast SEO",
    "release_date": null,
    "source": "httpx",
@@ -12806,6 +13293,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12823,9 +13311,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:www.securess.de:elementor:4.1.3",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "Elementor",
    "release_date": null,
    "source": "httpx",
@@ -12846,6 +13336,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12863,9 +13354,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:www.securess.de:jquery:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
    "source": "httpx",
@@ -12886,6 +13379,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12903,9 +13397,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:www.securess.de:jquery_migrate:3.4.1",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "jQuery Migrate",
    "release_date": null,
    "source": "httpx",
@@ -12926,6 +13422,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -12943,9 +13440,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:www.securess.de:mysql:unknown",
    "kind": "database",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "MySQL",
    "release_date": null,
    "source": "httpx",
@@ -12967,6 +13466,7 @@
    "eol": {
     "date": "2023-04-11",
     "latest_patch": "1.22.1",
+    "lts_since": null,
     "source": "endoflife_date",
     "status": "eol",
     "upstream_eol_date": null
@@ -12989,9 +13489,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:www.securess.de:nginx:1.22.1",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "httpx",
@@ -13012,6 +13514,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -13029,9 +13532,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:www.securess.de:php:unknown",
    "kind": "language",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "PHP",
    "release_date": null,
    "source": "httpx",
@@ -13052,6 +13557,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -13069,9 +13575,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:www.securess.de:swiper:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "Swiper",
    "release_date": null,
    "source": "httpx",
@@ -13092,6 +13600,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -13109,9 +13618,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:www.securess.de:wordpress:7.0.2",
    "kind": "cms_core",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "WordPress",
    "release_date": null,
    "source": "httpx",
@@ -13132,6 +13643,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -13149,9 +13661,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:www.securess.de:wp_rocket:unknown",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "WP Rocket",
    "release_date": null,
    "source": "httpx",
@@ -13172,6 +13686,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -13189,9 +13704,11 @@
    "host_ip": "85.22.47.41",
    "id": "sw:85.22.47.41:www.securess.de:yoast_seo:28.0",
    "kind": "plugin",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:23:18Z",
+   "outdated": null,
    "product": "Yoast SEO",
    "release_date": null,
    "source": "httpx",
@@ -13212,6 +13729,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -13239,9 +13757,11 @@
    "host_ip": "85.22.47.46",
    "id": "sw:85.22.47.46:-:microsoft_httpapi_httpd:2.0",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-19T21:12:26Z",
+   "outdated": null,
    "product": "Microsoft HTTPAPI httpd",
    "release_date": null,
    "source": "nmap",
@@ -13430,6 +13950,14 @@
      "connect.securess.de"
     ],
     "self_signed": null,
+    "valid_elsewhere": [
+     "51.116.154.224:443",
+     "85.22.47.38:443",
+     "85.22.47.39:443",
+     "85.22.47.41:443",
+     "85.22.47.46:443"
+    ],
+    "valid_elsewhere_not_after": "2026-09-12T23:59:59Z",
     "wildcard": false
    },
    "cert_assigned_from": null,
@@ -13467,10 +13995,14 @@
     "max_age": 63072000,
     "preload": null,
     "present": true,
-    "raw": "730 days=63072000 s, includeSubDomains"
+    "raw": "730 days=63072000 s, includeSubDomains",
+    "status_code": null,
+    "tool": null,
+    "url": null
    },
    "id": "tls:connect.securess.de:443@212.227.60.78",
    "json_filtered": false,
+   "measured_ip": "212.227.60.78",
    "mode": "active",
    "observed_at": "2026-07-19T21:24:52Z",
    "port": 443,
@@ -13508,6 +14040,8 @@
      "portal.premium-finance.net"
     ],
     "self_signed": null,
+    "valid_elsewhere": [],
+    "valid_elsewhere_not_after": null,
     "wildcard": false
    },
    "cert_assigned_from": null,
@@ -13533,6 +14067,7 @@
    "hsts": null,
    "id": "tls:vermittler.securess.de:443@212.227.60.78",
    "json_filtered": false,
+   "measured_ip": "212.227.60.78",
    "mode": "active",
    "observed_at": "2026-07-19T21:24:53Z",
    "port": 443,
@@ -13571,6 +14106,8 @@
      "securess.de"
     ],
     "self_signed": null,
+    "valid_elsewhere": [],
+    "valid_elsewhere_not_after": null,
     "wildcard": true
    },
    "cert_assigned_from": null,
@@ -13627,10 +14164,14 @@
     "max_age": 86400,
     "preload": null,
     "present": true,
-    "raw": "max-age too short. 1 days (=86400 seconds) < 15552000 seconds"
+    "raw": "max-age too short. 1 days (=86400 seconds) < 15552000 seconds",
+    "status_code": null,
+    "tool": null,
+    "url": null
    },
    "id": "tls:login-kundenportal.securess.de:443@51.116.154.224",
    "json_filtered": false,
+   "measured_ip": "51.116.154.224",
    "mode": "active",
    "observed_at": "2026-07-19T21:25:55Z",
    "port": 443,
@@ -13669,6 +14210,8 @@
      "securess.de"
     ],
     "self_signed": null,
+    "valid_elsewhere": [],
+    "valid_elsewhere_not_after": null,
     "wildcard": true
    },
    "cert_assigned_from": null,
@@ -13765,10 +14308,14 @@
     "max_age": 31536000,
     "preload": null,
     "present": true,
-    "raw": "365 days=31536000 s, includeSubDomains"
+    "raw": "365 days=31536000 s, includeSubDomains",
+    "status_code": null,
+    "tool": null,
+    "url": null
    },
    "id": "tls:eset.securess.de:443@85.22.47.38",
    "json_filtered": false,
+   "measured_ip": "85.22.47.38",
    "mode": "active",
    "observed_at": "2026-07-19T21:30:13Z",
    "port": 443,
@@ -13815,6 +14362,8 @@
      "securess.de"
     ],
     "self_signed": null,
+    "valid_elsewhere": [],
+    "valid_elsewhere_not_after": null,
     "wildcard": true
    },
    "cert_assigned_from": null,
@@ -13843,6 +14392,7 @@
    "hsts": null,
    "id": "tls:openotp.securess.de:443@85.22.47.38",
    "json_filtered": false,
+   "measured_ip": "85.22.47.38",
    "mode": "active",
    "observed_at": "2026-07-19T21:30:13Z",
    "port": 443,
@@ -13889,6 +14439,8 @@
      "securess.de"
     ],
     "self_signed": null,
+    "valid_elsewhere": [],
+    "valid_elsewhere_not_after": null,
     "wildcard": true
    },
    "cert_assigned_from": null,
@@ -13942,10 +14494,14 @@
     "max_age": null,
     "preload": null,
     "present": false,
-    "raw": "not offered"
+    "raw": "not offered",
+    "status_code": null,
+    "tool": null,
+    "url": null
    },
    "id": "tls:mailcleaner.securess.de:443@85.22.47.39",
    "json_filtered": false,
+   "measured_ip": "85.22.47.39",
    "mode": "active",
    "observed_at": "2026-07-19T21:28:39Z",
    "port": 443,
@@ -13988,6 +14544,8 @@
      "securess.de"
     ],
     "self_signed": null,
+    "valid_elsewhere": [],
+    "valid_elsewhere_not_after": null,
     "wildcard": true
    },
    "cert_assigned_from": null,
@@ -14015,6 +14573,7 @@
    "hsts": null,
    "id": "tls:mx1.securess.de:443@85.22.47.39",
    "json_filtered": false,
+   "measured_ip": "85.22.47.39",
    "mode": "active",
    "observed_at": "2026-07-19T21:28:40Z",
    "port": 443,
@@ -14057,6 +14616,8 @@
      "securess.de"
     ],
     "self_signed": null,
+    "valid_elsewhere": [],
+    "valid_elsewhere_not_after": null,
     "wildcard": true
    },
    "cert_assigned_from": null,
@@ -14108,10 +14669,14 @@
     "max_age": null,
     "preload": null,
     "present": false,
-    "raw": "not offered"
+    "raw": "not offered",
+    "status_code": null,
+    "tool": null,
+    "url": null
    },
    "id": "tls:securess.de:443@85.22.47.41",
    "json_filtered": false,
+   "measured_ip": "85.22.47.41",
    "mode": "active",
    "observed_at": "2026-07-19T21:23:17Z",
    "port": 443,
@@ -14150,6 +14715,8 @@
      "securess.de"
     ],
     "self_signed": null,
+    "valid_elsewhere": [],
+    "valid_elsewhere_not_after": null,
     "wildcard": true
    },
    "cert_assigned_from": null,
@@ -14222,6 +14789,7 @@
    "hsts": null,
    "id": "tls:rdgw.securess.de:443@85.22.47.46",
    "json_filtered": false,
+   "measured_ip": "85.22.47.46",
    "mode": "active",
    "observed_at": "2026-07-19T21:27:27Z",
    "port": 443,

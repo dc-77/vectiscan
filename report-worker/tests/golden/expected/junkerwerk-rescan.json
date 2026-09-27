@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-26.2 auf tests/golden/facts/860d0d5a-1086-4958-a9ac-4650423095f2.json",
+ "source": "reporter.catalog 2026-09-27.1 auf tests/golden/facts/860d0d5a-1086-4958-a9ac-4650423095f2.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -20,7 +20,7 @@
    "level": "erhoeht",
    "group": "217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de)",
    "affected": [
-    "217.243.248.28:4433 (SonicWall, laut Passivquelle)"
+    "217.243.248.28:4433 (SonicWall, laut Passivquelle, gesehen am 19.09.2026)"
    ],
    "title": "Verwaltungsoberfläche laut Passivquelle erreichbar"
   },
@@ -431,7 +431,7 @@
    "level": "mittel",
    "group": "junkerwerk.de",
    "affected": [
-    "junkerwerk.de (188.40.3.130 beim Hoster Hetzner Online AG)"
+    "junkerwerk.de (188.40.3.130 beim Hoster Hetzner Online GmbH)"
    ],
    "title": "SPF gibt geteilten Server frei"
   },
@@ -522,7 +522,7 @@
    "level": "niedrig",
    "group": "cloud.junkerwerk.de (+team.junkerwerk.de)",
    "affected": [
-    "cloud.junkerwerk.de:443 (BEAST)"
+    "cloud.junkerwerk.de:443 (BEAST, vermutlich abgeschwächt)"
    ],
    "title": "TLS-Verschlüsselung anfällig für bekannte Angriffe"
   },
@@ -833,22 +833,6 @@
   },
   {
    "id": "VS-2026-P34",
-   "check": "spf_missing",
-   "family": "spf_missing",
-   "cat": "C",
-   "group": "junkerwerk.de",
-   "title": "SPF-Eintrag vorhanden"
-  },
-  {
-   "id": "VS-2026-P35",
-   "check": "spf_missing",
-   "family": "spf_missing",
-   "cat": "C",
-   "group": "junkerwerk.hu",
-   "title": "SPF-Eintrag vorhanden"
-  },
-  {
-   "id": "VS-2026-P36",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
@@ -856,7 +840,7 @@
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
-   "id": "VS-2026-P37",
+   "id": "VS-2026-P35",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
@@ -864,7 +848,7 @@
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
-   "id": "VS-2026-P38",
+   "id": "VS-2026-P36",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -872,7 +856,7 @@
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P39",
+   "id": "VS-2026-P37",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -880,7 +864,7 @@
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P40",
+   "id": "VS-2026-P38",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",

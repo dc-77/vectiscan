@@ -3903,6 +3903,8 @@
    "mode": "active",
    "name": "autodiscover.bergersysteme.com",
    "observed_at": "2026-09-23T19:55:43Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -3938,6 +3940,8 @@
    "mode": "active",
    "name": "bergersysteme.com",
    "observed_at": "2026-09-23T19:55:43Z",
+   "probe_final_url": "https://www.bergersysteme.com/",
+   "probe_title": "Berger Systeme",
    "real_content": true,
    "screenshot_key": "68d59573-7a93-4efa-89cc-e7b10cc4d140/92.205.224.174__bergersysteme.com.png",
    "skipped": null,
@@ -3971,6 +3975,8 @@
    "mode": "active",
    "name": "bitwarden.bergersysteme.com",
    "observed_at": "2026-09-23T19:55:43Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -4000,6 +4006,8 @@
    "mode": "active",
    "name": "bstasks.bergersysteme.com",
    "observed_at": "2026-09-23T19:55:43Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -4029,6 +4037,8 @@
    "mode": "active",
    "name": "cdn.bergersysteme.com",
    "observed_at": "2026-09-23T19:55:43Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -4058,6 +4068,8 @@
    "mode": "active",
    "name": "ftp.bergersysteme.com",
    "observed_at": "2026-09-23T19:55:43Z",
+   "probe_final_url": "https://ftp.bergersysteme.com/",
+   "probe_title": "403 Forbidden",
    "real_content": false,
    "screenshot_key": "68d59573-7a93-4efa-89cc-e7b10cc4d140/92.205.224.174__ftp.bergersysteme.com.png",
    "skipped": null,
@@ -4091,6 +4103,8 @@
    "mode": "active",
    "name": "mail.bergersysteme.com",
    "observed_at": "2026-09-23T19:55:43Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -4120,6 +4134,8 @@
    "mode": "active",
    "name": "mail2.bergersysteme.com",
    "observed_at": "2026-09-23T19:55:43Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -4149,6 +4165,8 @@
    "mode": "active",
    "name": "owa.bergersysteme.com",
    "observed_at": "2026-09-23T19:55:43Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -4178,6 +4196,8 @@
    "mode": "active",
    "name": "ticket.bergersysteme.com",
    "observed_at": "2026-09-23T19:55:43Z",
+   "probe_final_url": null,
+   "probe_title": null,
    "real_content": null,
    "screenshot_key": null,
    "skipped": null,
@@ -4209,6 +4229,8 @@
    "mode": "active",
    "name": "www.bergersysteme.com",
    "observed_at": "2026-09-23T19:55:43Z",
+   "probe_final_url": "https://www.bergersysteme.com/",
+   "probe_title": "Berger Systeme",
    "real_content": true,
    "screenshot_key": "68d59573-7a93-4efa-89cc-e7b10cc4d140/198.202.211.1__www.bergersysteme.com.png",
    "skipped": null,
@@ -4246,6 +4268,16 @@
  },
  "hosts": [
   {
+   "additional_ips": [
+    {
+     "family": 6,
+     "ip": "2620:cb:2000::1",
+     "names": [
+      "www.bergersysteme.com"
+     ],
+     "source": "dnsx"
+    }
+   ],
    "betriebsform": "plattform",
    "blocked": {
     "detected": false,
@@ -4315,6 +4347,7 @@
     "foreign_names": [],
     "kind": "platform",
     "operator": "webflow.com",
+    "server_operator": null,
     "signals": [
      "cname_fremd"
     ]
@@ -4323,6 +4356,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "plattform",
    "blocked": {
     "detected": false,
@@ -4387,6 +4421,7 @@
     "foreign_names": [],
     "kind": "platform",
     "operator": "outlook.com",
+    "server_operator": null,
     "signals": [
      "cname_fremd"
     ]
@@ -4410,6 +4445,7 @@
    }
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4482,6 +4518,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4554,6 +4591,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4624,6 +4662,7 @@
    "third_party": null
   },
   {
+   "additional_ips": [],
    "betriebsform": "anschluss",
    "blocked": {
     "detected": false,
@@ -4692,6 +4731,18 @@
    "third_party": null
   },
   {
+   "additional_ips": [
+    {
+     "family": 6,
+     "ip": "2a00:1169:118:23d0::",
+     "names": [
+      "bergersysteme.com",
+      "cdn.bergersysteme.com",
+      "ftp.bergersysteme.com"
+     ],
+     "source": "dnsx"
+    }
+   ],
    "betriebsform": "rechenzentrum",
    "blocked": {
     "detected": false,
@@ -4776,6 +4827,7 @@
     ],
     "kind": "hoster",
     "operator": "Host Europe GmbH",
+    "server_operator": null,
     "signals": [
      "fremde_namen_shodan",
      "rdns_betreiber"
@@ -4838,10 +4890,14 @@
     "max_age": null,
     "preload": null,
     "present": false,
-    "raw": null
+    "raw": null,
+    "status_code": 301,
+    "tool": "header_check",
+    "url": "https://bergersysteme.com"
    },
    "id": "http:bergersysteme.com",
    "login_form": null,
+   "measured_ip": "92.205.224.174",
    "mode": "active",
    "observed_at": "2026-09-23T20:07:54Z",
    "paths": [
@@ -5911,6 +5967,7 @@
    "hsts": null,
    "id": "http:bitwarden.bergersysteme.com",
    "login_form": null,
+   "measured_ip": null,
    "mode": "active",
    "observed_at": "2026-09-23T20:19:25Z",
    "paths": [],
@@ -5958,6 +6015,7 @@
    "hsts": null,
    "id": "http:bstasks.bergersysteme.com",
    "login_form": null,
+   "measured_ip": null,
    "mode": "active",
    "observed_at": "2026-09-23T20:17:52Z",
    "paths": [],
@@ -6023,15 +6081,10 @@
     "server": "nginx"
    },
    "host_ip": "92.205.224.174",
-   "hsts": {
-    "include_subdomains": null,
-    "max_age": null,
-    "preload": null,
-    "present": false,
-    "raw": null
-   },
+   "hsts": null,
    "id": "http:ftp.bergersysteme.com",
    "login_form": null,
+   "measured_ip": "92.205.224.174",
    "mode": "active",
    "observed_at": "2026-09-23T20:07:58Z",
    "paths": [],
@@ -6084,6 +6137,7 @@
    "hsts": null,
    "id": "http:mail.bergersysteme.com",
    "login_form": null,
+   "measured_ip": null,
    "mode": "active",
    "observed_at": "2026-09-23T20:19:04Z",
    "paths": [],
@@ -6131,6 +6185,7 @@
    "hsts": null,
    "id": "http:mail2.bergersysteme.com",
    "login_form": null,
+   "measured_ip": null,
    "mode": "active",
    "observed_at": "2026-09-23T20:19:36Z",
    "paths": [],
@@ -6178,6 +6233,7 @@
    "hsts": null,
    "id": "http:owa.bergersysteme.com",
    "login_form": null,
+   "measured_ip": null,
    "mode": "active",
    "observed_at": "2026-09-23T20:19:04Z",
    "paths": [],
@@ -6225,6 +6281,7 @@
    "hsts": null,
    "id": "http:ticket.bergersysteme.com",
    "login_form": null,
+   "measured_ip": null,
    "mode": "active",
    "observed_at": "2026-09-23T20:18:22Z",
    "paths": [],
@@ -6369,10 +6426,14 @@
     "max_age": 31536000,
     "preload": false,
     "present": true,
-    "raw": "max-age=31536000"
+    "raw": "max-age=31536000",
+    "status_code": 200,
+    "tool": "header_check",
+    "url": "https://www.bergersysteme.com"
    },
    "id": "http:www.bergersysteme.com",
    "login_form": null,
+   "measured_ip": "198.202.211.1",
    "mode": "active",
    "observed_at": "2026-09-23T20:14:13Z",
    "paths": [
@@ -7447,6 +7508,7 @@
    "host_ip": null,
    "hostnames": [],
    "id": "passive:otx:bergersysteme.com",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T19:51:44Z",
    "port": null,
@@ -7462,7 +7524,9 @@
   {
    "banner_excerpt": "HTTP/1.1 301 Moved Permanently Date: Wed, 23 Sep 2026 12:56:57 GMT Content-Type: text/html Content-Length: 166 Connection: keep-alive Location: https://joinc...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "location": "https://joincallhub.com/"
+   },
    "domain": null,
    "evidence": [
     {
@@ -7477,6 +7541,7 @@
     "kinleysystems.com"
    ],
    "id": "passive:shodan:198.202.211.1:80",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T12:57:05Z",
    "port": 80,
@@ -7507,6 +7572,7 @@
     "kinleysystems.com"
    ],
    "id": "passive:shodan:198.202.211.1:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T12:57:05Z",
    "port": 443,
@@ -7537,6 +7603,7 @@
     "kinleysystems.com"
    ],
    "id": "passive:shodan:198.202.211.1:2052",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T12:57:05Z",
    "port": 2052,
@@ -7567,6 +7634,7 @@
     "kinleysystems.com"
    ],
    "id": "passive:shodan:198.202.211.1:2053",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T12:57:05Z",
    "port": 2053,
@@ -7597,6 +7665,7 @@
     "kinleysystems.com"
    ],
    "id": "passive:shodan:198.202.211.1:2082",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T12:57:05Z",
    "port": 2082,
@@ -7627,6 +7696,7 @@
     "kinleysystems.com"
    ],
    "id": "passive:shodan:198.202.211.1:2083",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T12:57:05Z",
    "port": 2083,
@@ -7657,6 +7727,7 @@
     "kinleysystems.com"
    ],
    "id": "passive:shodan:198.202.211.1:2086",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T12:57:05Z",
    "port": 2086,
@@ -7687,6 +7758,7 @@
     "kinleysystems.com"
    ],
    "id": "passive:shodan:198.202.211.1:2087",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T12:57:05Z",
    "port": 2087,
@@ -7717,6 +7789,7 @@
     "kinleysystems.com"
    ],
    "id": "passive:shodan:198.202.211.1:2095",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T12:57:05Z",
    "port": 2095,
@@ -7747,6 +7820,7 @@
     "kinleysystems.com"
    ],
    "id": "passive:shodan:198.202.211.1:2096",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T12:57:05Z",
    "port": 2096,
@@ -7777,6 +7851,7 @@
     "kinleysystems.com"
    ],
    "id": "passive:shodan:198.202.211.1:8080",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T12:57:05Z",
    "port": 8080,
@@ -7807,6 +7882,7 @@
     "kinleysystems.com"
    ],
    "id": "passive:shodan:198.202.211.1:8443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T12:57:05Z",
    "port": 8443,
@@ -7837,6 +7913,7 @@
     "kinleysystems.com"
    ],
    "id": "passive:shodan:198.202.211.1:8880",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T12:57:05Z",
    "port": 8880,
@@ -7852,7 +7929,9 @@
   {
    "banner_excerpt": "HTTP/1.1 301 Moved Permanently Cache-Control: no-cache Pragma: no-cache Content-Length: 0 Content-Type: text/plain Location: https://40.99.150.120/ Server: M...",
    "confidence": 0.5,
-   "details": {},
+   "details": {
+    "location": "https://40.99.150.120/"
+   },
    "domain": null,
    "evidence": [
     {
@@ -7864,6 +7943,7 @@
    "host_ip": "40.99.150.120",
    "hostnames": [],
    "id": "passive:shodan:40.99.150.120:80",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T13:37:46Z",
    "port": 80,
@@ -7879,7 +7959,9 @@
   {
    "banner_excerpt": "HTTP/1.1 301 Moved Permanently Date: Wed, 23 Sep 2026 18:35:39 GMT Server: Apache Location: https://62.217.52.162// Content-Length: 231 Content-Type: text/ht...",
    "confidence": 0.5,
-   "details": {},
+   "details": {
+    "location": "https://62.217.52.162//"
+   },
    "domain": null,
    "evidence": [
     {
@@ -7893,6 +7975,7 @@
     "bergersysteme.com"
    ],
    "id": "passive:shodan:62.217.52.162:80",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T18:35:39Z",
    "port": 80,
@@ -7909,6 +7992,7 @@
    "banner_excerpt": "HTTP/1.1 302 Date: Wed, 23 Sep 2026 18:31:07 GMT Server: Apache location: http://62.217.52.162/bstasks/login.cfm?redir=/index.cfm? Content-Type: text/html;ch...",
    "confidence": 0.5,
    "details": {
+    "location": "http://62.217.52.162/bstasks/login.cfm",
     "login_over_http": "http://62.217.52.162/bstasks/login.cfm?redir=/index.cfm?"
    },
    "domain": null,
@@ -7924,6 +8008,7 @@
     "bergersysteme.com"
    ],
    "id": "passive:shodan:62.217.52.162:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T18:35:39Z",
    "port": 443,
@@ -7957,6 +8042,7 @@
     "mail.bergersysteme.com"
    ],
    "id": "passive:shodan:62.217.52.166:25",
+   "kennung": "SMTP (CipherMail)",
    "mode": "passive",
    "observed_at": "2026-09-23T08:43:38Z",
    "port": 25,
@@ -7972,7 +8058,9 @@
   {
    "banner_excerpt": "HTTP/1.1 302 Moved Temporarily Cache-Control: no-cache Pragma: no-cache Location: https://62.217.52.166/owa/ Server: Microsoft-IIS/10.0 X-FEServer: W2K16SERV...",
    "confidence": 0.5,
-   "details": {},
+   "details": {
+    "location": "https://62.217.52.166/owa/"
+   },
    "domain": null,
    "evidence": [
     {
@@ -7987,6 +8075,7 @@
     "mail.bergersysteme.com"
    ],
    "id": "passive:shodan:62.217.52.166:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T08:43:38Z",
    "port": 443,
@@ -8016,6 +8105,7 @@
     "bergersysteme.com"
    ],
    "id": "passive:shodan:62.217.52.171:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-21T20:16:30Z",
    "port": 443,
@@ -8047,6 +8137,7 @@
     "www.dirak.de"
    ],
    "id": "passive:shodan:92.205.224.174:21",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T19:09:51Z",
    "port": 21,
@@ -8080,6 +8171,7 @@
     "www.dirak.de"
    ],
    "id": "passive:shodan:92.205.224.174:22",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T19:09:51Z",
    "port": 22,
@@ -8114,6 +8206,7 @@
     "www.dirak.de"
    ],
    "id": "passive:shodan:92.205.224.174:25",
+   "kennung": "SMTP (Postfix)",
    "mode": "passive",
    "observed_at": "2026-09-23T19:09:51Z",
    "port": 25,
@@ -8145,6 +8238,7 @@
     "www.dirak.de"
    ],
    "id": "passive:shodan:92.205.224.174:53",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T19:09:51Z",
    "port": 53,
@@ -8160,7 +8254,9 @@
   {
    "banner_excerpt": "HTTP/1.1 301 Moved Permanently Server: nginx Date: Tue, 22 Sep 2026 18:45:57 GMT Content-Type: text/html; charset=iso-8859-1 Content-Length: 226 Connection:...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "location": "https://dirak.co"
+   },
    "domain": null,
    "evidence": [
     {
@@ -8176,6 +8272,7 @@
     "www.dirak.de"
    ],
    "id": "passive:shodan:92.205.224.174:80",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T19:09:51Z",
    "port": 80,
@@ -8207,6 +8304,7 @@
     "www.dirak.de"
    ],
    "id": "passive:shodan:92.205.224.174:110",
+   "kennung": "POP3 (Dovecot)",
    "mode": "passive",
    "observed_at": "2026-09-23T19:09:51Z",
    "port": 110,
@@ -8238,6 +8336,7 @@
     "www.dirak.de"
    ],
    "id": "passive:shodan:92.205.224.174:143",
+   "kennung": "IMAP (Dovecot)",
    "mode": "passive",
    "observed_at": "2026-09-23T19:09:51Z",
    "port": 143,
@@ -8253,7 +8352,9 @@
   {
    "banner_excerpt": "HTTP/1.1 301 Moved Permanently Server: nginx Date: Tue, 22 Sep 2026 18:24:22 GMT Content-Type: text/html; charset=iso-8859-1 Content-Length: 226 Connection:...",
    "confidence": 0.8,
-   "details": {},
+   "details": {
+    "location": "https://dirak.co"
+   },
    "domain": null,
    "evidence": [
     {
@@ -8269,6 +8370,7 @@
     "www.dirak.de"
    ],
    "id": "passive:shodan:92.205.224.174:443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T19:09:51Z",
    "port": 443,
@@ -8302,6 +8404,7 @@
     "www.dirak.de"
    ],
    "id": "passive:shodan:92.205.224.174:465",
+   "kennung": "SMTP über TLS (Postfix)",
    "mode": "passive",
    "observed_at": "2026-09-23T19:09:51Z",
    "port": 465,
@@ -8333,6 +8436,7 @@
     "www.dirak.de"
    ],
    "id": "passive:shodan:92.205.224.174:993",
+   "kennung": "IMAP über TLS (Dovecot)",
    "mode": "passive",
    "observed_at": "2026-09-23T19:09:51Z",
    "port": 993,
@@ -8364,6 +8468,7 @@
     "www.dirak.de"
    ],
    "id": "passive:shodan:92.205.224.174:995",
+   "kennung": "POP3 über TLS (Dovecot)",
    "mode": "passive",
    "observed_at": "2026-09-23T19:09:51Z",
    "port": 995,
@@ -8395,6 +8500,7 @@
     "www.dirak.de"
    ],
    "id": "passive:shodan:92.205.224.174:8443",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T19:09:51Z",
    "port": 8443,
@@ -8426,6 +8532,7 @@
     "www.dirak.de"
    ],
    "id": "passive:shodan:92.205.224.174:8880",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T19:09:51Z",
    "port": 8880,
@@ -8455,6 +8562,7 @@
    "host_ip": null,
    "hostnames": [],
    "id": "passive:urlhaus:bergersysteme.com",
+   "kennung": null,
    "mode": "passive",
    "observed_at": "2026-09-23T19:51:44Z",
    "port": null,
@@ -8466,6 +8574,191 @@
    "transport": null,
    "verified": null,
    "version": null
+  }
+ ],
+ "path_search": [
+  {
+   "abort_reason": "waf_body_marker",
+   "challenge": false,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "ziel=https://www.bergersysteme.com urteil=aborted abbruch=waf_body_marker",
+     "ref": "hosts/198.202.211.1/phase2/feroxbuster.json",
+     "tool": "feroxbuster"
+    },
+    {
+     "excerpt": "ziel=https://www.bergersysteme.com urteil=aborted abbruch=waf_body_marker",
+     "ref": "hosts/198.202.211.1/phase2/ffuf_sensitive.json",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "hits": null,
+   "host_ip": "198.202.211.1",
+   "id": "paths:198.202.211.1",
+   "mode": "active",
+   "observed_at": "2026-09-23T20:15:22Z",
+   "requests": null,
+   "source": "feroxbuster",
+   "status_codes": [],
+   "target_url": "https://www.bergersysteme.com",
+   "tools": {
+    "feroxbuster": "aborted",
+    "ffuf_sensitive": "aborted"
+   },
+   "verdict": "aborted"
+  },
+  {
+   "abort_reason": null,
+   "challenge": false,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "urteil=skipped",
+     "ref": "scan_results:feroxbuster:62.217.52.162",
+     "tool": "feroxbuster"
+    },
+    {
+     "excerpt": "",
+     "ref": "scan_results:ffuf_sensitive:62.217.52.162",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "hits": null,
+   "host_ip": "62.217.52.162",
+   "id": "paths:62.217.52.162",
+   "mode": "active",
+   "observed_at": "2026-09-23T20:19:03Z",
+   "requests": null,
+   "source": "feroxbuster",
+   "status_codes": [],
+   "target_url": null,
+   "tools": {
+    "feroxbuster": "skipped"
+   },
+   "verdict": "skipped"
+  },
+  {
+   "abort_reason": null,
+   "challenge": false,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "urteil=skipped",
+     "ref": "scan_results:feroxbuster:62.217.52.166",
+     "tool": "feroxbuster"
+    },
+    {
+     "excerpt": "",
+     "ref": "scan_results:ffuf_sensitive:62.217.52.166",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "hits": null,
+   "host_ip": "62.217.52.166",
+   "id": "paths:62.217.52.166",
+   "mode": "active",
+   "observed_at": "2026-09-23T20:19:25Z",
+   "requests": null,
+   "source": "feroxbuster",
+   "status_codes": [],
+   "target_url": null,
+   "tools": {
+    "feroxbuster": "skipped"
+   },
+   "verdict": "skipped"
+  },
+  {
+   "abort_reason": null,
+   "challenge": false,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "urteil=skipped",
+     "ref": "scan_results:feroxbuster:62.217.52.171",
+     "tool": "feroxbuster"
+    },
+    {
+     "excerpt": "",
+     "ref": "scan_results:ffuf_sensitive:62.217.52.171",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "hits": null,
+   "host_ip": "62.217.52.171",
+   "id": "paths:62.217.52.171",
+   "mode": "active",
+   "observed_at": "2026-09-23T20:19:35Z",
+   "requests": null,
+   "source": "feroxbuster",
+   "status_codes": [],
+   "target_url": null,
+   "tools": {
+    "feroxbuster": "skipped"
+   },
+   "verdict": "skipped"
+  },
+  {
+   "abort_reason": null,
+   "challenge": false,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "urteil=skipped",
+     "ref": "scan_results:feroxbuster:79.140.188.181",
+     "tool": "feroxbuster"
+    },
+    {
+     "excerpt": "",
+     "ref": "scan_results:ffuf_sensitive:79.140.188.181",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "hits": null,
+   "host_ip": "79.140.188.181",
+   "id": "paths:79.140.188.181",
+   "mode": "active",
+   "observed_at": "2026-09-23T20:19:36Z",
+   "requests": null,
+   "source": "feroxbuster",
+   "status_codes": [],
+   "target_url": null,
+   "tools": {
+    "feroxbuster": "skipped"
+   },
+   "verdict": "skipped"
+  },
+  {
+   "abort_reason": null,
+   "challenge": false,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "ziel=https://bergersysteme.com",
+     "ref": "hosts/92.205.224.174/phase2/feroxbuster.json",
+     "tool": "feroxbuster"
+    },
+    {
+     "excerpt": "ziel=https://bergersysteme.com urteil=unreliable status=301 treffer=11424",
+     "ref": "hosts/92.205.224.174/phase2/ffuf_sensitive.json",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "hits": 11424,
+   "host_ip": "92.205.224.174",
+   "id": "paths:92.205.224.174",
+   "mode": "active",
+   "observed_at": "2026-09-23T20:12:09Z",
+   "requests": null,
+   "source": "feroxbuster",
+   "status_codes": [
+    301
+   ],
+   "target_url": "https://bergersysteme.com",
+   "tools": {
+    "ffuf_sensitive": "unreliable"
+   },
+   "verdict": "unreliable"
   }
  ],
  "scan": {
@@ -8495,6 +8788,8 @@
   "order_id": "68d59573-7a93-4efa-89cc-e7b10cc4d140",
   "package": "perimeter",
   "policy_version": null,
+  "scanned_port_count": 1000,
+  "scanned_ports": "1,3-4,6-7,9,13,17,19-26,30,32-33,37,42-43,49,53,70,79-85,88-90,99-100,106,109-111,113,119,125,135,139,143-144,146,161,163,179,199,211-212,222,254-256,259,264,280,301,306,311,340,366,389,406-407,416-417,425,427,443-445,458,464-465,481,497,500,512-515,524,541,543-545,548,554-555,563,587,593,616-617,625,631,636,646,648,666-668,683,687,691,700,705,711,714,720,722,726,749,765,777,783,787,800-801,808,843,873,880,888,898,900-903,911-912,981,987,990,992-993,995,999-1002,1007,1009-1011,1021-1100,1102,1104-1108,1110-1114,1117,1119,1121-1124,1126,1130-1132,1137-1138,1141,1145,1147-1149,1151-1152,1154,1163-1166,1169,1174-1175,1183,1185-1187,1192,1198-1199,1201,1213,1216-1218,1233-1234,1236,1244,1247-1248,1259,1271-1272,1277,1287,1296,1300-1301,1309-1311,1322,1328,1334,1352,1417,1433-1434,1443,1455,1461,1494,1500-1501,1503,1521,1524,1533,1556,1580,1583,1594,1600,1641,1658,1666,1687-1688,1700,1717-1721,1723,1755,1761,1782-1783,1801,1805,1812,1839-1840,1862-1864,1875,1900,1914,1935,1947,1971-1972,1974,1984,1998-2010,2013,2020-2022,2030,2033-2035,2038,2040-2043,2045-2049,2065,2068,2099-2100,2103,2105-2107,2111,2119,2121,2126,2135,2144,2160-2161,2170,2179,2190-2191,2196,2200,2222,2251,2260,2288,2301,2323,2366,2381-2383,2393-2394,2399,2401,2492,2500,2522,2525,2557,2601-2602,2604-2605,2607-2608,2638,2701-2702,2710,2717-2718,2725,2800,2809,2811,2869,2875,2909-2910,2920,2967-2968,2998,3000-3001,3003,3005-3007,3011,3013,3017,3030-3031,3052,3071,3077,3128,3168,3211,3221,3260-3261,3268-3269,3283,3300-3301,3306,3322-3325,3333,3351,3367,3369-3372,3389-3390,3404,3476,3493,3517,3527,3546,3551,3580,3659,3689-3690,3703,3737,3766,3784,3800-3801,3809,3814,3826-3828,3851,3869,3871,3878,3880,3889,3905,3914,3918,3920,3945,3971,3986,3995,3998,4000-4006,4045,4111,4125-4126,4129,4224,4242,4279,4321,4343,4443-4446,4449,4550,4567,4662,4848,4899-4900,4998,5000-5004,5009,5030,5033,5050-5051,5054,5060-5061,5080,5087,5100-5102,5120,5190,5200,5214,5221-5222,5225-5226,5269,5280,5298,5357,5405,5414,5431-5432,5440,5500,5510,5544,5550,5555,5560,5566,5631,5633,5666,5678-5679,5718,5730,5800-5802,5810-5811,5815,5822,5825,5850,5859,5862,5877,5900-5904,5906-5907,5910-5911,5915,5922,5925,5950,5952,5959-5963,5987-5989,5998-6007,6009,6025,6059,6100-6101,6106,6112,6123,6129,6156,6346,6389,6502,6510,6543,6547,6565-6567,6580,6646,6666-6669,6689,6692,6699,6779,6788-6789,6792,6839,6881,6901,6969,7000-7002,7004,7007,7019,7025,7070,7100,7103,7106,7200-7201,7402,7435,7443,7496,7512,7625,7627,7676,7741,7777-7778,7800,7911,7920-7921,7937-7938,7999-8002,8007-8011,8021-8022,8031,8042,8045,8080-8090,8093,8099-8100,8180-8181,8192-8194,8200,8222,8254,8290-8292,8300,8333,8383,8400,8402,8443,8500,8600,8649,8651-8652,8654,8701,8800,8873,8888,8899,8994,9000-9003,9009-9011,9040,9050,9071,9080-9081,9090-9091,9099-9103,9110-9111,9200,9207,9220,9290,9415,9418,9485,9500,9502-9503,9535,9575,9593-9595,9618,9666,9876-9878,9898,9900,9917,9929,9943-9944,9968,9998-10004,10009-10010,10012,10024-10025,10082,10180,10215,10243,10566,10616-10617,10621,10626,10628-10629,10778,11110-11111,11967,12000,12174,12265,12345,13456,13722,13782-13783,14000,14238,14441-14442,15000,15002-15004,15660,15742,16000-16001,16012,16016,16018,16080,16113,16992-16993,17877,17988,18040,18101,18988,19101,19283,19315,19350,19780,19801,19842,20000,20005,20031,20221-20222,20828,21571,22939,23502,24444,24800,25734-25735,26214,27000,27352-27353,27355-27356,27715,28201,30000,30718,30951,31038,31337,32768-32785,33354,33899,34571-34573,35500,38292,40193,40911,41511,42510,44176,44442-44443,44501,45100,48080,49152-49161,49163,49165,49167,49175-49176,49400,49999-50003,50006,50300,50389,50500,50636,50800,51103,51493,52673,52822,52848,52869,54045,54328,55055-55056,55555,55600,56737-56738,57294,57797,58080,60020,60443,61532,61900,62078,63331,64623,64680,65000,65129,65389",
   "scanner_egress": null,
   "source": "meta",
   "started_at": "2026-09-23T19:51:44Z",
@@ -8545,7 +8840,7 @@
    }
   ]
  },
- "schema_version": "1.1.0",
+ "schema_version": "1.2.0",
  "services": [
   {
    "auth_before_starttls": null,
@@ -8562,6 +8857,7 @@
     }
    ],
    "family": "cloudflare_http_proxy",
+   "foreign": null,
    "fp_login": null,
    "fp_server": "cloudflare",
    "fp_title": null,
@@ -8603,6 +8899,7 @@
     }
    ],
    "family": "cloudflare",
+   "foreign": null,
    "fp_login": null,
    "fp_server": "cloudflare",
    "fp_title": "400 The plain HTTP request was sent to HTTPS port",
@@ -8644,6 +8941,7 @@
     }
    ],
    "family": "cloudflare_http_proxy",
+   "foreign": null,
    "fp_login": null,
    "fp_server": "cloudflare",
    "fp_title": null,
@@ -8685,6 +8983,7 @@
     }
    ],
    "family": "cloudflare",
+   "foreign": null,
    "fp_login": null,
    "fp_server": "cloudflare",
    "fp_title": "400 The plain HTTP request was sent to HTTPS port",
@@ -8738,6 +9037,7 @@
     }
    ],
    "family": "proftpd",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8779,6 +9079,7 @@
     }
    ],
    "family": "openssh",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8820,6 +9121,7 @@
     }
    ],
    "family": null,
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -8861,6 +9163,7 @@
     }
    ],
    "family": "nginx",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": "Web Server's Default Page",
@@ -8933,6 +9236,7 @@
     }
    ],
    "family": "dovecot",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -9007,6 +9311,7 @@
     }
    ],
    "family": "dovecot",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -9060,6 +9365,7 @@
     }
    ],
    "family": "nginx",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": "Plesk Obsidian 18.0.80",
@@ -9130,6 +9436,7 @@
     }
    ],
    "family": "postfix",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -9203,6 +9510,7 @@
     }
    ],
    "family": "dovecot",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -9274,6 +9582,7 @@
     }
    ],
    "family": "dovecot",
+   "foreign": null,
    "fp_login": null,
    "fp_server": null,
    "fp_title": null,
@@ -9327,6 +9636,7 @@
     }
    ],
    "family": "plesk",
+   "foreign": null,
    "fp_login": true,
    "fp_server": "sw-cp-server",
    "fp_title": "Plesk Obsidian 18.0.80",
@@ -9367,6 +9677,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9394,9 +9705,11 @@
    "host_ip": "198.202.211.1",
    "id": "sw:198.202.211.1:-:cloudflare:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:56:49Z",
+   "outdated": null,
    "product": "cloudflare",
    "release_date": null,
    "source": "nmap",
@@ -9417,6 +9730,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9449,9 +9763,11 @@
    "host_ip": "198.202.211.1",
    "id": "sw:198.202.211.1:-:cloudflare_http_proxy:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:56:49Z",
+   "outdated": null,
    "product": "Cloudflare http proxy",
    "release_date": null,
    "source": "nmap",
@@ -9472,6 +9788,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9489,9 +9806,11 @@
    "host_ip": "198.202.211.1",
    "id": "sw:198.202.211.1:-:jquery:unknown",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T20:14:14Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
    "source": "httpx",
@@ -9513,6 +9832,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9535,9 +9855,11 @@
    "host_ip": "198.202.211.1",
    "id": "sw:198.202.211.1:-:webflow:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T20:19:37Z",
+   "outdated": null,
    "product": "Webflow",
    "release_date": null,
    "source": "cms_fingerprint",
@@ -9559,6 +9881,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9581,9 +9904,11 @@
    "host_ip": "198.202.211.1",
    "id": "sw:198.202.211.1:www.bergersysteme.com:cloudflare:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T20:14:14Z",
+   "outdated": null,
    "product": "Cloudflare",
    "release_date": null,
    "source": "httpx",
@@ -9597,13 +9922,15 @@
    "confidence": 0.8,
    "conflicts": [],
    "detection_sources": [
-    "httpx"
+    "httpx",
+    "redirect_probe"
    ],
    "distro": null,
    "edition": null,
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9613,22 +9940,29 @@
      "excerpt": "tech: jQuery",
      "ref": "hosts/198.202.211.1/phase2/httpx_www.bergersysteme.com.json",
      "tool": "httpx"
+    },
+    {
+     "excerpt": "Skript: https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=645bb79068f5e873d3dfa654",
+     "ref": "hosts/198.202.211.1/phase1/tech_profile.json",
+     "tool": "redirect_probe"
     }
    ],
    "family": "jquery",
    "fqdn": "www.bergersysteme.com",
    "hints": [],
    "host_ip": "198.202.211.1",
-   "id": "sw:198.202.211.1:www.bergersysteme.com:jquery:unknown",
+   "id": "sw:198.202.211.1:www.bergersysteme.com:jquery:3.5.1",
    "kind": "library",
+   "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-23T20:14:14Z",
+   "observed_at": "2026-09-23T20:19:37Z",
+   "outdated": null,
    "product": "jQuery",
    "release_date": null,
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
+   "source": "redirect_probe",
+   "version_norm": "3.5.1",
+   "version_raw": "3.5.1",
    "vulnerabilities": [],
    "vulnerabilities_count": null
   },
@@ -9644,6 +9978,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9661,9 +9996,11 @@
    "host_ip": "198.202.211.1",
    "id": "sw:198.202.211.1:www.bergersysteme.com:webflow:unknown",
    "kind": "component",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T20:14:14Z",
+   "outdated": null,
    "product": "Webflow",
    "release_date": null,
    "source": "httpx",
@@ -9684,6 +10021,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9721,9 +10059,11 @@
    "host_ip": "92.205.224.174",
    "id": "sw:92.205.224.174:-:dovecot:unknown",
    "kind": "mail",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:57:08Z",
+   "outdated": null,
    "product": "Dovecot",
    "release_date": null,
    "source": "nmap",
@@ -9744,6 +10084,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9776,9 +10117,11 @@
    "host_ip": "92.205.224.174",
    "id": "sw:92.205.224.174:-:nginx:unknown",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:57:08Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "nmap",
@@ -9799,6 +10142,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9821,9 +10165,11 @@
    "host_ip": "92.205.224.174",
    "id": "sw:92.205.224.174:-:openssh:9.9",
    "kind": "ssh",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:57:08Z",
+   "outdated": null,
    "product": "OpenSSH",
    "release_date": null,
    "source": "nmap",
@@ -9844,6 +10190,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9876,9 +10223,11 @@
    "host_ip": "92.205.224.174",
    "id": "sw:92.205.224.174:-:plesk:18.0.80",
    "kind": "control_panel",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:57:08Z",
+   "outdated": null,
    "product": "Plesk",
    "release_date": null,
    "source": "nmap",
@@ -9899,6 +10248,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9921,9 +10271,11 @@
    "host_ip": "92.205.224.174",
    "id": "sw:92.205.224.174:-:postfix:unknown",
    "kind": "mail",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:57:08Z",
+   "outdated": null,
    "product": "Postfix",
    "release_date": null,
    "source": "nmap",
@@ -9944,6 +10296,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -9966,9 +10319,11 @@
    "host_ip": "92.205.224.174",
    "id": "sw:92.205.224.174:-:proftpd:unknown",
    "kind": "ftp",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:57:08Z",
+   "outdated": null,
    "product": "ProFTPD",
    "release_date": null,
    "source": "nmap",
@@ -9989,6 +10344,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10006,9 +10362,11 @@
    "host_ip": "92.205.224.174",
    "id": "sw:92.205.224.174:bergersysteme.com:nginx:unknown",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T20:07:54Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "header_check",
@@ -10030,6 +10388,7 @@
    "eol": {
     "date": null,
     "latest_patch": null,
+    "lts_since": null,
     "source": null,
     "status": "unknown",
     "upstream_eol_date": null
@@ -10052,9 +10411,11 @@
    "host_ip": "92.205.224.174",
    "id": "sw:92.205.224.174:ftp.bergersysteme.com:nginx:unknown",
    "kind": "webserver",
+   "latest_version": null,
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T20:08:02Z",
+   "outdated": null,
    "product": "nginx",
    "release_date": null,
    "source": "httpx",
@@ -10335,19 +10696,15 @@
     "mismatch": false,
     "not_after": "2026-11-27T04:15:54Z",
     "not_before": "2026-08-29T03:15:58Z",
-    "renewal": {
-     "certificates": 42,
-     "interval_days": 59,
-     "last_not_after": "2026-09-29T03:57:33Z",
-     "last_not_before": "2026-07-01T02:57:35Z",
-     "lead_days": 59,
-     "name": "www.bergersysteme.com",
-     "source": "crtsh"
-    },
+    "renewal": null,
     "san": [
      "www.bergersysteme.com"
     ],
     "self_signed": null,
+    "valid_elsewhere": [
+     "92.205.224.174:443"
+    ],
+    "valid_elsewhere_not_after": "2026-12-10T23:59:00Z",
     "wildcard": false
    },
    "cert_assigned_from": null,
@@ -11918,10 +12275,14 @@
     "max_age": 31536000,
     "preload": false,
     "present": true,
-    "raw": "365 days (=31536000 seconds) > 15552000 seconds"
+    "raw": "365 days (=31536000 seconds) > 15552000 seconds",
+    "status_code": null,
+    "tool": null,
+    "url": null
    },
    "id": "tls:www.bergersysteme.com:443@198.202.211.1",
    "json_filtered": false,
+   "measured_ip": "198.202.211.1",
    "mode": "active",
    "observed_at": "2026-09-23T20:14:15Z",
    "port": 443,
@@ -11955,12 +12316,25 @@
     "not_after": "2026-12-10T23:59:00Z",
     "not_before": "2025-11-10T00:00:00Z",
     "renewal": {
-     "certificates": 23,
-     "interval_days": 152,
+     "certificates": 6,
+     "expected_renewal": "2026-11-08",
+     "interval_days": 369,
+     "issuer": "Sectigo Limited",
      "last_not_after": "2026-12-10T23:59:59Z",
      "last_not_before": "2025-11-10T00:00:00Z",
-     "lead_days": 75,
+     "lead_days": 26,
+     "lines": 9,
      "name": "bergersysteme.com",
+     "recent_leads": [
+      30,
+      26,
+      32
+     ],
+     "recent_renewals": [
+      "2023-11-09T00:00:00Z",
+      "2024-11-12T00:00:00Z",
+      "2025-11-10T00:00:00Z"
+     ],
      "source": "crtsh"
     },
     "san": [
@@ -11968,6 +12342,8 @@
      "bergersysteme.com"
     ],
     "self_signed": null,
+    "valid_elsewhere": [],
+    "valid_elsewhere_not_after": null,
     "wildcard": true
    },
    "cert_assigned_from": null,
@@ -13178,10 +13554,14 @@
     "max_age": null,
     "preload": null,
     "present": false,
-    "raw": "not offered"
+    "raw": "not offered",
+    "status_code": null,
+    "tool": null,
+    "url": null
    },
    "id": "tls:bergersysteme.com:443@92.205.224.174",
    "json_filtered": false,
+   "measured_ip": "92.205.224.174",
    "mode": "active",
    "observed_at": "2026-09-23T20:08:04Z",
    "port": 443,
@@ -13211,17 +13591,32 @@
     "not_before": "2026-08-24T10:11:44Z",
     "renewal": {
      "certificates": 8,
+     "expected_renewal": "2026-10-24",
      "interval_days": 60,
+     "issuer": "Let's Encrypt",
      "last_not_after": "2026-11-22T10:11:43Z",
      "last_not_before": "2026-08-24T10:11:44Z",
      "lead_days": 29,
+     "lines": 1,
      "name": "ftp.bergersysteme.com",
+     "recent_leads": [
+      29,
+      30,
+      29
+     ],
+     "recent_renewals": [
+      "2026-04-26T10:11:43Z",
+      "2026-06-25T10:11:41Z",
+      "2026-08-24T10:11:44Z"
+     ],
      "source": "crtsh"
     },
     "san": [
      "ftp.bergersysteme.com"
     ],
     "self_signed": null,
+    "valid_elsewhere": [],
+    "valid_elsewhere_not_after": null,
     "wildcard": false
    },
    "cert_assigned_from": null,
@@ -13247,6 +13642,7 @@
    "hsts": null,
    "id": "tls:ftp.bergersysteme.com:443@92.205.224.174",
    "json_filtered": false,
+   "measured_ip": "92.205.224.174",
    "mode": "active",
    "observed_at": "2026-09-23T20:08:03Z",
    "port": 443,

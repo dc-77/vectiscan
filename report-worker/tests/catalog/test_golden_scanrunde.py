@@ -165,24 +165,20 @@ def test_markierungen_q3_und_q9_sind_aufgeloest(name):
 
 # ---------------------------------------------------------------- S6b-2
 
-def test_nach_s6b3_bleiben_drei_q8_markierungen():
+def test_nach_s6b4_keine_q8_markierung_mehr():
     """S6b-2 liess 18 Q8-Markierungen (Header an Weiterleitung, Fehler- oder Challenge-Seite)
-    fuer S6c stehen. S6b-3 (spec/10 R1, Entscheidung DC 1) loest 15 davon auf: die Header-
-    Regeln sind dort nicht pruefbar oder messen die Endseite. Es bleiben die drei
-    hsts_missing-Eintraege (bergersysteme ftp, heuel edi und online), weil HSTS an jeder
-    Antwort gilt; die Messbasis aendert sich dort erst, wenn header_check in S6c der
-    Weiterleitung folgt."""
-    marks = []
+    fuer S6c stehen. S6b-3 (spec/10 R1, Entscheidung DC 1) loeste 15 davon auf. Die drei
+    hsts_missing-Eintraege (bergersysteme ftp an der 403, heuel edi an der 403 und online an
+    der 429) loest S6b-4 (spec/11 T4, E20): HSTS gilt nur an der ersten echten Antwort, an 4xx,
+    429 und einer Sicherheitsabfrage ist die Regel nicht pruefbar. Jede Liste traegt
+    hinweis_s6b4."""
     for name in NAMES:
         mapping = _map(name)
         assert mapping.get("hinweis_s6b2"), f"{name}: hinweis_s6b2 fehlt"
         assert mapping.get("hinweis_s6b3"), f"{name}: hinweis_s6b3 fehlt"
+        assert mapping.get("hinweis_s6b4"), f"{name}: hinweis_s6b4 fehlt"
         for liste in ("findings", "positives"):
             for eid, entry in mapping[liste].items():
-                if "spec09" in entry:
-                    marks.append((name, eid, entry["spec09"]))
-    assert {m for _, _, m in marks} == {"Q8"}, marks
-    assert len(marks) == 3
-    expected = {name: {e["id"]: e for e in _expected(name)["findings"]} for name in NAMES}
-    assert {(n, expected[n][eid]["check"]) for n, eid, _ in marks} == {
-        ("bergersysteme-0923", "hsts_missing"), ("heuel-0923", "hsts_missing")}
+                assert "spec09" not in entry, (name, eid, entry)
+    for name in ("bergersysteme-0923", "heuel-0923"):
+        assert "hsts_missing" in _map(name)["hinweis_s6b4"], name
