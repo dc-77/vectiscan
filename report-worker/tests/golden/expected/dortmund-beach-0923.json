@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-27.1 auf tests/golden/facts/1fbc92b9-34ab-414e-8843-a1f1e9f15431.json",
+ "source": "reporter.catalog 2026-09-27.2 auf tests/golden/facts/1fbc92b9-34ab-414e-8843-a1f1e9f15431.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -44,7 +44,7 @@
    "cat": "D",
    "scale": "hygiene",
    "level": "niedrig",
-   "group": "dortmund-beach.com (+www.dortmund-beach.com)",
+   "group": "dortmund-beach.com",
    "affected": [
     "dortmund-beach.com"
    ],
@@ -83,7 +83,7 @@
    "cat": "D",
    "scale": "hygiene",
    "level": "mittel",
-   "group": "dortmund-beach.com (+www.dortmund-beach.com)",
+   "group": "dortmund-beach.com",
    "affected": [
     "dortmund-beach.com"
    ],
@@ -96,7 +96,7 @@
    "cat": "E",
    "scale": "hygiene",
    "level": "niedrig",
-   "group": "dortmund-beach.com (+www.dortmund-beach.com)",
+   "group": "dortmund-beach.com",
    "affected": [
     "dortmund-beach.com (Server: Apache/2.4.67 (Debian))"
    ],
@@ -165,7 +165,7 @@
    "cat": "D",
    "scale": "hygiene",
    "level": "niedrig",
-   "group": "dortmund-beach.com (+www.dortmund-beach.com)",
+   "group": "dortmund-beach.com",
    "affected": [
     "dortmund-beach.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)"
    ],
@@ -194,7 +194,7 @@
    "level": "niedrig",
    "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
    "affected": [
-    "88.99.35.112:25 (laut Passivquelle, gesehen am 23.09.2026)"
+    "88.99.35.112:25 (laut Passivquelle, Hosteintrag aktualisiert am 23.09.2026)"
    ],
    "title": "Mailserver beantwortet den Befehl VRFY laut Passivquelle"
   },
@@ -289,10 +289,10 @@
    "level": "erhoeht",
    "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
    "affected": [
-    "88.99.35.112: betheme 27.5.3 (laut wpscan bekannte Schwachstellen: 12)",
-    "88.99.35.112: burst-statistics 1.7.1 (laut wpscan bekannte Schwachstellen: 1)",
-    "88.99.35.112: complianz-gdpr 7.1.0 (laut wpscan bekannte Schwachstellen: 7)",
-    "88.99.35.112: revslider 6.7.11 (laut wpscan bekannte Schwachstellen: 4)"
+    "88.99.35.112: BeTheme 27.5.3 (laut wpscan bekannte Schwachstellen: 12)",
+    "88.99.35.112: Burst Statistics 1.7.1 (laut wpscan bekannte Schwachstellen: 1)",
+    "88.99.35.112: Complianz 7.1.0 (laut wpscan bekannte Schwachstellen: 7)",
+    "88.99.35.112: Slider Revolution 6.7.11 (laut wpscan bekannte Schwachstellen: 4)"
    ],
    "title": "WordPress-Erweiterungen mit bekannten Schwachstellen"
   },
@@ -303,9 +303,9 @@
    "cat": "E",
    "scale": "hygiene",
    "level": "niedrig",
-   "group": "dortmund-beach.com (+www.dortmund-beach.com)",
+   "group": "dortmund-beach.com",
    "affected": [
-    "dortmund-beach.com (badmin)"
+    "dortmund-beach.com (1 Anmeldename, gefunden über https://dortmund-beach.com/wp-json/oembed/1.0/embed)"
    ],
    "title": "WordPress-Benutzernamen von außen ermittelbar"
   },
@@ -316,7 +316,7 @@
    "cat": "E",
    "scale": "hygiene",
    "level": "niedrig",
-   "group": "dortmund-beach.com (+www.dortmund-beach.com)",
+   "group": "dortmund-beach.com",
    "affected": [
     "dortmund-beach.com"
    ],

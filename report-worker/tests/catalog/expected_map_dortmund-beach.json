@@ -2,6 +2,7 @@
  "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/dortmund-beach.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
  "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Befunde: hsts_short dortmund-beach.com (+www.dortmund-beach.com) (R9 (Entscheidung DC 3)); entfallene Positivaussagen: hsts_missing dortmund-beach.com (+www.dortmund-beach.com) (R9 (Entscheidung DC 3)); tls_weak_ciphers dortmund-beach.com (+www.dortmund-beach.com) (R6 (CBC-Verfahren angeboten)); urlhaus_compromise dortmund-beach.com (R6 (URLhaus no_data ist kein Negativergebnis)).",
  "hinweis_s6b4": "S6b-4 (spec/11): Soll-Liste nach Katalog 2026-09-27.1 und Fakten 1.2.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (T-Nummer oder Teil 3) und warum. entfallene Positivaussagen: spf_missing dortmund-beach.com (Teil 3 DB (P05)).",
+ "hinweis_s6b4n": "S6b-4n (spec/11 Teil 6): Soll-Liste nach Katalog 2026-09-27.2 und Fakten 1.3.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (N-Nummer) und warum.",
  "strict": false,
  "orders": {
   "main": "14272c00-1145-4675-9b4c-19ce2ead403b"
@@ -20,7 +21,9 @@
   "VS-2026-003": {
    "checks": [
     "csp_missing"
-   ]
+   ],
+   "spec11": "N2",
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung)."
   },
   "VS-2026-004": {
    "checks": [
@@ -37,12 +40,15 @@
     "hsts_missing"
    ],
    "spec10": "R9",
-   "warum": "max-age=0 steht als „HSTS abgeschaltet“ unter hsts_missing statt unter hsts_short (Entscheidung DC 3)."
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung).",
+   "spec11": "N2"
   },
   "VS-2026-007": {
    "checks": [
     "http_header_disclosure"
-   ]
+   ],
+   "spec11": "N2",
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung)."
   },
   "VS-2026-008": {
    "checks": [
@@ -67,7 +73,9 @@
   "VS-2026-012": {
    "checks": [
     "security_headers_incomplete"
-   ]
+   ],
+   "spec11": "N2",
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung)."
   },
   "VS-2026-013": {
    "checks": [
@@ -83,7 +91,8 @@
     "smtp_vrfy_enabled_passive"
    ],
    "spec10": "R19",
-   "warum": "VRFY im SMTP-Banner laut Shodan; neue Prüfung."
+   "warum": "Shodan last_update heißt „Hosteintrag aktualisiert am“, nicht „gesehen am“.",
+   "spec11": "N15"
   },
   "VS-2026-015": {
    "checks": [
@@ -119,20 +128,23 @@
    "checks": [
     "wordpress_plugin_vulnerable"
    ],
-   "spec11": "T12 (Teil 3 DB VS-004)",
-   "warum": "Titel im Plural bei mehreren Erweiterungen."
+   "spec11": "N9, vorher T12 (Teil 3 DB VS-004)",
+   "warum": "Produktname aus der Alias-Tabelle statt wpscan-Slug. Vorher: Titel im Plural bei mehreren Erweiterungen."
   },
   "VS-2026-022": {
    "checks": [
     "wordpress_user_enumeration"
-   ]
+   ],
+   "spec11": "N2, N15 (E25)",
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung). Anmeldenamen nur als Anzahl und Fundweg, kein Name im Kundentext."
   },
   "VS-2026-023": {
    "checks": [
     "wordpress_xmlrpc_enabled"
    ],
    "spec10": "R19",
-   "warum": "XML-RPC laut wpscan aktiv; neue Prüfung."
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung).",
+   "spec11": "N2"
   }
  },
  "positives": {

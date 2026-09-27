@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-27.1 auf tests/golden/facts/68d59573-7a93-4efa-89cc-e7b10cc4d140.json",
+ "source": "reporter.catalog 2026-09-27.2 auf tests/golden/facts/68d59573-7a93-4efa-89cc-e7b10cc4d140.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -99,7 +99,7 @@
    "cat": "D",
    "scale": "hygiene",
    "level": "mittel",
-   "group": "bergersysteme.com (+cdn.bergersysteme.com)",
+   "group": "bergersysteme.com",
    "affected": [
     "bergersysteme.com"
    ],
@@ -196,11 +196,11 @@
    "level": "erhoeht",
    "group": "92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com)",
    "affected": [
-    "92.205.224.174:110 (Dovecot pop3d, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen)",
-    "92.205.224.174:143 (Dovecot imapd, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen)",
-    "92.205.224.174:465 (Postfix smtpd, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen)",
-    "92.205.224.174:993 (Dovecot imapd, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen)",
-    "92.205.224.174:995 (Dovecot pop3d, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen)"
+    "92.205.224.174:110 (Dovecot pop3d)",
+    "92.205.224.174:143 (Dovecot imapd)",
+    "92.205.224.174:465 (Postfix smtpd)",
+    "92.205.224.174:993 (Dovecot imapd)",
+    "92.205.224.174:995 (Dovecot pop3d)"
    ],
    "title": "Abgelaufenes Zertifikat an Diensten außerhalb der Webseiten",
    "zustaendig": "hoster"
@@ -214,7 +214,7 @@
    "level": "niedrig",
    "group": "62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com)",
    "affected": [
-    "62.217.52.166:25 (laut Passivquelle, gesehen am 23.09.2026)"
+    "62.217.52.166:25 (laut Passivquelle, Hosteintrag aktualisiert am 23.09.2026)"
    ],
    "title": "Mailserver beantwortet den Befehl VRFY laut Passivquelle"
   },
@@ -396,7 +396,7 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "198.202.211.1 (www.bergersysteme.com)",
+   "group": "62.217.52.162 (bstasks.bergersysteme.com, ticket.bergersysteme.com)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
@@ -404,7 +404,7 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "62.217.52.162 (bstasks.bergersysteme.com, ticket.bergersysteme.com)",
+   "group": "62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
@@ -412,7 +412,7 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com)",
+   "group": "62.217.52.171 (bitwarden.bergersysteme.com)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
@@ -420,7 +420,7 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "62.217.52.171 (bitwarden.bergersysteme.com)",
+   "group": "79.140.188.181 (mail2.bergersysteme.com)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
@@ -428,51 +428,43 @@
    "check": "ip_reputation",
    "family": "ip_reputation",
    "cat": "E",
-   "group": "79.140.188.181 (mail2.bergersysteme.com)",
+   "group": "92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com)",
    "title": "Keine Einträge in Reputationsquellen"
   },
   {
    "id": "VS-2026-P24",
-   "check": "ip_reputation",
-   "family": "ip_reputation",
-   "cat": "E",
-   "group": "92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com)",
-   "title": "Keine Einträge in Reputationsquellen"
+   "check": "rdp_exposed",
+   "family": "rdp_exposed",
+   "cat": "A",
+   "group": "198.202.211.1 (www.bergersysteme.com)",
+   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
    "id": "VS-2026-P25",
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
-   "group": "198.202.211.1 (www.bergersysteme.com)",
+   "group": "92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
   },
   {
    "id": "VS-2026-P26",
-   "check": "rdp_exposed",
-   "family": "rdp_exposed",
+   "check": "smb_exposed",
+   "family": "smb_exposed",
    "cat": "A",
-   "group": "92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com)",
-   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
+   "group": "198.202.211.1 (www.bergersysteme.com)",
+   "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
    "id": "VS-2026-P27",
    "check": "smb_exposed",
    "family": "smb_exposed",
    "cat": "A",
-   "group": "198.202.211.1 (www.bergersysteme.com)",
-   "title": "Kein SMB-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P28",
-   "check": "smb_exposed",
-   "family": "smb_exposed",
-   "cat": "A",
    "group": "92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com)",
    "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-P29",
+   "id": "VS-2026-P28",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
@@ -480,11 +472,19 @@
    "title": "SPF-Eintrag vorhanden"
   },
   {
-   "id": "VS-2026-P30",
+   "id": "VS-2026-P29",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
    "group": "bergersysteme.com (+cdn.bergersysteme.com)",
+   "title": "Nur aktuelle TLS-Protokolle"
+  },
+  {
+   "id": "VS-2026-P30",
+   "check": "tls_legacy_protocols",
+   "family": "tls_legacy_protocols",
+   "cat": "D",
+   "group": "ftp.bergersysteme.com",
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
@@ -492,23 +492,23 @@
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
-   "group": "ftp.bergersysteme.com",
+   "group": "www.bergersysteme.com",
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
    "id": "VS-2026-P32",
-   "check": "tls_legacy_protocols",
-   "family": "tls_legacy_protocols",
+   "check": "tls_no_13",
+   "family": "tls_no_13",
    "cat": "D",
-   "group": "www.bergersysteme.com",
-   "title": "Nur aktuelle TLS-Protokolle"
+   "group": "bergersysteme.com (+cdn.bergersysteme.com)",
+   "title": "TLS 1.3 verfügbar"
   },
   {
    "id": "VS-2026-P33",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
-   "group": "bergersysteme.com (+cdn.bergersysteme.com)",
+   "group": "ftp.bergersysteme.com",
    "title": "TLS 1.3 verfügbar"
   },
   {
@@ -516,19 +516,11 @@
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
-   "group": "ftp.bergersysteme.com",
-   "title": "TLS 1.3 verfügbar"
-  },
-  {
-   "id": "VS-2026-P35",
-   "check": "tls_no_13",
-   "family": "tls_no_13",
-   "cat": "D",
    "group": "www.bergersysteme.com",
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P36",
+   "id": "VS-2026-P35",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -536,7 +528,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P37",
+   "id": "VS-2026-P36",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -544,7 +536,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P38",
+   "id": "VS-2026-P37",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -552,7 +544,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P39",
+   "id": "VS-2026-P38",
    "check": "waf_present",
    "family": "waf_present",
    "cat": "D",

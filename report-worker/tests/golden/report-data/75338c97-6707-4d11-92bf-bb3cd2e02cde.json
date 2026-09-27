@@ -190,7 +190,7 @@
    },
    {
     "c": "mittel (Passivquelle, Zeitversatz)",
-    "t": "Shodan, AbuseIPDB, OTX, URLhaus",
+    "t": "Shodan, AbuseIPDB, OTX, URLhaus (ohne Ergebnis)",
     "u": "Passive Dienst- und Reputationsdaten"
    }
   ],
@@ -198,7 +198,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein noch gültiges Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen. Ein am Scantag bereits abgelaufenes Zertifikat an Diensten außerhalb der Webseiten (Mail, Datei, Verwaltung) folgt der Tabelle: Exposition erhöht, Gelb, In Kürze."
    },
    {
     "l": "Gelb",
@@ -929,7 +929,7 @@
    "evidence": "DNS-Abfragen · phase0/dns_records_vectiscan.de.json\nvectiscan.de · MX-Einträge: mx00.udag.de, mx01.udag.de · DMARC: v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de",
    "found": "Die DMARC-Richtlinie der Domain vectiscan.de ist auf reine Beobachtung gesetzt: vectiscan.de (p=none). E-Mails, die SPF oder DKIM nicht bestehen, werden dadurch nicht zurückgewiesen oder unter Quarantäne gestellt.",
    "id": "VS-2026-003",
-   "impact": "Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte E-Mails im Namen der Domain kommen weiterhin beim Empfänger an. Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse. Eingehende E-Mail nimmt ein Mailserver außerhalb der eigenen Domain an: mx00.udag.de, mx01.udag.de. Die Umstellung der Richtlinie betrifft auch dessen Betreiber.",
+   "impact": "Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte E-Mails im Namen der Domain kommen weiterhin beim Empfänger an. Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse dmarc@vectiscan.de.",
    "key": "mail_policy/vectiscan.de/kunde",
    "level": "mittel",
    "level_label": "mittel",
@@ -987,16 +987,7 @@
       "vectiscan.de|vectiscan.de"
      ],
      "statement": "meaning[1]",
-     "text": "Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse."
-    },
-    {
-     "check": "dmarc_none",
-     "field": "meaning",
-     "members": [
-      "vectiscan.de|vectiscan.de"
-     ],
-     "statement": "meaning[4]",
-     "text": "Eingehende E-Mail nimmt ein Mailserver außerhalb der eigenen Domain an: mx00.udag.de, mx01.udag.de. Die Umstellung der Richtlinie betrifft auch dessen Betreiber."
+     "text": "Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse dmarc@vectiscan.de."
     },
     {
      "check": "dmarc_none",
@@ -1874,7 +1865,7 @@
     "status": "blau"
    }
   ],
-  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von vectigal.tech und vectiscan.de am 20.09.2026: 31 Hostnamen auf 2 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
+  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von vectigal.tech und vectiscan.de am 20.09.2026: 31 Hostnamen auf 2 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 2 Systeme (62.217.52.165 und 62.217.52.177) liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
@@ -1909,8 +1900,8 @@
  "landscape_lead": "8 Befunde in 3 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 19,
-  "catalog_digest": "bbd6dccec70f05898fcc9e7fbbb77f57bca528dd070683052c467e758681182a",
-  "catalog_version": "2026-09-27.1",
+  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
+  "catalog_version": "2026-09-27.2",
   "classification": "Vertraulich",
   "consolidated": 8,
   "context_fields": [],
@@ -1922,7 +1913,7 @@
    "vectiscan.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.2.0",
+  "facts_schema_version": "1.3.0",
   "fqdns_total": 31,
   "generated_on": null,
   "generation": null,
@@ -1937,7 +1928,7 @@
   ],
   "package": "WebCheck",
   "package_label": "WEBCHECK",
-  "policy_version": "2026-09-27.1",
+  "policy_version": "2026-09-27.2",
   "positives": 2,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -2235,7 +2226,7 @@
     "role": "Nicht näher bestimmbar"
    }
   ],
-  "lead": "Der Scan hat 2 Systeme mit 2 IP-Adressen und 31 Hostnamen erfasst. Für 2 Systeme (2 Adressen) war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 2 Systeme mit 2 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort, und 31 Hostnamen erfasst. Für 2 Systeme (2 Adressen) war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [
@@ -2528,7 +2519,7 @@
    {
     "n": "0",
     "name": "Aufklärung (passiv)",
-    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 31 Hostnamen auf 2 IP-Adressen."
+    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 31 Hostnamen auf 2 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort."
    },
    {
     "n": "1",

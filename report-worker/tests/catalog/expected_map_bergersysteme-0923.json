@@ -5,6 +5,7 @@
  "hinweis_s6b2": "S6b-2 hat neun Markierungen aufgeloest: Q13 Plesk auf dem Sammelserver als admin_panel_hoster beim Hoster (erhoeht), Cloudflare-Ports 2083/2087/8880 ohne Fingerabdruck entfallen; Q4 dane_missing (MX in fremder Zone) und SSH-Banner entfallen; Q12 die vier Zertifikats-Positivbefunde stehen im Bericht nicht mehr, weil die Mail-TLS-Dienste des Hosts nie geprueft wurden (bundles.tls_untested_hosts; die Katalogergebnisse bleiben bestanden), waf_present entfaellt (Antwort des Weiterleitungsziels). Es bleiben fuenf Q8-Markierungen (S6c).",
  "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Befunde: csp_missing bergersysteme.com (+cdn.bergersysteme.com) (R1); csp_missing ftp.bergersysteme.com (R1); security_headers_incomplete bergersysteme.com (+cdn.bergersysteme.com) (R1); security_headers_incomplete ftp.bergersysteme.com (R1); entfallene Positivaussagen: urlhaus_compromise bergersysteme.com (R6 (URLhaus no_data ist kein Negativergebnis)). Q8 nach Entscheidung DC 1 aufgelöst (R1, Messung an der Endseite oder nicht prüfbar): csp_missing bergersysteme.com (+cdn.bergersysteme.com); csp_missing ftp.bergersysteme.com; security_headers_incomplete bergersysteme.com (+cdn.bergersysteme.com); security_headers_incomplete ftp.bergersysteme.com. Als Q8 für S6c bleiben (hsts_missing gilt an jeder Antwort): VS-2026-008 hsts_missing ftp.bergersysteme.com.",
  "hinweis_s6b4": "S6b-4 (spec/11): Soll-Liste nach Katalog 2026-09-27.1 und Fakten 1.2.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (T-Nummer oder Teil 3) und warum. entfallene Befunde: hsts_missing ftp.bergersysteme.com (T4 (E20)).",
+ "hinweis_s6b4n": "S6b-4n (spec/11 Teil 6): Soll-Liste nach Katalog 2026-09-27.2 und Fakten 1.3.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (N-Nummer) und warum. entfallene Positivaussagen: ip_reputation 198.202.211.1 (www.bergersysteme.com) (N6 (Plattform- und CDN-Adresse, Reputation nicht kundenbezogen)).",
  "strict": false,
  "orders": {
   "main": "68d59573-7a93-4efa-89cc-e7b10cc4d140"
@@ -45,7 +46,9 @@
   "VS-2026-007": {
    "checks": [
     "hsts_missing"
-   ]
+   ],
+   "spec11": "N2",
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung)."
   },
   "VS-2026-008": {
    "checks": [
@@ -84,14 +87,16 @@
     "service_cert_expired"
    ],
    "spec10": "R3",
-   "warum": "Mail- und Dateiports mit abgelaufenem Zertifikat aus nmap ssl-cert; neue Prüfung."
+   "warum": "Zertifikat einmal in der Beobachtung, nicht je Port in der Betroffenenliste.",
+   "spec11": "N10"
   },
   "VS-2026-015": {
    "checks": [
     "smtp_vrfy_enabled_passive"
    ],
    "spec10": "R19",
-   "warum": "VRFY im SMTP-Banner laut Shodan; neue Prüfung."
+   "warum": "Shodan last_update heißt „Hosteintrag aktualisiert am“, nicht „gesehen am“.",
+   "spec11": "N15"
   },
   "VS-2026-016": {
    "checks": [
@@ -200,9 +205,7 @@
   "VS-2026-P19": {
    "checks": [
     "ip_reputation"
-   ],
-   "spec11": "Teil 3 BS",
-   "warum": "Plattform- und CDN-Adressen ohne Meldung stehen im Positivbefund; einen Befund erzeugen sie nicht."
+   ]
   },
   "VS-2026-P20": {
    "checks": [
@@ -226,7 +229,7 @@
   },
   "VS-2026-P24": {
    "checks": [
-    "ip_reputation"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P25": {
@@ -236,7 +239,7 @@
   },
   "VS-2026-P26": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P27": {
@@ -246,29 +249,29 @@
   },
   "VS-2026-P28": {
    "checks": [
-    "smb_exposed"
+    "spf_missing"
    ]
   },
   "VS-2026-P29": {
    "checks": [
-    "spf_missing"
-   ]
-  },
-  "VS-2026-P30": {
-   "checks": [
     "tls_legacy_protocols"
    ]
   },
-  "VS-2026-P31": {
+  "VS-2026-P30": {
    "checks": [
     "tls_legacy_protocols"
    ],
    "spec10": "R4",
    "warum": "testssl-Ergebnis gilt je Adresse und Port für alle virtuellen Hosts."
   },
-  "VS-2026-P32": {
+  "VS-2026-P31": {
    "checks": [
     "tls_legacy_protocols"
+   ]
+  },
+  "VS-2026-P32": {
+   "checks": [
+    "tls_no_13"
    ]
   },
   "VS-2026-P33": {
@@ -283,27 +286,22 @@
   },
   "VS-2026-P35": {
    "checks": [
-    "tls_no_13"
-   ]
-  },
-  "VS-2026-P36": {
-   "checks": [
     "tls_weak_ciphers"
    ]
   },
-  "VS-2026-P37": {
+  "VS-2026-P36": {
    "checks": [
     "tls_weak_ciphers"
    ],
    "spec10": "R4",
    "warum": "testssl-Ergebnis gilt je Adresse und Port für alle virtuellen Hosts; ohne angebotene CBC-Verfahren."
   },
-  "VS-2026-P38": {
+  "VS-2026-P37": {
    "checks": [
     "tls_weak_ciphers"
    ]
   },
-  "VS-2026-P39": {
+  "VS-2026-P38": {
    "checks": [
     "waf_present"
    ]

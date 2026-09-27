@@ -69,7 +69,7 @@
     "host": "92.205.224.174",
     "port": "53",
     "ref": "",
-    "svc": "DOMAIN"
+    "svc": "DNS"
    },
    {
     "host": "92.205.224.174",
@@ -129,7 +129,7 @@
     "host": "198.202.211.1",
     "port": "2053",
     "ref": "",
-    "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
+    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "198.202.211.1",
@@ -141,7 +141,7 @@
     "host": "198.202.211.1",
     "port": "2083",
     "ref": "",
-    "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
+    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "198.202.211.1",
@@ -153,7 +153,7 @@
     "host": "198.202.211.1",
     "port": "2087",
     "ref": "",
-    "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
+    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "198.202.211.1",
@@ -165,7 +165,7 @@
     "host": "198.202.211.1",
     "port": "2096",
     "ref": "",
-    "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
+    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "198.202.211.1",
@@ -213,7 +213,7 @@
     "host": "92.205.224.174",
     "port": "8880",
     "ref": "VS-2026-001",
-    "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
+    "svc": "Plesk, laut Passivquelle, außerhalb des geprüften Portbereichs"
    }
   ],
   "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
@@ -274,12 +274,12 @@
    },
    {
     "c": "hoch",
-    "t": "DNS-Abfragen, dnsx, subfinder, gobuster, crt.sh, Certspotter, SecurityTrails",
+    "t": "DNS-Abfragen, dnsx, subfinder, gobuster, crt.sh, Certspotter, SecurityTrails (ohne Ergebnis)",
     "u": "Ermittlung der Hostnamen, DNS-Auflösung und DNS-Sicherheitseinträge"
    },
    {
     "c": "mittel (Passivquelle, Zeitversatz)",
-    "t": "Shodan, AbuseIPDB, OTX, URLhaus",
+    "t": "Shodan, AbuseIPDB, OTX, URLhaus (ohne Ergebnis)",
     "u": "Passive Dienst- und Reputationsdaten"
    }
   ],
@@ -287,7 +287,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein noch gültiges Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen. Ein am Scantag bereits abgelaufenes Zertifikat an Diensten außerhalb der Webseiten (Mail, Datei, Verwaltung) folgt der Tabelle: Exposition erhöht, Gelb, In Kürze."
    },
    {
     "l": "Gelb",
@@ -307,9 +307,10 @@
   ]
  },
  "architecture": {
-  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 6 Systeme mit folgenden Aufgaben: E-Mail-Versand laut SPF und Website. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 6 Systeme mit folgenden Aufgaben: Dateiaustausch, E-Mail-Versand laut SPF, Mail-Webzugang laut Passivquelle, Mailabruf und Einlieferung, Website und Weiterleitung auf www.bergersysteme.com. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
-   "Beobachtung ohne Regeltreffer, nicht als Befund bewertet: Anmeldung vor STARTTLS angeboten (92.205.224.174:25, laut Passivquelle)."
+   "Beobachtung ohne Regeltreffer, nicht als Befund bewertet: Anmeldung vor STARTTLS angeboten (92.205.224.174:25, laut Passivquelle).",
+   "An 198.202.211.1 meldet die Passivquelle die Ports 2052, 2053, 2082, 2083, 2086, 2087, 2095, 2096, 8880; es sind Standardports der CDN-Kante des Anbieters (Cloudflare), sie gehören nicht zu Ihren Systemen und sind nicht bewertet."
   ],
   "posture": [
    {
@@ -834,9 +835,7 @@
     "what": "403 Forbidden"
    },
    {
-    "also": [
-     "bergersysteme.com"
-    ],
+    "also": [],
     "file": "198.202.211.1__www.bergersysteme.com.png",
     "host": "www.bergersysteme.com",
     "key": "68d59573-7a93-4efa-89cc-e7b10cc4d140/198.202.211.1__www.bergersysteme.com.png",
@@ -876,7 +875,7 @@
      },
      {
       "p": "2053",
-      "s": "unbekannt",
+      "s": "Cloudflare",
       "st": "grau"
      },
      {
@@ -886,7 +885,7 @@
      },
      {
       "p": "2083",
-      "s": "HTTPS",
+      "s": "Cloudflare",
       "st": "grau"
      },
      {
@@ -896,7 +895,7 @@
      },
      {
       "p": "2087",
-      "s": "HTTPS",
+      "s": "Cloudflare",
       "st": "grau"
      },
      {
@@ -906,7 +905,7 @@
      },
      {
       "p": "2096",
-      "s": "unbekannt",
+      "s": "Cloudflare",
       "st": "grau"
      },
      {
@@ -975,7 +974,7 @@
      },
      {
       "p": "53",
-      "s": "DOMAIN",
+      "s": "DNS",
       "st": "gruen"
      },
      {
@@ -1025,7 +1024,7 @@
      },
      {
       "p": "8880",
-      "s": "HTTPS",
+      "s": "Plesk",
       "st": "gelb"
      }
     ]
@@ -1153,13 +1152,15 @@
    },
    {
     "evidence": [
+     "Passivquelle Port 443: https://62.217.52.166/owa/",
      "SPF-Eintrag von bergersysteme.com: a:mail.bergersysteme.com"
     ],
-    "meaning": "Dieses System darf laut SPF-Eintrag E-Mail im Namen der Domain versenden. Ein Missbrauch trifft die Glaubwürdigkeit der eigenen Absenderadresse.",
+    "meaning": "Webzugang zu den Postfächern. Mit erbeuteten Zugangsdaten ist darüber die E-Mail der Mitarbeitenden erreichbar, sofern kein zweiter Faktor verlangt wird; ob ein zweiter Faktor aktiv ist, ist von außen nicht feststellbar.",
     "role_keys": [
+     "webmail",
      "mail_versand"
     ],
-    "system": "E-Mail-Versand laut SPF (mail.bergersysteme.com, owa.bergersysteme.com)"
+    "system": "Mail-Webzugang laut Passivquelle, E-Mail-Versand laut SPF (mail.bergersysteme.com, owa.bergersysteme.com)"
    },
    {
     "evidence": [],
@@ -1174,10 +1175,20 @@
     "system": "Nicht näher bestimmbar (mail2.bergersysteme.com)"
    },
    {
-    "evidence": [],
-    "meaning": "Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte intern geklärt werden.",
-    "role_keys": [],
-    "system": "Nicht näher bestimmbar (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com)"
+    "evidence": [
+     "21/tcp ftp ProFTPD",
+     "110/tcp Dovecot pop3d",
+     "143/tcp Dovecot imapd",
+     "993/tcp Dovecot imapd",
+     "bergersysteme.com: leitet auf www.bergersysteme.com weiter"
+    ],
+    "meaning": "Austausch von Dateien mit Dritten. Die Inhalte und die verwendeten Zugangsdaten sind hier das Schutzgut.",
+    "role_keys": [
+     "dateiaustausch",
+     "mail_dienste",
+     "weiterleitung"
+    ],
+    "system": "Dateiaustausch, Mailabruf und Einlieferung, Weiterleitung auf www.bergersysteme.com (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com)"
    }
   ]
  },
@@ -1190,9 +1201,9 @@
     "admin_service_exposed_passive"
    ],
    "evidence": "nmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:443/tcp · Dienst: http · Produkt: nginx · Seitentitel: Plesk Obsidian 18.0.80 · TLS erzwungen: ja · Zertifikat für: 174.224.205.92.host.secureserver.net · Aussteller: YR1 · gültig bis: 05.12.2026, 17:11 UTC\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:8443/tcp · Dienst: https-alt · Produkt: sw-cp-server · Server-Kennung: sw-cp-server · Seitentitel: Plesk Obsidian 18.0.80 · Anmeldung verlangt: ja · TLS erzwungen: ja · Zertifikat für: 174.224.205.92.host.secureserver.net · Aussteller: YR1 · gültig bis: 05.12.2026, 17:11 UTC\n\nShodan · phase0a/shodan_hosts.json\nQuelle: shodan · 92.205.224.174:8880 · Dienst gesehen am: 17.09.2026 · Banner (Auszug): HTTP/1.1 200 OK Server: sw-cp-server Date: Thu, 17 Sep 2026 16:28:15 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked",
-   "found": "Auf dem geteilten Server 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 92.205.224.174:443 (Plesk), 92.205.224.174:8443 (Plesk). Laut Passivquelle ist dieselbe Verwaltungsoberfläche auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) zusätzlich über einen weiteren Port erreichbar: 92.205.224.174:8880 (Plesk, laut Passivquelle, gesehen am 17.09.2026). Der Port liegt außerhalb des geprüften Portbereichs; der Portscan hat ihn nicht erfasst. Die Oberfläche erscheint beim Aufruf über die IP-Adresse, also auf der Standardseite des Webservers: 92.205.224.174:443 (Plesk). Auf dem Server liegen laut Zertifikat oder Passivquelle weitere Domains; die Verwaltung betreibt der Hoster.",
+   "found": "Auf dem geteilten Server 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 92.205.224.174:443 (Plesk), 92.205.224.174:8443 (Plesk) und laut Passivquelle 92.205.224.174:8880 (Plesk, gesehen am 17.09.2026, außerhalb des geprüften Portbereichs). Die Oberfläche erscheint beim Aufruf über die IP-Adresse, also auf der Standardseite des Webservers: 92.205.224.174:443 (Plesk). Auf dem Server liegt laut Passivquelle 1 weitere Domain; die Verwaltung betreibt der Hoster.",
    "id": "VS-2026-001",
-   "impact": "Eine Übernahme der Verwaltungsoberfläche beträfe alle Dienste auf diesem Server. Abschalten oder beschränken kann sie nur der Hoster. Dazu gehören die eigenen Webseiten auf diesem Server.",
+   "impact": "Eine Übernahme der Verwaltungsoberfläche beträfe alle Dienste auf diesem Server. Dazu gehören die eigenen Webseiten auf diesem Server. Abschalten oder beschränken kann sie nur der Hoster.",
    "key": "admin_access/92.205.224.174/hoster:Host Europe GmbH",
    "level": "erhoeht",
    "level_label": "erhöht",
@@ -1224,16 +1235,7 @@
       "92.205.224.174|92.205.224.174:8443"
      ],
      "statement": "short",
-     "text": "Verwaltungsoberfläche des Hosters"
-    },
-    {
-     "check": "admin_service_exposed_passive",
-     "field": "title",
-     "members": [
-      "92.205.224.174|shodan:92.205.224.174:8880"
-     ],
-     "statement": "short",
-     "text": "Verwaltungsoberfläche laut Passivquelle"
+     "text": "Verwaltungsoberfläche Plesk auf 443, 8443 und laut Passivquelle 8880"
     },
     {
      "check": "admin_panel_hoster",
@@ -1243,25 +1245,7 @@
       "92.205.224.174|92.205.224.174:8443"
      ],
      "statement": "observation[0]",
-     "text": "Auf dem geteilten Server 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 92.205.224.174:443 (Plesk), 92.205.224.174:8443 (Plesk)."
-    },
-    {
-     "check": "admin_service_exposed_passive",
-     "field": "observation",
-     "members": [
-      "92.205.224.174|shodan:92.205.224.174:8880"
-     ],
-     "statement": "observation[1]",
-     "text": "Laut Passivquelle ist dieselbe Verwaltungsoberfläche auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) zusätzlich über einen weiteren Port erreichbar: 92.205.224.174:8880 (Plesk, laut Passivquelle, gesehen am 17.09.2026)."
-    },
-    {
-     "check": "admin_service_exposed_passive",
-     "field": "observation",
-     "members": [
-      "92.205.224.174|shodan:92.205.224.174:8880"
-     ],
-     "statement": "observation[3]",
-     "text": "Der Port liegt außerhalb des geprüften Portbereichs; der Portscan hat ihn nicht erfasst."
+     "text": "Auf dem geteilten Server 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 92.205.224.174:443 (Plesk), 92.205.224.174:8443 (Plesk) und laut Passivquelle 92.205.224.174:8880 (Plesk, gesehen am 17.09.2026, außerhalb des geprüften Portbereichs)."
     },
     {
      "check": "admin_panel_hoster",
@@ -1280,7 +1264,7 @@
       "92.205.224.174|92.205.224.174:8443"
      ],
      "statement": "observation[2]",
-     "text": "Auf dem Server liegen laut Zertifikat oder Passivquelle weitere Domains; die Verwaltung betreibt der Hoster."
+     "text": "Auf dem Server liegt laut Passivquelle 1 weitere Domain; die Verwaltung betreibt der Hoster."
     },
     {
      "check": "admin_panel_hoster",
@@ -1290,7 +1274,7 @@
       "92.205.224.174|92.205.224.174:8443"
      ],
      "statement": "meaning[0]",
-     "text": "Eine Übernahme der Verwaltungsoberfläche beträfe alle Dienste auf diesem Server. Abschalten oder beschränken kann sie nur der Hoster."
+     "text": "Eine Übernahme der Verwaltungsoberfläche beträfe alle Dienste auf diesem Server."
     },
     {
      "check": "admin_panel_hoster",
@@ -1304,6 +1288,16 @@
     },
     {
      "check": "admin_panel_hoster",
+     "field": "meaning",
+     "members": [
+      "92.205.224.174|92.205.224.174:443",
+      "92.205.224.174|92.205.224.174:8443"
+     ],
+     "statement": "meaning[3]",
+     "text": "Abschalten oder beschränken kann sie nur der Hoster."
+    },
+    {
+     "check": "admin_panel_hoster",
      "field": "verify",
      "members": [
       "92.205.224.174|92.205.224.174:443",
@@ -1314,12 +1308,12 @@
     },
     {
      "check": "admin_service_exposed_passive",
-     "field": "verify",
+     "field": "observation_zusatz",
      "members": [
       "92.205.224.174|shodan:92.205.224.174:8880"
      ],
-     "statement": "verify[0]",
-     "text": "Verbindungsversuch auf den gemeldeten Port von einer externen Adresse; erwartet wird keine Verwaltungsanmeldung ohne Zugriffsbeschränkung."
+     "statement": "observation[1]",
+     "text": "und laut Passivquelle 92.205.224.174:8880 (Plesk, gesehen am 17.09.2026, außerhalb des geprüften Portbereichs)"
     },
     {
      "check": "admin_panel_hoster",
@@ -1330,15 +1324,6 @@
      ],
      "statement": "recommendation[0]",
      "text": "Den Hoster bitten, die Verwaltungsoberfläche auf die benötigten Quellnetze zu beschränken oder hinter eine zusätzliche Anmeldestufe zu legen."
-    },
-    {
-     "check": "admin_service_exposed_passive",
-     "field": "recommendation",
-     "members": [
-      "92.205.224.174|shodan:92.205.224.174:8880"
-     ],
-     "statement": "recommendation[2]",
-     "text": "Den gemeldeten Port prüfen und die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken."
     },
     {
      "check": "admin_panel_hoster",
@@ -1357,10 +1342,6 @@
      "Den Hoster bitten, die Verwaltungsoberfläche auf die benötigten Quellnetze zu beschränken oder hinter eine zusätzliche Anmeldestufe zu legen."
     ],
     [
-     "In Kürze",
-     "Den gemeldeten Port prüfen und die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken."
-    ],
-    [
      "Mittelfristig",
      "Beim Hoster erfragen, wie die Verwaltungssoftware gepflegt wird, und die Zugangsdaten des eigenen Kundenkontos mit einer zweiten Anmeldestufe schützen."
     ]
@@ -1376,9 +1357,9 @@
     "admin_service_exposed_passive|shodan:92.205.224.174:8880"
    ],
    "threat": null,
-   "title": "Verwaltungszugänge auf 92.205.224.174: Verwaltungsoberfläche des Hosters und Verwaltungsoberfläche laut Passivquelle (beim Hoster Host Europe GmbH)",
+   "title": "Verwaltungszugänge auf 92.205.224.174: Verwaltungsoberfläche Plesk auf 443, 8443 und laut Passivquelle 8880 (beim Hoster Host Europe GmbH)",
    "urgency": "In Kürze",
-   "verify": "Den genannten Port von einer externen Adresse aufrufen; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung des Hosters. Verbindungsversuch auf den gemeldeten Port von einer externen Adresse; erwartet wird keine Verwaltungsanmeldung ohne Zugriffsbeschränkung."
+   "verify": "Den genannten Port von einer externen Adresse aufrufen; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung des Hosters."
   },
   {
    "affected": "92.205.224.174:110 (POP3 mit Anmeldung vor STARTTLS), 92.205.224.174:143 (IMAP mit Anmeldung vor STARTTLS)",
@@ -1498,15 +1479,15 @@
    "verify": "Verbindung zum Mailabrufdienst von außen aufbauen, bevor STARTTLS angefordert wird; erwartet wird die Ablehnung dieser unverschlüsselten Anmeldung."
   },
   {
-   "affected": "92.205.224.174:110 (Dovecot pop3d, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen), 92.205.224.174:143 (Dovecot imapd, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen), 92.205.224.174:465 (Postfix smtpd, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen), 92.205.224.174:993 (Dovecot imapd, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen), 92.205.224.174:995 (Dovecot pop3d, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen)",
+   "affected": "92.205.224.174:110 (Dovecot pop3d), 92.205.224.174:143 (Dovecot imapd), 92.205.224.174:465 (Postfix smtpd), 92.205.224.174:993 (Dovecot imapd), 92.205.224.174:995 (Dovecot pop3d)",
    "cat": "D",
    "checks": [
     "service_cert_expired"
    ],
    "evidence": "nmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:110/tcp · Dienst: pop3 · Produkt: Dovecot pop3d · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · Anmeldeverfahren: CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN · Zertifikat für: Plesk · Aussteller: Plesk · gültig bis: 18.07.2025, 18:06 UTC · selbstsigniert: ja · POP3-Fähigkeiten: AUTH-RESP-CODE RESP-CODES SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) STLS UIDL PIPELINING APOP TOP USER CAPA\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:143/tcp · Dienst: imap · Produkt: Dovecot imapd · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · Anmeldeverfahren: CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN · Zertifikat für: Plesk · Aussteller: Plesk · gültig bis: 18.07.2025, 18:06 UTC · selbstsigniert: ja · IMAP-Fähigkeiten: AUTH=CRAM-MD5 AUTH=DIGEST-MD5 AUTH=LOGIN ID IMAP4rev1 STARTTLS SASL-IR AUTH=PLAIN LITERAL+ LOGIN-REFERRALS IDLE ENABLE\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:465/tcp · Dienst: smtp · Produkt: Postfix smtpd · TLS erzwungen: ja · STARTTLS: nein · Anmeldeverfahren: CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN · Zertifikat für: Plesk · Aussteller: Plesk · gültig bis: 18.07.2025, 18:06 UTC · selbstsigniert: ja · SMTP-Befehle: 174.224.205.92.host.secureserver.net, PIPELINING, SIZE 10240000, ETRN, AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:993/tcp · Dienst: imap · Produkt: Dovecot imapd · TLS erzwungen: ja · STARTTLS: nein · Anmeldung vor TLS gesperrt: nein · Anmeldeverfahren: CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN · Zertifikat für: Plesk · Aussteller: Plesk · gültig bis: 18.07.2025, 18:06 UTC · selbstsigniert: ja · IMAP-Fähigkeiten: AUTH=CRAM-MD5 AUTH=LOGIN ID IMAP4rev1 AUTH=DIGEST-MD5 AUTH=PLAIN SASL-IR LITERAL+ LOGIN-REFERRALS IDLE ENABLE\n\nnmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:995/tcp · Dienst: pop3 · Produkt: Dovecot pop3d · TLS erzwungen: ja · STARTTLS: nein · Anmeldeverfahren: CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN · Zertifikat für: Plesk · Aussteller: Plesk · gültig bis: 18.07.2025, 18:06 UTC · selbstsigniert: ja · POP3-Fähigkeiten: AUTH-RESP-CODE RESP-CODES SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) APOP PIPELINING UIDL TOP USER CAPA",
-   "found": "Auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) liefern Dienste außerhalb der Webseiten ein abgelaufenes Zertifikat aus: 92.205.224.174:110 (Dovecot pop3d, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen), 92.205.224.174:143 (Dovecot imapd, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen), 92.205.224.174:465 (Postfix smtpd, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen), 92.205.224.174:993 (Dovecot imapd, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen), 92.205.224.174:995 (Dovecot pop3d, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen). Das Zertifikat ist zudem selbst signiert und stammt von keiner anerkannten Zertifizierungsstelle.",
+   "found": "Auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) liefern Dienste außerhalb der Webseiten ein abgelaufenes Zertifikat aus (Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen): 92.205.224.174:110 (Dovecot pop3d), 92.205.224.174:143 (Dovecot imapd), 92.205.224.174:465 (Postfix smtpd), 92.205.224.174:993 (Dovecot imapd), 92.205.224.174:995 (Dovecot pop3d). Das Zertifikat ist zudem selbst signiert und stammt von keiner anerkannten Zertifizierungsstelle.",
    "id": "VS-2026-003",
-   "impact": "Mail- und Dateiclients warnen bei abgelaufenen Zertifikaten oder brechen die Verbindung ab; wer die Warnung regelmäßig wegklickt, erkennt ein untergeschobenes Zertifikat nicht mehr.",
+   "impact": "Mailclients warnen bei abgelaufenen Zertifikaten oder brechen die Verbindung ab; wer die Warnung regelmäßig wegklickt, erkennt ein untergeschobenes Zertifikat nicht mehr.",
    "key": "cert_health/92.205.224.174/hoster:Host Europe GmbH",
    "level": "erhoeht",
    "level_label": "erhöht",
@@ -1514,19 +1495,19 @@
    "operator": "beim Hoster Host Europe GmbH",
    "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Dienst gehört zum Server und nicht zu Ihrer Website. Auf demselben Server steht laut Passivquelle 1 weitere Domain. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen.",
    "plan_action": "Für die betroffenen Dienste ein gültiges Zertifikat hinterlegen, das den Servernamen abdeckt, mit dem die Clients sich verbinden.",
-   "plan_effect": "Verhindert Zertifikatswarnungen an Mail- und Dateiclients",
+   "plan_effect": "Verhindert Zertifikatswarnungen an Mailclients",
    "plan_items": [
     {
      "action": "Für die betroffenen Dienste ein gültiges Zertifikat hinterlegen, das den Servernamen abdeckt, mit dem die Clients sich verbinden.",
      "check": "service_cert_expired",
      "detail": "",
-     "effect": "Verhindert Zertifikatswarnungen an Mail- und Dateiclients",
-     "lever": "Gültige Zertifikate für alle TLS-Dienste hinterlegen",
+     "effect": "Verhindert Zertifikatswarnungen an Mailclients",
+     "lever": "Gültige Zertifikate für die Maildienste hinterlegen",
      "per_rule": false,
      "stage": "in_kuerze"
     }
    ],
-   "plan_lever": "Gültige Zertifikate für alle TLS-Dienste hinterlegen",
+   "plan_lever": "Gültige Zertifikate für die Maildienste hinterlegen",
    "plan_stage": "in_kuerze",
    "policy": "service_cert_expired",
    "provenance": [
@@ -1554,7 +1535,7 @@
       "92.205.224.174|92.205.224.174:995"
      ],
      "statement": "observation[0]",
-     "text": "Auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) liefern Dienste außerhalb der Webseiten ein abgelaufenes Zertifikat aus: 92.205.224.174:110 (Dovecot pop3d, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen), 92.205.224.174:143 (Dovecot imapd, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen), 92.205.224.174:465 (Postfix smtpd, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen), 92.205.224.174:993 (Dovecot imapd, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen), 92.205.224.174:995 (Dovecot pop3d, Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen)."
+     "text": "Auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) liefern Dienste außerhalb der Webseiten ein abgelaufenes Zertifikat aus (Zertifikat Plesk, am Scantag seit 18.07.2025, 18:06 UTC abgelaufen): 92.205.224.174:110 (Dovecot pop3d), 92.205.224.174:143 (Dovecot imapd), 92.205.224.174:465 (Postfix smtpd), 92.205.224.174:993 (Dovecot imapd), 92.205.224.174:995 (Dovecot pop3d)."
     },
     {
      "check": "service_cert_expired",
@@ -1580,7 +1561,7 @@
       "92.205.224.174|92.205.224.174:995"
      ],
      "statement": "meaning[0]",
-     "text": "Mail- und Dateiclients warnen bei abgelaufenen Zertifikaten oder brechen die Verbindung ab; wer die Warnung regelmäßig wegklickt, erkennt ein untergeschobenes Zertifikat nicht mehr."
+     "text": "Mailclients warnen bei abgelaufenen Zertifikaten oder brechen die Verbindung ab; wer die Warnung regelmäßig wegklickt, erkennt ein untergeschobenes Zertifikat nicht mehr."
     },
     {
      "check": "service_cert_expired",
@@ -1785,18 +1766,18 @@
    "evidence": "DNS-Abfragen · phase0/dns_records.json\nbergersysteme.com · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere · DMARC: v=DMARC1; p=none; pct=100; rua=mailto:a.jg23hj7j@reports.hornetdmarc.com,mailto:dmarc@bergersysteme.com",
    "found": "Die DMARC-Richtlinie der Domain bergersysteme.com ist auf reine Beobachtung gesetzt: bergersysteme.com (p=none). E-Mails, die SPF oder DKIM nicht bestehen, werden dadurch nicht zurückgewiesen oder unter Quarantäne gestellt.",
    "id": "VS-2026-005",
-   "impact": "Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte E-Mails im Namen der Domain kommen weiterhin beim Empfänger an. Die Berichte gehen an eine Adresse außerhalb der eigenen Domain: a.jg23hj7j@reports.hornetdmarc.com, dmarc@bergersysteme.com. Sie erreichen damit zunächst den Empfänger dieser Adresse. Eingehende E-Mail nimmt ein Mailserver außerhalb der eigenen Domain an: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com, mx04.hornetsecurity.com. Die Umstellung der Richtlinie betrifft auch dessen Betreiber.",
+   "impact": "Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte E-Mails im Namen der Domain kommen weiterhin beim Empfänger an. Der DMARC-Eintrag ist per CNAME an bergersysteme.com.dmarc.hornetdmarc.com übertragen; die Richtlinie pflegt damit der Betreiber dieses Eintrags, die Umstellung erfolgt dort. Die Berichte gehen an dmarc@bergersysteme.com in der eigenen Domain und an a.jg23hj7j@reports.hornetdmarc.com außerhalb der eigenen Domain.",
    "key": "mail_policy/bergersysteme.com/kunde",
    "level": "mittel",
    "level_label": "mittel",
    "missing_headers": [],
    "operator": "",
    "operator_note": "",
-   "plan_action": "Die Berichte, die an a.jg23hj7j@reports.hornetdmarc.com, dmarc@bergersysteme.com gehen, beim Empfänger dieser Adresse anfordern und auswerten und alle legitimen Versandquellen der Domain bestätigen.",
+   "plan_action": "Die Berichte an dmarc@bergersysteme.com auswerten, die Auswertung der Berichte an a.jg23hj7j@reports.hornetdmarc.com beim Dienstleister anfordern und alle legitimen Versandquellen der Domain bestätigen.",
    "plan_effect": "Macht alle legitimen Versandquellen vor der Verschärfung sichtbar",
    "plan_items": [
     {
-     "action": "Die Berichte, die an a.jg23hj7j@reports.hornetdmarc.com, dmarc@bergersysteme.com gehen, beim Empfänger dieser Adresse anfordern und auswerten und alle legitimen Versandquellen der Domain bestätigen.",
+     "action": "Die Berichte an dmarc@bergersysteme.com auswerten, die Auswertung der Berichte an a.jg23hj7j@reports.hornetdmarc.com beim Dienstleister anfordern und alle legitimen Versandquellen der Domain bestätigen.",
      "check": "dmarc_none",
      "detail": "",
      "effect": "Macht alle legitimen Versandquellen vor der Verschärfung sichtbar",
@@ -1842,8 +1823,8 @@
      "members": [
       "bergersysteme.com|bergersysteme.com"
      ],
-     "statement": "meaning[3]",
-     "text": "Die Berichte gehen an eine Adresse außerhalb der eigenen Domain: a.jg23hj7j@reports.hornetdmarc.com, dmarc@bergersysteme.com. Sie erreichen damit zunächst den Empfänger dieser Adresse."
+     "statement": "meaning[4]",
+     "text": "Der DMARC-Eintrag ist per CNAME an bergersysteme.com.dmarc.hornetdmarc.com übertragen; die Richtlinie pflegt damit der Betreiber dieses Eintrags, die Umstellung erfolgt dort."
     },
     {
      "check": "dmarc_none",
@@ -1851,8 +1832,8 @@
      "members": [
       "bergersysteme.com|bergersysteme.com"
      ],
-     "statement": "meaning[4]",
-     "text": "Eingehende E-Mail nimmt ein Mailserver außerhalb der eigenen Domain an: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com, mx04.hornetsecurity.com. Die Umstellung der Richtlinie betrifft auch dessen Betreiber."
+     "statement": "meaning[6]",
+     "text": "Die Berichte gehen an dmarc@bergersysteme.com in der eigenen Domain und an a.jg23hj7j@reports.hornetdmarc.com außerhalb der eigenen Domain."
     },
     {
      "check": "dmarc_none",
@@ -1869,8 +1850,8 @@
      "members": [
       "bergersysteme.com|bergersysteme.com"
      ],
-     "statement": "recommendation[3]",
-     "text": "Die Berichte, die an a.jg23hj7j@reports.hornetdmarc.com, dmarc@bergersysteme.com gehen, beim Empfänger dieser Adresse anfordern und auswerten und alle legitimen Versandquellen der Domain bestätigen."
+     "statement": "recommendation[4]",
+     "text": "Die Berichte an dmarc@bergersysteme.com auswerten, die Auswertung der Berichte an a.jg23hj7j@reports.hornetdmarc.com beim Dienstleister anfordern und alle legitimen Versandquellen der Domain bestätigen."
     },
     {
      "check": "dmarc_none",
@@ -1885,7 +1866,7 @@
    "recommendation": [
     [
      "Mittelfristig",
-     "Die Berichte, die an a.jg23hj7j@reports.hornetdmarc.com, dmarc@bergersysteme.com gehen, beim Empfänger dieser Adresse anfordern und auswerten und alle legitimen Versandquellen der Domain bestätigen."
+     "Die Berichte an dmarc@bergersysteme.com auswerten, die Auswertung der Berichte an a.jg23hj7j@reports.hornetdmarc.com beim Dienstleister anfordern und alle legitimen Versandquellen der Domain bestätigen."
     ],
     [
      "Strategisch",
@@ -2029,7 +2010,7 @@
     "hsts_missing"
    ],
    "evidence": "header_check · hosts/92.205.224.174/phase2/headers_bergersysteme.com.json\nbergersysteme.com · Adresse: https://bergersysteme.com · Antwort: 301 (Weiterleitung) · weitergeleitet auf: https://www.bergersysteme.com/ · Strict-Transport-Security: nicht gesetzt",
-   "found": "Der Dienst bergersysteme.com (+cdn.bergersysteme.com) liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: bergersysteme.com.",
+   "found": "Der Dienst bergersysteme.com liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: bergersysteme.com.",
    "id": "VS-2026-007",
    "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift.",
    "key": "web_header_hygiene/92.205.224.174/kunde",
@@ -2071,7 +2052,7 @@
       "bergersysteme.com@92.205.224.174|bergersysteme.com@92.205.224.174"
      ],
      "statement": "observation[0]",
-     "text": "Der Dienst bergersysteme.com (+cdn.bergersysteme.com) liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: bergersysteme.com."
+     "text": "Der Dienst bergersysteme.com liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: bergersysteme.com."
     },
     {
      "check": "hsts_missing",
@@ -2114,7 +2095,7 @@
     "hsts_missing|bergersysteme.com@92.205.224.174"
    ],
    "threat": null,
-   "title": "Absicherung der Webdienste auf bergersysteme.com (+cdn.bergersysteme.com): HSTS fehlt",
+   "title": "Absicherung der Webdienste auf bergersysteme.com: HSTS fehlt",
    "urgency": "Mittelfristig",
    "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security."
   },
@@ -2412,7 +2393,7 @@
    "evidence": "header_check · hosts/198.202.211.1/phase2/headers_www.bergersysteme.com.json\nwww.bergersysteme.com · Adresse: https://www.bergersysteme.com · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options",
    "found": "Auf www.bergersysteme.com ist keine Content-Security-Policy gesetzt: www.bergersysteme.com. Auf www.bergersysteme.com fehlen einzelne Sicherheits-Header der Webseite: www.bergersysteme.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-010",
-   "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+   "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/198.202.211.1/platform:webflow.com",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -2520,7 +2501,7 @@
       "www.bergersysteme.com@198.202.211.1|www.bergersysteme.com@198.202.211.1"
      ],
      "statement": "meaning[2]",
-     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
+     "text": "Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter."
     },
     {
      "check": "security_headers_incomplete",
@@ -2822,13 +2803,13 @@
    "verify": "DNS-Abfrage des CAA-Eintrags für die Domain bergersysteme.com; erwartet wird mindestens ein issue-Eintrag mit der genutzten Zertifizierungsstelle. DNS-Abfrage der SOA mit aktivierter DNSSEC-Option für die Domain bergersysteme.com; erwartet wird ein RRSIG-Eintrag in der Antwort."
   },
   {
-   "affected": "62.217.52.166:25 (laut Passivquelle, gesehen am 23.09.2026)",
+   "affected": "62.217.52.166:25 (laut Passivquelle, Hosteintrag aktualisiert am 23.09.2026)",
    "cat": "E",
    "checks": [
     "smtp_vrfy_enabled_passive"
    ],
    "evidence": "Shodan · phase0a/shodan_hosts.json\nQuelle: shodan · 62.217.52.166:25 · VRFY in der EHLO-Antwort: ja · Banner (Auszug): 220 mail.bergersysteme.com ESMTP CipherMail 250-mail.bergersysteme.com 250-PIPELINING 250-SIZE 1024000000 250-VRFY 250-STARTTLS 250-ENHANCEDSTATUSCODES",
-   "found": "Laut Passivquelle nennt der Mailserver auf 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com) den Befehl VRFY in seiner Antwort auf EHLO: 62.217.52.166:25 (laut Passivquelle, gesehen am 23.09.2026). Der Host ist vom Prüfstand aus nicht erreichbar; die Angabe der Passivquelle ist deshalb nicht bestätigt.",
+   "found": "Laut Passivquelle nennt der Mailserver auf 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com) den Befehl VRFY in seiner Antwort auf EHLO: 62.217.52.166:25 (laut Passivquelle, Hosteintrag aktualisiert am 23.09.2026). Der Host ist vom Prüfstand aus nicht erreichbar; die Angabe der Passivquelle ist deshalb nicht bestätigt.",
    "id": "VS-2026-012",
    "impact": "Mit VRFY lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte Phishing-Mails und Rateangriffe auf Zugangsdaten.",
    "key": "smtp_commands/62.217.52.166/kunde",
@@ -2870,7 +2851,7 @@
       "62.217.52.166|shodan:62.217.52.166:25"
      ],
      "statement": "observation[0]",
-     "text": "Laut Passivquelle nennt der Mailserver auf 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com) den Befehl VRFY in seiner Antwort auf EHLO: 62.217.52.166:25 (laut Passivquelle, gesehen am 23.09.2026)."
+     "text": "Laut Passivquelle nennt der Mailserver auf 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com) den Befehl VRFY in seiner Antwort auf EHLO: 62.217.52.166:25 (laut Passivquelle, Hosteintrag aktualisiert am 23.09.2026)."
     },
     {
      "check": "smtp_vrfy_enabled_passive",
@@ -2947,7 +2928,7 @@
     "key": "A",
     "level": 2,
     "name": "Perimeter-Exposition",
-    "note": "Verwaltungszugänge auf 92.205.224.174: Verwaltungsoberfläche des Hosters und Verwaltungsoberfläche laut Passivquelle (beim Hoster Host Europe GmbH); Zugänge auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com): POP3 oder IMAP ohne TLS-Zwang (beim Hoster Host Europe GmbH)",
+    "note": "Verwaltungszugänge auf 92.205.224.174: Verwaltungsoberfläche Plesk auf 443, 8443 und laut Passivquelle 8880 (beim Hoster Host Europe GmbH); Zugänge auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com): POP3 oder IMAP ohne TLS-Zwang (beim Hoster Host Europe GmbH)",
     "status": "gelb"
    },
    {
@@ -2968,7 +2949,7 @@
     "key": "D",
     "level": 2,
     "name": "Web- und Transport-Hygiene",
-    "note": "Zertifikate auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com): abgelaufenes Zertifikat an Diensten (beim Hoster Host Europe GmbH); Absicherung der Webdienste auf bergersysteme.com (+cdn.bergersysteme.com): HSTS fehlt",
+    "note": "Zertifikate auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com): abgelaufenes Zertifikat an Diensten (beim Hoster Host Europe GmbH); Absicherung der Webdienste auf bergersysteme.com: HSTS fehlt",
     "status": "gelb"
    },
    {
@@ -2979,7 +2960,7 @@
     "status": "blau"
    }
   ],
-  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von bergersysteme.com am 23.09.2026: 10 Hostnamen auf 8 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
+  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von bergersysteme.com am 23.09.2026: 10 Hostnamen auf 8 IP-Adressen, davon 6 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 6 Systeme (198.202.211.1 mit 2620:cb:2000::1, 62.217.52.162, 62.217.52.166, 62.217.52.171, 79.140.188.181 und 92.205.224.174 mit 2a00:1169:118:23d0::) liegt keine oder nur eine teilweise aktive Prüfung vor. 24 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
@@ -2988,7 +2969,7 @@
     "refs": [
      "VS-2026-001"
     ],
-    "title": "Beim Hoster einfordern: Zugang zur Verwaltung des geteilten Servers beim Hoster beschränken lassen"
+    "title": "Zugang zur Verwaltung des geteilten Servers beim Hoster beschränken lassen"
    },
    {
     "effect": "Schützt Zugangsdaten und Nachrichten auf dem Übertragungsweg",
@@ -2999,12 +2980,12 @@
     "title": "Beim Hoster einfordern: TLS für POP3 und IMAP erzwingen"
    },
    {
-    "effect": "Verhindert Zertifikatswarnungen an Mail- und Dateiclients",
+    "effect": "Verhindert Zertifikatswarnungen an Mailclients",
     "n": 3,
     "refs": [
      "VS-2026-003"
     ],
-    "title": "Beim Hoster einfordern: Gültige Zertifikate für alle TLS-Dienste hinterlegen"
+    "title": "Beim Hoster einfordern: Gültige Zertifikate für die Maildienste hinterlegen"
    }
   ],
   "overall": "MITTEL",
@@ -3014,8 +2995,8 @@
  "landscape_lead": "12 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 17,
-  "catalog_digest": "bbd6dccec70f05898fcc9e7fbbb77f57bca528dd070683052c467e758681182a",
-  "catalog_version": "2026-09-27.1",
+  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
+  "catalog_version": "2026-09-27.2",
   "classification": "Vertraulich",
   "consolidated": 12,
   "context_fields": [],
@@ -3026,7 +3007,7 @@
    "bergersysteme.com"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.2.0",
+  "facts_schema_version": "1.3.0",
   "fqdns_total": 10,
   "generated_on": null,
   "generation": null,
@@ -3041,7 +3022,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.1",
+  "policy_version": "2026-09-27.2",
   "positives": 6,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -3060,7 +3041,7 @@
  },
  "plan": [
   {
-   "action": "Beim Hoster einfordern: Den Hoster bitten, die Verwaltungsoberfläche auf die benötigten Quellnetze zu beschränken oder hinter eine zusätzliche Anmeldestufe zu legen.",
+   "action": "Den Hoster bitten, die Verwaltungsoberfläche auf die benötigten Quellnetze zu beschränken oder hinter eine zusätzliche Anmeldestufe zu legen.",
    "effect": "Verkleinert die Angriffsfläche des geteilten Servers, auf dem die eigenen Dienste liegen",
    "lever": "Zugang zur Verwaltung des geteilten Servers beim Hoster beschränken lassen",
    "operator": "hoster",
@@ -3089,8 +3070,8 @@
   },
   {
    "action": "Beim Hoster einfordern: Für die betroffenen Dienste ein gültiges Zertifikat hinterlegen, das den Servernamen abdeckt, mit dem die Clients sich verbinden.",
-   "effect": "Verhindert Zertifikatswarnungen an Mail- und Dateiclients",
-   "lever": "Gültige Zertifikate für alle TLS-Dienste hinterlegen",
+   "effect": "Verhindert Zertifikatswarnungen an Mailclients",
+   "lever": "Gültige Zertifikate für die Maildienste hinterlegen",
    "operator": "hoster",
    "prio": "In Kürze",
    "refs": [
@@ -3102,7 +3083,7 @@
    "st": "gelb"
   },
   {
-   "action": "Die Berichte, die an a.jg23hj7j@reports.hornetdmarc.com, dmarc@bergersysteme.com gehen, beim Empfänger dieser Adresse anfordern und auswerten und alle legitimen Versandquellen der Domain bestätigen.",
+   "action": "Die Berichte an dmarc@bergersysteme.com auswerten, die Auswertung der Berichte an a.jg23hj7j@reports.hornetdmarc.com beim Dienstleister anfordern und alle legitimen Versandquellen der Domain bestätigen.",
    "effect": "Macht alle legitimen Versandquellen vor der Verschärfung sichtbar",
    "lever": "DMARC-Richtlinie durchsetzen",
    "operator": "",
@@ -3295,14 +3276,14 @@
       "92.205.224.174"
      ],
      "statement": "positive.text",
-     "text": "Die Hosts 198.202.211.1 (www.bergersysteme.com), beim Plattformbetreiber webflow.com und 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) bieten ihre Webdienste über HTTPS an."
+     "text": "Die Hosts 198.202.211.1 (www.bergersysteme.com; beim Plattformbetreiber webflow.com) und 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) bieten ihre Webdienste über HTTPS an."
     }
    ],
    "subjects": [
     "198.202.211.1",
     "92.205.224.174"
    ],
-   "text": "Die Hosts 198.202.211.1 (www.bergersysteme.com), beim Plattformbetreiber webflow.com und 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) bieten ihre Webdienste über HTTPS an.",
+   "text": "Die Hosts 198.202.211.1 (www.bergersysteme.com; beim Plattformbetreiber webflow.com) und 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) bieten ihre Webdienste über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
@@ -3411,13 +3392,13 @@
       "www.bergersysteme.com@198.202.211.1"
      ],
      "statement": "positive.text",
-     "text": "Der Dienst www.bergersysteme.com, beim Plattformbetreiber webflow.com setzt den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer."
+     "text": "Der Dienst www.bergersysteme.com (beim Plattformbetreiber webflow.com) setzt den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer."
     }
    ],
    "subjects": [
     "www.bergersysteme.com@198.202.211.1"
    ],
-   "text": "Der Dienst www.bergersysteme.com, beim Plattformbetreiber webflow.com setzt den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer.",
+   "text": "Der Dienst www.bergersysteme.com (beim Plattformbetreiber webflow.com) setzt den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer.",
    "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   },
   {
@@ -3442,13 +3423,13 @@
       "www.bergersysteme.com@198.202.211.1"
      ],
      "statement": "positive.text",
-     "text": "Vor www.bergersysteme.com, beim Plattformbetreiber webflow.com meldet sich eine Web Application Firewall mit benanntem Produkt."
+     "text": "Vor www.bergersysteme.com (beim Plattformbetreiber webflow.com) meldet sich eine Web Application Firewall mit benanntem Produkt."
     }
    ],
    "subjects": [
     "www.bergersysteme.com@198.202.211.1"
    ],
-   "text": "Vor www.bergersysteme.com, beim Plattformbetreiber webflow.com meldet sich eine Web Application Firewall mit benanntem Produkt.",
+   "text": "Vor www.bergersysteme.com (beim Plattformbetreiber webflow.com) meldet sich eine Web Application Firewall mit benanntem Produkt.",
    "title": "Web Application Firewall vorhanden"
   },
   {
@@ -3461,7 +3442,6 @@
      "check": "ip_reputation",
      "field": "positive",
      "members": [
-      "198.202.211.1",
       "62.217.52.162",
       "62.217.52.166",
       "62.217.52.171",
@@ -3475,7 +3455,6 @@
      "check": "ip_reputation",
      "field": "positive",
      "members": [
-      "198.202.211.1",
       "62.217.52.162",
       "62.217.52.166",
       "62.217.52.171",
@@ -3483,18 +3462,17 @@
       "92.205.224.174"
      ],
      "statement": "positive.text",
-     "text": "Für 198.202.211.1 (www.bergersysteme.com), beim Plattformbetreiber webflow.com, 62.217.52.162 (bstasks.bergersysteme.com, ticket.bergersysteme.com), 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com), 62.217.52.171 (bitwarden.bergersysteme.com), 79.140.188.181 (mail2.bergersysteme.com) und 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) liegen in den abgefragten Reputationsquellen keine Meldungen vor."
+     "text": "Für 62.217.52.162 (bstasks.bergersysteme.com, ticket.bergersysteme.com), 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com), 62.217.52.171 (bitwarden.bergersysteme.com), 79.140.188.181 (mail2.bergersysteme.com) und 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) liegen in den abgefragten Reputationsquellen keine Meldungen vor."
     }
    ],
    "subjects": [
-    "198.202.211.1",
     "62.217.52.162",
     "62.217.52.166",
     "62.217.52.171",
     "79.140.188.181",
     "92.205.224.174"
    ],
-   "text": "Für 198.202.211.1 (www.bergersysteme.com), beim Plattformbetreiber webflow.com, 62.217.52.162 (bstasks.bergersysteme.com, ticket.bergersysteme.com), 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com), 62.217.52.171 (bitwarden.bergersysteme.com), 79.140.188.181 (mail2.bergersysteme.com) und 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) liegen in den abgefragten Reputationsquellen keine Meldungen vor.",
+   "text": "Für 62.217.52.162 (bstasks.bergersysteme.com, ticket.bergersysteme.com), 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com), 62.217.52.171 (bitwarden.bergersysteme.com), 79.140.188.181 (mail2.bergersysteme.com) und 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) liegen in den abgefragten Reputationsquellen keine Meldungen vor.",
    "title": "Keine Einträge in Reputationsquellen"
   }
  ],
@@ -3517,7 +3495,7 @@
   "hosts": [
    {
     "cov": "teil",
-    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI www.bergersysteme.com) geprüft, nicht für Port 8443; aktive Webanalyse von der Scan-Steuerung übersprungen (Regel hosted-cms-webflow). 2620:cb:2000::1: IPv6-Adresse laut DNS, vom Prüfstand aus nicht geprüft.",
+    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI www.bergersysteme.com) geprüft, nicht für Port 8443; passive Webanalyse ohne Meldungen, Ergebnis nicht belastbar; aktive Webanalyse von der Scan-Steuerung übersprungen (Regel hosted-cms-webflow). 2620:cb:2000::1: IPv6-Adresse laut DNS, vom Prüfstand aus nicht geprüft.",
     "fqdns": "www.bergersysteme.com",
     "ip": "198.202.211.1",
     "more_ips": [
@@ -3528,7 +3506,7 @@
    },
    {
     "cov": "unerreichbar",
-    "coverage": "Vom Prüfstand aus nicht erreichbar: der Portscan erhielt keine Antwort, eine Passivquelle meldet dort Dienste (Port 80, 443, gesehen am 23.09.2026).",
+    "coverage": "Vom Prüfstand aus nicht erreichbar: der Portscan erhielt keine Antwort, eine Passivquelle meldet dort Dienste (Port 80, 443, Hosteintrag der Passivquelle aktualisiert am 23.09.2026).",
     "fqdns": "bstasks.bergersysteme.com, ticket.bergersysteme.com",
     "ip": "62.217.52.162",
     "more_ips": [],
@@ -3537,16 +3515,16 @@
    },
    {
     "cov": "unerreichbar",
-    "coverage": "Vom Prüfstand aus nicht erreichbar: der Portscan erhielt keine Antwort, eine Passivquelle meldet dort Dienste (Port 25, 443, gesehen am 23.09.2026).",
+    "coverage": "Vom Prüfstand aus nicht erreichbar: der Portscan erhielt keine Antwort, eine Passivquelle meldet dort Dienste (Port 25, 443, Hosteintrag der Passivquelle aktualisiert am 23.09.2026).",
     "fqdns": "mail.bergersysteme.com, owa.bergersysteme.com",
     "ip": "62.217.52.166",
     "more_ips": [],
     "operator": "Berger EDV-Systemberatungs GmbH (mail.bergersysteme.com)",
-    "role": "E-Mail-Versand laut SPF"
+    "role": "Mail-Webzugang laut Passivquelle, E-Mail-Versand laut SPF"
    },
    {
     "cov": "unerreichbar",
-    "coverage": "Vom Prüfstand aus nicht erreichbar: der Portscan erhielt keine Antwort, eine Passivquelle meldet dort Dienste (Port 443, gesehen am 21.09.2026).",
+    "coverage": "Vom Prüfstand aus nicht erreichbar: der Portscan erhielt keine Antwort, eine Passivquelle meldet dort Dienste (Port 443, Hosteintrag der Passivquelle aktualisiert am 21.09.2026).",
     "fqdns": "bitwarden.bergersysteme.com",
     "ip": "62.217.52.171",
     "more_ips": [],
@@ -3564,14 +3542,14 @@
    },
    {
     "cov": "teil",
-    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI bergersysteme.com) geprüft, nicht für Port 21, 110, 143, 465, 993, 995, 8443; aktive Webanalyse von der Scan-Steuerung übersprungen (Regel hosted-cms-webflow). 2a00:1169:118:23d0::: IPv6-Adresse laut DNS, vom Prüfstand aus nicht geprüft.",
+    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI bergersysteme.com) geprüft, nicht für Port 21, 110, 143, 465, 993, 995, 8443; passive Webanalyse ohne Meldungen, Ergebnis nicht belastbar; aktive Webanalyse von der Scan-Steuerung übersprungen (Regel hosted-cms-webflow), wegen Weiterleitung auf die Webflow-Seite www.bergersysteme.com. 2a00:1169:118:23d0::: IPv6-Adresse laut DNS, vom Prüfstand aus nicht geprüft.",
     "fqdns": "bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com",
     "ip": "92.205.224.174",
     "more_ips": [
      "2a00:1169:118:23d0::"
     ],
     "operator": "Host Europe GmbH (174.224.205.92.host.secureserver.net)",
-    "role": "Nicht näher bestimmbar · geteiltes System beim Hoster"
+    "role": "Dateiaustausch, Mailabruf und Einlieferung, Weiterleitung auf www.bergersysteme.com · geteiltes System beim Hoster"
    },
    {
     "cov": "extern",
@@ -3583,14 +3561,14 @@
     "role": "Drittanbieter"
    }
   ],
-  "lead": "Der Scan hat 6 Systeme mit 8 IP-Adressen und 10 Hostnamen erfasst. Für 6 Systeme (8 Adressen) war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 6 Systeme mit 8 IP-Adressen, davon 6 nur aus DNS oder ohne Antwort, und 10 Hostnamen erfasst. Für 6 Systeme (8 Adressen) war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [
      "Web-, Header-, TLS- und Dienst-Prüfungen"
     ],
     "code": "unreachable_from_scanner",
-    "detail": "Betroffen: 62.217.52.162 (bstasks.bergersysteme.com, ticket.bergersysteme.com), 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com), 62.217.52.171 (bitwarden.bergersysteme.com). Eine Passivquelle meldet dort Dienste (gesehen vom 21.09.2026 bis 23.09.2026); der Portscan erhielt keine Antwort. Ergebnisse zu diesen Hosts liegen deshalb nicht vor.",
+    "detail": "Betroffen: 62.217.52.162 (bstasks.bergersysteme.com, ticket.bergersysteme.com), 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com), 62.217.52.171 (bitwarden.bergersysteme.com). Eine Passivquelle meldet dort Dienste (Hosteintrag der Passivquelle aktualisiert vom 21.09.2026 bis 23.09.2026); der Portscan erhielt keine Antwort. Ergebnisse eigener Messungen liegen nicht vor; VS-2026-004, VS-2026-006 und VS-2026-012 beruhen allein auf der Passivquelle.",
     "refs": [],
     "subjects": [
      "62.217.52.162",
@@ -3631,7 +3609,7 @@
      "Mailserver auf Port 25 (Verschlüsselung, Anmeldung)"
     ],
     "code": "e5",
-    "detail": "Betroffen: 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com). Laut Passivquelle nimmt dort der Dienst SMTP Verbindungen an (gesehen am 23.09.2026); vom Prüfstand aus ist Port 25 nicht erreichbar, der Mailserver auf diesem Port ist deshalb nicht geprüft.",
+    "detail": "Betroffen: 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com). Laut Passivquelle nimmt dort der Dienst SMTP Verbindungen an (Hosteintrag der Passivquelle aktualisiert am 23.09.2026); vom Prüfstand aus ist Port 25 nicht erreichbar, der Mailserver auf diesem Port ist deshalb nicht geprüft.",
     "refs": [],
     "subjects": [
      "92.205.224.174"
@@ -3739,7 +3717,7 @@
      "Suche nach nicht verlinkten Pfaden"
     ],
     "code": "path_aborted",
-    "detail": "Betroffen: www.bergersysteme.com (Abwehrmerkmal der Seite).",
+    "detail": "Betroffen: www.bergersysteme.com: abgebrochen, der Scanner vermutete in der Startseite (200) ein Abwehrmerkmal.",
     "refs": [],
     "subjects": [
      "198.202.211.1"
@@ -3763,7 +3741,7 @@
      "Transportverschlüsselung"
     ],
     "code": "tls_partial",
-    "detail": "Betroffen: 198.202.211.1 (Port 8443), 92.205.224.174 (Port 21, 110, 143, 465, 993, 995, 8443). Geprüft wurde jeweils der Webdienst auf Port 443; die übrigen TLS-Dienste sind nur per Portscan erfasst, ihre Verschlüsselung und ihr Zertifikat sind nicht bewertet.",
+    "detail": "Betroffen: 198.202.211.1 (Port 8443: Protokolle, Verfahren und Zertifikat nicht bewertet), 92.205.224.174 (Ports 21, 110, 143, 465, 993, 995, 8443: Protokolle und Verfahren nicht bewertet, Zertifikat aus dem Portscan). Geprüft wurde jeweils der Webdienst auf Port 443; die übrigen TLS-Dienste sind nur per Portscan erfasst.",
     "refs": [],
     "subjects": [
      "198.202.211.1",
@@ -3790,7 +3768,7 @@
      "Web-Prüfungen"
     ],
     "code": "scan_control",
-    "detail": "Betroffen: 198.202.211.1 (www.bergersysteme.com), 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com).",
+    "detail": "Betroffen: 198.202.211.1 (www.bergersysteme.com), 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com): wegen Weiterleitung auf die Webflow-Seite www.bergersysteme.com.",
     "refs": [
      "cors_misconfiguration|bergersysteme.com@92.205.224.174",
      "cors_misconfiguration|ftp.bergersysteme.com@92.205.224.174",
@@ -3850,7 +3828,7 @@
    {
     "n": "0",
     "name": "Aufklärung (passiv)",
-    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 10 Hostnamen auf 8 IP-Adressen. Geprüft wurden 10 von 34 ermittelten Namen; die übrigen stehen in Kapitel 2 unter den Einschränkungen."
+    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 10 Hostnamen auf 8 IP-Adressen, davon 6 nur aus DNS oder ohne Antwort. Geprüft wurden 10 von 34 ermittelten Namen; die übrigen stehen in Kapitel 2 unter den Einschränkungen."
    },
    {
     "n": "1",

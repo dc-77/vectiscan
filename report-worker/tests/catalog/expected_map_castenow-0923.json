@@ -5,6 +5,7 @@
  "hinweis_s6b2": "S6b-2 hat neun Markierungen aufgeloest: Q13 Plesk 8443 als admin_panel_hoster und 8880 (sw-cp-server) im selben Befund admin_access mit Kennung Plesk; Q14 csrf_token_missing (Konfidenz Low) als Werkzeugmeldung; Q18 mailstore mit einem Tag Restlaufzeit Rot und Unverzueglich (urgent_when, E2); Q4 dane_missing und BREACH (bitwarden, umfrage) entfallen, BREACH als Hinweis im Anhang ohne CVE; Teil 2 kein Positivbefund fuer Exchange SE ohne Patchstand; Q12 waf_present nur mit benanntem Produkt. Es bleiben vier Q8-Markierungen (S6c).",
  "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Befunde: csp_missing ubb-wiki.castenow.de (R1); csp_missing umfrage.castenow.de (R1); csp_weak mailstore.castenow.de (R1); security_headers_incomplete mailstore.castenow.de (R1); security_headers_incomplete umfrage.castenow.de (R1); entfallene Positivaussagen: csp_missing mailstore.castenow.de (R1); tls_weak_ciphers mail.castenow.de (R6 (CBC-Verfahren angeboten)); tls_weak_ciphers mail2.castenow.de (R6 (CBC-Verfahren angeboten)); tls_weak_ciphers owa.castenow.de (R6 (CBC-Verfahren angeboten)); urlhaus_compromise castenow.de (R6 (URLhaus no_data ist kein Negativergebnis)). Q8 nach Entscheidung DC 1 aufgelöst (R1, Messung an der Endseite oder nicht prüfbar): csp_missing ubb-wiki.castenow.de; csp_missing umfrage.castenow.de; csp_weak mailstore.castenow.de; security_headers_incomplete mailstore.castenow.de; security_headers_incomplete umfrage.castenow.de.",
  "hinweis_s6b4": "S6b-4 (spec/11): Soll-Liste nach Katalog 2026-09-27.1 und Fakten 1.2.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (T-Nummer oder Teil 3) und warum. entfallene Befunde: http_alt_port 92.205.163.53 (ubb-wiki.castenow.de) (T9 (E18)); service_banner_version 92.205.163.53 (ubb-wiki.castenow.de) (T9 (E18)). entfallene Positivaussagen: spf_missing castenow.de (Teil 3 DB (P05)).",
+ "hinweis_s6b4n": "S6b-4n (spec/11 Teil 6): Soll-Liste nach Katalog 2026-09-27.2 und Fakten 1.3.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (N-Nummer) und warum. entfallene Befunde: tls_weakness_reported mail.castenow.de (N12 (TLS-Ergebnis nur von einem anderen Namen desselben IP:Port übernommen)); tls_weakness_reported owa.castenow.de (N12 (TLS-Ergebnis nur von einem anderen Namen desselben IP:Port übernommen)). entfallene Positivaussagen: csp_missing ubb-wiki.castenow.de (N1 (Inhaltsrichtlinie ohne Regel für Skriptquellen)); ip_reputation 3.174.98.120 (umfrage.castenow.de) (N6 (Plattform- und CDN-Adresse, Reputation nicht kundenbezogen)).",
  "strict": false,
  "orders": {
   "main": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52"
@@ -49,22 +50,26 @@
   },
   "VS-2026-008": {
    "checks": [
-    "csp_weak"
-   ]
+    "csp_missing"
+   ],
+   "spec11": "N1",
+   "warum": "Inhaltsrichtlinie nur mit frame-ancestors, keine Regel für Skriptquellen: Variante von csp_missing statt Positivbefund."
   },
   "VS-2026-009": {
+   "checks": [
+    "csp_weak"
+   ],
+   "spec11": "N2",
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung)."
+  },
+  "VS-2026-010": {
    "checks": [
     "dmarc_none"
    ]
   },
-  "VS-2026-010": {
-   "checks": [
-    "dnssec_missing"
-   ]
-  },
   "VS-2026-011": {
    "checks": [
-    "hsts_missing"
+    "dnssec_missing"
    ]
   },
   "VS-2026-012": {
@@ -79,34 +84,38 @@
   },
   "VS-2026-014": {
    "checks": [
-    "http_header_disclosure"
+    "hsts_missing"
    ]
   },
   "VS-2026-015": {
    "checks": [
     "http_header_disclosure"
-   ]
+   ],
+   "spec11": "N12",
+   "warum": "X-AspNet-Version auch aus httpx (Exchange-Endseite)."
   },
   "VS-2026-016": {
    "checks": [
     "http_header_disclosure"
-   ]
+   ],
+   "spec11": "N12",
+   "warum": "X-AspNet-Version auch aus httpx (Exchange-Endseite)."
   },
   "VS-2026-017": {
+   "checks": [
+    "http_header_disclosure"
+   ]
+  },
+  "VS-2026-018": {
    "checks": [
     "http_header_disclosure"
    ],
    "spec11": "Teil 3 CA",
    "warum": "X-Powered-By mit Version (PHP/8.4.25) an der Endseite der Anmeldung."
   },
-  "VS-2026-018": {
-   "checks": [
-    "http_header_disclosure"
-   ]
-  },
   "VS-2026-019": {
    "checks": [
-    "info_disclosure"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-020": {
@@ -136,17 +145,17 @@
   },
   "VS-2026-025": {
    "checks": [
-    "js_library_outdated"
+    "info_disclosure"
    ]
   },
   "VS-2026-026": {
    "checks": [
-    "legacy_protocols_present"
+    "js_library_outdated"
    ]
   },
   "VS-2026-027": {
    "checks": [
-    "login_portal_exposed"
+    "legacy_protocols_present"
    ]
   },
   "VS-2026-028": {
@@ -171,25 +180,25 @@
   },
   "VS-2026-032": {
    "checks": [
-    "mail_plaintext"
+    "login_portal_exposed"
    ]
   },
   "VS-2026-033": {
    "checks": [
-    "mta_sts_missing"
+    "mail_plaintext"
    ]
   },
   "VS-2026-034": {
+   "checks": [
+    "mta_sts_missing"
+   ]
+  },
+  "VS-2026-035": {
    "checks": [
     "security_headers_incomplete"
    ],
    "spec10": "R1",
    "warum": "Endseite gemessen (testssl-HTTP-Abschnitt), vorher ohne Messung."
-  },
-  "VS-2026-035": {
-   "checks": [
-    "security_headers_incomplete"
-   ]
   },
   "VS-2026-036": {
    "checks": [
@@ -213,33 +222,36 @@
   },
   "VS-2026-040": {
    "checks": [
+    "security_headers_incomplete"
+   ],
+   "spec11": "N2",
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung)."
+  },
+  "VS-2026-041": {
+   "checks": [
     "smtp_vrfy_enabled_passive"
    ],
    "spec10": "R19",
-   "warum": "VRFY im SMTP-Banner laut Shodan; neue Prüfung."
+   "warum": "Shodan last_update heißt „Hosteintrag aktualisiert am“, nicht „gesehen am“.",
+   "spec11": "N15"
   },
-  "VS-2026-041": {
+  "VS-2026-042": {
    "checks": [
     "spf_authorizes_shared_host"
    ],
    "spec10": "R19",
-   "warum": "SPF gibt einen Server frei, den der Hoster auch für andere Kunden betreibt; neue Prüfung.",
-   "spec11": "T9 (E18)",
+   "warum": "Fremddomains mit Quelle gezählt („laut Passivquelle n weitere Domains“). Vorher: SPF gibt einen Server frei, den der Hoster auch für andere Kunden betreibt; neue Prüfung.",
+   "spec11": "N11, vorher T9 (E18)",
    "warum_spec11": "Betreiber des Servers aus rDNS (planwerk6.de), Hetzner nur als Rechenzentrum."
   },
-  "VS-2026-042": {
+  "VS-2026-043": {
    "checks": [
     "spf_softfail"
    ]
   },
-  "VS-2026-043": {
-   "checks": [
-    "tls_rpt_missing"
-   ]
-  },
   "VS-2026-044": {
    "checks": [
-    "tls_weakness_reported"
+    "tls_rpt_missing"
    ]
   },
   "VS-2026-045": {
@@ -259,18 +271,15 @@
   },
   "VS-2026-048": {
    "checks": [
-    "tls_weakness_reported"
+    "web_vulnerability_reported"
    ]
   },
   "VS-2026-049": {
    "checks": [
-    "web_vulnerability_reported"
-   ]
-  },
-  "VS-2026-050": {
-   "checks": [
     "wordpress_user_enumeration"
-   ]
+   ],
+   "spec11": "N15 (E25)",
+   "warum": "Anmeldenamen nur als Anzahl und Fundweg, kein Name im Kundentext."
   }
  },
  "positives": {
@@ -417,12 +426,12 @@
    "checks": [
     "csp_missing"
    ],
-   "spec10": "R1",
-   "warum": "Endseite gemessen (Weiterleitungsziel oder testssl-HTTP-Abschnitt)."
+   "spec11": "N2",
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung)."
   },
   "VS-2026-P27": {
    "checks": [
-    "csp_missing"
+    "db_exposed"
    ]
   },
   "VS-2026-P28": {
@@ -452,35 +461,35 @@
   },
   "VS-2026-P33": {
    "checks": [
-    "db_exposed"
+    "dkim_missing"
    ]
   },
   "VS-2026-P34": {
    "checks": [
-    "dkim_missing"
+    "dmarc_missing"
    ]
   },
   "VS-2026-P35": {
    "checks": [
-    "dmarc_missing"
+    "dns_dangling_cname"
    ]
   },
   "VS-2026-P36": {
    "checks": [
-    "dns_dangling_cname"
-   ]
-  },
-  "VS-2026-P37": {
-   "checks": [
     "dns_zone_transfer"
    ]
   },
-  "VS-2026-P38": {
+  "VS-2026-P37": {
    "checks": [
     "hsts_missing"
    ],
    "spec10": "R1",
    "warum": "Endseite über testssl gemessen."
+  },
+  "VS-2026-P38": {
+   "checks": [
+    "hsts_missing"
+   ]
   },
   "VS-2026-P39": {
    "checks": [
@@ -495,19 +504,21 @@
   "VS-2026-P41": {
    "checks": [
     "hsts_missing"
-   ]
+   ],
+   "spec11": "N2",
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung)."
   },
   "VS-2026-P42": {
-   "checks": [
-    "hsts_missing"
-   ]
-  },
-  "VS-2026-P43": {
    "checks": [
     "hsts_short"
    ],
    "spec10": "R1",
    "warum": "Endseite über testssl gemessen."
+  },
+  "VS-2026-P43": {
+   "checks": [
+    "hsts_short"
+   ]
   },
   "VS-2026-P44": {
    "checks": [
@@ -522,11 +533,13 @@
   "VS-2026-P46": {
    "checks": [
     "hsts_short"
-   ]
+   ],
+   "spec11": "N2",
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung)."
   },
   "VS-2026-P47": {
    "checks": [
-    "hsts_short"
+    "http_no_tls"
    ]
   },
   "VS-2026-P48": {
@@ -556,7 +569,7 @@
   },
   "VS-2026-P53": {
    "checks": [
-    "http_no_tls"
+    "ip_reputation"
    ]
   },
   "VS-2026-P54": {
@@ -581,14 +594,12 @@
   },
   "VS-2026-P58": {
    "checks": [
-    "ip_reputation"
-   ],
-   "spec11": "Teil 3 BS",
-   "warum": "Plattform- und CDN-Adressen ohne Meldung stehen im Positivbefund; einen Befund erzeugen sie nicht."
+    "rdp_exposed"
+   ]
   },
   "VS-2026-P59": {
    "checks": [
-    "ip_reputation"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P60": {
@@ -613,12 +624,12 @@
   },
   "VS-2026-P64": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P65": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P66": {
@@ -643,12 +654,12 @@
   },
   "VS-2026-P70": {
    "checks": [
-    "smb_exposed"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P71": {
    "checks": [
-    "smb_exposed"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P72": {
@@ -683,12 +694,12 @@
   },
   "VS-2026-P78": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P79": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P80": {
@@ -723,12 +734,12 @@
   },
   "VS-2026-P86": {
    "checks": [
-    "tls_no_13"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P87": {
    "checks": [
-    "tls_no_13"
+    "tls_weak_ciphers"
    ]
   },
   "VS-2026-P88": {
@@ -747,16 +758,6 @@
    ]
   },
   "VS-2026-P91": {
-   "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P92": {
-   "checks": [
-    "tls_weak_ciphers"
-   ]
-  },
-  "VS-2026-P93": {
    "checks": [
     "wordpress_core_outdated"
    ]

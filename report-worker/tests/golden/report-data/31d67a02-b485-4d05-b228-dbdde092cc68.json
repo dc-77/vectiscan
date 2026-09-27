@@ -22,7 +22,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Korrelation hat 81 Einzelmeldungen der Werkzeuge erfasst, davon 45 Doppelmeldungen mehrerer Werkzeuge und Durchgänge. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 16 Befunde und 7 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
+  "filtering": "Die Korrelation hat 81 Einzelmeldungen der Werkzeuge erfasst, davon 14 gleiche Meldungen der Webanalyse und 31 der TLS-Prüfung zusammengeführt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 16 Befunde und 7 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -60,13 +60,13 @@
     "host": "188.40.3.130",
     "port": "110",
     "ref": "VS-2026-010",
-    "svc": "Courier pop3d, TLS erzwungen"
+    "svc": "Courier pop3d, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "188.40.3.130",
     "port": "143",
     "ref": "VS-2026-010",
-    "svc": "Dovecot imapd, TLS erzwungen"
+    "svc": "Dovecot imapd, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "188.40.3.130",
@@ -90,7 +90,7 @@
     "host": "188.40.3.130",
     "port": "587",
     "ref": "",
-    "svc": "SMTP (Exim), TLS erzwungen"
+    "svc": "SMTP (Exim), Anmeldung erst nach STARTTLS"
    },
    {
     "host": "188.40.3.130",
@@ -190,14 +190,6 @@
     "where": "autodiscover.junkerwerk.de, outlook.junkerwerk.de"
    },
    {
-    "count": 2,
-    "message": "X-AspNet-Version Response Header",
-    "note": "Versionsangabe im X-AspNet-Version-Header.",
-    "rule": "zap#10061",
-    "what": "„X-AspNet-Version Response Header“ (ZAP-Regel 10061), 2 Meldungen",
-    "where": "autodiscover.junkerwerk.de, outlook.junkerwerk.de"
-   },
-   {
     "count": 8,
     "message": "Application Error Disclosure",
     "note": "Fehlermeldung der Anwendung sichtbar.",
@@ -206,12 +198,12 @@
     "where": "autodiscover.junkerwerk.de, outlook.junkerwerk.de"
    },
    {
-    "count": 3,
+    "count": 2,
     "message": "LUCKY13",
     "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
     "rule": "tls_weakness_reported",
-    "what": "„LUCKY13“, 3 Meldungen",
-    "where": "autodiscover.junkerwerk.de, cloud.junkerwerk.de, outlook.junkerwerk.de"
+    "what": "„LUCKY13“, 2 Meldungen",
+    "where": "cloud.junkerwerk.de, outlook.junkerwerk.de"
    },
    {
     "count": 1,
@@ -248,14 +240,6 @@
     "where": "autodiscover.junkerwerk.de"
    },
    {
-    "count": 1,
-    "message": "X-AspNet-Version Response Header",
-    "note": "Versionsangabe im X-AspNet-Version-Header.",
-    "rule": "info_disclosure#10061",
-    "what": "autodiscover.junkerwerk.de (X-AspNet-Version Response Header)",
-    "where": "autodiscover.junkerwerk.de"
-   },
-   {
     "count": 4,
     "message": "Application Error Disclosure",
     "note": "Fehlermeldung der Anwendung sichtbar.",
@@ -272,28 +256,12 @@
     "where": "outlook.junkerwerk.de"
    },
    {
-    "count": 1,
-    "message": "X-AspNet-Version Response Header",
-    "note": "Versionsangabe im X-AspNet-Version-Header.",
-    "rule": "info_disclosure#10061",
-    "what": "outlook.junkerwerk.de (X-AspNet-Version Response Header)",
-    "where": "outlook.junkerwerk.de"
-   },
-   {
     "count": 4,
     "message": "Application Error Disclosure",
     "note": "Fehlermeldung der Anwendung sichtbar.",
     "rule": "info_disclosure#90022",
     "what": "outlook.junkerwerk.de (Application Error Disclosure)",
     "where": "outlook.junkerwerk.de"
-   },
-   {
-    "count": 1,
-    "message": "LUCKY13",
-    "note": "TLS-Hinweis der Analyse ohne eigene Einstufung.",
-    "rule": "tls_weakness_reported",
-    "what": "autodiscover.junkerwerk.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
-    "where": "autodiscover.junkerwerk.de"
    },
    {
     "count": 1,
@@ -358,12 +326,12 @@
    },
    {
     "c": "hoch",
-    "t": "DNS-Abfragen, dnsx, subfinder, gobuster, crt.sh, Certspotter, SecurityTrails",
+    "t": "DNS-Abfragen, dnsx, subfinder, gobuster, crt.sh, Certspotter, SecurityTrails (ohne Ergebnis)",
     "u": "Ermittlung der Hostnamen, DNS-Auflösung und DNS-Sicherheitseinträge"
    },
    {
     "c": "mittel (Passivquelle, Zeitversatz)",
-    "t": "Shodan, AbuseIPDB, OTX, URLhaus",
+    "t": "Shodan, AbuseIPDB, OTX, URLhaus (ohne Ergebnis)",
     "u": "Passive Dienst- und Reputationsdaten"
    }
   ],
@@ -371,7 +339,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein noch gültiges Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen. Ein am Scantag bereits abgelaufenes Zertifikat an Diensten außerhalb der Webseiten (Mail, Datei, Verwaltung) folgt der Tabelle: Exposition erhöht, Gelb, In Kürze."
    },
    {
     "l": "Gelb",
@@ -391,7 +359,7 @@
   ]
  },
  "architecture": {
-  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 3 Systeme mit folgenden Aufgaben: E-Mail-Versand laut SPF, Mail- und Kalenderplattform, Mail-Webzugang und Website. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 3 Systeme mit folgenden Aufgaben: Dateiaustausch (FTP, SFTP), Datenbanken erreichbar, Mail- und Kalenderplattform, Mail-Webzugang, Mailabruf, Einlieferung und Versand laut SPF und Website. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [],
   "posture": [
    {
@@ -965,10 +933,10 @@
      {
       "c": "Debian GNU/Linux",
       "conf": "hoch",
-      "note": "bis 30.06.2028 laut Debian",
+      "note": "in Langzeitpflege bis 30.06.2028 laut Debian",
       "src": "nmap",
       "st": "gruen",
-      "status": "in Langzeitpflege (LTS)",
+      "status": "LTS",
       "v": "12"
      },
      {
@@ -979,15 +947,6 @@
       "st": "grau",
       "status": "unbekannt",
       "v": "9.2p1"
-     },
-     {
-      "c": "ProFTPD mod_sftp",
-      "conf": "hoch",
-      "note": "",
-      "src": "nmap",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
      },
      {
       "c": "Apache httpd",
@@ -1048,7 +1007,7 @@
       "c": "Windows Server",
       "conf": "mittel",
       "note": "",
-      "src": "httpx, nmap",
+      "src": "httpx, nmap, shodan",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1076,15 +1035,21 @@
   "observed": [
    {
     "evidence": [
-     "www.junkerwerk.de: Seite „Home  - Junkerwerk - Schaumstoffverarbeitung“",
-     "SPF-Eintrag von junkerwerk.de: a"
+     "3306/tcp mysql MySQL",
+     "5432/tcp postgresql PostgreSQL DB",
+     "21/tcp ftp ProFTPD",
+     "22/tcp ssh ProFTPD mod_sftp",
+     "110/tcp Courier pop3d",
+     "143/tcp Dovecot imapd"
     ],
-    "meaning": "Außendarstellung des Unternehmens. Betroffen wären vor allem die Seiteninhalte.",
+    "meaning": "Datenbestände hinter den Anwendungen. Ein von außen erreichbarer Datenbankdienst ist ein direktes Ziel für Anmeldeversuche.",
     "role_keys": [
-     "website",
-     "mail_versand"
+     "datenbank",
+     "dateiaustausch",
+     "mail_dienste",
+     "website"
     ],
-    "system": "Website, E-Mail-Versand laut SPF (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de)"
+    "system": "Datenbanken erreichbar, Dateiaustausch (FTP, SFTP), Mailabruf, Einlieferung und Versand laut SPF, Website (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de)"
    },
    {
     "evidence": [
@@ -1260,13 +1225,13 @@
    "verify": "Portscan der betroffenen Datenbankports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen."
   },
   {
-   "affected": "217.243.248.28:4433 (SonicWall, laut Passivquelle, gesehen am 19.09.2026)",
+   "affected": "217.243.248.28:4433 (SonicWall, laut Passivquelle, Hosteintrag aktualisiert am 19.09.2026)",
    "cat": "A",
    "checks": [
     "admin_service_exposed_passive"
    ],
    "evidence": "Shodan · phase0a/shodan_hosts.json\nQuelle: shodan · 217.243.248.28:4433 · Produkt: SonicWall · Banner (Auszug): HTTP/1.1 200 OK Server: Web Server Cache-Control: no-store, max-age=0 Content-type: text/html; charset=UTF-8;",
-   "found": "Eine Passivquelle meldet für 217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de) eine Verwaltungsoberfläche: 217.243.248.28:4433 (SonicWall, laut Passivquelle, gesehen am 19.09.2026). Der Port liegt außerhalb des geprüften Portbereichs; der Portscan hat ihn nicht erfasst.",
+   "found": "Eine Passivquelle meldet für 217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de) eine Verwaltungsoberfläche: 217.243.248.28:4433 (SonicWall, laut Passivquelle, Hosteintrag aktualisiert am 19.09.2026). Der Port liegt außerhalb des geprüften Portbereichs; der Portscan hat ihn nicht erfasst.",
    "id": "VS-2026-002",
    "impact": "Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss mit den dahinter liegenden Systemen. Ob es sich um ein Anmeldeportal oder die Administrationsoberfläche handelt, ist von außen nicht erkennbar.",
    "key": "admin_access/217.243.248.28/kunde",
@@ -1308,7 +1273,7 @@
       "217.243.248.28|shodan:217.243.248.28:4433"
      ],
      "statement": "observation[0]",
-     "text": "Eine Passivquelle meldet für 217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de) eine Verwaltungsoberfläche: 217.243.248.28:4433 (SonicWall, laut Passivquelle, gesehen am 19.09.2026)."
+     "text": "Eine Passivquelle meldet für 217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de) eine Verwaltungsoberfläche: 217.243.248.28:4433 (SonicWall, laut Passivquelle, Hosteintrag aktualisiert am 19.09.2026)."
     },
     {
      "check": "admin_service_exposed_passive",
@@ -2094,13 +2059,13 @@
    "verify": "Anmeldeversuch mit einem falschen Kennwort durchführen; erwartet wird eine Sperre oder Verzögerung nach mehreren Fehlversuchen sowie die Abfrage des zusätzlichen Faktors."
   },
   {
-   "affected": "junkerwerk.de (188.40.3.130 beim Hoster Hetzner Online GmbH)",
+   "affected": "junkerwerk.de (188.40.3.130 beim Hoster Hetzner Online GmbH, laut Passivquelle 2 weitere Domains)",
    "cat": "C",
    "checks": [
     "spf_authorizes_shared_host"
    ],
-   "evidence": "DNS-Abfragen · phase0/dns_records.json\njunkerwerk.de · SPF: v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all · Mechanismus: a · löst auf: 188.40.3.130 · Server beim Hoster Hetzner Online GmbH · auf demselben Server: 2 weitere Domains laut Passivquelle",
-   "found": "Der SPF-Eintrag der Domain junkerwerk.de gibt einen Server als Absender frei, auf dem laut Zertifikat oder Passivquelle weitere Domains liegen: junkerwerk.de (188.40.3.130 beim Hoster Hetzner Online GmbH).",
+   "evidence": "DNS-Abfragen · phase0/dns_records.json\njunkerwerk.de · SPF: v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all · Mechanismus: a · löst auf: 188.40.3.130 · Server beim Hoster Hetzner Online GmbH · auf demselben Server: laut Passivquelle 2 weitere Domains",
+   "found": "Der SPF-Eintrag der Domain junkerwerk.de gibt einen Server als Absender frei, auf dem weitere Domains liegen: junkerwerk.de (188.40.3.130 beim Hoster Hetzner Online GmbH, laut Passivquelle 2 weitere Domains).",
    "id": "VS-2026-007",
    "impact": "Jede Anwendung auf diesem Server darf damit E-Mails im Namen der Domain versenden, auch die Anwendungen der weiteren Domains. Empfänger erkennen solche Mails an SPF nicht als gefälscht.",
    "key": "spf_authorizes_shared_host/scan/kunde",
@@ -2142,7 +2107,7 @@
       "junkerwerk.de|junkerwerk.de"
      ],
      "statement": "observation[0]",
-     "text": "Der SPF-Eintrag der Domain junkerwerk.de gibt einen Server als Absender frei, auf dem laut Zertifikat oder Passivquelle weitere Domains liegen: junkerwerk.de (188.40.3.130 beim Hoster Hetzner Online GmbH)."
+     "text": "Der SPF-Eintrag der Domain junkerwerk.de gibt einen Server als Absender frei, auf dem weitere Domains liegen: junkerwerk.de (188.40.3.130 beim Hoster Hetzner Online GmbH, laut Passivquelle 2 weitere Domains)."
     },
     {
      "check": "spf_authorizes_shared_host",
@@ -2210,10 +2175,10 @@
     "csp_missing",
     "security_headers_incomplete"
    ],
-   "evidence": "header_check · hosts/217.243.248.28/phase2/headers_autodiscover.junkerwerk.de.json\nautodiscover.junkerwerk.de · Adresse: https://autodiscover.junkerwerk.de · Antwort: 302 · weitergeleitet auf: https://autodiscover.junkerwerk.de/owa/ · Strict-Transport-Security: nicht gesetzt\n\nZAP · hosts/217.243.248.28/phase2/zap_alerts.json\nautodiscover.junkerwerk.de · bewertet an der Endseite: https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2f&reason=0 · nur einzelne Header belegt: Content-Security-Policy, X-Content-Type-Options · Content-Security-Policy: nicht gesetzt · fehlende Header: X-Content-Type-Options\n\nheader_check · hosts/217.243.248.28/phase2/headers_outlook.junkerwerk.de.json\noutlook.junkerwerk.de · Adresse: https://outlook.junkerwerk.de · Antwort: 302 · weitergeleitet auf: https://outlook.junkerwerk.de/owa/ · Strict-Transport-Security: nicht gesetzt\n\nWeiterleitungsprüfung · hosts/217.243.248.28/phase1/tech_profile.json\noutlook.junkerwerk.de · bewertet an der Endseite: https://outlook.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2f&reason=0 · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options",
+   "evidence": "header_check · hosts/217.243.248.28/phase2/headers_autodiscover.junkerwerk.de.json\nautodiscover.junkerwerk.de · Adresse: https://autodiscover.junkerwerk.de · Antwort: 302 · weitergeleitet auf: https://autodiscover.junkerwerk.de/owa/ · Strict-Transport-Security: nicht gesetzt\n\nZAP · hosts/217.243.248.28/phase2/zap_alerts.json\nautodiscover.junkerwerk.de · Einzelmeldungen an: https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2f&reason=0 · nur einzelne Header belegt: Content-Security-Policy, X-Content-Type-Options · an der Endseite nicht gemessen: X-Frame-Options, Referrer-Policy, Permissions-Policy · Content-Security-Policy: nicht gesetzt · fehlende Header: X-Content-Type-Options\n\nheader_check · hosts/217.243.248.28/phase2/headers_outlook.junkerwerk.de.json\noutlook.junkerwerk.de · Adresse: https://outlook.junkerwerk.de · Antwort: 302 · weitergeleitet auf: https://outlook.junkerwerk.de/owa/ · Strict-Transport-Security: nicht gesetzt\n\nWeiterleitungsprüfung · hosts/217.243.248.28/phase1/tech_profile.json\noutlook.junkerwerk.de · bewertet an der Endseite: https://outlook.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2f&reason=0 · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options",
    "found": "Der Dienst 217.243.248.28 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: autodiscover.junkerwerk.de, outlook.junkerwerk.de. Auf 217.243.248.28 ist keine Content-Security-Policy gesetzt: autodiscover.junkerwerk.de, outlook.junkerwerk.de. Auf 217.243.248.28 fehlen einzelne Sicherheits-Header der Webseite: autodiscover.junkerwerk.de (fehlend: X-Content-Type-Options), outlook.junkerwerk.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-008",
-   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/217.243.248.28/kunde",
    "level": "mittel",
    "level_label": "mittel",
@@ -2356,7 +2321,7 @@
       "outlook.junkerwerk.de@217.243.248.28|outlook.junkerwerk.de@217.243.248.28"
      ],
      "statement": "meaning[2]",
-     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
+     "text": "Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter."
     },
     {
      "check": "security_headers_incomplete",
@@ -2521,9 +2486,9 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check · hosts/217.243.248.29/phase2/headers_cloud.junkerwerk.de.json\ncloud.junkerwerk.de · Adresse: https://cloud.junkerwerk.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options",
-   "found": "Der Dienst cloud.junkerwerk.de (+team.junkerwerk.de) liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: cloud.junkerwerk.de. Auf cloud.junkerwerk.de (+team.junkerwerk.de) ist keine Content-Security-Policy gesetzt: cloud.junkerwerk.de. Auf cloud.junkerwerk.de (+team.junkerwerk.de) fehlen einzelne Sicherheits-Header der Webseite: cloud.junkerwerk.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Der Dienst cloud.junkerwerk.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: cloud.junkerwerk.de. Auf cloud.junkerwerk.de ist keine Content-Security-Policy gesetzt: cloud.junkerwerk.de. Auf cloud.junkerwerk.de fehlen einzelne Sicherheits-Header der Webseite: cloud.junkerwerk.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-009",
-   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/217.243.248.29/kunde",
    "level": "mittel",
    "level_label": "mittel",
@@ -2604,7 +2569,7 @@
       "cloud.junkerwerk.de@217.243.248.29|cloud.junkerwerk.de@217.243.248.29"
      ],
      "statement": "observation[0]",
-     "text": "Der Dienst cloud.junkerwerk.de (+team.junkerwerk.de) liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: cloud.junkerwerk.de."
+     "text": "Der Dienst cloud.junkerwerk.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: cloud.junkerwerk.de."
     },
     {
      "check": "csp_missing",
@@ -2613,7 +2578,7 @@
       "cloud.junkerwerk.de@217.243.248.29|cloud.junkerwerk.de@217.243.248.29"
      ],
      "statement": "observation[0]",
-     "text": "Auf cloud.junkerwerk.de (+team.junkerwerk.de) ist keine Content-Security-Policy gesetzt: cloud.junkerwerk.de."
+     "text": "Auf cloud.junkerwerk.de ist keine Content-Security-Policy gesetzt: cloud.junkerwerk.de."
     },
     {
      "check": "security_headers_incomplete",
@@ -2622,7 +2587,7 @@
       "cloud.junkerwerk.de@217.243.248.29|cloud.junkerwerk.de@217.243.248.29"
      ],
      "statement": "observation[0]",
-     "text": "Auf cloud.junkerwerk.de (+team.junkerwerk.de) fehlen einzelne Sicherheits-Header der Webseite: cloud.junkerwerk.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)."
+     "text": "Auf cloud.junkerwerk.de fehlen einzelne Sicherheits-Header der Webseite: cloud.junkerwerk.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)."
     },
     {
      "check": "hsts_missing",
@@ -2667,7 +2632,7 @@
       "cloud.junkerwerk.de@217.243.248.29|cloud.junkerwerk.de@217.243.248.29"
      ],
      "statement": "meaning[2]",
-     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
+     "text": "Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter."
     },
     {
      "check": "security_headers_incomplete",
@@ -2977,7 +2942,7 @@
     "legacy_protocols_present|188.40.3.130:21"
    ],
    "threat": null,
-   "title": "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen) (beim Hoster Hetzner Online GmbH)",
+   "title": "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen; beim Hoster Hetzner Online GmbH)",
    "urgency": "Mittelfristig",
    "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
   },
@@ -3464,16 +3429,16 @@
    "verify": "DNS-Abfrage des TXT-Eintrags _mta-sts.junkerwerk.hu sowie Abruf der Richtliniendatei unter der zugehörigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine Richtliniendatei mit mode enforce. DNS-Abfrage des TXT-Eintrags _smtp._tls.junkerwerk.hu; erwartet wird ein Eintrag, der mit v=TLSRPTv1 beginnt und eine Meldeadresse (rua) nennt."
   },
   {
-   "affected": "autodiscover.junkerwerk.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-SE), cloud.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET), outlook.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-SE), 217.243.248.29:8443 (Microsoft IIS 10.0)",
+   "affected": "autodiscover.junkerwerk.de (Server: Microsoft-IIS/10.0, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-SE), cloud.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET), outlook.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-SE), 217.243.248.29:8443 (Microsoft IIS 10.0)",
    "cat": "E",
    "checks": [
     "http_header_disclosure",
     "service_banner_version"
    ],
-   "evidence": "header_check · hosts/217.243.248.28/phase2/headers_autodiscover.junkerwerk.de.json\nautodiscover.junkerwerk.de · Adresse: https://autodiscover.junkerwerk.de · Antwort: 302 · weitergeleitet auf: https://autodiscover.junkerwerk.de/owa/ · Server: Microsoft-IIS/10.0 · X-FEServer (interner Servername): EXCHANGE-SE\n\nheader_check · hosts/217.243.248.29/phase2/headers_cloud.junkerwerk.de.json\ncloud.junkerwerk.de · Adresse: https://cloud.junkerwerk.de · Antwort: 200 · Server: Microsoft-IIS/10.0 · X-Powered-By: ASP.NET\n\nheader_check · hosts/217.243.248.28/phase2/headers_outlook.junkerwerk.de.json\noutlook.junkerwerk.de · Adresse: https://outlook.junkerwerk.de · Antwort: 302 · weitergeleitet auf: https://outlook.junkerwerk.de/owa/ · Server: Microsoft-IIS/10.0 · X-FEServer (interner Servername): EXCHANGE-SE\n\nWeiterleitungsprüfung · hosts/217.243.248.28/phase1/tech_profile.json\noutlook.junkerwerk.de · bewertet an der Endseite: https://outlook.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2f&reason=0 · Antwort: 200 · X-Powered-By: ASP.NET · X-AspNet-Version: 4.0.30319\n\nnmap · hosts/217.243.248.29/phase1/nmap.xml\n217.243.248.29:8443/tcp · Dienst: http · Produkt: Microsoft IIS httpd · Version: 10.0 · Server-Kennung: Microsoft-IIS/10.0 · Seitentitel: IIS Windows Server · TLS erzwungen: ja · Zertifikat für: *.junkerwerk.de · Aussteller: Sectigo Public Server Authentication CA DV R36 · gültig bis: 11.12.2026, 23:59 UTC",
-   "found": "Die Webantworten von autodiscover.junkerwerk.de, cloud.junkerwerk.de (+team.junkerwerk.de) und outlook.junkerwerk.de nennen in ihren Antwortheadern die Version der eingesetzten Serversoftware: autodiscover.junkerwerk.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-SE), cloud.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET), outlook.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-SE). Der Antwortheader X-FEServer nennt den internen Namen des Frontend-Servers: autodiscover.junkerwerk.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-SE), outlook.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-SE). Der Dienst auf 217.243.248.29 (cloud.junkerwerk.de, team.junkerwerk.de) gibt beim Verbindungsaufbau seine Produkt- und Versionskennung preis: 217.243.248.29:8443 (Microsoft IIS 10.0).",
+   "evidence": "header_check · hosts/217.243.248.28/phase2/headers_autodiscover.junkerwerk.de.json\nautodiscover.junkerwerk.de · Adresse: https://autodiscover.junkerwerk.de · Antwort: 302 · weitergeleitet auf: https://autodiscover.junkerwerk.de/owa/ · Server: Microsoft-IIS/10.0 · X-FEServer (interner Servername): EXCHANGE-SE\n\nZAP · hosts/217.243.248.28/phase2/zap_alerts.json\nautodiscover.junkerwerk.de · Einzelmeldungen an: https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2f&reason=0 · nur einzelne Header belegt: Content-Security-Policy, X-Content-Type-Options · an der Endseite nicht gemessen: X-Frame-Options, Referrer-Policy, Permissions-Policy · X-AspNet-Version: 4.0.30319\n\nheader_check · hosts/217.243.248.29/phase2/headers_cloud.junkerwerk.de.json\ncloud.junkerwerk.de · Adresse: https://cloud.junkerwerk.de · Antwort: 200 · Server: Microsoft-IIS/10.0 · X-Powered-By: ASP.NET\n\nheader_check · hosts/217.243.248.28/phase2/headers_outlook.junkerwerk.de.json\noutlook.junkerwerk.de · Adresse: https://outlook.junkerwerk.de · Antwort: 302 · weitergeleitet auf: https://outlook.junkerwerk.de/owa/ · Server: Microsoft-IIS/10.0 · X-FEServer (interner Servername): EXCHANGE-SE\n\nWeiterleitungsprüfung · hosts/217.243.248.28/phase1/tech_profile.json\noutlook.junkerwerk.de · bewertet an der Endseite: https://outlook.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2f&reason=0 · Antwort: 200 · X-Powered-By: ASP.NET · X-AspNet-Version: 4.0.30319\n\nnmap · hosts/217.243.248.29/phase1/nmap.xml\n217.243.248.29:8443/tcp · Dienst: http · Produkt: Microsoft IIS httpd · Version: 10.0 · Server-Kennung: Microsoft-IIS/10.0 · Seitentitel: IIS Windows Server · TLS erzwungen: ja · Zertifikat für: *.junkerwerk.de · Aussteller: Sectigo Public Server Authentication CA DV R36 · gültig bis: 11.12.2026, 23:59 UTC",
+   "found": "Die Webantworten von autodiscover.junkerwerk.de, cloud.junkerwerk.de und outlook.junkerwerk.de nennen in ihren Antwortheadern die Version der eingesetzten Serversoftware: autodiscover.junkerwerk.de (Server: Microsoft-IIS/10.0, X-AspNet-Version: 4.0.30319), cloud.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET), outlook.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319). Der Antwortheader X-FEServer nennt den internen Namen des Frontend-Servers: autodiscover.junkerwerk.de (X-FEServer: EXCHANGE-SE), outlook.junkerwerk.de (X-FEServer: EXCHANGE-SE). Der Dienst auf 217.243.248.29 (cloud.junkerwerk.de, team.junkerwerk.de) gibt beim Verbindungsaufbau seine Produkt- und Versionskennung preis: 217.243.248.29:8443 (Microsoft IIS 10.0).",
    "id": "VS-2026-014",
-   "impact": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs. Ein interner Servername verrät das Namensschema der Serverlandschaft; das erleichtert die Aufklärung vor einem gezielten Angriff. Eine sichtbare Versionskennung erleichtert die gezielte Suche nach bekannten Schwachstellen für genau diese Version und beschleunigt damit die Vorbereitung eines Angriffs.",
+   "impact": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs. Ein interner Servername verrät das Namensschema der Serverlandschaft; das erleichtert die Aufklärung vor einem gezielten Angriff.",
    "key": "banner_disclosure/scan/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -3540,7 +3505,7 @@
       "outlook.junkerwerk.de@217.243.248.28|outlook.junkerwerk.de@217.243.248.28"
      ],
      "statement": "observation[0]",
-     "text": "Die Webantworten von autodiscover.junkerwerk.de, cloud.junkerwerk.de (+team.junkerwerk.de) und outlook.junkerwerk.de nennen in ihren Antwortheadern die Version der eingesetzten Serversoftware: autodiscover.junkerwerk.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-SE), cloud.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET), outlook.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-SE)."
+     "text": "Die Webantworten von autodiscover.junkerwerk.de, cloud.junkerwerk.de und outlook.junkerwerk.de nennen in ihren Antwortheadern die Version der eingesetzten Serversoftware: autodiscover.junkerwerk.de (Server: Microsoft-IIS/10.0, X-AspNet-Version: 4.0.30319), cloud.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET), outlook.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319)."
     },
     {
      "check": "http_header_disclosure",
@@ -3550,7 +3515,7 @@
       "outlook.junkerwerk.de@217.243.248.28|outlook.junkerwerk.de@217.243.248.28"
      ],
      "statement": "observation[1]",
-     "text": "Der Antwortheader X-FEServer nennt den internen Namen des Frontend-Servers: autodiscover.junkerwerk.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE-SE), outlook.junkerwerk.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-SE)."
+     "text": "Der Antwortheader X-FEServer nennt den internen Namen des Frontend-Servers: autodiscover.junkerwerk.de (X-FEServer: EXCHANGE-SE), outlook.junkerwerk.de (X-FEServer: EXCHANGE-SE)."
     },
     {
      "check": "service_banner_version",
@@ -3581,15 +3546,6 @@
      ],
      "statement": "meaning[1]",
      "text": "Ein interner Servername verrät das Namensschema der Serverlandschaft; das erleichtert die Aufklärung vor einem gezielten Angriff."
-    },
-    {
-     "check": "service_banner_version",
-     "field": "meaning",
-     "members": [
-      "217.243.248.29|217.243.248.29:8443"
-     ],
-     "statement": "meaning[0]",
-     "text": "Eine sichtbare Versionskennung erleichtert die gezielte Suche nach bekannten Schwachstellen für genau diese Version und beschleunigt damit die Vorbereitung eines Angriffs."
     },
     {
      "check": "http_header_disclosure",
@@ -3656,7 +3612,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (Weiterleitungsprüfung, header_check, nmap)",
+   "source": "aktiv (Weiterleitungsprüfung, header_check, nmap), passiv (ZAP)",
    "status": "blau",
    "subjects": [
     "http_header_disclosure|autodiscover.junkerwerk.de@217.243.248.28",
@@ -4021,8 +3977,8 @@
     "status": "blau"
    }
   ],
-  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von junkerwerk.de und junkerwerk.hu am 23.09.2026: 7 Hostnamen auf 4 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 2 Systeme (188.40.3.130 mit 2a01:4f8:d0a:3124::2 und 217.243.248.29) liegt nur eine teilweise aktive Prüfung vor. 1 weitere gefundene Name ist nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von junkerwerk.de und junkerwerk.hu am 23.09.2026: 7 Hostnamen auf 4 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
+  "coverage_warning": "Für 3 Systeme (188.40.3.130 mit 2a01:4f8:d0a:3124::2, 217.243.248.28 und 217.243.248.29) liegt nur eine teilweise aktive Prüfung vor. 1 weiterer gefundener Name ist nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugriff auf die Datenbanken",
@@ -4056,9 +4012,9 @@
  },
  "landscape_lead": "16 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 42,
-  "catalog_digest": "bbd6dccec70f05898fcc9e7fbbb77f57bca528dd070683052c467e758681182a",
-  "catalog_version": "2026-09-27.1",
+  "after_fp": 41,
+  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
+  "catalog_version": "2026-09-27.2",
   "classification": "Vertraulich",
   "consolidated": 16,
   "context_fields": [],
@@ -4070,7 +4026,7 @@
    "junkerwerk.hu"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.2.0",
+  "facts_schema_version": "1.3.0",
   "fqdns_total": 7,
   "generated_on": null,
   "generation": null,
@@ -4085,7 +4041,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.1",
+  "policy_version": "2026-09-27.2",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -4478,7 +4434,7 @@
       "188.40.3.130"
      ],
      "statement": "positive.text",
-     "text": "Auf 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de), beim Hoster Hetzner Online GmbH lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab."
+     "text": "Auf 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de; beim Hoster Hetzner Online GmbH) lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab."
     },
     {
      "check": "mail_plaintext",
@@ -4487,7 +4443,7 @@
       "188.40.3.130"
      ],
      "statement": "positive.text",
-     "text": "Auf 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de), beim Hoster Hetzner Online GmbH lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu."
+     "text": "Auf 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de; beim Hoster Hetzner Online GmbH) lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu."
     }
    ],
    "subjects": [
@@ -4496,7 +4452,7 @@
     "188.40.3.130:143",
     "188.40.3.130:21"
    ],
-   "text": "Auf 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de), beim Hoster Hetzner Online GmbH lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab. Auf 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de), beim Hoster Hetzner Online GmbH lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu.",
+   "text": "Auf 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de; beim Hoster Hetzner Online GmbH) lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab. Auf 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de; beim Hoster Hetzner Online GmbH) lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu.",
    "title": "Datei- und Mailzugänge erzwingen TLS vor der Anmeldung"
   },
   {
@@ -4573,7 +4529,7 @@
       "188.40.3.130"
      ],
      "statement": "positive.text",
-     "text": "Auf 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 188.40.3.130: Debian GNU/Linux 12 (in Langzeitpflege (LTS) bis 30.06.2028 laut Debian)."
+     "text": "Auf 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 188.40.3.130: Debian GNU/Linux 12 (in Langzeitpflege bis 30.06.2028 laut Debian)."
     }
    ],
    "subjects": [
@@ -4589,7 +4545,7 @@
     "sw:188.40.3.130:-:proftpd:unknown",
     "sw:188.40.3.130:-:proftpd_sftp:unknown"
    ],
-   "text": "Auf 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 188.40.3.130: Debian GNU/Linux 12 (in Langzeitpflege (LTS) bis 30.06.2028 laut Debian).",
+   "text": "Auf 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 188.40.3.130: Debian GNU/Linux 12 (in Langzeitpflege bis 30.06.2028 laut Debian).",
    "title": "Serversoftware mit laufender Herstellerpflege"
   },
   {
@@ -4752,11 +4708,11 @@
      "2a01:4f8:d0a:3124::2"
     ],
     "operator": "Hetzner Online GmbH (dedi2230.your-server.de)",
-    "role": "Website, E-Mail-Versand laut SPF · geteiltes System beim Hoster"
+    "role": "Datenbanken erreichbar, Dateiaustausch (FTP, SFTP), Mailabruf, Einlieferung und Versand laut SPF, Website · geteiltes System beim Hoster"
    },
    {
-    "cov": "voll",
-    "coverage": "Portscan, Transportverschlüsselung und aktive Webanalyse vollständig.",
+    "cov": "teil",
+    "coverage": "Portscan und Transportverschlüsselung vollständig; aktive Webanalyse nur an outlook.junkerwerk.de; aktive Webanalyse als Kurzlauf (10 Sekunden); Anwendung autodiscover.junkerwerk.de nicht aktiv geprüft.",
     "fqdns": "autodiscover.junkerwerk.de, outlook.junkerwerk.de",
     "ip": "217.243.248.28",
     "more_ips": [],
@@ -4765,7 +4721,7 @@
    },
    {
     "cov": "teil",
-    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI cloud.junkerwerk.de) geprüft, nicht für Port 8443; aktive Webanalyse nur an cloud.junkerwerk.de ohne Seiteninhalt (Status 200).",
+    "coverage": "Portscan vollständig; Transportverschlüsselung nur für 443 (SNI cloud.junkerwerk.de) geprüft, nicht für Port 8443; aktive Webanalyse nur an cloud.junkerwerk.de, einer Seite ohne eigenen Inhalt (Titel „IIS Windows Server“, Status 200); aktive Webanalyse als Kurzlauf (10 Sekunden).",
     "fqdns": "cloud.junkerwerk.de, team.junkerwerk.de",
     "ip": "217.243.248.29",
     "more_ips": [],
@@ -4773,7 +4729,7 @@
     "role": "Nicht näher bestimmbar"
    }
   ],
-  "lead": "Der Scan hat 3 Systeme mit 4 IP-Adressen und 7 Hostnamen erfasst. Für 2 Systeme (3 Adressen) war die aktive Prüfung nur teilweise möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 3 Systeme mit 4 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort, und 7 Hostnamen erfasst. Für 3 Systeme (4 Adressen) war die aktive Prüfung nur teilweise möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [
@@ -4794,7 +4750,7 @@
      "Web-, Header- und TLS-Prüfungen"
     ],
     "code": "blocked",
-    "detail": "Betroffen: 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de).",
+    "detail": "Betroffen: 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de). Die Suche nach nicht verlinkten Pfaden an junkerwerk.de brach ab (Zeitlimit, keine Verbindung).",
     "refs": [],
     "subjects": [
      "188.40.3.130"
@@ -4806,7 +4762,7 @@
      "Mailserver auf Port 25 (Verschlüsselung, Anmeldung)"
     ],
     "code": "e5",
-    "detail": "Betroffen: 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de), 217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de). Laut Passivquelle nimmt dort der Dienst SMTP Verbindungen an (188.40.3.130 gesehen am 23.09.2026, 217.243.248.28 gesehen am 19.09.2026); vom Prüfstand aus ist Port 25 nicht erreichbar, der Mailserver auf diesem Port ist deshalb nicht geprüft.",
+    "detail": "Betroffen: 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de), 217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de). Laut Passivquelle nimmt dort der Dienst SMTP Verbindungen an (188.40.3.130 Hosteintrag der Passivquelle aktualisiert am 23.09.2026, 217.243.248.28 Hosteintrag der Passivquelle aktualisiert am 19.09.2026); vom Prüfstand aus ist Port 25 nicht erreichbar, der Mailserver auf diesem Port ist deshalb nicht geprüft.",
     "refs": [],
     "subjects": [
      "188.40.3.130",
@@ -4819,9 +4775,10 @@
      "Aktive Webanalyse"
     ],
     "code": "zap_partial",
-    "detail": "Betroffen: 217.243.248.29 (cloud.junkerwerk.de, team.junkerwerk.de).",
+    "detail": "Betroffen: 217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de): aktive Webanalyse nur an outlook.junkerwerk.de; aktive Webanalyse als Kurzlauf (10 Sekunden); Anwendung autodiscover.junkerwerk.de nicht aktiv geprüft, 217.243.248.29 (cloud.junkerwerk.de, team.junkerwerk.de): aktive Webanalyse nur an cloud.junkerwerk.de, einer Seite ohne eigenen Inhalt (Titel „IIS Windows Server“, Status 200); aktive Webanalyse als Kurzlauf (10 Sekunden).",
     "refs": [],
     "subjects": [
+     "217.243.248.28",
      "217.243.248.29"
     ],
     "what": "Aktive Webanalyse nur teilweise"
@@ -4854,10 +4811,22 @@
    },
    {
     "checks": [
+     "Sicherheits-Header"
+    ],
+    "code": "headers_partial",
+    "detail": "Betroffen: autodiscover.junkerwerk.de (X-Frame-Options, Referrer-Policy und Permissions-Policy an der Endseite nicht gemessen).",
+    "refs": [],
+    "subjects": [
+     "autodiscover.junkerwerk.de@217.243.248.28"
+    ],
+    "what": "Sicherheits-Header an der Endseite nur einzeln belegt"
+   },
+   {
+    "checks": [
      "Suche nach nicht verlinkten Pfaden"
     ],
     "code": "path_unreliable",
-    "detail": "Betroffen: outlook.junkerwerk.de (Weiterleitung 302).",
+    "detail": "Betroffen: outlook.junkerwerk.de (Weiterleitung 302); Anwendung autodiscover.junkerwerk.de nicht durchsucht.",
     "refs": [],
     "subjects": [
      "217.243.248.28"
@@ -4866,10 +4835,22 @@
    },
    {
     "checks": [
+     "Suche nach nicht verlinkten Pfaden"
+    ],
+    "code": "path_partial",
+    "detail": "Betroffen: cloud.junkerwerk.de: Verzeichnissuche ohne Abschlussstatistik beendet.",
+    "refs": [],
+    "subjects": [
+     "217.243.248.29#teil"
+    ],
+    "what": "Suche nach nicht verlinkten Pfaden nur teilweise"
+   },
+   {
+    "checks": [
      "Transportverschlüsselung"
     ],
     "code": "tls_partial",
-    "detail": "Betroffen: 217.243.248.29 (Port 8443). Geprüft wurde jeweils der Webdienst auf Port 443; die übrigen TLS-Dienste sind nur per Portscan erfasst, ihre Verschlüsselung und ihr Zertifikat sind nicht bewertet.",
+    "detail": "Betroffen: 217.243.248.29 (Port 8443: Protokolle und Verfahren nicht bewertet, Zertifikat aus dem Portscan). Geprüft wurde jeweils der Webdienst auf Port 443; die übrigen TLS-Dienste sind nur per Portscan erfasst.",
     "refs": [],
     "subjects": [
      "217.243.248.29"
@@ -4906,7 +4887,7 @@
    {
     "n": "0",
     "name": "Aufklärung (passiv)",
-    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 7 Hostnamen auf 4 IP-Adressen. Geprüft wurden 7 von 8 ermittelten Namen; die übrigen stehen in Kapitel 2 unter den Einschränkungen."
+    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 7 Hostnamen auf 4 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort. Geprüft wurden 7 von 8 ermittelten Namen; die übrigen stehen in Kapitel 2 unter den Einschränkungen."
    },
    {
     "n": "1",

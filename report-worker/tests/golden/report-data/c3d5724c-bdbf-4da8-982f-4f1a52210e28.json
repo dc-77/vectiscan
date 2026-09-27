@@ -51,13 +51,13 @@
     "host": "116.202.77.64",
     "port": "110",
     "ref": "VS-2026-003",
-    "svc": "Courier pop3d, TLS erzwungen"
+    "svc": "Courier pop3d, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "116.202.77.64",
     "port": "143",
     "ref": "VS-2026-003",
-    "svc": "Dovecot imapd, TLS erzwungen"
+    "svc": "Dovecot imapd, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "116.202.77.64",
@@ -81,7 +81,7 @@
     "host": "116.202.77.64",
     "port": "587",
     "ref": "",
-    "svc": "SMTP (Exim), TLS erzwungen"
+    "svc": "SMTP (Exim), Anmeldung erst nach STARTTLS"
    },
    {
     "host": "116.202.77.64",
@@ -157,12 +157,12 @@
    },
    {
     "c": "hoch",
-    "t": "DNS-Abfragen, dnsx, subfinder, gobuster, crt.sh, Certspotter, SecurityTrails",
+    "t": "DNS-Abfragen, dnsx, subfinder, gobuster, crt.sh, Certspotter, SecurityTrails (ohne Ergebnis)",
     "u": "Ermittlung der Hostnamen, DNS-Auflösung und DNS-Sicherheitseinträge"
    },
    {
     "c": "mittel (Passivquelle, Zeitversatz)",
-    "t": "Shodan, AbuseIPDB, OTX, URLhaus",
+    "t": "Shodan, AbuseIPDB, OTX, URLhaus (ohne Ergebnis)",
     "u": "Passive Dienst- und Reputationsdaten"
    }
   ],
@@ -170,7 +170,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein noch gültiges Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen. Ein am Scantag bereits abgelaufenes Zertifikat an Diensten außerhalb der Webseiten (Mail, Datei, Verwaltung) folgt der Tabelle: Exposition erhöht, Gelb, In Kürze."
    },
    {
     "l": "Gelb",
@@ -190,7 +190,7 @@
   ]
  },
  "architecture": {
-  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 1 System mit folgenden Aufgaben: Website. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 1 System mit folgenden Aufgaben: Dateiaustausch (FTP, SFTP), Datenbanken erreichbar, Mailabruf und Einlieferung und Website. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
    "Beobachtung ohne Regeltreffer, nicht als Befund bewertet: 116.202.77.64:4190 (ManageSieve (Dovecot Pigeonhole)) laut Passivquelle, außerhalb des geprüften Portbereichs."
   ],
@@ -596,10 +596,10 @@
      {
       "c": "Debian GNU/Linux",
       "conf": "hoch",
-      "note": "bis 30.06.2028 laut Debian",
+      "note": "in Langzeitpflege bis 30.06.2028 laut Debian",
       "src": "nmap",
       "st": "gruen",
-      "status": "in Langzeitpflege (LTS)",
+      "status": "LTS",
       "v": "12"
      },
      {
@@ -610,15 +610,6 @@
       "st": "grau",
       "status": "unbekannt",
       "v": "9.2p1"
-     },
-     {
-      "c": "ProFTPD mod_sftp",
-      "conf": "hoch",
-      "note": "",
-      "src": "nmap",
-      "st": "grau",
-      "status": "unbekannt",
-      "v": "unbekannt"
      },
      {
       "c": "Apache httpd",
@@ -642,13 +633,21 @@
   "observed": [
    {
     "evidence": [
-     "www.lumbeck-wolter.de: Seite „Schneidwerkzeuge für Fleischwölfe | Lumbeck & Wolter“"
+     "3306/tcp mysql MySQL",
+     "5432/tcp postgresql PostgreSQL DB",
+     "21/tcp ftp ProFTPD",
+     "22/tcp ssh ProFTPD mod_sftp",
+     "110/tcp Courier pop3d",
+     "143/tcp Dovecot imapd"
     ],
-    "meaning": "Außendarstellung des Unternehmens. Betroffen wären vor allem die Seiteninhalte.",
+    "meaning": "Datenbestände hinter den Anwendungen. Ein von außen erreichbarer Datenbankdienst ist ein direktes Ziel für Anmeldeversuche.",
     "role_keys": [
+     "datenbank",
+     "dateiaustausch",
+     "mail_dienste",
      "website"
     ],
-    "system": "Website (lumbeck-wolter.de, www.lumbeck-wolter.de)"
+    "system": "Datenbanken erreichbar, Dateiaustausch (FTP, SFTP), Mailabruf und Einlieferung, Website (lumbeck-wolter.de, www.lumbeck-wolter.de)"
    }
   ]
  },
@@ -1113,7 +1112,7 @@
     "legacy_protocols_present|116.202.77.64:21"
    ],
    "threat": null,
-   "title": "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen) (beim Hoster Hetzner Online GmbH)",
+   "title": "Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen; beim Hoster Hetzner Online GmbH)",
    "urgency": "Mittelfristig",
    "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
   },
@@ -1436,7 +1435,7 @@
     "key": "A",
     "level": 4,
     "name": "Perimeter-Exposition",
-    "note": "Datenbankdienst aus dem Internet erreichbar; Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen) (beim Hoster Hetzner Online GmbH)",
+    "note": "Datenbankdienst aus dem Internet erreichbar; Zusätzliche Mail- und Dateidienste erreichbar (TLS erzwungen; beim Hoster Hetzner Online GmbH)",
     "status": "rot"
    },
    {
@@ -1457,8 +1456,8 @@
     "key": "D",
     "level": 0,
     "name": "Web- und Transport-Hygiene",
-    "note": "Keine Befunde in dieser Kategorie",
-    "status": "gruen"
+    "note": "Nicht bewertbar: Prüfung von Transportverschlüsselung und Sicherheits-Headern nicht möglich, siehe 2.2",
+    "status": "grau"
    },
    {
     "key": "E",
@@ -1468,7 +1467,7 @@
     "status": "blau"
    }
   ],
-  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von lumbeck-wolter.de am 23.09.2026: 2 Hostnamen auf 2 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
+  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von lumbeck-wolter.de am 23.09.2026: 2 Hostnamen auf 2 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 1 System (116.202.77.64 mit 2a01:4f8:d0a:668b::2) liegt nur eine teilweise aktive Prüfung vor. 3 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
@@ -1503,8 +1502,8 @@
  "landscape_lead": "5 Befunde in 3 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 8,
-  "catalog_digest": "bbd6dccec70f05898fcc9e7fbbb77f57bca528dd070683052c467e758681182a",
-  "catalog_version": "2026-09-27.1",
+  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
+  "catalog_version": "2026-09-27.2",
   "classification": "Vertraulich",
   "consolidated": 5,
   "context_fields": [],
@@ -1515,7 +1514,7 @@
    "lumbeck-wolter.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.2.0",
+  "facts_schema_version": "1.3.0",
   "fqdns_total": 2,
   "generated_on": null,
   "generation": null,
@@ -1530,7 +1529,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.1",
+  "policy_version": "2026-09-27.2",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1717,7 +1716,7 @@
       "116.202.77.64"
      ],
      "statement": "positive.text",
-     "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de), beim Hoster Hetzner Online GmbH lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab."
+     "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de; beim Hoster Hetzner Online GmbH) lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab."
     },
     {
      "check": "mail_plaintext",
@@ -1726,7 +1725,7 @@
       "116.202.77.64"
      ],
      "statement": "positive.text",
-     "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de), beim Hoster Hetzner Online GmbH lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu."
+     "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de; beim Hoster Hetzner Online GmbH) lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu."
     }
    ],
    "subjects": [
@@ -1735,7 +1734,7 @@
     "116.202.77.64:143",
     "116.202.77.64:21"
    ],
-   "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de), beim Hoster Hetzner Online GmbH lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab. Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de), beim Hoster Hetzner Online GmbH lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu.",
+   "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de; beim Hoster Hetzner Online GmbH) lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschlüsselung ab. Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de; beim Hoster Hetzner Online GmbH) lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter Transportverschlüsselung zu.",
    "title": "Datei- und Mailzugänge erzwingen TLS vor der Anmeldung"
   },
   {
@@ -1802,7 +1801,7 @@
       "116.202.77.64"
      ],
      "statement": "positive.text",
-     "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 116.202.77.64: Debian GNU/Linux 12 (in Langzeitpflege (LTS) bis 30.06.2028 laut Debian)."
+     "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 116.202.77.64: Debian GNU/Linux 12 (in Langzeitpflege bis 30.06.2028 laut Debian)."
     }
    ],
    "subjects": [
@@ -1818,7 +1817,7 @@
     "sw:116.202.77.64:-:proftpd:unknown",
     "sw:116.202.77.64:-:proftpd_sftp:unknown"
    ],
-   "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 116.202.77.64: Debian GNU/Linux 12 (in Langzeitpflege (LTS) bis 30.06.2028 laut Debian).",
+   "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) ist Serversoftware in einer vom Hersteller gepflegten Version im Einsatz: 116.202.77.64: Debian GNU/Linux 12 (in Langzeitpflege bis 30.06.2028 laut Debian).",
    "title": "Serversoftware mit laufender Herstellerpflege"
   },
   {
@@ -1941,7 +1940,7 @@
      "2a01:4f8:d0a:668b::2"
     ],
     "operator": "Hetzner Online GmbH (dedi5705.your-server.de)",
-    "role": "Website · geteiltes System beim Hoster"
+    "role": "Datenbanken erreichbar, Dateiaustausch (FTP, SFTP), Mailabruf und Einlieferung, Website · geteiltes System beim Hoster"
    },
    {
     "cov": "extern",
@@ -1949,11 +1948,11 @@
     "fqdns": "autodiscover.lumbeck-wolter.de",
     "ip": "52.97.135.104",
     "more_ips": [],
-    "operator": "Microsoft 365",
+    "operator": "Microsoft 365 (laut Namensauflösung und SPF)",
     "role": "Drittanbieter"
    }
   ],
-  "lead": "Der Scan hat 1 System mit 2 IP-Adressen und 2 Hostnamen erfasst. Für 1 System (2 Adressen) war die aktive Prüfung nur teilweise möglich; diese Lücke ist unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 1 System mit 2 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort, und 2 Hostnamen erfasst. Für 1 System (2 Adressen) war die aktive Prüfung nur teilweise möglich; diese Lücke ist unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [
@@ -1962,7 +1961,7 @@
      "Webanalyse über IPv6"
     ],
     "code": "ipv6_not_scanned",
-    "detail": "Betroffen: 2a01:4f8:d0a:668b::2 (lumbeck-wolter.de, www.lumbeck-wolter.de). Die Adressen stehen als AAAA-Eintrag derselben Namen im DNS; der Scanner hat sie nicht in die Prüfung übernommen. Geprüft wurde die IPv4-Adresse desselben Systems.",
+    "detail": "Betroffen: 2a01:4f8:d0a:668b::2 (lumbeck-wolter.de, www.lumbeck-wolter.de). Die Adresse steht als AAAA-Eintrag derselben Namen im DNS; der Scanner hat sie nicht in die Prüfung übernommen. Geprüft wurde die IPv4-Adresse desselben Systems.",
     "refs": [],
     "subjects": [
      "2a01:4f8:d0a:668b::2"
@@ -1974,7 +1973,7 @@
      "Web-, Header- und TLS-Prüfungen"
     ],
     "code": "blocked",
-    "detail": "Betroffen: 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de).",
+    "detail": "Betroffen: 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de). Die Suche nach nicht verlinkten Pfaden an lumbeck-wolter.de brach ab (Zeitlimit, keine Verbindung).",
     "refs": [],
     "subjects": [
      "116.202.77.64"
@@ -1986,7 +1985,7 @@
      "Mailserver auf Port 25 (Verschlüsselung, Anmeldung)"
     ],
     "code": "e5",
-    "detail": "Betroffen: 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de). Laut Passivquelle nimmt dort der Dienst SMTP Verbindungen an (gesehen am 23.09.2026); vom Prüfstand aus ist Port 25 nicht erreichbar, der Mailserver auf diesem Port ist deshalb nicht geprüft.",
+    "detail": "Betroffen: 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de). Laut Passivquelle nimmt dort der Dienst SMTP Verbindungen an (Hosteintrag der Passivquelle aktualisiert am 23.09.2026); vom Prüfstand aus ist Port 25 nicht erreichbar, der Mailserver auf diesem Port ist deshalb nicht geprüft.",
     "refs": [],
     "subjects": [
      "116.202.77.64"
@@ -2036,7 +2035,7 @@
    {
     "n": "0",
     "name": "Aufklärung (passiv)",
-    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 2 Hostnamen auf 2 IP-Adressen. Geprüft wurden 2 von 5 ermittelten Namen; die übrigen stehen in Kapitel 2 unter den Einschränkungen."
+    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 2 Hostnamen auf 2 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort. Geprüft wurden 2 von 5 ermittelten Namen; die übrigen stehen in Kapitel 2 unter den Einschränkungen."
    },
    {
     "n": "1",

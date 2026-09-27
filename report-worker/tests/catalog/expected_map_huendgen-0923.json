@@ -5,6 +5,7 @@
  "hinweis_s6b2": "S6b-2 hat drei Markierungen aufgeloest: Q18 Zertifikat mit 17 Tagen als cert_expiring_later mittelfristig (E2); Q4 dane_missing entfaellt; Q12 waf_present ohne benanntes Produkt entfaellt. Es bleibt eine Q8-Markierung (S6c).",
  "hinweis_s6b3": "S6b-3 (spec/10): Soll-Liste nach Katalog 2026-09-26.2 und Fakten 1.1.0 neu gebaut. Neue oder geänderte Einträge tragen spec10 (R-Nummer) und warum. entfallene Positivaussagen: tls_weak_ciphers exchange.huendgen-entsorgung.de (R6 (CBC-Verfahren angeboten)); urlhaus_compromise huendgen-entsorgung.de (R6 (URLhaus no_data ist kein Negativergebnis)). Q8 nach Entscheidung DC 1 aufgelöst (R1, Messung an der Endseite oder nicht prüfbar): VS-2026-012 security_headers_incomplete|exchange.huendgen-entsorgung.de.",
  "hinweis_s6b4": "S6b-4 (spec/11): Soll-Liste nach Katalog 2026-09-27.1 und Fakten 1.2.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (T-Nummer oder Teil 3) und warum.",
+ "hinweis_s6b4n": "S6b-4n (spec/11 Teil 6): Soll-Liste nach Katalog 2026-09-27.2 und Fakten 1.3.0 neu gebaut. Neue oder geänderte Einträge tragen spec11 (N-Nummer) und warum. entfallene Positivaussagen: csp_missing www.huendgen-entsorgung.de (+huendgen-entsorgung.de) (N1 (Inhaltsrichtlinie ohne Regel für Skriptquellen)); ip_reputation 18.197.248.23 (huendgen-entsorgung.de, www.huendgen-entsorgung.de) (N6 (Plattform- und CDN-Adresse, Reputation nicht kundenbezogen)).",
  "strict": false,
  "orders": {
   "main": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7"
@@ -27,22 +28,24 @@
   },
   "VS-2026-004": {
    "checks": [
-    "dmarc_quarantine"
-   ]
+    "csp_missing"
+   ],
+   "spec11": "N1",
+   "warum": "Inhaltsrichtlinie nur mit frame-ancestors, keine Regel für Skriptquellen: Variante von csp_missing statt Positivbefund."
   },
   "VS-2026-005": {
    "checks": [
-    "dnssec_missing"
+    "dmarc_quarantine"
    ]
   },
   "VS-2026-006": {
    "checks": [
-    "hsts_missing"
+    "dnssec_missing"
    ]
   },
   "VS-2026-007": {
    "checks": [
-    "http_alt_port"
+    "hsts_missing"
    ]
   },
   "VS-2026-008": {
@@ -52,49 +55,56 @@
   },
   "VS-2026-009": {
    "checks": [
-    "http_header_disclosure"
+    "http_alt_port"
    ]
   },
   "VS-2026-010": {
    "checks": [
-    "login_portal_exposed"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-011": {
    "checks": [
-    "mta_sts_missing"
+    "login_portal_exposed"
    ]
   },
   "VS-2026-012": {
+   "checks": [
+    "mta_sts_missing"
+   ]
+  },
+  "VS-2026-013": {
    "checks": [
     "security_headers_incomplete"
    ],
    "spec10": "R1",
    "warum": "Jetzt an der Endseite gemessen (redirect_probe oder ZAP); vorher Q8 an der Weiterleitung."
   },
-  "VS-2026-013": {
+  "VS-2026-014": {
    "checks": [
     "security_headers_incomplete"
-   ]
+   ],
+   "spec11": "N2",
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung)."
   },
-  "VS-2026-014": {
+  "VS-2026-015": {
    "checks": [
     "service_unidentified"
    ],
    "spec10": "R9",
    "warum": "Offener Dienst ohne Banner, Titel oder Zertifikat; neue Prüfung statt „Zweck klären“ oder unverarbeitet."
   },
-  "VS-2026-015": {
+  "VS-2026-016": {
    "checks": [
     "software_eol"
    ]
   },
-  "VS-2026-016": {
+  "VS-2026-017": {
    "checks": [
     "tls_rpt_missing"
    ]
   },
-  "VS-2026-017": {
+  "VS-2026-018": {
    "checks": [
     "tls_weakness_reported"
    ]
@@ -137,7 +147,7 @@
   },
   "VS-2026-P07": {
    "checks": [
-    "csp_missing"
+    "db_exposed"
    ]
   },
   "VS-2026-P08": {
@@ -147,37 +157,41 @@
   },
   "VS-2026-P09": {
    "checks": [
-    "db_exposed"
+    "dkim_missing"
    ]
   },
   "VS-2026-P10": {
    "checks": [
-    "dkim_missing"
+    "dmarc_missing"
    ]
   },
   "VS-2026-P11": {
    "checks": [
-    "dmarc_missing"
+    "dns_dangling_cname"
    ]
   },
   "VS-2026-P12": {
    "checks": [
-    "dns_dangling_cname"
+    "dns_zone_transfer"
    ]
   },
   "VS-2026-P13": {
    "checks": [
-    "dns_zone_transfer"
-   ]
+    "hsts_missing"
+   ],
+   "spec11": "N2",
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung)."
   },
   "VS-2026-P14": {
    "checks": [
-    "hsts_missing"
-   ]
+    "hsts_short"
+   ],
+   "spec11": "N2",
+   "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung)."
   },
   "VS-2026-P15": {
    "checks": [
-    "hsts_short"
+    "http_no_tls"
    ]
   },
   "VS-2026-P16": {
@@ -187,72 +201,60 @@
   },
   "VS-2026-P17": {
    "checks": [
-    "http_no_tls"
+    "ip_reputation"
    ]
   },
   "VS-2026-P18": {
    "checks": [
-    "ip_reputation"
-   ],
-   "spec11": "Teil 3 BS",
-   "warum": "Plattform- und CDN-Adressen ohne Meldung stehen im Positivbefund; einen Befund erzeugen sie nicht."
+    "rdp_exposed"
+   ]
   },
   "VS-2026-P19": {
    "checks": [
-    "ip_reputation"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P20": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P21": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P22": {
    "checks": [
-    "smb_exposed"
+    "spf_missing"
    ]
   },
   "VS-2026-P23": {
    "checks": [
-    "smb_exposed"
+    "spf_softfail"
    ]
   },
   "VS-2026-P24": {
    "checks": [
-    "spf_missing"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P25": {
    "checks": [
-    "spf_softfail"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P26": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P27": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P28": {
-   "checks": [
-    "tls_no_13"
-   ]
-  },
-  "VS-2026-P29": {
-   "checks": [
-    "tls_no_13"
-   ]
-  },
-  "VS-2026-P30": {
    "checks": [
     "tls_weak_ciphers"
    ]

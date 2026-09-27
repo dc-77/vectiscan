@@ -13,7 +13,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Korrelation hat 2462 Einzelmeldungen der Werkzeuge erfasst, davon 872 Doppelmeldungen mehrerer Werkzeuge und Durchgänge. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 8 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
+  "filtering": "Die Korrelation hat 2462 Einzelmeldungen der Werkzeuge erfasst, davon 23 gleiche Meldungen der Webanalyse und 849 der TLS-Prüfung zusammengeführt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 7 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -38,7 +38,7 @@
    {
     "host": "104.16.10.6",
     "port": "443",
-    "ref": "VS-2026-002",
+    "ref": "",
     "svc": "Cloudflare http proxy, TLS erzwungen"
    },
    {
@@ -56,7 +56,7 @@
    {
     "host": "20.79.218.75",
     "port": "21",
-    "ref": "VS-2026-005",
+    "ref": "VS-2026-004",
     "svc": "TLS-Dienst, Zertifikat *.heuel.com"
    },
    {
@@ -74,7 +74,7 @@
    {
     "host": "20.79.218.75",
     "port": "443",
-    "ref": "VS-2026-003",
+    "ref": "VS-2026-002",
     "svc": "Apache httpd, TLS erzwungen"
    },
    {
@@ -92,7 +92,7 @@
    {
     "host": "217.72.203.132",
     "port": "443",
-    "ref": "VS-2026-004",
+    "ref": "VS-2026-003",
     "svc": "nginx, TLS erzwungen"
    },
    {
@@ -105,7 +105,7 @@
     "host": "104.16.10.6",
     "port": "2053",
     "ref": "",
-    "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
+    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "104.16.10.6",
@@ -117,7 +117,7 @@
     "host": "104.16.10.6",
     "port": "2083",
     "ref": "",
-    "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
+    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "104.16.10.6",
@@ -129,7 +129,7 @@
     "host": "104.16.10.6",
     "port": "2087",
     "ref": "",
-    "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
+    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "104.16.10.6",
@@ -141,13 +141,13 @@
     "host": "104.16.10.6",
     "port": "2096",
     "ref": "",
-    "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
+    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "104.16.10.6",
     "port": "6443",
     "ref": "",
-    "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
+    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "104.16.10.6",
@@ -246,7 +246,7 @@
     "note": "Versionsangabe im Seiteninhalt.",
     "rule": "zap#10009",
     "what": "„In Page Banner Information Leak“ (ZAP-Regel 10009), 2 Meldungen",
-    "where": "ose.heuel.com"
+    "where": "ose.heuel.com (an Nebenpfaden robots.txt, sitemap.xml)"
    },
    {
     "count": 1,
@@ -278,7 +278,7 @@
     "note": "Zeitstempel in der Antwort.",
     "rule": "zap#10096",
     "what": "„Timestamp Disclosure - Unix“ (ZAP-Regel 10096), 18 Meldungen",
-    "where": "online.heuel.com, www.heuel.com"
+    "where": "online.heuel.com (an der Sicherheitsabfrage), www.heuel.com"
    },
    {
     "count": 5,
@@ -334,7 +334,7 @@
     "note": "Cookie mit abgeschaltetem SameSite-Schutz.",
     "rule": "zap#10054",
     "what": "„Cookie with SameSite Attribute None“ (ZAP-Regel 10054), 3 Meldungen",
-    "where": "online.heuel.com"
+    "where": "online.heuel.com (an der Sicherheitsabfrage)"
    },
    {
     "count": 1,
@@ -342,7 +342,15 @@
     "note": "X-Content-Type-Options fehlt.",
     "rule": "zap#10021",
     "what": "„X-Content-Type-Options Header Missing“ (ZAP-Regel 10021), 1 Meldung",
-    "where": "online.heuel.com"
+    "where": "online.heuel.com (an der Sicherheitsabfrage)"
+   },
+   {
+    "count": 3,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt.",
+    "rule": "zap#10035",
+    "what": "„Strict-Transport-Security Header Not Set“ (ZAP-Regel 10035), 3 Meldungen",
+    "where": "online.heuel.com (an der Sicherheitsabfrage)"
    },
    {
     "count": 2,
@@ -350,7 +358,7 @@
     "note": "Content-Security-Policy lückenhaft.",
     "rule": "zap#10055",
     "what": "„CSP: Failure to Define Directive with No Fallback“ (ZAP-Regel 10055), 2 Meldungen",
-    "where": "online.heuel.com"
+    "where": "online.heuel.com (an der Sicherheitsabfrage)"
    },
    {
     "count": 1,
@@ -370,11 +378,11 @@
    },
    {
     "count": 1,
-    "message": "Java/Servlet",
-    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "message": "Facebook Pixel",
+    "note": "Nur laut redirect_probe, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
-    "what": "Technik „Java/Servlet“, 1 Meldung",
-    "where": "20.79.218.75"
+    "what": "Technik „Facebook Pixel“, 1 Meldung",
+    "where": "www.heuel.com"
    },
    {
     "count": 1,
@@ -382,30 +390,6 @@
     "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
     "what": "Technik „Google Analytics“, 1 Meldung",
-    "where": "217.72.203.132"
-   },
-   {
-    "count": 1,
-    "message": "Google Tag Manager",
-    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
-    "rule": "technik",
-    "what": "Technik „Google Tag Manager“, 1 Meldung",
-    "where": "217.72.203.132"
-   },
-   {
-    "count": 1,
-    "message": "Neos CMS",
-    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
-    "rule": "technik",
-    "what": "Technik „Neos CMS“, 1 Meldung",
-    "where": "217.72.203.132"
-   },
-   {
-    "count": 1,
-    "message": "Neos Flow",
-    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
-    "rule": "technik",
-    "what": "Technik „Neos Flow“, 1 Meldung",
     "where": "217.72.203.132"
    },
    {
@@ -424,7 +408,7 @@
     "note": "Versionsangabe im Seiteninhalt.",
     "rule": "info_disclosure#10009",
     "what": "ose.heuel.com (In Page Banner Information Leak)",
-    "where": "ose.heuel.com"
+    "where": "ose.heuel.com (an Nebenpfaden robots.txt, sitemap.xml)"
    },
    {
     "count": 1,
@@ -528,7 +512,7 @@
     "note": "Zeitstempel in der Antwort.",
     "rule": "info_disclosure#10096",
     "what": "online.heuel.com (Timestamp Disclosure - Unix)",
-    "where": "online.heuel.com"
+    "where": "online.heuel.com (an der Sicherheitsabfrage)"
    },
    {
     "count": 3,
@@ -536,7 +520,7 @@
     "note": "Cookie mit abgeschaltetem SameSite-Schutz.",
     "rule": "web_vulnerability_reported#10054",
     "what": "Cookie with SameSite Attribute None auf online.heuel.com/ (Konfidenz mittel, passiv gemeldet von ZAP)",
-    "where": "online.heuel.com"
+    "where": "online.heuel.com (an der Sicherheitsabfrage)"
    },
    {
     "count": 1,
@@ -544,7 +528,15 @@
     "note": "X-Content-Type-Options fehlt.",
     "rule": "zap_uncovered#10021",
     "what": "X-Content-Type-Options Header Missing auf online.heuel.com",
-    "where": "online.heuel.com"
+    "where": "online.heuel.com (an der Sicherheitsabfrage)"
+   },
+   {
+    "count": 3,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt.",
+    "rule": "zap_uncovered#10035",
+    "what": "Strict-Transport-Security Header Not Set auf online.heuel.com",
+    "where": "online.heuel.com (an der Sicherheitsabfrage)"
    },
    {
     "count": 2,
@@ -552,7 +544,7 @@
     "note": "Content-Security-Policy lückenhaft.",
     "rule": "zap_uncovered#10055",
     "what": "CSP: Failure to Define Directive with No Fallback auf online.heuel.com",
-    "where": "online.heuel.com"
+    "where": "online.heuel.com (an der Sicherheitsabfrage)"
    },
    {
     "count": 1,
@@ -572,11 +564,11 @@
    },
    {
     "count": 1,
-    "message": "Java/Servlet",
-    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
+    "message": "Facebook Pixel",
+    "note": "Nur laut redirect_probe, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
-    "what": "Technik „Java/Servlet“",
-    "where": "20.79.218.75"
+    "what": "Technik „Facebook Pixel“",
+    "where": "www.heuel.com"
    },
    {
     "count": 1,
@@ -584,30 +576,6 @@
     "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
     "what": "Technik „Google Analytics“",
-    "where": "217.72.203.132"
-   },
-   {
-    "count": 1,
-    "message": "Google Tag Manager",
-    "note": "Nur laut webtech, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
-    "rule": "technik",
-    "what": "Technik „Google Tag Manager“",
-    "where": "217.72.203.132"
-   },
-   {
-    "count": 1,
-    "message": "Neos CMS",
-    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
-    "rule": "technik",
-    "what": "Technik „Neos CMS“",
-    "where": "217.72.203.132"
-   },
-   {
-    "count": 1,
-    "message": "Neos Flow",
-    "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
-    "rule": "technik",
-    "what": "Technik „Neos Flow“",
     "where": "217.72.203.132"
    },
    {
@@ -655,7 +623,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein noch gültiges Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen. Ein am Scantag bereits abgelaufenes Zertifikat an Diensten außerhalb der Webseiten (Mail, Datei, Verwaltung) folgt der Tabelle: Exposition erhöht, Gelb, In Kürze."
    },
    {
     "l": "Gelb",
@@ -677,7 +645,8 @@
  "architecture": {
   "lead": "Die geprüfte Angriffsfläche verteilt sich auf 5 Systeme mit folgenden Aufgaben: Dateiaustausch, Fernzugang und Verwaltung, Webanwendung mit Anmeldung und Website. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
-   "Beobachtungen ohne Regeltreffer, nicht als Befund bewertet: 104.16.10.6:6443 laut Passivquelle, außerhalb des geprüften Portbereichs; 213.133.104.51:110 (POP3) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:143 (IMAP) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:21 laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:22 laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:25 (SMTP (Exim)) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:443 (Apache httpd) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:465 (SMTP über TLS (Exim)) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:587 (SMTP (Exim)) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:80 (Apache httpd) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:993 (IMAP über TLS) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:995 (POP3 über TLS) laut Passivquelle, vom Portscan nicht bestätigt; [2a01:4f8:d0a:2757::2]:443 (Apache httpd) laut Passivquelle, vom Portscan nicht bestätigt; [2a01:4f8:d0a:2757::2]:80 (Apache httpd) laut Passivquelle, vom Portscan nicht bestätigt; Bibliotheksversion primefaces 11.0.1-SNAPSHOT in einer Ressourcenadresse (ose.heuel.com); Bibliotheksversion primefaces-casablanca 11.0.1-SNAPSHOT in einer Ressourcenadresse (ose.heuel.com)."
+   "Beobachtungen ohne Regeltreffer, nicht als Befund bewertet: 104.16.10.6:6443 laut Passivquelle, außerhalb des geprüften Portbereichs; 213.133.104.51:110 (POP3) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:143 (IMAP) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:21 laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:22 laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:25 (SMTP (Exim)) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:443 (Apache httpd) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:465 (SMTP über TLS (Exim)) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:587 (SMTP (Exim)) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:80 (Apache httpd) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:993 (IMAP über TLS) laut Passivquelle, vom Portscan nicht bestätigt; 213.133.104.51:995 (POP3 über TLS) laut Passivquelle, vom Portscan nicht bestätigt; [2a01:4f8:d0a:2757::2]:443 (Apache httpd) laut Passivquelle, vom Portscan nicht bestätigt; [2a01:4f8:d0a:2757::2]:80 (Apache httpd) laut Passivquelle, vom Portscan nicht bestätigt; Bibliotheksversion primefaces 11.0.1-SNAPSHOT in einer Ressourcenadresse (ose.heuel.com); Bibliotheksversion primefaces-casablanca 11.0.1-SNAPSHOT in einer Ressourcenadresse (ose.heuel.com).",
+   "An 104.16.10.6 meldet die Passivquelle die Ports 2052, 2053, 2082, 2083, 2086, 2087, 2095, 2096, 6443, 8880; es sind Standardports der CDN-Kante des Anbieters (Cloudflare), sie gehören nicht zu Ihren Systemen und sind nicht bewertet."
   ],
   "posture": [
    {
@@ -842,6 +811,30 @@
       ],
       "subjects": [
        "104.16.10.6"
+      ],
+      "v": "nicht prüfbar"
+     },
+     {
+      "checks": [
+       "tls_legacy_protocols",
+       "tls_no_13",
+       "tls_weak_ciphers",
+       "tls_weakness",
+       "tls_no_fallback_scsv"
+      ],
+      "l": "104.16.11.6",
+      "ok": null,
+      "pulls": [
+       "cert_expired",
+       "cert_expiring",
+       "cert_expiring_later",
+       "cert_chain_incomplete",
+       "cert_hostname_mismatch",
+       "cert_self_signed",
+       "service_cert_expired"
+      ],
+      "subjects": [
+       "104.16.11.6"
       ],
       "v": "nicht prüfbar"
      },
@@ -1061,12 +1054,29 @@
        "header_duplicate"
       ],
       "l": "104.16.10.6",
-      "ok": false,
+      "ok": null,
       "pulls": [],
       "subjects": [
        "104.16.10.6"
       ],
-      "v": "Handlungsbedarf"
+      "v": "nicht prüfbar"
+     },
+     {
+      "checks": [
+       "security_headers_incomplete",
+       "csp_missing",
+       "csp_weak",
+       "hsts_missing",
+       "hsts_short",
+       "header_duplicate"
+      ],
+      "l": "104.16.11.6",
+      "ok": null,
+      "pulls": [],
+      "subjects": [
+       "104.16.11.6"
+      ],
+      "v": "nicht prüfbar"
      },
      {
       "checks": [
@@ -1237,7 +1247,7 @@
      {
       "p": "443",
       "s": "Cloudflare http proxy",
-      "st": "gelb"
+      "st": "gruen"
      },
      {
       "p": "8080",
@@ -1256,7 +1266,7 @@
      },
      {
       "p": "2053",
-      "s": "unbekannt",
+      "s": "Cloudflare",
       "st": "grau"
      },
      {
@@ -1266,7 +1276,7 @@
      },
      {
       "p": "2083",
-      "s": "HTTPS",
+      "s": "Cloudflare",
       "st": "grau"
      },
      {
@@ -1276,7 +1286,7 @@
      },
      {
       "p": "2087",
-      "s": "HTTPS",
+      "s": "Cloudflare",
       "st": "grau"
      },
      {
@@ -1286,12 +1296,12 @@
      },
      {
       "p": "2096",
-      "s": "unbekannt",
+      "s": "Cloudflare",
       "st": "grau"
      },
      {
       "p": "6443",
-      "s": "HTTPS",
+      "s": "Cloudflare",
       "st": "grau"
      },
      {
@@ -1455,6 +1465,15 @@
       "v": "unbekannt"
      },
      {
+      "c": "Java/Servlet",
+      "conf": "mittel",
+      "note": "",
+      "src": "redirect_probe, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
@@ -1469,10 +1488,19 @@
     "host": "217.72.203.132 (ip217-72-203-132.pbiaas.com)",
     "rows": [
      {
-      "c": "NEOS",
+      "c": "Google Tag Manager",
+      "conf": "mittel",
+      "note": "",
+      "src": "redirect_probe, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Neos",
       "conf": "hoch",
       "note": "",
-      "src": "cms_fingerprint",
+      "src": "cms_fingerprint, httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1551,8 +1579,8 @@
    "checks": [
     "service_unidentified"
    ],
-   "evidence": "nmap · hosts/20.79.218.75/phase1/nmap.xml\n20.79.218.75:8443/tcp · Dienst: nicht identifiziert · 8443/tcp open https-alt",
-   "found": "Der Host 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) hat offene Ports, deren Dienst sich weder mit Produkt noch mit Titel zu erkennen gibt: 20.79.218.75:8443 (nicht identifiziert). Der Portscan kennt nur die übliche Belegung dieser Portnummern, nicht den tatsächlichen Dienst.",
+   "evidence": "nmap · hosts/20.79.218.75/phase1/nmap.xml\n20.79.218.75:8443/tcp · Dienst: nicht identifiziert · 8443/tcp open https-alt?",
+   "found": "Auf 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) ist ein Port offen, dessen Dienst sich weder mit Produkt noch mit Titel zu erkennen gibt: 20.79.218.75:8443 (nicht identifiziert). Der Portscan kennt nur die übliche Belegung dieser Portnummer, nicht den tatsächlichen Dienst.",
    "id": "VS-2026-001",
    "impact": "Ein offener Dienst ohne erkennbaren Zweck vergrößert die Angriffsfläche. Ob er gepflegt wird und wer ihn nutzt, ist von außen nicht feststellbar.",
    "key": "service_unidentified/scan/kunde",
@@ -1594,7 +1622,7 @@
       "20.79.218.75|20.79.218.75:8443"
      ],
      "statement": "observation[0]",
-     "text": "Der Host 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) hat offene Ports, deren Dienst sich weder mit Produkt noch mit Titel zu erkennen gibt: 20.79.218.75:8443 (nicht identifiziert). Der Portscan kennt nur die übliche Belegung dieser Portnummern, nicht den tatsächlichen Dienst."
+     "text": "Auf 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) ist ein Port offen, dessen Dienst sich weder mit Produkt noch mit Titel zu erkennen gibt: 20.79.218.75:8443 (nicht identifiziert). Der Portscan kennt nur die übliche Belegung dieser Portnummer, nicht den tatsächlichen Dienst."
     },
     {
      "check": "service_unidentified",
@@ -1656,103 +1684,7 @@
    "verify": "Portscan der genannten Ports von einer externen Adresse wiederholen; erwartet wird ein geschlossener Port oder ein Dienst, dessen Zweck dokumentiert ist."
   },
   {
-   "affected": "online.heuel.com",
-   "cat": "D",
-   "checks": [
-    "hsts_missing"
-   ],
-   "evidence": "header_check\nonline.heuel.com · Adresse: https://online.heuel.com · Antwort: 403 (Sicherheitsabfrage der Plattform) · Abwehrmerkmal: cf-mitigated: challenge\n\nWeiterleitungsprüfung · hosts/104.16.10.6/phase1/tech_profile.json\nonline.heuel.com · Adresse: https://online.heuel.com/ · Antwort: Weiterleitung · Strict-Transport-Security: nicht gesetzt",
-   "found": "Der Dienst online.heuel.com liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: online.heuel.com.",
-   "id": "VS-2026-002",
-   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift.",
-   "key": "web_header_hygiene/104.16.10.6/platform:funnelcockpit.com",
-   "level": "mittel",
-   "level_label": "mittel",
-   "missing_headers": [],
-   "operator": "beim Plattformbetreiber funnelcockpit.com",
-   "operator_note": "Dieser Sachverhalt liegt beim Plattformbetreiber funnelcockpit.com: der Hostname zeigt auf dessen Plattform, Server und Grundkonfiguration betreibt er. Die Empfehlung richtet sich an ihn; Sie können sie über den Vertrag oder die Einstellungen der Plattform einfordern.",
-   "plan_action": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
-   "plan_effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
-   "plan_items": [
-    {
-     "action": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
-     "check": "hsts_missing",
-     "detail": "",
-     "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
-     "lever": "HTTP Strict Transport Security setzen",
-     "per_rule": false,
-     "stage": "mittelfristig"
-    }
-   ],
-   "plan_lever": "HTTP Strict Transport Security setzen",
-   "plan_stage": "mittelfristig",
-   "policy": "hsts_missing",
-   "provenance": [
-    {
-     "check": "hsts_missing",
-     "field": "title",
-     "members": [
-      "online.heuel.com@104.16.10.6|online.heuel.com@104.16.10.6"
-     ],
-     "statement": "short_variants[1]",
-     "text": "HSTS fehlt"
-    },
-    {
-     "check": "hsts_missing",
-     "field": "observation",
-     "members": [
-      "online.heuel.com@104.16.10.6|online.heuel.com@104.16.10.6"
-     ],
-     "statement": "observation[0]",
-     "text": "Der Dienst online.heuel.com liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: online.heuel.com."
-    },
-    {
-     "check": "hsts_missing",
-     "field": "meaning",
-     "members": [
-      "online.heuel.com@104.16.10.6|online.heuel.com@104.16.10.6"
-     ],
-     "statement": "meaning[0]",
-     "text": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift."
-    },
-    {
-     "check": "hsts_missing",
-     "field": "verify",
-     "members": [
-      "online.heuel.com@104.16.10.6|online.heuel.com@104.16.10.6"
-     ],
-     "statement": "verify[0]",
-     "text": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security."
-    },
-    {
-     "check": "hsts_missing",
-     "field": "recommendation",
-     "members": [
-      "online.heuel.com@104.16.10.6|online.heuel.com@104.16.10.6"
-     ],
-     "statement": "recommendation[0]",
-     "text": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist."
-    }
-   ],
-   "recommendation": [
-    [
-     "Mittelfristig",
-     "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist."
-    ]
-   ],
-   "scale": "hygiene",
-   "source": "aktiv (Weiterleitungsprüfung, header_check)",
-   "status": "gelb",
-   "subjects": [
-    "hsts_missing|online.heuel.com@104.16.10.6"
-   ],
-   "threat": null,
-   "title": "Absicherung der Webdienste auf online.heuel.com: HSTS fehlt (beim Plattformbetreiber funnelcockpit.com)",
-   "urgency": "Mittelfristig",
-   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security."
-  },
-  {
-   "affected": "ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy; /webmodule-ee/images/loading.gif;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01)",
+   "affected": "ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options; /webmodule-ee/images/loading.gif;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01)",
    "cat": "D",
    "checks": [
     "hsts_missing",
@@ -1760,18 +1692,16 @@
     "csp_missing",
     "security_headers_incomplete"
    ],
-   "evidence": "header_check\nose.heuel.com · Adresse: https://ose.heuel.com · Antwort: 200 · weitergeleitet auf: https://ose.heuel.com/webmodule-ee/login.seam · Strict-Transport-Security: nicht gesetzt\n\nWeiterleitungsprüfung · hosts/20.79.218.75/phase1/tech_profile.json\nose.heuel.com · bewertet an der Endseite: https://ose.heuel.com/webmodule-ee/login.seam · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options\n\nZAP\nSession ID in URL Rewrite · ZAP-Kennung: 3 · Risiko: mittel · Konfidenz: hoch · Adresse: https://ose.heuel.com/webmodule-ee/images/loading.gif;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01?pfdrid_c=true · Beleg: jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x · CWE: CWE-598 · betroffene Adressen: 64",
-   "found": "Der Dienst ose.heuel.com liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: ose.heuel.com. Die passive Webanalyse hat auf ose.heuel.com eine Sitzungskennung gefunden, die in der Adresse übertragen wird: ose.heuel.com (/webmodule-ee/images/loading.gif;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01). Auf ose.heuel.com ist keine Content-Security-Policy gesetzt: ose.heuel.com. Auf ose.heuel.com fehlen einzelne Sicherheits-Header der Webseite: ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
-   "id": "VS-2026-003",
-   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Eine Sitzungskennung in der Adresse landet in Protokolldateien, im Browserverlauf, in Lesezeichen und im Referrer-Header nachfolgender Anfragen. Wer diese Adresse erhält, kann unter Umständen die Sitzung übernehmen. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+   "evidence": "header_check\nose.heuel.com · Adresse: https://ose.heuel.com · Antwort: 200 · weitergeleitet auf: https://ose.heuel.com/webmodule-ee/login.seam · Strict-Transport-Security: nicht gesetzt\n\nZAP · hosts/20.79.218.75/phase2/zap_alerts.json\nose.heuel.com · Einzelmeldungen an: https://ose.heuel.com/webmodule-ee/login.seam · nur einzelne Header belegt: Content-Security-Policy, X-Content-Type-Options, X-Frame-Options · nur an der Weiterleitungsseite gemessen: Referrer-Policy, Permissions-Policy · Content-Security-Policy: nicht gesetzt · fehlende Header: X-Content-Type-Options, X-Frame-Options\n\nZAP\nSession ID in URL Rewrite · ZAP-Kennung: 3 · Risiko: mittel · Konfidenz: hoch · Adresse: https://ose.heuel.com/webmodule-ee/images/loading.gif;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01?pfdrid_c=true · Beleg: jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x · CWE: CWE-598 · betroffene Adressen: 64",
+   "found": "Der Dienst ose.heuel.com liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: ose.heuel.com. Die passive Webanalyse hat auf ose.heuel.com eine Sitzungskennung gefunden, die in der Adresse übertragen wird: ose.heuel.com (/webmodule-ee/images/loading.gif;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01). Auf ose.heuel.com ist keine Content-Security-Policy gesetzt: ose.heuel.com. Auf ose.heuel.com fehlen einzelne Sicherheits-Header der Webseite: ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options).",
+   "id": "VS-2026-002",
+   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Eine Sitzungskennung in der Adresse landet in Protokolldateien, im Browserverlauf, in Lesezeichen und im Referrer-Header nachfolgender Anfragen. Wer diese Adresse erhält, kann unter Umständen die Sitzung übernehmen. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert.",
    "key": "web_header_hygiene/20.79.218.75/kunde",
    "level": "mittel",
    "level_label": "mittel",
    "missing_headers": [
     "X-Frame-Options",
-    "X-Content-Type-Options",
-    "Referrer-Policy",
-    "Permissions-Policy"
+    "X-Content-Type-Options"
    ],
    "operator": "",
    "operator_note": "",
@@ -1808,7 +1738,7 @@
     {
      "action": "Die fehlenden Sicherheits-Header setzen",
      "check": "security_headers_incomplete",
-     "detail": "ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)",
+     "detail": "ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options)",
      "effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
      "lever": "Fehlende Sicherheits-Header ergänzen",
      "per_rule": true,
@@ -1889,7 +1819,7 @@
       "ose.heuel.com@20.79.218.75|ose.heuel.com@20.79.218.75"
      ],
      "statement": "observation[0]",
-     "text": "Auf ose.heuel.com fehlen einzelne Sicherheits-Header der Webseite: ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)."
+     "text": "Auf ose.heuel.com fehlen einzelne Sicherheits-Header der Webseite: ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options)."
     },
     {
      "check": "hsts_missing",
@@ -1935,24 +1865,6 @@
      ],
      "statement": "meaning[1]",
      "text": "Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "meaning",
-     "members": [
-      "ose.heuel.com@20.79.218.75|ose.heuel.com@20.79.218.75"
-     ],
-     "statement": "meaning[2]",
-     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "meaning",
-     "members": [
-      "ose.heuel.com@20.79.218.75|ose.heuel.com@20.79.218.75"
-     ],
-     "statement": "meaning[3]",
-     "text": "Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen."
     },
     {
      "check": "hsts_missing",
@@ -2009,24 +1921,6 @@
      "text": "Erwartet wird X-Content-Type-Options mit dem Wert nosniff."
     },
     {
-     "check": "security_headers_incomplete",
-     "field": "verify",
-     "members": [
-      "ose.heuel.com@20.79.218.75|ose.heuel.com@20.79.218.75"
-     ],
-     "statement": "verify[3]",
-     "text": "Erwartet wird eine Referrer-Policy."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "verify",
-     "members": [
-      "ose.heuel.com@20.79.218.75|ose.heuel.com@20.79.218.75"
-     ],
-     "statement": "verify[4]",
-     "text": "Erwartet wird eine Permissions-Policy."
-    },
-    {
      "check": "hsts_missing",
      "field": "recommendation",
      "members": [
@@ -2070,24 +1964,6 @@
      ],
      "statement": "recommendation[1]",
      "text": "X-Content-Type-Options mit dem Wert nosniff setzen."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "recommendation",
-     "members": [
-      "ose.heuel.com@20.79.218.75|ose.heuel.com@20.79.218.75"
-     ],
-     "statement": "recommendation[2]",
-     "text": "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
-    },
-    {
-     "check": "security_headers_incomplete",
-     "field": "recommendation",
-     "members": [
-      "ose.heuel.com@20.79.218.75|ose.heuel.com@20.79.218.75"
-     ],
-     "statement": "recommendation[3]",
-     "text": "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
     }
    ],
    "recommendation": [
@@ -2110,18 +1986,10 @@
     [
      "Mittelfristig",
      "X-Content-Type-Options mit dem Wert nosniff setzen."
-    ],
-    [
-     "Mittelfristig",
-     "Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin."
-    ],
-    [
-     "Mittelfristig",
-     "Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet."
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (Weiterleitungsprüfung, header_check), passiv (ZAP)",
+   "source": "aktiv (header_check), passiv (ZAP)",
    "status": "gelb",
    "subjects": [
     "csp_missing|ose.heuel.com@20.79.218.75",
@@ -2133,7 +2001,7 @@
    "threat": null,
    "title": "Absicherung der Webdienste auf 20.79.218.75: HSTS fehlt, Sitzungskennung in der Adresse, Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
    "urgency": "Mittelfristig",
-   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security. Eine Anmeldung über den Browser durchführen und die Adresszeile sowie die aufgerufenen Links auf eine Sitzungskennung im Text der Adresse prüfen; erwartet wird eine Adresse ohne Sitzungskennung. HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird X-Frame-Options oder frame-ancestors in der Content-Security-Policy. Erwartet wird X-Content-Type-Options mit dem Wert nosniff. Erwartet wird eine Referrer-Policy. Erwartet wird eine Permissions-Policy."
+   "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security. Eine Anmeldung über den Browser durchführen und die Adresszeile sowie die aufgerufenen Links auf eine Sitzungskennung im Text der Adresse prüfen; erwartet wird eine Adresse ohne Sitzungskennung. HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird X-Frame-Options oder frame-ancestors in der Content-Security-Policy. Erwartet wird X-Content-Type-Options mit dem Wert nosniff."
   },
   {
    "affected": "www.heuel.com (unsafe-inline für Skripte, unsafe-eval für Skripte, Wildcard-Quelle in connect-src, default-src, font-src, img-src, script-src, style-src; /en/freight-inquiry.html)",
@@ -2143,8 +2011,8 @@
     "sri_missing"
    ],
    "evidence": "header_check\nwww.heuel.com · Adresse: https://www.heuel.com · Antwort: 200 · Content-Security-Policy: default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; font-src 'self' data: https://*; connect-src 'self' webpack: https://*;\n\nZAP\nSub Resource Integrity Attribute Missing · ZAP-Kennung: 90003 · Risiko: mittel · Konfidenz: hoch · Adresse: https://www.heuel.com/en/freight-inquiry.html · Beleg: <script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js'></script> · CWE: CWE-345 · betroffene Adressen: 6",
-   "found": "Auf www.heuel.com (+heuel.com, jobs.heuel.com) ist eine Content-Security-Policy gesetzt, die einzelne Direktiven wieder lockert: www.heuel.com (unsafe-inline für Skripte, unsafe-eval für Skripte, Wildcard-Quelle in connect-src, default-src, font-src, img-src, script-src, style-src). Die passive Webanalyse hat auf www.heuel.com (+heuel.com, jobs.heuel.com) eine eingebundene Ressource ohne Sub-Resource-Integrity-Absicherung gefunden: www.heuel.com (/en/freight-inquiry.html).",
-   "id": "VS-2026-004",
+   "found": "Auf www.heuel.com ist eine Content-Security-Policy gesetzt, die einzelne Direktiven wieder lockert: www.heuel.com (unsafe-inline für Skripte, unsafe-eval für Skripte, Wildcard-Quelle in connect-src, default-src, font-src, img-src, script-src, style-src). Die passive Webanalyse hat auf www.heuel.com (+heuel.com, jobs.heuel.com) eine eingebundene Ressource ohne Sub-Resource-Integrity-Absicherung gefunden: www.heuel.com (/en/freight-inquiry.html).",
+   "id": "VS-2026-003",
    "impact": "Die Freigabe unsafe-inline für Skripte erlaubt eingebettete Skripte in der Seite und hebt damit den Schutz gegen eingeschleuste Skripte weitgehend auf. Die Freigabe unsafe-eval erlaubt Skripte, die zur Laufzeit aus Zeichenketten erzeugt werden. Eine Wildcard-Quelle erlaubt Inhalte von beliebigen Ursprüngen. Ohne dieses Attribut prüft der Browser nicht, ob eine von einer fremden Adresse eingebundene Datei unverändert ist. Wird die fremde Quelle kompromittiert, wird der veränderte Inhalt ohne Warnung ausgeführt.",
    "key": "web_header_hygiene/217.72.203.132/kunde",
    "level": "mittel",
@@ -2203,7 +2071,7 @@
       "www.heuel.com@217.72.203.132|www.heuel.com@217.72.203.132"
      ],
      "statement": "observation[0]",
-     "text": "Auf www.heuel.com (+heuel.com, jobs.heuel.com) ist eine Content-Security-Policy gesetzt, die einzelne Direktiven wieder lockert: www.heuel.com (unsafe-inline für Skripte, unsafe-eval für Skripte, Wildcard-Quelle in connect-src, default-src, font-src, img-src, script-src, style-src)."
+     "text": "Auf www.heuel.com ist eine Content-Security-Policy gesetzt, die einzelne Direktiven wieder lockert: www.heuel.com (unsafe-inline für Skripte, unsafe-eval für Skripte, Wildcard-Quelle in connect-src, default-src, font-src, img-src, script-src, style-src)."
     },
     {
      "check": "sri_missing",
@@ -2347,9 +2215,9 @@
    "checks": [
     "legacy_protocols_present"
    ],
-   "evidence": "nmap · hosts/20.79.218.75/phase1/nmap.xml\n20.79.218.75:21/tcp · Kennung: TLS-Dienst, Zertifikat *.heuel.com · Zertifikat für: *.heuel.com · Aussteller: GlobalSign GCC R6 AlphaSSL CA 2025 · gültig bis: 14.04.2027, 14:45 UTC · 21/tcp open ftp",
+   "evidence": "nmap · hosts/20.79.218.75/phase1/nmap.xml\n20.79.218.75:21/tcp · Kennung: TLS-Dienst, Zertifikat *.heuel.com · Zertifikat für: *.heuel.com · Aussteller: GlobalSign GCC R6 AlphaSSL CA 2025 · gültig bis: 14.04.2027, 14:45 UTC · 21/tcp open ftp?",
    "found": "Der Host 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) bietet ein älteres Übertragungsprotokoll an: 20.79.218.75:21 (FTP). Ob dort eine Anmeldung ohne Transportverschlüsselung abgelehnt wird, ließ sich von außen nicht feststellen: 20.79.218.75:21 (FTP).",
-   "id": "VS-2026-005",
+   "id": "VS-2026-004",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Servers, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "key": "legacy_protocols_present/scan/kunde",
    "level": "niedrig",
@@ -2478,7 +2346,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0/dns_records.json\nheuel.com · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere · DMARC: v=DMARC1;p=quarantine;pct=100;rua=mailto:dmarcrua@heuel.com · SPF: v=spf1 ip4:20.52.130.35 ip4:168.245.40.44 ip4:167.89.99.179 ip4:149.72.147.186 ip4:167.89.101.239 ip4:88.99.138.97 ip6:2a01:4f8:10a:22a2::2 include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.crsend.com include:_spf.samanage.com include:spf-de.emailsignatures365.com ~all",
    "found": "Die DMARC-Richtlinie der Domain heuel.com stellt E-Mails, die SPF oder DKIM nicht bestehen, unter Quarantäne, weist sie aber nicht zurück: heuel.com (p=quarantine). Der SPF-Eintrag der Domain heuel.com setzt bei nicht autorisierten Versendern nur auf eine weiche oder neutrale Fehlbehandlung: heuel.com (~all). Empfangende Mailserver dürfen die E-Mail trotzdem zustellen.",
-   "id": "VS-2026-006",
+   "id": "VS-2026-005",
    "impact": "Eine Quarantäne-Richtlinie verschiebt verdächtige E-Mails in der Regel in einen Spam-Ordner, statt sie abzulehnen. Je nach Einstellung des Empfangssystems können gefälschte E-Mails im Namen der Domain trotzdem gelesen werden. Eine weiche oder neutrale Fehlbehandlung markiert eine E-Mail lediglich als verdächtig, lehnt sie aber nicht ab. Empfangssysteme, die diese Markierung nicht auswerten, stellen gefälschte E-Mails im Namen der Domain trotzdem zu.",
    "key": "mail_policy/heuel.com/kunde",
    "level": "niedrig",
@@ -2634,7 +2502,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0/dns_records.json\nheuel.com · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere\n\nDNS-Abfragen · phase0a/dns_security.json\nheuel.com · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
    "found": "Für heuel.com ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain heuel.com fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten. Für heuel.com ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain heuel.com fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können.",
-   "id": "VS-2026-007",
+   "id": "VS-2026-006",
    "impact": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen. Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.",
    "key": "mail_transport_enforcement/heuel.com/kunde",
    "level": "niedrig",
@@ -2790,7 +2658,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0a/dns_security.json\nheuel.com · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
    "found": "Für heuel.com ist kein CAA-Eintrag veröffentlicht. Für die Domain heuel.com legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen. Für heuel.com ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain heuel.com lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
-   "id": "VS-2026-008",
+   "id": "VS-2026-007",
    "impact": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf. Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
    "key": "dns_hygiene/heuel.com/kunde",
    "level": "niedrig",
@@ -2965,7 +2833,7 @@
     "key": "D",
     "level": 2,
     "name": "Web- und Transport-Hygiene",
-    "note": "Absicherung der Webdienste auf online.heuel.com: HSTS fehlt (beim Plattformbetreiber funnelcockpit.com); Absicherung der Webdienste auf 20.79.218.75: HSTS fehlt, Sitzungskennung in der Adresse, Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
+    "note": "Absicherung der Webdienste auf 20.79.218.75: HSTS fehlt, Sitzungskennung in der Adresse, Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig; Absicherung der Webdienste auf 217.72.203.132: Inhaltsrichtlinie mit unsicheren Freigaben und Einbindung ohne Integritätsprüfung",
     "status": "gelb"
    },
    {
@@ -2976,8 +2844,8 @@
     "status": "blau"
    }
   ],
-  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von heuel.com am 22.05.2026: 11 Hostnamen auf 8 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 5 Systeme (104.16.10.6 mit 2606:4700::6810:a06 und 2606:4700::6810:b06, 195.225.241.75, 20.79.218.75, 213.133.104.51 mit 2a01:4f8:d0a:2757::2 und 217.72.203.132) liegt keine oder nur eine teilweise aktive Prüfung vor. 3 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von heuel.com am 22.05.2026: 11 Hostnamen auf 9 IP-Adressen, davon 3 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
+  "coverage_warning": "Für 5 Systeme (104.16.10.6 mit 104.16.11.6, 2606:4700::6810:a06 und 2606:4700::6810:b06, 195.225.241.75, 20.79.218.75, 213.133.104.51 mit 2a01:4f8:d0a:2757::2 und 217.72.203.132) liegt keine oder nur eine teilweise aktive Prüfung vor. 3 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
     "effect": "Verkleinert die Angriffsfläche um Dienste ohne erkennbaren Zweck",
@@ -2993,28 +2861,28 @@
     "refs": [
      "VS-2026-002"
     ],
-    "title": "Beim Plattformbetreiber einfordern: HTTP Strict Transport Security setzen"
+    "title": "HTTP Strict Transport Security setzen"
    },
    {
-    "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+    "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
     "n": 3,
     "refs": [
      "VS-2026-003"
     ],
-    "title": "HTTP Strict Transport Security setzen"
+    "title": "Unsichere Freigaben aus der Inhaltsrichtlinie entfernen"
    }
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
   "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration."
  },
- "landscape_lead": "8 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "7 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 22,
-  "catalog_digest": "bbd6dccec70f05898fcc9e7fbbb77f57bca528dd070683052c467e758681182a",
-  "catalog_version": "2026-09-27.1",
+  "after_fp": 21,
+  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
+  "catalog_version": "2026-09-27.2",
   "classification": "Vertraulich",
-  "consolidated": 8,
+  "consolidated": 7,
   "context_fields": [],
   "context_sources": {},
   "customer": "Auftraggeber",
@@ -3023,13 +2891,13 @@
    "heuel.com"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.2.0",
+  "facts_schema_version": "1.3.0",
   "fqdns_total": 11,
   "generated_on": null,
   "generation": null,
-  "hosts_ipv4": 5,
+  "hosts_ipv4": 6,
   "hosts_ipv6": 3,
-  "hosts_total": 8,
+  "hosts_total": 9,
   "orders": [
    {
     "id": "176db198-fa4a-4520-bf18-43cbc02a229d",
@@ -3038,7 +2906,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.1",
+  "policy_version": "2026-09-27.2",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -3071,10 +2939,10 @@
    "st": "gelb"
   },
   {
-   "action": "Beim Plattformbetreiber einfordern: Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
+   "action": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
    "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
    "lever": "HTTP Strict Transport Security setzen",
-   "operator": "platform",
+   "operator": "",
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-002"
@@ -3085,44 +2953,30 @@
    "st": "gelb"
   },
   {
-   "action": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
-   "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
-   "lever": "HTTP Strict Transport Security setzen",
-   "operator": "",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-003"
-   ],
-   "sources": [
-    "VS-2026-003:hsts_missing"
-   ],
-   "st": "gelb"
-  },
-  {
    "action": "Die Sitzungskennung ausschließlich über ein Cookie übertragen und die Weitergabe per Adresse in der Anwendungs- oder Serverkonfiguration deaktivieren.",
    "effect": "Verhindert, dass Sitzungen über Verläufe und Verweise abfließen",
    "lever": "Sitzungskennungen nur in Cookies übertragen",
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-003"
+    "VS-2026-002"
    ],
    "sources": [
-    "VS-2026-003:session_in_url"
+    "VS-2026-002:session_in_url"
    ],
    "st": "gelb"
   },
   {
-   "action": "Die fehlenden Sicherheits-Header setzen: ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)",
+   "action": "Die fehlenden Sicherheits-Header setzen: ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options)",
    "effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
    "lever": "Fehlende Sicherheits-Header ergänzen",
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-003"
+    "VS-2026-002"
    ],
    "sources": [
-    "VS-2026-003:security_headers_incomplete"
+    "VS-2026-002:security_headers_incomplete"
    ],
    "st": "gelb"
   },
@@ -3133,10 +2987,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-003"
+    "VS-2026-002"
    ],
    "sources": [
-    "VS-2026-003:csp_missing"
+    "VS-2026-002:csp_missing"
    ],
    "st": "gelb"
   },
@@ -3147,10 +3001,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-004"
+    "VS-2026-003"
    ],
    "sources": [
-    "VS-2026-004:csp_weak"
+    "VS-2026-003:csp_weak"
    ],
    "st": "gelb"
   },
@@ -3161,10 +3015,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-004"
+    "VS-2026-003"
    ],
    "sources": [
-    "VS-2026-004:sri_missing"
+    "VS-2026-003:sri_missing"
    ],
    "st": "gelb"
   },
@@ -3175,10 +3029,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-005"
+    "VS-2026-004"
    ],
    "sources": [
-    "VS-2026-005:legacy_protocols_present"
+    "VS-2026-004:legacy_protocols_present"
    ],
    "st": "blau"
   },
@@ -3189,10 +3043,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-006"
+    "VS-2026-005"
    ],
    "sources": [
-    "VS-2026-006:spf_softfail"
+    "VS-2026-005:spf_softfail"
    ],
    "st": "blau"
   },
@@ -3203,10 +3057,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-006"
+    "VS-2026-005"
    ],
    "sources": [
-    "VS-2026-006:dmarc_quarantine"
+    "VS-2026-005:dmarc_quarantine"
    ],
    "st": "blau"
   },
@@ -3217,10 +3071,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-008"
+    "VS-2026-007"
    ],
    "sources": [
-    "VS-2026-008:caa_missing"
+    "VS-2026-007:caa_missing"
    ],
    "st": "blau"
   },
@@ -3231,10 +3085,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-007"
+    "VS-2026-006"
    ],
    "sources": [
-    "VS-2026-007:mta_sts_missing"
+    "VS-2026-006:mta_sts_missing"
    ],
    "st": "blau"
   },
@@ -3245,10 +3099,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-007"
+    "VS-2026-006"
    ],
    "sources": [
-    "VS-2026-007:tls_rpt_missing"
+    "VS-2026-006:tls_rpt_missing"
    ],
    "st": "blau"
   },
@@ -3259,10 +3113,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-008"
+    "VS-2026-007"
    ],
    "sources": [
-    "VS-2026-008:dnssec_missing"
+    "VS-2026-007:dnssec_missing"
    ],
    "st": "blau"
   }
@@ -3294,7 +3148,7 @@
       "217.72.203.132"
      ],
      "statement": "positive.text",
-     "text": "Die Hosts 104.16.10.6 (online.heuel.com), beim Plattformbetreiber funnelcockpit.com, 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) und 217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com) bieten ihre Webdienste über HTTPS an."
+     "text": "Die Hosts 104.16.10.6 (online.heuel.com; beim Plattformbetreiber funnelcockpit.com), 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) und 217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com) bieten ihre Webdienste über HTTPS an."
     }
    ],
    "subjects": [
@@ -3302,7 +3156,7 @@
     "20.79.218.75",
     "217.72.203.132"
    ],
-   "text": "Die Hosts 104.16.10.6 (online.heuel.com), beim Plattformbetreiber funnelcockpit.com, 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) und 217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com) bieten ihre Webdienste über HTTPS an.",
+   "text": "Die Hosts 104.16.10.6 (online.heuel.com; beim Plattformbetreiber funnelcockpit.com), 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) und 217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com) bieten ihre Webdienste über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
@@ -3389,13 +3243,13 @@
       "www.heuel.com@217.72.203.132"
      ],
      "statement": "positive.text",
-     "text": "Der Dienst www.heuel.com (+heuel.com, jobs.heuel.com) setzt den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer."
+     "text": "Der Dienst www.heuel.com setzt den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer."
     }
    ],
    "subjects": [
     "www.heuel.com@217.72.203.132"
    ],
-   "text": "Der Dienst www.heuel.com (+heuel.com, jobs.heuel.com) setzt den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer.",
+   "text": "Der Dienst www.heuel.com setzt den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer.",
    "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   },
   {
@@ -3420,13 +3274,13 @@
       "online.heuel.com@104.16.10.6"
      ],
      "statement": "positive.text",
-     "text": "Vor online.heuel.com, beim Plattformbetreiber funnelcockpit.com meldet sich eine Web Application Firewall mit benanntem Produkt."
+     "text": "Vor online.heuel.com (beim Plattformbetreiber funnelcockpit.com) meldet sich eine Web Application Firewall mit benanntem Produkt."
     }
    ],
    "subjects": [
     "online.heuel.com@104.16.10.6"
    ],
-   "text": "Vor online.heuel.com, beim Plattformbetreiber funnelcockpit.com meldet sich eine Web Application Firewall mit benanntem Produkt.",
+   "text": "Vor online.heuel.com (beim Plattformbetreiber funnelcockpit.com) meldet sich eine Web Application Firewall mit benanntem Produkt.",
    "title": "Web Application Firewall vorhanden"
   }
  ],
@@ -3449,10 +3303,11 @@
   "hosts": [
    {
     "cov": "teil",
-    "coverage": "Portscan vollständig; nicht geprüft: Transportverschlüsselung und aktive Webanalyse. 2606:4700::6810:a06: IPv6-Adresse laut DNS, vom Prüfstand aus nicht geprüft. 2606:4700::6810:b06: IPv6-Adresse laut DNS, vom Prüfstand aus nicht geprüft.",
+    "coverage": "Portscan vollständig; nicht geprüft: Transportverschlüsselung und aktive Webanalyse. 104.16.11.6: Weitere Adresse laut DNS, nicht geprüft (kein Portscan). 2606:4700::6810:a06: IPv6-Adresse laut DNS, vom Prüfstand aus nicht geprüft. 2606:4700::6810:b06: IPv6-Adresse laut DNS, vom Prüfstand aus nicht geprüft.",
     "fqdns": "online.heuel.com",
     "ip": "104.16.10.6",
     "more_ips": [
+     "104.16.11.6",
      "2606:4700::6810:a06",
      "2606:4700::6810:b06"
     ],
@@ -3503,11 +3358,11 @@
     "fqdns": "autodiscover.heuel.com",
     "ip": "40.99.149.168",
     "more_ips": [],
-    "operator": "Microsoft 365",
+    "operator": "Microsoft 365 (laut Namensauflösung und SPF)",
     "role": "Drittanbieter"
    }
   ],
-  "lead": "Der Scan hat 5 Systeme mit 8 IP-Adressen und 11 Hostnamen erfasst. Für 5 Systeme (8 Adressen) war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "lead": "Der Scan hat 5 Systeme mit 9 IP-Adressen, davon 3 nur aus DNS oder ohne Antwort, und 11 Hostnamen erfasst. Für 5 Systeme (9 Adressen) war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
     "checks": [
@@ -3523,6 +3378,18 @@
      "2606:4700::6810:b06"
     ],
     "what": "IPv6-Adresse vom Prüfstand aus nicht geprüft"
+   },
+   {
+    "checks": [
+     "Portscan und Diensterkennung"
+    ],
+    "code": "dns_not_scanned",
+    "detail": "Betroffen: 104.16.11.6 (online.heuel.com). Die Adresse steht als weiterer A-Eintrag derselben Namen im DNS; der Scanner hat sie nicht in den Portscan übernommen. Messungen am Namen gelten für den Namen, nicht für die Adresse.",
+    "refs": [],
+    "subjects": [
+     "104.16.11.6"
+    ],
+    "what": "Weitere Adresse laut DNS, nicht geprüft"
    },
    {
     "checks": [
@@ -3574,7 +3441,7 @@
      "Reputation der Adressen"
     ],
     "code": "no_coverage_rows",
-    "detail": "Betroffen: 104.16.10.6 (online.heuel.com), 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com), 217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com), heuel.com.",
+    "detail": "Betroffen: 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com), 217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com), heuel.com, online.heuel.com.",
     "refs": [
      "cert_chain_incomplete|ose.heuel.com@20.79.218.75",
      "cert_expired|ose.heuel.com@20.79.218.75",
@@ -3582,7 +3449,6 @@
      "cert_expiring|ose.heuel.com@20.79.218.75",
      "cert_hostname_mismatch|ose.heuel.com@20.79.218.75",
      "cert_self_signed|ose.heuel.com@20.79.218.75",
-     "ip_reputation|104.16.10.6",
      "ip_reputation|20.79.218.75",
      "ip_reputation|217.72.203.132",
      "tls_known_vulnerability|edi.heuel.com@20.79.218.75",
@@ -3631,6 +3497,18 @@
    },
    {
     "checks": [
+     "Sicherheits-Header"
+    ],
+    "code": "headers_partial",
+    "detail": "Betroffen: ose.heuel.com (Referrer-Policy und Permissions-Policy nur an der Weiterleitungsseite gemessen).",
+    "refs": [],
+    "subjects": [
+     "ose.heuel.com@20.79.218.75"
+    ],
+    "what": "Sicherheits-Header an der Endseite nur einzeln belegt"
+   },
+   {
+    "checks": [
      "Content-Security-Policy",
      "HSTS",
      "Sicherheits-Header"
@@ -3650,12 +3528,14 @@
    {
     "checks": [
      "Content-Security-Policy",
+     "HSTS",
      "Sicherheits-Header"
     ],
     "code": "headers_challenge_only",
     "detail": "Betroffen: online.heuel.com (403).",
     "refs": [
      "csp_missing|online.heuel.com@104.16.10.6",
+     "hsts_missing|online.heuel.com@104.16.10.6",
      "security_headers_incomplete|online.heuel.com@104.16.10.6"
     ],
     "subjects": [
@@ -3668,7 +3548,7 @@
      "Suche nach nicht verlinkten Pfaden"
     ],
     "code": "path_unreliable",
-    "detail": "Betroffen: edi.heuel.com (Fehlerseite 403), online.heuel.com (Sicherheitsabfrage der Plattform).",
+    "detail": "Betroffen: edi.heuel.com (Fehlerseite 403); Anwendung ose.heuel.com nicht durchsucht, online.heuel.com (Sicherheitsabfrage der Plattform).",
     "refs": [],
     "subjects": [
      "104.16.10.6",
@@ -3748,7 +3628,7 @@
    {
     "n": "0",
     "name": "Aufklärung (passiv)",
-    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 11 Hostnamen auf 8 IP-Adressen. Geprüft wurden 11 von 14 ermittelten Namen; die übrigen stehen in Kapitel 2 unter den Einschränkungen."
+    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 11 Hostnamen auf 9 IP-Adressen, davon 3 nur aus DNS oder ohne Antwort. Geprüft wurden 11 von 14 ermittelten Namen; die übrigen stehen in Kapitel 2 unter den Einschränkungen."
    },
    {
     "n": "1",
@@ -3763,7 +3643,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 8 Befunde und 5 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 7 Befunde und 5 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -3781,7 +3661,7 @@
    },
    {
     "l": "Befunde im Bericht",
-    "v": "8"
+    "v": "7"
    }
   ],
   "out_of_scope": [

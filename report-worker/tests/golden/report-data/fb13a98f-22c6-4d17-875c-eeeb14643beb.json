@@ -102,13 +102,13 @@
     "host": "37.114.55.171",
     "port": "25",
     "ref": "VS-2026-013",
-    "svc": "Postfix smtpd, TLS erzwungen"
+    "svc": "Postfix smtpd, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "37.114.55.171",
     "port": "26",
     "ref": "VS-2026-013",
-    "svc": "SMTP, TLS erzwungen"
+    "svc": "SMTP, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "37.114.55.171",
@@ -341,7 +341,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden). Ausnahme: Rot und Unverzüglich gelten auch für ein noch gültiges Zertifikat mit einer Restlaufzeit von höchstens sieben Tagen. Ein am Scantag bereits abgelaufenes Zertifikat an Diensten außerhalb der Webseiten (Mail, Datei, Verwaltung) folgt der Tabelle: Exposition erhöht, Gelb, In Kürze."
    },
    {
     "l": "Gelb",
@@ -361,9 +361,9 @@
   ]
  },
  "architecture": {
-  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 3 Systeme mit folgenden Aufgaben: Dateiaustausch, Datenbankdienst, E-Mail-Server, Fernzugang und Verwaltung und Kollaboration. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 3 Systeme mit folgenden Aufgaben: Dateiaustausch, Datenbanken erreichbar, E-Mail-Server, Fernzugang und Verwaltung, Kollaboration und Mailabruf und Einlieferung. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
-   "Beobachtungen ohne Regeltreffer, nicht als Befund bewertet: 37.114.55.171:3478 laut Passivquelle, außerhalb des geprüften Portbereichs; Anmeldung vor STARTTLS angeboten (85.13.167.158:587); Anmeldung vor STARTTLS angeboten (85.13.167.158:25); Anmeldung vor STARTTLS angeboten (85.13.167.158:587, laut Passivquelle); Anmeldung vor STARTTLS angeboten (85.13.167.158:25, laut Passivquelle)."
+   "Beobachtungen ohne Regeltreffer, nicht als Befund bewertet: 37.114.55.171:3478 laut Passivquelle, außerhalb des geprüften Portbereichs; Anmeldung vor STARTTLS angeboten (85.13.167.158:587); Anmeldung vor STARTTLS angeboten (85.13.167.158:25)."
   ],
   "posture": [
    {
@@ -1087,15 +1087,19 @@
     "evidence": [
      "22/tcp ssh OpenSSH",
      "3306/tcp mysql MySQL",
-     "21/tcp nagios-nsca Nagios NSCA"
+     "21/tcp nagios-nsca Nagios NSCA",
+     "110/tcp Dovecot pop3d",
+     "143/tcp Dovecot imapd",
+     "993/tcp IMAP über TLS"
     ],
     "meaning": "Zugang zur Verwaltung dieses Servers. Solche Zugänge sind das bevorzugte Ziel, weil über sie der Server selbst und alle Dienste darauf gesteuert werden.",
     "role_keys": [
      "fernzugang",
      "datenbank",
-     "dateiaustausch"
+     "dateiaustausch",
+     "mail_dienste"
     ],
-    "system": "Fernzugang und Verwaltung, Datenbankdienst, Dateiaustausch (krause-computer.de, www.krause-computer.de)"
+    "system": "Fernzugang und Verwaltung, Datenbanken erreichbar, Dateiaustausch, Mailabruf und Einlieferung (krause-computer.de, www.krause-computer.de)"
    },
    {
     "evidence": [
@@ -1754,7 +1758,7 @@
    "evidence": "header_check\nyoutube.krause-computer.de · Adresse: https://youtube.krause-computer.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options\n\nheader_check\nfilebrowser.krause-computer.de · Adresse: https://filebrowser.krause-computer.de · Antwort: 200 (keine Webseite) · Strict-Transport-Security: nicht gesetzt\n\nheader_check\nnavidrome.krause-computer.de · Adresse: https://navidrome.krause-computer.de · Antwort: 302 (Weiterleitung) · Strict-Transport-Security: nicht gesetzt",
    "found": "Der Dienst 87.79.190.79 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: filebrowser.krause-computer.de, navidrome.krause-computer.de, youtube.krause-computer.de. Auf youtube.krause-computer.de ist keine Content-Security-Policy gesetzt: youtube.krause-computer.de. Auf youtube.krause-computer.de fehlen einzelne Sicherheits-Header der Webseite: youtube.krause-computer.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-006",
-   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+   "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/87.79.190.79/platform:skclient.de",
    "level": "mittel",
    "level_label": "mittel",
@@ -1904,7 +1908,7 @@
       "youtube.krause-computer.de@87.79.190.79|youtube.krause-computer.de@87.79.190.79"
      ],
      "statement": "meaning[2]",
-     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
+     "text": "Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter."
     },
     {
      "check": "security_headers_incomplete",
@@ -2372,7 +2376,7 @@
    "evidence": "header_check\njitsi.krause-computer.de · Adresse: https://jitsi.krause-computer.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options",
    "found": "Auf jitsi.krause-computer.de ist keine Content-Security-Policy gesetzt: jitsi.krause-computer.de. Auf jitsi.krause-computer.de fehlen einzelne Sicherheits-Header der Webseite: jitsi.krause-computer.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-009",
-   "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+   "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/37.114.55.171/kunde",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -2480,7 +2484,7 @@
       "jitsi.krause-computer.de@37.114.55.171|jitsi.krause-computer.de@37.114.55.171"
      ],
      "statement": "meaning[2]",
-     "text": "Ohne Referrer-Policy übergeben Browser beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern."
+     "text": "Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter."
     },
     {
      "check": "security_headers_incomplete",
@@ -3329,8 +3333,8 @@
  "landscape_lead": "13 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 26,
-  "catalog_digest": "bbd6dccec70f05898fcc9e7fbbb77f57bca528dd070683052c467e758681182a",
-  "catalog_version": "2026-09-27.1",
+  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
+  "catalog_version": "2026-09-27.2",
   "classification": "Vertraulich",
   "consolidated": 13,
   "context_fields": [],
@@ -3341,7 +3345,7 @@
    "krause-computer.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.2.0",
+  "facts_schema_version": "1.3.0",
   "fqdns_total": 11,
   "generated_on": null,
   "generation": null,
@@ -3356,7 +3360,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.1",
+  "policy_version": "2026-09-27.2",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -3658,7 +3662,7 @@
       "87.79.190.79"
      ],
      "statement": "positive.text",
-     "text": "Die Hosts 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und 1 weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de) und 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und 2 weitere), beim Plattformbetreiber skclient.de bieten ihre Webdienste über HTTPS an."
+     "text": "Die Hosts 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und 1 weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de) und 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und 2 weitere; beim Plattformbetreiber skclient.de) bieten ihre Webdienste über HTTPS an."
     }
    ],
    "subjects": [
@@ -3666,7 +3670,7 @@
     "85.13.167.158",
     "87.79.190.79"
    ],
-   "text": "Die Hosts 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und 1 weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de) und 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und 2 weitere), beim Plattformbetreiber skclient.de bieten ihre Webdienste über HTTPS an.",
+   "text": "Die Hosts 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und 1 weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de) und 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und 2 weitere; beim Plattformbetreiber skclient.de) bieten ihre Webdienste über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
@@ -3808,14 +3812,14 @@
       "nextcloud.krause-computer.de@87.79.190.79"
      ],
      "statement": "positive.text",
-     "text": "Die Dienste jitsi.krause-computer.de und nextcloud.krause-computer.de, beim Plattformbetreiber skclient.de setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer."
+     "text": "Die Dienste jitsi.krause-computer.de und nextcloud.krause-computer.de (beim Plattformbetreiber skclient.de; gemessen an der Weiterleitung mit Status 302) setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer."
     }
    ],
    "subjects": [
     "jitsi.krause-computer.de@37.114.55.171",
     "nextcloud.krause-computer.de@87.79.190.79"
    ],
-   "text": "Die Dienste jitsi.krause-computer.de und nextcloud.krause-computer.de, beim Plattformbetreiber skclient.de setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer.",
+   "text": "Die Dienste jitsi.krause-computer.de und nextcloud.krause-computer.de (beim Plattformbetreiber skclient.de; gemessen an der Weiterleitung mit Status 302) setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer.",
    "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   }
  ],
@@ -3852,7 +3856,7 @@
     "ip": "85.13.167.158",
     "more_ips": [],
     "operator": "Neue Medien Muennich GmbH (dd55420.kasserver.com)",
-    "role": "Fernzugang und Verwaltung, Datenbankdienst, Dateiaustausch"
+    "role": "Fernzugang und Verwaltung, Datenbanken erreichbar, Dateiaustausch, Mailabruf und Einlieferung"
    },
    {
     "cov": "teil",
@@ -3914,7 +3918,7 @@
      "Reputation der Adressen"
     ],
     "code": "no_coverage_rows",
-    "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de), 85.13.167.158 (krause-computer.de, www.krause-computer.de), 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de, transmission.krause-computer.de, youtube.krause-computer.de), krause-computer.de.",
+    "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de), 85.13.167.158 (krause-computer.de, www.krause-computer.de), krause-computer.de, transmission.krause-computer.de.",
     "refs": [
      "cert_chain_incomplete|filebrowser.krause-computer.de@87.79.190.79",
      "cert_chain_incomplete|jitsi.krause-computer.de@37.114.55.171",
@@ -4010,7 +4014,6 @@
      "info_disclosure|youtube.krause-computer.de@87.79.190.79",
      "ip_reputation|37.114.55.171",
      "ip_reputation|85.13.167.158",
-     "ip_reputation|87.79.190.79",
      "js_library_outdated|filebrowser.krause-computer.de@87.79.190.79",
      "js_library_outdated|jitsi.krause-computer.de@37.114.55.171",
      "js_library_outdated|krause-computer.de@85.13.167.158",
