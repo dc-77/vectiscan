@@ -337,6 +337,15 @@ def _probe_single_fqdn(
         redirect_chain: list[str] = []
         final_status_code: int = 0
         response_headers: dict[str, str] = {}
+        # S6c/N3 (spec/11 Teil 6): bei clientseitigen Weiterleitungen (ose
+        # "Redirector" auf login.seam, online Vercel auf www, CA mail 302 auf
+        # /owa/) speicherte response_headers nur die ERSTE Antwort. Die
+        # Endantwort kommt jetzt in ein NEUES Feld; das Bestandsfeld bleibt
+        # unveraendert (Auflage d). response_chain traegt (url, status) je Antwort,
+        # damit der report-worker die Endantwort ihrer URL zuordnen kann.
+        final_response_headers: dict[str, str] = {}
+        first_status_code: int = 0
+        response_chain: list[dict[str, Any]] = []
         page = None
 
         try:
@@ -345,13 +354,19 @@ def _probe_single_fqdn(
 
             def on_response(response: Any) -> None:
                 nonlocal final_status_code, response_headers
+                nonlocal final_response_headers, first_status_code
                 redirect_chain.append(response.url)
                 final_status_code = response.status
+                try:
+                    hdrs = dict(response.headers) if hasattr(response, "headers") else {}
+                except Exception:
+                    hdrs = {}
+                response_chain.append({"url": response.url, "status": response.status})
                 if not response_headers:
-                    try:
-                        response_headers = dict(response.headers) if hasattr(response, "headers") else {}
-                    except Exception:
-                        pass
+                    response_headers = hdrs
+                    first_status_code = response.status
+                # Endantwort: letzte Antwort gewinnt (last-wins).
+                final_response_headers = hdrs
 
             page.on("response", on_response)
 
@@ -391,6 +406,12 @@ def _probe_single_fqdn(
                 "status_code": final_status_code,
                 "error": None,
                 "response_headers": response_headers,
+                # S6c/N3: neue Felder, Bestandsfeld response_headers unveraendert.
+                "first_response_headers": response_headers,
+                "final_response_headers": final_response_headers,
+                "first_status": first_status_code,
+                "final_status": final_status_code,
+                "response_chain": response_chain,
                 "tech_info": tech_info,
                 "screenshot_path": screenshot_path,
             }

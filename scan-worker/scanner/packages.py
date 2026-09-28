@@ -21,8 +21,10 @@ _PERIMETER_BASE: dict[str, Any] = {
     # deckt URLhaus/AbuseIPDB/GreyNoise/OTX bereits ab. Der Client bleibt unter
     # scanner/passive/virustotal_client.py im Code und ist durch Aufnahme in
     # diese Liste jederzeit wieder aktivierbar.
+    # S6c/T2 (spec/11): rdap ergaenzt AbuseIPDB um die autoritative RIR-Quelle
+    # fuer den Netzbetreiber je IP.
     "phase0a_tools": ["shodan", "abuseipdb", "securitytrails", "whois",
-                      "urlhaus", "greynoise", "otx"],
+                      "urlhaus", "greynoise", "otx", "rdap"],
     "phase0a_timeout": 120,       # 2 Minuten
     # F-P0A-005: Cap fuer Shodan/AbuseIPDB IP-Loops (war hardcoded 15).
     # ENV-Override `PHASE0A_IP_CAP` ueberschreibt diesen Wert (Premium-Tier).

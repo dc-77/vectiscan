@@ -178,19 +178,39 @@ def should_parallelize_stage2(
     return True
 
 
+# S6c/Q17 (spec/09, spec/10 R3): testssl je TLS-Port, nicht nur 443 mit einer SNI.
+# STARTTLS-Ports brauchen `--starttls <proto>`, direkte TLS-Ports nicht. Port 25
+# bleibt bis E5 vom Pruefstand aus nicht pruefbar.
+TLS_PORTS_STARTTLS: dict[int, str] = {
+    21: "ftp", 25: "smtp", 110: "pop3", 143: "imap", 587: "smtp",
+}
+TLS_PORTS_DIRECT: frozenset[int] = frozenset({443, 465, 993, 995, 8443, 444, 10000})
+
+
 def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
                       severity: str = "MEDIUM", tool_name: str = "testssl",
-                      fast_mode: bool = False) -> Optional[list]:
+                      fast_mode: bool = False, port: int = 443,
+                      starttls: str = "") -> Optional[list]:
     """Run a single testssl pass. Returns parsed JSON list or None.
 
     `fast_mode=True` (WebCheck-Paket): nutzt `--fast` (skip schwere
     Cipher-Tests) — bei Schnellscans ausreichend.
+
+    S6c/Q17: ``port``/``starttls`` erlauben einen Lauf je TLS-Port. Der 443-Lauf
+    behaelt Dateinamen (testssl.json) und Werkzeugnamen (testssl); Zusatzports
+    tragen eigene (testssl_<port>), damit der report-worker sie nicht mit dem
+    443-Lauf verwechselt.
     """
+    # S6c/Q16 (spec/09, spec/11 T7): an die Inventar-IP binden, damit testssl bei
+    # DNS-Rotation die Inventaradresse misst und nicht eine rotierte (HE
+    # 52.59.120.70 statt 18.197.248.23, CA .123 statt .120, HL .129 statt .65).
+    # SNI bleibt der fqdn. Ohne bekannte IP der alte Default "one".
+    ip_arg = ip if ip else "one"
     cmd = [
         "bash", "/opt/testssl.sh/testssl.sh",
         "--jsonfile", output_path,
         "--quiet",
-        "--ip", "one",
+        "--ip", ip_arg,
         "--warnings", "off",
         "--sneaky",
         "--hints",
@@ -217,9 +237,17 @@ def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
     # Omit --severity to get ALL entries (incl. OK/INFO) for TR-03116-4
     if severity:
         cmd.extend(["--severity", severity])
+    if starttls:
+        cmd.extend(["--starttls", starttls])
+    # Zielangabe: STARTTLS und Nicht-443-Ports als host:port, 443 wie bisher als
+    # https://host (unveraendert fuer den Bestandslauf).
+    if starttls or port != 443:
+        target = f"{fqdn}:{port}"
+    else:
+        target = f"https://{fqdn}"
     cmd.extend([
         "--nodns", "min",
-        f"https://{fqdn}",
+        target,
     ])
 
     exit_code, duration_ms = run_tool(
@@ -323,6 +351,229 @@ FFUF_WORDLISTS = {
 # typische Pentest-Quick-Wins (.env, .git/, dump.sql, config.bak, ...).
 CRITICAL_EXTENSIONS = "bak,old,sql,zip,tar.gz,tgz,env,backup,swp,save,orig,~"
 
+# S6c/Q17 (spec/09): gegen Exchange-Hosts (HE, CA) ergibt die PHP/CMS-Liste nichts;
+# geprueft werden die Exchange-Verwaltungs- und Protokollpfade. Kurze kuratierte
+# Liste, zur Laufzeit als Wordlist-Datei geschrieben (kein Docker-Packaging).
+EXCHANGE_PATHS = [
+    "ecp", "EWS", "EWS/Exchange.asmx", "autodiscover",
+    "autodiscover/autodiscover.xml", "mapi", "mapi/emsmdb",
+    "Microsoft-Server-ActiveSync", "owa", "owa/auth/logon.aspx",
+    "rpc", "OAB", "PowerShell",
+]
+
+
+def _is_exchange_host(tech_profile: dict[str, Any] | None) -> bool:
+    """Deutet das Tech-Profil auf einen Exchange/OWA-Host (HE, CA)?"""
+    if not tech_profile:
+        return False
+    blob = " ".join(str(tech_profile.get(k, "")) for k in ("cms", "server")).lower()
+    blob += " " + " ".join(str(t) for t in (tech_profile.get("technologies") or [])).lower()
+    return "exchange" in blob or "outlook web" in blob or "owa" in blob
+
+
+def _build_zap_alert_summary(all_alerts: list[dict[str, Any]], passive_count: int,
+                             active_count: int) -> dict[str, Any]:
+    """DB-Zeile fuer ZAP: Konfidenz und Risiko je Meldung, top_alerts nicht auf 20
+    gekuerzt (S6c/Q14, spec/11 N2). Der Konfidenzfilter Q14 ist sonst nicht
+    pruefbar. Die volle Rohliste steht im Tar (zap_alerts.json); ueberschreitet die
+    Zeile die 50-KB-Spalte, wird nur die Zeile gekuerzt und markiert."""
+    def _alert_row(a: dict) -> dict:
+        return {
+            "name": a.get("name", a.get("alert", "")),
+            "risk": a.get("risk", ""),
+            "confidence": a.get("confidence", ""),
+            "url": (a.get("url", "") or a.get("nodeName", ""))[:120],
+            "status": a.get("status") or a.get("statusCode") or "",
+            "cweid": a.get("cweid", ""),
+            "param": a.get("param", ""),
+            "sourceid": a.get("sourceid", ""),
+        }
+    conf_dist: dict[str, int] = {}
+    for a in all_alerts:
+        c = str(a.get("confidence", "")) or "unknown"
+        conf_dist[c] = conf_dist.get(c, 0) + 1
+    summary: dict[str, Any] = {
+        "total_alerts": len(all_alerts),
+        "passive": passive_count,
+        "active": active_count,
+        "unique_types": len(set(a.get("name", a.get("alert", "")) for a in all_alerts)),
+        "confidence_distribution": conf_dist,
+        "top_alerts": [_alert_row(a) for a in all_alerts],
+        "truncated": False,
+    }
+    if len(json.dumps(summary)) > 49000:
+        keep = 60
+        while keep > 5:
+            summary["top_alerts"] = [_alert_row(a) for a in all_alerts[:keep]]
+            summary["truncated"] = True
+            summary["truncated_note"] = "vollstaendige Liste in zap_alerts.json"
+            if len(json.dumps(summary)) <= 49000:
+                break
+            keep -= 10
+    return summary
+
+
+def _content_fqdn(tech_profile: dict[str, Any] | None, primary_fqdn: str) -> str:
+    """Der Host der final_url des Inhalts-VHosts (S6c/Q17: HE, CA Apex-Weiterleitung).
+
+    ffuf/feroxbuster sollen die Endadresse durchsuchen, nicht die
+    Apex-Weiterleitung. Bleibt das Weiterleitungsziel eine Fremddomain, bleibt es
+    beim primary_fqdn (E3: keine aktive Pruefung fremder Hosts)."""
+    if not tech_profile:
+        return primary_fqdn
+    final_url = tech_profile.get("final_url") or ""
+    if not final_url:
+        return primary_fqdn
+    from urllib.parse import urlparse
+    host = (urlparse(final_url).hostname or "").lower()
+    if not host:
+        return primary_fqdn
+    # Nur wenn das Ziel zur selben registrierbaren Domain gehoert (kein
+    # Fremd-VHost). Grobe Naeherung: gemeinsames Suffix ab der zweituntersten
+    # Ebene.
+    def _reg(d: str) -> str:
+        parts = d.split(".")
+        return ".".join(parts[-2:]) if len(parts) >= 2 else d
+    if _reg(host) == _reg(primary_fqdn):
+        return host
+    return primary_fqdn
+
+
+def run_xmlrpc_probe(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
+    """S6c/7a (spec/11 T1): eigene Sonde auf /xmlrpc.php (POST system.listMethods).
+
+    wpscan meldet XML-RPC bei castenow nicht. Die Sonde belegt den Fakt
+    ``wordpress_xmlrpc`` unabhaengig von wpscan (Fixture DB aktiv und CA). Nur
+    Rohdaten-Export; der report-worker liest den Fakt spaeter. An die Inventar-IP
+    gebunden.
+    """
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+    output_path = f"{phase2_dir}/xmlrpc_probe.json"
+    url = f"https://{fqdn}/xmlrpc.php"
+    body = ("<?xml version=\"1.0\"?><methodCall>"
+            "<methodName>system.listMethods</methodName><params></params></methodCall>")
+    resolve = ["--resolve", f"{fqdn}:443:{ip}"] if ip and ":" not in ip else []
+    cmd = ["curl", "-sS", "-o", "-", "-w", "\n__VS_CODE__:%{http_code}",
+           "-X", "POST", "--max-time", "12", "--retry", "1",
+           *resolve, "-H", "Content-Type: text/xml",
+           "-A", "Mozilla/5.0 vectiscan", "--data", body, url]
+    out = ""
+    try:
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                text=True, start_new_session=True)
+        out, _ = proc.communicate(timeout=15)
+        out = out or ""
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError, NameError):
+            pass
+        record_tool_run(order_id, ip, 2, "wordpress_xmlrpc", "failed",
+                        reason="timeout", exit_code=-1, duration_ms=0)
+        return None
+    except Exception as e:
+        record_tool_run(order_id, ip, 2, "wordpress_xmlrpc", "failed",
+                        reason=str(e)[:120], exit_code=-2, duration_ms=0)
+        return None
+
+    status = 0
+    body_text = out
+    if "__VS_CODE__:" in out:
+        body_text, _, code = out.rpartition("__VS_CODE__:")
+        try:
+            status = int(code.strip())
+        except ValueError:
+            status = 0
+    low = body_text.lower()
+    # XML-RPC aktiv: methodResponse mit Methodenliste; "system.listmethods"
+    # taucht dann in der Antwort auf. faultCode 405/403 = abgeschaltet.
+    enabled = ("methodresponse" in low and "system." in low) or "wp.getusersblogs" in low
+    fault = "faultcode" in low
+    result = {
+        "fqdn": fqdn, "url": url, "status": status,
+        "xmlrpc_enabled": bool(enabled and not fault),
+        "fault": fault,
+        "evidence": body_text[:400],
+    }
+    try:
+        with open(output_path, "w") as f:
+            json.dump(result, f, indent=2)
+    except Exception:
+        pass
+    record_tool_run(order_id, ip, 2, "wordpress_xmlrpc", "ok",
+                    exit_code=0, duration_ms=0,
+                    raw_output=json.dumps(result, ensure_ascii=False))
+    return result
+
+
+def run_smtp_ehlo(fqdn: str, ip: str, port: int, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
+    """S6c/5 (spec/09): EHLO-Faehigkeiten vor STARTTLS je SMTP-Port als Rohdatum.
+
+    AUTH-Verfahren, VRFY und STARTTLS werden vor STARTTLS im Klartext angeboten.
+    nmap smtp-commands liefert das fuer als SMTP erkannte Ports schon; diese Sonde
+    deckt 465 (implizit TLS) und 587 (Klartext) ab, die nmap nicht immer als smtp
+    fuehrt. Port 25 bleibt bis E5 vom Pruefstand aus nicht pruefbar. Nur Rohdaten-
+    Export; Katalogregel folgt spaeter. An die Inventar-IP gebunden.
+    """
+    import socket as _socket
+    import ssl as _ssl
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+    target_ip = ip if ip else fqdn
+    lines: list[str] = []
+    try:
+        raw = _socket.create_connection((target_ip, port), timeout=10)
+        sock: Any = raw
+        if port == 465:
+            ctx = _ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = _ssl.CERT_NONE
+            sock = ctx.wrap_socket(raw, server_hostname=fqdn)
+        sock.settimeout(10)
+        sock.recv(1024)  # Begruessungsbanner
+        sock.sendall(f"EHLO vectiscan\r\n".encode())
+        data = b""
+        while b"\r\n" in data[-4:] or len(data) < 4:
+            chunk = sock.recv(4096)
+            if not chunk:
+                break
+            data += chunk
+            if len(data) > 8192:
+                break
+        text = data.decode("latin-1", errors="replace")
+        lines = [ln.strip() for ln in text.splitlines() if ln[:3].isdigit()]
+        try:
+            sock.sendall(b"QUIT\r\n")
+        except Exception:
+            pass
+        sock.close()
+    except Exception as e:
+        record_tool_run(order_id, ip, 2, f"smtp_ehlo_{port}", "failed",
+                        reason=str(e)[:120], exit_code=-2, duration_ms=0)
+        return None
+
+    caps = [ln[4:].strip().upper() for ln in lines if ln[:4] in ("250-", "250 ")]
+    auth = [c for c in caps if c.startswith("AUTH ") or c.startswith("AUTH=")]
+    result = {
+        "fqdn": fqdn, "port": port,
+        "capabilities": caps,
+        "starttls": any(c == "STARTTLS" for c in caps),
+        "vrfy": any(c == "VRFY" for c in caps),
+        "auth_before_starttls": bool(auth) and port != 465,
+        "auth_mechanisms": auth,
+        "evidence": "\n".join(lines[:20]),
+    }
+    try:
+        with open(f"{phase2_dir}/smtp_ehlo_{port}.json", "w") as f:
+            json.dump(result, f, indent=2)
+    except Exception:
+        pass
+    record_tool_run(order_id, ip, 2, f"smtp_ehlo_{port}", "ok",
+                    exit_code=0, duration_ms=0,
+                    raw_output=json.dumps(result, ensure_ascii=False))
+    return result
+
 
 def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str,
                      adaptive_config: dict[str, Any] | None = None) -> Optional[str]:
@@ -388,6 +639,145 @@ def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str,
     return output_path
 
 
+# S6c/Q8 (spec/09, spec/10 R1): Header, die eine Sicherheitsabfrage der Plattform
+# belegen. Steht einer davon in irgendeiner Antwort, ist die Messung nicht
+# aussagekraeftig ("nicht pruefbar").
+_CHALLENGE_HEADERS = ("x-vercel-mitigated", "cf-mitigated")
+
+
+def _parse_header_blocks(raw: str) -> list[dict[str, Any]]:
+    """Zerlegt eine curl ``-D -``-Ausgabe (mit ``-L``) in Antwortbloecke.
+
+    Jeder Block beginnt mit der Statuszeile ``HTTP/x yyy``. Doppelte Header
+    werden je Block zu einer kommaverbundenen Zeichenkette zusammengefuehrt
+    (S6c/Q8, CA x-powered-by), NICHT ueberschrieben. Rueckgabe je Block:
+    ``{status, headers}``.
+    """
+    blocks: list[dict[str, Any]] = []
+    cur: Optional[dict[str, Any]] = None
+    for line in raw.splitlines():
+        s = line.rstrip("\r")
+        if s[:5].upper() == "HTTP/":
+            if cur is not None:
+                blocks.append(cur)
+            status = 0
+            parts = s.split(None, 2)
+            if len(parts) >= 2 and parts[1].isdigit():
+                status = int(parts[1])
+            cur = {"status": status, "headers": {}}
+            continue
+        if cur is None:
+            continue
+        if ":" in s:
+            key, _, value = s.partition(":")
+            key = key.strip().lower()
+            value = value.strip()
+            if not key:
+                continue
+            if key in cur["headers"]:
+                # Doppelter Header: zusammenfuehren statt ueberschreiben.
+                cur["headers"][key] = f"{cur['headers'][key]}, {value}"
+            else:
+                cur["headers"][key] = value
+    if cur is not None:
+        blocks.append(cur)
+    return blocks
+
+
+def _eval_redirects(url: str, ip: str = "") -> dict[str, Any]:
+    """S6c/Q8: folgt Weiterleitungen und bewertet die Endantwort.
+
+    Neues Feld ``redirect_eval`` neben den unveraenderten Bestandsfeldern
+    (Auflage c/d): der report-worker liest es erst in der Berichtsseiten-Session.
+    Enthaelt die erste Antwort (fuer HSTS), die Endantwort (Status, Header,
+    location, Laenge), die Statuskette und einen ``not_testable``-Marker mit
+    Grund bei 4xx, 429 oder Sicherheitsabfrage.
+    """
+    from urllib.parse import urlparse
+    fqdn = urlparse(url).hostname or ""
+    cmd = ["curl", "-sS", "-o", "/dev/null", "-D", "-", "-L",
+           "--max-time", "15", "--retry", "1",
+           "-A", "Mozilla/5.0 vectiscan"]
+    # S6c/Q16: an die Inventar-IP binden (DNS-Rotation), wenn bekannt.
+    if ip and ":" not in ip and fqdn:
+        cmd += ["--resolve", f"{fqdn}:443:{ip}", "--resolve", f"{fqdn}:80:{ip}"]
+    cmd += ["-w", "\n__VS_META__ code=%{http_code} url=%{url_effective} size=%{size_download}\n", url]
+
+    out = ""
+    try:
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                text=True, start_new_session=True)
+        out, _ = proc.communicate(timeout=20)
+        out = out or ""
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError, NameError):
+            pass
+        return {"reachable": False, "not_testable": True, "not_testable_reason": "timeout"}
+    except Exception:
+        return {"reachable": False, "not_testable": True, "not_testable_reason": "error"}
+
+    header_text = out
+    final_code = 0
+    final_url = url
+    size = 0
+    for meta_line in out.splitlines():
+        if meta_line.startswith("__VS_META__"):
+            header_text = out[: out.index(meta_line)]
+            for tok in meta_line.split():
+                if tok.startswith("code="):
+                    try:
+                        final_code = int(tok[5:])
+                    except ValueError:
+                        pass
+                elif tok.startswith("url="):
+                    final_url = tok[4:]
+                elif tok.startswith("size="):
+                    try:
+                        size = int(tok[5:])
+                    except ValueError:
+                        pass
+            break
+
+    blocks = _parse_header_blocks(header_text)
+    if not blocks:
+        return {"reachable": False, "not_testable": True, "not_testable_reason": "no_response"}
+
+    first = blocks[0]
+    final = blocks[-1]
+    hops = [b["status"] for b in blocks]
+    all_headers_lower_keys = {k for b in blocks for k in b["headers"]}
+    is_challenge = any(h in all_headers_lower_keys for h in _CHALLENGE_HEADERS)
+
+    not_testable = False
+    reason = None
+    if is_challenge:
+        not_testable, reason = True, "challenge"
+    elif final_code == 429:
+        not_testable, reason = True, "http_429"
+    elif 400 <= final_code < 500:
+        not_testable, reason = True, "http_4xx"
+    elif final_code == 0:
+        not_testable, reason = True, "no_response"
+
+    return {
+        "reachable": True,
+        "first": {"status": first["status"], "headers": first["headers"]},
+        "final": {
+            "status": final_code or final["status"],
+            "location": final.get("headers", {}).get("location"),
+            "url": final_url,
+            "content_length": final.get("headers", {}).get("content-length"),
+            "response_length": size,
+            "headers": final["headers"],
+        },
+        "hops": hops,
+        "not_testable": not_testable,
+        "not_testable_reason": reason,
+    }
+
+
 def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str,
                      filename: str | None = None) -> dict[str, Any]:
     """Check HTTP security headers using curl.
@@ -406,6 +796,12 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str,
     output_path = f"{phase2_dir}/{filename or 'headers.json'}"
     url = f"https://{fqdn}"
 
+    # S6c/Q16: an die Inventar-IP binden (DNS-Rotation), SNI bleibt der fqdn.
+    # Nur IPv4; IPv6-Adressen ohne Route sind ueber das Phase-2-Gate schon raus.
+    resolve_args: list[str] = []
+    if ip and ":" not in ip:
+        resolve_args = ["--resolve", f"{fqdn}:443:{ip}", "--resolve", f"{fqdn}:80:{ip}"]
+
     # Strategie: erst HEAD (billig). Wenn der Server Security-Header
     # nur bei GET liefert (manche Apache-Setups, viele SPA-Backends),
     # GET-Fallback. Header werden bei beiden ueber `-D -` gesammelt.
@@ -413,6 +809,7 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str,
         "curl", "-sI",
         "--max-time", "10",
         "--retry", "1",
+        *resolve_args,
         "-A", "Mozilla/5.0 vectiscan",
         url,
     ]
@@ -424,6 +821,7 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str,
         "--max-time", "10",
         "--retry", "1",
         "-L",             # follow redirects
+        *resolve_args,
         "-A", "Mozilla/5.0 vectiscan",
         url,
     ]
@@ -471,6 +869,9 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str,
             "score": None,
             "headers": {},
             "security_headers": {},
+            # S6c/Q8: neues Feld, Bestandsfelder unveraendert (Auflage c/d).
+            "redirect_eval": {"reachable": False, "not_testable": True,
+                              "not_testable_reason": "no_response"},
         }
         try:
             with open(output_path, "w") as f:
@@ -519,6 +920,10 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str,
         "headers": headers,
         "security_headers": security_headers,
         "score": score,
+        # S6c/Q8: Endantwort-Auswertung als neues Feld; die Bestandsfelder oben
+        # (headers/security_headers/score) bleiben unveraendert (Auflage c/d),
+        # der report-worker liest redirect_eval erst in der Berichtsseiten-Session.
+        "redirect_eval": _eval_redirects(url, ip),
     }
 
     # Save to disk
@@ -810,6 +1215,36 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
             "-s",
         ]
 
+    elif mode == "exchange":
+        # S6c/Q17: Exchange-Verwaltungs- und Protokollpfade statt PHP/CMS-Liste
+        # (HE, CA). Die kuratierte Liste wird zur Laufzeit als Wordlist geschrieben.
+        wordlist = f"{phase2_dir}/exchange_wordlist.txt"
+        try:
+            with open(wordlist, "w") as wf:
+                wf.write("\n".join(EXCHANGE_PATHS) + "\n")
+        except Exception as e:
+            log.warning("ffuf_exchange_wordlist_write_failed", error=str(e))
+            _record_phase2_status(order_id, ip, "ffuf_sensitive", "skipped",
+                                  "exchange_wordlist_write_failed")
+            return None
+        # ffuf_sensitive-Slot, aber Exchange-Ziele; 401/403 an /ecp und /EWS sind
+        # ein Signal (der Dienst existiert), daher zusaetzlich gematcht.
+        output_path = f"{phase2_dir}/ffuf_sensitive.json"
+        cmd = [
+            "ffuf",
+            "-u", f"https://{fqdn}/FUZZ",
+            "-w", wordlist,
+            "-mc", "200,301,302,307,401,403",
+            "-H", "User-Agent: Mozilla/5.0 vectiscan",
+            "-json",
+            "-o", output_path,
+            "-t", "20",
+            "-rate", "50",
+            "-timeout", "8",
+            "-maxtime", "120",
+            "-s",
+        ]
+
     elif mode == "sensitive":
         # Sensitive-File-Discovery: jagt nach .env/.git/backup.zip/dump.sql/...
         # mittels SecLists raft-small-files.txt (~10k Eintraege). Diese
@@ -848,6 +1283,10 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
                               f"unknown_mode:{mode}")
         return None
 
+    # S6c/Q17: der Exchange-Modus ist eine Variante von ffuf_sensitive und traegt
+    # denselben Werkzeugnamen und dieselbe Ausgabedatei, damit der report-worker
+    # sie im selben Slot liest.
+    run_tool_name = "ffuf_sensitive" if mode in ("sensitive", "exchange") else f"ffuf_{mode}"
     exit_code, duration_ms = run_tool(
         cmd=cmd,
         timeout=180,
@@ -855,7 +1294,7 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
         order_id=order_id,
         host_ip=ip,
         phase=2,
-        tool_name=f"ffuf_{mode}",
+        tool_name=run_tool_name,
     )
 
     if exit_code not in (0, 1, -1):
@@ -1075,6 +1514,37 @@ def run_phase2(
     # AI-adaptive skip list
     ai_skip = set(adaptive_config.get("skip_tools", [])) if adaptive_config else set()
 
+    # S6c/Q16 (spec/09, spec/11 T7): eine IPv6-Adresse ohne Route vom Pruefstand
+    # aus wird in Phase 2 gar nicht erst geprueft (kein Verzeichnis, keine leeren
+    # ok-Zeilen). Jedes Phase-2-Werkzeug failed mit Grund no_ipv6_route, damit die
+    # Luecke ehrlich ist (no_ipv6_route setzt phase1 schon fuer nmap).
+    if ":" in ip:
+        from scanner.phase1 import _ipv6_route_available
+        if not _ipv6_route_available(ip):
+            log.info("phase2_skipped_no_ipv6_route", ip=ip, order_id=order_id)
+            for _t in ("testssl", "zap_spider", "zap_active", "header_check",
+                       "httpx", "ffuf_param", "ffuf_sensitive", "feroxbuster",
+                       "wpscan", "zap"):
+                if phase2_tools is None or _t in (phase2_tools or []) or _t in (
+                        "zap", "zap_spider", "zap_active", "header_check", "httpx",
+                        "ffuf_param", "ffuf_sensitive"):
+                    _record_phase2_status(order_id, ip, _t, "failed", "no_ipv6_route")
+            return {"ip": ip, "fqdn": fqdns[0] if fqdns else ip,
+                    "tools_run": [], "no_ipv6_route": True}
+
+    # S6c/Q17 (spec/09, DC c): sperrt das Zielnetz die Pruefadresse nach dem
+    # Portscan (Hetzner), bekommt jedes Phase-2-Werkzeug failed mit klarem Grund
+    # statt eines leeren ok. Das Verdikt kommt aus phase1 (provider_block).
+    pblock = tech_profile.get("provider_block") if isinstance(tech_profile, dict) else None
+    if isinstance(pblock, dict) and pblock.get("blocked"):
+        log.info("phase2_skipped_provider_block", ip=ip, order_id=order_id)
+        for _t in ("testssl", "zap_spider", "zap_active", "header_check", "httpx",
+                   "ffuf_param", "ffuf_sensitive", "feroxbuster", "wpscan", "zap"):
+            _record_phase2_status(order_id, ip, _t, "failed",
+                                  "Zielnetz sperrt die Pruefadresse nach dem Portscan")
+        return {"ip": ip, "fqdn": fqdns[0] if fqdns else ip,
+                "tools_run": [], "provider_blocked": True}
+
     host_dir = f"{scan_dir}/hosts/{ip}"
     phase2_dir = f"{host_dir}/phase2"
     os.makedirs(phase2_dir, exist_ok=True)
@@ -1175,12 +1645,16 @@ def run_phase2(
             return r
 
         zap = _zap_client()
+        # S6c/Q17 (spec/09, spec/10 R4 CA www zap-3): ZAP unreachable bekommt einen
+        # zweiten Versuch; bleibt der Daemon aus, ist der Lauf failed (nicht bloss
+        # skipped), damit die Luecke als Ausfall im Bericht steht.
         if not zap.health_check():
-            log.warning("zap_daemon_unavailable", ip=ip)
-            # A7: ZAP-Ausfall wird protokolliert statt still verschluckt.
-            _record_phase2_status(order_id, ip, "zap_spider", "skipped",
-                                  "zap_daemon_unavailable")
-            return r
+            _time.sleep(3)
+            if not zap.health_check():
+                log.warning("zap_daemon_unavailable", ip=ip)
+                _record_phase2_status(order_id, ip, "zap_spider", "failed",
+                                      "zap_unreachable")
+                return r
 
         ac = adaptive_config or {}
         all_spider_urls: list[str] = []
@@ -1228,11 +1702,39 @@ def run_phase2(
                          duration_ms=spider_duration)
 
             # AJAX Spider (conditional on SPA) — sequenziell pro VHost,
-            # da ZAP nur 1 AJAX-Spider gleichzeitig erlaubt
+            # da ZAP nur 1 AJAX-Spider gleichzeitig erlaubt.
+            # S6c/#27 (Issue #27): vor dem Start warten, bis der vorige AJAX-Spider
+            # der Instanz "stopped" ist; bei scan_in_progress einmal nachfassen,
+            # statt den ganzen Hostlauf zu verlieren.
             if ac.get("zap_ajax_spider_enabled") and "zap_ajax_spider" not in set(ac.get("skip_tools", [])):
                 publish_event(order_id, {"type": "tool_starting", "tool": "zap_ajax_spider", "host": ip})
                 for vh_ajax in vhost_fqdns:
-                    zap.start_ajax_spider(f"https://{vh_ajax}", context_name=context_name)
+                    # Serialisieren: warten, bis kein AJAX-Spider mehr laeuft.
+                    zap.poll_until_complete(
+                        lambda: 100 if zap.ajax_spider_status() == "stopped" else 50,
+                        timeout=60, interval=5, stop_value=100,
+                        order_id=order_id, tool_name="zap_ajax_spider_wait",
+                    )
+                    try:
+                        zap.start_ajax_spider(f"https://{vh_ajax}", context_name=context_name)
+                    except ZapError as ajax_err:
+                        if "scan_in_progress" in str(ajax_err).lower():
+                            log.info("zap_ajax_scan_in_progress_retry", fqdn=vh_ajax)
+                            zap.poll_until_complete(
+                                lambda: 100 if zap.ajax_spider_status() == "stopped" else 50,
+                                timeout=120, interval=5, stop_value=100,
+                                order_id=order_id, tool_name="zap_ajax_spider_wait",
+                            )
+                            try:
+                                zap.start_ajax_spider(f"https://{vh_ajax}", context_name=context_name)
+                            except ZapError as ajax_err2:
+                                log.warning("zap_ajax_spider_failed", fqdn=vh_ajax,
+                                            error=str(ajax_err2))
+                                continue
+                        else:
+                            log.warning("zap_ajax_spider_failed", fqdn=vh_ajax,
+                                        error=str(ajax_err))
+                            continue
                     completed = zap.poll_until_complete(
                         lambda: 100 if zap.ajax_spider_status() == "stopped" else 50,
                         timeout=240, interval=10, stop_value=100,
@@ -1299,6 +1801,37 @@ def run_phase2(
                 count = len(testssl_result)
                 publish_tool_output(order_id, "testssl", ip,
                                     f"{count} SSL/TLS checks completed")
+
+            # S6c/Q17 (spec/09, spec/10 R3): testssl je weiterem TLS-Port, nicht
+            # nur 443. STARTTLS-Ports mit --starttls; Port 25 bleibt bis E5 nicht
+            # pruefbar. Eigene Dateien/Werkzeugnamen (testssl_<port>), damit der
+            # report-worker sie nicht mit dem 443-Lauf verwechselt (Auflage c).
+            if not testssl_fast:
+                open_ports = [int(p) for p in (tech_profile.get("open_ports") or [])]
+                extra_ports = [p for p in open_ports
+                               if p != 443 and (p in TLS_PORTS_DIRECT or p in TLS_PORTS_STARTTLS)]
+                for p in sorted(set(extra_ports)):
+                    if p == 25:
+                        # E5: SMTP auf Port 25 vom Pruefstand aus nicht pruefbar.
+                        _record_phase2_status(order_id, ip, "testssl_25", "skipped",
+                                              "smtp_port25_not_testable_e5")
+                        continue
+                    starttls = TLS_PORTS_STARTTLS.get(p, "")
+                    out_path = f"{phase2_dir}/testssl_{p}.json"
+                    _run_testssl_once(primary_fqdn, ip, out_path, order_id,
+                                      severity=testssl_sev, tool_name=f"testssl_{p}",
+                                      port=p, starttls=starttls)
+
+                # S6c/Q17: testssl je VHost-SNI, wenn Zertifikate abweichen koennen
+                # (BS ftp traegt ein eigenes Zertifikat auf demselben IP:443).
+                # Cert-Grab (fast_mode) fuer bis zu zwei weitere VHosts; eigene
+                # Datei/Werkzeugnamen, damit der 443-Lauf eindeutig bleibt.
+                extra_vhosts = [v for v in (vhost_fqdns or []) if v and v != primary_fqdn][:2]
+                for vh in extra_vhosts:
+                    slug = vhost_slug(vh)
+                    _run_testssl_once(vh, ip, f"{phase2_dir}/testssl_sni_{slug}.json",
+                                      order_id, severity=testssl_sev,
+                                      tool_name=f"testssl_sni_{slug}", fast_mode=True)
         else:
             _record_phase2_status(order_id, ip, "testssl", "skipped",
                                   "no_ssl" if not has_ssl else "not_in_package")
@@ -1546,6 +2079,12 @@ def run_phase2(
         """Run ffuf param, feroxbuster, wpscan with Spider URLs."""
         r: dict[str, Any] = {"_tools": []}
 
+        # S6c/Q17: Pfadsuche auf die Endadresse des Inhalts-VHosts (HE, CA laufen
+        # sonst gegen die Apex-Weiterleitung) und Exchange-Pfadliste gegen
+        # Exchange-Hosts statt PHP/CMS-Liste.
+        target_fqdn = _content_fqdn(tech_profile, primary_fqdn)
+        is_exchange = _is_exchange_host(tech_profile)
+
         # A6-Circuit-Breaker (Strang-A Befund 2): gegen einen bereits (durch ein
         # echtes WAF-Signal) geblockten Host laufen die teuren Phase-2-Tools
         # nicht mehr voll bis zum Timeout, sondern werden als "blocked"
@@ -1598,7 +2137,7 @@ def run_phase2(
             if ferox_enabled:
                 publish_event(order_id, {"type": "tool_starting", "tool": "feroxbuster", "host": ip})
                 spider_paths = {_urlparse(u).path for u in spider_urls if u}
-                ferox_result = run_feroxbuster(primary_fqdn, ip, host_dir, order_id,
+                ferox_result = run_feroxbuster(target_fqdn, ip, host_dir, order_id,
                                                adaptive_config=adaptive_config,
                                                known_paths=spider_paths if spider_paths else None,
                                                deadline_monotonic=deadline_monotonic)
@@ -1625,8 +2164,9 @@ def run_phase2(
         if (phase2_tools is not None and "ffuf" in phase2_tools) and "ffuf" not in ai_skip and has_web:
             publish_event(order_id, {"type": "tool_starting", "tool": "ffuf_sensitive", "host": ip})
             sens_config = dict(adaptive_config) if adaptive_config else {}
-            sens_config["ffuf_mode"] = "sensitive"
-            sens_result = run_ffuf(primary_fqdn, ip, host_dir, order_id,
+            # S6c/Q17: gegen Exchange die Exchange-Pfadliste, sonst Sensitive-Files.
+            sens_config["ffuf_mode"] = "exchange" if is_exchange else "sensitive"
+            sens_result = run_ffuf(target_fqdn, ip, host_dir, order_id,
                                     adaptive_config=sens_config)
             r["ffuf_sensitive"] = sens_result
             r["_tools"].append("ffuf_sensitive")
@@ -1644,6 +2184,26 @@ def run_phase2(
             else:
                 sens_reason = "no_web"
             _record_phase2_status(order_id, ip, "ffuf_sensitive", "skipped", sens_reason)
+
+        # S6c/5 (spec/09): EHLO-Faehigkeiten vor STARTTLS je SMTP-Port als Rohdatum
+        # (465, 587; 25 bleibt bis E5 nicht pruefbar). Unabhaengig von has_web.
+        smtp_ports = [p for p in (tech_profile.get("open_ports") or []) if p in (465, 587)]
+        for sp in sorted(set(smtp_ports)):
+            try:
+                run_smtp_ehlo(target_fqdn, ip, sp, host_dir, order_id)
+            except Exception as e:
+                log.warning("smtp_ehlo_failed", ip=ip, port=sp, error=str(e))
+        if [p for p in (tech_profile.get("open_ports") or []) if p == 25]:
+            _record_phase2_status(order_id, ip, "smtp_ehlo_25", "skipped",
+                                  "smtp_port25_not_testable_e5")
+
+        # S6c/7a (spec/11 T1): XML-RPC-Sonde gegen WordPress (wpscan meldet es bei
+        # castenow nicht). An der Endadresse des Inhalts-VHosts.
+        if cms and cms.lower() == "wordpress" and has_web:
+            try:
+                run_xmlrpc_probe(target_fqdn, ip, host_dir, order_id)
+            except Exception as e:
+                log.warning("xmlrpc_probe_failed", ip=ip, error=str(e))
 
         # wpscan (conditional on WordPress) — use final URL after redirects
         if (phase2_tools is None or "wpscan" in phase2_tools) and cms and cms.lower() == "wordpress":
@@ -1747,6 +2307,28 @@ def run_phase2(
             log.info("zap_alerts_collected", ip=ip,
                      raw=len(all_alerts_raw), filtered=len(all_alerts),
                      domains=list(allowed_domains)[:5])
+
+            # S6c/N2 (spec/11 Teil 6): Statuscode je Meldung nachtragen, damit
+            # Meldungen an Abwehrseiten (429) und Nebenpfaden (robots.txt) im
+            # Bericht zuordenbar sind. Best-effort, begrenzt auf die eindeutigen
+            # Nachrichten (Kosten: eine ZAP-Abfrage je Nachricht).
+            try:
+                status_by_msg: dict[str, Optional[int]] = {}
+                budget = 80
+                for a in all_alerts:
+                    mid = str(a.get("messageId") or a.get("msgId") or "")
+                    if not mid:
+                        continue
+                    if mid not in status_by_msg:
+                        if budget <= 0:
+                            continue
+                        status_by_msg[mid] = zap.message_status(mid)
+                        budget -= 1
+                    if status_by_msg.get(mid) is not None:
+                        a["status"] = status_by_msg[mid]
+            except Exception as _st_err:
+                log.warning("zap_alert_status_enrich_failed", ip=ip, error=str(_st_err))
+
             results["zap_alerts"] = all_alerts
 
             mapper = ZapAlertMapper()
@@ -1763,18 +2345,12 @@ def run_phase2(
             publish_tool_output(order_id, "zap", ip,
                                 f"{len(all_alerts)} alerts ({passive_count} passive, {active_count} active)")
 
-            # Save alert summary (not full JSON — too large for 50K DB column)
-            alert_summary = {
-                "total_alerts": len(all_alerts),
-                "passive": passive_count,
-                "active": active_count,
-                "unique_types": len(set(a.get("name", a.get("alert", "")) for a in all_alerts)),
-                "top_alerts": [{"name": a.get("name",""), "risk": a.get("risk",""), "url": a.get("url","")[:80]}
-                               for a in all_alerts[:20]],
-            }
+            raw_summary = json.dumps(
+                _build_zap_alert_summary(all_alerts, passive_count, active_count),
+                indent=2)
             record_tool_run(order_id, ip, 2, "zap", "ok",
                             exit_code=0, duration_ms=0,
-                            raw_output=json.dumps(alert_summary, indent=2))
+                            raw_output=raw_summary)
         except ZapError as e:
             log.error("zap_alert_collection_failed", ip=ip, error=str(e))
             _record_phase2_status(order_id, ip, "zap", "failed", str(e))

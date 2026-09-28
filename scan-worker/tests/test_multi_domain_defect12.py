@@ -218,6 +218,7 @@ def _run_phase0_with_extras(tmp_path, extras):
             patch("scanner.phase0.run_certspotter", return_value=[]), \
             patch("scanner.phase0.run_subfinder", return_value=[]), \
             patch("scanner.phase0.run_gobuster_dns", return_value=[]), \
+            patch("scanner.phase0.is_wildcard_dns", return_value=False), \
             patch("scanner.phase0.collect_dns_records",
                   return_value=dns_default) as mock_dns, \
             patch("scanner.phase0.run_zone_transfer",
@@ -262,13 +263,11 @@ def test_deckel_ist_gesetzt():
 
 # ----------------------------------- Nachweis-Scan 20.09.2026, zwei Befunde
 
-def test_domain_intel_ohne_treffer_ist_kein_fehler(tmp_path):
-    """Befund aus dem Nachweis-Scan (Order 75338c97): die whois-Zeile fuer die
-    zweite Domain stand auf `failed`, obwohl die Registry nur nichts lieferte.
-
-    Ursache: "empty" ist kein Wert aus TOOL_RUN_STATUSES; record_tool_run hat
-    ihn still zu "failed" verbogen. run_phase0a fuehrt denselben Fall als
-    ok mit Grund no_data.
+def test_domain_intel_whois_ohne_daten_ist_failed(tmp_path):
+    """S6c/#35 (spec/09 Teil 2 Punkt 21): ein whois-Abruf ohne Daten ist failed,
+    nicht ok mit no_data. Frueher (S2b) stand er auf ok, weil "empty" still zu
+    "failed" verbogen wurde; jetzt ist "failed" mit Grund whois_no_data explizit.
+    dns_security ohne Treffer bleibt ok.
     """
     with patch("scanner.phase0a.WhoisClient") as whois_cls, \
             patch("scanner.phase0a.run_all_dns_security",
@@ -280,11 +279,11 @@ def test_domain_intel_ohne_treffer_ist_kein_fehler(tmp_path):
                          {"package": "perimeter", "phase0a_tools": ["whois"]})
 
     stati = {(c.args[3], c.args[4]) for c in rec.call_args_list}
-    assert ("whois", "ok") in stati, stati
-    assert ("whois", "failed") not in stati
+    assert ("whois", "failed") in stati, stati
+    assert ("whois", "ok") not in stati
     grund = [c.kwargs.get("reason") for c in rec.call_args_list
              if c.args[3] == "whois"][0]
-    assert grund == "no_data"
+    assert grund == "whois_no_data"
 
 
 def test_status_wird_nicht_still_verbogen():

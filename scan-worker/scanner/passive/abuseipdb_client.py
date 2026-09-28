@@ -53,6 +53,9 @@ class AbuseIPDBClient(PassiveClient):
             "isp": d.get("isp"),
             "domain": d.get("domain"),
             "isTor": d.get("isTor", False),
+            # S6c/7b (spec/11): der Zeitraum, ueber den totalReports zaehlt, gehoert
+            # in den Export, sonst ist "n Meldungen" ohne Bezugsgroesse.
+            "maxAgeInDays": max_age_days,
         }
 
         log.info("abuseipdb_check", ip=ip,

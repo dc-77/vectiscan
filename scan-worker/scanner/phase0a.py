@@ -14,6 +14,7 @@ import structlog
 
 from scanner.passive.shodan_client import ShodanClient
 from scanner.passive.abuseipdb_client import AbuseIPDBClient
+from scanner.passive.rdap_client import RDAPClient
 from scanner.passive.securitytrails_client import SecurityTrailsClient
 from scanner.passive.whois_client import WhoisClient
 from scanner.passive.urlhaus_client import URLhausClient
@@ -31,6 +32,8 @@ log = structlog.get_logger()
 PHASE0A_EXPECTED_TOOLS: tuple[str, ...] = (
     "whois", "shodan", "abuseipdb", "securitytrails",
     "urlhaus", "greynoise", "otx", "virustotal",
+    # S6c/T2 (spec/11): RDAP als autoritative Netzbetreiber-Quelle je IP.
+    "rdap",
 )
 
 # Issue #12: Werkzeuge, deren Ergebnis zu genau einer Domain gehoert. Alles
@@ -143,6 +146,12 @@ def run_phase0a(
         data = whois.lookup(domain)
         if data:
             _save_json(phase0a_dir, "whois.json", data)
+            _record_passive("whois", "ok", None, data)
+        else:
+            # S6c/#35 (spec/09 Teil 2 Punkt 21): ein fehlgeschlagener Abruf ist
+            # failed, nicht ok mit no_data. lookup() liefert None bei leerer
+            # Ausgabe, Fehlercode, Timeout oder fehlendem Binary.
+            _record_passive("whois", "failed", "whois_no_data")
         return "whois", data
 
     def _run_shodan() -> tuple[str, dict[str, Any] | None]:
@@ -225,7 +234,45 @@ def run_phase0a(
                 "dns_history": f_hist.result(),
             }
         _save_json(phase0a_dir, "securitytrails.json", st_data)
+        # S6c/R6 (spec/10): securitytrails gab bisher immer ein nicht-leeres Dict
+        # zurueck und stand damit immer auf ok. Liefert keine der drei Abfragen
+        # Daten, ist der Abruf fehlgeschlagen (failed), nicht ok.
+        if any(st_data.get(k) for k in ("domain", "subdomains", "dns_history")):
+            _record_passive("securitytrails", "ok", None, st_data)
+        else:
+            _record_passive("securitytrails", "failed", "securitytrails_no_data")
         return "securitytrails", st_data
+
+    def _run_rdap() -> tuple[str, dict[str, Any] | None]:
+        # S6c/T2, E17 (spec/11): Netzbetreiber je IP aus der RIR-Registry (RDAP).
+        # IP-bezogen und auftragsweit (kein Domain-Etikett). Nur Export; der
+        # report-worker liest netblock_owner erst in der Berichtsseiten-Session.
+        publish_event(order_id, {"type": "tool_starting", "tool": "rdap", "host": domain})
+        client = RDAPClient()
+        rdap_results: dict[str, Any] = {}
+        if capped_ips:
+            with ThreadPoolExecutor(
+                max_workers=passive_concurrency,
+                thread_name_prefix="rdap_ips",
+            ) as inner:
+                futures = {inner.submit(client.lookup_ip, ip): ip for ip in capped_ips}
+                for fut in as_completed(futures):
+                    ip = futures[fut]
+                    try:
+                        rdap_data = fut.result()
+                    except Exception as e:
+                        log.warning("rdap_ip_lookup_failed", ip=ip, error=str(e))
+                        continue
+                    if rdap_data:
+                        rdap_results[ip] = rdap_data
+        if rdap_results:
+            _save_json(phase0a_dir, "rdap.json", rdap_results)
+            _record_passive("rdap", "ok", None, rdap_results)
+        elif capped_ips:
+            _record_passive("rdap", "failed", "rdap_no_data")
+        else:
+            _record_passive("rdap", "ok", "no_ips")
+        return "rdap", rdap_results or None
 
     def _run_dns_security() -> tuple[str, dict[str, Any] | None]:
         publish_event(order_id, {"type": "tool_starting", "tool": "dns_security", "host": domain})
@@ -270,6 +317,13 @@ def run_phase0a(
                 )
         if result:
             _save_json(phase0a_dir, "urlhaus.json", result)
+        # S6c/R6 (spec/10): "no_data" hiess bisher "Abruf fehlgeschlagen". Kam
+        # keine Domain-Antwort (transport-/HTTP-Fehler, fehlender Key), ist der
+        # Abruf failed; eine echte leere Antwort (kein Treffer) ist ok.
+        if domain_resp is None and not per_ip:
+            _record_passive("urlhaus", "failed", "urlhaus_no_response")
+        else:
+            _record_passive("urlhaus", "ok", None, result)
         return "urlhaus", result or None
 
     def _run_greynoise() -> tuple[str, dict[str, Any] | None]:
@@ -354,6 +408,8 @@ def run_phase0a(
             futures[pool.submit(_run_shodan)] = "shodan"
         if "abuseipdb" in phase0a_tools:
             futures[pool.submit(_run_abuseipdb)] = "abuseipdb"
+        if "rdap" in phase0a_tools:
+            futures[pool.submit(_run_rdap)] = "rdap"
         if "securitytrails" in phase0a_tools:
             futures[pool.submit(_run_securitytrails)] = "securitytrails"
         # F-P0A-003 — Threat-Intel-Clients
@@ -435,6 +491,11 @@ def build_passive_intel_for_ai(
     """Extract passive intelligence relevant for AI Host Strategy for a specific IP.
 
     Returns a compact dict suitable for inclusion in the AI prompt.
+
+    S6c/8 (spec/09): der Rohwert (auch "PostgreSQL 9.6.0 or later") geht bewusst
+    unveraendert in den KI-#1-Input; die S6a2-Prompt-Regel ("or later ist eine
+    Untergrenze, nicht veraltet") bleibt und verhindert die Fehldeutung. Der
+    JW-Fall "veraltete PostgreSQL 9.6" stammt aus einem Lauf vor S6a2.
     """
     intel: dict[str, Any] = {}
 
@@ -595,10 +656,14 @@ def run_domain_intel(domain: str, scan_dir: str, order_id: str,
                            _with_domain(data, domain))
                 out[tool] = data
                 _record(tool, "ok", data)
+            elif tool == "whois":
+                # S6c/#35 (spec/09 Teil 2 Punkt 21): ein whois-Abruf ohne Daten ist
+                # failed, nicht ok mit no_data (dieselbe Regel wie in run_phase0a).
+                # "empty" waere kein gueltiger Status und wuerde von record_tool_run
+                # still zu "failed" verbogen; hier ist "failed" explizit.
+                _record(tool, "failed", reason="whois_no_data")
             else:
-                # Kein Treffer ist kein Fehler: dieselbe Form wie run_phase0a
-                # (ok mit Grund no_data). "empty" waere kein gueltiger Status
-                # und wuerde von record_tool_run still zu "failed" verbogen.
+                # dns_security ohne Treffer bleibt ein gueltiges Leerergebnis (ok).
                 _record(tool, "ok", reason="no_data")
         except Exception as e:
             log.warning("domain_intel_failed", tool=tool, domain=domain, error=str(e))

@@ -90,16 +90,28 @@ def _exchange_from_headers(headers: dict[str, str]) -> tuple[str, str] | None:
     return None
 
 
-def _exchange_build_from_zap(zap_data: Any) -> str | None:
-    """Sucht in zap_spider-URLs nach /owa/auth/<build>/-Pfaden."""
+def _exchange_build_from_zap(zap_data: Any, own_hosts: set[str] | None = None) -> str | None:
+    """Sucht in zap_spider-URLs nach /owa/auth/<build>/-Pfaden.
+
+    S6c/N4 (spec/11 Teil 6): nur URLs des eigenen Hosts zaehlen. Der ZAP-Spider
+    sammelt hostuebergreifend; bei Junkerwerk trug der Hetzner-Host 188.40.3.130
+    dadurch "Microsoft Exchange" aus Spider-URLs von autodiscover/outlook
+    (217.243.248.x). Ist ``own_hosts`` gesetzt, werden fremde Hostnamen verworfen.
+    """
     if not zap_data:
         return None
+    from urllib.parse import urlparse
     urls: list[str] = []
     if isinstance(zap_data, dict):
         urls = list(zap_data.get("urls") or [])
     elif isinstance(zap_data, list):
         urls = [u for u in zap_data if isinstance(u, str)]
+    own = {h.lower() for h in (own_hosts or set())}
     for url in urls:
+        if own:
+            host = (urlparse(url).hostname or "").lower()
+            if host and host not in own:
+                continue
         m = _OWA_BUILD_RE.search(url)
         if m:
             return m.group(1)
@@ -196,8 +208,14 @@ def _enrich_one_host(
         if powered:
             _add_to_technologies(technologies, seen, powered)
 
-    # 2. zap_spider — Build aus URL-Pfad
-    zap_build = _exchange_build_from_zap(zap_spider_data)
+    # 2. zap_spider — Build aus URL-Pfad, nur aus URLs des eigenen Hosts (N4).
+    own_hosts: set[str] = set()
+    own_hosts.update(f.lower() for f in (tech_profile.get("fqdns") or []) if f)
+    own_hosts.update(str(k).lower() for k in (tech_profile.get("vhost_results") or {}))
+    pv = tech_profile.get("primary_vhost")
+    if pv:
+        own_hosts.add(str(pv).lower())
+    zap_build = _exchange_build_from_zap(zap_spider_data, own_hosts=own_hosts or None)
     if zap_build:
         _add_to_technologies(technologies, seen, "Microsoft Exchange", zap_build)
         # zap_build ist konkreter (4-Tupel-Build), bevorzuge ihn

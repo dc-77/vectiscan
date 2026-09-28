@@ -174,39 +174,55 @@ def _extract_all_tech_signals(redirect_data: dict[str, Any]) -> list[dict[str, s
         tech_info = probe.get("tech_info") or {}
         headers = probe.get("response_headers") or {}
 
-        # 1. generator + powered_by + server (klassisch)
-        if tech_info.get("generator"):
-            _add(tech_info["generator"])
+        # S6c/N4 (spec/11 Teil 6): Die Seiten-Signale (generator, Cookies, Scripts,
+        # Body-Classes) stammen aus der ENDSEITE. Leitet der VHost auf einen anderen
+        # Host weiter (bergersysteme ftp -> Webflow-www), beschreiben sie das
+        # Weiterleitungsziel, nicht diesen Host. Dann nur die Kopfzeilen der ersten
+        # Antwort (server, x-powered-by) auswerten, die wirklich von diesem Host
+        # kommen. Sonst bekaeme der Plesk-Server die Webflow-Regel.
+        cross = bool(probe.get("is_cross_domain"))
+        final_host = _extract_final_host(probe)
+        if final_host and fqdn_key and final_host.lower() != str(fqdn_key).lower():
+            cross = True
+
+        # 1. server + powered_by aus der ersten Antwort (immer diesem Host).
         srv = headers.get("server", "")
         if srv:
             parts = srv.split("/", 1)
             _add(parts[0], parts[1] if len(parts) > 1 else "")
-        powered = headers.get("x-powered-by", "") or tech_info.get("powered_by", "")
+        powered = headers.get("x-powered-by", "")
         if powered:
             _add(powered)
 
-        # 2. Cookies (Framework / CMS)
-        cookies = (tech_info.get("cookies") or "").lower()
-        if cookies:
-            for pat, name in _COOKIE_PATTERNS:
-                if pat.lower() in cookies:
-                    _add(name)
+        if not cross:
+            # generator + powered_by (Seite)
+            if tech_info.get("generator"):
+                _add(tech_info["generator"])
+            if tech_info.get("powered_by"):
+                _add(tech_info["powered_by"])
 
-        # 3. Scripts (Framework / 3rd-Party)
-        for src in tech_info.get("scripts") or []:
-            src_l = (src or "").lower()
-            for pat, name in _SCRIPT_PATTERNS:
-                if pat in src_l:
-                    _add(name)
+            # 2. Cookies (Framework / CMS)
+            cookies = (tech_info.get("cookies") or "").lower()
+            if cookies:
+                for pat, name in _COOKIE_PATTERNS:
+                    if pat.lower() in cookies:
+                        _add(name)
 
-        # 4. Body-Classes (CMS)
-        body_classes = (tech_info.get("body_classes") or "").lower()
-        if body_classes:
-            for pat, name in _BODY_CLASS_PATTERNS:
-                if pat in body_classes:
-                    _add(name)
+            # 3. Scripts (Framework / 3rd-Party)
+            for src in tech_info.get("scripts") or []:
+                src_l = (src or "").lower()
+                for pat, name in _SCRIPT_PATTERNS:
+                    if pat in src_l:
+                        _add(name)
 
-        # 5. Header-Patterns (CDN / Hosting / CMS-Footprint)
+            # 4. Body-Classes (CMS)
+            body_classes = (tech_info.get("body_classes") or "").lower()
+            if body_classes:
+                for pat, name in _BODY_CLASS_PATTERNS:
+                    if pat in body_classes:
+                        _add(name)
+
+        # 5. Header-Patterns (CDN / Hosting / CMS-Footprint) aus der ersten Antwort.
         headers_l = {k.lower(): str(v).lower() for k, v in (headers or {}).items()}
         for h_name, h_val, name in _HEADER_PATTERNS:
             v = headers_l.get(h_name, "")
@@ -214,6 +230,18 @@ def _extract_all_tech_signals(redirect_data: dict[str, Any]) -> list[dict[str, s
                 _add(name)
 
     return tech_list
+
+
+def _extract_final_host(probe: dict[str, Any]) -> str:
+    """Hostname der Endadresse eines redirect_probe-Eintrags (S6c/N4)."""
+    from urllib.parse import urlparse
+    fu = probe.get("final_url") or ""
+    if fu:
+        try:
+            return urlparse(fu).hostname or ""
+        except Exception:
+            return ""
+    return str(probe.get("final_domain") or "")
 
 
 def _parse_nmap_xml(xml_path: str) -> dict[str, Any]:
@@ -252,6 +280,10 @@ def _parse_nmap_xml(xml_path: str) -> dict[str, Any]:
                     service_info["product"] = service_elem.get("product", "")
                     service_info["version"] = service_elem.get("version", "")
                     service_info["extrainfo"] = service_elem.get("extrainfo", "")
+                    # S6c/E9: method="table" = aus der Portnamen-Tabelle geraten
+                    # (der "?"-Fall), nicht aus einer Probe. conf = Konfidenz 0..10.
+                    service_info["method"] = service_elem.get("method", "")
+                    service_info["conf"] = service_elem.get("conf", "")
 
                 result["services"].append(service_info)
 
@@ -272,6 +304,23 @@ def _nmap_hosts_total(xml_path: str) -> Optional[int]:
         return None
     total = hosts_el.get("total")
     return int(total) if total and total.isdigit() else None
+
+
+def _nmap_hosts_up(xml_path: str) -> Optional[int]:
+    """`runstats/hosts/@up` aus dem nmap-XML, None wenn nicht lesbar.
+
+    S6c/Q17: ``up=0`` heisst, das Ziel hat den Portscan nicht beantwortet
+    ("keine Antwort"), nicht "kein offener Port" (HL 195.225.241.75; die vier
+    unerreichten BS-Hosts). Nur so unterscheidet der Bericht beides."""
+    try:
+        root = ET.parse(xml_path).getroot()
+    except Exception:
+        return None
+    hosts_el = root.find("./runstats/hosts")
+    if hosts_el is None:
+        return None
+    up = hosts_el.get("up")
+    return int(up) if up and up.isdigit() else None
 
 
 def _nmap_has_host(xml_path: str) -> bool:
@@ -339,14 +388,95 @@ def _nmap_status_check(ip: str, xml_path: str):
             return "failed", reason
         if ":" in ip and not _nmap_has_host(xml_path) and not _ipv6_route_available(ip):
             return "failed", "no_ipv6_route"
+        # S6c/Q17: das Ziel war im Scanbereich (total>=1), hat aber nicht
+        # geantwortet (hosts up=0, kein Hostblock). Das ist "keine Antwort", nicht
+        # "kein offener Port" (HL 195.225.241.75, die vier unerreichten BS-Hosts).
+        up = _nmap_hosts_up(xml_path)
+        if up == 0 and not _nmap_has_host(xml_path):
+            return "failed", "nmap_no_response"
         return None
     return check
 
 
-def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-ports 1000") -> dict[str, Any]:
+def _unidentified_ports(nmap_result: dict[str, Any]) -> list[int]:
+    """Offene Ports ohne belegte Kennung (der "?"-Fall, S6c/E9).
+
+    nmap hat den Dienst aus der Portnamen-Tabelle geraten (method="table") oder
+    gar keinen Namen/kein Produkt gefunden (HE 1000-1002, CA 8001, HL 8443)."""
+    out: list[int] = []
+    for svc in (nmap_result.get("services") or []):
+        product = (svc.get("product") or "").strip()
+        method = (svc.get("method") or "").strip().lower()
+        if not product and method != "probed":
+            try:
+                out.append(int(svc.get("port")))
+            except (TypeError, ValueError):
+                continue
+    return sorted(set(out))
+
+
+def run_nmap_version_reprobe(ip: str, ports: list[int], scan_dir: str,
+                            order_id: str) -> None:
+    """S6c/E9 (spec/09 Teil 4, spec/11 T1): Ports ohne Kennung mit
+    ``-sV --version-all`` nachproben. Nur Rohdaten-Export (eigene Datei/Zeile);
+    der report-worker liest sie spaeter."""
+    if not ports:
+        return
+    phase1_dir = f"{scan_dir}/hosts/{ip}/phase1"
+    os.makedirs(phase1_dir, exist_ok=True)
+    xml_path = f"{phase1_dir}/nmap_versionall.xml"
+    port_arg = ",".join(str(p) for p in ports)
+    cmd = [
+        "nmap",
+        *(["-6"] if ":" in ip else []),
+        "-Pn", "-n", "-sV",
+        "--version-all", "--version-intensity", "9",
+        "--host-timeout", "180s",
+        "-p", port_arg,
+        "-oX", xml_path,
+        ip,
+    ]
+    run_tool(cmd=cmd, timeout=240, output_path=xml_path, order_id=order_id,
+             host_ip=ip, phase=1, tool_name="nmap_versionall")
+
+
+def _nmap_default_rate_flags() -> list[str]:
+    """Rate-/Reliability-Flags fuer den Regelfall (unveraendert zum Bestand)."""
+    return [
+        # `--max-retries 2` reduziert default 10 → 2.
+        "--max-retries", "2",
+        # `--host-timeout` haerter als run_tool-Timeout, damit nmap selbst
+        # kontrolliert abbricht statt SIGKILL ohne Output.
+        "--host-timeout", "240s",
+        # `--min-rate 100` garantiert Mindest-Paket-Rate auf gefilterten Hosts.
+        "--min-rate", "100",
+        # `--defeat-rst-ratelimit` umgeht RST-Throttling vieler Firewalls.
+        "--defeat-rst-ratelimit",
+    ]
+
+
+def _nmap_throttle_flags() -> list[str]:
+    """S6c/Q17: gedrosselte Flags fuer sperrende Netze (Hetzner). Kein --min-rate,
+    kein --defeat-rst-ratelimit; --max-rate deckelt, --max-retries 1, laengeres
+    Host-Timeout (~10 Min)."""
+    from scanner.net_throttle import throttle_max_rate, throttle_max_retries
+    return [
+        "--max-retries", str(throttle_max_retries()),
+        "--host-timeout", "600s",
+        "--max-rate", str(throttle_max_rate()),
+    ]
+
+
+def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-ports 1000",
+             throttle: bool = False) -> dict[str, Any]:
     """Run nmap service/version scan against a host.
 
     Returns parsed results dict with open ports and services.
+
+    S6c/Q17: ``throttle=True`` fuer Netze, die nach dem Portscan sperren
+    (Hetzner/your-server.de). Dann ueber ``--max-rate`` und ``--max-retries 1``
+    gedrosselt (nicht ``-T2``), damit der volle Portscan je Host bei etwa zehn
+    Minuten bleibt und die Sperre spaeter auftritt.
     """
     host_dir = f"{scan_dir}/hosts/{ip}"
     phase1_dir = f"{host_dir}/phase1"
@@ -385,23 +515,11 @@ def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-por
         "-sC",
         "--script-timeout", "60s",
         # ── Performance / Reliability ─────────────────────────────────
+        # -T4 bleibt (nicht -T2/-T1); bei gedrosselten Netzen begrenzt --max-rate
+        # die Paketrate.
         "-T4",
-        # `--max-retries 2` reduziert default 10 → 2; verhindert dass
-        # gefilterte Ports den Scan auf Minuten ziehen. Mit `-T4` ohnehin
-        # schon aggressiv.
-        "--max-retries", "2",
-        # `--host-timeout` haerter als run_tool-Timeout (300s), damit
-        # nmap selbst kontrolliert abbricht und einen partial-XML schreibt
-        # statt SIGKILL ohne Output.
-        "--host-timeout", "240s",
-        # `--min-rate 100` garantiert Mindest-Paket-Rate; auf gefilterten
-        # Hosts (das was du gepostet hast: "997 filtered tcp ports
-        # no-response") laeuft sonst der Scan fast leer.
-        "--min-rate", "100",
-        # `--defeat-rst-ratelimit` umgeht RST-Throttling vieler Firewalls
-        # (Cisco/Fortinet) → mehr offene Ports detektiert.
-        "--defeat-rst-ratelimit",
-        # ── Ports ──────────────────────────────────────────────────────
+        # ── Ports und Rate ─────────────────────────────────────────────
+        *(_nmap_throttle_flags() if throttle else _nmap_default_rate_flags()),
         *nmap_port_args,
         # ── Output ─────────────────────────────────────────────────────
         "--open",  # nur offene Ports im NORMAL-Output (XML hat alles)
@@ -415,7 +533,9 @@ def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-por
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=300,
+        # Gedrosselte Hosts brauchen laenger (Host-Timeout 600s); der Wrapper
+        # muss darueber liegen, damit nmap selbst abbricht.
+        timeout=660 if throttle else 300,
         output_path=xml_path,
         order_id=order_id,
         host_ip=ip,
@@ -816,12 +936,46 @@ def run_phase1(
 
     phase1_tools = (config or {}).get("phase1_tools", ["nmap", "webtech", "wafw00f", "cms_fingerprint"])
 
+    # S6c/Q17: Netze, die nach dem Portscan sperren (Hetzner/your-server.de),
+    # werden gedrosselt gescannt. isp/rdns aus dem Web-Probe/Inventar, sonst loest
+    # der Throttle-Check rDNS selbst auf.
+    from scanner.net_throttle import (is_throttled_host,
+                                      probe_reachable_after_portscan)
+    host_isp = ""
+    host_rdns = ""
+    if isinstance(web_probe, dict):
+        host_isp = str(web_probe.get("isp") or "")
+        host_rdns = str(web_probe.get("rdns") or web_probe.get("reverse") or "")
+    throttle = is_throttled_host(ip, rdns=host_rdns, isp=host_isp)
+
+    provider_block: Optional[dict[str, Any]] = None
     # Run nmap — A7: explizit gegated, damit ein Paket ohne nmap eine
     # skipped-Zeile hinterlaesst statt den Scan stumm trotzdem zu fahren.
     if "nmap" in phase1_tools:
         publish_event(order_id, {"type": "tool_starting", "tool": "nmap", "host": ip})
-        nmap_result = run_nmap(ip, scan_dir, order_id, nmap_ports)
+        nmap_result = run_nmap(ip, scan_dir, order_id, nmap_ports, throttle=throttle)
         progress_callback(order_id, "nmap", "complete")
+        # S6c/Q17 (DC c): nach dem vollen Portscan die Erreichbarkeit pruefen. Sperrt
+        # das Netz die Pruefadresse, bekommt Phase 2 spaeter fuer diesen Host
+        # failed-Zeilen statt leerer ok. Nur fuer gedrosselte Netze, um Zeit zu sparen.
+        if throttle:
+            provider_block = probe_reachable_after_portscan(
+                ip, known_ports=nmap_result.get("open_ports") or None)
+            record_tool_run(order_id, ip, 1, "provider_block_probe",
+                            "ok" if not provider_block["blocked"] else "failed",
+                            reason=None if not provider_block["blocked"]
+                            else "netz_sperrt_pruefadresse_nach_portscan",
+                            exit_code=0, duration_ms=0,
+                            raw_output=json.dumps(provider_block))
+        # S6c/E9: Ports ohne Kennung mit -sV --version-all nachproben (HE 1000-1002,
+        # CA 8001, HL 8443). Nur wenn der Host nicht gerade gesperrt wurde.
+        if not (provider_block and provider_block.get("blocked")):
+            reprobe_ports = _unidentified_ports(nmap_result)
+            if reprobe_ports:
+                try:
+                    run_nmap_version_reprobe(ip, reprobe_ports, scan_dir, order_id)
+                except Exception as e:
+                    log.warning("nmap_versionall_failed", ip=ip, error=str(e))
     else:
         record_tool_run(order_id, ip, 1, "nmap", "skipped",
                         reason="not_in_package")
@@ -975,6 +1129,11 @@ def run_phase1(
             tech_profile["redirect_data"] = redirect_data  # type: ignore[possibly-undefined]
         except NameError:
             pass  # redirect_data not set if Playwright failed
+
+    # S6c/Q17: Drosselung und Sperrverdikt fuer Phase 2 mitgeben.
+    tech_profile["throttled"] = throttle
+    if provider_block is not None:
+        tech_profile["provider_block"] = provider_block
 
     log.info("phase1_complete", ip=ip, order_id=order_id)
     return tech_profile

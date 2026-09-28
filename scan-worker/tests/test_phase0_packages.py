@@ -42,6 +42,7 @@ class TestPhase0Packages:
         # DNS records should always be collected
         mock_dns.assert_called_once()
 
+    @patch("scanner.phase0.is_wildcard_dns", return_value=False)
     @patch("scanner.phase0.run_dnsx", return_value=[])
     @patch("scanner.phase0.collect_dns_records", return_value={"spf": None, "dmarc": None, "dkim": False, "mx": [], "ns": []})
     @patch("scanner.phase0.run_zone_transfer", return_value={"success": False, "data": {}})
@@ -50,7 +51,7 @@ class TestPhase0Packages:
     @patch("scanner.phase0.run_crtsh", return_value=["www.example.com"])
     def test_perimeter_runs_all_tools(
         self, mock_crtsh, mock_subfinder, mock_gobuster,
-        mock_zone, mock_dns, mock_dnsx, tmp_path
+        mock_zone, mock_dns, mock_dnsx, mock_wildcard, tmp_path
     ):
         from scanner.phase0 import run_phase0
         config = get_config("perimeter")

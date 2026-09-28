@@ -102,16 +102,19 @@ class TestPhase2Coverage:
             assert rows[0]["phase"] == 2
 
     def test_zap_daemon_unavailable_is_recorded(self, tmp_path):
-        """Der wichtigste Einzelfall: ZAP-Daemon nicht erreichbar."""
-        calls = self._run(
-            tmp_path,
-            {"phase2_tools": ["zap_spider", "zap_active", "headers"]},
-            zap_health=False,
-        )
+        """S6c/Q17 (spec/10 R4): ZAP unreachable bekommt einen zweiten Versuch und
+        ist danach failed (nicht bloss skipped), damit die Luecke als Ausfall im
+        Bericht steht."""
+        with patch("time.sleep", return_value=None):
+            calls = self._run(
+                tmp_path,
+                {"phase2_tools": ["zap_spider", "zap_active", "headers"]},
+                zap_health=False,
+            )
         rows = _rows_for(calls, "zap_spider")
         assert len(rows) == 1
-        assert rows[0]["status"] == "skipped"
-        assert rows[0]["reason"] == "zap_daemon_unavailable"
+        assert rows[0]["status"] == "failed"
+        assert rows[0]["reason"] == "zap_unreachable"
 
     def test_no_web_host_skips_zap_with_reason_no_web(self, tmp_path):
         calls = self._run(
