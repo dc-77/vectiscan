@@ -178,13 +178,28 @@ def should_parallelize_stage2(
     return True
 
 
+# S6c/Q17 (spec/09, spec/10 R3): testssl je TLS-Port, nicht nur 443 mit einer SNI.
+# STARTTLS-Ports brauchen `--starttls <proto>`, direkte TLS-Ports nicht. Port 25
+# bleibt bis E5 vom Pruefstand aus nicht pruefbar.
+TLS_PORTS_STARTTLS: dict[int, str] = {
+    21: "ftp", 25: "smtp", 110: "pop3", 143: "imap", 587: "smtp",
+}
+TLS_PORTS_DIRECT: frozenset[int] = frozenset({443, 465, 993, 995, 8443, 444, 10000})
+
+
 def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
                       severity: str = "MEDIUM", tool_name: str = "testssl",
-                      fast_mode: bool = False) -> Optional[list]:
+                      fast_mode: bool = False, port: int = 443,
+                      starttls: str = "") -> Optional[list]:
     """Run a single testssl pass. Returns parsed JSON list or None.
 
     `fast_mode=True` (WebCheck-Paket): nutzt `--fast` (skip schwere
     Cipher-Tests) — bei Schnellscans ausreichend.
+
+    S6c/Q17: ``port``/``starttls`` erlauben einen Lauf je TLS-Port. Der 443-Lauf
+    behaelt Dateinamen (testssl.json) und Werkzeugnamen (testssl); Zusatzports
+    tragen eigene (testssl_<port>), damit der report-worker sie nicht mit dem
+    443-Lauf verwechselt.
     """
     # S6c/Q16 (spec/09, spec/11 T7): an die Inventar-IP binden, damit testssl bei
     # DNS-Rotation die Inventaradresse misst und nicht eine rotierte (HE
@@ -222,9 +237,17 @@ def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
     # Omit --severity to get ALL entries (incl. OK/INFO) for TR-03116-4
     if severity:
         cmd.extend(["--severity", severity])
+    if starttls:
+        cmd.extend(["--starttls", starttls])
+    # Zielangabe: STARTTLS und Nicht-443-Ports als host:port, 443 wie bisher als
+    # https://host (unveraendert fuer den Bestandslauf).
+    if starttls or port != 443:
+        target = f"{fqdn}:{port}"
+    else:
+        target = f"https://{fqdn}"
     cmd.extend([
         "--nodns", "min",
-        f"https://{fqdn}",
+        target,
     ])
 
     exit_code, duration_ms = run_tool(
@@ -414,6 +437,142 @@ def _content_fqdn(tech_profile: dict[str, Any] | None, primary_fqdn: str) -> str
     if _reg(host) == _reg(primary_fqdn):
         return host
     return primary_fqdn
+
+
+def run_xmlrpc_probe(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
+    """S6c/7a (spec/11 T1): eigene Sonde auf /xmlrpc.php (POST system.listMethods).
+
+    wpscan meldet XML-RPC bei castenow nicht. Die Sonde belegt den Fakt
+    ``wordpress_xmlrpc`` unabhaengig von wpscan (Fixture DB aktiv und CA). Nur
+    Rohdaten-Export; der report-worker liest den Fakt spaeter. An die Inventar-IP
+    gebunden.
+    """
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+    output_path = f"{phase2_dir}/xmlrpc_probe.json"
+    url = f"https://{fqdn}/xmlrpc.php"
+    body = ("<?xml version=\"1.0\"?><methodCall>"
+            "<methodName>system.listMethods</methodName><params></params></methodCall>")
+    resolve = ["--resolve", f"{fqdn}:443:{ip}"] if ip and ":" not in ip else []
+    cmd = ["curl", "-sS", "-o", "-", "-w", "\n__VS_CODE__:%{http_code}",
+           "-X", "POST", "--max-time", "12", "--retry", "1",
+           *resolve, "-H", "Content-Type: text/xml",
+           "-A", "Mozilla/5.0 vectiscan", "--data", body, url]
+    out = ""
+    try:
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                text=True, start_new_session=True)
+        out, _ = proc.communicate(timeout=15)
+        out = out or ""
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError, NameError):
+            pass
+        record_tool_run(order_id, ip, 2, "wordpress_xmlrpc", "failed",
+                        reason="timeout", exit_code=-1, duration_ms=0)
+        return None
+    except Exception as e:
+        record_tool_run(order_id, ip, 2, "wordpress_xmlrpc", "failed",
+                        reason=str(e)[:120], exit_code=-2, duration_ms=0)
+        return None
+
+    status = 0
+    body_text = out
+    if "__VS_CODE__:" in out:
+        body_text, _, code = out.rpartition("__VS_CODE__:")
+        try:
+            status = int(code.strip())
+        except ValueError:
+            status = 0
+    low = body_text.lower()
+    # XML-RPC aktiv: methodResponse mit Methodenliste; "system.listmethods"
+    # taucht dann in der Antwort auf. faultCode 405/403 = abgeschaltet.
+    enabled = ("methodresponse" in low and "system." in low) or "wp.getusersblogs" in low
+    fault = "faultcode" in low
+    result = {
+        "fqdn": fqdn, "url": url, "status": status,
+        "xmlrpc_enabled": bool(enabled and not fault),
+        "fault": fault,
+        "evidence": body_text[:400],
+    }
+    try:
+        with open(output_path, "w") as f:
+            json.dump(result, f, indent=2)
+    except Exception:
+        pass
+    record_tool_run(order_id, ip, 2, "wordpress_xmlrpc", "ok",
+                    exit_code=0, duration_ms=0,
+                    raw_output=json.dumps(result, ensure_ascii=False))
+    return result
+
+
+def run_smtp_ehlo(fqdn: str, ip: str, port: int, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
+    """S6c/5 (spec/09): EHLO-Faehigkeiten vor STARTTLS je SMTP-Port als Rohdatum.
+
+    AUTH-Verfahren, VRFY und STARTTLS werden vor STARTTLS im Klartext angeboten.
+    nmap smtp-commands liefert das fuer als SMTP erkannte Ports schon; diese Sonde
+    deckt 465 (implizit TLS) und 587 (Klartext) ab, die nmap nicht immer als smtp
+    fuehrt. Port 25 bleibt bis E5 vom Pruefstand aus nicht pruefbar. Nur Rohdaten-
+    Export; Katalogregel folgt spaeter. An die Inventar-IP gebunden.
+    """
+    import socket as _socket
+    import ssl as _ssl
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+    target_ip = ip if ip else fqdn
+    lines: list[str] = []
+    try:
+        raw = _socket.create_connection((target_ip, port), timeout=10)
+        sock: Any = raw
+        if port == 465:
+            ctx = _ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = _ssl.CERT_NONE
+            sock = ctx.wrap_socket(raw, server_hostname=fqdn)
+        sock.settimeout(10)
+        sock.recv(1024)  # Begruessungsbanner
+        sock.sendall(f"EHLO vectiscan\r\n".encode())
+        data = b""
+        while b"\r\n" in data[-4:] or len(data) < 4:
+            chunk = sock.recv(4096)
+            if not chunk:
+                break
+            data += chunk
+            if len(data) > 8192:
+                break
+        text = data.decode("latin-1", errors="replace")
+        lines = [ln.strip() for ln in text.splitlines() if ln[:3].isdigit()]
+        try:
+            sock.sendall(b"QUIT\r\n")
+        except Exception:
+            pass
+        sock.close()
+    except Exception as e:
+        record_tool_run(order_id, ip, 2, f"smtp_ehlo_{port}", "failed",
+                        reason=str(e)[:120], exit_code=-2, duration_ms=0)
+        return None
+
+    caps = [ln[4:].strip().upper() for ln in lines if ln[:4] in ("250-", "250 ")]
+    auth = [c for c in caps if c.startswith("AUTH ") or c.startswith("AUTH=")]
+    result = {
+        "fqdn": fqdn, "port": port,
+        "capabilities": caps,
+        "starttls": any(c == "STARTTLS" for c in caps),
+        "vrfy": any(c == "VRFY" for c in caps),
+        "auth_before_starttls": bool(auth) and port != 465,
+        "auth_mechanisms": auth,
+        "evidence": "\n".join(lines[:20]),
+    }
+    try:
+        with open(f"{phase2_dir}/smtp_ehlo_{port}.json", "w") as f:
+            json.dump(result, f, indent=2)
+    except Exception:
+        pass
+    record_tool_run(order_id, ip, 2, f"smtp_ehlo_{port}", "ok",
+                    exit_code=0, duration_ms=0,
+                    raw_output=json.dumps(result, ensure_ascii=False))
+    return result
 
 
 def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str,
@@ -1629,6 +1788,37 @@ def run_phase2(
                 count = len(testssl_result)
                 publish_tool_output(order_id, "testssl", ip,
                                     f"{count} SSL/TLS checks completed")
+
+            # S6c/Q17 (spec/09, spec/10 R3): testssl je weiterem TLS-Port, nicht
+            # nur 443. STARTTLS-Ports mit --starttls; Port 25 bleibt bis E5 nicht
+            # pruefbar. Eigene Dateien/Werkzeugnamen (testssl_<port>), damit der
+            # report-worker sie nicht mit dem 443-Lauf verwechselt (Auflage c).
+            if not testssl_fast:
+                open_ports = [int(p) for p in (tech_profile.get("open_ports") or [])]
+                extra_ports = [p for p in open_ports
+                               if p != 443 and (p in TLS_PORTS_DIRECT or p in TLS_PORTS_STARTTLS)]
+                for p in sorted(set(extra_ports)):
+                    if p == 25:
+                        # E5: SMTP auf Port 25 vom Pruefstand aus nicht pruefbar.
+                        _record_phase2_status(order_id, ip, "testssl_25", "skipped",
+                                              "smtp_port25_not_testable_e5")
+                        continue
+                    starttls = TLS_PORTS_STARTTLS.get(p, "")
+                    out_path = f"{phase2_dir}/testssl_{p}.json"
+                    _run_testssl_once(primary_fqdn, ip, out_path, order_id,
+                                      severity=testssl_sev, tool_name=f"testssl_{p}",
+                                      port=p, starttls=starttls)
+
+                # S6c/Q17: testssl je VHost-SNI, wenn Zertifikate abweichen koennen
+                # (BS ftp traegt ein eigenes Zertifikat auf demselben IP:443).
+                # Cert-Grab (fast_mode) fuer bis zu zwei weitere VHosts; eigene
+                # Datei/Werkzeugnamen, damit der 443-Lauf eindeutig bleibt.
+                extra_vhosts = [v for v in (vhost_fqdns or []) if v and v != primary_fqdn][:2]
+                for vh in extra_vhosts:
+                    slug = vhost_slug(vh)
+                    _run_testssl_once(vh, ip, f"{phase2_dir}/testssl_sni_{slug}.json",
+                                      order_id, severity=testssl_sev,
+                                      tool_name=f"testssl_sni_{slug}", fast_mode=True)
         else:
             _record_phase2_status(order_id, ip, "testssl", "skipped",
                                   "no_ssl" if not has_ssl else "not_in_package")
@@ -1981,6 +2171,26 @@ def run_phase2(
             else:
                 sens_reason = "no_web"
             _record_phase2_status(order_id, ip, "ffuf_sensitive", "skipped", sens_reason)
+
+        # S6c/5 (spec/09): EHLO-Faehigkeiten vor STARTTLS je SMTP-Port als Rohdatum
+        # (465, 587; 25 bleibt bis E5 nicht pruefbar). Unabhaengig von has_web.
+        smtp_ports = [p for p in (tech_profile.get("open_ports") or []) if p in (465, 587)]
+        for sp in sorted(set(smtp_ports)):
+            try:
+                run_smtp_ehlo(target_fqdn, ip, sp, host_dir, order_id)
+            except Exception as e:
+                log.warning("smtp_ehlo_failed", ip=ip, port=sp, error=str(e))
+        if [p for p in (tech_profile.get("open_ports") or []) if p == 25]:
+            _record_phase2_status(order_id, ip, "smtp_ehlo_25", "skipped",
+                                  "smtp_port25_not_testable_e5")
+
+        # S6c/7a (spec/11 T1): XML-RPC-Sonde gegen WordPress (wpscan meldet es bei
+        # castenow nicht). An der Endadresse des Inhalts-VHosts.
+        if cms and cms.lower() == "wordpress" and has_web:
+            try:
+                run_xmlrpc_probe(target_fqdn, ip, host_dir, order_id)
+            except Exception as e:
+                log.warning("xmlrpc_probe_failed", ip=ip, error=str(e))
 
         # wpscan (conditional on WordPress) — use final URL after redirects
         if (phase2_tools is None or "wpscan" in phase2_tools) and cms and cms.lower() == "wordpress":
