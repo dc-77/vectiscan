@@ -186,11 +186,16 @@ def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
     `fast_mode=True` (WebCheck-Paket): nutzt `--fast` (skip schwere
     Cipher-Tests) — bei Schnellscans ausreichend.
     """
+    # S6c/Q16 (spec/09, spec/11 T7): an die Inventar-IP binden, damit testssl bei
+    # DNS-Rotation die Inventaradresse misst und nicht eine rotierte (HE
+    # 52.59.120.70 statt 18.197.248.23, CA .123 statt .120, HL .129 statt .65).
+    # SNI bleibt der fqdn. Ohne bekannte IP der alte Default "one".
+    ip_arg = ip if ip else "one"
     cmd = [
         "bash", "/opt/testssl.sh/testssl.sh",
         "--jsonfile", output_path,
         "--quiet",
-        "--ip", "one",
+        "--ip", ip_arg,
         "--warnings", "off",
         "--sneaky",
         "--hints",
@@ -388,6 +393,145 @@ def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str,
     return output_path
 
 
+# S6c/Q8 (spec/09, spec/10 R1): Header, die eine Sicherheitsabfrage der Plattform
+# belegen. Steht einer davon in irgendeiner Antwort, ist die Messung nicht
+# aussagekraeftig ("nicht pruefbar").
+_CHALLENGE_HEADERS = ("x-vercel-mitigated", "cf-mitigated")
+
+
+def _parse_header_blocks(raw: str) -> list[dict[str, Any]]:
+    """Zerlegt eine curl ``-D -``-Ausgabe (mit ``-L``) in Antwortbloecke.
+
+    Jeder Block beginnt mit der Statuszeile ``HTTP/x yyy``. Doppelte Header
+    werden je Block zu einer kommaverbundenen Zeichenkette zusammengefuehrt
+    (S6c/Q8, CA x-powered-by), NICHT ueberschrieben. Rueckgabe je Block:
+    ``{status, headers}``.
+    """
+    blocks: list[dict[str, Any]] = []
+    cur: Optional[dict[str, Any]] = None
+    for line in raw.splitlines():
+        s = line.rstrip("\r")
+        if s[:5].upper() == "HTTP/":
+            if cur is not None:
+                blocks.append(cur)
+            status = 0
+            parts = s.split(None, 2)
+            if len(parts) >= 2 and parts[1].isdigit():
+                status = int(parts[1])
+            cur = {"status": status, "headers": {}}
+            continue
+        if cur is None:
+            continue
+        if ":" in s:
+            key, _, value = s.partition(":")
+            key = key.strip().lower()
+            value = value.strip()
+            if not key:
+                continue
+            if key in cur["headers"]:
+                # Doppelter Header: zusammenfuehren statt ueberschreiben.
+                cur["headers"][key] = f"{cur['headers'][key]}, {value}"
+            else:
+                cur["headers"][key] = value
+    if cur is not None:
+        blocks.append(cur)
+    return blocks
+
+
+def _eval_redirects(url: str, ip: str = "") -> dict[str, Any]:
+    """S6c/Q8: folgt Weiterleitungen und bewertet die Endantwort.
+
+    Neues Feld ``redirect_eval`` neben den unveraenderten Bestandsfeldern
+    (Auflage c/d): der report-worker liest es erst in der Berichtsseiten-Session.
+    Enthaelt die erste Antwort (fuer HSTS), die Endantwort (Status, Header,
+    location, Laenge), die Statuskette und einen ``not_testable``-Marker mit
+    Grund bei 4xx, 429 oder Sicherheitsabfrage.
+    """
+    from urllib.parse import urlparse
+    fqdn = urlparse(url).hostname or ""
+    cmd = ["curl", "-sS", "-o", "/dev/null", "-D", "-", "-L",
+           "--max-time", "15", "--retry", "1",
+           "-A", "Mozilla/5.0 vectiscan"]
+    # S6c/Q16: an die Inventar-IP binden (DNS-Rotation), wenn bekannt.
+    if ip and ":" not in ip and fqdn:
+        cmd += ["--resolve", f"{fqdn}:443:{ip}", "--resolve", f"{fqdn}:80:{ip}"]
+    cmd += ["-w", "\n__VS_META__ code=%{http_code} url=%{url_effective} size=%{size_download}\n", url]
+
+    out = ""
+    try:
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                text=True, start_new_session=True)
+        out, _ = proc.communicate(timeout=20)
+        out = out or ""
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError, NameError):
+            pass
+        return {"reachable": False, "not_testable": True, "not_testable_reason": "timeout"}
+    except Exception:
+        return {"reachable": False, "not_testable": True, "not_testable_reason": "error"}
+
+    header_text = out
+    final_code = 0
+    final_url = url
+    size = 0
+    for meta_line in out.splitlines():
+        if meta_line.startswith("__VS_META__"):
+            header_text = out[: out.index(meta_line)]
+            for tok in meta_line.split():
+                if tok.startswith("code="):
+                    try:
+                        final_code = int(tok[5:])
+                    except ValueError:
+                        pass
+                elif tok.startswith("url="):
+                    final_url = tok[4:]
+                elif tok.startswith("size="):
+                    try:
+                        size = int(tok[5:])
+                    except ValueError:
+                        pass
+            break
+
+    blocks = _parse_header_blocks(header_text)
+    if not blocks:
+        return {"reachable": False, "not_testable": True, "not_testable_reason": "no_response"}
+
+    first = blocks[0]
+    final = blocks[-1]
+    hops = [b["status"] for b in blocks]
+    all_headers_lower_keys = {k for b in blocks for k in b["headers"]}
+    is_challenge = any(h in all_headers_lower_keys for h in _CHALLENGE_HEADERS)
+
+    not_testable = False
+    reason = None
+    if is_challenge:
+        not_testable, reason = True, "challenge"
+    elif final_code == 429:
+        not_testable, reason = True, "http_429"
+    elif 400 <= final_code < 500:
+        not_testable, reason = True, "http_4xx"
+    elif final_code == 0:
+        not_testable, reason = True, "no_response"
+
+    return {
+        "reachable": True,
+        "first": {"status": first["status"], "headers": first["headers"]},
+        "final": {
+            "status": final_code or final["status"],
+            "location": final.get("headers", {}).get("location"),
+            "url": final_url,
+            "content_length": final.get("headers", {}).get("content-length"),
+            "response_length": size,
+            "headers": final["headers"],
+        },
+        "hops": hops,
+        "not_testable": not_testable,
+        "not_testable_reason": reason,
+    }
+
+
 def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str,
                      filename: str | None = None) -> dict[str, Any]:
     """Check HTTP security headers using curl.
@@ -406,6 +550,12 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str,
     output_path = f"{phase2_dir}/{filename or 'headers.json'}"
     url = f"https://{fqdn}"
 
+    # S6c/Q16: an die Inventar-IP binden (DNS-Rotation), SNI bleibt der fqdn.
+    # Nur IPv4; IPv6-Adressen ohne Route sind ueber das Phase-2-Gate schon raus.
+    resolve_args: list[str] = []
+    if ip and ":" not in ip:
+        resolve_args = ["--resolve", f"{fqdn}:443:{ip}", "--resolve", f"{fqdn}:80:{ip}"]
+
     # Strategie: erst HEAD (billig). Wenn der Server Security-Header
     # nur bei GET liefert (manche Apache-Setups, viele SPA-Backends),
     # GET-Fallback. Header werden bei beiden ueber `-D -` gesammelt.
@@ -413,6 +563,7 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str,
         "curl", "-sI",
         "--max-time", "10",
         "--retry", "1",
+        *resolve_args,
         "-A", "Mozilla/5.0 vectiscan",
         url,
     ]
@@ -424,6 +575,7 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str,
         "--max-time", "10",
         "--retry", "1",
         "-L",             # follow redirects
+        *resolve_args,
         "-A", "Mozilla/5.0 vectiscan",
         url,
     ]
@@ -471,6 +623,9 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str,
             "score": None,
             "headers": {},
             "security_headers": {},
+            # S6c/Q8: neues Feld, Bestandsfelder unveraendert (Auflage c/d).
+            "redirect_eval": {"reachable": False, "not_testable": True,
+                              "not_testable_reason": "no_response"},
         }
         try:
             with open(output_path, "w") as f:
@@ -519,6 +674,10 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str,
         "headers": headers,
         "security_headers": security_headers,
         "score": score,
+        # S6c/Q8: Endantwort-Auswertung als neues Feld; die Bestandsfelder oben
+        # (headers/security_headers/score) bleiben unveraendert (Auflage c/d),
+        # der report-worker liest redirect_eval erst in der Berichtsseiten-Session.
+        "redirect_eval": _eval_redirects(url, ip),
     }
 
     # Save to disk
@@ -1074,6 +1233,24 @@ def run_phase2(
 
     # AI-adaptive skip list
     ai_skip = set(adaptive_config.get("skip_tools", [])) if adaptive_config else set()
+
+    # S6c/Q16 (spec/09, spec/11 T7): eine IPv6-Adresse ohne Route vom Pruefstand
+    # aus wird in Phase 2 gar nicht erst geprueft (kein Verzeichnis, keine leeren
+    # ok-Zeilen). Jedes Phase-2-Werkzeug failed mit Grund no_ipv6_route, damit die
+    # Luecke ehrlich ist (no_ipv6_route setzt phase1 schon fuer nmap).
+    if ":" in ip:
+        from scanner.phase1 import _ipv6_route_available
+        if not _ipv6_route_available(ip):
+            log.info("phase2_skipped_no_ipv6_route", ip=ip, order_id=order_id)
+            for _t in ("testssl", "zap_spider", "zap_active", "header_check",
+                       "httpx", "ffuf_param", "ffuf_sensitive", "feroxbuster",
+                       "wpscan", "zap"):
+                if phase2_tools is None or _t in (phase2_tools or []) or _t in (
+                        "zap", "zap_spider", "zap_active", "header_check", "httpx",
+                        "ffuf_param", "ffuf_sensitive"):
+                    _record_phase2_status(order_id, ip, _t, "failed", "no_ipv6_route")
+            return {"ip": ip, "fqdn": fqdns[0] if fqdns else ip,
+                    "tools_run": [], "no_ipv6_route": True}
 
     host_dir = f"{scan_dir}/hosts/{ip}"
     phase2_dir = f"{host_dir}/phase2"

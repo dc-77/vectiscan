@@ -396,6 +396,60 @@ def run_subfinder(domain: str, scan_dir: str, order_id: str) -> list[str]:
 GOBUSTER_DNS_WORDLIST_PATH = "/opt/wordlists/dns-merged-30k.txt"
 
 
+def _dns_label_resolves(fqdn: str) -> bool:
+    """Loest ein FQDN auf mindestens eine A/AAAA-Adresse auf?
+
+    Eigene Funktion, damit Tests die Aufloesung ohne echtes DNS ersetzen
+    koennen (Wildcard-Erkennung, S6c/Q1).
+    """
+    try:
+        socket.getaddrinfo(fqdn, None)
+        return True
+    except (OSError, UnicodeError):
+        return False
+
+
+def is_wildcard_dns(domain: str, probes: int = 3) -> bool:
+    """Antwortet die Zone auf zufaellige, nicht existierende Namen (Wildcard-DNS)?
+
+    S6c/Q1 (spec/09): dortmund-beach.com ist Wildcard — jeder Name loest auf,
+    also liefert gobuster_dns nur Rauschen. gobusters `--wildcard`-Filter greift
+    dort nicht zuverlaessig. Erkennungsregel: loesen mehrere zufaellige Labels
+    auf, ist die Zone Wildcard und gobuster_dns wird uebersprungen.
+    Bergersysteme.com dagegen loest zufaellige Labels NICHT auf (nur echte
+    Namen wie adfs, api, cloud) und bleibt damit ein regulaerer Lauf.
+    """
+    import uuid
+    hits = 0
+    for _ in range(max(1, probes)):
+        label = f"vs-wildcard-probe-{uuid.uuid4().hex[:12]}"
+        if _dns_label_resolves(f"{label}.{domain}"):
+            hits += 1
+    # Alle Proben muessen aufloesen; ein einzelner Zufallstreffer (etwa ein
+    # Catch-all-Redirector) reicht nicht.
+    return hits >= max(1, probes)
+
+
+def _found_not_in_inventory(dnsx_results: list[dict[str, Any]] | None,
+                            discovery_set: set[str],
+                            inventory: dict[str, Any]) -> list[str]:
+    """Namen, die die Discovery fand, dnsx aufloeste, die aber im Inventar fehlen.
+
+    S6c/Q1 (spec/09 R5). Eigene Funktion fuer den Test."""
+    resolved_names: set[str] = set()
+    for r in (dnsx_results or []):
+        raw = r.get("host") or ""
+        host_name = str(raw).split()[0].strip().rstrip(".").lower() if raw else ""
+        if host_name and (r.get("a") or r.get("aaaa")):
+            resolved_names.add(host_name)
+    in_inventory: set[str] = set()
+    for h in inventory.get("hosts", []):
+        in_inventory.update(f.lower() for f in (h.get("fqdns") or []))
+    for h in inventory.get("skipped_hosts", []):
+        in_inventory.update(f.lower() for f in (h.get("fqdns") or []))
+    return sorted(n for n in (resolved_names & discovery_set) if n not in in_inventory)
+
+
 def run_gobuster_dns(domain: str, scan_dir: str, order_id: str) -> list[str]:
     """Run gobuster DNS brute-force. Timeout 180s (3 Min).
 
@@ -403,6 +457,13 @@ def run_gobuster_dns(domain: str, scan_dir: str, order_id: str) -> list[str]:
     (`/opt/wordlists/dns-merged-30k.txt`), Threads 30 (statt 50) +
     Per-Query-Timeout 3s (statt 5s) als Compromise zwischen Speed und
     Customer-NS-Friendliness.
+
+    S6c/Q1: Wildcard-Zonen werden uebersprungen (nur Rauschen). Die
+    Ausgabezeilen haben das Format ``fqdn ip[,ip]``; hier wird nur das erste
+    Feld (der Name) uebernommen und an dnsx gegeben — frueher ging die ganze
+    Zeile durch und dnsx fragte ``"eset.lumbeck-wolter.de 85.22.176.108"`` als
+    einen Namen ab (NXDOMAIN). Die Teilausgabe eines Timeouts wird ebenso
+    geparst (die Datei steht auf der Platte, unabhaengig vom Exit-Code).
     """
     publish_event(order_id, {"type": "tool_starting", "tool": "gobuster_dns", "host": domain})
     output_path = os.path.join(scan_dir, "phase0", "gobuster_dns.txt")
@@ -438,21 +499,28 @@ def run_gobuster_dns(domain: str, scan_dir: str, order_id: str) -> list[str]:
     if exit_code not in (0,):
         log.warning("gobuster_dns_failed", exit_code=exit_code)
 
-    # Parse text output: "Found: sub.example.com" or just "sub.example.com"
+    # Parse text output. Zeilenformat (auch in der Timeout-Teilausgabe):
+    #   "fqdn ip[,ip]"      z.B. "eset.lumbeck-wolter.de 85.22.176.108"
+    #   "Found: fqdn ..."   (stdout-Praefix, im -o-File selten)
+    # Nur das erste Feld ist der Name; der Rest sind IPs und darf NICHT mit an
+    # dnsx gehen (S6c/Q1). Bei Timeout enthaelt die Datei die Teilausgabe
+    # zwischen den PARTIAL-OUTPUT-Markern von run_tool — die Markerzeilen
+    # (beginnen mit "TIMEOUT" bzw. "---") werden uebersprungen.
     try:
         if os.path.exists(output_path):
-            with open(output_path, "r") as f:
+            with open(output_path, "r", errors="replace") as f:
                 for line in f:
                     line = line.strip()
                     if not line:
                         continue
-                    # gobuster output: "Found: subdomain.example.com"
+                    if line.startswith("TIMEOUT") or line.startswith("---"):
+                        continue
                     if line.startswith("Found:"):
-                        host = line.split("Found:")[-1].strip().lower()
-                    else:
-                        host = line.strip().lower()
-                    if host:
-                        subdomains.append(host)
+                        line = line.split("Found:", 1)[-1].strip()
+                    # Erstes Feld = FQDN; Rest (IPs) verwerfen.
+                    name = line.split()[0].strip().rstrip(".").lower()
+                    if name and "." in name:
+                        subdomains.append(name)
             log.info("gobuster_dns_complete", subdomains_found=len(subdomains))
     except Exception as e:
         log.warning("gobuster_dns_parse_error", error=str(e))
@@ -1776,7 +1844,14 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
         # `-brute`-Doppelarbeit zu gobuster_dns). Wenn Configs `"amass"` noch
         # in `phase0b_tools` listen, wird der Eintrag stillschweigend ignoriert.
         if "gobuster_dns" in phase0_tools:
-            discovery_futures[pool.submit(run_gobuster_dns, domain, scan_dir, order_id)] = "gobuster_dns"
+            # S6c/Q1: Wildcard-Zonen (dortmund-beach.com) liefern nur Rauschen;
+            # gobuster_dns wird dann uebersprungen statt Muell zu erzeugen.
+            if is_wildcard_dns(domain):
+                log.info("gobuster_dns_skipped_wildcard", domain=domain)
+                record_tool_run(order_id, None, 0, "gobuster_dns", "skipped",
+                                reason="wildcard_dns")
+            else:
+                discovery_futures[pool.submit(run_gobuster_dns, domain, scan_dir, order_id)] = "gobuster_dns"
         # F-P0A-004 (Mai 2026): SecurityTrails-Doppelcall in Phase 0b entfernt.
         # Phase 0a ruft SecurityTrails bereits auf (parallel zu shodan/whois);
         # die Subdomains kommen ueber `seed_subdomains` (= passive_subdomains)
@@ -1911,6 +1986,13 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
             continue
         discovery_set.update(s for s in (subs or []) if s)
     discovery_added = sorted(discovery_set - snapshot_set)
+
+    # S6c/Q1 (spec/09 R5): Namen, die die Discovery gefunden hat UND die dnsx
+    # auf eine Adresse aufgeloest hat, die es aber nicht ins Inventar geschafft
+    # haben. `tools_with_zero_results` reicht nicht — der Parser-Bug lieferte
+    # aufgeloeste Namen, die dann still verschwanden.
+    found_not_in_inventory = _found_not_in_inventory(dnsx_results, discovery_set, inventory)
+
     discovery_health: dict[str, Any] = {
         "snapshot_seeded": snapshot_seeded,
         "snapshot_age_minutes": snapshot_age_min,
@@ -1926,8 +2008,32 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
             not tool_sources.get("crtsh")
             and not tool_sources.get("certspotter")
         ),
+        # S6c/Q1 (spec/09 R5): aufgeloeste, aber nicht ins Inventar
+        # uebernommene Namen.
+        "found_not_in_inventory": found_not_in_inventory,
     }
     inventory["discovery_health"] = discovery_health
+
+    # S6c/Q1: aufgeloeste Namen ohne Inventareintrag sind ein Discovery-Verlust
+    # (nicht bloss NXDOMAIN). Explizit warnen, damit der Bericht die Luecke
+    # ausweisen kann.
+    if found_not_in_inventory:
+        log.warning(
+            "phase0_found_not_in_inventory",
+            domain=domain,
+            names=found_not_in_inventory[:20],
+            count=len(found_not_in_inventory),
+        )
+        publish_event(order_id, {
+            "type": "phase0_discovery_warning",
+            "orderId": order_id,
+            "domain": domain,
+            "message": (
+                "Aufgeloeste Namen sind nicht ins Host-Inventar gelangt: "
+                + ", ".join(found_not_in_inventory[:10])
+            ),
+            "foundNotInInventory": found_not_in_inventory,
+        })
 
     # Wenn alle CT-Quellen leer waren UND wir keinen Snapshot-Seed haben,
     # warnen wir explizit — das ist verdaechtig (Domain hat normalerweise

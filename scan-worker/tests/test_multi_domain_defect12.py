@@ -218,6 +218,7 @@ def _run_phase0_with_extras(tmp_path, extras):
             patch("scanner.phase0.run_certspotter", return_value=[]), \
             patch("scanner.phase0.run_subfinder", return_value=[]), \
             patch("scanner.phase0.run_gobuster_dns", return_value=[]), \
+            patch("scanner.phase0.is_wildcard_dns", return_value=False), \
             patch("scanner.phase0.collect_dns_records",
                   return_value=dns_default) as mock_dns, \
             patch("scanner.phase0.run_zone_transfer",
