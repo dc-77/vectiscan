@@ -491,6 +491,11 @@ def build_passive_intel_for_ai(
     """Extract passive intelligence relevant for AI Host Strategy for a specific IP.
 
     Returns a compact dict suitable for inclusion in the AI prompt.
+
+    S6c/8 (spec/09): der Rohwert (auch "PostgreSQL 9.6.0 or later") geht bewusst
+    unveraendert in den KI-#1-Input; die S6a2-Prompt-Regel ("or later ist eine
+    Untergrenze, nicht veraltet") bleibt und verhindert die Fehldeutung. Der
+    JW-Fall "veraltete PostgreSQL 9.6" stammt aus einem Lauf vor S6a2.
     """
     intel: dict[str, Any] = {}
 

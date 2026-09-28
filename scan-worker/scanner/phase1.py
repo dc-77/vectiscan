@@ -174,39 +174,55 @@ def _extract_all_tech_signals(redirect_data: dict[str, Any]) -> list[dict[str, s
         tech_info = probe.get("tech_info") or {}
         headers = probe.get("response_headers") or {}
 
-        # 1. generator + powered_by + server (klassisch)
-        if tech_info.get("generator"):
-            _add(tech_info["generator"])
+        # S6c/N4 (spec/11 Teil 6): Die Seiten-Signale (generator, Cookies, Scripts,
+        # Body-Classes) stammen aus der ENDSEITE. Leitet der VHost auf einen anderen
+        # Host weiter (bergersysteme ftp -> Webflow-www), beschreiben sie das
+        # Weiterleitungsziel, nicht diesen Host. Dann nur die Kopfzeilen der ersten
+        # Antwort (server, x-powered-by) auswerten, die wirklich von diesem Host
+        # kommen. Sonst bekaeme der Plesk-Server die Webflow-Regel.
+        cross = bool(probe.get("is_cross_domain"))
+        final_host = _extract_final_host(probe)
+        if final_host and fqdn_key and final_host.lower() != str(fqdn_key).lower():
+            cross = True
+
+        # 1. server + powered_by aus der ersten Antwort (immer diesem Host).
         srv = headers.get("server", "")
         if srv:
             parts = srv.split("/", 1)
             _add(parts[0], parts[1] if len(parts) > 1 else "")
-        powered = headers.get("x-powered-by", "") or tech_info.get("powered_by", "")
+        powered = headers.get("x-powered-by", "")
         if powered:
             _add(powered)
 
-        # 2. Cookies (Framework / CMS)
-        cookies = (tech_info.get("cookies") or "").lower()
-        if cookies:
-            for pat, name in _COOKIE_PATTERNS:
-                if pat.lower() in cookies:
-                    _add(name)
+        if not cross:
+            # generator + powered_by (Seite)
+            if tech_info.get("generator"):
+                _add(tech_info["generator"])
+            if tech_info.get("powered_by"):
+                _add(tech_info["powered_by"])
 
-        # 3. Scripts (Framework / 3rd-Party)
-        for src in tech_info.get("scripts") or []:
-            src_l = (src or "").lower()
-            for pat, name in _SCRIPT_PATTERNS:
-                if pat in src_l:
-                    _add(name)
+            # 2. Cookies (Framework / CMS)
+            cookies = (tech_info.get("cookies") or "").lower()
+            if cookies:
+                for pat, name in _COOKIE_PATTERNS:
+                    if pat.lower() in cookies:
+                        _add(name)
 
-        # 4. Body-Classes (CMS)
-        body_classes = (tech_info.get("body_classes") or "").lower()
-        if body_classes:
-            for pat, name in _BODY_CLASS_PATTERNS:
-                if pat in body_classes:
-                    _add(name)
+            # 3. Scripts (Framework / 3rd-Party)
+            for src in tech_info.get("scripts") or []:
+                src_l = (src or "").lower()
+                for pat, name in _SCRIPT_PATTERNS:
+                    if pat in src_l:
+                        _add(name)
 
-        # 5. Header-Patterns (CDN / Hosting / CMS-Footprint)
+            # 4. Body-Classes (CMS)
+            body_classes = (tech_info.get("body_classes") or "").lower()
+            if body_classes:
+                for pat, name in _BODY_CLASS_PATTERNS:
+                    if pat in body_classes:
+                        _add(name)
+
+        # 5. Header-Patterns (CDN / Hosting / CMS-Footprint) aus der ersten Antwort.
         headers_l = {k.lower(): str(v).lower() for k, v in (headers or {}).items()}
         for h_name, h_val, name in _HEADER_PATTERNS:
             v = headers_l.get(h_name, "")
@@ -214,6 +230,18 @@ def _extract_all_tech_signals(redirect_data: dict[str, Any]) -> list[dict[str, s
                 _add(name)
 
     return tech_list
+
+
+def _extract_final_host(probe: dict[str, Any]) -> str:
+    """Hostname der Endadresse eines redirect_probe-Eintrags (S6c/N4)."""
+    from urllib.parse import urlparse
+    fu = probe.get("final_url") or ""
+    if fu:
+        try:
+            return urlparse(fu).hostname or ""
+        except Exception:
+            return ""
+    return str(probe.get("final_domain") or "")
 
 
 def _parse_nmap_xml(xml_path: str) -> dict[str, Any]:
