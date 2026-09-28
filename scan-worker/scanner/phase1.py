@@ -274,6 +274,23 @@ def _nmap_hosts_total(xml_path: str) -> Optional[int]:
     return int(total) if total and total.isdigit() else None
 
 
+def _nmap_hosts_up(xml_path: str) -> Optional[int]:
+    """`runstats/hosts/@up` aus dem nmap-XML, None wenn nicht lesbar.
+
+    S6c/Q17: ``up=0`` heisst, das Ziel hat den Portscan nicht beantwortet
+    ("keine Antwort"), nicht "kein offener Port" (HL 195.225.241.75; die vier
+    unerreichten BS-Hosts). Nur so unterscheidet der Bericht beides."""
+    try:
+        root = ET.parse(xml_path).getroot()
+    except Exception:
+        return None
+    hosts_el = root.find("./runstats/hosts")
+    if hosts_el is None:
+        return None
+    up = hosts_el.get("up")
+    return int(up) if up and up.isdigit() else None
+
+
 def _nmap_has_host(xml_path: str) -> bool:
     """Traegt das nmap-XML mindestens einen `<host>`-Block?
 
@@ -339,6 +356,12 @@ def _nmap_status_check(ip: str, xml_path: str):
             return "failed", reason
         if ":" in ip and not _nmap_has_host(xml_path) and not _ipv6_route_available(ip):
             return "failed", "no_ipv6_route"
+        # S6c/Q17: das Ziel war im Scanbereich (total>=1), hat aber nicht
+        # geantwortet (hosts up=0, kein Hostblock). Das ist "keine Antwort", nicht
+        # "kein offener Port" (HL 195.225.241.75, die vier unerreichten BS-Hosts).
+        up = _nmap_hosts_up(xml_path)
+        if up == 0 and not _nmap_has_host(xml_path):
+            return "failed", "nmap_no_response"
         return None
     return check
 

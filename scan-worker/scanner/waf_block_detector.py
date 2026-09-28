@@ -35,21 +35,24 @@ import structlog
 
 log = structlog.get_logger()
 
-# WAF-Body-Signaturen (case-insensitive Substring-Suche im ersten 500-Byte-Excerpt)
-_HARD_BLOCK_MARKERS = [
-    # CloudFlare
+# WAF-Body-Signaturen (case-insensitive Substring-Suche im ersten 500-Byte-Excerpt).
+#
+# S6c/Q17 (spec/09): "waf_body_marker" nur bei belegter Sperr- oder Challenge-Seite.
+# Frueher genuegte ein Markenname (etwa "akamai" oder "cf-ray") in einer ganz
+# normalen 200- oder 404-Antwort (bergersysteme 198.202.211.1). Die Marker sind
+# jetzt getrennt:
+#  - STRONG: eindeutige Sperr-/Challenge-Formulierungen. Sie belegen eine Sperre
+#    unabhaengig vom Statuscode.
+#  - WEAK: Markennamen und Header-Fragmente, die auch legitim im Inhalt stehen.
+#    Sie zaehlen nur zusammen mit einem Block-Statuscode (403/429/503).
+_STRONG_BLOCK_MARKERS = [
+    # CloudFlare Challenge
     "__cf_chl",
     "cf-mitigated",
     "just a moment",
     "checking your browser",
-    "cf-ray",  # alleine nicht hart, aber im Body deutet auf Challenge-Page
-    # Akamai
+    # Akamai/Imperva Incapsula
     "/_incapsula_resource",
-    "incapsula",
-    "akamai",
-    # Imperva
-    "imperva",
-    "_imperva_",
     # Sucuri
     "access-denied-sucuri",
     "sucuri website firewall",
@@ -59,6 +62,17 @@ _HARD_BLOCK_MARKERS = [
     # F5 BIG-IP ASM
     "the requested url was rejected",
 ]
+_WEAK_BLOCK_MARKERS = [
+    "cf-ray",
+    "incapsula",
+    "akamai",
+    "imperva",
+    "_imperva_",
+]
+# Rueckwaertskompatibel: die alte Gesamtliste bleibt als Name erhalten.
+_HARD_BLOCK_MARKERS = _STRONG_BLOCK_MARKERS + _WEAK_BLOCK_MARKERS
+# Statuscodes, die einen Block belegen (fuer die schwachen Marker).
+_BLOCK_STATUS = frozenset({403, 429, 503})
 
 # Zeitfenster fuer alle Counters
 _WINDOW_SECONDS = 60.0
@@ -120,16 +134,16 @@ class BlockDetector:
         excerpt_lower = (body_excerpt or "")[:500].lower()
         stats.events.append((now, effective_status, int(body_size or 0), excerpt_lower))
 
-        # Hard-Marker einmalig pruefen
+        # Hard-Marker einmalig pruefen. S6c/Q17: starke Marker belegen die Sperre
+        # allein; schwache (Markennamen) nur zusammen mit einem Block-Statuscode.
         if not stats.hard_marker_hit and excerpt_lower:
-            for marker in _HARD_BLOCK_MARKERS:
-                if marker in excerpt_lower:
-                    stats.hard_marker_hit = True
-                    log.warning(
-                        "waf_hard_marker_detected",
-                        host=host, marker=marker,
-                    )
-                    break
+            hit = next((m for m in _STRONG_BLOCK_MARKERS if m in excerpt_lower), None)
+            if hit is None and effective_status in _BLOCK_STATUS:
+                hit = next((m for m in _WEAK_BLOCK_MARKERS if m in excerpt_lower), None)
+            if hit is not None:
+                stats.hard_marker_hit = True
+                log.warning("waf_hard_marker_detected", host=host, marker=hit,
+                            status=effective_status)
 
     def is_blocked(self, host: str) -> tuple[bool, str]:
         """Prueft Heuristik. Returns (blocked, reason)."""

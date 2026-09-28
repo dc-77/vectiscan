@@ -684,6 +684,26 @@ class ZapClient:
         log.info("zap_alerts_retrieved", count=len(alerts), base_url=base_url[:60] if base_url else "all")
         return alerts
 
+    def message_status(self, message_id: str) -> Optional[int]:
+        """Statuscode der Antwort einer ZAP-Nachricht (S6c/N2, spec/11 Teil 6).
+
+        ZAP-Alerts tragen die ``messageId``; der Statuscode steckt in der
+        Antwortkopfzeile der Nachricht. Damit lassen sich Meldungen an
+        Abwehrseiten (HL online 429) und Nebenpfaden (robots.txt) zuordnen.
+        Best-effort: gibt None zurueck, wenn die Nachricht fehlt oder nicht
+        parsebar ist."""
+        try:
+            data = self._get("/JSON/core/view/message/", {"id": str(message_id)})
+        except ZapError:
+            return None
+        msg = data.get("message") if isinstance(data, dict) else None
+        header = (msg or {}).get("responseHeader", "") if isinstance(msg, dict) else ""
+        first = header.split("\n", 1)[0].strip() if header else ""
+        parts = first.split()
+        if len(parts) >= 2 and parts[1].isdigit():
+            return int(parts[1])
+        return None
+
     # ------------------------------------------------------------------
     # Generic Polling
     # ------------------------------------------------------------------
