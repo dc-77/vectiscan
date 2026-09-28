@@ -1532,6 +1532,19 @@ def run_phase2(
             return {"ip": ip, "fqdn": fqdns[0] if fqdns else ip,
                     "tools_run": [], "no_ipv6_route": True}
 
+    # S6c/Q17 (spec/09, DC c): sperrt das Zielnetz die Pruefadresse nach dem
+    # Portscan (Hetzner), bekommt jedes Phase-2-Werkzeug failed mit klarem Grund
+    # statt eines leeren ok. Das Verdikt kommt aus phase1 (provider_block).
+    pblock = tech_profile.get("provider_block") if isinstance(tech_profile, dict) else None
+    if isinstance(pblock, dict) and pblock.get("blocked"):
+        log.info("phase2_skipped_provider_block", ip=ip, order_id=order_id)
+        for _t in ("testssl", "zap_spider", "zap_active", "header_check", "httpx",
+                   "ffuf_param", "ffuf_sensitive", "feroxbuster", "wpscan", "zap"):
+            _record_phase2_status(order_id, ip, _t, "failed",
+                                  "Zielnetz sperrt die Pruefadresse nach dem Portscan")
+        return {"ip": ip, "fqdn": fqdns[0] if fqdns else ip,
+                "tools_run": [], "provider_blocked": True}
+
     host_dir = f"{scan_dir}/hosts/{ip}"
     phase2_dir = f"{host_dir}/phase2"
     os.makedirs(phase2_dir, exist_ok=True)

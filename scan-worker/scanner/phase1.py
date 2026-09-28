@@ -394,10 +394,43 @@ def _nmap_status_check(ip: str, xml_path: str):
     return check
 
 
-def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-ports 1000") -> dict[str, Any]:
+def _nmap_default_rate_flags() -> list[str]:
+    """Rate-/Reliability-Flags fuer den Regelfall (unveraendert zum Bestand)."""
+    return [
+        # `--max-retries 2` reduziert default 10 → 2.
+        "--max-retries", "2",
+        # `--host-timeout` haerter als run_tool-Timeout, damit nmap selbst
+        # kontrolliert abbricht statt SIGKILL ohne Output.
+        "--host-timeout", "240s",
+        # `--min-rate 100` garantiert Mindest-Paket-Rate auf gefilterten Hosts.
+        "--min-rate", "100",
+        # `--defeat-rst-ratelimit` umgeht RST-Throttling vieler Firewalls.
+        "--defeat-rst-ratelimit",
+    ]
+
+
+def _nmap_throttle_flags() -> list[str]:
+    """S6c/Q17: gedrosselte Flags fuer sperrende Netze (Hetzner). Kein --min-rate,
+    kein --defeat-rst-ratelimit; --max-rate deckelt, --max-retries 1, laengeres
+    Host-Timeout (~10 Min)."""
+    from scanner.net_throttle import throttle_max_rate, throttle_max_retries
+    return [
+        "--max-retries", str(throttle_max_retries()),
+        "--host-timeout", "600s",
+        "--max-rate", str(throttle_max_rate()),
+    ]
+
+
+def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-ports 1000",
+             throttle: bool = False) -> dict[str, Any]:
     """Run nmap service/version scan against a host.
 
     Returns parsed results dict with open ports and services.
+
+    S6c/Q17: ``throttle=True`` fuer Netze, die nach dem Portscan sperren
+    (Hetzner/your-server.de). Dann ueber ``--max-rate`` und ``--max-retries 1``
+    gedrosselt (nicht ``-T2``), damit der volle Portscan je Host bei etwa zehn
+    Minuten bleibt und die Sperre spaeter auftritt.
     """
     host_dir = f"{scan_dir}/hosts/{ip}"
     phase1_dir = f"{host_dir}/phase1"
@@ -436,23 +469,11 @@ def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-por
         "-sC",
         "--script-timeout", "60s",
         # ── Performance / Reliability ─────────────────────────────────
+        # -T4 bleibt (nicht -T2/-T1); bei gedrosselten Netzen begrenzt --max-rate
+        # die Paketrate.
         "-T4",
-        # `--max-retries 2` reduziert default 10 → 2; verhindert dass
-        # gefilterte Ports den Scan auf Minuten ziehen. Mit `-T4` ohnehin
-        # schon aggressiv.
-        "--max-retries", "2",
-        # `--host-timeout` haerter als run_tool-Timeout (300s), damit
-        # nmap selbst kontrolliert abbricht und einen partial-XML schreibt
-        # statt SIGKILL ohne Output.
-        "--host-timeout", "240s",
-        # `--min-rate 100` garantiert Mindest-Paket-Rate; auf gefilterten
-        # Hosts (das was du gepostet hast: "997 filtered tcp ports
-        # no-response") laeuft sonst der Scan fast leer.
-        "--min-rate", "100",
-        # `--defeat-rst-ratelimit` umgeht RST-Throttling vieler Firewalls
-        # (Cisco/Fortinet) → mehr offene Ports detektiert.
-        "--defeat-rst-ratelimit",
-        # ── Ports ──────────────────────────────────────────────────────
+        # ── Ports und Rate ─────────────────────────────────────────────
+        *(_nmap_throttle_flags() if throttle else _nmap_default_rate_flags()),
         *nmap_port_args,
         # ── Output ─────────────────────────────────────────────────────
         "--open",  # nur offene Ports im NORMAL-Output (XML hat alles)
@@ -466,7 +487,9 @@ def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-por
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=300,
+        # Gedrosselte Hosts brauchen laenger (Host-Timeout 600s); der Wrapper
+        # muss darueber liegen, damit nmap selbst abbricht.
+        timeout=660 if throttle else 300,
         output_path=xml_path,
         order_id=order_id,
         host_ip=ip,
@@ -867,12 +890,37 @@ def run_phase1(
 
     phase1_tools = (config or {}).get("phase1_tools", ["nmap", "webtech", "wafw00f", "cms_fingerprint"])
 
+    # S6c/Q17: Netze, die nach dem Portscan sperren (Hetzner/your-server.de),
+    # werden gedrosselt gescannt. isp/rdns aus dem Web-Probe/Inventar, sonst loest
+    # der Throttle-Check rDNS selbst auf.
+    from scanner.net_throttle import (is_throttled_host,
+                                      probe_reachable_after_portscan)
+    host_isp = ""
+    host_rdns = ""
+    if isinstance(web_probe, dict):
+        host_isp = str(web_probe.get("isp") or "")
+        host_rdns = str(web_probe.get("rdns") or web_probe.get("reverse") or "")
+    throttle = is_throttled_host(ip, rdns=host_rdns, isp=host_isp)
+
+    provider_block: Optional[dict[str, Any]] = None
     # Run nmap — A7: explizit gegated, damit ein Paket ohne nmap eine
     # skipped-Zeile hinterlaesst statt den Scan stumm trotzdem zu fahren.
     if "nmap" in phase1_tools:
         publish_event(order_id, {"type": "tool_starting", "tool": "nmap", "host": ip})
-        nmap_result = run_nmap(ip, scan_dir, order_id, nmap_ports)
+        nmap_result = run_nmap(ip, scan_dir, order_id, nmap_ports, throttle=throttle)
         progress_callback(order_id, "nmap", "complete")
+        # S6c/Q17 (DC c): nach dem vollen Portscan die Erreichbarkeit pruefen. Sperrt
+        # das Netz die Pruefadresse, bekommt Phase 2 spaeter fuer diesen Host
+        # failed-Zeilen statt leerer ok. Nur fuer gedrosselte Netze, um Zeit zu sparen.
+        if throttle:
+            provider_block = probe_reachable_after_portscan(
+                ip, known_ports=nmap_result.get("open_ports") or None)
+            record_tool_run(order_id, ip, 1, "provider_block_probe",
+                            "ok" if not provider_block["blocked"] else "failed",
+                            reason=None if not provider_block["blocked"]
+                            else "netz_sperrt_pruefadresse_nach_portscan",
+                            exit_code=0, duration_ms=0,
+                            raw_output=json.dumps(provider_block))
     else:
         record_tool_run(order_id, ip, 1, "nmap", "skipped",
                         reason="not_in_package")
@@ -1026,6 +1074,11 @@ def run_phase1(
             tech_profile["redirect_data"] = redirect_data  # type: ignore[possibly-undefined]
         except NameError:
             pass  # redirect_data not set if Playwright failed
+
+    # S6c/Q17: Drosselung und Sperrverdikt fuer Phase 2 mitgeben.
+    tech_profile["throttled"] = throttle
+    if provider_block is not None:
+        tech_profile["provider_block"] = provider_block
 
     log.info("phase1_complete", ip=ip, order_id=order_id)
     return tech_profile
