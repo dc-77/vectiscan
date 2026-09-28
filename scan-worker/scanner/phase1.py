@@ -280,6 +280,10 @@ def _parse_nmap_xml(xml_path: str) -> dict[str, Any]:
                     service_info["product"] = service_elem.get("product", "")
                     service_info["version"] = service_elem.get("version", "")
                     service_info["extrainfo"] = service_elem.get("extrainfo", "")
+                    # S6c/E9: method="table" = aus der Portnamen-Tabelle geraten
+                    # (der "?"-Fall), nicht aus einer Probe. conf = Konfidenz 0..10.
+                    service_info["method"] = service_elem.get("method", "")
+                    service_info["conf"] = service_elem.get("conf", "")
 
                 result["services"].append(service_info)
 
@@ -392,6 +396,48 @@ def _nmap_status_check(ip: str, xml_path: str):
             return "failed", "nmap_no_response"
         return None
     return check
+
+
+def _unidentified_ports(nmap_result: dict[str, Any]) -> list[int]:
+    """Offene Ports ohne belegte Kennung (der "?"-Fall, S6c/E9).
+
+    nmap hat den Dienst aus der Portnamen-Tabelle geraten (method="table") oder
+    gar keinen Namen/kein Produkt gefunden (HE 1000-1002, CA 8001, HL 8443)."""
+    out: list[int] = []
+    for svc in (nmap_result.get("services") or []):
+        product = (svc.get("product") or "").strip()
+        method = (svc.get("method") or "").strip().lower()
+        if not product and method != "probed":
+            try:
+                out.append(int(svc.get("port")))
+            except (TypeError, ValueError):
+                continue
+    return sorted(set(out))
+
+
+def run_nmap_version_reprobe(ip: str, ports: list[int], scan_dir: str,
+                            order_id: str) -> None:
+    """S6c/E9 (spec/09 Teil 4, spec/11 T1): Ports ohne Kennung mit
+    ``-sV --version-all`` nachproben. Nur Rohdaten-Export (eigene Datei/Zeile);
+    der report-worker liest sie spaeter."""
+    if not ports:
+        return
+    phase1_dir = f"{scan_dir}/hosts/{ip}/phase1"
+    os.makedirs(phase1_dir, exist_ok=True)
+    xml_path = f"{phase1_dir}/nmap_versionall.xml"
+    port_arg = ",".join(str(p) for p in ports)
+    cmd = [
+        "nmap",
+        *(["-6"] if ":" in ip else []),
+        "-Pn", "-n", "-sV",
+        "--version-all", "--version-intensity", "9",
+        "--host-timeout", "180s",
+        "-p", port_arg,
+        "-oX", xml_path,
+        ip,
+    ]
+    run_tool(cmd=cmd, timeout=240, output_path=xml_path, order_id=order_id,
+             host_ip=ip, phase=1, tool_name="nmap_versionall")
 
 
 def _nmap_default_rate_flags() -> list[str]:
@@ -921,6 +967,15 @@ def run_phase1(
                             else "netz_sperrt_pruefadresse_nach_portscan",
                             exit_code=0, duration_ms=0,
                             raw_output=json.dumps(provider_block))
+        # S6c/E9: Ports ohne Kennung mit -sV --version-all nachproben (HE 1000-1002,
+        # CA 8001, HL 8443). Nur wenn der Host nicht gerade gesperrt wurde.
+        if not (provider_block and provider_block.get("blocked")):
+            reprobe_ports = _unidentified_ports(nmap_result)
+            if reprobe_ports:
+                try:
+                    run_nmap_version_reprobe(ip, reprobe_ports, scan_dir, order_id)
+                except Exception as e:
+                    log.warning("nmap_versionall_failed", ip=ip, error=str(e))
     else:
         record_tool_run(order_id, ip, 1, "nmap", "skipped",
                         reason="not_in_package")

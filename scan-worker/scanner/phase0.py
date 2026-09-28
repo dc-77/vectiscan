@@ -173,7 +173,8 @@ def _classify_dangling_cname(cname_target: str) -> tuple[str, str]:
     return "low", f"Verwaister DNS-Eintrag (Ziel: {cname_target})"
 
 
-def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
+def run_crtsh(domain: str, scan_dir: str, order_id: str,
+              filename: str | None = None) -> list[str]:
     """Query crt.sh for certificate transparency subdomains. Timeout 60s.
 
     Mit 3-Stufen-Self-Retry: crt.sh ist berüchtigt instabil (HTTP 502 / leere
@@ -186,8 +187,11 @@ def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
     (run_certificate_transparency) ruft dann certspotter als Fallback.
     """
     publish_event(order_id, {"type": "tool_starting", "tool": "crtsh", "host": domain})
-    output_path = os.path.join(scan_dir, "phase0", "crtsh_raw.json")
-    parsed_path = os.path.join(scan_dir, "phase0", "crtsh.json")
+    # S6c: eigene Dateinamen je Zieldomain, damit die Zusatzdomain die Datei des
+    # Primaerziels nicht ueberschreibt.
+    stem = filename[:-5] if filename and filename.endswith(".json") else None
+    output_path = os.path.join(scan_dir, "phase0", f"{stem}_raw.json" if stem else "crtsh_raw.json")
+    parsed_path = os.path.join(scan_dir, "phase0", filename or "crtsh.json")
     subdomains: list[str] = []
 
     # 3-Stufen-Self-Retry mit exponentiellem Backoff. Erfolg = JSON parsbar
@@ -307,10 +311,15 @@ def run_certspotter(domain: str, scan_dir: str, order_id: str) -> list[str]:
     return subdomains
 
 
-def run_subfinder(domain: str, scan_dir: str, order_id: str) -> list[str]:
-    """Run subfinder for passive subdomain enumeration. Timeout 120s."""
+def run_subfinder(domain: str, scan_dir: str, order_id: str,
+                  filename: str | None = None) -> list[str]:
+    """Run subfinder for passive subdomain enumeration. Timeout 120s.
+
+    S6c: ``filename`` gibt der Ablage je Zieldomain einen eigenen Namen, damit die
+    Hostsuche einer Zusatzdomain (junkerwerk.hu) die Datei des Primaerziels nicht
+    ueberschreibt."""
     publish_event(order_id, {"type": "tool_starting", "tool": "subfinder", "host": domain})
-    output_path = os.path.join(scan_dir, "phase0", "subfinder.json")
+    output_path = os.path.join(scan_dir, "phase0", filename or "subfinder.json")
     subdomains: list[str] = []
 
     # F-P0B-002 (Mai 2026): `-all` durch explizite `-sources`-Liste mit
@@ -528,11 +537,22 @@ def run_gobuster_dns(domain: str, scan_dir: str, order_id: str) -> list[str]:
     return subdomains
 
 
+def _write_zone_transfer_file(output_path: str, text: str) -> None:
+    """Schreibt die AXFR-Rohausgabe je Domain (S6c/7b), auch bei "kein Lauf"."""
+    try:
+        with open(output_path, "w") as f:
+            f.write(text)
+    except Exception as e:
+        log.warning("zone_transfer_save_error", error=str(e))
+
+
 def run_zone_transfer(domain: str, scan_dir: str, order_id: str,
                       filename: str | None = None) -> dict[str, Any]:
     """Attempt DNS zone transfer via AXFR. Timeout 30s per NS.
 
     Issue #12: `filename` haelt die Ausgabe je Domain auseinander.
+    S6c/7b: es wird immer eine Rohdatei je Domain geschrieben, auch wenn kein
+    Transfer lief (junkerwerk.hu), damit der Bericht einen Fakt hat.
     """
     publish_event(order_id, {"type": "tool_starting", "tool": "axfr", "host": domain})
     output_path = os.path.join(scan_dir, "phase0", filename or "zone_transfer.txt")
@@ -556,10 +576,15 @@ def run_zone_transfer(domain: str, scan_dir: str, order_id: str,
         ]
     except Exception as e:
         log.warning("zone_transfer_ns_lookup_failed", error=str(e))
+        # S6c/7b: auch bei fehlgeschlagener NS-Suche eine Rohdatei je Domain
+        # schreiben, damit der Zonentransfer-Satz im Bericht einen Fakt hat (kein
+        # stiller "kein Lauf" wie bei junkerwerk.hu).
+        _write_zone_transfer_file(output_path, f"=== {domain}: NS-Suche fehlgeschlagen: {e} ===\n")
         return result_data
 
     if not nameservers:
         log.info("zone_transfer_no_ns", domain=domain)
+        _write_zone_transfer_file(output_path, f"=== {domain}: keine Nameserver ermittelt ===\n")
         return result_data
 
     log.info("zone_transfer_attempting", nameservers=nameservers)
@@ -1876,6 +1901,21 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
                 discovery_futures[pool.submit(
                     run_zone_transfer, extra, scan_dir, order_id,
                     filename=f"zone_transfer_{slug}.txt")] = f"axfr:{extra}"
+            # S6c/Q16, 7b (spec/09, spec/11): Hostsuche je Zieldomain, damit
+            # junkerwerk.hu eigene Hosts bekommt (nicht nur DNS-/Mail-Eintraege).
+            # Die gefundenen Namen fliessen in all_subdomains und werden vom einen
+            # dnsx-Lauf aufgeloest; merge_and_group bildet daraus Hosts der Domain.
+            # Das Etikett "enum:<domain>" unterscheidet sie vom Primaerziel.
+            all_subdomains.append(extra)
+            if "crtsh" in phase0_tools:
+                discovery_futures[pool.submit(run_crtsh, extra, scan_dir, order_id,
+                                              filename=f"crtsh_{slug}.json")] = f"enum:{extra}"
+            if "subfinder" in phase0_tools:
+                discovery_futures[pool.submit(run_subfinder, extra, scan_dir, order_id,
+                                              filename=f"subfinder_{slug}.json")] = f"enum:{extra}"
+            if "gobuster_dns" in phase0_tools and not is_wildcard_dns(extra):
+                discovery_futures[pool.submit(run_gobuster_dns, extra, scan_dir,
+                                              order_id)] = f"enum:{extra}"
 
         for future in as_completed(discovery_futures, timeout=_time_remaining()):
             tool_name = discovery_futures[future]
@@ -1887,6 +1927,16 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
                 elif tool_name == "dns_records":
                     dns_records = result
                     log.info("phase0_dns_records_done")
+                elif tool_name.startswith("enum:"):
+                    # S6c: Hostsuche einer Zusatzdomain (junkerwerk.hu). Die Namen
+                    # fliessen in all_subdomains und werden vom einen dnsx-Lauf
+                    # aufgeloest; merge_and_group bildet daraus Hosts der Domain.
+                    subs = result if isinstance(result, list) else []
+                    all_subdomains.extend(subs)
+                    src_key = "enum_" + tool_name.split(":", 1)[1]
+                    tool_sources.setdefault(src_key, [])
+                    tool_sources[src_key].extend(subs)
+                    log.info("phase0_extra_domain_enum_done", tool=tool_name, found=len(subs))
                 elif ":" in tool_name:
                     # Zusatzdomain (Issue #12): Datei und Zeile sind geschrieben,
                     # das Primaerinventar bleibt unberuehrt.

@@ -74,3 +74,32 @@ def test_nmap_offener_port_ist_ok(tmp_path: Path) -> None:
     xml.write_text(_XML_OPEN_PORT)
     check = phase1._nmap_status_check("195.225.241.75", str(xml))
     assert check(0, "") is None
+
+
+# ---- E9: -sV --version-all Nachprobe fuer ?-Ports -----------------------
+
+def test_unidentified_ports_erkennt_table_methode() -> None:
+    nmap_result = {"services": [
+        {"port": 443, "product": "nginx", "method": "probed"},
+        {"port": 8443, "product": "", "method": "table"},   # ?-Port
+        {"port": 1000, "product": "", "method": "table"},   # ?-Port
+        {"port": 22, "product": "OpenSSH", "method": "probed"},
+    ]}
+    assert phase1._unidentified_ports(nmap_result) == [1000, 8443]
+
+
+def test_version_reprobe_baut_kommando(tmp_path: Path) -> None:
+    captured = {}
+
+    def fake_run_tool(cmd, **kw):
+        captured["cmd"] = cmd
+        captured["tool_name"] = kw.get("tool_name")
+        return (0, 100)
+
+    with patch.object(phase1, "run_tool", side_effect=fake_run_tool):
+        phase1.run_nmap_version_reprobe("195.50.179.4", [8001], str(tmp_path), "o")
+    cmd = captured["cmd"]
+    assert "--version-all" in cmd
+    assert "-sV" in cmd
+    assert cmd[cmd.index("-p") + 1] == "8001"
+    assert captured["tool_name"] == "nmap_versionall"
