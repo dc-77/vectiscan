@@ -52,9 +52,12 @@ offener Port"), wafw00f Timeout; waf_body_marker nur bei belegter Sperr- oder Ch
 vor dem vollen Portscan oder Portscan mit niedrigerer Rate für your-server.de-Netze, Ergebnis messen;
 Ports ohne Kennung mit -sV --version-all nachproben (HE 1000 bis 1002, CA 8001, HL 8443).
 (5) SMTP-Fakt: je SMTP-Port (25, 465, 587) die EHLO-Fähigkeiten vor STARTTLS (AUTH-Verfahren, VRFY,
-STARTTLS) als Fakt aus nmap smtp-commands oder eigener Sonde; danach Katalogregel
-smtp_auth_before_starttls (Fixture DB 587, BS 25 laut Shodan) und Fakt für smtp_vrfy_enabled; Port 25
-bleibt bis E5 vom Prüfstand aus nicht prüfbar, die E5-Einschränkung bleibt.
+STARTTLS) als Rohdatum aus nmap smtp-commands oder eigener Sonde, mit Fixture DB 587 und BS 25 laut
+Shodan. Nur Scanner: die Katalogregel smtp_auth_before_starttls und der Fakt smtp_vrfy_enabled sowie der
+Konsum aller neuen Rohfelder (RDAP netblock_owner, testssl je Port und je SNI, Kennungen je Port,
+ZAP-Konfidenz, Endantwort-Header, XML-RPC) gehören in die Berichtsseiten-Session nach spec/12, nicht in
+S6c (report-worker unverändert grün). Bis dahin bleibt die unprocessed-Art smtp_auth_before_starttls.
+Port 25 bleibt bis E5 vom Prüfstand aus nicht prüfbar, die E5-Einschränkung bleibt.
 (6) ZAP: Konfidenz und Risiko je Meldung in die Rohausgabe und in die Fakten, top_alerts nicht auf 20
 kürzen (Konfidenzfilter Q14 ist sonst nicht prüfbar); AJAX-Spider je Instanz serialisieren oder
 scan_in_progress einmal nachfassen (#27); Cookie-Meldungen an Login-Seiten mit URL.
