@@ -1060,6 +1060,9 @@ ops-export-golden-tars:
           - "68d59573-7a93-4efa-89cc-e7b10cc4d140"
           - "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52"
           - "2e56abe1-c1a6-442e-b36a-dc9f83c81da8"
+          - "4394b0b7-5dc6-4e01-b700-2a4052a7bd4a"
+          - "f9a2a2f6-a97f-47bf-9d7f-9afb3869f97c"
+          - "cd28d260-cf49-4d17-a980-64a4b1951444"
   artifacts:
     when: always
     expire_in: 7 days

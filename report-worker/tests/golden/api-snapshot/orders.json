@@ -3,6 +3,108 @@
   "orders": [
    {
     "businessImpactScore": null,
+    "createdAt": "2026-09-28T17:09:22.944Z",
+    "currentHost": null,
+    "currentTool": null,
+    "domain": "castenow.de",
+    "email": "redacted@example.invalid",
+    "error": null,
+    "finishedAt": "2026-09-28T18:17:15.762Z",
+    "hasReport": true,
+    "hostsCompleted": 7,
+    "hostsTotal": 7,
+    "id": "cd28d260-cf49-4d17-a980-64a4b1951444",
+    "isRescan": false,
+    "overallRisk": "MITTEL",
+    "package": "perimeter",
+    "severityCounts": {
+     "CRITICAL": 0,
+     "HIGH": 3,
+     "INFO": 0,
+     "LOW": 10,
+     "MEDIUM": 6
+    },
+    "startedAt": "2026-09-28T17:09:40.064Z",
+    "status": "pending_review",
+    "subscriptionId": null,
+    "targetCount": 1,
+    "targets": [
+     {
+      "canonical": "castenow.de"
+     }
+    ]
+   },
+   {
+    "businessImpactScore": null,
+    "createdAt": "2026-09-28T16:08:45.054Z",
+    "currentHost": null,
+    "currentTool": null,
+    "domain": "multi-target (2)",
+    "email": "redacted@example.invalid",
+    "error": null,
+    "finishedAt": "2026-09-28T16:51:47.767Z",
+    "hasReport": true,
+    "hostsCompleted": 5,
+    "hostsTotal": 5,
+    "id": "f9a2a2f6-a97f-47bf-9d7f-9afb3869f97c",
+    "isRescan": false,
+    "overallRisk": "HOCH",
+    "package": "perimeter",
+    "severityCounts": {
+     "CRITICAL": 1,
+     "HIGH": 4,
+     "INFO": 0,
+     "LOW": 7,
+     "MEDIUM": 4
+    },
+    "startedAt": "2026-09-28T16:09:02.895Z",
+    "status": "pending_review",
+    "subscriptionId": null,
+    "targetCount": 2,
+    "targets": [
+     {
+      "canonical": "junkerwerk.de"
+     },
+     {
+      "canonical": "junkerwerk.hu"
+     }
+    ]
+   },
+   {
+    "businessImpactScore": null,
+    "createdAt": "2026-09-28T14:48:02.494Z",
+    "currentHost": null,
+    "currentTool": null,
+    "domain": "dortmund-beach.com",
+    "email": "redacted@example.invalid",
+    "error": null,
+    "finishedAt": "2026-09-28T15:24:38.994Z",
+    "hasReport": true,
+    "hostsCompleted": 1,
+    "hostsTotal": 1,
+    "id": "4394b0b7-5dc6-4e01-b700-2a4052a7bd4a",
+    "isRescan": false,
+    "overallRisk": "HOCH",
+    "package": "perimeter",
+    "severityCounts": {
+     "CRITICAL": 1,
+     "HIGH": 3,
+     "INFO": 0,
+     "LOW": 8,
+     "MEDIUM": 2
+    },
+    "startedAt": "2026-09-28T14:48:38.222Z",
+    "status": "pending_review",
+    "subscriptionId": null,
+    "targetCount": 1,
+    "targets": [
+     {
+      "canonical": "dortmund-beach.com"
+     }
+    ]
+   },
+   {
+    "businessImpactScore": null,
     "createdAt": "2026-09-23T19:11:29.075Z",
     "currentHost": null,
     "currentTool": null,
