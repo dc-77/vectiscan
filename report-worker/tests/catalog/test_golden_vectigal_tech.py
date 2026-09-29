@@ -129,6 +129,9 @@ def test_zweites_ziel_bringt_keine_eigenen_hosts(facts):
     bringt deshalb keinen eigenen Host mit. Der Bericht darf daraus keine
     getrennte Pruefung machen.
     """
-    assert any("Multi-Target" in w for w in facts.warnings), facts.warnings
+    # S6d (A9): die Warnung "nur die erste Domain hat eigene DNS- und Passivlaeufe" steht nur noch
+    # bei Domains ohne eigene Daten; vectiscan.de hat seit S2b eigene DNS-Laeufe.
+    assert not any("Multi-Target" in w for w in facts.warnings), facts.warnings
+    assert any(d.domain == "vectiscan.de" for d in facts.dns)
     ziele = {t.domain for t in facts.targets}
     assert ziele == {"vectigal.tech", "vectiscan.de"}

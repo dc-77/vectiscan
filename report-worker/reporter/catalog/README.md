@@ -400,7 +400,9 @@ Positivaussagen nur mit tragendem Fakt, Faktenfamilien, Berichtstag, Effekt je S
 HSTS nach E20, Zertifikat am Berichtsdatum, VRFY "angeboten" (S6b-4), `2026-09-27.2` CSP nur mit
 Skriptregel positiv, Reputation ohne CDN-Adressen, DMARC-Meldeadressen je Domain, Zielversionen und
 Produktnamen aus wpscan, Baustein-Schluessel `key`, Zertifikat einmal je Befund, Anmeldenamen nur als
-Anzahl (Nachtrag S6b-4, spec/11 N1 bis N15).
+Anzahl (Nachtrag S6b-4, spec/11 N1 bis N15), `2026-09-29.1` AUTH vor STARTTLS aktiv und laut
+Passivquelle (Buendel `smtp_auth`), XML-RPC aus der Sonde, ZAP-Befunde nur an der Zielseite,
+Abfragefenster der Reputation, Abdeckungsgruende der S6c-Rohfelder (S6d).
 
 Baustein-Schluessel (S6b-4n): eine Aussage unter `observation`, `meaning` oder `verify` kann ein
 `key` tragen. Treffen in einem Befund mehrere Regeln mit Aussagen desselben Schluessels, steht die

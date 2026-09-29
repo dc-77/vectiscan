@@ -1,0 +1,50 @@
+id: smtp_auth_before_starttls
+title: Mailserver bietet die Anmeldung vor STARTTLS an
+family: smtp_auth_cleartext
+category: E
+# S6d (A4, Entscheidung DC 29.09.): Gelb, Mittelfristig (hygiene mittel). Aktiver Nachweis aus
+# der EHLO-Sonde vor STARTTLS (S6c smtp_ehlo_<port>) oder aus nmap smtp-commands.
+scale: hygiene
+level: mittel
+group_by: host
+scope: service
+applicable_when: null
+item_when: null
+when: service.auth_before_starttls is True
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [nmap]
+kind: check
+bundle: smtp_auth
+affected_template: "{host_ip}:{port} ({mail_name})"
+evidence: [service]
+references: [CWE-319, CWE-523]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: S6d (A4)
+  start_level: mittel
+  deviation: null
+texts:
+  short: "AUTH vor STARTTLS angeboten"
+  plan:
+    lever: "Anmeldung am Mailserver erst nach STARTTLS anbieten"
+    effect: "Verhindert, dass Zugangsdaten unverschlüsselt übertragen werden"
+  observation: >-
+    Der Mailserver auf {group} bietet die Anmeldung (AUTH) schon vor STARTTLS an: {affected}.
+  meaning: >-
+    Nimmt ein Mailprogramm das Angebot an, bevor die Verbindung verschlüsselt ist, könnten
+    Zugangsdaten unverschlüsselt übertragen werden.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim
+        auth_advertise_hosts nur für verschlüsselte Verbindungen).
+  verify: >-
+    Verbindung zum genannten Port aufbauen und EHLO senden; erwartet wird eine Antwort, die AUTH
+    erst nach STARTTLS nennt.

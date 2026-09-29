@@ -6,9 +6,11 @@ scale: hygiene
 level: niedrig
 group_by: fqdn
 scope: http
-applicable_when: http is not None and http.wordpress is not None
-item_when: http.wordpress is not None
-when: any_attr(http.wordpress.findings, "type", ["xmlrpc"])
+# S6d (A5): die XML-RPC-Sonde (S6c, xmlrpc_probe.json) zusaetzlich zu wpscan; castenow meldet
+# wpscan XML-RPC nicht.
+applicable_when: http is not None and (http.wordpress is not None or http.xmlrpc_probe is not None)
+item_when: http.wordpress is not None or http.xmlrpc_probe is not None
+when: (http.wordpress is not None and any_attr(http.wordpress.findings, "type", ["xmlrpc"])) or (http.xmlrpc_probe is not None and http.xmlrpc_probe.enabled is True)
 positive_when: never
 not_testable_when: []
 undetermined: not_testable
@@ -19,7 +21,8 @@ bundle: null
 affected_template: "{fqdn}"
 evidence: [http]
 # S6b-4 (spec/11 T3): der Nachweis kommt aus wpscan, nicht aus der Header-Messung.
-evidence_detail: http.wordpress
+# S6d (A5): und aus der XML-RPC-Sonde; der Nachweis nennt sie.
+evidence_detail: http.xmlrpc
 references: [CWE-307]
 frameworks:
   bsi: []

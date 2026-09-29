@@ -39,7 +39,9 @@ def masker(facts: FS.Facts) -> Callable[[str], str] | None:
     names = foreign_domain_names(facts)
     if not names:
         return None
-    pattern = re.compile(r"(?<![\w.-])(?:\*\.)?(?:[a-z0-9-]+\.)*(?:"
+    # S6d (A4): auch nach dem Mehrzeilencode einer SMTP-Antwort ("250-netscope-media.de" im
+    # Shodan-Banner des Plesk-Servers bei castenow), sonst nur an einer Wortgrenze.
+    pattern = re.compile(r"(?:(?<=\d\d\d-)|(?<![\w.-]))(?:\*\.)?(?:[a-z0-9-]+\.)*(?:"
                          + "|".join(re.escape(n) for n in names) + r")(?![\w-])", re.I)
 
     def mask(text: str) -> str:

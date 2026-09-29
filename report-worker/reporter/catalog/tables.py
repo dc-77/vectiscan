@@ -227,6 +227,15 @@ COVERAGE_REASONS: dict[str, tuple[str, str]] = {
     "coverage_unknown": ("not_testable", "Ob dieses Werkzeug gelaufen ist, geht aus den Protokollen nicht hervor."),
     "rohtext_nicht_geladen": ("not_testable", "Die Werkzeugausgabe war zu groß und wurde nicht geladen; Ergebnis nicht belastbar."),
     "testssl_nicht_getestet": ("not_testable", "testssl konnte diese Schwachstelle nicht prüfen (Zeitüberschreitung oder Verbindungsfehler)."),
+    # S6d (A8): Sperrerkennung nach dem Portscan (S6c provider_block_probe).
+    "provider_block_after_portscan": ("not_testable", "Das Zielnetz sperrt die Prüfadresse nach dem Portscan; weitere Prüfungen waren nicht möglich."),
+    # S6d (A2, C4): Ursachen eines fehlgeschlagenen testssl-Laufs je Port oder SNI.
+    "no_tls_on_port": ("not_testable", "Auf dem Port antwortete kein TLS-Dienst."),
+    "tls_connect_refused": ("not_testable", "Die Verbindung zum TLS-Dienst wurde abgewiesen."),
+    "starttls_failed": ("not_testable", "STARTTLS ließ sich auf dem Port nicht aufbauen."),
+    "incomplete": ("not_testable", "Der Lauf endete ohne auswertbares Ergebnis."),
+    # S6d (A11): whois ohne Daten ist seit S6c ein Ausfall (#35), kein Negativergebnis.
+    "whois_no_data": ("not_testable", "Die Abfrage der Domain-Registrierungsdaten lieferte kein Ergebnis."),
 }
 GENERIC_NOT_TESTABLE = "Diese Prüfung war mit den vorliegenden Daten nicht möglich."
 
@@ -258,7 +267,7 @@ FAMILIES: frozenset[str] = frozenset({
     "mail_spoofing_unprotected",
     # S6b-3 (spec/10 R9, R19): offene Dienste ohne Kennung und Beobachtungen, die bis S6b-3
     # nur in den Rohdaten standen.
-    "service_unidentified", "smtp_vrfy", "wordpress_xmlrpc", "login_over_http", "spf_shared_host",
+    "service_unidentified", "smtp_vrfy", "smtp_auth_cleartext", "wordpress_xmlrpc", "login_over_http", "spf_shared_host",
 })
 
 # S6b-4n (spec/11 N6): Abfragefenster der Reputationsquelle (AbuseIPDB maxAgeInDays im Scanner).

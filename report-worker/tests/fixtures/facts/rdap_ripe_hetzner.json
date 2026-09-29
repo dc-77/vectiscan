@@ -1,0 +1,21 @@
+{
+ "116.202.77.64": {
+  "cidr": [
+   {
+    "length": 15,
+    "v4prefix": "116.202.0.0"
+   }
+  ],
+  "country": "DE",
+  "end_address": "116.203.255.255",
+  "handle": "HETZNER-nl",
+  "ip": "116.202.77.64",
+  "netblock_owner": "Hetzner Online GmbH",
+  "netname": "HETZNER-nl",
+  "rir": "RIPE",
+  "source": "RIR",
+  "source_url": "https://rdap.db.ripe.net/ip/116.202.77.64",
+  "start_address": "116.202.0.0"
+ },
+ "_quelle": "scan-worker/tests/test_rdap_s6c.py _RIPE_HETZNER durch RDAPClient.lookup_ip (S6d A1)"
+}

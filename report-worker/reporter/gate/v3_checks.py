@@ -790,6 +790,9 @@ REGELFAKT: dict[str, re.Pattern[str]] = {
     "wordpress_xmlrpc_enabled": re.compile(r"XML-RPC"),
     "smtp_vrfy_enabled": re.compile(r"VRFY in der EHLO-Liste"),
     "smtp_vrfy_enabled_passive": re.compile(r"VRFY in der EHLO-Antwort"),
+    # S6d (A4): AUTH vor STARTTLS, aktiv und laut Passivquelle.
+    "smtp_auth_before_starttls": re.compile(r"AUTH vor STARTTLS"),
+    "smtp_auth_before_starttls_passive": re.compile(r"AUTH vor STARTTLS in der EHLO-Antwort"),
     "cert_expiring": re.compile(r"gültig bis"),
     "cert_expiring_later": re.compile(r"gültig bis"),
 }

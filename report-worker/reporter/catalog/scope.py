@@ -277,8 +277,16 @@ def normalize_reason(reason: str | None, raw_status: str | None = None) -> str:
         return "not_in_package"
     if low.startswith("wordlist_missing"):
         return "wordlist_missing"
-    if low.startswith("timeout"):
+    if low.startswith("timeout") or "timed out" in low:
+        # S6d (A11): smtp_ehlo schreibt die Meldung der Bibliothek ("The read operation timed out").
         return "timeout"
+    if "zielnetz sperrt" in low or low.startswith("netz_sperrt"):
+        # S6d (A8): Phase-2-Zeilen gesperrter Hosts tragen den Freitext des Scanners (S6c).
+        return "provider_block_after_portscan"
+    if low in ("no_output_file", "invalid_json", "usage_banner", "unexpected_format", "incomplete_output",
+               "testssl_scan_problem"):
+        # S6d (C4): testssl ohne auswertbare Ausgabe.
+        return "incomplete"
     if "does_not_exist" in low:
         return "does_not_exist"
     if low.startswith("zap api error"):

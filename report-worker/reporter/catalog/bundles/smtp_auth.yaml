@@ -1,0 +1,13 @@
+id: smtp_auth
+title: "Mailserver auf {group}: {rules}"
+category: E
+merge_by: host
+members: [smtp_auth_before_starttls, smtp_auth_before_starttls_passive]
+target: findings
+references: [CWE-319, CWE-523]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+positive_title: Mailserver ohne Anmeldung vor STARTTLS

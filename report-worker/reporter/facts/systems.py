@@ -93,7 +93,12 @@ def network_operator_label(provider: object, *, platform: bool = False,
     Konzern, der im Namen nicht vorkommt, steht er dabei ("A100 ROW GmbH (Amazon)")."""
     if provider is None:
         return None
-    name = network_operator(getattr(provider, "isp", None))
+    # S6d (A1, E17): Inhaber des Adressblocks laut RDAP der Registry, wenn die Antwort eine RIR
+    # nennt; der Anschlussbetreiber-Zusatz kommt weiter aus AbuseIPDB (Nutzungsart, Domain).
+    if network_operator_source(provider) not in (None, "AbuseIPDB"):
+        name = network_operator(getattr(provider, "netblock_owner", None))
+    else:
+        name = network_operator(getattr(provider, "isp", None))
     if not name:
         return None
     usage = str(getattr(provider, "usage_type", None) or "").strip().lower()
@@ -109,6 +114,17 @@ def network_operator_label(provider: object, *, platform: bool = False,
     if platform and "content delivery" in usage:
         zusatz.append("CDN")
     return f"{name} ({', '.join(zusatz)})" if zusatz else name
+
+
+def network_operator_source(provider: object) -> Optional[str]:
+    """Quelle des Netzbetreibers fuer die Spalte "laut ..." (S6d, A1): die RIR aus der RDAP-Antwort
+    (RIPE, ARIN, APNIC, LACNIC, AFRINIC), sonst AbuseIPDB; None ohne Angabe."""
+    if provider is None:
+        return None
+    rir = getattr(provider, "rir", None)
+    if rir and getattr(provider, "netblock_owner", None):
+        return str(rir)
+    return "AbuseIPDB" if getattr(provider, "isp", None) else None
 
 
 def is_dns_name(name: object) -> bool:

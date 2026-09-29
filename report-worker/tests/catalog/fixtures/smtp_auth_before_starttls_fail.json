@@ -1,0 +1,14 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "88.99.35.112", "port": 587, "service": "smtp", "product": "Postfix smtpd", "starttls": true, "auth_before_starttls": true}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "88.99.35.112",
+  "positive": false,
+  "members": {"88.99.35.112:587": "fail"}
+ }
+}

@@ -119,13 +119,24 @@ Bump-Historie:
                   `wordpress_user_enumeration` nur Anzahl und Fundweg der Anmeldenamen (E25);
                   Lebenszyklus in der LTS-Phase "in Langzeitpflege bis <Datum> laut <Quelle>"
                   ohne zweite Klammer. Einstufungen unveraendert.
+    2026-09-29.1  S6d (S6c-Rohfelder, Fakten 1.4.0): neue Pruefungen
+                  `smtp_auth_before_starttls` und `smtp_auth_before_starttls_passive` im Buendel
+                  `smtp_auth` (Familie `smtp_auth_cleartext`, hygiene mittel, Gelb/Mittelfristig,
+                  Entscheidung DC 29.09.2026; ersetzt die unprocessed-Art); `wordpress_xmlrpc_enabled`
+                  auch aus der XML-RPC-Sonde (`http.xmlrpc_probe`, Nachweis `http.xmlrpc`); ZAP-Regeln
+                  mit Befund (`csrf_token_missing`, `session_in_url`, `sri_missing`,
+                  `cors_misconfiguration`, `directory_listing`) nur an der Zielseite
+                  (`alert.location`); `ip_reputation` nennt das Abfragefenster aus dem Rohdatum
+                  (`reputation_window`); neue Abdeckungsgruende `provider_block_after_portscan`,
+                  `no_tls_on_port`, `tls_connect_refused`, `starttls_failed`, `incomplete`,
+                  `whois_no_data`. Einstufungen der bestehenden Pruefungen unveraendert.
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-27.2"
+CATALOG_VERSION = "2026-09-29.1"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"

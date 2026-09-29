@@ -85,7 +85,8 @@ def test_castenow_teilt_auf_und_laesst_nichts_weg():
     # S6b-3: 29, neu sind SPF gibt geteilten Server frei, VRFY laut Passivquelle, Port 8001
     # ohne Kennung (spec/10 R19, R9); Header-Befunde nach der Endseite (R1, R2).
     # S6b-4: 27, Shoutcast und Icecast einer weiteren Domain sind kein Kundenbefund (spec/11 T9).
-    gesamt = 27
+    # S6d (A4): 28, AUTH vor STARTTLS laut Passivquelle an 92.205.163.53:25 ist ein Befund.
+    gesamt = 28
     assert f"Dieses Kapitel zeigt die 15 dringendsten der {gesamt} Befunde" in text_of(html)
     haupt = _abschnitt(html, "Befunde im Detail", "Weitere Sachverhalte")
     anhang = _abschnitt(html, "Weitere Sachverhalte", "ANHÄNGE")

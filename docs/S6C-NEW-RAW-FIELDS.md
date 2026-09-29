@@ -5,6 +5,13 @@ Werkzeug, Feldname, Struktur, Fixture und dem zugehörigen spec/11-Punkt. Der re
 Felder **noch nicht** (S6c ist nur scanner-seitiger Export, „report-worker unverändert grün"); die
 Umstellung des Lesens ist die Berichtsseiten-Session nach spec/12.
 
+Stand S6d: der report-worker liest alle Felder dieser Tabelle (Faktenschema 1.4.0, Katalog
+2026-09-29.1, Übersicht in `report-worker/reporter/facts/README.md`, Abgleich je Punkt in
+`report-worker/tests/golden/README.md`, Abschnitt „Abgleich S6c-Rohfelder nach S6d"). S6d hat im
+Scanner dazu `rdap` mit den Inventar-IPs (vorher nie gelaufen), die Endantwort von redirect_probe
+nur aus Hauptframe-Navigationen (`final_response_source`), `skipReason` bei testssl je Port und
+`waited_s` in der Sperrerkennung ergänzt.
+
 Grundregel (Auflage c/d): die Felder, die der report-worker heute liest, sind unverändert. Neue
 Erkenntnisse stehen in **zusätzlichen** Feldern oder Einträgen. Wo ein Bestandsfeld heute einen
 falschen Wert trägt (redirect_probe erste statt Endantwort), bleibt es und die Endantwort kommt in ein

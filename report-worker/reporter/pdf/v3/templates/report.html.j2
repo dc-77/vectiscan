@@ -243,7 +243,7 @@ tr{break-inside:avoid;}
  <p class="lead">{{ s.lead }}</p>
  <h3>2.1 Prüfungsumfang</h3>
  <table>
-  <thead><tr><th style="width:28mm">IP-Adresse</th><th style="width:54mm">Hostnamen</th><th style="width:42mm">Netzbetreiber (laut AbuseIPDB) / Rolle</th><th style="width:44mm">Abdeckung</th></tr></thead>
+  <thead><tr><th style="width:28mm">IP-Adresse</th><th style="width:54mm">Hostnamen</th><th style="width:42mm">{{ s.operator_header }} / Rolle</th><th style="width:44mm">Abdeckung</th></tr></thead>
   {% for h in s.hosts %}
   <tr><td class="mono">{{ h.ip }}{% for a in h.more_ips %}<br>{{ a }}{% endfor %}</td><td class="wrap">{{ h.fqdns }}</td><td class="wrap">{{ h.operator }}<br><span class="small">{{ h.role }}</span></td>
       <td class="wrap"><span class="dot d-{{ {'voll':'gruen','teil':'gelb','keine':'rot','unerreichbar':'rot','extern':'grau'}[h.cov] }}"></span>{{ h.coverage }}</td></tr>
@@ -407,7 +407,7 @@ tr{break-inside:avoid;}
  <div class="sec-head" style="margin-top:6mm"><div class="kicker">Anhang {{ ltr.inventory }}</div><h2>Service-Inventar</h2></div>
  <p>Alle erkannten Dienste je Host, als Nachschlagewerk für den Maßnahmenplan. Einträge aus Passivquellen sind gekennzeichnet.</p>
  <table><thead><tr><th style="width:36mm">Host</th><th style="width:14mm">Port</th><th style="width:82mm">Dienst</th><th style="width:36mm">Befund</th></tr></thead>
- {% for r in ap.inventory %}<tr><td class="mono wrap">{{ r.host }}</td><td class="mono">{{ r.port }}</td><td>{{ r.svc }}</td><td class="mono" style="font-size:7.6pt">{{ r.ref }}</td></tr>{% endfor %}</table>
+ {% for r in ap.inventory %}<tr><td class="mono wrap">{{ r.host }}{% if r.operator %}<br><span class="small">{{ r.operator }}</span>{% endif %}</td><td class="mono">{{ r.port }}</td><td>{{ r.svc }}</td><td class="mono" style="font-size:7.6pt">{{ r.ref }}</td></tr>{% endfor %}</table>
  {% endif %}
  <h3>Anhang {{ ltr.tools }} · Eingesetzte Werkzeuge</h3>
  <table><thead><tr><th style="width:44mm">Werkzeug</th><th style="width:84mm">Einsatz</th><th style="width:40mm">Konfidenz</th></tr></thead>

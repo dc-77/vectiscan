@@ -129,6 +129,8 @@ class ScopeHost(Base):
     ip: str
     fqdns: str = ""
     operator: str = ""
+    # S6d (A1): Quelle der Betreiberangabe (RIR laut RDAP oder AbuseIPDB).
+    operator_source: str = ""
     role: str = ""
     coverage: str = ""
     cov: str = "keine"
@@ -174,6 +176,8 @@ class CanCannot(Base):
 class Scope(Base):
     lead: str = ""
     hosts: list[ScopeHost] = Field(default_factory=list)
+    # S6d (A1, E17): Kopf der Betreiberspalte in 2.1, mit Quelle, wenn alle Zeilen dieselbe haben.
+    operator_header: str = "Netzbetreiber (laut AbuseIPDB)"
     domains: list[DomainScope] = Field(default_factory=list)
     out_of_scope: list[str] = Field(default_factory=list)
     limitations: list[Limitation] = Field(default_factory=list)
@@ -389,6 +393,8 @@ class InventoryRow(Base):
     port: str
     svc: str
     ref: str = ""
+    # S6d (A1): Netzbetreiber mit Quelle, nur in der ersten Zeile eines Hosts.
+    operator: str = ""
 
 
 class ToolRow(Base):

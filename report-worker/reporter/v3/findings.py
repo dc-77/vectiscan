@@ -233,7 +233,10 @@ def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY,
             for x in r.vars.get(name) or []:
                 if x not in werte:
                     werte.append(x)
+    # S6d (A10): Abfragefenster der Reputation nur, wenn alle Gruppen dasselbe nennen.
+    fenster = {str(r.vars.get("reputation_window") or "") for r in results}
     return {
+        "reputation_window": fenster.pop() if len(fenster) == 1 else "",
         "passed": passed,
         "missing_header_names": fehlend,
         **gesammelt,
@@ -456,6 +459,8 @@ PASSIVE_COUNTERPARTS: dict[str, frozenset[str]] = {
     "admin_service_exposed_passive": frozenset({"admin_panel_hoster", "admin_service_exposed",
                                                 "admin_portal_exposed", "admin_service_unconfirmed"}),
     "smtp_vrfy_enabled_passive": frozenset({"smtp_vrfy_enabled"}),
+    # S6d (A4): AUTH vor STARTTLS laut Passivquelle am selben Mailserver wie der aktive Nachweis.
+    "smtp_auth_before_starttls_passive": frozenset({"smtp_auth_before_starttls"}),
 }
 
 
@@ -866,8 +871,9 @@ def build_findings(
                     alert = alerts.get((m.fqdn or "", m.message_id or "", m.message or ""))
                     if alert is not None:
                         note, anzahl = zap_note(alert) or note, max(alert.count, 1)
-                        # S6b-4n (spec/11 N12): Fundort der Meldung.
-                        ort = _mit_fundort(ort, fundort(facts, m.fqdn or "", alert))
+                        # S6b-4n (spec/11 N12): Fundort der Meldung; S6d (A7): mit Pfad.
+                        ort = _mit_fundort(meldungs_ort(m.fqdn or "", alert) or ort,
+                                           fundort(facts, m.fqdn or "", alert))
                     tool_findings.append(ToolFinding(what=m.label, where=ort, note=note,
                                                      rule=regel, message=m.message, count=anzahl))
             continue
@@ -1145,7 +1151,8 @@ def meldung_bewertet(t: ToolFinding, bewertet: set[tuple[str, str]]) -> bool:
     regeln = ZAP_HEADER_RULES.get(kennung)
     if not regeln:
         return False
-    name = (t.where or "").split(" (", 1)[0]
+    # S6d (A7): der Ort traegt seit S6d den Pfad der Meldung ("mail.x.de/owa/auth/logon.aspx").
+    name = (t.where or "").split(" (", 1)[0].split("/", 1)[0]
     return any((r, name) in bewertet for r in regeln)
 
 
@@ -1158,6 +1165,12 @@ def fundort(facts: FS.Facts, fqdn: str, alert: Optional[FS.WebAlert]) -> str:
         return "an der Sicherheitsabfrage"
     if alert is None:
         return ""
+    # S6d (A7): Fundort laut Statuscode der Meldung im ZAP-Export (S6c).
+    codes = ", ".join(str(s) for s in alert.statuses)
+    if alert.location == "challenge":
+        return "an der Sicherheitsabfrage" + (f" (Status {codes})" if codes else "")
+    if alert.location == "error_page":
+        return "an der Fehlerseite" + (f" (Status {codes})" if codes else "")
     urls = [u for u in (list(alert.urls_sample) or ([alert.url] if alert.url else [])) if u]
     pfade = []
     for u in urls:
@@ -1173,6 +1186,23 @@ def fundort(facts: FS.Facts, fqdn: str, alert: Optional[FS.WebAlert]) -> str:
 
 def _mit_fundort(ort: str, zusatz: str) -> str:
     return f"{ort} ({zusatz})" if zusatz and ort else ort
+
+
+def meldungs_ort(fqdn: str, alert: Optional[FS.WebAlert]) -> str:
+    """Ort einer ZAP-Meldung im Anhang mit Pfad der ersten Adresse (S6d, A7: URL je Meldung).
+
+    ``castenow.de/wp-login.php``; an der Startseite nur der Name."""
+    from urllib.parse import urlsplit
+    if alert is None or not alert.url or not fqdn:
+        return fqdn
+    try:
+        path = urlsplit(alert.url).path or "/"
+    except ValueError:
+        return fqdn
+    if path == "/":
+        return fqdn
+    ort = f"{fqdn}{path}"
+    return ort if len(ort) <= 90 else ort[:87] + "..."
 
 
 def _alert_index(facts: FS.Facts) -> dict[tuple[str, str, str], FS.WebAlert]:
@@ -1223,7 +1253,7 @@ def uncovered_zap_messages(output: CatalogOutput, facts: FS.Facts,
             kennung = f"#{alert.plugin_id}" if alert.plugin_id else ""
             out.append(ToolFinding(
                 what=f"{alert.name} auf {fqdn}" if fqdn else alert.name,
-                where=_mit_fundort(fqdn or item.host_ip or "", fundort(facts, fqdn, alert)),
+                where=_mit_fundort(meldungs_ort(fqdn, alert) or item.host_ip or "", fundort(facts, fqdn, alert)),
                 note=zap_note(alert) or "Werkzeugmeldung ohne eigene Einstufung.",
                 rule=f"zap_uncovered{kennung}", message=alert.name, count=max(alert.count, 1)))
     return out

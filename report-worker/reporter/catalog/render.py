@@ -57,7 +57,8 @@ ITEM_VARS: dict[str, tuple[str, ...]] = {
 OBSERVATION_VARS: tuple[str, ...] = ("affected", "count", "group", "fqdn_names", "domain", "host_ip", "notes",
                                      "n", "m", "missing_header_names", "passed", "valid_elsewhere",
                                      "target_versions", "dmarc_rua", "mx", "dmarc_rua_own", "dmarc_rua_foreign",
-                                     "dmarc_delegated_to", "version_headers", "feserver_names", "cert_summary", "shared_domains")
+                                     "dmarc_delegated_to", "version_headers", "feserver_names", "cert_summary", "shared_domains",
+                                     "reputation_window")
 # S6b-4 (spec/11 T12, T14): Item-Werte, die die Engine ueber die fehlgeschlagenen Mitglieder einer
 # Gruppe sammelt und als Gruppenvariable in Texte gibt.
 COLLECT_VARS: tuple[str, ...] = ("valid_elsewhere", "target_versions", "dmarc_rua", "mx", "dmarc_rua_own",
@@ -563,9 +564,18 @@ def group_vars(group: Group, labels: list[str], notes: list[str],
            "n": Numerus(1), "m": Numerus(len(labels)), "missing_header_names": [], "passed": [],
            "valid_elsewhere": [], "target_versions": [], "dmarc_rua": [], "mx": [], "dmarc_rua_own": [],
            "dmarc_rua_foreign": [], "dmarc_delegated_to": [], "version_headers": [], "feserver_names": [],
-           "cert_summary": [], "shared_domains": []}
+           "cert_summary": [], "shared_domains": [], "reputation_window": reputation_window(group)}
     out.update(extra or {})
     return out
+
+
+def reputation_window(group: Group) -> str:
+    """S6d (A10): Abfragefenster der Reputationsabfrage laut AbuseIPDB (``maxAgeInDays``) als
+    Textbaustein " in den letzten 90 Tagen"; ohne das Feld (Laeufe vor S6c) leer."""
+    host = getattr(group, "host", None)
+    rep = getattr(host, "reputation", None) if host is not None else None
+    tage = getattr(rep, "abuseipdb_max_age_days", None) if rep is not None else None
+    return f" in den letzten {tage} Tagen" if isinstance(tage, int) and tage > 0 else ""
 
 
 __all__ = ["ITEM_VARS", "OBSERVATION_VARS", "UNKNOWN", "Numerus", "validate_template", "format_strict", "template_fields",
