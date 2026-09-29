@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-27.2 auf tests/golden/facts/1fbc92b9-34ab-414e-8843-a1f1e9f15431.json",
+ "source": "reporter.catalog 2026-09-29.1 auf tests/golden/facts/1fbc92b9-34ab-414e-8843-a1f1e9f15431.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -173,6 +173,32 @@
   },
   {
    "id": "VS-2026-013",
+   "check": "smtp_auth_before_starttls",
+   "family": "smtp_auth_cleartext",
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "mittel",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "affected": [
+    "88.99.35.112:587 (Submission)"
+   ],
+   "title": "Mailserver bietet die Anmeldung vor STARTTLS an"
+  },
+  {
+   "id": "VS-2026-014",
+   "check": "smtp_auth_before_starttls_passive",
+   "family": "smtp_auth_cleartext",
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "mittel",
+   "group": "88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com)",
+   "affected": [
+    "88.99.35.112:25 (laut Passivquelle, Hosteintrag aktualisiert am 23.09.2026)"
+   ],
+   "title": "Mailserver bietet die Anmeldung vor STARTTLS an laut Passivquelle"
+  },
+  {
+   "id": "VS-2026-015",
    "check": "smtp_vrfy_enabled",
    "family": "smtp_vrfy",
    "cat": "E",
@@ -186,7 +212,7 @@
    "title": "Mailserver bietet den Befehl VRFY an"
   },
   {
-   "id": "VS-2026-014",
+   "id": "VS-2026-016",
    "check": "smtp_vrfy_enabled_passive",
    "family": "smtp_vrfy",
    "cat": "E",
@@ -199,7 +225,7 @@
    "title": "Mailserver beantwortet den Befehl VRFY laut Passivquelle"
   },
   {
-   "id": "VS-2026-015",
+   "id": "VS-2026-017",
    "check": "software_eol",
    "family": "software_eol",
    "cat": "B",
@@ -212,7 +238,7 @@
    "title": "Serversoftware ohne Herstellerpflege"
   },
   {
-   "id": "VS-2026-016",
+   "id": "VS-2026-018",
    "check": "spf_softfail",
    "family": "spf_softfail",
    "cat": "C",
@@ -225,7 +251,7 @@
    "title": "SPF-Eintrag ohne konsequente Durchsetzung"
   },
   {
-   "id": "VS-2026-017",
+   "id": "VS-2026-019",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -238,7 +264,7 @@
    "title": "TLS 1.3 nicht verfügbar"
   },
   {
-   "id": "VS-2026-018",
+   "id": "VS-2026-020",
    "check": "tls_rpt_missing",
    "family": "tls_rpt_missing",
    "cat": "C",
@@ -251,7 +277,7 @@
    "title": "TLS-RPT nicht eingerichtet"
   },
   {
-   "id": "VS-2026-019",
+   "id": "VS-2026-021",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -265,7 +291,7 @@
    "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-020",
+   "id": "VS-2026-022",
    "check": "web_vulnerability_reported",
    "family": "web_vulnerability_reported",
    "cat": "E",
@@ -281,7 +307,7 @@
    "title": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-021",
+   "id": "VS-2026-023",
    "check": "wordpress_plugin_vulnerable",
    "family": "wordpress_plugin_vulnerable",
    "cat": "B",
@@ -297,7 +323,7 @@
    "title": "WordPress-Erweiterungen mit bekannten Schwachstellen"
   },
   {
-   "id": "VS-2026-022",
+   "id": "VS-2026-024",
    "check": "wordpress_user_enumeration",
    "family": "user_enumeration",
    "cat": "E",
@@ -310,7 +336,7 @@
    "title": "WordPress-Benutzernamen von außen ermittelbar"
   },
   {
-   "id": "VS-2026-023",
+   "id": "VS-2026-025",
    "check": "wordpress_xmlrpc_enabled",
    "family": "wordpress_xmlrpc",
    "cat": "E",

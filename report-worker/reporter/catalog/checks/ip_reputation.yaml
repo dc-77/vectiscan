@@ -67,5 +67,6 @@ texts:
     unauffällige Bewertung.
   positive:
     title: Keine Einträge in Reputationsquellen
+    # S6d (A10): Abfragefenster aus dem Rohdatum (maxAgeInDays), ohne das Feld wie bisher.
     text: >-
-      Für {group} liegen in den abgefragten Reputationsquellen keine Meldungen vor.
+      Für {group} liegen in den abgefragten Reputationsquellen keine Meldungen{reputation_window} vor.

@@ -1,0 +1,13 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "188.40.3.130", "port": 587, "service": "smtp", "product": "Exim smtpd", "starttls": true, "auth_before_starttls": false}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "188.40.3.130",
+  "positive": false
+ }
+}

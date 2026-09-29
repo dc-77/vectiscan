@@ -110,6 +110,17 @@ class ToolRun:
             v = data.get("vhost")
             if isinstance(v, str) and v:
                 return v
+        if self.tool_norm == "httpx":
+            # S6d (Issue #18): die httpx-Zeile ist JSONL ohne ``vhost``-Schluessel. Der VHost steht
+            # im Inhalt (``input``, sonst ``url``), wie bei ``httpx_<slug>.json`` im Tar; der
+            # Dateiname ist nur ein Eindeutigkeitsmerkmal und steht in der Zeile nicht.
+            for line in jsonl(self.raw_output):
+                if not isinstance(line, dict):
+                    continue
+                raw = str(line.get("input") or line.get("url") or "").strip()
+                host = urlsplit(raw).hostname if "://" in raw else raw.split("/")[0].split(":")[0]
+                if host:
+                    return host.lower()
         return None
 
     def domain(self) -> Optional[str]:
@@ -153,6 +164,32 @@ def tool_run_from_row(row: dict[str, Any], index: int) -> ToolRun:
     )
 
 
+# S6d (A2): Werkzeugnamen der zusaetzlichen testssl-Laeufe aus S6c. ``testssl_<port>`` laeuft mit
+# ``--starttls`` gegen einen weiteren TLS-Port, ``testssl_sni_<name>`` gegen 443 mit dem Namen
+# eines weiteren VHosts. Dateiname (ohne ``.json``) und Werkzeugname der Zeile sind gleich.
+TESTSSL_PORT_RE = re.compile(r"^testssl_(\d+)$")
+TESTSSL_SNI_RE = re.compile(r"^testssl_sni_(.+)$")
+SMTP_EHLO_RE = re.compile(r"^smtp_ehlo_(\d+)$")
+
+
+def is_testssl_tool(tool: str | None) -> bool:
+    """``testssl`` (443) oder einer der zusaetzlichen Laeufe je Port oder SNI (S6d, A2)."""
+    t = tool or ""
+    return t == "testssl" or bool(TESTSSL_PORT_RE.match(t) or TESTSSL_SNI_RE.match(t))
+
+
+@dataclass
+class TestsslRunData:
+    """Ein zusaetzlicher testssl-Lauf aus S6c (Tar-Datei und/oder Zeile), S6d A2."""
+    tool: str
+    port: Optional[int] = None
+    sni_slug: Optional[str] = None
+    json: Optional[list[dict[str, Any]]] = None
+    text: Optional[str] = None
+    ref: str = ""
+    unparsable: bool = False
+
+
 @dataclass
 class HostData:
     ip: str
@@ -185,9 +222,26 @@ class HostData:
     # S6b-4 (spec/11 T8): ffuf je Modus ("sensitive", "param"); ``ffuf`` bleibt die letzte Datei.
     ffuf_by_mode: dict[str, dict[str, Any]] = field(default_factory=dict)
     wpscan: Optional[dict[str, Any]] = None
+    # S6d (S6c-Rohfelder): testssl je Port und je SNI (Werkzeugname -> Lauf), EHLO-Sonde je Port,
+    # XML-RPC-Sonde, Nachlauf ``nmap -sV --version-all`` und die Sperrerkennung aus der Zeile.
+    testssl_runs: dict[str, TestsslRunData] = field(default_factory=dict)
+    smtp_ehlo: dict[int, dict[str, Any]] = field(default_factory=dict)
+    xmlrpc_probe: Optional[dict[str, Any]] = None
+    nmap_versionall_xml: Optional[str] = None
+    nmap_versionall_txt: Optional[str] = None
+    provider_block_rows: dict[str, dict[str, Any]] = field(default_factory=dict)
     ai_rows: list[ToolRun] = field(default_factory=list)
     refs: dict[str, str] = field(default_factory=dict)
     unparsed: list[str] = field(default_factory=list)
+
+    def testssl_run(self, tool: str) -> TestsslRunData:
+        """Lauf zu einem Werkzeugnamen anlegen oder holen (Port bzw. SNI aus dem Namen)."""
+        if tool not in self.testssl_runs:
+            m = TESTSSL_PORT_RE.match(tool)
+            s = TESTSSL_SNI_RE.match(tool)
+            self.testssl_runs[tool] = TestsslRunData(tool=tool, port=int(m.group(1)) if m else (443 if s else None),
+                                                     sni_slug=s.group(1) if s else None)
+        return self.testssl_runs[tool]
 
 
 @dataclass
@@ -216,6 +270,8 @@ class ScanBundle:
     dns_aaaa: dict[str, list[str]] = field(default_factory=dict)
     host_strategy: Optional[dict[str, Any]] = None
     ai_prioritization: Optional[dict[str, Any]] = None
+    # S6d (A1): RDAP-Antworten je IP (``phase0a/rdap.json`` oder Zeile ``rdap``).
+    rdap: dict[str, dict[str, Any]] = field(default_factory=dict)
     # S6b-3 (spec/10 R5, E13): Teilausgabe der Hostsuche (``fqdn ip[,ip]`` je Zeile) und
     # die Zertifikatsliste von crt.sh.
     gobuster_dns_txt: Optional[str] = None
@@ -323,7 +379,7 @@ _HOST_RE = re.compile(r"^hosts/([^/]+)/phase(\d)/([^/]+)$")
 # Domain, die Wahrheit steht als "_domain" im Inhalt (bei zone_transfer, das
 # reiner Text ist, gilt der Slug). Aeltere Tars haben diese Dateien nicht.
 _DOMAIN_FILE_RE = re.compile(
-    r"^phase0a?/(dns_records|dns_security|whois)_(.+)\.json$")
+    r"^phase0a?/(dns_records|dns_security|whois|otx|securitytrails)_(.+)\.json$")
 _DOMAIN_ZONE_RE = re.compile(r"^phase0/zone_transfer_(.+)\.txt$")
 
 
@@ -345,7 +401,8 @@ def _load_domain_scoped(reader: "_Reader", b: "ScanBundle") -> None:
             elif kind == "dns_security":
                 b.dns_security_by_domain.setdefault(dom, data)
             else:
-                b.passive_by_domain.setdefault(dom, {}).setdefault("whois", data)
+                # whois seit S2b, otx und securitytrails seit S6d (Issue #22) je Domain.
+                b.passive_by_domain.setdefault(dom, {}).setdefault(kind, data)
             b.refs.setdefault(f"{kind}:{dom}", name)
             continue
         m = _DOMAIN_ZONE_RE.match(name)
@@ -416,6 +473,14 @@ def _load_bundle_from_reader(reader: _Reader, order_id_hint: str, source_kind: s
                 b.passive[key] = (_without_domain_label(data)
                                   if isinstance(data, dict) else data)
                 b.refs[key] = name
+    # S6d (A1, spec/11 T2, E17): Netzbetreiber je IP laut RDAP der Registry (S6c ``rdap``).
+    if reader.exists("phase0a/rdap.json"):
+        rd = reader.json("phase0a/rdap.json")
+        if isinstance(rd, dict):
+            b.rdap = {str(ip): v for ip, v in rd.items() if isinstance(v, dict)}
+            b.refs["rdap"] = "phase0a/rdap.json"
+        else:
+            b.unparsed.append(("file_unparsable", "phase0a/rdap.json", None))
     cs = reader.json("phase0/certspotter.json")
     if isinstance(cs, dict):
         b.passive["certspotter"] = cs
@@ -530,6 +595,31 @@ def _load_bundle_from_reader(reader: _Reader, order_id_hint: str, source_kind: s
                 h.wpscan = data
             elif (reader.text(name) or "").strip():
                 h.unparsed.append(name)
+        # S6d (S6c-Rohfelder, docs/S6C-NEW-RAW-FIELDS.md): testssl je Port und je SNI, EHLO vor
+        # STARTTLS, XML-RPC-Sonde und der Nachlauf mit --version-all.
+        elif fname.endswith(".json") and is_testssl_tool(fname[:-5]) and fname != "testssl.json":
+            run = h.testssl_run(fname[:-5])
+            run.ref = name
+            data = reader.json(name)
+            if isinstance(data, list):
+                run.json = [x for x in data if isinstance(x, dict)]
+            elif (reader.text(name) or "").strip():
+                run.unparsable = True
+                h.unparsed.append(name)
+        elif fname.endswith(".json") and SMTP_EHLO_RE.match(fname[:-5]):
+            data = reader.json(name)
+            if isinstance(data, dict):
+                h.smtp_ehlo[int(SMTP_EHLO_RE.match(fname[:-5]).group(1))] = data
+            elif (reader.text(name) or "").strip():
+                h.unparsed.append(name)
+        elif fname == "xmlrpc_probe.json":
+            data = reader.json(name)
+            if isinstance(data, dict):
+                h.xmlrpc_probe = data
+            elif (reader.text(name) or "").strip():
+                h.unparsed.append(name)
+        elif fname == "nmap_versionall.xml":
+            h.nmap_versionall_xml = reader.text(name)
         elif fname.endswith((".png", ".jpg", ".jpeg", ".txt")):
             continue
         else:
@@ -663,6 +753,28 @@ def merge_tool_runs(bundle: ScanBundle, runs: list[ToolRun], *, name: str | None
             elif run.tool == "testssl":
                 if raw.strip() and h.testssl_txt is None:
                     h.testssl_txt = raw
+            elif is_testssl_tool(run.tool):
+                # S6d (A2): Rohtext des Laufs je Port bzw. SNI (Protokollzeilen wie beim 443-Lauf).
+                tr = h.testssl_run(run.tool)
+                if raw.strip() and tr.text is None:
+                    tr.text = raw
+                if not tr.ref:
+                    tr.ref = run.ref
+            elif SMTP_EHLO_RE.match(run.tool):
+                data = run.json()
+                if isinstance(data, dict):
+                    h.smtp_ehlo.setdefault(int(SMTP_EHLO_RE.match(run.tool).group(1)), data)
+            elif run.tool == "wordpress_xmlrpc":
+                data = run.json()
+                if isinstance(data, dict) and h.xmlrpc_probe is None:
+                    h.xmlrpc_probe = data
+            elif run.tool == "nmap_versionall":
+                if raw.strip() and h.nmap_versionall_txt is None:
+                    h.nmap_versionall_txt = raw
+            elif run.tool in ("provider_block_probe", "provider_block_probe_p2"):
+                data = run.json()
+                if isinstance(data, dict):
+                    h.provider_block_rows.setdefault(run.tool, data)
             elif run.tool == "nmap":
                 if raw.strip() and h.nmap_txt is None:
                     h.nmap_txt = raw
@@ -715,6 +827,13 @@ def merge_tool_runs(bundle: ScanBundle, runs: list[ToolRun], *, name: str | None
             if run.is_ai:
                 continue
             data = run.json()
+            if run.tool == "rdap":
+                # S6d (A1): RDAP je IP, wenn das Tar keine rdap.json traegt.
+                if isinstance(data, dict) and not bundle.rdap:
+                    bundle.rdap = {str(ip): v for ip, v in data.items() if isinstance(v, dict)}
+                    if bundle.rdap:
+                        bundle.refs["rdap"] = run.ref
+                continue
             # Issue #12: traegt die Zeile ein Domain-Etikett, gehoert sie in
             # die Domain-Maps. Das Primaerziel fuellt zusaetzlich die Skalare,
             # damit jeder bisherige Leser unveraendert weiterlaeuft. Zeilen

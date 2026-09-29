@@ -163,6 +163,27 @@ ROLES: dict[str, tuple[list[str], str]] = {
         "heuel.com, Scan-Runde 23.09.2026; Soll-Liste expected/heuel-0923.json. "
         "IPv6-Host, Vercel- und IONOS-Kanten, AbuseIPDB mit isWhitelisted (spec/09 Q12)",
     ),
+    # S6d: die drei Probeauftraege der S6c-Live-Proben vom 28.09.2026, die ersten Tars mit
+    # den neuen Rohfeldern (docs/S6C-NEW-RAW-FIELDS.md). Eigene Testauftraege, keine
+    # Deliverables; rdap lief dort nicht (Scanner-Defekt, in S6d als C6 behoben).
+    "4394b0b7-5dc6-4e01-b700-2a4052a7bd4a": (
+        ["golden", "coverage"],
+        "dortmund-beach.com, S6c-Probe 28.09.2026; Soll-Liste "
+        "expected/dortmund-beach-0928.json. testssl je Port (21, 110, 143, 465, 587, 993, "
+        "995, 10000), smtp_ehlo 587 mit AUTH vor STARTTLS, XML-RPC-Sonde",
+    ),
+    "f9a2a2f6-a97f-47bf-9d7f-9afb3869f97c": (
+        ["golden", "coverage"],
+        "junkerwerk.de und junkerwerk.hu, S6c-Probe 28.09.2026; Soll-Liste "
+        "expected/junkerwerk-0928.json. Hetzner-Drosselung mit provider_block_probe, "
+        "nmap_versionall an 993/995, Zonentransfer .hu ohne Lauf, IPv6 no_ipv6_route",
+    ),
+    "cd28d260-cf49-4d17-a980-64a4b1951444": (
+        ["golden", "coverage"],
+        "castenow.de, S6c-Probe 28.09.2026; Soll-Liste expected/castenow-0928.json. "
+        "XML-RPC-Sonde ohne wpscan-Meldung, testssl je SNI, ZAP unreachable, "
+        "Messadresse ausserhalb des Inventars (DNS-Rotation)",
+    ),
 }
 
 

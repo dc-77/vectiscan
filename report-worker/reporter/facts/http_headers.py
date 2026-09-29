@@ -305,13 +305,32 @@ def measure(vh: str, res: Optional[dict], line: Optional[dict], rd: Optional[dic
         else:
             return _complete(first, first, hc_headers, "final")
 
+    final_hc: Optional[S.HttpResponse] = None
     if basis == "redirect":
+        # S6d (A6, spec/11 N3, E24): Endantwort aus header_check (S6c ``redirect_eval``, curl folgt
+        # HTTP-Weiterleitungen, nur das Dokument). Gilt nur als Endseite mit 2xx, HTML, ohne
+        # ``location`` und ohne Sicherheitsabfrage am selben Host; sonst steht der Status in der
+        # Einschraenkung.
+        # Bei clientseitiger Weiterleitung (heuel ose "Redirector") folgt curl nicht; die Endantwort
+        # von header_check ist dann die Weiterleitungsseite selbst.
+        final_hc, final_headers = (None, None) if client_redirect else _redirect_eval_final(vh, res)
+        if final_hc is not None and final_headers is not None:
+            return _complete(final_hc, first, final_headers, "final")
+        # S6d (A6, C7): Endantwort der Weiterleitungspruefung nur mit dem Kennzeichen
+        # ``final_response_source: document`` (Hauptframe-Navigation). Ohne Kennzeichen sind die
+        # S6c-Header die letzte Antwort irgendeiner Ressource (castenow mail: eine Schriftdatei).
+        rh_doc = _rd_document_final(vh, rd, hc_headers)
+        if rh_doc is not None:
+            ev = S.HttpResponse(tool="redirect_probe", url=str(rd.get("final_url"))[:300],
+                                status_code=_int(rd.get("final_status")) or _int(rd.get("status_code")),
+                                status_basis="claimed", content_type=rh_doc.get("content-type"))
+            return _complete(ev, first, rh_doc, "final", final=final_hc)
         rh = _rd_final(vh, rd, hc_headers)
         if rh is not None:
             ev = S.HttpResponse(tool="redirect_probe", url=str(rd.get("final_url"))[:300],
                                 status_code=_int(rd.get("status_code")), status_basis="claimed",
                                 content_type=rh.get("content-type"))
-            return _complete(ev, first, rh, "final")
+            return _complete(ev, first, rh, "final", final=final_hc)
         final_url = None
         for cand in ((line or {}).get("final_url"), (rd or {}).get("final_url"), first.location):
             if cand and _host(cand) == vh.lower():
@@ -321,20 +340,76 @@ def measure(vh: str, res: Optional[dict], line: Optional[dict], rd: Optional[dic
         if values and tool:
             ev = S.HttpResponse(tool=tool, url=final_url[:300] if final_url else None,
                                 status_code=None, status_basis="claimed")
-            return _partial_result(ev, first, values, client_redirect=client_redirect)
+            m = _partial_result(ev, first, values, client_redirect=client_redirect)
+            m.measurement.final = final_hc
+            return m
     return Measured(measurement=S.HeaderMeasurement(basis=basis, first=first,
-                                                    client_redirect=client_redirect or None))
+                                                    client_redirect=client_redirect or None, final=final_hc))
+
+
+def _redirect_eval_final(vh: str, res: Optional[dict]) -> tuple[Optional[S.HttpResponse], Optional[dict[str, str]]]:
+    """Endantwort laut header_check ``redirect_eval.final`` (S6c) und ihre Header, wenn bewertbar.
+
+    Rueckgabe (Antwort, Header): Header nur, wenn die Endantwort eine Endseite desselben Namens ist
+    (2xx, HTML oder ohne Angabe, ohne ``location``, ohne Sicherheitsabfrage, kein
+    ``not_testable``). Sonst (Antwort, None), damit die Einschraenkung den Status nennen kann."""
+    ev = (res or {}).get("redirect_eval") if isinstance(res, dict) else None
+    fin = ev.get("final") if isinstance(ev, dict) else None
+    if not isinstance(fin, dict):
+        return None, None
+    headers = _lower(fin.get("headers"))
+    status = _int(fin.get("status"))
+    url = str(fin.get("url") or "")[:300] or None
+    location = fin.get("location") or headers.get("location")
+    resp = S.HttpResponse(tool="header_check", url=url, status_code=status, status_basis="redirect_eval",
+                          location=str(location)[:300] if location else None,
+                          content_type=headers.get("content-type") or None,
+                          challenge=_challenge(headers, None))
+    hops = ev.get("hops") if isinstance(ev.get("hops"), list) else []
+    if len(hops) < 2:
+        # Ohne HTTP-Weiterleitung ist die Endantwort die erste Antwort; nichts Neues.
+        return None, None
+    bewertbar = (bool(headers) and status is not None and 200 <= status < 300 and not location
+                 and not resp.challenge and _html(resp.content_type) is not False
+                 and (not url or _host(url) == vh.lower()) and not ev.get("not_testable"))
+    return resp, (headers if bewertbar else None)
+
+
+def _rd_document_final(vh: str, rd: Optional[dict], hc_headers: dict[str, str]) -> Optional[dict[str, str]]:
+    """Endantwort der Weiterleitungspruefung mit Kennzeichen ``final_response_source: document``
+    (S6d C7): 2xx, HTML, gleicher Host, kein Fehler- oder Weiterleitungstitel, nicht dieselbe
+    Antwort wie header_check."""
+    if not isinstance(rd, dict) or rd.get("final_response_source") != "document":
+        return None
+    rh = _lower(rd.get("final_response_headers"))
+    status = _int(rd.get("final_status"))
+    if not rh or rh.get("location") or _html(rh.get("content-type")) is not True:
+        return None
+    if status is not None and not 200 <= status < 300:
+        return None
+    if rd.get("is_cross_domain") or _host(rd.get("final_url")) != vh.lower():
+        return None
+    titel = str(rd.get("page_title") or "")
+    if _ERROR_TITLE_RE.search(titel) or _REDIRECTOR_TITLE.search(titel):
+        return None
+    if hc_headers and same_response(rh, hc_headers):
+        return None
+    return rh
 
 
 def _complete(evaluated: S.HttpResponse, first: Optional[S.HttpResponse], headers: dict[str, str],
-              basis: S.HeaderBasis) -> Measured:
+              basis: S.HeaderBasis, *, final: Optional[S.HttpResponse] = None) -> Measured:
     csp = parse_csp(headers.get("content-security-policy")) or S.Csp(present=False)
     values: dict[str, S.HeaderValue] = {}
     for name in CANONICAL:
         present = name in headers
         values[name] = S.HeaderValue(present=present, value=headers.get(name, None) and headers[name][:300],
                                      tool=evaluated.tool, url=evaluated.url)
-    return _finish(evaluated, first, values, basis, complete=True, csp=csp, headers=headers)
+    m = _finish(evaluated, first, values, basis, complete=True, csp=csp, headers=headers)
+    # S6d (A6): Endantwort laut header_check auch dann, wenn eine andere Quelle bewertet wurde.
+    m.measurement.final = final if final is not None else (
+        evaluated if evaluated.status_basis == "redirect_eval" else None)
+    return m
 
 
 def _partial_result(evaluated: S.HttpResponse, first: S.HttpResponse,

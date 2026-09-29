@@ -16,6 +16,8 @@ from scanner.progress import publish_event, publish_tool_output
 # test_phase2_packages.py patcht den Namen); geschrieben wird ueber
 # record_tool_run.
 from scanner.tools import run_tool, _save_result, record_tool_run  # noqa: F401
+from scanner.net_throttle import (pause_between_probes, probe_reachable_after_portscan,
+                                  throttle_probe_order)
 
 log = structlog.get_logger()
 
@@ -250,6 +252,14 @@ def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
         target,
     ])
 
+    # S6d (C4): der Status der Zeile kommt aus der Ausgabe, nicht aus dem
+    # Exit-Code. testssl meldet als Exit-Code die Zahl der Befunde (DB 4394b0b7:
+    # testssl_587 mit Exit 8 und vollstaendigem JSON stand auf failed), und ein
+    # abgebrochener Lauf trug bisher keinen Grund.
+    def _status_check(code: int, raw_out: str) -> Optional[tuple[str, Optional[str]]]:
+        status, reason, _ = evaluate_testssl_output(output_path, code, raw_out)
+        return status, reason
+
     exit_code, duration_ms = run_tool(
         cmd=cmd,
         timeout=300,
@@ -258,46 +268,114 @@ def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
         host_ip=ip,
         phase=2,
         tool_name=tool_name,
+        status_check=_status_check,
     )
 
-    # VEC-373 (D4b): Tool-Failures NICHT mehr still verschlucken. testssl
-    # nutzt Exit 0/1 fuer Erfolg (1 = "Findings vorhanden"); alles andere ist
-    # ein echter Fehler. Zusaetzlich gilt ein leeres/ungueltiges JSON oder ein
-    # durchgereichter Usage-Banner als Failure. In allen Faellen: laut loggen
-    # und None zurueckgeben (None == failed, [] == lief sauber ohne Findings).
-    if exit_code not in (0, 1):
-        log.error("testssl_failed", reason="bad_exit_code", exit_code=exit_code,
+    # VEC-373 (D4b): Tool-Failures NICHT still verschlucken: laut loggen und None
+    # zurueckgeben (None == failed, [] == lief sauber ohne Findings). Timeout und
+    # Ausnahme (Exit < 0) sind immer failed; sonst entscheidet die Ausgabe (S6d).
+    if exit_code < 0:
+        log.error("testssl_failed", reason="timeout_or_error", exit_code=exit_code,
                   fqdn=fqdn, ip=ip, order_id=order_id)
         return None
-
-    try:
-        with open(output_path, "r") as f:
-            raw = f.read()
-    except FileNotFoundError:
-        log.error("testssl_failed", reason="no_output_file", exit_code=exit_code,
+    status, reason, data = evaluate_testssl_output(output_path, exit_code, "")
+    if status != "ok":
+        log.error("testssl_failed", reason=reason, exit_code=exit_code,
                   fqdn=fqdn, ip=ip, output_path=output_path, order_id=order_id)
         return None
-
-    # Usage-Banner / Help-Text durchgereicht (z.B. unrecognized option) →
-    # testssl ist abgebrochen, bevor es echte Checks gefahren hat.
-    if "testssl.sh [options]" in raw or "testssl.sh <options>" in raw:
-        log.error("testssl_failed", reason="usage_banner_in_output",
-                  exit_code=exit_code, fqdn=fqdn, ip=ip, order_id=order_id)
-        return None
-
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError as e:
-        log.error("testssl_failed", reason="invalid_json", exit_code=exit_code,
-                  fqdn=fqdn, ip=ip, error=str(e), order_id=order_id)
-        return None
-
-    if not isinstance(data, list):
-        log.error("testssl_failed", reason="unexpected_format", exit_code=exit_code,
-                  fqdn=fqdn, ip=ip, order_id=order_id)
-        return None
-
     return data
+
+
+# S6d (C4): Protokollzeilen eines vollstaendigen testssl-Laufs. Stehen sie im JSON,
+# hat testssl den Dienst geprueft, gleich welcher Exit-Code.
+_TESTSSL_PROTOCOL_IDS: frozenset[str] = frozenset(
+    {"SSLv2", "SSLv3", "TLS1", "TLS1_1", "TLS1_2", "TLS1_3"})
+_TESTSSL_NO_TLS_RE = re.compile(
+    r"(not|doesn't seem to be) an? TLS/SSL enabled server|no (TLS|SSL)/(TLS|SSL)", re.I)
+_TESTSSL_STARTTLS_RE = re.compile(r"starttls", re.I)
+_TESTSSL_CONNECT_RE = re.compile(
+    r"can'?t connect|couldn'?t connect|connection refused|tcp connect problem|"
+    r"unable to open a socket|connect problem", re.I)
+
+
+def _testssl_problem_reason(text: str) -> str:
+    """Grund eines scanProblem/FATAL-Eintrags in einen Code (S6d, C4)."""
+    if _TESTSSL_NO_TLS_RE.search(text):
+        return "no_tls_on_port"
+    if _TESTSSL_STARTTLS_RE.search(text):
+        return "starttls_failed"
+    if _TESTSSL_CONNECT_RE.search(text):
+        return "tls_connect_refused"
+    return "testssl_scan_problem"
+
+
+def evaluate_testssl_output(output_path: str, exit_code: int,
+                           raw_out: str = "") -> tuple[str, Optional[str], Optional[list]]:
+    """Status, Grund und JSON eines testssl-Laufs aus seiner Ausgabe (S6d, C4).
+
+    - keine Datei, Usage-Banner, ungueltiges JSON: ``failed`` mit Grund
+      (``no_output_file``, ``usage_banner``, ``invalid_json``);
+    - Protokollzeilen (SSLv2 bis TLS1_3) im JSON: ``ok``, gleich welcher Exit-Code
+      (testssl zaehlt Befunde im Exit-Code);
+    - scanProblem oder FATAL ohne Protokollzeilen: ``failed`` mit
+      ``no_tls_on_port``, ``starttls_failed``, ``tls_connect_refused`` oder
+      ``testssl_scan_problem``. Entschieden wird am Inhalt des JSON; STDERR allein
+      reicht nicht (DB testssl_110: "Connection refused" im STDERR, aber 47 KB
+      Ergebnis);
+    - sonst: Exit 0/1 ``ok``, anderer Exit ``failed`` mit ``incomplete_output``.
+    """
+    try:
+        with open(output_path, "r", errors="replace") as f:
+            content = f.read()
+    except (FileNotFoundError, OSError):
+        return "failed", "no_output_file", None
+    if "testssl.sh [options]" in content or "testssl.sh <options>" in content:
+        return "failed", "usage_banner", None
+    if not content.strip():
+        return "failed", "no_output_file", None
+    try:
+        data = json.loads(content)
+    except json.JSONDecodeError:
+        return "failed", "invalid_json", None
+    if not isinstance(data, list):
+        return "failed", "invalid_json", None
+
+    ids = {str(e.get("id", "")) for e in data if isinstance(e, dict)}
+    if ids & _TESTSSL_PROTOCOL_IDS:
+        return "ok", None, data
+
+    problems = [
+        str(e.get("finding", ""))
+        for e in data
+        if isinstance(e, dict)
+        and (e.get("id") == "scanProblem" or str(e.get("severity", "")).upper() == "FATAL")
+    ]
+    if problems:
+        return "failed", _testssl_problem_reason(" ".join(problems)), data
+    if exit_code in (0, 1):
+        return "ok", None, data
+    return "failed", "incomplete_output", data
+
+
+def record_provider_block_probe_p2(ip: str, tech_profile: dict[str, Any],
+                                   order_id: str) -> dict[str, Any]:
+    """S6d (C3): zweite Sperrmessung nach den Per-Port-Sonden eines gedrosselten Hosts.
+
+    Gleiche Messung und gleiche Zeilenlogik wie ``provider_block_probe`` in phase1
+    (ok bzw. failed mit ``netz_sperrt_pruefadresse_nach_portscan``), aber als eigene
+    Zeile ``provider_block_probe_p2``. Sie misst, ob der Host nach den
+    nacheinander gefahrenen Sonden noch erreichbar ist.
+    """
+    known = [int(p) for p in (tech_profile.get("open_ports") or [])
+             if str(p).isdigit()] if isinstance(tech_profile, dict) else []
+    result = probe_reachable_after_portscan(ip, known_ports=known or None)
+    record_tool_run(order_id, ip, 2, "provider_block_probe_p2",
+                    "ok" if not result["blocked"] else "failed",
+                    reason=None if not result["blocked"]
+                    else "netz_sperrt_pruefadresse_nach_portscan",
+                    exit_code=0, duration_ms=0,
+                    raw_output=json.dumps(result))
+    return result
 
 
 def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str,
@@ -1570,6 +1648,9 @@ def run_phase2(
                 ai_skip = set()  # Override: full scan on base domain
     has_ssl = tech_profile.get("has_ssl", False)
     has_web = tech_profile.get("has_web", True)  # default True for safety
+    # S6d (C3): gedrosselter Host (phase1, Hetzner): Per-Port-Sonden nacheinander
+    # mit Pause statt gleichzeitig, danach eine zweite Sperrmessung.
+    throttled = bool(tech_profile.get("throttled")) if isinstance(tech_profile, dict) else False
 
     log.info("phase2_start", ip=ip, fqdn=primary_fqdn, order_id=order_id,
              has_ssl=has_ssl, has_web=has_web,
@@ -1810,12 +1891,17 @@ def run_phase2(
                 open_ports = [int(p) for p in (tech_profile.get("open_ports") or [])]
                 extra_ports = [p for p in open_ports
                                if p != 443 and (p in TLS_PORTS_DIRECT or p in TLS_PORTS_STARTTLS)]
-                for p in sorted(set(extra_ports)):
+                # S6d (C3): auf gedrosselten Hosts konfigurierbare Reihung und Pause
+                # vor jeder weiteren Sonde; sonst unveraendert aufsteigend ohne Pause.
+                ordered_ports = (throttle_probe_order(extra_ports) if throttled
+                                 else sorted(set(extra_ports)))
+                for p in ordered_ports:
                     if p == 25:
                         # E5: SMTP auf Port 25 vom Pruefstand aus nicht pruefbar.
                         _record_phase2_status(order_id, ip, "testssl_25", "skipped",
                                               "smtp_port25_not_testable_e5")
                         continue
+                    pause_between_probes(throttled)
                     starttls = TLS_PORTS_STARTTLS.get(p, "")
                     out_path = f"{phase2_dir}/testssl_{p}.json"
                     _run_testssl_once(primary_fqdn, ip, out_path, order_id,
@@ -1828,6 +1914,7 @@ def run_phase2(
                 # Datei/Werkzeugnamen, damit der 443-Lauf eindeutig bleibt.
                 extra_vhosts = [v for v in (vhost_fqdns or []) if v and v != primary_fqdn][:2]
                 for vh in extra_vhosts:
+                    pause_between_probes(throttled)
                     slug = vhost_slug(vh)
                     _run_testssl_once(vh, ip, f"{phase2_dir}/testssl_sni_{slug}.json",
                                       order_id, severity=testssl_sev,
@@ -1921,31 +2008,37 @@ def run_phase2(
                                   "not_in_package")
         return r
 
+    def _merge_stage1(group_name: str, run: Callable[[], dict[str, Any]]) -> None:
+        try:
+            group_result = run()
+            tools = group_result.pop("_tools", [])
+            # Keep internal keys (_zap_context etc.) but don't add to tools_run
+            for k, v in group_result.items():
+                results[k] = v  # interne Schluessel bleiben fuer Stage 2
+            results["tools_run"].extend(tools)
+        except Exception as e:
+            log.error("phase2_stage1_failed", group=group_name, ip=ip, error=str(e))
+            _record_group_failure(group_name, str(e))
+
     log.info("phase2_stage1_start", ip=ip, tools="testssl+zap_spider+quick",
-             zap_id=_zap_target)
+             zap_id=_zap_target, throttled=throttled)
+    # S6d (C3): auf gedrosselten Hosts laeuft der testssl-Block (443, je Port, je
+    # SNI) allein und vor den uebrigen Stage-1-Werkzeugen, damit seine Sonden nicht
+    # mit ZAP-Discovery, header_check und httpx zusammen auf den Host treffen.
+    if throttled:
+        _merge_stage1("testssl", _run_testssl_group)
     with ThreadPoolExecutor(max_workers=3, thread_name_prefix="p2s1",
                             initializer=_set_thread_zap_id,
                             initargs=(_zap_target,)) as pool:
         s1_futures = {
-            pool.submit(_run_testssl_group): "testssl",
             pool.submit(_run_zap_discovery): "zap_discovery",
             pool.submit(_run_quick_tools_stage1): "quick",
         }
+        if not throttled:
+            s1_futures[pool.submit(_run_testssl_group)] = "testssl"
         for future in as_completed(s1_futures):
             group_name = s1_futures[future]
-            try:
-                group_result = future.result()
-                tools = group_result.pop("_tools", [])
-                # Keep internal keys (_zap_context etc.) but don't add to tools_run
-                for k, v in group_result.items():
-                    if not k.startswith("_"):
-                        results[k] = v
-                    else:
-                        results[k] = v  # Keep internal state for Stage 2
-                results["tools_run"].extend(tools)
-            except Exception as e:
-                log.error("phase2_stage1_failed", group=group_name, ip=ip, error=str(e))
-                _record_group_failure(group_name, str(e))
+            _merge_stage1(group_name, future.result)
 
     # Extract Spider URLs for Stage 2
     spider_urls = results.get("zap_spider_urls", [])
@@ -2188,7 +2281,9 @@ def run_phase2(
         # S6c/5 (spec/09): EHLO-Faehigkeiten vor STARTTLS je SMTP-Port als Rohdatum
         # (465, 587; 25 bleibt bis E5 nicht pruefbar). Unabhaengig von has_web.
         smtp_ports = [p for p in (tech_profile.get("open_ports") or []) if p in (465, 587)]
-        for sp in sorted(set(smtp_ports)):
+        # S6d (C3): auf gedrosselten Hosts konfigurierbare Reihung und Pause.
+        for sp in (throttle_probe_order(smtp_ports) if throttled else sorted(set(smtp_ports))):
+            pause_between_probes(throttled)
             try:
                 run_smtp_ehlo(target_fqdn, ip, sp, host_dir, order_id)
             except Exception as e:
@@ -2271,6 +2366,12 @@ def run_phase2(
             except Exception as e:
                 log.error("phase2_stage2_failed", group=group_name, ip=ip, error=str(e))
                 _record_group_failure(group_name, str(e))
+
+    # S6d (C3): zweite Sperrmessung nach den Per-Port-Sonden auf gedrosselten
+    # Hosts. Sie belegt in der Testrunde, ob die Reihung mit Pause reicht; der
+    # report-worker kennt die Zeile, wertet sie aber nicht als Sperre des Scans aus.
+    if throttled:
+        record_provider_block_probe_p2(ip, tech_profile, order_id)
 
     # ── Stage 3: Collect ZAP alerts (passive + active) ────────
     if zap_context:

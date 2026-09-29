@@ -1,0 +1,3025 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 3,
+   "info": 0,
+   "low": 10,
+   "medium": 6
+  },
+  "business_impact_score": "6.5",
+  "catalog_version": "2026-09-27.2",
+  "customer_context": {},
+  "engine": "catalog",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "facts_schema_version": "1.3.0",
+  "findings": [
+   {
+    "affected": "92.205.163.53:8443 (Plesk), 92.205.163.53:8880 (Plesk, laut Passivquelle, gesehen am 28.09.2026)",
+    "category": "A",
+    "description": "Auf dem geteilten Server 92.205.163.53 (ubb-wiki.castenow.de) ist eine Verwaltungsoberfläche aus dem gesamten Internet erreichbar: 92.205.163.53:8443 (Plesk) und laut Passivquelle 92.205.163.53:8880 (Plesk, gesehen am 28.09.2026, außerhalb des geprüften Portbereichs). Auf dem Server liegen laut Passivquelle 2 weitere Domains; die Verwaltung betreibt der Hoster.",
+    "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:8443/tcp · Dienst: https-alt · Produkt: sw-cp-server · Server-Kennung: sw-cp-server · Seitentitel: Plesk Obsidian 18.0.81 · Anmeldung verlangt: ja · TLS erzwungen: ja · Zertifikat für: Fremddomain · Aussteller: YR1 · gültig bis: 12.11.2026, 00:41 UTC\n\nShodan · phase0a/shodan_hosts.json\nQuelle: shodan · 92.205.163.53:8880 · Dienst gesehen am: 28.09.2026 · Banner (Auszug): HTTP/1.1 200 OK Server: sw-cp-server Date: Mon, 28 Sep 2026 04:31:03 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked",
+    "id": "VS-2026-001",
+    "impact": "Eine Übernahme der Verwaltungsoberfläche beträfe alle Dienste auf diesem Server. Dazu gehören die eigenen Webseiten auf diesem Server. Abschalten oder beschränken kann sie nur der Hoster.",
+    "key": "admin_access/92.205.163.53/hoster:Host Europe GmbH",
+    "level": "erhöht",
+    "policy_id": "admin_panel_hoster, admin_service_exposed_passive",
+    "recommendation": "In Kürze: Den Hoster bitten, die Verwaltungsoberfläche auf die benötigten Quellnetze zu beschränken oder hinter eine zusätzliche Anmeldestufe zu legen.\nMittelfristig: Beim Hoster erfragen, wie die Verwaltungssoftware gepflegt wird, und die Zugangsdaten des eigenen Kundenkontos mit einer zweiten Anmeldestufe schützen.",
+    "scale": "exposure",
+    "severity": "HIGH",
+    "source": "aktiv (nmap), passiv (Shodan)",
+    "title": "Verwaltungszugänge auf 92.205.163.53: Verwaltungsoberfläche Plesk auf 8443 und laut Passivquelle 8880 (beim Hoster Host Europe GmbH)",
+    "urgency": "In Kürze",
+    "verification": "Den genannten Port von einer externen Adresse aufrufen; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung des Hosters."
+   },
+   {
+    "affected": "92.205.163.53:110 (POP3 mit Anmeldung vor STARTTLS), 92.205.163.53:143 (IMAP mit Anmeldung vor STARTTLS)",
+    "category": "A",
+    "description": "Auf 92.205.163.53 (ubb-wiki.castenow.de) bietet der Mailabrufdienst zwar STARTTLS an, nimmt eine Anmeldung aber schon vor dem Aufbau der Verschlüsselung entgegen: 92.205.163.53:110 (POP3 mit Anmeldung vor STARTTLS), 92.205.163.53:143 (IMAP mit Anmeldung vor STARTTLS).",
+    "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:110/tcp · Dienst: pop3 · Produkt: Dovecot pop3d · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · Anmeldeverfahren: CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN · Zertifikat für: Fremddomain · Aussteller: YR1 · gültig bis: 12.11.2026, 00:41 UTC · POP3-Fähigkeiten: AUTH-RESP-CODE SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) RESP-CODES STLS PIPELINING APOP USER TOP CAPA UIDL\n\nnmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:143/tcp · Dienst: imap · Produkt: Dovecot imapd · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · Anmeldeverfahren: CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN · Zertifikat für: Fremddomain · Aussteller: YR1 · gültig bis: 12.11.2026, 00:41 UTC · IMAP-Fähigkeiten: LITERAL+ AUTH=CRAM-MD5 AUTH=DIGEST-MD5 STARTTLS LOGIN-REFERRALS AUTH=PLAIN IDLE AUTH=LOGIN ID SASL-IR IMAP4rev1 ENABLE",
+    "id": "VS-2026-002",
+    "impact": "STARTTLS wird angeboten, aber nicht verlangt: Ein Angreifer auf dem Übertragungsweg kann das Angebot unterdrücken und die Anmeldedaten dann im Klartext mitlesen.",
+    "key": "plaintext_services/92.205.163.53/hoster:Host Europe GmbH",
+    "level": "erhöht",
+    "policy_id": "mail_plaintext",
+    "recommendation": "In Kürze: Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten.\nStrategisch: Mail-Clients auf die verschlüsselten Abrufwege umstellen und die Klartextports anschließend schließen.",
+    "scale": "exposure",
+    "severity": "HIGH",
+    "source": "aktiv (nmap)",
+    "title": "Zugänge auf 92.205.163.53 (ubb-wiki.castenow.de): POP3 oder IMAP ohne TLS-Zwang (beim Hoster Host Europe GmbH)",
+    "urgency": "In Kürze",
+    "verification": "Verbindung zum Mailabrufdienst von außen aufbauen, bevor STARTTLS angefordert wird; erwartet wird die Ablehnung dieser unverschlüsselten Anmeldung."
+   },
+   {
+    "affected": "92.205.163.53:8001 (nicht identifiziert)",
+    "category": "A",
+    "description": "Auf 92.205.163.53 (ubb-wiki.castenow.de) ist ein Port offen, dessen Dienst sich weder mit Produkt noch mit Titel zu erkennen gibt: 92.205.163.53:8001 (nicht identifiziert). Der Portscan kennt nur die übliche Belegung dieser Portnummer, nicht den tatsächlichen Dienst.",
+    "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:8001/tcp · Dienst: nicht identifiziert · 8001/tcp open vcom-tunnel?",
+    "id": "VS-2026-003",
+    "impact": "Ein offener Dienst ohne erkennbaren Zweck vergrößert die Angriffsfläche. Ob er gepflegt wird und wer ihn nutzt, ist von außen nicht feststellbar.",
+    "key": "service_unidentified/scan/hoster:Host Europe GmbH",
+    "level": "erhöht",
+    "policy_id": "service_unidentified",
+    "recommendation": "In Kürze: Klären, welcher Dienst auf dem Port läuft und ob er aus dem Internet erreichbar sein muss; andernfalls den Port schließen.\nMittelfristig: Benötigte Dienste auf feste Quellnetze beschränken und in die Dokumentation der erreichbaren Dienste aufnehmen.",
+    "scale": "exposure",
+    "severity": "HIGH",
+    "source": "aktiv (nmap)",
+    "title": "Offener Dienst ohne Kennung (beim Hoster Host Europe GmbH)",
+    "urgency": "In Kürze",
+    "verification": "Portscan der genannten Ports von einer externen Adresse wiederholen; erwartet wird ein geschlossener Port oder ein Dienst, dessen Zweck dokumentiert ist."
+   },
+   {
+    "affected": "bitwarden.castenow.de (Bitwarden Web vault), mail.castenow.de (Outlook), mail2.castenow.de (Outlook), ubb-wiki.castenow.de (Login · ubb-wiki | castenow.de)",
+    "category": "A",
+    "description": "Die Webseiten bitwarden.castenow.de, mail.castenow.de, mail2.castenow.de und ubb-wiki.castenow.de zeigen ein Anmeldeportal, das aus dem gesamten Internet erreichbar ist: bitwarden.castenow.de (Bitwarden Web vault), mail.castenow.de (Outlook), mail2.castenow.de (Outlook), ubb-wiki.castenow.de (Login · ubb-wiki | castenow.de). Die Erreichbarkeit selbst ist beabsichtigt, wenn das Portal für den externen Zugriff vorgesehen ist.",
+    "evidence": "Webabruf · argument:host_inventory\nbitwarden.castenow.de · Status: 200 · Titel: Bitwarden Web vault · Zieladresse: https://bitwarden.castenow.de · erreichbar: ja\n\nWebabruf · argument:host_inventory\nmail.castenow.de · Status: 200 · Titel: Outlook · Zieladresse: https://mail.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.castenow.de%2fowa%2f&reason=0 · erreichbar: ja\n\nWebabruf · argument:host_inventory\nmail2.castenow.de · Status: 200 · Titel: Outlook · Zieladresse: https://mail2.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail2.castenow.de%2fowa%2f&reason=0 · erreichbar: ja\n\nWebabruf · argument:host_inventory\nubb-wiki.castenow.de · Status: 200 · Titel: Login – ubb-wiki | castenow.de · Zieladresse: https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F · Schutzsystem: Generic · erreichbar: ja",
+    "id": "VS-2026-004",
+    "impact": "Ein öffentlich erreichbares Anmeldeportal ist ein häufiges Ziel für automatisierte Anmeldeversuche mit gestohlenen oder erratenen Zugangsdaten. Ohne zusätzliche Absicherung genügt ein einzelnes bekanntes Passwort für den Zugriff. Ob ein zweiter Faktor aktiv ist, ist von außen nicht feststellbar.",
+    "key": "login_portal_exposed/scan/kunde",
+    "level": "mittel",
+    "policy_id": "login_portal_exposed",
+    "recommendation": "Mittelfristig: Prüfen, ob die Anmeldung am Portal einen zusätzlichen Faktor verlangt, etwa eine Authentifizierungs-App oder ein Einmalkennwort, und ihn andernfalls ergänzen.\nMittelfristig: Zugriff auf bekannte Quellnetze beschränken, soweit die Nutzung des Portals das zulässt.\nStrategisch: Softwarestand des Portals regelmäßig gegen die Sicherheitshinweise des Herstellers prüfen und zeitnah einspielen.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (Webabruf)",
+    "title": "Anmeldeportal aus dem Internet erreichbar",
+    "urgency": "Mittelfristig",
+    "verification": "Anmeldeversuch mit einem falschen Kennwort durchführen; erwartet wird eine Sperre oder Verzögerung nach mehreren Fehlversuchen sowie die Abfrage des zusätzlichen Faktors."
+   },
+   {
+    "affected": "castenow.de (p=none; ~all)",
+    "category": "C",
+    "description": "Die DMARC-Richtlinie der Domain castenow.de ist auf reine Beobachtung gesetzt: castenow.de (p=none). E-Mails, die SPF oder DKIM nicht bestehen, werden dadurch nicht zurückgewiesen oder unter Quarantäne gestellt. Der SPF-Eintrag der Domain castenow.de setzt bei nicht autorisierten Versendern nur auf eine weiche oder neutrale Fehlbehandlung: castenow.de (~all). Empfangende Mailserver dürfen die E-Mail trotzdem zustellen.",
+    "evidence": "DNS-Abfragen · phase0/dns_records.json\ncastenow.de · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere · DMARC: v=DMARC1; p=none; rua=mailto:dmarc@castenow.de · SPF: v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ip4:195.50.179.4 ~all",
+    "id": "VS-2026-005",
+    "impact": "Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte E-Mails im Namen der Domain kommen weiterhin beim Empfänger an. Die Berichte über fehlgeschlagene Prüfungen gehen an die hinterlegte Meldeadresse dmarc@castenow.de. Eingehende E-Mail nimmt ein Mailserver außerhalb der eigenen Domain an: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com, mx04.hornetsecurity.com. Der SPF-Eintrag gibt ihn über den Mechanismus mx auch als Absender frei; die Umstellung der Richtlinie betrifft deshalb auch dessen Betreiber. Eine weiche oder neutrale Fehlbehandlung markiert eine E-Mail lediglich als verdächtig, lehnt sie aber nicht ab. Empfangssysteme, die diese Markierung nicht auswerten, stellen gefälschte E-Mails im Namen der Domain trotzdem zu.",
+    "key": "mail_policy/castenow.de/kunde",
+    "level": "mittel",
+    "policy_id": "dmarc_none, spf_softfail",
+    "recommendation": "Mittelfristig: Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen.\nMittelfristig: Nach einer Beobachtungsphase ohne Fehlmeldungen den Qualifizierer des SPF-Eintrags auf eine harte Fehlbehandlung umstellen, sobald alle legitimen Versandquellen erfasst sind.\nStrategisch: Die Richtlinie auf Quarantäne und danach auf Zurückweisung anheben, sobald alle legitimen Versender erfasst sind.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (DNS-Abfragen)",
+    "title": "Richtlinien zur Absender-Authentizität für castenow.de: DMARC ohne Durchsetzung und SPF nur mit Softfail",
+    "urgency": "Mittelfristig",
+    "verification": "DNS-Abfrage des TXT-Eintrags _dmarc.castenow.de; erwartet wird eine Richtlinie p, die nicht auf reine Beobachtung gesetzt ist. DNS-Abfrage des TXT-Eintrags der Domain castenow.de; erwartet wird ein SPF-Eintrag mit harter Fehlbehandlung am Ende der Regel."
+   },
+   {
+    "affected": "castenow.de (159.69.143.80, Server von planwerk6.de im Rechenzentrum Hetzner Online GmbH, laut Passivquelle 2 weitere Domains)",
+    "category": "C",
+    "description": "Der SPF-Eintrag der Domain castenow.de gibt einen Server als Absender frei, auf dem weitere Domains liegen: castenow.de (159.69.143.80, Server von planwerk6.de im Rechenzentrum Hetzner Online GmbH, laut Passivquelle 2 weitere Domains).",
+    "evidence": "DNS-Abfragen · phase0/dns_records.json\ncastenow.de · SPF: v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ip4:195.50.179.4 ~all · Mechanismus: a · löst auf: 159.69.143.80 · Server von planwerk6.de · auf demselben Server: laut Passivquelle 2 weitere Domains",
+    "id": "VS-2026-006",
+    "impact": "Jede Anwendung auf diesem Server darf damit E-Mails im Namen der Domain versenden, auch die Anwendungen der weiteren Domains. Empfänger erkennen solche Mails an SPF nicht als gefälscht.",
+    "key": "spf_authorizes_shared_host/scan/kunde",
+    "level": "mittel",
+    "policy_id": "spf_authorizes_shared_host",
+    "recommendation": "Mittelfristig: Prüfen, ob über den genannten Server tatsächlich E-Mails der Domain versendet werden; andernfalls den Mechanismus aus dem SPF-Eintrag entfernen.\nStrategisch: E-Mails der Domain nur über eigene oder vertraglich gebundene Versanddienste senden und diese im SPF-Eintrag gezielt freigeben.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (DNS-Abfragen)",
+    "title": "SPF gibt geteilten Server frei",
+    "urgency": "Mittelfristig",
+    "verification": "SPF-Eintrag der Domain erneut abfragen; erwartet wird, dass kein Server mit weiteren Domains mehr freigegeben ist oder der Versand über ihn belegt ist."
+   },
+   {
+    "affected": "bitwarden.castenow.de:443",
+    "category": "D",
+    "description": "Für den Dienst bitwarden.castenow.de liefert der TLS-Handshake eine unvollständige Zertifikatskette: bitwarden.castenow.de:443. Zwischen dem Server-Zertifikat und einer allgemein bekannten Vertrauensstelle fehlt mindestens ein Zwischenzertifikat.",
+    "evidence": "testssl.sh\nbitwarden.castenow.de:443 · Zertifikat für: *.castenow.de · weitere Namen: *.castenow.de, castenow.de · Aussteller: Sectigo Public Server Authentication CA DV R36 · gültig bis: 14.03.2027, 23:59 UTC · Vertrauenskette vollständig: nein · Erneuerung laut CT-Logs: zuletzt 27 Tage vor Ablauf erneuert (28.08.2026), davor 31 und 32 Tage; nächste Erneuerung nach diesem Muster um den 15.02.2027; 6 Zertifikate dieser Linie (Sectigo Limited)",
+    "id": "VS-2026-007",
+    "impact": "Clients, die die fehlende Zwischenstelle nicht bereits im eigenen Speicher haben, können die Vertrauenskette nicht vollständig nachvollziehen und zeigen eine Warnung oder lehnen die Verbindung ab. Betroffen sind vor allem ältere oder abweichend konfigurierte Clients.",
+    "key": "cert_health/195.50.179.6/kunde",
+    "level": "mittel",
+    "policy_id": "cert_chain_incomplete",
+    "recommendation": "Mittelfristig: Die vollständige Zertifikatskette einschließlich aller Zwischenzertifikate auf dem Dienst hinterlegen, so wie es die ausstellende Stelle vorgibt.\nStrategisch: Die Auslieferung der Zertifikatskette in die Prüfung neuer oder erneuerter Zertifikate aufnehmen, damit dieser Zustand nicht erneut entsteht.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (testssl.sh)",
+    "title": "Zertifikate auf bitwarden.castenow.de: Vertrauenskette unvollständig",
+    "urgency": "Mittelfristig",
+    "verification": "Verbindung zum Dienst mit einem TLS-Client aufbauen und die übermittelte Zertifikatskette prüfen; erwartet wird eine Kette bis zu einer allgemein bekannten Vertrauensstelle ohne fehlendes Zwischenzertifikat."
+   },
+   {
+    "affected": "www.castenow.de (unsafe-inline für Skripte, unsafe-eval für Skripte; fehlend: Permissions-Policy)",
+    "category": "D",
+    "description": "Auf www.castenow.de ist eine Content-Security-Policy gesetzt, die einzelne Direktiven wieder lockert: www.castenow.de (unsafe-inline für Skripte, unsafe-eval für Skripte). Auf www.castenow.de fehlen einzelne Sicherheits-Header der Webseite: www.castenow.de (fehlend: Permissions-Policy).",
+    "evidence": "header_check · hosts/159.69.143.80/phase2/headers_www.castenow.de.json\nwww.castenow.de · Adresse: https://www.castenow.de · Antwort: 200 · Content-Security-Policy: default-src 'none'; connect-src 'self' wss: data: https://matomo.pw6.de/; font-src 'self' data:; frame-src 'self' www.youtube.com https://auth.pw6.de; img-src 'self' data: i.ytimg.com; media-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' matomo.pw6.de https://www.instagram.com https://matomo.pw6.de/; script-src-elem 'self' 'unsafe-eval' 'unsafe-inline' matomo.pw6.de https://www.instagram.com; style-src 'self' 'unsafe-inline' · fehlende Header: Permissions-Policy",
+    "id": "VS-2026-008",
+    "impact": "Die Freigabe unsafe-inline für Skripte erlaubt eingebettete Skripte in der Seite und hebt damit den Schutz gegen eingeschleuste Skripte weitgehend auf. Die Freigabe unsafe-eval erlaubt Skripte, die zur Laufzeit aus Zeichenketten erzeugt werden. Es fehlt nur die Permissions-Policy, die festlegt, welche Browserfunktionen wie Kamera, Mikrofon oder Standort eingebettete Inhalte nutzen dürfen. Die Auswirkung ist gering; die übrigen grundlegenden Sicherheits-Header sind gesetzt.",
+    "key": "web_header_hygiene/159.69.143.80/kunde",
+    "level": "mittel",
+    "policy_id": "csp_weak, security_headers_incomplete",
+    "recommendation": "Mittelfristig: Die Freigaben unsafe-inline und unsafe-eval für Skripte aus der Content-Security-Policy entfernen und eingebettete Skripte über Nonces oder Hashes freigeben.\nMittelfristig: Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (header_check)",
+    "title": "Absicherung der Webdienste auf 159.69.143.80: Inhaltsrichtlinie mit unsicheren Freigaben und Sicherheits-Header unvollständig",
+    "urgency": "Mittelfristig",
+    "verification": "HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird eine Content-Security-Policy ohne unsafe-inline und unsafe-eval für Skripte. Erwartet wird eine Permissions-Policy."
+   },
+   {
+    "affected": "mail.castenow.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mail2.castenow.de (fehlend: X-Content-Type-Options)",
+    "category": "D",
+    "description": "Der Dienst 195.50.179.4 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: mail.castenow.de, mail2.castenow.de. Auf 195.50.179.4 ist keine Content-Security-Policy gesetzt: mail.castenow.de, mail2.castenow.de. Auf 195.50.179.4 fehlen einzelne Sicherheits-Header der Webseite: mail.castenow.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy), mail2.castenow.de (fehlend: X-Content-Type-Options).",
+    "evidence": "header_check · hosts/195.50.179.4/phase2/headers_mail.castenow.de.json\nmail.castenow.de · Adresse: https://mail.castenow.de · Antwort: 302 · weitergeleitet auf: https://mail.castenow.de/owa/ · Strict-Transport-Security: nicht gesetzt\n\nWeiterleitungsprüfung · hosts/195.50.179.4/phase1/tech_profile.json\nmail.castenow.de · bewertet an der Endseite: https://mail.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.castenow.de%2fowa%2f&reason=0 · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options\n\nheader_check · hosts/195.50.179.4/phase2/headers_mail2.castenow.de.json\nmail2.castenow.de · Adresse: https://mail2.castenow.de · Antwort: 302 · weitergeleitet auf: https://mail2.castenow.de/owa/ · Strict-Transport-Security: nicht gesetzt\n\nZAP · hosts/195.50.179.4/phase2/zap_alerts.json\nmail2.castenow.de · Einzelmeldungen an: https://mail2.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail2.castenow.de%2fowa%2f&reason=0 · nur einzelne Header belegt: Content-Security-Policy, X-Content-Type-Options · an der Endseite nicht gemessen: X-Frame-Options, Referrer-Policy, Permissions-Policy · Content-Security-Policy: nicht gesetzt · fehlende Header: X-Content-Type-Options",
+    "id": "VS-2026-009",
+    "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+    "key": "web_header_hygiene/195.50.179.4/kunde",
+    "level": "mittel",
+    "policy_id": "csp_missing, hsts_missing, security_headers_incomplete",
+    "recommendation": "Mittelfristig: Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.\nMittelfristig: Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.\nMittelfristig: X-Content-Type-Options mit dem Wert nosniff setzen.\nMittelfristig: Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin.\nMittelfristig: Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (Weiterleitungsprüfung, header_check), passiv (ZAP)",
+    "title": "Absicherung der Webdienste auf 195.50.179.4: HSTS fehlt, Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
+    "urgency": "Mittelfristig",
+    "verification": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security. HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird X-Content-Type-Options mit dem Wert nosniff. Erwartet wird eine Referrer-Policy. Erwartet wird eine Permissions-Policy."
+   },
+   {
+    "affected": "92.205.163.53:21 (FTP)",
+    "category": "A",
+    "description": "Der Host 92.205.163.53 (ubb-wiki.castenow.de) bietet ein älteres Übertragungsprotokoll an: 92.205.163.53:21 (FTP). Ob dort eine Anmeldung ohne Transportverschlüsselung abgelehnt wird, ließ sich von außen nicht feststellen: 92.205.163.53:21 (FTP).",
+    "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:21/tcp · Dienst: ftp · Produkt: ProFTPD · Zertifikat für: Fremddomain · Aussteller: YR1 · gültig bis: 12.11.2026, 00:41 UTC",
+    "id": "VS-2026-010",
+    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Servers, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
+    "key": "legacy_protocols_present/scan/hoster:Host Europe GmbH",
+    "level": "niedrig",
+    "policy_id": "legacy_protocols_present",
+    "recommendation": "Mittelfristig: Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.\nStrategisch: Falls der Dienst benötigt wird, den Zugriff auf feste Quelladressen beschränken und eine erzwungene Verschlüsselung sicherstellen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (nmap)",
+    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar (beim Hoster Host Europe GmbH)",
+    "urgency": "Mittelfristig",
+    "verification": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
+   },
+   {
+    "affected": "92.205.163.53:8000 (ERROR: Script execution failed (use -d to debug), Stream tonausstrom.de)",
+    "category": "A",
+    "description": "Der Host 92.205.163.53 (ubb-wiki.castenow.de) beantwortet Anfragen an einen Webdienst auf einem Port außerhalb der üblichen Web- und Verwaltungsports: 92.205.163.53:8000 (ERROR: Script execution failed (use -d to debug), Stream tonausstrom.de).",
+    "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:8000/tcp · Kennung: ERROR: Script execution failed (use -d to debug), Stream tonausstrom.de · Server-Kennung: ERROR: Script execution failed (use -d to debug) · 8000/tcp open http-alt?",
+    "id": "VS-2026-011",
+    "impact": "Ein Webdienst auf einem unüblichen Port bleibt bei einer Prüfung der Standardports leicht unbemerkt und vergrößert die Angriffsfläche um eine Anwendung, deren Pflegezustand von außen nicht erkennbar ist.",
+    "key": "windows_edge_exposure/92.205.163.53/hoster:Host Europe GmbH",
+    "level": "niedrig",
+    "policy_id": "http_alt_port",
+    "recommendation": "Mittelfristig: Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss.\nStrategisch: Nicht mehr benötigte Dienste abschalten und den zugehörigen Port schließen; weiterhin benötigte Dienste auf feste Quellnetze beschränken.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (nmap)",
+    "title": "Webdienste auf 92.205.163.53 (ubb-wiki.castenow.de): zusätzlicher Webport (beim Hoster Host Europe GmbH)",
+    "urgency": "Mittelfristig",
+    "verification": "Portscan des Hosts von einer externen Adresse wiederholen; erwartet wird, dass der Port nur noch für berechtigte Quellnetze erreichbar oder vollständig geschlossen ist."
+   },
+   {
+    "affected": "castenow.de",
+    "category": "C",
+    "description": "Für castenow.de ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain castenow.de fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten. Für castenow.de ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain castenow.de fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können.",
+    "evidence": "DNS-Abfragen · phase0/dns_records.json\ncastenow.de · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere\n\nDNS-Abfragen · phase0a/dns_security.json\ncastenow.de · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
+    "id": "VS-2026-012",
+    "impact": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen. Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.",
+    "key": "mail_transport_enforcement/castenow.de/kunde",
+    "level": "niedrig",
+    "policy_id": "mta_sts_missing, tls_rpt_missing",
+    "recommendation": "Strategisch: Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.\nStrategisch: Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (DNS-Abfragen)",
+    "title": "Verschlüsselte Zustellung von E-Mails für castenow.de: kein MTA-STS und kein TLS-RPT",
+    "urgency": "Strategisch",
+    "verification": "DNS-Abfrage des TXT-Eintrags _mta-sts.castenow.de sowie Abruf der Richtliniendatei unter der zugehörigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine Richtliniendatei mit mode enforce. DNS-Abfrage des TXT-Eintrags _smtp._tls.castenow.de; erwartet wird ein Eintrag, der mit v=TLSRPTv1 beginnt und eine Meldeadresse (rua) nennt."
+   },
+   {
+    "affected": "bitwarden.castenow.de (fehlend: Permissions-Policy)",
+    "category": "D",
+    "description": "Auf bitwarden.castenow.de fehlen einzelne Sicherheits-Header der Webseite: bitwarden.castenow.de (fehlend: Permissions-Policy).",
+    "evidence": "testssl.sh · hosts/195.50.179.6/phase2/testssl.json\nbitwarden.castenow.de · bewertet an der Endseite: https://bitwarden.castenow.de/ · Antwort: 200 · fehlende Header: Permissions-Policy",
+    "id": "VS-2026-013",
+    "impact": "Es fehlt nur die Permissions-Policy, die festlegt, welche Browserfunktionen wie Kamera, Mikrofon oder Standort eingebettete Inhalte nutzen dürfen. Die Auswirkung ist gering; die übrigen grundlegenden Sicherheits-Header sind gesetzt.",
+    "key": "web_header_hygiene/195.50.179.6/kunde",
+    "level": "niedrig",
+    "policy_id": "security_headers_incomplete",
+    "recommendation": "Mittelfristig: Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (testssl.sh)",
+    "title": "Absicherung der Webdienste auf bitwarden.castenow.de: Sicherheits-Header unvollständig",
+    "urgency": "Mittelfristig",
+    "verification": "HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird eine Permissions-Policy."
+   },
+   {
+    "affected": "ubb-wiki.castenow.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy)",
+    "category": "D",
+    "description": "Auf ubb-wiki.castenow.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src): ubb-wiki.castenow.de. Auf ubb-wiki.castenow.de fehlen einzelne Sicherheits-Header der Webseite: ubb-wiki.castenow.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+    "evidence": "header_check · hosts/92.205.163.53/phase2/headers_ubb-wiki.castenow.de.json\nubb-wiki.castenow.de · Adresse: https://ubb-wiki.castenow.de · Antwort: 302 · weitergeleitet auf: https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F\n\nWeiterleitungsprüfung · hosts/92.205.163.53/phase1/tech_profile.json\nubb-wiki.castenow.de · bewertet an der Endseite: https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F · Antwort: 200 · Content-Security-Policy: frame-ancestors 'self'; · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options",
+    "id": "VS-2026-014",
+    "impact": "Eine Richtlinie ohne Regel für Skriptquellen schränkt nicht ein, welche Skripte eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit die zweite Verteidigungslinie; der Schutz vor Einbettung in fremde Seiten bleibt davon unberührt. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+    "key": "web_header_hygiene/92.205.163.53/kunde",
+    "level": "niedrig",
+    "policy_id": "csp_missing, security_headers_incomplete",
+    "recommendation": "Mittelfristig: Die bestehende Content-Security-Policy um eine Regel für Skriptquellen (script-src oder default-src) ergänzen, die nur die tatsächlich benötigten Ursprünge zulässt.\nMittelfristig: X-Content-Type-Options mit dem Wert nosniff setzen.\nMittelfristig: Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin.\nMittelfristig: Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (Weiterleitungsprüfung, header_check)",
+    "title": "Absicherung der Webdienste auf 92.205.163.53: Inhaltsrichtlinie nur mit frame-ancestors, keine Regel für Skriptquellen und Sicherheits-Header unvollständig",
+    "urgency": "Mittelfristig",
+    "verification": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird X-Content-Type-Options mit dem Wert nosniff. Erwartet wird eine Referrer-Policy. Erwartet wird eine Permissions-Policy."
+   },
+   {
+    "affected": "mail.castenow.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-SE), mail2.castenow.de (Server: Microsoft-IIS/10.0, X-AspNet-Version: 4.0.30319, X-FEServer: EXCHANGE-SE), ubb-wiki.castenow.de (Server: nginx, X-Powered-By: PHP/8.4.25, PleskLin)",
+    "category": "E",
+    "description": "Die Webantworten von mail.castenow.de, mail2.castenow.de und ubb-wiki.castenow.de nennen in ihren Antwortheadern die Version der eingesetzten Serversoftware: mail.castenow.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319), mail2.castenow.de (Server: Microsoft-IIS/10.0, X-AspNet-Version: 4.0.30319), ubb-wiki.castenow.de (Server: nginx, X-Powered-By: PHP/8.4.25, PleskLin). Der Antwortheader X-FEServer nennt den internen Namen des Frontend-Servers: mail.castenow.de (X-FEServer: EXCHANGE-SE), mail2.castenow.de (X-FEServer: EXCHANGE-SE).",
+    "evidence": "header_check · hosts/195.50.179.4/phase2/headers_mail.castenow.de.json\nmail.castenow.de · Adresse: https://mail.castenow.de · Antwort: 302 · weitergeleitet auf: https://mail.castenow.de/owa/ · Server: Microsoft-IIS/10.0 · X-FEServer (interner Servername): EXCHANGE-SE\n\nWeiterleitungsprüfung · hosts/195.50.179.4/phase1/tech_profile.json\nmail.castenow.de · bewertet an der Endseite: https://mail.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.castenow.de%2fowa%2f&reason=0 · Antwort: 200 · X-Powered-By: ASP.NET · X-AspNet-Version: 4.0.30319\n\nheader_check · hosts/195.50.179.4/phase2/headers_mail2.castenow.de.json\nmail2.castenow.de · Adresse: https://mail2.castenow.de · Antwort: 302 · weitergeleitet auf: https://mail2.castenow.de/owa/ · Server: Microsoft-IIS/10.0 · X-FEServer (interner Servername): EXCHANGE-SE\n\nZAP · hosts/195.50.179.4/phase2/zap_alerts.json\nmail2.castenow.de · Einzelmeldungen an: https://mail2.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail2.castenow.de%2fowa%2f&reason=0 · nur einzelne Header belegt: Content-Security-Policy, X-Content-Type-Options · an der Endseite nicht gemessen: X-Frame-Options, Referrer-Policy, Permissions-Policy · X-AspNet-Version: 4.0.30319\n\nheader_check · hosts/92.205.163.53/phase2/headers_ubb-wiki.castenow.de.json\nubb-wiki.castenow.de · Adresse: https://ubb-wiki.castenow.de · Antwort: 302 · weitergeleitet auf: https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F · Server: nginx\n\nWeiterleitungsprüfung · hosts/92.205.163.53/phase1/tech_profile.json\nubb-wiki.castenow.de · bewertet an der Endseite: https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F · Antwort: 200 · X-Powered-By: PHP/8.4.25, PleskLin",
+    "id": "VS-2026-015",
+    "impact": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs. Ein interner Servername verrät das Namensschema der Serverlandschaft; das erleichtert die Aufklärung vor einem gezielten Angriff.",
+    "key": "banner_disclosure/scan/kunde",
+    "level": "niedrig",
+    "policy_id": "http_header_disclosure",
+    "recommendation": "Mittelfristig: Versionskennungen und interne Servernamen in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert setzen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (Weiterleitungsprüfung, header_check), passiv (ZAP)",
+    "title": "Versionsangaben in den Antworten der Dienste: Versions- oder Servername im HTTP-Header",
+    "urgency": "Mittelfristig",
+    "verification": "HTTP-Antwortheader der genannten Adresse von außen abrufen; erwartet wird kein Header mit einer konkreten Versionsangabe."
+   },
+   {
+    "affected": "umfrage.castenow.de (Server: Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.8)",
+    "category": "E",
+    "description": "Die Webantwort von umfrage.castenow.de nennt in ihren Antwortheadern die Version der eingesetzten Serversoftware: umfrage.castenow.de (Server: Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.8).",
+    "evidence": "header_check · hosts/18.239.50.54/phase2/headers_umfrage.castenow.de.json\numfrage.castenow.de · Adresse: https://umfrage.castenow.de · Antwort: 301 (Weiterleitung) · weitergeleitet auf: https://www.castenow.de/ · Server: Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.8",
+    "id": "VS-2026-016",
+    "impact": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs.",
+    "key": "banner_disclosure/scan/platform:umfrageonline.com",
+    "level": "niedrig",
+    "policy_id": "http_header_disclosure",
+    "recommendation": "Mittelfristig: Versionskennungen und interne Servernamen in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert setzen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (header_check)",
+    "title": "Versionsangaben in den Antworten der Dienste: Versions- oder Servername im HTTP-Header (beim Plattformbetreiber umfrageonline.com)",
+    "urgency": "Mittelfristig",
+    "verification": "HTTP-Antwortheader der genannten Adresse von außen abrufen; erwartet wird kein Header mit einer konkreten Versionsangabe."
+   },
+   {
+    "affected": "castenow.de",
+    "category": "E",
+    "description": "Für castenow.de ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain castenow.de lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
+    "evidence": "DNS-Abfragen · phase0a/dns_security.json\ncastenow.de · DNSSEC: Zone nicht signiert",
+    "id": "VS-2026-017",
+    "impact": "Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
+    "key": "dns_hygiene/castenow.de/kunde",
+    "level": "niedrig",
+    "policy_id": "dnssec_missing",
+    "recommendation": "Strategisch: DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (DNS-Abfragen)",
+    "title": "DNS-Absicherung für castenow.de: keine DNSSEC-Signatur",
+    "urgency": "Strategisch",
+    "verification": "DNS-Abfrage der SOA mit aktivierter DNSSEC-Option für die Domain castenow.de; erwartet wird ein RRSIG-Eintrag in der Antwort."
+   },
+   {
+    "affected": "195.50.179.4:25 (laut Passivquelle, Hosteintrag aktualisiert am 28.09.2026)",
+    "category": "E",
+    "description": "Laut Passivquelle nennt der Mailserver auf 195.50.179.4 (mail.castenow.de, mail2.castenow.de, owa.castenow.de) den Befehl VRFY in seiner Antwort auf EHLO: 195.50.179.4:25 (laut Passivquelle, Hosteintrag aktualisiert am 28.09.2026). Port 25 ist vom Prüfstand aus nicht prüfbar; die Angabe der Passivquelle ist deshalb nicht bestätigt.",
+    "evidence": "Shodan · phase0a/shodan_hosts.json\nQuelle: shodan · 195.50.179.4:25 · VRFY in der EHLO-Antwort: ja · Banner (Auszug): 220 ciphermail.castenow.de ESMTP CipherMail 250-ciphermail.castenow.de 250-PIPELINING 250-SIZE 31457280 250-VRFY 250-STARTTLS 250-ENHANCEDSTATUSCODES",
+    "id": "VS-2026-018",
+    "impact": "Mit VRFY lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte Phishing-Mails und Rateangriffe auf Zugangsdaten.",
+    "key": "smtp_commands/195.50.179.4/kunde",
+    "level": "niedrig",
+    "policy_id": "smtp_vrfy_enabled_passive",
+    "recommendation": "Mittelfristig: Prüfen, ob der Mailserver den Befehl VRFY beantwortet, und ihn gegebenenfalls abschalten.\nStrategisch: Den Befehl VRFY in der Konfiguration des Mailservers abschalten, bei Postfix über disable_vrfy_command.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "passiv (Shodan)",
+    "title": "Mailserver auf 195.50.179.4 (mail.castenow.de, mail2.castenow.de, owa.castenow.de): VRFY angeboten laut Passivquelle",
+    "urgency": "Mittelfristig",
+    "verification": "Verbindung zum Mailserver aufbauen und VRFY mit einem bekannten Postfachnamen senden; erwartet wird eine Ablehnung ohne Aussage über das Postfach."
+   },
+   {
+    "affected": "ubb-wiki.castenow.de (1 Anmeldename, gefunden über https://ubb-wiki.castenow.de/wp-json/oembed/1.0/embed)",
+    "category": "E",
+    "description": "Auf ubb-wiki.castenow.de lassen sich über WordPress-Schnittstellen gültige Benutzernamen ermitteln: ubb-wiki.castenow.de (1 Anmeldename, gefunden über https://ubb-wiki.castenow.de/wp-json/oembed/1.0/embed).",
+    "evidence": "wpscan\nubb-wiki.castenow.de · Anmeldenamen: 1 (Namen in den Rohdaten) · gefunden über: https://ubb-wiki.castenow.de/wp-json/oembed/1.0/embed",
+    "id": "VS-2026-019",
+    "impact": "Bekannte Benutzernamen erleichtern Passwort-Rateangriffe und gezieltes Phishing, weil ein Angreifer sich nicht mehr auf Vermutungen verlassen muss, sondern echte Anmeldenamen kennt.",
+    "key": "wordpress_user_enumeration/scan/kunde",
+    "level": "niedrig",
+    "policy_id": "wordpress_user_enumeration",
+    "recommendation": "Mittelfristig: Die Offenlegung von Benutzernamen über die REST-Schnittstelle und die Autorenarchive einschränken, etwa durch eine entsprechende Erweiterung oder eine Anpassung der WordPress-Konfiguration.\nStrategisch: Anmeldenamen von den öffentlich sichtbaren Anzeigenamen trennen, damit ein ermittelter Anzeigename keinen Rückschluss auf den Anmeldenamen erlaubt.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (wpscan)",
+    "title": "WordPress-Benutzernamen von außen ermittelbar",
+    "urgency": "Mittelfristig",
+    "verification": "Die WordPress-REST-Schnittstelle und die Autorenarchive von außen abrufen; erwartet wird, dass dabei keine Benutzernamen preisgegeben werden."
+   }
+  ],
+  "overall_description": "Die Prüfung vom 28.09.2026 umfasst 6 Systeme mit 9 IP-Adressen und 9 Hostnamen der Domain castenow.de und führt zu 19 Befunden sowie 9 positiven Beobachtungen. Der Schwerpunkt liegt auf dem geteilten Server 92.205.163.53 beim Hoster Host Europe GmbH, auf dem die Verwaltungsoberfläche Plesk aus dem gesamten Internet erreichbar ist, der Mailabruf über POP3 und IMAP eine Anmeldung vor dem Aufbau der Verschlüsselung entgegennimmt und ein Port ohne erkennbare Dienstkennung offensteht. Diese drei Punkte sind mit der Dringlichkeit In Kürze versehen und lassen sich nur gemeinsam mit dem Hoster klären, der die Verwaltung des Servers betreibt. Mittelfristig folgen die Punkte zur Absender-Authentizität von castenow.de, zu Sicherheits-Headern und Inhaltsrichtlinien der Webdienste sowie zu Versionsangaben in den HTTP-Antworten, strategisch MTA-STS, TLS-RPT und DNSSEC.",
+  "overall_risk": "MITTEL",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "admin_panel_hoster",
+   "admin_service_exposed_passive",
+   "cert_chain_incomplete",
+   "csp_missing",
+   "csp_weak",
+   "dmarc_none",
+   "dnssec_missing",
+   "hsts_missing",
+   "http_alt_port",
+   "http_header_disclosure",
+   "legacy_protocols_present",
+   "login_portal_exposed",
+   "mail_plaintext",
+   "mta_sts_missing",
+   "security_headers_incomplete",
+   "service_unidentified",
+   "smtp_vrfy_enabled_passive",
+   "spf_authorizes_shared_host",
+   "spf_softfail",
+   "tls_rpt_missing",
+   "wordpress_user_enumeration"
+  ],
+  "policy_version": "Katalog 2026-09-27.2 / Fakten 1.3.0",
+  "positive_findings": [
+   {
+    "category": "A",
+    "description": "Auf 159.69.143.80 (castenow.de, www.castenow.de), 18.239.50.54 (umfrage.castenow.de; beim Plattformbetreiber umfrageonline.com), 195.50.179.4 (mail.castenow.de, mail2.castenow.de, owa.castenow.de), 195.50.179.5 (mailstore.castenow.de), 195.50.179.6 (bitwarden.castenow.de) und 92.205.163.53 (ubb-wiki.castenow.de) antwortet kein Datenbankdienst auf Verbindungen von außen.",
+    "id": "VS-P01",
+    "title": "Keine Datenbankdienste aus dem Internet erreichbar"
+   },
+   {
+    "category": "A",
+    "description": "Die Hosts 159.69.143.80 (castenow.de, www.castenow.de), 18.239.50.54 (umfrage.castenow.de; beim Plattformbetreiber umfrageonline.com), 195.50.179.4 (mail.castenow.de, mail2.castenow.de, owa.castenow.de), 195.50.179.5 (mailstore.castenow.de), 195.50.179.6 (bitwarden.castenow.de) und 92.205.163.53 (ubb-wiki.castenow.de) bieten ihre Webdienste über HTTPS an.",
+    "id": "VS-P02",
+    "title": "Webdienst mit Transportverschlüsselung"
+   },
+   {
+    "category": "A",
+    "description": "Auf 159.69.143.80 (castenow.de, www.castenow.de), 18.239.50.54 (umfrage.castenow.de; beim Plattformbetreiber umfrageonline.com), 195.50.179.4 (mail.castenow.de, mail2.castenow.de, owa.castenow.de), 195.50.179.5 (mailstore.castenow.de), 195.50.179.6 (bitwarden.castenow.de) und 92.205.163.53 (ubb-wiki.castenow.de) antwortet kein Fernwartungsdienst auf RDP-Verbindungen von außen. Auf 159.69.143.80 (castenow.de, www.castenow.de), 18.239.50.54 (umfrage.castenow.de; beim Plattformbetreiber umfrageonline.com), 195.50.179.4 (mail.castenow.de, mail2.castenow.de, owa.castenow.de), 195.50.179.5 (mailstore.castenow.de), 195.50.179.6 (bitwarden.castenow.de) und 92.205.163.53 (ubb-wiki.castenow.de) antwortet kein SMB-Dienst auf Verbindungen von außen.",
+    "id": "VS-P03",
+    "title": "Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet erreichbar"
+   },
+   {
+    "category": "B",
+    "description": "Auf ubb-wiki.castenow.de entspricht die WordPress-Kernversion nach der Versionsprüfung dem aktuellen Stand des Projekts.",
+    "id": "VS-P04",
+    "title": "WordPress-Kernversion aktuell"
+   },
+   {
+    "category": "C",
+    "description": "Für die Domain castenow.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+    "id": "VS-P05",
+    "title": "DKIM vorhanden"
+   },
+   {
+    "category": "C",
+    "description": "Für die Domain castenow.de weisen die Nameserver einen vollständigen Zonentransfer ab.",
+    "id": "VS-P06",
+    "title": "Zonentransfer abgewiesen"
+   },
+   {
+    "category": "D",
+    "description": "Die Dienste bitwarden.castenow.de, mailstore.castenow.de (gemessen an der Fehlerseite mit Status 400), ubb-wiki.castenow.de (gemessen an der Weiterleitung mit Status 302), umfrage.castenow.de (beim Plattformbetreiber umfrageonline.com; gemessen an der Weiterleitung mit Status 301) und www.castenow.de setzen den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer.",
+    "id": "VS-P07",
+    "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
+   },
+   {
+    "category": "D",
+    "description": "Die Dienste bitwarden.castenow.de, mailstore.castenow.de, umfrage.castenow.de (beim Plattformbetreiber umfrageonline.com) und www.castenow.de (+castenow.de) bieten ausschließlich als sicher eingestufte Cipher-Suiten an.",
+    "id": "VS-P08",
+    "title": "Keine schwachen TLS-Cipher"
+   },
+   {
+    "category": "E",
+    "description": "Für 159.69.143.80 (castenow.de, www.castenow.de), 195.50.179.4 (mail.castenow.de, mail2.castenow.de, owa.castenow.de), 195.50.179.5 (mailstore.castenow.de), 195.50.179.6 (bitwarden.castenow.de) und 92.205.163.53 (ubb-wiki.castenow.de) liegen in den abgefragten Reputationsquellen keine Meldungen vor.",
+    "id": "VS-P09",
+    "title": "Keine Einträge in Reputationsquellen"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Den Hoster bitten, die Verwaltungsoberfläche auf die benötigten Quellnetze zu beschränken oder hinter eine zusätzliche Anmeldestufe zu legen.",
+    "effect": "Verkleinert die Angriffsfläche des geteilten Servers, auf dem die eigenen Dienste liegen",
+    "findings": [
+     "VS-2026-001"
+    ],
+    "priority": "In Kürze"
+   },
+   {
+    "action": "Beim Hoster einfordern: Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten.",
+    "effect": "Schützt Zugangsdaten und Nachrichten auf dem Übertragungsweg",
+    "findings": [
+     "VS-2026-002"
+    ],
+    "priority": "In Kürze"
+   },
+   {
+    "action": "Beim Hoster einfordern: Klären, welcher Dienst auf dem Port läuft und ob er aus dem Internet erreichbar sein muss; andernfalls den Port schließen.",
+    "effect": "Verkleinert die Angriffsfläche um Dienste ohne erkennbaren Zweck",
+    "findings": [
+     "VS-2026-003"
+    ],
+    "priority": "In Kürze"
+   },
+   {
+    "action": "Prüfen, ob die Anmeldung am Portal einen zusätzlichen Faktor verlangt, etwa eine Authentifizierungs-App oder ein Einmalkennwort, und ihn andernfalls ergänzen.",
+    "effect": "Erschwert die Übernahme von Konten durch Rateangriffe",
+    "findings": [
+     "VS-2026-004"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der Domain bestätigen.",
+    "effect": "Macht alle legitimen Versandquellen vor der Verschärfung sichtbar",
+    "findings": [
+     "VS-2026-005"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Nach einer Beobachtungsphase ohne Fehlmeldungen den Qualifizierer des SPF-Eintrags auf eine harte Fehlbehandlung umstellen, sobald alle legitimen Versandquellen erfasst sind.",
+    "effect": "Lässt Empfänger gefälschte Absender eindeutig ablehnen",
+    "findings": [
+     "VS-2026-005"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Prüfen, ob über den genannten Server tatsächlich E-Mails der Domain versendet werden; andernfalls den Mechanismus aus dem SPF-Eintrag entfernen.",
+    "effect": "Verhindert, dass andere Anwendungen desselben Servers im Namen der Domain senden",
+    "findings": [
+     "VS-2026-006"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die vollständige Zertifikatskette einschließlich aller Zwischenzertifikate auf dem Dienst hinterlegen, so wie es die ausstellende Stelle vorgibt.",
+    "effect": "Vermeidet Verbindungsfehler bei Clients, denen ein Zwischenzertifikat fehlt",
+    "findings": [
+     "VS-2026-007"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die Freigaben unsafe-inline und unsafe-eval für Skripte aus der Content-Security-Policy entfernen und eingebettete Skripte über Nonces oder Hashes freigeben.",
+    "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+    "findings": [
+     "VS-2026-008"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die fehlenden Sicherheits-Header setzen: www.castenow.de (fehlend: Permissions-Policy); mail.castenow.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy); mail2.castenow.de (fehlend: X-Content-Type-Options); bitwarden.castenow.de (fehlend: Permissions-Policy); ubb-wiki.castenow.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy)",
+    "effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
+    "findings": [
+     "VS-2026-008",
+     "VS-2026-009",
+     "VS-2026-013",
+     "VS-2026-014"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen, sobald der Hostname dauerhaft über HTTPS erreichbar ist.",
+    "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+    "findings": [
+     "VS-2026-009"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
+    "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+    "findings": [
+     "VS-2026-009"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Beim Hoster einfordern: Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
+    "effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
+    "findings": [
+     "VS-2026-010"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Beim Hoster einfordern: Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss.",
+    "effect": "Klärt, ob der Dienst aus dem Internet erreichbar sein muss",
+    "findings": [
+     "VS-2026-011"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die bestehende Content-Security-Policy um eine Regel für Skriptquellen (script-src oder default-src) ergänzen, die nur die tatsächlich benötigten Ursprünge zulässt.",
+    "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+    "findings": [
+     "VS-2026-014"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Versionskennungen und interne Servernamen in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert setzen.",
+    "effect": "Erschwert die gezielte Suche nach passenden Schwachstellen",
+    "findings": [
+     "VS-2026-015"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Beim Plattformbetreiber einfordern: Versionskennungen und interne Servernamen in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert setzen.",
+    "effect": "Erschwert die gezielte Suche nach passenden Schwachstellen",
+    "findings": [
+     "VS-2026-016"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Prüfen, ob der Mailserver den Befehl VRFY beantwortet, und ihn gegebenenfalls abschalten.",
+    "effect": "Verhindert die Abfrage gültiger Postfachnamen",
+    "findings": [
+     "VS-2026-018"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die Offenlegung von Benutzernamen über die REST-Schnittstelle und die Autorenarchive einschränken, etwa durch eine entsprechende Erweiterung oder eine Anpassung der WordPress-Konfiguration.",
+    "effect": "Erschwert Rateangriffe auf WordPress-Konten",
+    "findings": [
+     "VS-2026-019"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
+    "effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
+    "findings": [
+     "VS-2026-012"
+    ],
+    "priority": "Strategisch"
+   },
+   {
+    "action": "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten.",
+    "effect": "Meldet fehlgeschlagene verschlüsselte Zustellungen an Sie zurück",
+    "findings": [
+     "VS-2026-012"
+    ],
+    "priority": "Strategisch"
+   },
+   {
+    "action": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
+    "effect": "Schützt DNS-Antworten gegen Verfälschung auf dem Übertragungsweg",
+    "findings": [
+     "VS-2026-017"
+    ],
+    "priority": "Strategisch"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 3,
+   "INFO": 0,
+   "LOW": 10,
+   "MEDIUM": 6
+  },
+  "tech_profiles": [
+   {
+    "cms": "Drupal",
+    "cms_confidence": 0.99,
+    "cms_details": {
+     "cms": "Drupal",
+     "confidence": 0.99,
+     "details": {
+      "header": "x-generator",
+      "meta_generator": "Drupal 11 (https://www.drupal.org)",
+      "raw": {
+       "name": "Drupal",
+       "version": ""
+      },
+      "source": "webtech",
+      "value": "Drupal 11 (https://www.drupal.org)"
+     },
+     "detection_methods": [
+      "meta_tag",
+      "response_header",
+      "webtech"
+     ],
+     "version": "11"
+    },
+    "cms_version": "11",
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "443",
+      "service": "Apache httpd"
+     }
+    ],
+    "fqdns": [
+     "www.castenow.de",
+     "castenow.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "159.69.143.80",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      80,
+      443
+     ],
+     "shodan_services": {
+      "443": "Apache httpd",
+      "80": "Apache httpd"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "www.castenow.de",
+    "redirect_data": {
+     "www.castenow.de": {
+      "error": null,
+      "final_domain": "www.castenow.de",
+      "final_response_headers": {
+       "access-control-allow-credentials": "true",
+       "access-control-allow-origin": "https://www.castenow.de",
+       "date": "Mon, 28 Sep 2026 17:14:54 GMT",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "server": "Apache",
+       "strict-transport-security": "max-age=31536000",
+       "x-xss-protection": "0"
+      },
+      "final_status": 204,
+      "final_url": "https://www.castenow.de/",
+      "first_response_headers": {
+       "cache-control": "must-revalidate, no-cache, private",
+       "content-encoding": "br",
+       "content-language": "de",
+       "content-length": "10470",
+       "content-security-policy": "default-src 'none'; connect-src 'self' wss: data: https://matomo.pw6.de/; font-src 'self' data:; frame-src 'self' www.youtube.com https://auth.pw6.de; img-src 'self' data: i.ytimg.com; media-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' matomo.pw6.de https://www.instagram.com https://matomo.pw6.de/; script-src-elem 'self' 'unsafe-eval' 'unsafe-inline' matomo.pw6.de https://www.instagram.com; style-src 'self' 'unsafe-inline'",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Mon, 28 Sep 2026 11:51:13 GMT",
+       "expires": "Sun, 19 Nov 1978 05:00:00 GMT",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "server": "Apache",
+       "strict-transport-security": "max-age=31536000",
+       "vary": "Accept-Encoding",
+       "x-content-type-options": "nosniff",
+       "x-drupal-dynamic-cache": "HIT",
+       "x-frame-options": "SAMEORIGIN",
+       "x-generator": "Drupal 11 (https://www.drupal.org)",
+       "x-xss-protection": "0"
+      },
+      "first_status": 200,
+      "is_cross_domain": false,
+      "page_title": "CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW",
+      "redirect_chain": [
+       "https://www.castenow.de/",
+       "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Bold%20Italic.woff2?r=67350c178a059506ecadf39d9ee7c191",
+       "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Italic.woff2?r=67350c178a059506ecadf39d9ee7c191",
+       "https://www.castenow.de/sites/default/files/autofont/Icons.woff2?r=c6d6b6174f2c8d753bc3d6f37f394509",
+       "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Regular.woff2?r=67350c178a059506ecadf39d9ee7c191",
+       "https://www.castenow.de/sites/default/files/styles/full_width_landscape_desktop_1x/public/media/screenshot-desktop_0.jpg.avif?itok=fIVKl7oB",
+       "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Bold.woff2?r=67350c178a059506ecadf39d9ee7c191",
+       "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Screenshot%202026-02-25%20153330.png.avif?itok=Ony_BvMU",
+       "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Bundeswehr%20Exploreres.png.avif?itok=x-3rekf-",
+       "https://www.castenow.de/sites/default/files/media/all_cases.svg",
+       "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Screenshot%202026-06-02%20161615.png.avif?itok=oApzAiha",
+       "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Screenshot%202026-04-29%20100539.png.avif?itok=T4rXeIMo",
+       "https://www.castenow.de/sites/default/files/css/css_XhdzdKGwo26bSpisHd0vZs9DyF_GHRZCU_pvUxs0ht4.css?delta=0&language=de&theme=castenow&include=eJxVzcEOwjAMA9Afmppv8tqURauaKE3H-HvEDsBu9jvYmKFr07xTk9XhwmPBx5yxm0oPKlwxW1ycYZE3UHXtwb1caC4H8ov-crqvDYxB0gufVz2En6YeVFWDfSnW-Pz-GBwPh22Dik9DSz9Js9tcm4yNyxtd5Upv",
+       "https://www.castenow.de/sites/default/files/inline-images/linkedin_grey.svg",
+       "https://www.castenow.de/themes/castenow/images/logo_white.svg",
+       "https://www.castenow.de/sites/default/files/inline-images/tiktok_0.svg",
+       "https://www.castenow.de/sites/default/files/inline-images/instagram_grey.svg",
+       "https://www.castenow.de/core/assets/vendor/jquery/jquery.min.js?v=4.0.0",
+       "https://www.castenow.de/sites/default/files/js/js_S5o6dCEsXhnXk80atmVTscDXV7UAJ_ofFN1lwogqnl4.js?scope=footer&delta=1&language=de&theme=castenow&include=eJxdj2uOwzAIhC-UXc40trHixjEI42xz-0bZqEr7A8F8jHig7VlsJTzwnDBcgjEWldKcEmeM6ieOqDUgLnQXv7UEgxXul0c9zqBs0pxbOiGv6jt9GvPRp8AztiJ2ErWyIe50q7-Gd_ROpSX-P7NHK-o3sBX-UzGnLOJsU9LKz_cLyYaiHnqs-haXs8_Hlpzpyj8NC6epK9YjGknIo0c4vwBW8nYO",
+       "https://www.castenow.de/sites/default/files/autofont/Icons.woff2?r=fd3d513529946a4d22646f54dffa0bdc",
+       "https://www.castenow.de/sites/default/files/media/Castenow_Showreel_16zu9_V4_Desktop.mp4",
+       "https://matomo.pw6.de/matomo.js",
+       "https://www.castenow.de/autoprivacy/ajax?_wrapper_format=drupal_ajax",
+       "https://www.castenow.de/sites/default/files/js/js_Id4bx53klqbTa8jJ5m3c8OsHfJn3uFgWNSzuTVQ0bGY.js?scope=footer&delta=0&language=de&theme=castenow&include=eJzLTSzJz83XzwVTACTjBUo&exclude=eJxdj2t2hCAMhTdkzZouEAoVIScEO-6-VudM7fzISe6XN-oem66ELzwmDGuuNL9QyU6hmfvFlLFIy9UocMQodmKPUhyO6ruY_7d6iPkEitqqcQ0n5FVsf9sRjzw5Tthy05OI5g1-p1v8Nryjd8o18HV695rFbmDL_C1NjWJrxjoFKfx4vRB0CMqhxyov8awUKD4VkjpdmfmPzKPKcCX3xGHq6TgnRnr6j4rllwrWwyo1F0f3MP4BYuaOHg",
+       "https://matomo.pw6.de/matomo.php?action_name=CASTENOW%20%E2%94%82Agentur%20f%C3%BCr%20Employer%20Branding%20%26%20Markenf%C3%BChrung%20%7C%20CASTENOW&idsite=6&rec=1&r=136846&h=17&m=14&s=54&url=https%3A%2F%2Fwww.castenow.de%2F&_id=10b82c1ac81c8ea2&_idn=1&send_image=0&_refts=0&pv_id=0eNRTn&pf_net=4065&pf_srv=90&pf_tfr=1&pf_dm1=126&pf_dm2=858&pf_onl=0&uadata=%7B%22formFactors%22%3A%5B%22Desktop%22%5D%2C%22fullVersionList%22%3A%5B%7B%22brand%22%3A%22HeadlessChrome%22%2C%22version%22%3A%22153.0.8010.12%22%7D%2C%7B%22brand%22%3A%22Not_A%20Brand%22%2C%22version%22%3A%228.0.0.0%22%7D%2C%7B%22brand%22%3A%22Chromium%22%2C%22version%22%3A%22153.0.8010.12%22%7D%5D%2C%22mobile%22%3Afalse%2C%22model%22%3A%22%22%2C%22platform%22%3A%22Linux%22%2C%22platformVersion%22%3A%22%22%7D&cookie=1&res=1280x720"
+      ],
+      "response_chain": [
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Bold%20Italic.woff2?r=67350c178a059506ecadf39d9ee7c191"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Italic.woff2?r=67350c178a059506ecadf39d9ee7c191"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/autofont/Icons.woff2?r=c6d6b6174f2c8d753bc3d6f37f394509"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Regular.woff2?r=67350c178a059506ecadf39d9ee7c191"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/styles/full_width_landscape_desktop_1x/public/media/screenshot-desktop_0.jpg.avif?itok=fIVKl7oB"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Bold.woff2?r=67350c178a059506ecadf39d9ee7c191"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Screenshot%202026-02-25%20153330.png.avif?itok=Ony_BvMU"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Bundeswehr%20Exploreres.png.avif?itok=x-3rekf-"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/media/all_cases.svg"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Screenshot%202026-06-02%20161615.png.avif?itok=oApzAiha"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Screenshot%202026-04-29%20100539.png.avif?itok=T4rXeIMo"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/css/css_XhdzdKGwo26bSpisHd0vZs9DyF_GHRZCU_pvUxs0ht4.css?delta=0&language=de&theme=castenow&include=eJxVzcEOwjAMA9Afmppv8tqURauaKE3H-HvEDsBu9jvYmKFr07xTk9XhwmPBx5yxm0oPKlwxW1ycYZE3UHXtwb1caC4H8ov-crqvDYxB0gufVz2En6YeVFWDfSnW-Pz-GBwPh22Dik9DSz9Js9tcm4yNyxtd5Upv"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/inline-images/linkedin_grey.svg"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/themes/castenow/images/logo_white.svg"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/inline-images/tiktok_0.svg"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/inline-images/instagram_grey.svg"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/core/assets/vendor/jquery/jquery.min.js?v=4.0.0"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/js/js_S5o6dCEsXhnXk80atmVTscDXV7UAJ_ofFN1lwogqnl4.js?scope=footer&delta=1&language=de&theme=castenow&include=eJxdj2uOwzAIhC-UXc40trHixjEI42xz-0bZqEr7A8F8jHig7VlsJTzwnDBcgjEWldKcEmeM6ieOqDUgLnQXv7UEgxXul0c9zqBs0pxbOiGv6jt9GvPRp8AztiJ2ErWyIe50q7-Gd_ROpSX-P7NHK-o3sBX-UzGnLOJsU9LKz_cLyYaiHnqs-haXs8_Hlpzpyj8NC6epK9YjGknIo0c4vwBW8nYO"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/autofont/Icons.woff2?r=fd3d513529946a4d22646f54dffa0bdc"
+       },
+       {
+        "status": 206,
+        "url": "https://www.castenow.de/sites/default/files/media/Castenow_Showreel_16zu9_V4_Desktop.mp4"
+       },
+       {
+        "status": 200,
+        "url": "https://matomo.pw6.de/matomo.js"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/autoprivacy/ajax?_wrapper_format=drupal_ajax"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/js/js_Id4bx53klqbTa8jJ5m3c8OsHfJn3uFgWNSzuTVQ0bGY.js?scope=footer&delta=0&language=de&theme=castenow&include=eJzLTSzJz83XzwVTACTjBUo&exclude=eJxdj2t2hCAMhTdkzZouEAoVIScEO-6-VudM7fzISe6XN-oem66ELzwmDGuuNL9QyU6hmfvFlLFIy9UocMQodmKPUhyO6ruY_7d6iPkEitqqcQ0n5FVsf9sRjzw5Tthy05OI5g1-p1v8Nryjd8o18HV695rFbmDL_C1NjWJrxjoFKfx4vRB0CMqhxyov8awUKD4VkjpdmfmPzKPKcCX3xGHq6TgnRnr6j4rllwrWwyo1F0f3MP4BYuaOHg"
+       },
+       {
+        "status": 204,
+        "url": "https://matomo.pw6.de/matomo.php?action_name=CASTENOW%20%E2%94%82Agentur%20f%C3%BCr%20Employer%20Branding%20%26%20Markenf%C3%BChrung%20%7C%20CASTENOW&idsite=6&rec=1&r=136846&h=17&m=14&s=54&url=https%3A%2F%2Fwww.castenow.de%2F&_id=10b82c1ac81c8ea2&_idn=1&send_image=0&_refts=0&pv_id=0eNRTn&pf_net=4065&pf_srv=90&pf_tfr=1&pf_dm1=126&pf_dm2=858&pf_onl=0&uadata=%7B%22formFactors%22%3A%5B%22Desktop%22%5D%2C%22fullVersionList%22%3A%5B%7B%22brand%22%3A%22HeadlessChrome%22%2C%22version%22%3A%22153.0.8010.12%22%7D%2C%7B%22brand%22%3A%22Not_A%20Brand%22%2C%22version%22%3A%228.0.0.0%22%7D%2C%7B%22brand%22%3A%22Chromium%22%2C%22version%22%3A%22153.0.8010.12%22%7D%5D%2C%22mobile%22%3Afalse%2C%22model%22%3A%22%22%2C%22platform%22%3A%22Linux%22%2C%22platformVersion%22%3A%22%22%7D&cookie=1&res=1280x720"
+       }
+      ],
+      "response_headers": {
+       "cache-control": "must-revalidate, no-cache, private",
+       "content-encoding": "br",
+       "content-language": "de",
+       "content-length": "10470",
+       "content-security-policy": "default-src 'none'; connect-src 'self' wss: data: https://matomo.pw6.de/; font-src 'self' data:; frame-src 'self' www.youtube.com https://auth.pw6.de; img-src 'self' data: i.ytimg.com; media-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' matomo.pw6.de https://www.instagram.com https://matomo.pw6.de/; script-src-elem 'self' 'unsafe-eval' 'unsafe-inline' matomo.pw6.de https://www.instagram.com; style-src 'self' 'unsafe-inline'",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Mon, 28 Sep 2026 11:51:13 GMT",
+       "expires": "Sun, 19 Nov 1978 05:00:00 GMT",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "server": "Apache",
+       "strict-transport-security": "max-age=31536000",
+       "vary": "Accept-Encoding",
+       "x-content-type-options": "nosniff",
+       "x-drupal-dynamic-cache": "HIT",
+       "x-frame-options": "SAMEORIGIN",
+       "x-generator": "Drupal 11 (https://www.drupal.org)",
+       "x-xss-protection": "0"
+      },
+      "screenshot_path": "/tmp/scan-cd28d260-cf49-4d17-a980-64a4b1951444/hosts/159.69.143.80/phase2/screenshot_www.castenow.de.png",
+      "status_code": 204,
+      "tech_info": {
+       "body_classes": "role-anonymous front",
+       "cookies": "disable_tracking=%7B%22matomo%22%3Afalse%2C%22youtube%22%3Afalse%7D; _pk_id.6.693a=10b82c1ac81c8ea2.1790615694.; _pk_ses.6.693a=1",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "Wir sind eine Agentur für Markenkommunikation und Employer Branding mit Sitz in Düsseldorf. Lernt uns und unsere preisgekrönten Arbeiten kennen.",
+         "name": "description"
+        },
+        {
+         "content": "Drupal 11 (https://www.drupal.org)",
+         "name": "Generator"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0",
+         "name": "viewport"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://matomo.pw6.de/matomo.js",
+        "https://www.castenow.de/core/assets/vendor/jquery/jquery.min.js?v=4.0.0",
+        "https://www.castenow.de/sites/default/files/js/js_S5o6dCEsXhnXk80atmVTscDXV7UAJ_ofFN1lwogqnl4.js?scope=footer&delta=1&language=de&theme=castenow&include=eJxdj2uOwzAIhC-UXc40trHixjEI42xz-0bZqEr7A8F8jHig7VlsJTzwnDBcgjEWldKcEmeM6ieOqDUgLnQXv7UEgxXul0c9zqBs0pxbOiGv6jt9GvPRp8AztiJ2ErWyIe50q7-Gd_ROpSX-P7NHK-o3sBX-UzGnLOJsU9LKz_cLyYaiHnqs-haXs8_Hlpzpyj8NC6epK9YjGknIo0c4vwBW8nYO",
+        "https://www.castenow.de/sites/default/files/js/js_Id4bx53klqbTa8jJ5m3c8OsHfJn3uFgWNSzuTVQ0bGY.js?scope=footer&delta=0&language=de&theme=castenow&include=eJzLTSzJz83XzwVTACTjBUo&exclude=eJxdj2t2hCAMhTdkzZouEAoVIScEO-6-VudM7fzISe6XN-oem66ELzwmDGuuNL9QyU6hmfvFlLFIy9UocMQodmKPUhyO6ruY_7d6iPkEitqqcQ0n5FVsf9sRjzw5Tthy05OI5g1-p1v8Nryjd8o18HV695rFbmDL_C1NjWJrxjoFKfx4vRB0CMqhxyov8awUKD4VkjpdmfmPzKPKcCX3xGHq6TgnRnr6j4rllwrWwyo1F0f3MP4BYuaOHg"
+       ],
+       "stylesheets": [
+        "https://www.castenow.de/sites/default/files/css/css_XhdzdKGwo26bSpisHd0vZs9DyF_GHRZCU_pvUxs0ht4.css?delta=0&language=de&theme=castenow&include=eJxVzcEOwjAMA9Afmppv8tqURauaKE3H-HvEDsBu9jvYmKFr07xTk9XhwmPBx5yxm0oPKlwxW1ycYZE3UHXtwb1caC4H8ov-crqvDYxB0gufVz2En6YeVFWDfSnW-Pz-GBwPh22Dik9DSz9Js9tcm4yNyxtd5Upv"
+       ],
+       "title": "CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW"
+      }
+     }
+    },
+    "server": "Apache httpd",
+    "tech_rows": [
+     {
+      "category": "CMS",
+      "confidence": 0.8,
+      "confidence_label": "mittel",
+      "cves": [],
+      "detection_source": "cms_fingerprint, httpx, webtech",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Drupal",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint, httpx, webtech",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "11",
+      "vuln_name": ""
+     },
+     {
+      "category": "Bibliothek",
+      "confidence": 0.8,
+      "confidence_label": "mittel",
+      "cves": [],
+      "detection_source": "httpx, redirect_probe",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "patch_status": "unbekannt",
+      "source": "httpx, redirect_probe",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "4.0.0",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "header_check, httpx, nmap, webtech",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "header_check, httpx, nmap, webtech",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Apache httpd",
+      "version": ""
+     },
+     {
+      "name": "Apache",
+      "version": ""
+     },
+     {
+      "name": "Drupal",
+      "version": "11"
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "PHP",
+      "version": ""
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     }
+    ],
+    "throttled": false,
+    "vhost_results": {
+     "www.castenow.de": {
+      "cms": "Drupal",
+      "cms_confidence": 0.99,
+      "cms_version": "11",
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "www.castenow.de"
+   },
+   {
+    "cms": "Microsoft Exchange",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "enriched_from": "header_check"
+    },
+    "cms_version": "15.2.2562",
+    "exposed_services": [
+     {
+      "port": "443",
+      "service": "Outlook Web App"
+     },
+     {
+      "port": "25",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "mail.castenow.de",
+     "mail2.castenow.de",
+     "owa.castenow.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "195.50.179.4",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      25,
+      443
+     ],
+     "shodan_services": {
+      "443": "Outlook Web App"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "mail.castenow.de",
+    "redirect_data": {
+     "mail.castenow.de": {
+      "error": null,
+      "final_domain": "mail.castenow.de",
+      "final_response_headers": {
+       "accept-ranges": "bytes",
+       "cache-control": "public,max-age=2592000",
+       "content-length": "56760",
+       "content-type": "application/octet-stream",
+       "date": "Mon, 28 Sep 2026 17:14:48 GMT",
+       "etag": "\"04795448ccdb1:0\"",
+       "last-modified": "Fri, 23 May 2025 17:29:42 GMT",
+       "request-id": "b7e0fd2a-f404-4f1e-afb0-9d5ad083dba3",
+       "server": "Microsoft-IIS/10.0",
+       "x-powered-by": "ASP.NET"
+      },
+      "final_status": 200,
+      "final_url": "https://mail.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.castenow.de%2fowa%2f&reason=0",
+      "first_response_headers": {
+       "cache-control": "no-cache, no-store",
+       "content-length": "58723",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Mon, 28 Sep 2026 17:14:48 GMT",
+       "expires": "-1",
+       "pragma": "no-cache",
+       "request-id": "b49cebc2-a9df-4e17-bf77-ff4758260b42",
+       "server": "Microsoft-IIS/10.0",
+       "x-aspnet-version": "4.0.30319",
+       "x-frame-options": "SAMEORIGIN",
+       "x-powered-by": "ASP.NET"
+      },
+      "first_status": 200,
+      "is_cross_domain": false,
+      "page_title": "Outlook",
+      "redirect_chain": [
+       "https://mail.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.castenow.de%2fowa%2f&reason=0",
+       "https://mail.castenow.de/owa/auth/15.2.2562/themes/resources/segoeui-regular.ttf"
+      ],
+      "response_chain": [
+       {
+        "status": 200,
+        "url": "https://mail.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.castenow.de%2fowa%2f&reason=0"
+       },
+       {
+        "status": 200,
+        "url": "https://mail.castenow.de/owa/auth/15.2.2562/themes/resources/segoeui-regular.ttf"
+       }
+      ],
+      "response_headers": {
+       "cache-control": "no-cache, no-store",
+       "content-length": "58723",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Mon, 28 Sep 2026 17:14:48 GMT",
+       "expires": "-1",
+       "pragma": "no-cache",
+       "request-id": "b49cebc2-a9df-4e17-bf77-ff4758260b42",
+       "server": "Microsoft-IIS/10.0",
+       "x-aspnet-version": "4.0.30319",
+       "x-frame-options": "SAMEORIGIN",
+       "x-powered-by": "ASP.NET"
+      },
+      "screenshot_path": "/tmp/scan-cd28d260-cf49-4d17-a980-64a4b1951444/hosts/195.50.179.4/phase2/screenshot_mail.castenow.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "signInBg",
+       "cookies": "cookieTest=1",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "IE=10",
+         "name": "X-UA-Compatible"
+        },
+        {
+         "content": "text/html; CHARSET=utf-8",
+         "name": "Content-Type"
+        },
+        {
+         "content": "NOINDEX, NOFOLLOW",
+         "name": "Robots"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Outlook"
+      }
+     },
+     "mail2.castenow.de": {
+      "error": null,
+      "final_domain": "mail2.castenow.de",
+      "final_response_headers": {
+       "accept-ranges": "bytes",
+       "cache-control": "public,max-age=2592000",
+       "content-length": "56760",
+       "content-type": "application/octet-stream",
+       "date": "Mon, 28 Sep 2026 17:14:54 GMT",
+       "etag": "\"04795448ccdb1:0\"",
+       "last-modified": "Fri, 23 May 2025 17:29:42 GMT",
+       "request-id": "e9cc735e-cdc7-4de4-9dbf-a06ea4b6b87c",
+       "server": "Microsoft-IIS/10.0",
+       "x-powered-by": "ASP.NET"
+      },
+      "final_status": 200,
+      "final_url": "https://mail2.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail2.castenow.de%2fowa%2f&reason=0",
+      "first_response_headers": {
+       "cache-control": "no-cache",
+       "content-length": "0",
+       "date": "Mon, 28 Sep 2026 17:14:54 GMT",
+       "location": "https://mail2.castenow.de/owa/",
+       "pragma": "no-cache",
+       "server": "Microsoft-IIS/10.0",
+       "x-feserver": "EXCHANGE-SE",
+       "x-requestid": "5926ae55-c03a-4346-af80-d29045eae146"
+      },
+      "first_status": 302,
+      "is_cross_domain": false,
+      "page_title": "Outlook",
+      "redirect_chain": [
+       "https://mail2.castenow.de/",
+       "https://mail2.castenow.de/owa/",
+       "https://mail2.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail2.castenow.de%2fowa%2f&reason=0",
+       "https://mail2.castenow.de/owa/auth/15.2.2562/themes/resources/segoeui-regular.ttf"
+      ],
+      "response_chain": [
+       {
+        "status": 302,
+        "url": "https://mail2.castenow.de/"
+       },
+       {
+        "status": 302,
+        "url": "https://mail2.castenow.de/owa/"
+       },
+       {
+        "status": 200,
+        "url": "https://mail2.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail2.castenow.de%2fowa%2f&reason=0"
+       },
+       {
+        "status": 200,
+        "url": "https://mail2.castenow.de/owa/auth/15.2.2562/themes/resources/segoeui-regular.ttf"
+       }
+      ],
+      "response_headers": {
+       "cache-control": "no-cache",
+       "content-length": "0",
+       "date": "Mon, 28 Sep 2026 17:14:54 GMT",
+       "location": "https://mail2.castenow.de/owa/",
+       "pragma": "no-cache",
+       "server": "Microsoft-IIS/10.0",
+       "x-feserver": "EXCHANGE-SE",
+       "x-requestid": "5926ae55-c03a-4346-af80-d29045eae146"
+      },
+      "screenshot_path": "/tmp/scan-cd28d260-cf49-4d17-a980-64a4b1951444/hosts/195.50.179.4/phase2/screenshot_mail2.castenow.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "signInBg",
+       "cookies": "cookieTest=1",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "IE=10",
+         "name": "X-UA-Compatible"
+        },
+        {
+         "content": "text/html; CHARSET=utf-8",
+         "name": "Content-Type"
+        },
+        {
+         "content": "NOINDEX, NOFOLLOW",
+         "name": "Robots"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Outlook"
+      }
+     }
+    },
+    "server": null,
+    "tech_rows": [
+     {
+      "category": "Sprache",
+      "confidence": 0.8,
+      "confidence_label": "mittel",
+      "cves": [],
+      "detection_source": "httpx, webtech",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ASP.NET",
+      "patch_status": "unbekannt",
+      "source": "httpx, webtech",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "4.0.30319",
+      "vuln_name": ""
+     },
+     {
+      "category": "Mail",
+      "confidence": 0.8,
+      "confidence_label": "mittel",
+      "cves": [],
+      "detection_source": "cms_fingerprint, httpx, redirect_probe, zap_spider",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft Exchange",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint, httpx, redirect_probe, zap_spider",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "SE (Build 15.2.2562)",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "header_check, httpx, webtech",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft IIS",
+      "patch_status": "unbekannt",
+      "source": "header_check, httpx, webtech",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "10.0",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Microsoft-IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "ASP.NET",
+      "version": ""
+     },
+     {
+      "name": "Microsoft Exchange",
+      "version": "EXCHANGE-SE"
+     },
+     {
+      "name": "IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "Microsoft ASP.NET",
+      "version": "4.0.30319"
+     },
+     {
+      "name": "Outlook Web App",
+      "version": "15.2.2562"
+     },
+     {
+      "name": "Windows Server",
+      "version": ""
+     }
+    ],
+    "throttled": false,
+    "vhost_results": {
+     "mail.castenow.de": {
+      "cms": "Microsoft Exchange",
+      "cms_confidence": 0.95,
+      "cms_version": "15.2.2562",
+      "waf": null
+     },
+     "mail2.castenow.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "mail.castenow.de"
+   },
+   {
+    "cms": "Drupal",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "Drupal",
+     "confidence": 0.95,
+     "details": {
+      "header": "x-generator",
+      "meta_generator": "Drupal 11 (https://www.drupal.org)",
+      "value": "Drupal 11 (https://www.drupal.org)"
+     },
+     "detection_methods": [
+      "meta_tag",
+      "response_header"
+     ],
+     "version": "11"
+    },
+    "cms_version": "11",
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": "CloudFront httpd"
+     },
+     {
+      "port": "443",
+      "service": "CloudFront httpd"
+     }
+    ],
+    "fqdns": [
+     "umfrage.castenow.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "18.239.50.54",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      80,
+      443
+     ],
+     "shodan_services": {
+      "443": "CloudFront httpd",
+      "80": "CloudFront httpd"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "umfrage.castenow.de",
+    "redirect_data": {
+     "umfrage.castenow.de": {
+      "error": null,
+      "final_domain": "www.castenow.de",
+      "final_response_headers": {
+       "access-control-allow-credentials": "true",
+       "access-control-allow-origin": "https://www.castenow.de",
+       "date": "Mon, 28 Sep 2026 17:18:39 GMT",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "server": "Apache",
+       "strict-transport-security": "max-age=31536000",
+       "x-xss-protection": "0"
+      },
+      "final_status": 204,
+      "final_url": "https://www.castenow.de/",
+      "first_response_headers": {
+       "cache-control": "must-revalidate, no-cache, private",
+       "content-encoding": "br",
+       "content-language": "de",
+       "content-length": "10469",
+       "content-security-policy": "default-src 'none'; connect-src 'self' wss: data: https://matomo.pw6.de/; font-src 'self' data:; frame-src 'self' www.youtube.com https://auth.pw6.de; img-src 'self' data: i.ytimg.com; media-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' matomo.pw6.de https://www.instagram.com https://matomo.pw6.de/; script-src-elem 'self' 'unsafe-eval' 'unsafe-inline' matomo.pw6.de https://www.instagram.com; style-src 'self' 'unsafe-inline'",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Mon, 28 Sep 2026 11:51:13 GMT",
+       "expires": "Sun, 19 Nov 1978 05:00:00 GMT",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "server": "Apache",
+       "strict-transport-security": "max-age=31536000",
+       "vary": "Accept-Encoding",
+       "x-content-type-options": "nosniff",
+       "x-drupal-dynamic-cache": "HIT",
+       "x-frame-options": "SAMEORIGIN",
+       "x-generator": "Drupal 11 (https://www.drupal.org)",
+       "x-xss-protection": "0"
+      },
+      "first_status": 200,
+      "is_cross_domain": true,
+      "page_title": "CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW",
+      "redirect_chain": [
+       "https://www.castenow.de/",
+       "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Italic.woff2?r=67350c178a059506ecadf39d9ee7c191",
+       "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Bold.woff2?r=67350c178a059506ecadf39d9ee7c191",
+       "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Bold%20Italic.woff2?r=67350c178a059506ecadf39d9ee7c191",
+       "https://www.castenow.de/sites/default/files/styles/full_width_landscape_desktop_1x/public/media/screenshot-desktop_0.jpg.avif?itok=fIVKl7oB",
+       "https://www.castenow.de/sites/default/files/autofont/Icons.woff2?r=c6d6b6174f2c8d753bc3d6f37f394509",
+       "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Screenshot%202026-02-25%20153330.png.avif?itok=Ony_BvMU",
+       "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Regular.woff2?r=67350c178a059506ecadf39d9ee7c191",
+       "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Bundeswehr%20Exploreres.png.avif?itok=x-3rekf-",
+       "https://www.castenow.de/sites/default/files/css/css_XhdzdKGwo26bSpisHd0vZs9DyF_GHRZCU_pvUxs0ht4.css?delta=0&language=de&theme=castenow&include=eJxVzcEOwjAMA9Afmppv8tqURauaKE3H-HvEDsBu9jvYmKFr07xTk9XhwmPBx5yxm0oPKlwxW1ycYZE3UHXtwb1caC4H8ov-crqvDYxB0gufVz2En6YeVFWDfSnW-Pz-GBwPh22Dik9DSz9Js9tcm4yNyxtd5Upv",
+       "https://www.castenow.de/sites/default/files/media/all_cases.svg",
+       "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Screenshot%202026-04-29%20100539.png.avif?itok=T4rXeIMo",
+       "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Screenshot%202026-06-02%20161615.png.avif?itok=oApzAiha",
+       "https://www.castenow.de/themes/castenow/images/logo_white.svg",
+       "https://www.castenow.de/sites/default/files/inline-images/tiktok_0.svg",
+       "https://www.castenow.de/sites/default/files/inline-images/linkedin_grey.svg",
+       "https://www.castenow.de/sites/default/files/inline-images/instagram_grey.svg",
+       "https://www.castenow.de/core/assets/vendor/jquery/jquery.min.js?v=4.0.0",
+       "https://www.castenow.de/sites/default/files/js/js_S5o6dCEsXhnXk80atmVTscDXV7UAJ_ofFN1lwogqnl4.js?scope=footer&delta=1&language=de&theme=castenow&include=eJxdj2uOwzAIhC-UXc40trHixjEI42xz-0bZqEr7A8F8jHig7VlsJTzwnDBcgjEWldKcEmeM6ieOqDUgLnQXv7UEgxXul0c9zqBs0pxbOiGv6jt9GvPRp8AztiJ2ErWyIe50q7-Gd_ROpSX-P7NHK-o3sBX-UzGnLOJsU9LKz_cLyYaiHnqs-haXs8_Hlpzpyj8NC6epK9YjGknIo0c4vwBW8nYO",
+       "https://www.castenow.de/sites/default/files/autofont/Icons.woff2?r=fd3d513529946a4d22646f54dffa0bdc",
+       "https://www.castenow.de/sites/default/files/media/Castenow_Showreel_16zu9_V4_Desktop.mp4",
+       "https://www.castenow.de/autoprivacy/ajax?_wrapper_format=drupal_ajax",
+       "https://matomo.pw6.de/matomo.js",
+       "https://www.castenow.de/sites/default/files/js/js_Id4bx53klqbTa8jJ5m3c8OsHfJn3uFgWNSzuTVQ0bGY.js?scope=footer&delta=0&language=de&theme=castenow&include=eJzLTSzJz83XzwVTACTjBUo&exclude=eJxdj2t2hCAMhTdkzZouEAoVIScEO-6-VudM7fzISe6XN-oem66ELzwmDGuuNL9QyU6hmfvFlLFIy9UocMQodmKPUhyO6ruY_7d6iPkEitqqcQ0n5FVsf9sRjzw5Tthy05OI5g1-p1v8Nryjd8o18HV695rFbmDL_C1NjWJrxjoFKfx4vRB0CMqhxyov8awUKD4VkjpdmfmPzKPKcCX3xGHq6TgnRnr6j4rllwrWwyo1F0f3MP4BYuaOHg",
+       "https://matomo.pw6.de/matomo.php?action_name=CASTENOW%20%E2%94%82Agentur%20f%C3%BCr%20Employer%20Branding%20%26%20Markenf%C3%BChrung%20%7C%20CASTENOW&idsite=6&rec=1&r=782654&h=17&m=18&s=39&url=https%3A%2F%2Fwww.castenow.de%2F&_id=9030b96a6911d187&_idn=1&send_image=0&_refts=0&pv_id=GQ6GqN&pf_net=4041&pf_srv=73&pf_tfr=1&pf_dm1=139&pf_dm2=162&pf_onl=0&uadata=%7B%22formFactors%22%3A%5B%22Desktop%22%5D%2C%22fullVersionList%22%3A%5B%7B%22brand%22%3A%22HeadlessChrome%22%2C%22version%22%3A%22153.0.8010.12%22%7D%2C%7B%22brand%22%3A%22Not_A%20Brand%22%2C%22version%22%3A%228.0.0.0%22%7D%2C%7B%22brand%22%3A%22Chromium%22%2C%22version%22%3A%22153.0.8010.12%22%7D%5D%2C%22mobile%22%3Afalse%2C%22model%22%3A%22%22%2C%22platform%22%3A%22Linux%22%2C%22platformVersion%22%3A%22%22%7D&cookie=1&res=1280x720"
+      ],
+      "response_chain": [
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Italic.woff2?r=67350c178a059506ecadf39d9ee7c191"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Bold.woff2?r=67350c178a059506ecadf39d9ee7c191"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Bold%20Italic.woff2?r=67350c178a059506ecadf39d9ee7c191"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/styles/full_width_landscape_desktop_1x/public/media/screenshot-desktop_0.jpg.avif?itok=fIVKl7oB"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/autofont/Icons.woff2?r=c6d6b6174f2c8d753bc3d6f37f394509"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Screenshot%202026-02-25%20153330.png.avif?itok=Ony_BvMU"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/themes/castenow/fonts/Poppins/Poppins,%20Regular.woff2?r=67350c178a059506ecadf39d9ee7c191"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Bundeswehr%20Exploreres.png.avif?itok=x-3rekf-"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/css/css_XhdzdKGwo26bSpisHd0vZs9DyF_GHRZCU_pvUxs0ht4.css?delta=0&language=de&theme=castenow&include=eJxVzcEOwjAMA9Afmppv8tqURauaKE3H-HvEDsBu9jvYmKFr07xTk9XhwmPBx5yxm0oPKlwxW1ycYZE3UHXtwb1caC4H8ov-crqvDYxB0gufVz2En6YeVFWDfSnW-Pz-GBwPh22Dik9DSz9Js9tcm4yNyxtd5Upv"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/media/all_cases.svg"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Screenshot%202026-04-29%20100539.png.avif?itok=T4rXeIMo"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/styles/half_width_landscape_desktop_1x/public/media/Screenshot%202026-06-02%20161615.png.avif?itok=oApzAiha"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/themes/castenow/images/logo_white.svg"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/inline-images/tiktok_0.svg"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/inline-images/linkedin_grey.svg"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/inline-images/instagram_grey.svg"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/core/assets/vendor/jquery/jquery.min.js?v=4.0.0"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/js/js_S5o6dCEsXhnXk80atmVTscDXV7UAJ_ofFN1lwogqnl4.js?scope=footer&delta=1&language=de&theme=castenow&include=eJxdj2uOwzAIhC-UXc40trHixjEI42xz-0bZqEr7A8F8jHig7VlsJTzwnDBcgjEWldKcEmeM6ieOqDUgLnQXv7UEgxXul0c9zqBs0pxbOiGv6jt9GvPRp8AztiJ2ErWyIe50q7-Gd_ROpSX-P7NHK-o3sBX-UzGnLOJsU9LKz_cLyYaiHnqs-haXs8_Hlpzpyj8NC6epK9YjGknIo0c4vwBW8nYO"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/autofont/Icons.woff2?r=fd3d513529946a4d22646f54dffa0bdc"
+       },
+       {
+        "status": 206,
+        "url": "https://www.castenow.de/sites/default/files/media/Castenow_Showreel_16zu9_V4_Desktop.mp4"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/autoprivacy/ajax?_wrapper_format=drupal_ajax"
+       },
+       {
+        "status": 200,
+        "url": "https://matomo.pw6.de/matomo.js"
+       },
+       {
+        "status": 200,
+        "url": "https://www.castenow.de/sites/default/files/js/js_Id4bx53klqbTa8jJ5m3c8OsHfJn3uFgWNSzuTVQ0bGY.js?scope=footer&delta=0&language=de&theme=castenow&include=eJzLTSzJz83XzwVTACTjBUo&exclude=eJxdj2t2hCAMhTdkzZouEAoVIScEO-6-VudM7fzISe6XN-oem66ELzwmDGuuNL9QyU6hmfvFlLFIy9UocMQodmKPUhyO6ruY_7d6iPkEitqqcQ0n5FVsf9sRjzw5Tthy05OI5g1-p1v8Nryjd8o18HV695rFbmDL_C1NjWJrxjoFKfx4vRB0CMqhxyov8awUKD4VkjpdmfmPzKPKcCX3xGHq6TgnRnr6j4rllwrWwyo1F0f3MP4BYuaOHg"
+       },
+       {
+        "status": 204,
+        "url": "https://matomo.pw6.de/matomo.php?action_name=CASTENOW%20%E2%94%82Agentur%20f%C3%BCr%20Employer%20Branding%20%26%20Markenf%C3%BChrung%20%7C%20CASTENOW&idsite=6&rec=1&r=782654&h=17&m=18&s=39&url=https%3A%2F%2Fwww.castenow.de%2F&_id=9030b96a6911d187&_idn=1&send_image=0&_refts=0&pv_id=GQ6GqN&pf_net=4041&pf_srv=73&pf_tfr=1&pf_dm1=139&pf_dm2=162&pf_onl=0&uadata=%7B%22formFactors%22%3A%5B%22Desktop%22%5D%2C%22fullVersionList%22%3A%5B%7B%22brand%22%3A%22HeadlessChrome%22%2C%22version%22%3A%22153.0.8010.12%22%7D%2C%7B%22brand%22%3A%22Not_A%20Brand%22%2C%22version%22%3A%228.0.0.0%22%7D%2C%7B%22brand%22%3A%22Chromium%22%2C%22version%22%3A%22153.0.8010.12%22%7D%5D%2C%22mobile%22%3Afalse%2C%22model%22%3A%22%22%2C%22platform%22%3A%22Linux%22%2C%22platformVersion%22%3A%22%22%7D&cookie=1&res=1280x720"
+       }
+      ],
+      "response_headers": {
+       "cache-control": "must-revalidate, no-cache, private",
+       "content-encoding": "br",
+       "content-language": "de",
+       "content-length": "10469",
+       "content-security-policy": "default-src 'none'; connect-src 'self' wss: data: https://matomo.pw6.de/; font-src 'self' data:; frame-src 'self' www.youtube.com https://auth.pw6.de; img-src 'self' data: i.ytimg.com; media-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' matomo.pw6.de https://www.instagram.com https://matomo.pw6.de/; script-src-elem 'self' 'unsafe-eval' 'unsafe-inline' matomo.pw6.de https://www.instagram.com; style-src 'self' 'unsafe-inline'",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Mon, 28 Sep 2026 11:51:13 GMT",
+       "expires": "Sun, 19 Nov 1978 05:00:00 GMT",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "server": "Apache",
+       "strict-transport-security": "max-age=31536000",
+       "vary": "Accept-Encoding",
+       "x-content-type-options": "nosniff",
+       "x-drupal-dynamic-cache": "HIT",
+       "x-frame-options": "SAMEORIGIN",
+       "x-generator": "Drupal 11 (https://www.drupal.org)",
+       "x-xss-protection": "0"
+      },
+      "screenshot_path": "/tmp/scan-cd28d260-cf49-4d17-a980-64a4b1951444/hosts/18.239.50.54/phase2/screenshot_umfrage.castenow.de.png",
+      "status_code": 204,
+      "tech_info": {
+       "body_classes": "role-anonymous front",
+       "cookies": "disable_tracking=%7B%22matomo%22%3Afalse%2C%22youtube%22%3Afalse%7D; _pk_id.6.693a=9030b96a6911d187.1790615920.; _pk_ses.6.693a=1",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "Wir sind eine Agentur für Markenkommunikation und Employer Branding mit Sitz in Düsseldorf. Lernt uns und unsere preisgekrönten Arbeiten kennen.",
+         "name": "description"
+        },
+        {
+         "content": "Drupal 11 (https://www.drupal.org)",
+         "name": "Generator"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0",
+         "name": "viewport"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://matomo.pw6.de/matomo.js",
+        "https://www.castenow.de/core/assets/vendor/jquery/jquery.min.js?v=4.0.0",
+        "https://www.castenow.de/sites/default/files/js/js_S5o6dCEsXhnXk80atmVTscDXV7UAJ_ofFN1lwogqnl4.js?scope=footer&delta=1&language=de&theme=castenow&include=eJxdj2uOwzAIhC-UXc40trHixjEI42xz-0bZqEr7A8F8jHig7VlsJTzwnDBcgjEWldKcEmeM6ieOqDUgLnQXv7UEgxXul0c9zqBs0pxbOiGv6jt9GvPRp8AztiJ2ErWyIe50q7-Gd_ROpSX-P7NHK-o3sBX-UzGnLOJsU9LKz_cLyYaiHnqs-haXs8_Hlpzpyj8NC6epK9YjGknIo0c4vwBW8nYO",
+        "https://www.castenow.de/sites/default/files/js/js_Id4bx53klqbTa8jJ5m3c8OsHfJn3uFgWNSzuTVQ0bGY.js?scope=footer&delta=0&language=de&theme=castenow&include=eJzLTSzJz83XzwVTACTjBUo&exclude=eJxdj2t2hCAMhTdkzZouEAoVIScEO-6-VudM7fzISe6XN-oem66ELzwmDGuuNL9QyU6hmfvFlLFIy9UocMQodmKPUhyO6ruY_7d6iPkEitqqcQ0n5FVsf9sRjzw5Tthy05OI5g1-p1v8Nryjd8o18HV695rFbmDL_C1NjWJrxjoFKfx4vRB0CMqhxyov8awUKD4VkjpdmfmPzKPKcCX3xGHq6TgnRnr6j4rllwrWwyo1F0f3MP4BYuaOHg"
+       ],
+       "stylesheets": [
+        "https://www.castenow.de/sites/default/files/css/css_XhdzdKGwo26bSpisHd0vZs9DyF_GHRZCU_pvUxs0ht4.css?delta=0&language=de&theme=castenow&include=eJxVzcEOwjAMA9Afmppv8tqURauaKE3H-HvEDsBu9jvYmKFr07xTk9XhwmPBx5yxm0oPKlwxW1ycYZE3UHXtwb1caC4H8ov-crqvDYxB0gufVz2En6YeVFWDfSnW-Pz-GBwPh22Dik9DSz9Js9tcm4yNyxtd5Upv"
+       ],
+       "title": "CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW"
+      }
+     }
+    },
+    "server": "Amazon CloudFront httpd",
+    "tech_rows": [
+     {
+      "category": "Sonstiges",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "nmap",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Amazon CloudFront httpd",
+      "patch_status": "unbekannt",
+      "source": "nmap",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "header_check",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "header_check",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "2.4.68",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Amazon CloudFront httpd",
+      "version": ""
+     },
+     {
+      "name": "Apache",
+      "version": ""
+     },
+     {
+      "name": "Drupal",
+      "version": "11"
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "PHP",
+      "version": ""
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     }
+    ],
+    "throttled": false,
+    "vhost_results": {
+     "umfrage.castenow.de": {
+      "cms": "Drupal",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": "11",
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "umfrage.castenow.de"
+   },
+   {
+    "cms": "Nextcloud",
+    "cms_confidence": 0.85,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "443",
+      "service": "Nextcloud"
+     }
+    ],
+    "fqdns": [
+     "mailstore.castenow.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "195.50.179.5",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      443
+     ],
+     "shodan_services": {
+      "443": "Nextcloud"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "mailstore.castenow.de",
+    "redirect_data": {
+     "mailstore.castenow.de": {
+      "error": null,
+      "final_domain": "mailstore.castenow.de",
+      "final_response_headers": {
+       "accept-ranges": "bytes",
+       "cache-control": "max-age=15778463",
+       "content-length": "815",
+       "content-type": "image/svg+xml",
+       "date": "Mon, 28 Sep 2026 17:15:56 GMT",
+       "etag": "\"32f-638c8acf231bc\"",
+       "last-modified": "Mon, 30 Jun 2025 11:53:26 GMT",
+       "referrer-policy": "no-referrer",
+       "server": "Apache",
+       "strict-transport-security": "max-age=15552000;includeSubdomains",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "SAMEORIGIN",
+       "x-permitted-cross-domain-policies": "none",
+       "x-robots-tag": "noindex, nofollow",
+       "x-xss-protection": "1; mode=block"
+      },
+      "final_status": 200,
+      "final_url": "https://mailstore.castenow.de/",
+      "first_response_headers": {
+       "content-security-policy": "default-src 'self'; script-src 'self' 'nonce-YZmyuLbaPhD/8k40aFJDApD5fYb3YMHxNSOmQtUycT4='; style-src 'self' 'unsafe-inline'; frame-src *; img-src * data: blob:; font-src 'self' data:; media-src *; connect-src *; object-src 'none'; base-uri 'self';",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Mon, 28 Sep 2026 17:15:56 GMT",
+       "referrer-policy": "no-referrer",
+       "server": "Apache",
+       "strict-transport-security": "max-age=15552000;includeSubdomains",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "SAMEORIGIN",
+       "x-permitted-cross-domain-policies": "none",
+       "x-robots-tag": "noindex, nofollow",
+       "x-xss-protection": "1; mode=block"
+      },
+      "first_status": 400,
+      "is_cross_domain": false,
+      "page_title": "Nextcloud",
+      "redirect_chain": [
+       "https://mailstore.castenow.de/",
+       "https://mailstore.castenow.de/apps/theming/css/default.css?v=919645f5-20",
+       "https://mailstore.castenow.de/core/css/guest.css?v=4f19527a-20",
+       "https://mailstore.castenow.de/apps/theming/img/background/jenna-kim-the-globe.webp",
+       "https://mailstore.castenow.de/core/img/logo/logo.svg"
+      ],
+      "response_chain": [
+       {
+        "status": 400,
+        "url": "https://mailstore.castenow.de/"
+       },
+       {
+        "status": 200,
+        "url": "https://mailstore.castenow.de/apps/theming/css/default.css?v=919645f5-20"
+       },
+       {
+        "status": 200,
+        "url": "https://mailstore.castenow.de/core/css/guest.css?v=4f19527a-20"
+       },
+       {
+        "status": 200,
+        "url": "https://mailstore.castenow.de/apps/theming/img/background/jenna-kim-the-globe.webp"
+       },
+       {
+        "status": 200,
+        "url": "https://mailstore.castenow.de/core/img/logo/logo.svg"
+       }
+      ],
+      "response_headers": {
+       "content-security-policy": "default-src 'self'; script-src 'self' 'nonce-YZmyuLbaPhD/8k40aFJDApD5fYb3YMHxNSOmQtUycT4='; style-src 'self' 'unsafe-inline'; frame-src *; img-src * data: blob:; font-src 'self' data:; media-src *; connect-src *; object-src 'none'; base-uri 'self';",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Mon, 28 Sep 2026 17:15:56 GMT",
+       "referrer-policy": "no-referrer",
+       "server": "Apache",
+       "strict-transport-security": "max-age=15552000;includeSubdomains",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "SAMEORIGIN",
+       "x-permitted-cross-domain-policies": "none",
+       "x-robots-tag": "noindex, nofollow",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-cd28d260-cf49-4d17-a980-64a4b1951444/hosts/195.50.179.5/phase2/screenshot_mailstore.castenow.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "",
+         "name": "csp-nonce"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, minimum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "app-id=1125420102",
+         "name": "apple-itunes-app"
+        },
+        {
+         "content": "#00679e",
+         "name": "theme-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [
+        "https://mailstore.castenow.de/apps/theming/css/default.css?v=919645f5-20",
+        "https://mailstore.castenow.de/core/css/guest.css?v=4f19527a-20"
+       ],
+       "title": "Nextcloud"
+      }
+     }
+    },
+    "server": "Apache httpd",
+    "tech_rows": [
+     {
+      "category": "Anwendung",
+      "confidence": 0.8,
+      "confidence_label": "mittel",
+      "cves": [],
+      "detection_source": "cms_fingerprint, httpx",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nextcloud",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint, httpx",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "header_check, httpx, nmap, webtech",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "header_check, httpx, nmap, webtech",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Apache httpd",
+      "version": ""
+     },
+     {
+      "name": "Apache",
+      "version": ""
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "Nextcloud",
+      "version": ""
+     },
+     {
+      "name": "PHP",
+      "version": ""
+     }
+    ],
+    "throttled": false,
+    "vhost_results": {
+     "mailstore.castenow.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "mailstore.castenow.de"
+   },
+   {
+    "cms": "Bitwarden",
+    "cms_confidence": 0.9,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "443",
+      "service": "nginx"
+     }
+    ],
+    "fqdns": [
+     "bitwarden.castenow.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "195.50.179.6",
+    "is_spa": true,
+    "mail_services": false,
+    "open_ports": [
+     443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      443
+     ],
+     "shodan_services": {
+      "443": "nginx"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "bitwarden.castenow.de",
+    "redirect_data": {
+     "bitwarden.castenow.de": {
+      "error": null,
+      "final_domain": "bitwarden.castenow.de",
+      "final_response_headers": {
+       "content-encoding": "gzip",
+       "content-type": "application/json; charset=utf-8",
+       "date": "Mon, 28 Sep 2026 17:17:06 GMT",
+       "referrer-policy": "same-origin",
+       "server": "nginx",
+       "strict-transport-security": "max-age=15768000",
+       "vary": "Accept-Encoding",
+       "x-content-type-options": "nosniff, nosniff",
+       "x-frame-options": "SAMEORIGIN",
+       "x-xss-protection": "1; mode=block, 1; mode=block"
+      },
+      "final_status": 200,
+      "final_url": "https://bitwarden.castenow.de/#/login",
+      "first_response_headers": {
+       "content-encoding": "gzip",
+       "content-security-policy": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://haveibeenpwned.com; child-src 'self' https://*.duosecurity.com https://*.duofederal.com; frame-src 'self' https://*.duosecurity.com https://*.duofederal.com; connect-src 'self' wss://bitwarden.castenow.de https://api.pwnedpasswords.com https://api.2fa.directory; object-src 'self' blob:;",
+       "content-type": "text/html",
+       "date": "Mon, 28 Sep 2026 17:17:05 GMT",
+       "etag": "W/\"1dd3638340879b2\"",
+       "last-modified": "Thu, 27 Aug 2026 15:24:51 GMT",
+       "referrer-policy": "same-origin",
+       "server": "nginx",
+       "strict-transport-security": "max-age=15768000",
+       "vary": "Accept-Encoding",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "SAMEORIGIN",
+       "x-robots-tag": "noindex, nofollow",
+       "x-xss-protection": "1; mode=block"
+      },
+      "first_status": 200,
+      "is_cross_domain": false,
+      "page_title": "Bitwarden Web vault",
+      "redirect_chain": [
+       "https://bitwarden.castenow.de/",
+       "https://bitwarden.castenow.de/styles.c97bd415789d41b47051.css",
+       "https://bitwarden.castenow.de/styles.31d6cfe0d16ae931b73c.js",
+       "https://bitwarden.castenow.de/theme_head.6991036cc6ce1ab5eee1.js",
+       "https://bitwarden.castenow.de/app/polyfills.17d66214ebf3b773befe.js",
+       "https://bitwarden.castenow.de/images/logo.svg",
+       "https://bitwarden.castenow.de/fonts/bwi-font.d448fde250b83350bb3b.ttf",
+       "https://bitwarden.castenow.de/fonts/inter.c504db5c06caaf7cdfba.woff2",
+       "https://bitwarden.castenow.de/app/main.d1ab62eb945c702563bf.js",
+       "https://bitwarden.castenow.de/app/vendor.c41428502ffee161a862.js",
+       "https://bitwarden.castenow.de/685.3d01ede770940fbb87f0.js",
+       "https://bitwarden.castenow.de/d34376af7e27c0350c30.module.wasm",
+       "https://bitwarden.castenow.de/locales/en/messages.json?cache=o1y8wp",
+       "https://bitwarden.castenow.de/api/config"
+      ],
+      "response_chain": [
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/"
+       },
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/styles.c97bd415789d41b47051.css"
+       },
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/styles.31d6cfe0d16ae931b73c.js"
+       },
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/theme_head.6991036cc6ce1ab5eee1.js"
+       },
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/app/polyfills.17d66214ebf3b773befe.js"
+       },
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/images/logo.svg"
+       },
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/fonts/bwi-font.d448fde250b83350bb3b.ttf"
+       },
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/fonts/inter.c504db5c06caaf7cdfba.woff2"
+       },
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/app/main.d1ab62eb945c702563bf.js"
+       },
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/app/vendor.c41428502ffee161a862.js"
+       },
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/685.3d01ede770940fbb87f0.js"
+       },
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/d34376af7e27c0350c30.module.wasm"
+       },
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/locales/en/messages.json?cache=o1y8wp"
+       },
+       {
+        "status": 200,
+        "url": "https://bitwarden.castenow.de/api/config"
+       }
+      ],
+      "response_headers": {
+       "content-encoding": "gzip",
+       "content-security-policy": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://haveibeenpwned.com; child-src 'self' https://*.duosecurity.com https://*.duofederal.com; frame-src 'self' https://*.duosecurity.com https://*.duofederal.com; connect-src 'self' wss://bitwarden.castenow.de https://api.pwnedpasswords.com https://api.2fa.directory; object-src 'self' blob:;",
+       "content-type": "text/html",
+       "date": "Mon, 28 Sep 2026 17:17:05 GMT",
+       "etag": "W/\"1dd3638340879b2\"",
+       "last-modified": "Thu, 27 Aug 2026 15:24:51 GMT",
+       "referrer-policy": "same-origin",
+       "server": "nginx",
+       "strict-transport-security": "max-age=15768000",
+       "vary": "Accept-Encoding",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "SAMEORIGIN",
+       "x-robots-tag": "noindex, nofollow",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-cd28d260-cf49-4d17-a980-64a4b1951444/hosts/195.50.179.6/phase2/screenshot_bitwarden.castenow.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "layout_frontend",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "width=1010",
+         "name": "viewport"
+        },
+        {
+         "content": "#175DDC",
+         "name": "theme-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://bitwarden.castenow.de/theme_head.6991036cc6ce1ab5eee1.js",
+        "https://bitwarden.castenow.de/app/polyfills.17d66214ebf3b773befe.js",
+        "https://bitwarden.castenow.de/app/vendor.c41428502ffee161a862.js",
+        "https://bitwarden.castenow.de/app/main.d1ab62eb945c702563bf.js",
+        "https://bitwarden.castenow.de/styles.31d6cfe0d16ae931b73c.js"
+       ],
+       "stylesheets": [
+        "https://bitwarden.castenow.de/styles.c97bd415789d41b47051.css"
+       ],
+       "title": "Bitwarden Web vault"
+      }
+     }
+    },
+    "server": "nginx",
+    "tech_rows": [
+     {
+      "category": "Web-Server",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "httpx, nmap",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "httpx, nmap",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "nginx",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     }
+    ],
+    "throttled": false,
+    "vhost_results": {
+     "bitwarden.castenow.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "bitwarden.castenow.de"
+   },
+   {
+    "cms": "WordPress",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "WordPress",
+     "confidence": 0.95,
+     "details": {
+      "meta_generator": "WordPress 7.1.2",
+      "raw": {
+       "name": "WordPress",
+       "version": "7.1.2"
+      },
+      "source": "webtech"
+     },
+     "detection_methods": [
+      "meta_tag",
+      "webtech"
+     ],
+     "version": "7.1.2"
+    },
+    "cms_version": "7.1.2",
+    "exposed_services": [
+     {
+      "port": "25",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "80",
+      "service": "nginx"
+     },
+     {
+      "port": "443",
+      "service": "nginx"
+     },
+     {
+      "port": "465",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "587",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "8000",
+      "service": ""
+     },
+     {
+      "port": "993",
+      "service": ""
+     },
+     {
+      "port": "995",
+      "service": ""
+     },
+     {
+      "port": "8800",
+      "service": ""
+     },
+     {
+      "port": "8001",
+      "service": ""
+     },
+     {
+      "port": "106",
+      "service": ""
+     },
+     {
+      "port": "110",
+      "service": ""
+     },
+     {
+      "port": "143",
+      "service": ""
+     },
+     {
+      "port": "21",
+      "service": ""
+     },
+     {
+      "port": "8880",
+      "service": ""
+     },
+     {
+      "port": "8443",
+      "service": ""
+     },
+     {
+      "port": "53",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "ubb-wiki.castenow.de"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "92.205.163.53",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     53,
+     80,
+     106,
+     110,
+     143,
+     443,
+     465,
+     587,
+     993,
+     995,
+     8000,
+     8001,
+     8443,
+     8800
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      8000,
+      993,
+      995,
+      8800,
+      8001,
+      106,
+      587,
+      110,
+      143,
+      80,
+      465,
+      21,
+      8880,
+      8443,
+      25,
+      443,
+      53
+     ],
+     "shodan_services": {
+      "25": "Postfix smtpd",
+      "443": "nginx",
+      "465": "Postfix smtpd",
+      "587": "Postfix smtpd",
+      "80": "nginx"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "ubb-wiki.castenow.de",
+    "redirect_data": {
+     "ubb-wiki.castenow.de": {
+      "error": null,
+      "final_domain": "ubb-wiki.castenow.de",
+      "final_response_headers": {
+       "alt-svc": "h3=\":443\"; ma=86400",
+       "content-encoding": "br",
+       "content-type": "application/javascript",
+       "date": "Mon, 28 Sep 2026 17:19:22 GMT",
+       "etag": "W/\"6a507926-58e0\"",
+       "last-modified": "Fri, 10 Jul 2026 04:46:30 GMT",
+       "server": "nginx",
+       "strict-transport-security": "max-age=15768000; includeSubDomains",
+       "x-cache-status": "MISS",
+       "x-powered-by": "PleskLin"
+      },
+      "final_status": 200,
+      "final_url": "https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F",
+      "first_response_headers": {
+       "alt-svc": "h3=\":443\"; ma=86400",
+       "content-encoding": "br",
+       "content-security-policy": "frame-ancestors 'self';",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Mon, 28 Sep 2026 17:19:22 GMT",
+       "link": "<https://ubb-wiki.castenow.de/wp-json/>; rel=\"https://api.w.org/\", <https://ubb-wiki.castenow.de/wp-json/wp/v2/pages/17>; rel=\"alternate\"; title=\"JSON\"; type=\"application/json\", <https://ubb-wiki.castenow.de/?p=17>; rel=shortlink",
+       "server": "nginx",
+       "strict-transport-security": "max-age=15768000; includeSubDomains",
+       "x-cache-status": "STALE",
+       "x-frame-options": "SAMEORIGIN",
+       "x-powered-by": "PHP/8.4.25\nPleskLin"
+      },
+      "first_status": 200,
+      "is_cross_domain": false,
+      "page_title": "Login – ubb-wiki | castenow.de",
+      "redirect_chain": [
+       "https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/tipsy/tipsy.min.css?ver=1.0.0a",
+       "https://ubb-wiki.castenow.de/wp-content/themes/myknowledgebase/style.css?ver=7.1.2",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-modal.min.css?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/um-confirm/um-confirm.min.css?ver=1.0",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/raty/um-raty.min.css?ver=2.6.0",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-fileupload.min.css?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/select2/select2.min.css?ver=4.0.13",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/jquery-ui/jquery-ui.min.css?ver=1.13.2",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/default.time.min.css?ver=3.6.2",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/legacy/fonticons/fonticons-ii.min.css?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/common.min.css?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/legacy/fonticons/fonticons-fa.min.css?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-profile.min.css?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-fontawesome.min.css?ver=6.5.2",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-responsive.min.css?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-styles.min.css?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-account.min.css?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/cropper/cropper.min.css?ver=1.6.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/default.min.css?ver=3.6.2",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/um-notice/um-notice.min.css?ver=1.0",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-old-default.min.css?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-includes/js/wp-util.min.js?ver=7.1.2",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/um-confirm/um-confirm.min.js?ver=1.0",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/tipsy/tipsy.min.js?ver=1.0.0a",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/um-notice/um-notice.min.js?ver=1.0",
+       "https://ubb-wiki.castenow.de/wp-includes/js/dist/hooks.min.js?ver=f0f188028580e8dc1255",
+       "https://ubb-wiki.castenow.de/wp-includes/js/dist/i18n.min.js?ver=1dfe7db3940c23ea9216",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-misc.min.css?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-includes/js/underscore.min.js?ver=1.13.8",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/default.date.min.css?ver=3.6.2",
+       "https://ubb-wiki.castenow.de/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+       "https://ubb-wiki.castenow.de/wp-content/themes/myknowledgebase/js/nav.js?ver=7.1.2",
+       "https://ubb-wiki.castenow.de/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-gdpr.min.js?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-conditional.min.js?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-functions.min.js?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/raty/um-raty.min.js?ver=2.6.0",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.min.js?ver=3.6.2",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/fileupload/jquery.uploadfile.min.js?ver=3.1.2",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.date.min.js?ver=3.6.2",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.time.min.js?ver=3.6.2",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/common.min.js?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/translations/de_DE.min.js?ver=3.6.2",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/common-frontend.min.js?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-modal.min.js?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/cropper/cropper.min.js?ver=1.6.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-responsive.min.js?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/jquery-form/jquery-form.min.js?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/select2/i18n/de.js?ver=4.0.13",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-profile.min.js?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-account.min.js?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-scripts.min.js?ver=2.13.1",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/select2/select2.full.min.js?ver=4.0.13",
+       "blob:https://ubb-wiki.castenow.de/63a56684-3b5d-4c77-930a-d84270d15fac",
+       "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/legacy/fonticons/font/ionicons.woff?v=2.0.0",
+       "https://ubb-wiki.castenow.de/wp-includes/js/wp-emoji-release.min.js?ver=7.1.2"
+      ],
+      "response_chain": [
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/tipsy/tipsy.min.css?ver=1.0.0a"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/themes/myknowledgebase/style.css?ver=7.1.2"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-modal.min.css?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/um-confirm/um-confirm.min.css?ver=1.0"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/raty/um-raty.min.css?ver=2.6.0"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-fileupload.min.css?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/select2/select2.min.css?ver=4.0.13"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/jquery-ui/jquery-ui.min.css?ver=1.13.2"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/default.time.min.css?ver=3.6.2"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/legacy/fonticons/fonticons-ii.min.css?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/common.min.css?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/legacy/fonticons/fonticons-fa.min.css?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-profile.min.css?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-fontawesome.min.css?ver=6.5.2"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-responsive.min.css?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-styles.min.css?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-account.min.css?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/cropper/cropper.min.css?ver=1.6.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/default.min.css?ver=3.6.2"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/um-notice/um-notice.min.css?ver=1.0"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-old-default.min.css?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-includes/js/wp-util.min.js?ver=7.1.2"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/um-confirm/um-confirm.min.js?ver=1.0"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/tipsy/tipsy.min.js?ver=1.0.0a"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/um-notice/um-notice.min.js?ver=1.0"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-includes/js/dist/hooks.min.js?ver=f0f188028580e8dc1255"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-includes/js/dist/i18n.min.js?ver=1dfe7db3940c23ea9216"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-misc.min.css?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-includes/js/underscore.min.js?ver=1.13.8"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/default.date.min.css?ver=3.6.2"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/themes/myknowledgebase/js/nav.js?ver=7.1.2"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-gdpr.min.js?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-conditional.min.js?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-functions.min.js?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/raty/um-raty.min.js?ver=2.6.0"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.min.js?ver=3.6.2"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/fileupload/jquery.uploadfile.min.js?ver=3.1.2"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.date.min.js?ver=3.6.2"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.time.min.js?ver=3.6.2"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/common.min.js?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/translations/de_DE.min.js?ver=3.6.2"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/common-frontend.min.js?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-modal.min.js?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/cropper/cropper.min.js?ver=1.6.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-responsive.min.js?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/jquery-form/jquery-form.min.js?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/select2/i18n/de.js?ver=4.0.13"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-profile.min.js?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-account.min.js?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-scripts.min.js?ver=2.13.1"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/select2/select2.full.min.js?ver=4.0.13"
+       },
+       {
+        "status": 200,
+        "url": "blob:https://ubb-wiki.castenow.de/63a56684-3b5d-4c77-930a-d84270d15fac"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/legacy/fonticons/font/ionicons.woff?v=2.0.0"
+       },
+       {
+        "status": 200,
+        "url": "https://ubb-wiki.castenow.de/wp-includes/js/wp-emoji-release.min.js?ver=7.1.2"
+       }
+      ],
+      "response_headers": {
+       "alt-svc": "h3=\":443\"; ma=86400",
+       "content-encoding": "br",
+       "content-security-policy": "frame-ancestors 'self';",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Mon, 28 Sep 2026 17:19:22 GMT",
+       "link": "<https://ubb-wiki.castenow.de/wp-json/>; rel=\"https://api.w.org/\", <https://ubb-wiki.castenow.de/wp-json/wp/v2/pages/17>; rel=\"alternate\"; title=\"JSON\"; type=\"application/json\", <https://ubb-wiki.castenow.de/?p=17>; rel=shortlink",
+       "server": "nginx",
+       "strict-transport-security": "max-age=15768000; includeSubDomains",
+       "x-cache-status": "STALE",
+       "x-frame-options": "SAMEORIGIN",
+       "x-powered-by": "PHP/8.4.25\nPleskLin"
+      },
+      "screenshot_path": "/tmp/scan-cd28d260-cf49-4d17-a980-64a4b1951444/hosts/92.205.163.53/phase2/screenshot_ubb-wiki.castenow.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "wp-singular page-template-default page page-id-17 wp-theme-myknowledgebase um-page um-page-login um-page-loggedout",
+       "cookies": "",
+       "generator": "WordPress 7.1.2",
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "noindex, nofollow",
+         "name": "robots"
+        },
+        {
+         "content": "WordPress 7.1.2",
+         "name": "generator"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://ubb-wiki.castenow.de/wp-content/themes/myknowledgebase/js/nav.js?ver=7.1.2",
+        "https://ubb-wiki.castenow.de/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+        "https://ubb-wiki.castenow.de/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-gdpr.min.js?ver=2.13.1",
+        "https://ubb-wiki.castenow.de/wp-includes/js/wp-emoji-release.min.js?ver=7.1.2",
+        "https://ubb-wiki.castenow.de/wp-includes/js/underscore.min.js?ver=1.13.8",
+        "https://ubb-wiki.castenow.de/wp-includes/js/wp-util.min.js?ver=7.1.2",
+        "https://ubb-wiki.castenow.de/wp-includes/js/dist/hooks.min.js?ver=f0f188028580e8dc1255",
+        "https://ubb-wiki.castenow.de/wp-includes/js/dist/i18n.min.js?ver=1dfe7db3940c23ea9216",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/tipsy/tipsy.min.js?ver=1.0.0a",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/um-confirm/um-confirm.min.js?ver=1.0",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/um-notice/um-notice.min.js?ver=1.0",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.min.js?ver=3.6.2",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.date.min.js?ver=3.6.2",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.time.min.js?ver=3.6.2",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/translations/de_DE.min.js?ver=3.6.2",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/common.min.js?ver=2.13.1",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/cropper/cropper.min.js?ver=1.6.1",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/common-frontend.min.js?ver=2.13.1",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/js/um-modal.min.js?ver=2.13.1"
+       ],
+       "stylesheets": [
+        "https://ubb-wiki.castenow.de/wp-content/themes/myknowledgebase/style.css?ver=7.1.2",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-modal.min.css?ver=2.13.1",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/jquery-ui/jquery-ui.min.css?ver=1.13.2",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/tipsy/tipsy.min.css?ver=1.0.0a",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/raty/um-raty.min.css?ver=2.6.0",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/select2/select2.min.css?ver=4.0.13",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-fileupload.min.css?ver=2.13.1",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/um-confirm/um-confirm.min.css?ver=1.0",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/um-notice/um-notice.min.css?ver=1.0",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/default.min.css?ver=3.6.2",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/default.date.min.css?ver=3.6.2",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/pickadate/default.time.min.css?ver=3.6.2",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/legacy/fonticons/fonticons-ii.min.css?ver=2.13.1",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/legacy/fonticons/fonticons-fa.min.css?ver=2.13.1",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-fontawesome.min.css?ver=6.5.2",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/common.min.css?ver=2.13.1",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-responsive.min.css?ver=2.13.1",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-styles.min.css?ver=2.13.1",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/libs/cropper/cropper.min.css?ver=1.6.1",
+        "https://ubb-wiki.castenow.de/wp-content/plugins/ultimate-member/assets/css/um-profile.min.css?ver=2.13.1"
+       ],
+       "title": "Login – ubb-wiki | castenow.de"
+      }
+     }
+    },
+    "server": "nginx",
+    "tech_rows": [
+     {
+      "category": "CMS",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "cms_fingerprint, httpx, webtech, wpscan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "WordPress",
+      "patch_status": "aktuell",
+      "source": "cms_fingerprint, httpx, webtech, wpscan",
+      "status": "current",
+      "top_cve": null,
+      "version": "7.1.2",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": 0.8,
+      "confidence_label": "mittel",
+      "cves": [],
+      "detection_source": "redirect_probe",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Ultimate Member",
+      "patch_status": "unbekannt",
+      "source": "redirect_probe",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "2.13.1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": 0.8,
+      "confidence_label": "mittel",
+      "cves": [],
+      "detection_source": "httpx",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Underscore.js",
+      "patch_status": "unbekannt",
+      "source": "httpx",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "1.13.8",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": 0.8,
+      "confidence_label": "mittel",
+      "cves": [],
+      "detection_source": "httpx, redirect_probe",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery Migrate",
+      "patch_status": "unbekannt",
+      "source": "httpx, redirect_probe",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "3.4.1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Verwaltungsoberfläche",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "header_check, nmap",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Plesk",
+      "patch_status": "unbekannt",
+      "source": "header_check, nmap",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "18.0.81",
+      "vuln_name": ""
+     },
+     {
+      "category": "File-Transfer",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "nmap",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ProFTPD",
+      "patch_status": "unbekannt",
+      "source": "nmap",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sprache",
+      "confidence": 0.8,
+      "confidence_label": "mittel",
+      "cves": [],
+      "detection_source": "httpx, webtech",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PHP",
+      "patch_status": "unbekannt",
+      "source": "httpx, webtech",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "8.4.25",
+      "vuln_name": ""
+     },
+     {
+      "category": "Bibliothek",
+      "confidence": 0.8,
+      "confidence_label": "mittel",
+      "cves": [],
+      "detection_source": "httpx, redirect_probe",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "patch_status": "unbekannt",
+      "source": "httpx, redirect_probe",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "3.7.1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Mail",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "nmap",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot",
+      "patch_status": "unbekannt",
+      "source": "nmap",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Mail",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "nmap",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix",
+      "patch_status": "unbekannt",
+      "source": "nmap",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "CMS-Theme",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "wpscan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "myknowledgebase",
+      "patch_status": "aktuell",
+      "source": "wpscan",
+      "status": "current",
+      "top_cve": null,
+      "version": "8.7",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "header_check, httpx, nmap",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "header_check, httpx, nmap",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "ProFTPD",
+      "version": ""
+     },
+     {
+      "name": "nginx",
+      "version": ""
+     },
+     {
+      "name": "Dovecot pop3d",
+      "version": ""
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "Postfix smtpd",
+      "version": ""
+     },
+     {
+      "name": "sw-cp-server",
+      "version": ""
+     },
+     {
+      "name": "Icecast streaming media server",
+      "version": "2.4.4"
+     },
+     {
+      "name": "PHP/8.4.25\nPleskLin",
+      "version": ""
+     },
+     {
+      "name": "WordPress",
+      "version": "7.1.2"
+     },
+     {
+      "name": "PleskLin",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "HTTP/3",
+      "version": ""
+     },
+     {
+      "name": "MySQL",
+      "version": ""
+     },
+     {
+      "name": "PHP",
+      "version": "8.4.25"
+     },
+     {
+      "name": "Underscore.js",
+      "version": "1.13.8"
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     },
+     {
+      "name": "jQuery Migrate",
+      "version": "3.4.1"
+     }
+    ],
+    "throttled": false,
+    "vhost_results": {
+     "ubb-wiki.castenow.de": {
+      "cms": "WordPress",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": "7.1.2",
+      "waf": "Generic"
+     }
+    },
+    "waf": "Generic",
+    "web_fqdn": "ubb-wiki.castenow.de"
+   }
+  ]
+ },
+ "success": true
+}

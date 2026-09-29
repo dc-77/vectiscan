@@ -23,9 +23,10 @@ def http(order: str, fqdn: str) -> S.HttpFact:
     return next(h for h in facts(order).http if h.fqdn == fqdn)
 
 
-def test_schema_1_3_0():
-    assert S.FACTS_SCHEMA_VERSION == "1.3.0"
-    assert all(facts(o).schema_version == "1.3.0" for o in (DB, LW, JW, HE, BS, CA, HL))
+def test_schema_mindestens_1_3_0():
+    # S6d: das Schema steht seit S6d auf 1.4.0; die N-Felder aus 1.3.0 bleiben enthalten.
+    assert tuple(int(x) for x in S.FACTS_SCHEMA_VERSION.split(".")) >= (1, 3, 0)
+    assert all(facts(o).schema_version == S.FACTS_SCHEMA_VERSION for o in (DB, LW, JW, HE, BS, CA, HL))
 
 
 # ---------------------------------------------------------------- N1 CSP

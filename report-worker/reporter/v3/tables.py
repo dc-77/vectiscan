@@ -7,6 +7,7 @@ ohne Versionsnummer, weil der Gate-Check des Prototyps das verlangt (spec/03 Reg
 """
 from __future__ import annotations
 
+import re
 from typing import Optional
 
 from reporter.v3 import levels as _levels
@@ -394,8 +395,30 @@ TOOL_CHECKS: dict[str, str] = {
     "virustotal": "Reputationsdaten",
     "phase3_correlation": "Abgleich mit Schwachstellendatenbanken",
     "searchsploit": "Abgleich mit Schwachstellendatenbanken",
+    # S6d (S6c-Werkzeuge): Zusatzlaeufe und Sonden.
+    "nmap_versionall": "Portscan und Diensterkennung",
+    "wordpress_xmlrpc": "WordPress-Prüfung",
+    "provider_block_probe": "Sperrerkennung nach dem Portscan",
+    "provider_block_probe_p2": "Sperrerkennung nach dem Portscan",
+    "rdap": "Netzbetreiber laut Registry",
 }
+# S6d (A2, A4): Werkzeugnamen mit Port oder Name im Suffix (testssl_587, testssl_sni_www.x.de,
+# smtp_ehlo_465).
+TOOL_CHECK_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"^testssl_(\d+|sni_.+)$"), "Transportverschlüsselung"),
+    (re.compile(r"^smtp_ehlo_\d+$"), "Anmeldung am Mailserver vor STARTTLS"),
+)
 TOOL_CHECKS_FALLBACK = "Weitere Prüfungen"
+
+
+def tool_check(tool: str) -> str:
+    """Pruefung in Kundensprache zu einem Werkzeug der Abdeckung, sonst ``TOOL_CHECKS_FALLBACK``."""
+    if tool in TOOL_CHECKS:
+        return TOOL_CHECKS[tool]
+    for rx, name in TOOL_CHECK_PATTERNS:
+        if rx.match(tool or ""):
+            return name
+    return TOOL_CHECKS_FALLBACK
 
 FAMILY_CHECKS: dict[str, str] = {
     "admin_service_exposed": "Verwaltungsoberflächen",
@@ -440,6 +463,7 @@ FAMILY_CHECKS: dict[str, str] = {
     "mail_plaintext": "Verschlüsselung der Mailzugänge",
     "service_unidentified": "Offene Dienste ohne Kennung",
     "smtp_vrfy": "Befehle der Mailserver",
+    "smtp_auth_cleartext": "Anmeldung am Mailserver vor STARTTLS",
     "wordpress_xmlrpc": "XML-RPC-Schnittstelle der Website",
     "login_over_http": "Anmeldung über unverschlüsselte Verbindungen",
     "spf_shared_host": "Absenderfreigaben im SPF-Eintrag",

@@ -1,0 +1,1319 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 1,
+   "high": 3,
+   "info": 0,
+   "low": 8,
+   "medium": 2
+  },
+  "business_impact_score": "7.0",
+  "catalog_version": "2026-09-27.2",
+  "customer_context": {},
+  "engine": "catalog",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "facts_schema_version": "1.3.0",
+  "findings": [
+   {
+    "affected": "88.99.35.112:10000 (Webmin), 88.99.35.112:443 (froxlor)",
+    "category": "A",
+    "description": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet eine Verwaltungsoberfläche mit Anmeldung an, die aus dem gesamten Internet erreichbar ist: 88.99.35.112:10000 (Webmin), 88.99.35.112:443 (froxlor). Die Antwort des Dienstes nennt die Verwaltungssoftware und verlangt eine Anmeldung: 88.99.35.112:10000 (Webmin). Der Seitentitel nennt ein Hosting-Panel, dessen Startseite die Anmeldung ist: 88.99.35.112:443 (froxlor). Die Oberfläche erscheint beim Aufruf über die IP-Adresse, also auf der Standardseite des Webservers und nicht unter einem Hostnamen der Webseite: 88.99.35.112:443 (froxlor). Eine Zugriffsbeschränkung auf bestimmte Quellnetze war von außen nicht erkennbar.",
+    "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:443/tcp · Dienst: http · Produkt: Apache httpd · Version: 2.4.67 · Server-Kennung: Apache/2.4.67 (Debian) · Seitentitel: froxlor · TLS erzwungen: ja · Zertifikat für: vsrv2.spacekoeln.de · Aussteller: YR1 · gültig bis: 30.10.2026, 21:10 UTC · 443/tcp open http Apache httpd 2.4.67 ((Debian)) tunnel=ssl\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:10000/tcp · Kennung: Webmin (MiniServ) · Server-Kennung: MiniServ · Anmeldung verlangt: ja · TLS erzwungen: ja · Zertifikat für: vsrv2.spacekoeln.de · Aussteller: YR1 · gültig bis: 30.10.2026, 21:10 UTC · 10000/tcp open snet-sensor-mgmt? tunnel=ssl",
+    "id": "VS-2026-001",
+    "impact": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft das gesamte System und alle Dienste darauf. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen.",
+    "key": "admin_access/88.99.35.112/kunde",
+    "level": "kritisch",
+    "policy_id": "admin_service_exposed",
+    "recommendation": "Unverzüglich: Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.\nIn Kürze: Die Standardseite des Webservers, die beim Aufruf über die IP-Adresse erscheint, auf eine neutrale Seite oder eine Fehlerantwort umstellen.\nIn Kürze: Prüfen, ob die Verwaltungsoberfläche eine Mehrfaktor-Anmeldung verlangt, und sie andernfalls aktivieren; Standardkonten deaktivieren oder umbenennen.\nMittelfristig: Softwarestand der Verwaltungsoberfläche gegen die Sicherheitshinweise des Herstellers abgleichen und Anmeldeversuche überwachen.",
+    "scale": "exposure",
+    "severity": "CRITICAL",
+    "source": "aktiv (nmap)",
+    "title": "Verwaltungszugänge auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com): Verwaltungsoberfläche mit Anmeldung",
+    "urgency": "Unverzüglich",
+    "verification": "Verbindungsversuch auf den betroffenen Port von einer externen Adresse außerhalb der freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung."
+   },
+   {
+    "affected": "88.99.35.112:110 (POP3 mit Anmeldung vor STARTTLS), 88.99.35.112:143 (IMAP mit Anmeldung vor STARTTLS)",
+    "category": "A",
+    "description": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet der Mailabrufdienst zwar STARTTLS an, nimmt eine Anmeldung aber schon vor dem Aufbau der Verschlüsselung entgegen: 88.99.35.112:110 (POP3 mit Anmeldung vor STARTTLS), 88.99.35.112:143 (IMAP mit Anmeldung vor STARTTLS).",
+    "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:110/tcp · Dienst: pop3 · Produkt: Dovecot pop3d · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · Anmeldeverfahren: LOGIN, PLAIN · Zertifikat für: vsrv2.spacekoeln.de · Aussteller: YR1 · gültig bis: 30.10.2026, 21:10 UTC · POP3-Fähigkeiten: CAPA PIPELINING UIDL USER STLS RESP-CODES TOP SASL(PLAIN LOGIN) AUTH-RESP-CODE\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:143/tcp · Dienst: imap · Produkt: Dovecot imapd · TLS erzwungen: nein · STARTTLS: ja · Anmeldung vor TLS gesperrt: nein · Anmeldeverfahren: LOGIN, PLAIN · Zertifikat für: vsrv2.spacekoeln.de · Aussteller: YR1 · gültig bis: 30.10.2026, 21:10 UTC · IMAP-Fähigkeiten: ID AUTH=LOGIN LITERAL+ IMAP4rev1 IDLE LOGIN-REFERRALS SASL-IR STARTTLS AUTH=PLAIN ENABLE",
+    "id": "VS-2026-002",
+    "impact": "STARTTLS wird angeboten, aber nicht verlangt: Ein Angreifer auf dem Übertragungsweg kann das Angebot unterdrücken und die Anmeldedaten dann im Klartext mitlesen.",
+    "key": "plaintext_services/88.99.35.112/kunde",
+    "level": "erhöht",
+    "policy_id": "mail_plaintext",
+    "recommendation": "In Kürze: Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten.\nMittelfristig: Postfach-Zugangsdaten rotieren und die Zugriffsprotokolle auf unverschlüsselte Anmeldeversuche prüfen.\nStrategisch: Mail-Clients auf die verschlüsselten Abrufwege umstellen und die Klartextports anschließend schließen.",
+    "scale": "exposure",
+    "severity": "HIGH",
+    "source": "aktiv (nmap)",
+    "title": "Zugänge auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com): POP3 oder IMAP ohne TLS-Zwang",
+    "urgency": "In Kürze",
+    "verification": "Verbindung zum Mailabrufdienst von außen aufbauen, bevor STARTTLS angefordert wird; erwartet wird die Ablehnung dieser unverschlüsselten Anmeldung."
+   },
+   {
+    "affected": "88.99.35.112: Debian GNU/Linux 11 (Herstellerpflege beendet 31.08.2026 laut Debian LTS)",
+    "category": "B",
+    "description": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 88.99.35.112: Debian GNU/Linux 11 (Herstellerpflege beendet 31.08.2026 laut Debian LTS).",
+    "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112 · Produkt: Debian GNU/Linux · Version: 11 · Pflegestatus: ohne Herstellerpflege · Pflegeende: 31.08.2026 · Quelle der Lebenszyklusdaten: Debian LTS, https://wiki.debian.org/LTS · Beleg: 30000/tcp open ssh OpenSSH 8.4p1 Debian 5+deb11u7 (protocol 2.0)",
+    "id": "VS-2026-003",
+    "impact": "Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits zurückgreifen. Das Release des Betriebssystems ist aus der Paketkennung eines Dienstes abgeleitet; mit dem Ende der Unterstützung erhalten alle Pakete dieses Releases keine Sicherheitsupdates mehr: 88.99.35.112: Debian GNU/Linux 11 (Herstellerpflege beendet 31.08.2026 laut Debian LTS).",
+    "key": "software_eol/scan/kunde",
+    "level": "erhöht",
+    "policy_id": "software_eol",
+    "recommendation": "In Kürze: Das Betriebssystem auf ein Release mit laufender Sicherheitsunterstützung anheben oder eine verlängerte Unterstützung für das eingesetzte Release sicherstellen.\nMittelfristig: Auf eine vom Hersteller gepflegte Version aktualisieren und einen festen Update-Rhythmus festlegen.",
+    "scale": "exposure",
+    "severity": "HIGH",
+    "source": "aktiv (nmap)",
+    "title": "Serversoftware ohne Herstellerpflege",
+    "urgency": "In Kürze",
+    "verification": "Versionsstand auf dem System prüfen und mit den Lebenszyklusangaben des Herstellers vergleichen; erwartet wird eine Version mit laufender Pflege."
+   },
+   {
+    "affected": "88.99.35.112: BeTheme 27.5.3 (laut wpscan bekannte Schwachstellen: 12), 88.99.35.112: Burst Statistics 1.7.1 (laut wpscan bekannte Schwachstellen: 1), 88.99.35.112: Complianz 7.1.0 (laut wpscan bekannte Schwachstellen: 7), 88.99.35.112: Slider Revolution 6.7.11 (laut wpscan bekannte Schwachstellen: 4)",
+    "category": "B",
+    "description": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) sind WordPress-Erweiterungen mit bekannten Schwachstellen im Einsatz: 88.99.35.112: BeTheme 27.5.3 (laut wpscan bekannte Schwachstellen: 12), 88.99.35.112: Burst Statistics 1.7.1 (laut wpscan bekannte Schwachstellen: 1), 88.99.35.112: Complianz 7.1.0 (laut wpscan bekannte Schwachstellen: 7), 88.99.35.112: Slider Revolution 6.7.11 (laut wpscan bekannte Schwachstellen: 4).",
+    "evidence": "wpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: betheme · Version: 27.5.3 · bekannte Schwachstellen laut wpscan: 12 · neueste Version laut wpscan: 28.5.10 · fehlerbereinigt ab: 28.5.8 · Betheme | Responsive Multipurpose WordPress & WooCommerce Theme <= 27.5.6 - Authenticated (Contributor+) Stored Cross-Site Scripting via Shortcode (CVE-2024-3998) · Betheme < 27.5.7 - Authenticated (Contributor+) PHP Object Injection (CVE-2024-2694), behoben in 27.5.7 · Betheme | Responsive Multipurpose WordPress & WooCommerce Theme < 27.5.6 - Authenticated (Author+) Stored Cross-Site Scripting via SVG File (CVE-2024-5567), behoben in 27.5.6 · Betheme < 27.6.2 - Authenticated (Contributor+) Stored Cross-Site Scripting via Custom JS (CVE-2025-0450), behoben in 27.6.2 · Betheme < 28.0.4 - Authenticated (Contributor+) Stored Cross-Site Scripting (CVE-2025-3077), behoben in 28.0.4 · Betheme < 28.1.4 - Authenticated (Contributor+) Stored Cross-Site Scripting (CVE-2025-7399), behoben in 28.1.4 · Betheme < 28.1.7 - Authenticated (Contributor+) Stored Cross-Site Scripting via 'page_title' (CVE-2025-9371), behoben in 28.1.7 · Betheme < 28.2.1 - Authenticated (Contributor+) Stored Cross-Site Scripting (CVE-2025-63075), behoben in 28.2.1 · Betheme < 28.4.1 - Authenticated (Contributor+) Arbitrary File Deletion via 'mfn-icon-upload' (CVE-2026-6262), behoben in 28.4.1 · Betheme < 28.4.1 - Authenticated (Author+) Arbitrary File Upload to Remote Code Execution via Icon Pack Upload (CVE-2026-6261), behoben in 28.4.1 · Betheme <= 28.5.7 - Authenticated (Contributor+) Remote Code Execution (CVE-2026-65548), behoben in 28.5.8 · Betheme < 28.4.1 - Authenticated (Contributor+) Stored Cross-Site Scripting via 'icon_box_2' Shortcode (CVE-2026-6178), behoben in 28.4.1\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: burst-statistics · Version: 1.7.1 · bekannte Schwachstellen laut wpscan: 1 · neueste Version laut wpscan: 3.7.1 · fehlerbereinigt ab: 2.0.8 · Burst Statistics < 2.0.8 - Cross-Site Request Forgery (CVE-2025-53193), behoben in 2.0.8\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: complianz-gdpr · Version: 7.1.0 · bekannte Schwachstellen laut wpscan: 7 · neueste Version laut wpscan: 7.5.5 · fehlerbereinigt ab: 7.5.5 · Complianz | GDPR/CCPA Cookie Consent < 7.4.4 - Contributor+ Stored XSS (CVE-2025-11185), behoben in 7.4.4 · Complianz – GDPR/CCPA Cookie Consent < 7.4.5 - Contributor+ Stored XSS via Content Filter (CVE-2026-2389), behoben in 7.4.5 · Complianz < 7.4.6 - Unauthenticated Private Post Content Disclosure (CVE-2026-4019), behoben in 7.4.6 · Complianz – GDPR/CCPA Cookie Consent < 7.5.2 - Admin+ PHP Object Injection (CVE-2026-65497), behoben in 7.5.2 · Complianz – GDPR/CCPA Cookie Consent < 7.5.2 - Author+ Server-Side Request Forgery (CVE-2026-65496), behoben in 7.5.2 · Complianz – GDPR/CCPA Cookie Consent < 7.5.2 - Unauthenticated Sensitive Information Exposure (CVE-2026-65498), behoben in 7.5.2 · Complianz – GDPR/CCPA Cookie Consent < 7.5.5 - Unauthenticated Stored XSS via Elementor Cookie Blocker Regex (CVE-2026-83561), behoben in 7.5.5\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: revslider · Version: 6.7.11 · bekannte Schwachstellen laut wpscan: 4 · neueste Version laut wpscan: 6.7.35 · fehlerbereinigt ab: 6.7.38 · Hinweis: Verzeichnis von wpscan veraltet · Slider Revolution < 6.7.14 - Authenticated (Administrator+) Stored Cross-Site Scripting (CVE-2024-37449), behoben in 6.7.14 · Slider Revolution < 6.7.19 - Authenticated (Author+) Stored Cross-Site Scripting via SVG File Upload (CVE-2024-8107), behoben in 6.7.19 · Slider Revolution < 6.7.37 - Authenticated (Contributor+) Arbitrary File Read via 'used_svg' and 'used_images' (CVE-2025-9217), behoben in 6.7.37 · Slider Revolution < 6.7.38 - Contributor+ Arbitrary File Read (CVE-2025-10249), behoben in 6.7.38",
+    "id": "VS-2026-004",
+    "impact": "Bekannte Schwachstellen in Plugins oder Themes sind öffentlich dokumentiert und lassen sich ohne Zugriff auf den Server nachvollziehen. Eine veraltete Erweiterung bleibt so lange angreifbar, bis die fehlerbereinigte Version eingespielt ist.",
+    "key": "wordpress_plugin_vulnerable/scan/kunde",
+    "level": "erhöht",
+    "policy_id": "wordpress_plugin_vulnerable",
+    "recommendation": "In Kürze: Erweiterungen auf eine fehlerbereinigte Version aktualisieren: BeTheme (fehlerbereinigt ab 28.5.8, neueste laut wpscan 28.5.10), Burst Statistics (fehlerbereinigt ab 2.0.8, neueste laut wpscan 3.7.1), Complianz (neueste und fehlerbereinigte Version laut wpscan 7.5.5), Slider Revolution (fehlerbereinigt ab 6.7.38, neueste laut wpscan 6.7.35, Verzeichnis von wpscan veraltet); lässt sich das nicht sofort umsetzen, die Erweiterung deaktivieren.\nMittelfristig: Prüfen, ob die Erweiterung für den Betrieb noch benötigt wird, und nicht mehr genutzte Erweiterungen entfernen.",
+    "scale": "exposure",
+    "severity": "HIGH",
+    "source": "aktiv (wpscan)",
+    "title": "WordPress-Erweiterungen mit bekannten Schwachstellen",
+    "urgency": "In Kürze",
+    "verification": "Versionsstand der Erweiterung im Adminbereich prüfen und mit dem Eintrag im Plugin- beziehungsweise Theme-Verzeichnis des Herstellers abgleichen; erwartet wird die aktuelle, fehlerbereinigte Version ohne offene Schwachstellen."
+   },
+   {
+    "affected": "dortmund-beach.com (p=none; ~all)",
+    "category": "C",
+    "description": "Die DMARC-Richtlinie der Domain dortmund-beach.com ist auf reine Beobachtung gesetzt: dortmund-beach.com (p=none). E-Mails, die SPF oder DKIM nicht bestehen, werden dadurch nicht zurückgewiesen oder unter Quarantäne gestellt. Der SPF-Eintrag der Domain dortmund-beach.com setzt bei nicht autorisierten Versendern nur auf eine weiche oder neutrale Fehlbehandlung: dortmund-beach.com (~all). Empfangende Mailserver dürfen die E-Mail trotzdem zustellen.",
+    "evidence": "DNS-Abfragen · phase0/dns_records.json\ndortmund-beach.com · MX-Einträge: mail1.spacekoelnsrv1.de · DMARC: v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de; · SPF: v=spf1 a mx ip4:78.46.161.114 ~all",
+    "id": "VS-2026-005",
+    "impact": "Eine DMARC-Richtlinie ohne Durchsetzung verändert die Zustellung nicht. Gefälschte E-Mails im Namen der Domain kommen weiterhin beim Empfänger an. Die Berichte gehen an eine Adresse außerhalb der eigenen Domain: postmaster@spacekoeln.de. Sie erreichen damit zunächst den Empfänger dieser Adresse. Eingehende E-Mail nimmt ein Mailserver außerhalb der eigenen Domain an: mail1.spacekoelnsrv1.de. Der SPF-Eintrag gibt ihn über den Mechanismus mx auch als Absender frei; die Umstellung der Richtlinie betrifft deshalb auch dessen Betreiber. Eine weiche oder neutrale Fehlbehandlung markiert eine E-Mail lediglich als verdächtig, lehnt sie aber nicht ab. Empfangssysteme, die diese Markierung nicht auswerten, stellen gefälschte E-Mails im Namen der Domain trotzdem zu.",
+    "key": "mail_policy/dortmund-beach.com/kunde",
+    "level": "mittel",
+    "policy_id": "dmarc_none, spf_softfail",
+    "recommendation": "Mittelfristig: Die Auswertung der Berichte an postmaster@spacekoeln.de beim Dienstleister anfordern und alle legitimen Versandquellen der Domain bestätigen.\nMittelfristig: Nach einer Beobachtungsphase ohne Fehlmeldungen den Qualifizierer des SPF-Eintrags auf eine harte Fehlbehandlung umstellen, sobald alle legitimen Versandquellen erfasst sind.\nStrategisch: Die Richtlinie auf Quarantäne und danach auf Zurückweisung anheben, sobald alle legitimen Versender erfasst sind.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (DNS-Abfragen)",
+    "title": "Richtlinien zur Absender-Authentizität für dortmund-beach.com: DMARC ohne Durchsetzung und SPF nur mit Softfail",
+    "urgency": "Mittelfristig",
+    "verification": "DNS-Abfrage des TXT-Eintrags _dmarc.dortmund-beach.com; erwartet wird eine Richtlinie p, die nicht auf reine Beobachtung gesetzt ist. DNS-Abfrage des TXT-Eintrags der Domain dortmund-beach.com; erwartet wird ein SPF-Eintrag mit harter Fehlbehandlung am Ende der Regel."
+   },
+   {
+    "affected": "dortmund-beach.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)",
+    "category": "D",
+    "description": "HSTS abgeschaltet: der Dienst dortmund-beach.com setzt den Header Strict-Transport-Security mit max-age=0 und hebt die Festlegung auf die verschlüsselte Verbindung damit auf: dortmund-beach.com. Auf dortmund-beach.com ist keine Content-Security-Policy gesetzt: dortmund-beach.com. Auf dortmund-beach.com fehlen einzelne Sicherheits-Header der Webseite: dortmund-beach.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+    "evidence": "header_check · hosts/88.99.35.112/phase2/headers_dortmund-beach.com.json\ndortmund-beach.com · Adresse: https://dortmund-beach.com · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: max-age=0 · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options",
+    "id": "VS-2026-006",
+    "impact": "Mit max-age=0 löscht der Browser eine bestehende Festlegung auf die verschlüsselte Verbindung; jeder spätere Aufruf über HTTP kann wieder unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
+    "key": "web_header_hygiene/88.99.35.112/kunde",
+    "level": "mittel",
+    "policy_id": "csp_missing, hsts_missing, security_headers_incomplete",
+    "recommendation": "Mittelfristig: Im Header Strict-Transport-Security einen Wert max-age über null setzen, empfohlen mindestens ein Jahr (max-age=31536000).\nMittelfristig: Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.\nMittelfristig: X-Frame-Options oder frame-ancestors in der Content-Security-Policy setzen.\nMittelfristig: X-Content-Type-Options mit dem Wert nosniff setzen.\nMittelfristig: Eine Referrer-Policy setzen, etwa strict-origin-when-cross-origin.\nMittelfristig: Eine Permissions-Policy setzen, die nicht benötigte Browserfunktionen abschaltet.",
+    "scale": "hygiene",
+    "severity": "MEDIUM",
+    "source": "aktiv (header_check)",
+    "title": "Absicherung der Webdienste auf 88.99.35.112: HSTS abgeschaltet (max-age=0), Inhaltsrichtlinie fehlt und Sicherheits-Header unvollständig",
+    "urgency": "Mittelfristig",
+    "verification": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein max-age über null, empfohlen mindestens ein Jahr. HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird X-Frame-Options oder frame-ancestors in der Content-Security-Policy. Erwartet wird X-Content-Type-Options mit dem Wert nosniff. Erwartet wird eine Referrer-Policy. Erwartet wird eine Permissions-Policy."
+   },
+   {
+    "affected": "88.99.35.112:21 (FTP)",
+    "category": "A",
+    "description": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet ein älteres Übertragungsprotokoll an: 88.99.35.112:21 (FTP). Ob dort eine Anmeldung ohne Transportverschlüsselung abgelehnt wird, ließ sich von außen nicht feststellen: 88.99.35.112:21 (FTP).",
+    "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:21/tcp · Dienst: ftp · Produkt: Pure-FTPd · Zertifikat für: vsrv2.spacekoeln.de · Aussteller: YR1 · gültig bis: 30.10.2026, 21:10 UTC",
+    "id": "VS-2026-007",
+    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Servers, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
+    "key": "legacy_protocols_present/scan/kunde",
+    "level": "niedrig",
+    "policy_id": "legacy_protocols_present",
+    "recommendation": "Mittelfristig: Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.\nStrategisch: Falls der Dienst benötigt wird, den Zugriff auf feste Quelladressen beschränken und eine erzwungene Verschlüsselung sicherstellen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (nmap)",
+    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+    "urgency": "Mittelfristig",
+    "verification": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
+   },
+   {
+    "affected": "dortmund-beach.com",
+    "category": "C",
+    "description": "Für dortmund-beach.com ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain dortmund-beach.com fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten. Für dortmund-beach.com ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain dortmund-beach.com fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können.",
+    "evidence": "DNS-Abfragen · phase0/dns_records.json\ndortmund-beach.com · MX-Einträge: mail1.spacekoelnsrv1.de\n\nDNS-Abfragen · phase0a/dns_security.json\ndortmund-beach.com · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
+    "id": "VS-2026-008",
+    "impact": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen. Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.",
+    "key": "mail_transport_enforcement/dortmund-beach.com/kunde",
+    "level": "niedrig",
+    "policy_id": "mta_sts_missing, tls_rpt_missing",
+    "recommendation": "Strategisch: Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.\nStrategisch: Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (DNS-Abfragen)",
+    "title": "Verschlüsselte Zustellung von E-Mails für dortmund-beach.com: kein MTA-STS und kein TLS-RPT",
+    "urgency": "Strategisch",
+    "verification": "DNS-Abfrage des TXT-Eintrags _mta-sts.dortmund-beach.com sowie Abruf der Richtliniendatei unter der zugehörigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine Richtliniendatei mit mode enforce. DNS-Abfrage des TXT-Eintrags _smtp._tls.dortmund-beach.com; erwartet wird ein Eintrag, der mit v=TLSRPTv1 beginnt und eine Meldeadresse (rua) nennt."
+   },
+   {
+    "affected": "dortmund-beach.com:443",
+    "category": "D",
+    "description": "Der Dienst dortmund-beach.com (+www.dortmund-beach.com) bietet TLS 1.2 an, jedoch keine Unterstützung für TLS 1.3: dortmund-beach.com:443.",
+    "evidence": "testssl.sh\ndortmund-beach.com:443 · Protokolle: TLS 1.2",
+    "id": "VS-2026-009",
+    "impact": "TLS 1.3 vereinfacht den Verbindungsaufbau, entfernt veraltete Verschlüsselungsoptionen und verkleinert die Angriffsfläche gegenüber älteren Protokollversionen. Ohne TLS 1.3 bleibt der Dienst auf den größeren Funktionsumfang von TLS 1.2 angewiesen.",
+    "key": "tls_hardening/88.99.35.112/kunde",
+    "level": "niedrig",
+    "policy_id": "tls_no_13",
+    "recommendation": "Strategisch: TLS 1.3 auf dem Dienst aktivieren, sobald die eingesetzte TLS-Bibliothek und alle angebundenen Clients dies unterstützen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (testssl.sh)",
+    "title": "Transportverschlüsselung auf dortmund-beach.com (+www.dortmund-beach.com): kein TLS 1.3",
+    "urgency": "Strategisch",
+    "verification": "Verbindungsversuch mit einem auf TLS 1.3 beschränkten Client gegen den Dienst durchführen; erwartet wird ein erfolgreicher Verbindungsaufbau."
+   },
+   {
+    "affected": "dortmund-beach.com (Server: Apache/2.4.67 (Debian))",
+    "category": "E",
+    "description": "Die Webantwort von dortmund-beach.com nennt in ihren Antwortheadern die Version der eingesetzten Serversoftware: dortmund-beach.com (Server: Apache/2.4.67 (Debian)).",
+    "evidence": "header_check · hosts/88.99.35.112/phase2/headers_dortmund-beach.com.json\ndortmund-beach.com · Adresse: https://dortmund-beach.com · Antwort: 200 · Server: Apache/2.4.67 (Debian)",
+    "id": "VS-2026-010",
+    "impact": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs.",
+    "key": "banner_disclosure/scan/kunde",
+    "level": "niedrig",
+    "policy_id": "http_header_disclosure",
+    "recommendation": "Mittelfristig: Versionskennungen und interne Servernamen in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert setzen.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (header_check)",
+    "title": "Versionsangaben in den Antworten der Dienste: Versions- oder Servername im HTTP-Header",
+    "urgency": "Mittelfristig",
+    "verification": "HTTP-Antwortheader der genannten Adresse von außen abrufen; erwartet wird kein Header mit einer konkreten Versionsangabe."
+   },
+   {
+    "affected": "dortmund-beach.com",
+    "category": "E",
+    "description": "Für dortmund-beach.com ist kein CAA-Eintrag veröffentlicht. Für die Domain dortmund-beach.com legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen. Für dortmund-beach.com ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain dortmund-beach.com lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
+    "evidence": "DNS-Abfragen · phase0a/dns_security.json\ndortmund-beach.com · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
+    "id": "VS-2026-011",
+    "impact": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf. Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
+    "key": "dns_hygiene/dortmund-beach.com/kunde",
+    "level": "niedrig",
+    "policy_id": "caa_missing, dnssec_missing",
+    "recommendation": "Mittelfristig: Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.\nStrategisch: DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (DNS-Abfragen)",
+    "title": "DNS-Absicherung für dortmund-beach.com: kein CAA-Eintrag und keine DNSSEC-Signatur",
+    "urgency": "Mittelfristig",
+    "verification": "DNS-Abfrage des CAA-Eintrags für die Domain dortmund-beach.com; erwartet wird mindestens ein issue-Eintrag mit der genutzten Zertifizierungsstelle. DNS-Abfrage der SOA mit aktivierter DNSSEC-Option für die Domain dortmund-beach.com; erwartet wird ein RRSIG-Eintrag in der Antwort."
+   },
+   {
+    "affected": "88.99.35.112:465 (SMTPS), 88.99.35.112:587 (Submission), 88.99.35.112:25 (laut Passivquelle, Hosteintrag aktualisiert am 28.09.2026)",
+    "category": "E",
+    "description": "Der Mailserver auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) nennt den Befehl VRFY in seiner Antwort auf EHLO: 88.99.35.112:465 (SMTPS), 88.99.35.112:587 (Submission) und laut Passivquelle 88.99.35.112:25 (Hosteintrag aktualisiert am 28.09.2026, vom Prüfstand aus nicht prüfbar). Ob er Anfragen zu Postfachnamen beantwortet, hat der Scan nicht geprüft.",
+    "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:465/tcp · Dienst: smtp · Produkt: Postfix smtpd · TLS erzwungen: ja · STARTTLS: nein · Anmeldeverfahren: LOGIN, PLAIN · VRFY in der EHLO-Liste: ja · Zertifikat für: vsrv2.spacekoeln.de · Aussteller: YR1 · gültig bis: 30.10.2026, 21:10 UTC · SMTP-Befehle: vsrv2.spacekoeln.de, PIPELINING, SIZE 52428800, VRFY, ETRN, AUTH PLAIN LOGIN, AUTH=PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, CHUNKING\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:587/tcp · Dienst: smtp · Produkt: Postfix smtpd · STARTTLS: ja · Anmeldeverfahren: LOGIN, PLAIN · VRFY in der EHLO-Liste: ja · Zertifikat für: vsrv2.spacekoeln.de · Aussteller: YR1 · gültig bis: 30.10.2026, 21:10 UTC · SMTP-Befehle: vsrv2.spacekoeln.de, PIPELINING, SIZE 52428800, VRFY, ETRN, STARTTLS, AUTH PLAIN LOGIN, AUTH=PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, CHUNKING\n\nShodan · phase0a/shodan_hosts.json\nQuelle: shodan · 88.99.35.112:25 · Produkt: Postfix smtpd · VRFY in der EHLO-Antwort: ja · Banner (Auszug): 220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-STARTTLS 250-AUTH PLAIN",
+    "id": "VS-2026-012",
+    "impact": "Beantwortet der Mailserver VRFY, lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte Phishing-Mails und Rateangriffe auf Zugangsdaten.",
+    "key": "smtp_commands/88.99.35.112/kunde",
+    "level": "niedrig",
+    "policy_id": "smtp_vrfy_enabled, smtp_vrfy_enabled_passive",
+    "recommendation": "Mittelfristig: Den Befehl VRFY in der Konfiguration des Mailservers abschalten, bei Postfix über disable_vrfy_command.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (nmap), passiv (Shodan)",
+    "title": "Mailserver auf 88.99.35.112: VRFY angeboten (laut EHLO) auf 465, 587 und laut Passivquelle 25",
+    "urgency": "Mittelfristig",
+    "verification": "Verbindung zum Mailserver aufbauen und VRFY mit einem bekannten Postfachnamen senden; erwartet wird eine Ablehnung ohne Aussage über das Postfach."
+   },
+   {
+    "affected": "dortmund-beach.com (1 Anmeldename, gefunden über https://dortmund-beach.com/wp-json/oembed/1.0/embed)",
+    "category": "E",
+    "description": "Auf dortmund-beach.com lassen sich über WordPress-Schnittstellen gültige Benutzernamen ermitteln: dortmund-beach.com (1 Anmeldename, gefunden über https://dortmund-beach.com/wp-json/oembed/1.0/embed).",
+    "evidence": "wpscan\ndortmund-beach.com · Anmeldenamen: 1 (Namen in den Rohdaten) · gefunden über: https://dortmund-beach.com/wp-json/oembed/1.0/embed",
+    "id": "VS-2026-013",
+    "impact": "Bekannte Benutzernamen erleichtern Passwort-Rateangriffe und gezieltes Phishing, weil ein Angreifer sich nicht mehr auf Vermutungen verlassen muss, sondern echte Anmeldenamen kennt.",
+    "key": "wordpress_user_enumeration/scan/kunde",
+    "level": "niedrig",
+    "policy_id": "wordpress_user_enumeration",
+    "recommendation": "Mittelfristig: Die Offenlegung von Benutzernamen über die REST-Schnittstelle und die Autorenarchive einschränken, etwa durch eine entsprechende Erweiterung oder eine Anpassung der WordPress-Konfiguration.\nStrategisch: Anmeldenamen von den öffentlich sichtbaren Anzeigenamen trennen, damit ein ermittelter Anzeigename keinen Rückschluss auf den Anmeldenamen erlaubt.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (wpscan)",
+    "title": "WordPress-Benutzernamen von außen ermittelbar",
+    "urgency": "Mittelfristig",
+    "verification": "Die WordPress-REST-Schnittstelle und die Autorenarchive von außen abrufen; erwartet wird, dass dabei keine Benutzernamen preisgegeben werden."
+   },
+   {
+    "affected": "dortmund-beach.com",
+    "category": "E",
+    "description": "Auf dortmund-beach.com ist die XML-RPC-Schnittstelle von WordPress aus dem Internet erreichbar: dortmund-beach.com.",
+    "evidence": "wpscan\ndortmund-beach.com · XML-RPC: https://dortmund-beach.com/xmlrpc.php · belegt durch: direkter Abruf der Adresse",
+    "id": "VS-2026-014",
+    "impact": "Über XML-RPC lassen sich viele Anmeldeversuche in einer einzigen Anfrage bündeln; Sperren gegen wiederholte Fehlversuche auf der Anmeldeseite greifen dort oft nicht. Zusammen mit bekannten Benutzernamen erleichtert das Rateangriffe auf Zugangsdaten.",
+    "key": "wordpress_xmlrpc_enabled/scan/kunde",
+    "level": "niedrig",
+    "policy_id": "wordpress_xmlrpc_enabled",
+    "recommendation": "Mittelfristig: Die XML-RPC-Schnittstelle abschalten oder den Zugriff auf xmlrpc.php sperren, sofern keine Anwendung sie benötigt.",
+    "scale": "hygiene",
+    "severity": "LOW",
+    "source": "aktiv (wpscan)",
+    "title": "XML-RPC-Schnittstelle von WordPress erreichbar",
+    "urgency": "Mittelfristig",
+    "verification": "Die Adresse xmlrpc.php der Website von außen aufrufen; erwartet wird eine Ablehnung."
+   }
+  ],
+  "overall_description": "Die Prüfung vom 28.09.2026 umfasst ein System mit einer IP-Adresse und drei Hostnamen und führt zu 14 Befunden sowie fünf positiven Feststellungen. Die Befunde verteilen sich auf die Perimeter-Exposition, den Patch- und EOL-Status, die E-Mail-Authentizität, die Web- und Transport-Hygiene sowie die Konfigurations- und Informations-Hygiene. Zuerst ist der Zugriff auf die Verwaltungsoberflächen auf 88.99.35.112 (Webmin auf Port 10000 und froxlor auf Port 443) auf die benötigten Quellnetze zu beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst. Anschließend folgen das Betriebssystem Debian GNU/Linux 11 ohne laufende Herstellerpflege, die WordPress-Erweiterungen mit bekannten Schwachstellen sowie der fehlende TLS-Zwang bei POP3 und IMAP.",
+  "overall_risk": "HOCH",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "admin_service_exposed",
+   "caa_missing",
+   "csp_missing",
+   "dmarc_none",
+   "dnssec_missing",
+   "hsts_missing",
+   "http_header_disclosure",
+   "legacy_protocols_present",
+   "mail_plaintext",
+   "mta_sts_missing",
+   "security_headers_incomplete",
+   "smtp_vrfy_enabled",
+   "smtp_vrfy_enabled_passive",
+   "software_eol",
+   "spf_softfail",
+   "tls_no_13",
+   "tls_rpt_missing",
+   "wordpress_plugin_vulnerable",
+   "wordpress_user_enumeration",
+   "wordpress_xmlrpc_enabled"
+  ],
+  "policy_version": "Katalog 2026-09-27.2 / Fakten 1.3.0",
+  "positive_findings": [
+   {
+    "category": "A",
+    "description": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) antwortet kein Datenbankdienst auf Verbindungen von außen.",
+    "id": "VS-P01",
+    "title": "Keine Datenbankdienste aus dem Internet erreichbar"
+   },
+   {
+    "category": "A",
+    "description": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet seinen Webdienst über HTTPS an.",
+    "id": "VS-P02",
+    "title": "Webdienst mit Transportverschlüsselung"
+   },
+   {
+    "category": "A",
+    "description": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) antwortet kein Fernwartungsdienst auf RDP-Verbindungen von außen. Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) antwortet kein SMB-Dienst auf Verbindungen von außen.",
+    "id": "VS-P03",
+    "title": "Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet erreichbar"
+   },
+   {
+    "category": "C",
+    "description": "Für die Domain dortmund-beach.com weisen die Nameserver einen vollständigen Zonentransfer ab.",
+    "id": "VS-P04",
+    "title": "Zonentransfer abgewiesen"
+   },
+   {
+    "category": "E",
+    "description": "Für 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) liegen in den abgefragten Reputationsquellen keine Meldungen vor.",
+    "id": "VS-P05",
+    "title": "Keine Einträge in Reputationsquellen"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.",
+    "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugang zur Verwaltung der Systeme",
+    "findings": [
+     "VS-2026-001"
+    ],
+    "priority": "Unverzüglich"
+   },
+   {
+    "action": "Das Betriebssystem auf ein Release mit laufender Sicherheitsunterstützung anheben oder eine verlängerte Unterstützung für das eingesetzte Release sicherstellen.",
+    "effect": "Schließt Lücken, für die der Hersteller keine Updates mehr liefert",
+    "findings": [
+     "VS-2026-003"
+    ],
+    "priority": "In Kürze"
+   },
+   {
+    "action": "Erweiterungen auf eine fehlerbereinigte Version aktualisieren: BeTheme (fehlerbereinigt ab 28.5.8, neueste laut wpscan 28.5.10), Burst Statistics (fehlerbereinigt ab 2.0.8, neueste laut wpscan 3.7.1), Complianz (neueste und fehlerbereinigte Version laut wpscan 7.5.5), Slider Revolution (fehlerbereinigt ab 6.7.38, neueste laut wpscan 6.7.35, Verzeichnis von wpscan veraltet); lässt sich das nicht sofort umsetzen, die Erweiterung deaktivieren.",
+    "effect": "Schließt bekannte Lücken in Erweiterungen",
+    "findings": [
+     "VS-2026-004"
+    ],
+    "priority": "In Kürze"
+   },
+   {
+    "action": "Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten.",
+    "effect": "Schützt Zugangsdaten und Nachrichten auf dem Übertragungsweg",
+    "findings": [
+     "VS-2026-002"
+    ],
+    "priority": "In Kürze"
+   },
+   {
+    "action": "Die Auswertung der Berichte an postmaster@spacekoeln.de beim Dienstleister anfordern und alle legitimen Versandquellen der Domain bestätigen.",
+    "effect": "Macht alle legitimen Versandquellen vor der Verschärfung sichtbar",
+    "findings": [
+     "VS-2026-005"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Nach einer Beobachtungsphase ohne Fehlmeldungen den Qualifizierer des SPF-Eintrags auf eine harte Fehlbehandlung umstellen, sobald alle legitimen Versandquellen erfasst sind.",
+    "effect": "Lässt Empfänger gefälschte Absender eindeutig ablehnen",
+    "findings": [
+     "VS-2026-005"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die fehlenden Sicherheits-Header setzen: dortmund-beach.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)",
+    "effect": "Lässt den Browser fremde Einbettung und Fehldeutungen von Inhalten ablehnen",
+    "findings": [
+     "VS-2026-006"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.",
+    "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
+    "findings": [
+     "VS-2026-006"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Im Header Strict-Transport-Security einen Wert max-age über null setzen, empfohlen mindestens ein Jahr (max-age=31536000).",
+    "effect": "Verhindert unverschlüsselte Aufrufe der Webseite",
+    "findings": [
+     "VS-2026-006"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
+    "effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
+    "findings": [
+     "VS-2026-007"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Versionskennungen und interne Servernamen in den Antwortheadern der Webserver- und Anwendungskonfiguration entfernen oder auf einen generischen Wert setzen.",
+    "effect": "Erschwert die gezielte Suche nach passenden Schwachstellen",
+    "findings": [
+     "VS-2026-010"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten Zertifizierungsstellen zur Ausstellung berechtigt.",
+    "effect": "Begrenzt, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen",
+    "findings": [
+     "VS-2026-011"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Den Befehl VRFY in der Konfiguration des Mailservers abschalten, bei Postfix über disable_vrfy_command.",
+    "effect": "Verhindert die Abfrage gültiger Postfachnamen",
+    "findings": [
+     "VS-2026-012"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die Offenlegung von Benutzernamen über die REST-Schnittstelle und die Autorenarchive einschränken, etwa durch eine entsprechende Erweiterung oder eine Anpassung der WordPress-Konfiguration.",
+    "effect": "Erschwert Rateangriffe auf WordPress-Konten",
+    "findings": [
+     "VS-2026-013"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Die XML-RPC-Schnittstelle abschalten oder den Zugriff auf xmlrpc.php sperren, sofern keine Anwendung sie benötigt.",
+    "effect": "Nimmt Rateangriffen auf Anmeldungen einen Zugangsweg",
+    "findings": [
+     "VS-2026-014"
+    ],
+    "priority": "Mittelfristig"
+   },
+   {
+    "action": "Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden Mailwege ausschließlich gültige TLS-Zertifikate verwenden.",
+    "effect": "Erzwingt die verschlüsselte Zustellung eingehender E-Mails",
+    "findings": [
+     "VS-2026-008"
+    ],
+    "priority": "Strategisch"
+   },
+   {
+    "action": "Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die eingehenden Berichte regelmäßig auf Transportfehler auswerten.",
+    "effect": "Meldet fehlgeschlagene verschlüsselte Zustellungen an Sie zurück",
+    "findings": [
+     "VS-2026-008"
+    ],
+    "priority": "Strategisch"
+   },
+   {
+    "action": "TLS 1.3 auf dem Dienst aktivieren, sobald die eingesetzte TLS-Bibliothek und alle angebundenen Clients dies unterstützen.",
+    "effect": "Nutzt das aktuelle Protokoll mit kleinerer Angriffsfläche",
+    "findings": [
+     "VS-2026-009"
+    ],
+    "priority": "Strategisch"
+   },
+   {
+    "action": "DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.",
+    "effect": "Schützt DNS-Antworten gegen Verfälschung auf dem Übertragungsweg",
+    "findings": [
+     "VS-2026-011"
+    ],
+    "priority": "Strategisch"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 1,
+   "HIGH": 3,
+   "INFO": 0,
+   "LOW": 8,
+   "MEDIUM": 2
+  },
+  "tech_profiles": [
+   {
+    "cms": "WordPress",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "WordPress",
+     "confidence": 0.95,
+     "details": {
+      "meta_generator": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+      "raw": {
+       "name": "WordPress",
+       "version": ""
+      },
+      "source": "webtech"
+     },
+     "detection_methods": [
+      "meta_tag",
+      "webtech"
+     ],
+     "version": null
+    },
+    "cms_version": "6.5.12",
+    "exposed_services": [
+     {
+      "port": "21",
+      "service": "Pure-FTPd"
+     },
+     {
+      "port": "25",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "80",
+      "service": "Apache httpd 2.4.67"
+     },
+     {
+      "port": "443",
+      "service": "Apache httpd 2.4.67"
+     },
+     {
+      "port": "465",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "587",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "993",
+      "service": ""
+     },
+     {
+      "port": "995",
+      "service": ""
+     },
+     {
+      "port": "110",
+      "service": ""
+     },
+     {
+      "port": "143",
+      "service": ""
+     },
+     {
+      "port": "10000",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "dortmund-beach.com",
+     "www.dortmund-beach.com",
+     "*.dortmund-beach.com",
+     "pflege.dortmund-beach.com"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "88.99.35.112",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     80,
+     110,
+     143,
+     443,
+     465,
+     587,
+     993,
+     995,
+     10000,
+     30000
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      993,
+      995,
+      587,
+      110,
+      143,
+      80,
+      465,
+      21,
+      25,
+      443,
+      10000
+     ],
+     "shodan_services": {
+      "21": "Pure-FTPd",
+      "25": "Postfix smtpd",
+      "443": "Apache httpd 2.4.67",
+      "465": "Postfix smtpd",
+      "587": "Postfix smtpd",
+      "80": "Apache httpd 2.4.67"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "dortmund-beach.com",
+    "redirect_data": {
+     "dortmund-beach.com": {
+      "error": null,
+      "final_domain": "dortmund-beach.com",
+      "final_response_headers": {
+       "connection": "Keep-Alive",
+       "content-length": "0",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Mon, 28 Sep 2026 14:55:10 GMT",
+       "keep-alive": "timeout=5, max=100",
+       "server": "Apache/2.4.67 (Debian)",
+       "strict-transport-security": "max-age=0"
+      },
+      "final_status": 200,
+      "final_url": "https://dortmund-beach.com/",
+      "first_response_headers": {
+       "accept-ranges": "bytes",
+       "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+       "connection": "Keep-Alive",
+       "content-encoding": "gzip",
+       "content-length": "14053",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Mon, 28 Sep 2026 14:55:03 GMT",
+       "expires": "Mon, 29 Oct 1923 20:30:00 GMT",
+       "keep-alive": "timeout=5, max=100",
+       "last-modified": "Thu, 20 Jun 2024 10:51:53 GMT",
+       "pragma": "no-cache",
+       "server": "Apache/2.4.67 (Debian)",
+       "strict-transport-security": "max-age=0",
+       "vary": "User-Agent,Accept-Encoding"
+      },
+      "first_status": 200,
+      "is_cross_domain": false,
+      "page_title": "Dortmund Beach Design | Webdesign | Corporate Design",
+      "redirect_chain": [
+       "https://dortmund-beach.com/",
+       "https://dortmund-beach.com/wp-content/cache/wpfc-minified/7ubk1iuu/9mjyk.css",
+       "https://dortmund-beach.com/wp-content/themes/betheme-child/style.css?ver=6858e88174e609ac00d8a83f4c146a3b",
+       "https://dortmund-beach.com/wp-content/uploads/2021/12/dortmundbeach-logo-2zeilig@2x.png",
+       "https://dortmund-beach.com/wp-content/uploads/2021/12/dortmund-beach-logo-tilde@2x.png",
+       "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/assets/dummy.png",
+       "https://dortmund-beach.com/wp-content/cache/wpfc-minified/mbb4a78c/63tkw.css",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/debouncedresize.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-includes/js/jquery/ui/core.min.js?ver=1.13.2",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/magnificpopup.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+       "https://dortmund-beach.com/wp-includes/js/jquery/ui/tabs.min.js?ver=1.13.2",
+       "https://dortmund-beach.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/menu.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/visible.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/themes/betheme/assets/animations/animations.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/enllax.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/parallax/translate3d.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/assets/js/build/burst.min.js?ver=1.6.1",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/helpers/timeme/timeme.min.js?ver=1.6.1",
+       "https://dortmund-beach.com/wp-content/plugins/complianz-gdpr/cookiebanner/js/complianz.min.js?ver=1718879508",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/scripts.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rbtools.min.js?ver=6.7.11",
+       "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rs6.min.js?ver=6.7.11",
+       "https://dortmund-beach.com/wp-content/themes/betheme/fonts/mfn/icons.woff2?11083851",
+       "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-500italic-latin.woff2",
+       "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-500-latin.woff2",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php",
+       "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-700-latin.woff2",
+       "https://dortmund-beach.com/wp-content/uploads/complianz/css/banner-1-optin.css?v=15",
+       "https://player.vimeo.com/api/player.js",
+       "https://i.vimeocdn.com/video/1357114649-1646339a0c1a11bb529068c3cd5afe2e9391456acc5dad70744a314e58c75d7a-d_640",
+       "https://player.vimeo.com/video/669941546?loop=1&autoplay=1&title=0&byline=0&portrait=0&background=1&player_id=iframe6769",
+       "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=turnstileLoad",
+       "https://challenges.cloudflare.com/turnstile/v0/b/d76008a69eab/api.js",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/turnstile/f/av0/rch/uvl8s/0x4AAAAAAAbaszMygKLnGbeo/auto/fbE/new/normal?lang=auto",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/fo/3240229067:1790604042:92-7g5Etl0lzzWj-Ctt9IxG9jKIzSVFD0cOGGHOB7Tc/a423964bdcbc0121/eTj5hACtMDKdJIEOpZN0YKKtVRtBpQyGdY2a.JSNx9g-1790607305-1.2.1.1-oBFgW1J.FNPO1BNca79GdgvafYXBa4etSbC1j1m9bRBLtvyoFoAAs8NSs.KPDtG2",
+       "blob:https://challenges.cloudflare.com/ff5b14d4-7316-44ac-b4c0-7419b0bccf41",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/pat/a423964bdcbc0121/1790607306269/575105568c5aaad3c19920ae25cd520b32b3baa015dd5b0b221a1de4571ceb20/w5q5OOqyR5vw6qjgmf93DreQE2ONJR8jlZKDno07UAk-1790607306-1.3.1.1-Frxthtlgm.GNvlh4eDcRUoZ9QFweafQ_1h5ZTyWfRPe8TiLnDv7f33M57mChoOsxZ9b8klOZC28lyndfY8GxyteooZij40.vP9gkIzQvWrfokOZ1nbGTQj6yN71_Kyo2GTGXhvpKSczdOzNOrhBMLq3OkTzzLs.nGWwvIy9ZCaLsNYIRo_T1mnKF6aZfwMyiMrfnQHFP25Xd7jCAg0gC_tOTtRn8tKF4kTCRnSCof.QqKLhArnw_bEFnsROUaMNRRowOAdCd3U7BVQO5Yo6p2P53m.oYlFTEb6wZyCXOuhEWMu61Bjcs1uB9r5_XYbXoWPoBJ.nsT2x0g9Yhb2xq_h2doR.JYnjyW1VNK2sNmr.uO_mvhaAbzGWxW_JChHXMPKS0N8vuadSZQVBukUVjINK4QHjmrgGraUHmAM5.2KL1UWmf2Wpl2e3mh.uPpXNt0PD93iGOR_OLcgAQ0nKlGqJ8U169.s6MLrXCxJp6dRdMwuVLpyxdpdK4ZgxyG_kmBDMyzBMRTtekjXC45JwGSeYBd_peYRmuRTZsN37So8FeszngTBjPI0IqnjTw3aZS2ljmQCElXQJbiRSYGJit3bOBHwA9gSZXEsvH6ugBkREXAsiZso6r7c6T3ulB1KdkCuIT7j_exp6lo.y9EPQllLndvFoDrNKz1p6UiUj3ksOrbAG0M9LJhCXCFJlf4Gys6hpLuHfsA4DHjfHS1aeQvQBzhU5X_K215Cm5loYinLae5Zqr7hj.BJ1zyERlyjgDnYdOwI2JBXy5sHGKF7mEO8QtC4k.nTxMxMhmhpPWFw2dacZqoJUx3J5dwGihgB69",
+       "blob:https://challenges.cloudflare.com/ff5b14d4-7316-44ac-b4c0-7419b0bccf41",
+       "blob:https://challenges.cloudflare.com/ff5b14d4-7316-44ac-b4c0-7419b0bccf41",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/ci/a423964bdcbc0121/1790607306270/y1WUZ1guD.sVsJ_kbETZ0ntYE6IapCnWC7GtwwEWsLE-1790607306-1.3.1.1-7aIl0_tOpizgPVYHjBswUPnPHMtOmIAr_19qjKIw4XOQsDfhlDzdemRZSTTNvIwJx_6FxGNdIFobdaoO4uGida02JvddqXObLi0KPrxZmeR6V_im3l4K6NDwGWa5DL0oK3cGftGaUL1BNiS1fepPUp85kzNTMeIZUDywJnjJwvRQcKt.M.bZy7fbylyIV29b4ZVM6AjsmyxgPnnrDwMWqGWzfvZcX3Zacc1d4YgCys8WUgTy_6HUplI4r18QNdTssSi5uBY9BgqUsX0qGcfw402PRaOrqetDOZuD8SW2CE7OJfyKm1frqmO0hDzXV4eUay_YXPGWr.m0889XBXK6uRpoW3gZTkBJxW6_Stw7zbstQEqgkTfbSXA3Jo.jiLDnqPI4Kx3YvUCeQHUvCj3CpCsDWRzXvOu2ToBCMjsywQ6ZdBrIlDAlLGHnUbJLZrTAp4st.k__yj9yaQxViwe3aY5aYh1HTdWBAdXIoBYI2Tr4Locbz8qk_E13v9V1DDi0EBMiyoBLOyxl9Clkgl1RG8CoAuELcxUjwJ6IJuxnXDwQCtRbbIv12Ma3amYwGvTYGRcRi2ZvrX1iY95qbvc89J2.FjsOP6rOWRlXTohNLElieb_qXyIHRi7WKRAxFYyv6rFeGTjJPHdGuf_UONEI9xREDpLJ__KAyIDOb2FmxIJq1E2hbhOsDz7vdOHFSRjrBIbO8CMiTCKcHu5f9aT1gedv2tm0ASr.lsfI95zkXdE",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/fo/3240229067:1790604042:92-7g5Etl0lzzWj-Ctt9IxG9jKIzSVFD0cOGGHOB7Tc/a423964bdcbc0121/eTj5hACtMDKdJIEOpZN0YKKtVRtBpQyGdY2a.JSNx9g-1790607305-1.2.1.1-oBFgW1J.FNPO1BNca79GdgvafYXBa4etSbC1j1m9bRBLtvyoFoAAs8NSs.KPDtG2",
+       "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-1-latin.woff2",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php"
+      ],
+      "response_chain": [
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/cache/wpfc-minified/7ubk1iuu/9mjyk.css"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/themes/betheme-child/style.css?ver=6858e88174e609ac00d8a83f4c146a3b"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/uploads/2021/12/dortmundbeach-logo-2zeilig@2x.png"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/uploads/2021/12/dortmund-beach-logo-tilde@2x.png"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/assets/dummy.png"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/cache/wpfc-minified/mbb4a78c/63tkw.css"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/debouncedresize.min.js?ver=27.4.5"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-includes/js/jquery/ui/core.min.js?ver=1.13.2"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/magnificpopup.min.js?ver=27.4.5"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-includes/js/jquery/ui/tabs.min.js?ver=1.13.2"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/themes/betheme/js/menu.min.js?ver=27.4.5"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/visible.min.js?ver=27.4.5"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/themes/betheme/assets/animations/animations.min.js?ver=27.4.5"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/enllax.min.js?ver=27.4.5"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/themes/betheme/js/parallax/translate3d.min.js?ver=27.4.5"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/plugins/burst-statistics/assets/js/build/burst.min.js?ver=1.6.1"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/plugins/burst-statistics/helpers/timeme/timeme.min.js?ver=1.6.1"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/plugins/complianz-gdpr/cookiebanner/js/complianz.min.js?ver=1718879508"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/themes/betheme/js/scripts.min.js?ver=27.4.5"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rbtools.min.js?ver=6.7.11"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rs6.min.js?ver=6.7.11"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/themes/betheme/fonts/mfn/icons.woff2?11083851"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-500italic-latin.woff2"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-500-latin.woff2"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-700-latin.woff2"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/uploads/complianz/css/banner-1-optin.css?v=15"
+       },
+       {
+        "status": 200,
+        "url": "https://player.vimeo.com/api/player.js"
+       },
+       {
+        "status": 200,
+        "url": "https://i.vimeocdn.com/video/1357114649-1646339a0c1a11bb529068c3cd5afe2e9391456acc5dad70744a314e58c75d7a-d_640"
+       },
+       {
+        "status": 401,
+        "url": "https://player.vimeo.com/video/669941546?loop=1&autoplay=1&title=0&byline=0&portrait=0&background=1&player_id=iframe6769"
+       },
+       {
+        "status": 302,
+        "url": "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=turnstileLoad"
+       },
+       {
+        "status": 200,
+        "url": "https://challenges.cloudflare.com/turnstile/v0/b/d76008a69eab/api.js"
+       },
+       {
+        "status": 200,
+        "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/turnstile/f/av0/rch/uvl8s/0x4AAAAAAAbaszMygKLnGbeo/auto/fbE/new/normal?lang=auto"
+       },
+       {
+        "status": 200,
+        "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/fo/3240229067:1790604042:92-7g5Etl0lzzWj-Ctt9IxG9jKIzSVFD0cOGGHOB7Tc/a423964bdcbc0121/eTj5hACtMDKdJIEOpZN0YKKtVRtBpQyGdY2a.JSNx9g-1790607305-1.2.1.1-oBFgW1J.FNPO1BNca79GdgvafYXBa4etSbC1j1m9bRBLtvyoFoAAs8NSs.KPDtG2"
+       },
+       {
+        "status": 200,
+        "url": "blob:https://challenges.cloudflare.com/ff5b14d4-7316-44ac-b4c0-7419b0bccf41"
+       },
+       {
+        "status": 401,
+        "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/pat/a423964bdcbc0121/1790607306269/575105568c5aaad3c19920ae25cd520b32b3baa015dd5b0b221a1de4571ceb20/w5q5OOqyR5vw6qjgmf93DreQE2ONJR8jlZKDno07UAk-1790607306-1.3.1.1-Frxthtlgm.GNvlh4eDcRUoZ9QFweafQ_1h5ZTyWfRPe8TiLnDv7f33M57mChoOsxZ9b8klOZC28lyndfY8GxyteooZij40.vP9gkIzQvWrfokOZ1nbGTQj6yN71_Kyo2GTGXhvpKSczdOzNOrhBMLq3OkTzzLs.nGWwvIy9ZCaLsNYIRo_T1mnKF6aZfwMyiMrfnQHFP25Xd7jCAg0gC_tOTtRn8tKF4kTCRnSCof.QqKLhArnw_bEFnsROUaMNRRowOAdCd3U7BVQO5Yo6p2P53m.oYlFTEb6wZyCXOuhEWMu61Bjcs1uB9r5_XYbXoWPoBJ.nsT2x0g9Yhb2xq_h2doR.JYnjyW1VNK2sNmr.uO_mvhaAbzGWxW_JChHXMPKS0N8vuadSZQVBukUVjINK4QHjmrgGraUHmAM5.2KL1UWmf2Wpl2e3mh.uPpXNt0PD93iGOR_OLcgAQ0nKlGqJ8U169.s6MLrXCxJp6dRdMwuVLpyxdpdK4ZgxyG_kmBDMyzBMRTtekjXC45JwGSeYBd_peYRmuRTZsN37So8FeszngTBjPI0IqnjTw3aZS2ljmQCElXQJbiRSYGJit3bOBHwA9gSZXEsvH6ugBkREXAsiZso6r7c6T3ulB1KdkCuIT7j_exp6lo.y9EPQllLndvFoDrNKz1p6UiUj3ksOrbAG0M9LJhCXCFJlf4Gys6hpLuHfsA4DHjfHS1aeQvQBzhU5X_K215Cm5loYinLae5Zqr7hj.BJ1zyERlyjgDnYdOwI2JBXy5sHGKF7mEO8QtC4k.nTxMxMhmhpPWFw2dacZqoJUx3J5dwGihgB69"
+       },
+       {
+        "status": 200,
+        "url": "blob:https://challenges.cloudflare.com/ff5b14d4-7316-44ac-b4c0-7419b0bccf41"
+       },
+       {
+        "status": 200,
+        "url": "blob:https://challenges.cloudflare.com/ff5b14d4-7316-44ac-b4c0-7419b0bccf41"
+       },
+       {
+        "status": 200,
+        "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/ci/a423964bdcbc0121/1790607306270/y1WUZ1guD.sVsJ_kbETZ0ntYE6IapCnWC7GtwwEWsLE-1790607306-1.3.1.1-7aIl0_tOpizgPVYHjBswUPnPHMtOmIAr_19qjKIw4XOQsDfhlDzdemRZSTTNvIwJx_6FxGNdIFobdaoO4uGida02JvddqXObLi0KPrxZmeR6V_im3l4K6NDwGWa5DL0oK3cGftGaUL1BNiS1fepPUp85kzNTMeIZUDywJnjJwvRQcKt.M.bZy7fbylyIV29b4ZVM6AjsmyxgPnnrDwMWqGWzfvZcX3Zacc1d4YgCys8WUgTy_6HUplI4r18QNdTssSi5uBY9BgqUsX0qGcfw402PRaOrqetDOZuD8SW2CE7OJfyKm1frqmO0hDzXV4eUay_YXPGWr.m0889XBXK6uRpoW3gZTkBJxW6_Stw7zbstQEqgkTfbSXA3Jo.jiLDnqPI4Kx3YvUCeQHUvCj3CpCsDWRzXvOu2ToBCMjsywQ6ZdBrIlDAlLGHnUbJLZrTAp4st.k__yj9yaQxViwe3aY5aYh1HTdWBAdXIoBYI2Tr4Locbz8qk_E13v9V1DDi0EBMiyoBLOyxl9Clkgl1RG8CoAuELcxUjwJ6IJuxnXDwQCtRbbIv12Ma3amYwGvTYGRcRi2ZvrX1iY95qbvc89J2.FjsOP6rOWRlXTohNLElieb_qXyIHRi7WKRAxFYyv6rFeGTjJPHdGuf_UONEI9xREDpLJ__KAyIDOb2FmxIJq1E2hbhOsDz7vdOHFSRjrBIbO8CMiTCKcHu5f9aT1gedv2tm0ASr.lsfI95zkXdE"
+       },
+       {
+        "status": 200,
+        "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/fo/3240229067:1790604042:92-7g5Etl0lzzWj-Ctt9IxG9jKIzSVFD0cOGGHOB7Tc/a423964bdcbc0121/eTj5hACtMDKdJIEOpZN0YKKtVRtBpQyGdY2a.JSNx9g-1790607305-1.2.1.1-oBFgW1J.FNPO1BNca79GdgvafYXBa4etSbC1j1m9bRBLtvyoFoAAs8NSs.KPDtG2"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-1-latin.woff2"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php"
+       },
+       {
+        "status": 200,
+        "url": "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php"
+       }
+      ],
+      "response_headers": {
+       "accept-ranges": "bytes",
+       "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+       "connection": "Keep-Alive",
+       "content-encoding": "gzip",
+       "content-length": "14053",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Mon, 28 Sep 2026 14:55:03 GMT",
+       "expires": "Mon, 29 Oct 1923 20:30:00 GMT",
+       "keep-alive": "timeout=5, max=100",
+       "last-modified": "Thu, 20 Jun 2024 10:51:53 GMT",
+       "pragma": "no-cache",
+       "server": "Apache/2.4.67 (Debian)",
+       "strict-transport-security": "max-age=0",
+       "vary": "User-Agent,Accept-Encoding"
+      },
+      "screenshot_path": "/tmp/scan-4394b0b7-5dc6-4e01-b700-2a4052a7bd4a/hosts/88.99.35.112/phase2/screenshot_dortmund-beach.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "home page-template-default page page-id-124 woocommerce-block-theme-has-button-styles template-slider color-custom content-brightness-light input-brightness-light style-simple button-animation-fade layout-full-width if-zoom hide-love no-shadows header-simple header-empty header-fw sticky-header sticky-tb-color ab-hide menu-link-color subheader-both-left footer-copy-center responsive-overflow-x-mobile mobile-tb-center mobile-side-slide mobile-mini-mr-ll mobile-header-mini mobile-icon-user-ss mobile-icon-wishlist-ss mobile-icon-search-ss mobile-icon-wpml-ss mobile-icon-action-ss be-page-124 be-reg-2745 rs-safari cmplz-marketing cmplz-statistics cmplz-preferences cmplz-functional cmplz-eu cmplz-optin",
+       "cookies": "burst_uid=cb7c5fa103c4f10e1234cf804c0a5c92; cmplz_consented_services=; cmplz_policy_id=16; cmplz_marketing=allow; cmplz_statistics=allow; cmplz_preferences=allow; cmplz_functional=allow; cmplz_banner-status=dismissed",
+       "generator": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+       "html_lang": "de-DE",
+       "meta_tags": [
+        {
+         "content": "Das passende Design für ihre Marke. Wir helfen ihnen ihre Marke zu visualisieren.",
+         "name": "description"
+        },
+        {
+         "content": "max-image-preview:large",
+         "name": "robots"
+        },
+        {
+         "content": "telephone=no",
+         "name": "format-detection"
+        },
+        {
+         "content": "width=device-width, initial-scale=1, maximum-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "#ffffff",
+         "name": "theme-color"
+        },
+        {
+         "content": "#ffffff",
+         "name": "theme-color"
+        },
+        {
+         "content": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+         "name": "generator"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://player.vimeo.com/api/player.js",
+        "https://www.googletagmanager.com/gtag/js?id=UA-4628890-1",
+        "https://dortmund-beach.com/wp-content/plugins/burst-statistics/helpers/timeme/timeme.min.js?ver=1.6.1",
+        "https://dortmund-beach.com/wp-content/plugins/burst-statistics/assets/js/build/burst.min.js?ver=1.6.1",
+        "https://dortmund-beach.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+        "https://dortmund-beach.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+        "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rbtools.min.js?ver=6.7.11",
+        "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rs6.min.js?ver=6.7.11",
+        "https://dortmund-beach.com/wp-includes/js/jquery/ui/core.min.js?ver=1.13.2",
+        "https://dortmund-beach.com/wp-includes/js/jquery/ui/tabs.min.js?ver=1.13.2",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/debouncedresize.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/magnificpopup.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/menu.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/visible.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/assets/animations/animations.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/enllax.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/parallax/translate3d.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/scripts.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/plugins/complianz-gdpr/cookiebanner/js/complianz.min.js?ver=1718879508"
+       ],
+       "stylesheets": [
+        "https://dortmund-beach.com/wp-content/cache/wpfc-minified/7ubk1iuu/9mjyk.css",
+        "https://dortmund-beach.com/wp-content/themes/betheme-child/style.css?ver=6858e88174e609ac00d8a83f4c146a3b",
+        "https://dortmund-beach.com/wp-content/uploads/complianz/css/banner-1-optin.css?v=15",
+        "https://dortmund-beach.com/wp-content/cache/wpfc-minified/mbb4a78c/63tkw.css"
+       ],
+       "title": "Dortmund Beach Design | Webdesign | Corporate Design"
+      }
+     }
+    },
+    "server": "Apache httpd/2.4.67",
+    "tech_rows": [
+     {
+      "category": "CMS",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "httpx, wpscan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "WordPress",
+      "patch_status": "veraltet",
+      "source": "httpx, wpscan",
+      "status": "outdated",
+      "top_cve": null,
+      "version": "6.5.12",
+      "vuln_name": ""
+     },
+     {
+      "category": "CMS-Plugin",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "httpx, webtech, wpscan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Slider Revolution",
+      "patch_status": "veraltet",
+      "source": "httpx, webtech, wpscan",
+      "status": "outdated",
+      "top_cve": null,
+      "version": "6.7.11",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": 0.8,
+      "confidence_label": "mittel",
+      "cves": [],
+      "detection_source": "httpx, redirect_probe",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery Migrate",
+      "patch_status": "unbekannt",
+      "source": "httpx, redirect_probe",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "3.4.1",
+      "vuln_name": ""
+     },
+     {
+      "category": "File-Transfer",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "nmap",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Pure-FTPd",
+      "patch_status": "unbekannt",
+      "source": "nmap",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Bibliothek",
+      "confidence": 0.8,
+      "confidence_label": "mittel",
+      "cves": [],
+      "detection_source": "httpx, redirect_probe",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "patch_status": "unbekannt",
+      "source": "httpx, redirect_probe",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "3.7.1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Mail",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "nmap",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot",
+      "patch_status": "unbekannt",
+      "source": "nmap",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Mail",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "nmap",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix",
+      "patch_status": "unbekannt",
+      "source": "nmap",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "OS",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "nmap",
+      "eol_date": "2026-08-31",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Debian GNU/Linux",
+      "patch_status": "eol",
+      "source": "nmap",
+      "status": "eol",
+      "top_cve": null,
+      "version": "11",
+      "vuln_name": ""
+     },
+     {
+      "category": "CMS-Plugin",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "wpscan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Burst Statistics",
+      "patch_status": "veraltet",
+      "source": "wpscan",
+      "status": "outdated",
+      "top_cve": null,
+      "version": "1.7.1",
+      "vuln_name": ""
+     },
+     {
+      "category": "CMS-Plugin",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "wpscan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Complianz",
+      "patch_status": "veraltet",
+      "source": "wpscan",
+      "status": "outdated",
+      "top_cve": null,
+      "version": "7.1.0",
+      "vuln_name": ""
+     },
+     {
+      "category": "Remote-Access",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "nmap",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "unbekannt",
+      "source": "nmap",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "8.4p1 (debian)",
+      "vuln_name": ""
+     },
+     {
+      "category": "CMS-Theme",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "httpx, wpscan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "BeTheme",
+      "patch_status": "veraltet",
+      "source": "httpx, wpscan",
+      "status": "outdated",
+      "top_cve": null,
+      "version": "27.5.3",
+      "vuln_name": ""
+     },
+     {
+      "category": "CMS-Theme",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "wpscan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "BeTheme Child",
+      "patch_status": "unbekannt",
+      "source": "wpscan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "2.0",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": 1,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "header_check, httpx, nmap, webtech",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "header_check, httpx, nmap, webtech",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "2.4.67 (debian)",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Pure-FTPd",
+      "version": ""
+     },
+     {
+      "name": "Apache httpd",
+      "version": "2.4.67"
+     },
+     {
+      "name": "Dovecot pop3d",
+      "version": ""
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "Postfix smtpd",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "8.4p1 Debian 5+deb11u7"
+     },
+     {
+      "name": "Apache",
+      "version": "2.4.67 (Debian)"
+     },
+     {
+      "name": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+      "version": ""
+     },
+     {
+      "name": "Google Tag Manager",
+      "version": ""
+     },
+     {
+      "name": "WordPress",
+      "version": ""
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": "2.4.67"
+     },
+     {
+      "name": "BeTheme",
+      "version": "27.4.5"
+     },
+     {
+      "name": "Burst",
+      "version": ""
+     },
+     {
+      "name": "Complianz",
+      "version": ""
+     },
+     {
+      "name": "Debian",
+      "version": ""
+     },
+     {
+      "name": "Google Analytics",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "MySQL",
+      "version": ""
+     },
+     {
+      "name": "PHP",
+      "version": ""
+     },
+     {
+      "name": "Slider Revolution",
+      "version": "6.7.11"
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     },
+     {
+      "name": "jQuery Migrate",
+      "version": "3.4.1"
+     }
+    ],
+    "throttled": false,
+    "vhost_results": {
+     "dortmund-beach.com": {
+      "cms": "WordPress",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "dortmund-beach.com"
+   }
+  ]
+ },
+ "success": true
+}

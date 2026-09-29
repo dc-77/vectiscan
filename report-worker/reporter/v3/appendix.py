@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from reporter.catalog.schema import CatalogOutput
 from reporter.facts import schema as FS
+from reporter.facts import systems as SYS
 from reporter.v3 import chapters as C
 from reporter.v3 import coverage as COV
 from reporter.v3 import levels as L
@@ -76,6 +77,24 @@ def build_inventory(facts: FS.Facts,
         rows.append(InventoryRow(host=pv.host_ip, port=str(pv.port),
                                  svc=f"{name}, laut Passivquelle{wo}",
                                  ref=ref(pv.host_ip, pv.port)))
+    # S6d (A1, E17): Netzbetreiber mit Quelle (RIR laut RDAP, sonst AbuseIPDB) in der ersten Zeile
+    # jedes Hosts.
+    by_ip = {h.ip: h for h in facts.hosts}
+    domains = list(facts.scan.domains) or [facts.scan.domain]
+    gesehen: set[str] = set()
+    for r in rows:
+        if r.host in gesehen:
+            continue
+        gesehen.add(r.host)
+        h = by_ip.get(r.host)
+        if h is None:
+            continue
+        label = SYS.network_operator_label(
+            h.provider, platform=bool(h.cdn_provider or (h.shared and h.shared.kind == "platform")),
+            customer_domains=domains)
+        quelle = SYS.network_operator_source(h.provider)
+        if label and quelle:
+            r.operator = f"{label}, laut {quelle}"
     return rows
 
 

@@ -262,6 +262,10 @@ def _http(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Eviden
     ev = he.evaluated if he is not None else None
     # Werkzeug, das die bewerteten Sicherheits-Header geliefert hat.
     eval_tool = ev.tool if ev is not None else "header_check"
+    if ev is not None and getattr(ev, "status_basis", None) == "redirect_eval":
+        # S6d (A6, spec/11 T3): Endantwort von header_check nach HTTP-Weiterleitung; eigene Zeile
+        # ("header_check, logon.aspx, 200" getrennt von "header_check, /, 302").
+        eval_tool = "header_check_end"
     end_anders = ev is not None and (first is None or ev.url != first.url or ev.tool != "header_check")
     werte: dict[str, list[tuple[str, Any]]] = {}
 
@@ -320,7 +324,7 @@ def _http(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Eviden
     if eigene or "header_check" in (eval_tool, hsts_tool) or not werte:
         out.extend(_line(http, _zeile(kopf + eigene), tool="header_check"))
     # Je weiteres Werkzeug eine Zeile mit seiner Adresse und seinem Status.
-    for tool in ("redirect_probe", "testssl", "wpscan", "zap"):
+    for tool in ("header_check_end", "redirect_probe", "testssl", "wpscan", "zap"):
         paare = werte.pop(tool, [])
         if not paare:
             continue
@@ -343,7 +347,7 @@ def _http(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Eviden
         elif tool == hsts_tool and http.hsts is not None:
             zeile.append(("Adresse", http.hsts.url))
             zeile.append(("Antwort", http.hsts.status_code or ("Weiterleitung" if tool == "redirect_probe" else None)))
-        out.extend(_line(http, _zeile(zeile + paare), tool=tool))
+        out.extend(_line(http, _zeile(zeile + paare), tool="header_check" if tool == "header_check_end" else tool))
     return out
 
 
@@ -405,6 +409,31 @@ def _http_wordpress(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> l
             paare.append(("XML-RPC", f.url))
             paare.append(("belegt durch", WPSCAN_FOUND_BY.get(f.found_by or "", f.found_by)))
     return _line(http, _zeile(paare), tool="wpscan")
+
+
+def _http_xmlrpc(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[EvidenceRef]:
+    """XML-RPC-Schnittstelle: Fund von wpscan und Antwort der XML-RPC-Sonde (S6c, S6d A5).
+
+    Der Nachweis nennt die Sonde mit Adresse und Antwort; bei castenow meldet wpscan XML-RPC
+    nicht, die Sonde aber schon (oder, wie dort am 28.09., eine Ablehnung mit 403)."""
+    http = item.fact
+    out: list[EvidenceRef] = []
+    wp = http.wordpress
+    if wp is not None and any(f.type == "xmlrpc" for f in wp.findings):
+        paare: list[tuple[str, Any]] = [("", f"{http.fqdn or http.host_ip}")]
+        for f in wp.findings:
+            if f.type == "xmlrpc":
+                paare.append(("XML-RPC", f.url))
+                paare.append(("belegt durch", WPSCAN_FOUND_BY.get(f.found_by or "", f.found_by)))
+        out += _line(http, _zeile(paare), tool="wpscan")
+    probe = getattr(http, "xmlrpc_probe", None)
+    if probe is not None and probe.enabled is not None:
+        antwort = ("XML-RPC-Fehlerantwort" if probe.fault else
+                   ("Methodenliste" if probe.enabled else "keine XML-RPC-Antwort"))
+        paare = [("", f"{http.fqdn or http.host_ip}"), ("XML-RPC-Sonde", probe.url),
+                 ("Status", probe.status), ("Antwort", antwort)]
+        out += _line(http, _zeile(paare), tool="wordpress_xmlrpc")
+    return out
 
 
 # wpscan ``found_by`` in Kundensprache.
@@ -553,6 +582,11 @@ def _service(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Evi
                              # hat der Scan den Befehl nicht.
                              ("VRFY in der EHLO-Liste", True if (svc.smtp_vrfy and _touches(
                                  paths, "service.smtp_vrfy")) else None),
+                             # S6d (A4): AUTH vor STARTTLS mit der Quelle (EHLO-Sonde oder nmap).
+                             ("AUTH vor STARTTLS", ("laut EHLO-Sonde" if svc.smtp_source == "smtp_ehlo"
+                                                    else "laut Portscan")
+                              if (svc.auth_before_starttls and _touches(paths, "service.auth_before_starttls"))
+                              else None),
                              ("Zertifikat für", cert.cn if cert else None),
                              ("Aussteller", cert.issuer if cert else None),
                              ("gültig bis", datum(cert.not_after, with_time=True) if cert else None),
@@ -695,8 +729,11 @@ def _software(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Ev
     beleg = next((e for e in sw.evidence if e.tool in ("nmap", "header_check", "httpx")), None)
     if beleg is not None:
         paare.append(("Beleg", beleg_text(beleg.excerpt)))
-    if sw.vulnerabilities:
-        paare.append(("bekannte Schwachstellen laut wpscan", len(sw.vulnerabilities)))
+    # S6d (B1, #16): die Zahl ist die Zahl der Eintraege im wpscan-Feed (``vulnerabilities_count``),
+    # nie eine Zahl aus einem Text.
+    anzahl = sw.vulnerabilities_count if sw.vulnerabilities_count is not None else len(sw.vulnerabilities)
+    if anzahl:
+        paare.append(("bekannte Schwachstellen laut wpscan", anzahl))
     # S6b-4 (spec/11 T12, T15): neueste Version laut wpscan; S6b-4n (spec/11 N9): die
     # Fehlerbereinigung getrennt davon.
     from reporter.catalog.render import fixed_version, wpscan_directory_stale
@@ -710,10 +747,27 @@ def _software(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Ev
     # spec/08 Punkt 20 (#16): die Kennungen stehen im Nachweis. S6b-4 (spec/11 T12): alle, nicht
     # nur die ersten sechs; hinter "und 6 weitere" verschwanden die schwersten Luecken
     # (dortmund-beach betheme CVE-2026-65548) und damit auch ihr Eintrag in A.3.
-    for v in sw.vulnerabilities:
+    # S6d (B1, Entscheidung DC 29.09.): Reihenfolge nach Schwere laut NVD aus den threat-Fakten,
+    # sofern dort ein Wert steht (Werkzeugwert, kein eigener CVSS); ohne Wert die Reihenfolge des
+    # Feeds, mit dem Hinweis, dass der Feed keine Schwere nennt.
+    nvd = {t.cve_id.upper(): t.cvss_nvd.score for t in (ictx.get("threats") or [])
+           if getattr(t, "cvss_nvd", None) is not None and t.cvss_nvd.score is not None}
+    def schwere(v: Any) -> float:
+        return max((nvd.get(c.upper(), -1.0) for c in v.cves), default=-1.0)
+    reihe = sorted(enumerate(sw.vulnerabilities), key=lambda iv: (-schwere(iv[1]), iv[0]))
+    ohne = 0
+    for _i, v in reihe:
+        wert = schwere(v)
+        if wert < 0:
+            ohne += 1
         text = v.title + (f" ({', '.join(v.cves)})" if v.cves else "") + \
-            (f", behoben in {v.fixed_in}" if v.fixed_in else "")
+            (f", behoben in {v.fixed_in}" if v.fixed_in else "") + \
+            (f", CVSS laut NVD {wert:.1f}" if wert >= 0 else "")
         out.extend(_line(sw, text, tool="wpscan"))
+    if ohne:
+        out.extend(_line(sw, "Schweregrad im Feed nicht angegeben"
+                             + ("" if ohne == len(reihe) else f" ({ohne} von {len(reihe)} Einträgen)"),
+                         tool="wpscan"))
     return out
 
 
@@ -733,6 +787,9 @@ def _passive(item: Any, ictx: dict[str, Any], paths: frozenset[str]) -> list[Evi
                              # Bannerauszug ihn abschneidet.
                              ("VRFY in der EHLO-Antwort", True if details.get("smtp_vrfy") and _touches(
                                  paths, "passive.details") else None),
+                             # S6d (A4): der Regelfakt der Passivvariante.
+                             ("AUTH vor STARTTLS in der EHLO-Antwort", True if details.get("smtp_auth_before_starttls")
+                              and _touches(paths, "passive.details") else None),
                              ("Weiterleitung auf", details.get("location") if _touches(
                                  paths, "passive.details") else None),
                              ("Banner (Auszug)", _auszug(pv.banner_excerpt))]))
@@ -795,6 +852,7 @@ BUILDERS: dict[str, Builder] = {
     "http.paths": _http_path,
     "http.cookies": _http_cookie,
     "http.wordpress": _http_wordpress,
+    "http.xmlrpc": _http_xmlrpc,
     "tls": _tls,
     "tls.vulns": _tls_vuln,
     "service": _service,

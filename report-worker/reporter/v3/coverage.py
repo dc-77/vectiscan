@@ -35,6 +35,8 @@ from reporter.catalog.schema import CatalogOutput
 from reporter.facts import schema as FS
 from reporter.facts import systems as SYS
 from reporter.facts.serialize import sort_key
+from reporter.facts.sources import TESTSSL_PORT_RE, TESTSSL_SNI_RE, SMTP_EHLO_RE, is_testssl_tool
+from reporter.facts.tool_coverage import PROVIDER_BLOCK_REASON
 from reporter.v3 import tables as T
 from reporter.v3.findings import aufzaehlung, kurz_label
 from reporter.v3.models import Limitation
@@ -66,6 +68,10 @@ HOST_CAUSES: dict[str, tuple[str, tuple[str, ...]]] = {
         ("Portscan und Diensterkennung",)),
     "blocked": (
         "Verbindungen nach dem Portscan abgewiesen",
+        ("Transportverschlüsselung", "Sicherheits-Header", "Webanalyse", "Suche nach nicht verlinkten Pfaden")),
+    # S6d (A8): die Sperrerkennung nach dem Portscan (S6c) belegt die Sperre als Messfakt.
+    "provider_block": (
+        "Zielnetz sperrt die Prüfadresse nach dem Portscan",
         ("Transportverschlüsselung", "Sicherheits-Header", "Webanalyse", "Suche nach nicht verlinkten Pfaden")),
     "ai_skip_host": (
         "Von der Scan-Steuerung ausgelassen",
@@ -118,7 +124,27 @@ TOOL_CAUSES: dict[str, str] = {
     "parked_name": "Nicht eingerichteter Name, keine Web- und Header-Analyse",
     "cert_chain_unknown": "Vertrauenskette des Zertifikats nicht geprüft",
     "mail_tls_unknown": "Ablehnung einer Anmeldung vor STARTTLS nicht belegt",
+    # S6d (A11): whois ohne Daten (S6c: failed statt ok, #35).
+    "whois_no_data": "Registrierungsdaten der Domain nicht abrufbar",
 }
+# S6d (A2): Ursache eines fehlgeschlagenen testssl-Laufs je Port oder SNI, im Detail der Zeile
+# "Transportverschluesselung nur fuer einen Teil der TLS-Dienste geprueft".
+TLS_RUN_CAUSES: dict[str, str] = {
+    "no_tls_on_port": "kein TLS auf dem Port",
+    "tls_connect_refused": "Verbindung abgewiesen",
+    "connect": "Verbindung abgewiesen",
+    "starttls_failed": "STARTTLS nicht aufgebaut",
+    "timeout": "Zeitlimit",
+    "provider_block_after_portscan": "Zielnetz sperrt die Prüfadresse",
+    "incomplete": "Lauf ohne auswertbares Ergebnis",
+}
+# S6d (A4, A11): EHLO-Sonde ohne Ergebnis; eine Ursache mit der Katalogzeile mail_tls_unknown.
+SMTP_EHLO_CAUSE = "Ablehnung einer Anmeldung vor STARTTLS nicht belegt"
+# S6d: Zusatzlaeufe, deren Ausfall keine eigene Zeile bekommt: der Hauptlauf (nmap) bzw. die
+# Ersatzangabe (AbuseIPDB fuer den Netzbetreiber) steht fuer die Pruefung, die Sperrerkennung ist
+# selbst eine Ursache (Abschnitt 1), und die Passivquellen ohne Daten stehen im Anhang.
+SUPPLEMENTARY_TOOLS = frozenset({"nmap_versionall", "provider_block_probe", "provider_block_probe_p2", "rdap",
+                                 "securitytrails", "urlhaus", "otx"})
 
 # S6b-3 (spec/10 R1, Entscheidung DC 4): Messung der Sicherheits-Header an einer Antwort, die
 # keine Endseite ist; der Statuscode kommt aus dem Fakt.
@@ -171,12 +197,13 @@ TLS_IMPLICIT_PORTS = frozenset({443, 465, 636, 853, 990, 993, 995, 8443})
 
 # Werkzeuge, deren leeres Ergebnis keine Einschraenkung ist: ein Webauftritt ohne
 # erkennbare Technologie oder ohne vorgelagerte Schutzsysteme ist ein Ergebnis.
-NO_LIMITATION_TOOLS = frozenset({"webtech", "wafw00f", "whois"})
+# S6d (A11): whois gehoert nicht mehr dazu. Seit S6c ist ein Abruf ohne Daten ``failed`` (#35);
+# der Bericht nennt ihn als Einschraenkung "Registrierungsdaten der Domain nicht abrufbar".
+NO_LIMITATION_TOOLS = frozenset({"webtech", "wafw00f"})
 NO_LIMITATION_CODES = frozenset({"no_tech_signals", "whois_unavailable"})
 # S6b-2 (spec/08 Punkt 21): whois lieferte in keinem der 21 Golden-Auftraege Daten (der
-# Scanner meldet "ok" mit "no_data"). Solange das Werkzeug nicht repariert ist (Scanner,
-# S6c), nimmt der Bericht die Registrierungsdaten ganz heraus: keine Einschraenkungszeile,
-# kein Befund zur Laufzeit der Domain.
+# Scanner meldet "ok" mit "no_data"). Der Bericht nimmt die Laufzeit der Domain deshalb
+# heraus (kein Befund); seit S6d steht der Ausfall als Einschraenkung (A11).
 REPORT_SUPPRESSED_CHECKS = frozenset({"domain_expiring"})
 ZAP_TOOLS = ("zap", "zap_spider", "zap_ajax_spider", "zap_active")
 WEB_SERVICES = frozenset({"http", "https", "http-alt", "https-alt", "http-proxy", "ssl/http", "ssl/https"})
@@ -262,7 +289,7 @@ def passive_module_name(pv: FS.PassiveFact) -> str:
 
 
 def check_name(tool: str) -> str:
-    return T.TOOL_CHECKS.get(tool, T.TOOL_CHECKS_FALLBACK)
+    return T.tool_check(tool)
 
 
 def family_check_name(family: str) -> str:
@@ -327,6 +354,29 @@ def tls_sni(facts: FS.Facts, ip: str) -> dict[int, list[str]]:
         if t.host_ip == ip and t.source == "testssl" and t.fqdn and t.fqdn not in out[t.port]:
             out[t.port].append(t.fqdn)
     return dict(out)
+
+
+def tls_run_failures(facts: FS.Facts) -> dict[str, dict[str, dict]]:
+    """Je Adresse die gescheiterten testssl-Laeufe je Port und je SNI mit Ursache (S6d, A2).
+
+    ``{"88.99.35.112": {"ports": {110: "Verbindung abgewiesen"}, "sni": {"junkerwerk.hu": ...}}}``.
+    Ein Lauf ohne Fakt ist nie "vollstaendig"; seine Ursache kommt aus der Zeile (skipReason, S6c
+    C4) oder aus der Ausgabe (``testssl_run_state``)."""
+    out: dict[str, dict[str, dict]] = {}
+    for c in facts.coverage:
+        if not c.host_ip or c.status not in ("failed", "blocked"):
+            continue
+        m = TESTSSL_PORT_RE.match(c.tool)
+        s = TESTSSL_SNI_RE.match(c.tool)
+        if not (m or s):
+            continue
+        grund = TLS_RUN_CAUSES.get(_code(c), "Lauf ohne auswertbares Ergebnis")
+        entry = out.setdefault(c.host_ip, {"ports": {}, "sni": {}})
+        if m:
+            entry["ports"][int(m.group(1))] = grund
+        elif not any(t.host_ip == c.host_ip and t.source == "testssl" and t.sni == s.group(1) for t in facts.tls):
+            entry["sni"][s.group(1)] = grund
+    return out
 
 
 def measured_elsewhere(facts: FS.Facts, ip: str) -> dict[str, list[str]]:
@@ -519,7 +569,26 @@ def host_coverage(facts: FS.Facts, host: FS.HostFact) -> HostCoverage:
     if not any(c.status in ("ok", "empty") for c in nmap):
         return HostCoverage(ip=ip, cov="keine", cause="nmap_failed", text="Portscan ohne Ergebnis; nicht geprüft.")
     if host.blocked.detected:
-        return HostCoverage(ip=ip, cov="teil", cause="blocked", missing=[n for _, n in _lead_checks(facts.scan.package)],
+        # S6d (A2): lief testssl vor der Sperre schon an weiteren Ports (junkerwerk 188.40.3.130: sieben
+        # Mail- und FTP-Ports gemessen, nur die Webdienste antworteten nicht mehr), sagt der Text das.
+        tls_vorher = sorted(tls_tested(facts, ip))
+        leit = [n for _, n in _lead_checks(facts.scan.package)]
+        if tls_vorher:
+            leit = [n for n in leit if n != LEAD_IN_SENTENCE["testssl"]]
+        vorher = (f"; Transportverschlüsselung an Port {', '.join(str(p) for p in tls_vorher)} geprüft"
+                  if tls_vorher else "")
+        nicht = ("Webanalyse und Sicherheits-Header waren nicht möglich" if tls_vorher
+                 else "Transportverschlüsselung und Webanalyse waren nicht möglich")
+        if host.blocked.reason == PROVIDER_BLOCK_REASON:
+            # S6d (A8): die Sperrerkennung nach dem Portscan hat die Sperre gemessen.
+            return HostCoverage(ip=ip, cov="teil", cause="provider_block", missing=leit,
+                                text=f"Portscan vollständig{vorher}; danach abgewiesen, das Zielnetz sperrt die "
+                                     f"Prüfadresse. {nicht[0].upper()}{nicht[1:]}.")
+        if tls_vorher:
+            return HostCoverage(ip=ip, cov="teil", cause="blocked", missing=leit,
+                                text=f"Portscan vollständig{vorher}; Verbindungen zu den Webdiensten hat der Host "
+                                     f"abgewiesen, {nicht}.")
+        return HostCoverage(ip=ip, cov="teil", cause="blocked", missing=leit,
                             text="Portscan vollständig; danach hat der Host weitere Verbindungen abgewiesen, "
                                  "Transportverschlüsselung und Webanalyse waren nicht möglich.")
     done: list[str] = ["Portscan"]
@@ -785,6 +854,33 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
         if partner:
             row(HOST_CAUSES["no_ipv6_route"][0]).zusatz.append(
                 f"Geprüft wurde die IPv4-Adresse desselben Systems ({', '.join(partner)}).")
+    # S6d (A8): Dauer und Ports der Sperrerkennung je gesperrtem Host; ohne Sperre kein Text.
+    gesperrt = [h for h in facts.hosts if host_cause.get(h.ip) == "provider_block" and h.provider_block]
+    for h in gesperrt:
+        pb = h.provider_block
+        if pb.waited_s:
+            dauer = f"nach {int(round(pb.waited_s))} Sekunden"
+        elif pb.attempts:
+            dauer = f"nach {pb.attempts} Versuchen"
+        else:
+            dauer = "bei erneuten Versuchen"
+        ports = [str(p) for p in pb.checked_ports]
+        an = ""
+        if ports:
+            an = (f" an Port {ports[0]}" if len(ports) == 1
+                  else f" an den Ports {', '.join(ports[:6])}" + (" und weiteren" if len(ports) > 6 else ""))
+        vorne = f"{h.ip}: " if len(gesperrt) > 1 else ""
+        row(HOST_CAUSES["provider_block"][0]).zusatz.append(
+            f"{vorne}Nach dem Portscan wies das Zielnetz Verbindungen der Prüfadresse ab; {dauer} war die "
+            f"Adresse{an} noch nicht wieder erreichbar.")
+    # Sperre erst waehrend der weiteren Pruefungen (junkerwerk f9a2a2f6: Sperrerkennung um 16:15 ohne
+    # Sperre, ab 16:30 scheiterten alle Verbindungen): die abgeleitete Ursache bleibt, der Satz sagt es.
+    spaet = [h for h in facts.hosts if host_cause.get(h.ip) == "blocked" and h.provider_block is not None
+             and h.provider_block.blocked is False]
+    for h in spaet:
+        row(HOST_CAUSES["blocked"][0]).zusatz.append(
+            f"Die Sperrerkennung direkt nach dem Portscan fand {h.ip} noch erreichbar; abgewiesen wurden die "
+            "Verbindungen erst während der folgenden Prüfungen.")
 
     # 2 Werkzeugzeilen ohne hostweite Ursache
     spider_cause: dict[str, str] = {}
@@ -800,10 +896,31 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
     steuerung = {ip: regel for ip in model.hosts
                  if (regel := scan_control_skip(facts, ip, [c for c in facts.coverage if c.host_ip == ip]))
                  is not None and not host_cause.get(ip)}
+    wpscan_ok = {c.host_ip for c in facts.coverage if c.tool == "wpscan" and c.status in ("ok", "empty")}
     for c in facts.coverage:
         if c.status not in ("failed", "blocked", "empty", "skipped"):
             continue
         if c.tool in T.OUT_OF_PRODUCT_TOOLS or c.tool == "nmap":
+            continue
+        # S6d: Ausfaelle der zusaetzlichen testssl-Laeufe stehen je Port in Abschnitt 5, der Port 25
+        # (E5) in Abschnitt 4; die Zusatzlaeufe aus SUPPLEMENTARY_TOOLS bekommen keine eigene Zeile.
+        if is_testssl_tool(c.tool) and c.tool != "testssl":
+            continue
+        if c.tool in SUPPLEMENTARY_TOOLS or (c.tool == "wordpress_xmlrpc" and c.host_ip in wpscan_ok):
+            continue
+        if SMTP_EHLO_RE.match(c.tool):
+            if c.status == "skipped" or (c.host_ip and host_cause.get(c.host_ip)):
+                continue
+            r = row(SMTP_EHLO_CAUSE, "smtp_ehlo")
+            r.checks.add(check_name(c.tool))
+            port = SMTP_EHLO_RE.match(c.tool).group(1)
+            grund = TLS_RUN_CAUSES.get(_code(c), "ohne Ergebnis")
+            vorhanden = r.orte.get(c.host_ip or "")
+            teil = f"Port {port}: {grund}"
+            label = (f"{vorhanden[:-1]}; {teil})" if vorhanden and vorhanden.endswith(")")
+                     else f"{_host_label(facts, c.host_ip)} ({teil})")
+            r.orte[c.host_ip or ""] = label
+            r.subjects.add(c.host_ip or "")
             continue
         # S6b-4n (spec/11 N13): ohne Schutzsystem ist kein Mangel, ein abgebrochener Lauf schon
         # (huendgen wafw00f nach 60 Sekunden).
@@ -822,6 +939,9 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
             # Steht als eigene Zeile mit Ursache (Abschnitt 5); eine Ursache, eine Zeile.
             continue
         code = _code(c)
+        if c.tool == "whois" and c.status == "failed" and code in ("no_data", "passive_no_data"):
+            # S6d (A11): ein fehlgeschlagener whois-Abruf ohne Daten ist ein Ausfall, kein "ohne Treffer".
+            code = "whois_no_data"
         if code in NO_LIMITATION_CODES:
             continue
         erzwungen = False
@@ -908,7 +1028,14 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
                     ziel = (f" auf {loc.path or '/'}" if (loc.hostname or "") == (hf.fqdn or "")
                             else f" auf {loc.hostname}")
                 status_txt = str(first.status_code) if first.status_code else HEADER_REASONS[code]
-                label = f"{label} ({status_txt}{ziel})"
+                # S6d (A6): Status der Endantwort laut header_check, wenn sie nicht bewertbar war.
+                fin = hf.header_eval.final if hf is not None and hf.header_eval is not None else None
+                ende = ""
+                # Nur am selben Namen; eine Endantwort auf einem anderen Host nennt schon "auf <Host>".
+                if fin is not None and fin.status_code and hf.header_eval.evaluated is None \
+                        and (urlsplit(fin.url or "").hostname or hf.fqdn or "").lower() == (hf.fqdn or "").lower():
+                    ende = f", Endantwort {fin.status_code}"
+                label = f"{label} ({status_txt}{ziel}{ende})"
             entry["orte"][res.group_key] = label
             entry["refs"].add(f"{res.check_id}|{res.group_key}")
             entry["checks"].add(name)
@@ -994,24 +1121,33 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
               "deshalb nicht geprüft.")
 
     # 5 Teilpruefungen (spec/10 R3): TLS-Dienste ohne Pruefung, aktive Webanalyse ohne Inhalt.
+    laeufe = tls_run_failures(facts)
     for ip, h in sorted(model.hosts.items(), key=lambda kv: sort_key(kv[0])):
         if h.cause:
             continue
-        if h.tls_untested:
+        port_grund = laeufe.get(ip, {}).get("ports", {})
+        sni_grund = laeufe.get(ip, {}).get("sni", {})
+        if h.tls_untested or sni_grund:
             r = row(TLS_PARTIAL_CAUSE, "tls_partial")
             r.checks.add("Transportverschlüsselung")
             # S6b-4n (spec/11 N13): das Zertifikat las der Portscan (bergersysteme 110 bis 995, heuel 21);
             # nicht bewertet sind dort Protokolle und Verfahren.
             mit_zert = {s_.port for s_ in facts.services if s_.host_ip == ip and s_.cert is not None}
             teile = []
+            # S6d (A2): lief testssl fuer den Port und scheiterte, steht die Ursache am Port.
             z = [p for p in h.tls_untested if p in mit_zert]
             o = [p for p in h.tls_untested if p not in mit_zert]
+
+            def _ports(ps: list[int]) -> str:
+                return ", ".join(f"{p} ({port_grund[p]})" if p in port_grund else str(p) for p in ps)
             if z:
-                teile.append(f"{'Port' if len(z) == 1 else 'Ports'} {', '.join(str(p) for p in z)}: Protokolle und "
+                teile.append(f"{'Port' if len(z) == 1 else 'Ports'} {_ports(z)}: Protokolle und "
                              "Verfahren nicht bewertet, Zertifikat aus dem Portscan")
             if o:
-                teile.append(f"{'Port' if len(o) == 1 else 'Ports'} {', '.join(str(p) for p in o)}: Protokolle, "
+                teile.append(f"{'Port' if len(o) == 1 else 'Ports'} {_ports(o)}: Protokolle, "
                              "Verfahren und Zertifikat nicht bewertet")
+            for name, grund in sorted(sni_grund.items()):
+                teile.append(f"Name {name} an Port 443: {grund}")
             r.ort(ip, f"{ip} ({'; '.join(teile)})")
         if h.zap_note:
             r = row(ZAP_PARTIAL_CAUSE, "zap_partial")
@@ -1027,9 +1163,15 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
             r.checks.update(zusatz_checks.get(ip, set()))
             r.ort(ip, f"{_host_label(facts, ip)}: {h.zap_no_alerts}")
     if any(h.tls_untested for h in model.hosts.values() if not h.cause):
-        row(TLS_PARTIAL_CAUSE).zusatz.append(
-            "Geprüft wurde jeweils der Webdienst auf Port 443; die übrigen TLS-Dienste sind nur per "
-            "Portscan erfasst.")
+        # S6d (A2): seit S6c laeuft testssl je TLS-Port; der Satz nennt dann, was geprueft ist.
+        if any(TESTSSL_PORT_RE.match(c.tool) for c in facts.coverage):
+            row(TLS_PARTIAL_CAUSE).zusatz.append(
+                "Geprüft wurden die TLS-Dienste mit eigenem Lauf der Transportverschlüsselung; bei den "
+                "genannten Ports scheiterte der Lauf oder fehlte, sie sind nur per Portscan erfasst.")
+        else:
+            row(TLS_PARTIAL_CAUSE).zusatz.append(
+                "Geprüft wurde jeweils der Webdienst auf Port 443; die übrigen TLS-Dienste sind nur per "
+                "Portscan erfasst.")
 
     # 6 Gefunden, nicht geprueft (spec/10 R5, bis S6c die Hostsuche repariert)
     gefunden = [(t.domain, d) for t in facts.targets for d in t.discovered]
@@ -1073,10 +1215,10 @@ def limitations(facts: FS.Facts, output: CatalogOutput, model: Model,
     for p in facts.path_search:
         ziel = (urlsplit(p.target_url).hostname if p.target_url else None) or p.host_ip
         if host_cause.get(p.host_ip):
-            if host_cause[p.host_ip] == "blocked" and p.tool_reasons:
+            if host_cause[p.host_ip] in ("blocked", "provider_block") and p.tool_reasons:
                 gruende = sorted({path_abort_text(g) for g in p.tool_reasons.values() if path_abort_text(g)})
                 if gruende:
-                    row(HOST_CAUSES["blocked"][0]).zusatz.append(
+                    row(HOST_CAUSES[host_cause[p.host_ip]][0]).zusatz.append(
                         f"Die Suche nach nicht verlinkten Pfaden an {ziel} brach ab ({', '.join(gruende)}).")
             continue
         teil = _path_partial(facts, p, ziel)

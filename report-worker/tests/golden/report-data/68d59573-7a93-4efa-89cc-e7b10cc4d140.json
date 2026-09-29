@@ -13,7 +13,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Korrelation hat 17 Einzelmeldungen der Werkzeuge erfasst. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 12 Befunde und 6 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
+  "filtering": "Die Korrelation hat 17 Einzelmeldungen der Werkzeuge erfasst. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 13 Befunde und 6 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -31,186 +31,217 @@
   "inventory": [
    {
     "host": "198.202.211.1",
+    "operator": "Webflow, Inc (CDN), laut AbuseIPDB",
     "port": "80",
     "ref": "",
     "svc": "Cloudflare http proxy"
    },
    {
     "host": "198.202.211.1",
+    "operator": "",
     "port": "443",
-    "ref": "VS-2026-010",
+    "ref": "VS-2026-011",
     "svc": "cloudflare, TLS erzwungen"
    },
    {
     "host": "198.202.211.1",
+    "operator": "",
     "port": "8080",
     "ref": "",
     "svc": "Cloudflare http proxy"
    },
    {
     "host": "198.202.211.1",
+    "operator": "",
     "port": "8443",
     "ref": "",
     "svc": "cloudflare, TLS erzwungen"
    },
    {
     "host": "92.205.224.174",
+    "operator": "Host Europe GmbH, laut AbuseIPDB",
     "port": "21",
-    "ref": "VS-2026-008",
+    "ref": "VS-2026-009",
     "svc": "ProFTPD"
    },
    {
     "host": "92.205.224.174",
+    "operator": "",
     "port": "22",
     "ref": "",
     "svc": "OpenSSH 9.9"
    },
    {
     "host": "92.205.224.174",
+    "operator": "",
     "port": "53",
     "ref": "",
     "svc": "DNS"
    },
    {
     "host": "92.205.224.174",
+    "operator": "",
     "port": "80",
     "ref": "",
     "svc": "nginx"
    },
    {
     "host": "92.205.224.174",
+    "operator": "",
     "port": "110",
     "ref": "VS-2026-002, VS-2026-003",
     "svc": "Dovecot pop3d, STARTTLS"
    },
    {
     "host": "92.205.224.174",
+    "operator": "",
     "port": "143",
     "ref": "VS-2026-002, VS-2026-003",
     "svc": "Dovecot imapd, STARTTLS"
    },
    {
     "host": "92.205.224.174",
+    "operator": "",
     "port": "443",
     "ref": "VS-2026-001, VS-2026-007",
     "svc": "nginx, TLS erzwungen"
    },
    {
     "host": "92.205.224.174",
+    "operator": "",
     "port": "465",
     "ref": "VS-2026-003",
     "svc": "Postfix smtpd, TLS erzwungen"
    },
    {
     "host": "92.205.224.174",
+    "operator": "",
     "port": "993",
     "ref": "VS-2026-003",
     "svc": "Dovecot imapd, TLS erzwungen"
    },
    {
     "host": "92.205.224.174",
+    "operator": "",
     "port": "995",
     "ref": "VS-2026-003",
     "svc": "Dovecot pop3d, TLS erzwungen"
    },
    {
     "host": "92.205.224.174",
+    "operator": "",
     "port": "8443",
     "ref": "VS-2026-001",
     "svc": "sw-cp-server, TLS erzwungen"
    },
    {
     "host": "198.202.211.1",
+    "operator": "",
     "port": "2052",
     "ref": "",
     "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "198.202.211.1",
+    "operator": "",
     "port": "2053",
     "ref": "",
     "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "198.202.211.1",
+    "operator": "",
     "port": "2082",
     "ref": "",
     "svc": "HTTP, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "198.202.211.1",
+    "operator": "",
     "port": "2083",
     "ref": "",
     "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "198.202.211.1",
+    "operator": "",
     "port": "2086",
     "ref": "",
     "svc": "HTTP, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "198.202.211.1",
+    "operator": "",
     "port": "2087",
     "ref": "",
     "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "198.202.211.1",
+    "operator": "",
     "port": "2095",
     "ref": "",
     "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "198.202.211.1",
+    "operator": "",
     "port": "2096",
     "ref": "",
     "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "198.202.211.1",
+    "operator": "",
     "port": "8880",
     "ref": "",
     "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "62.217.52.162",
+    "operator": "Berger EDV-Systemberatungs GmbH, laut AbuseIPDB",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd, laut Passivquelle"
    },
    {
     "host": "62.217.52.162",
+    "operator": "",
     "port": "443",
     "ref": "VS-2026-006",
     "svc": "Apache httpd, laut Passivquelle"
    },
    {
     "host": "62.217.52.166",
+    "operator": "Berger EDV-Systemberatungs GmbH, laut AbuseIPDB",
     "port": "25",
-    "ref": "VS-2026-012",
+    "ref": "VS-2026-013",
     "svc": "SMTP (CipherMail), laut Passivquelle"
    },
    {
     "host": "62.217.52.166",
+    "operator": "",
     "port": "443",
     "ref": "VS-2026-004",
     "svc": "Microsoft IIS httpd 10.0, laut Passivquelle"
    },
    {
     "host": "62.217.52.171",
+    "operator": "Berger EDV-Systemberatungs GmbH, laut AbuseIPDB",
     "port": "443",
     "ref": "",
     "svc": "nginx, laut Passivquelle"
    },
    {
     "host": "92.205.224.174",
+    "operator": "",
     "port": "25",
-    "ref": "",
+    "ref": "VS-2026-008",
     "svc": "Postfix smtpd, laut Passivquelle"
    },
    {
     "host": "92.205.224.174",
+    "operator": "",
     "port": "8880",
     "ref": "VS-2026-001",
     "svc": "Plesk, laut Passivquelle, außerhalb des geprüften Portbereichs"
@@ -309,7 +340,6 @@
  "architecture": {
   "lead": "Die geprüfte Angriffsfläche verteilt sich auf 6 Systeme mit folgenden Aufgaben: Dateiaustausch, E-Mail-Versand laut SPF, Mail-Webzugang laut Passivquelle, Mailabruf und Einlieferung, Website und Weiterleitung auf www.bergersysteme.com. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
-   "Beobachtung ohne Regeltreffer, nicht als Befund bewertet: Anmeldung vor STARTTLS angeboten (92.205.224.174:25, laut Passivquelle).",
    "An 198.202.211.1 meldet die Passivquelle die Ports 2052, 2053, 2082, 2083, 2086, 2087, 2095, 2096, 8880; es sind Standardports der CDN-Kante des Anbieters (Cloudflare), sie gehören nicht zu Ihren Systemen und sind nicht bewertet."
   ],
   "posture": [
@@ -1020,7 +1050,7 @@
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "grau"
+      "st": "gelb"
      },
      {
       "p": "8880",
@@ -2100,6 +2130,112 @@
    "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security."
   },
   {
+   "affected": "92.205.224.174:25 (laut Passivquelle, Hosteintrag aktualisiert am 23.09.2026)",
+   "cat": "E",
+   "checks": [
+    "smtp_auth_before_starttls_passive"
+   ],
+   "evidence": "Shodan · phase0a/shodan_hosts.json\nQuelle: shodan · 92.205.224.174:25 · Produkt: Postfix smtpd · AUTH vor STARTTLS in der EHLO-Antwort: ja · Banner (Auszug): 220 174.224.205.92.host.secureserver.net ESMTP Postfix 250-174.224.205.92.host.secureserver.net 250-PIPELINING 250-SIZE 10240000 250-ETRN 250-STARTTLS",
+   "found": "Laut Passivquelle bietet der Mailserver auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) die Anmeldung (AUTH) schon vor STARTTLS an: 92.205.224.174:25 (laut Passivquelle, Hosteintrag aktualisiert am 23.09.2026). Port 25 ist vom Prüfstand aus nicht prüfbar; die Angabe der Passivquelle ist deshalb nicht bestätigt.",
+   "id": "VS-2026-008",
+   "impact": "Nimmt ein Mailprogramm das Angebot an, bevor die Verbindung verschlüsselt ist, könnten Zugangsdaten unverschlüsselt übertragen werden.",
+   "key": "smtp_auth/92.205.224.174/kunde",
+   "level": "mittel",
+   "level_label": "mittel",
+   "missing_headers": [],
+   "operator": "",
+   "operator_note": "",
+   "plan_action": "Prüfen, ob der Mailserver AUTH vor STARTTLS anbietet, und die Anmeldung gegebenenfalls erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen).",
+   "plan_effect": "Verhindert, dass Zugangsdaten unverschlüsselt übertragen werden",
+   "plan_items": [
+    {
+     "action": "Prüfen, ob der Mailserver AUTH vor STARTTLS anbietet, und die Anmeldung gegebenenfalls erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen).",
+     "check": "smtp_auth_before_starttls_passive",
+     "detail": "",
+     "effect": "Verhindert, dass Zugangsdaten unverschlüsselt übertragen werden",
+     "lever": "Anmeldung am Mailserver erst nach STARTTLS anbieten",
+     "per_rule": false,
+     "stage": "mittelfristig"
+    }
+   ],
+   "plan_lever": "Anmeldung am Mailserver erst nach STARTTLS anbieten",
+   "plan_stage": "mittelfristig",
+   "policy": "smtp_auth_before_starttls_passive",
+   "provenance": [
+    {
+     "check": "smtp_auth_before_starttls_passive",
+     "field": "title",
+     "members": [
+      "92.205.224.174|shodan:92.205.224.174:25"
+     ],
+     "statement": "short",
+     "text": "AUTH vor STARTTLS angeboten laut Passivquelle"
+    },
+    {
+     "check": "smtp_auth_before_starttls_passive",
+     "field": "observation",
+     "members": [
+      "92.205.224.174|shodan:92.205.224.174:25"
+     ],
+     "statement": "observation[0]",
+     "text": "Laut Passivquelle bietet der Mailserver auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) die Anmeldung (AUTH) schon vor STARTTLS an: 92.205.224.174:25 (laut Passivquelle, Hosteintrag aktualisiert am 23.09.2026)."
+    },
+    {
+     "check": "smtp_auth_before_starttls_passive",
+     "field": "observation",
+     "members": [
+      "92.205.224.174|shodan:92.205.224.174:25"
+     ],
+     "statement": "observation[2]",
+     "text": "Port 25 ist vom Prüfstand aus nicht prüfbar; die Angabe der Passivquelle ist deshalb nicht bestätigt."
+    },
+    {
+     "check": "smtp_auth_before_starttls_passive",
+     "field": "meaning",
+     "members": [
+      "92.205.224.174|shodan:92.205.224.174:25"
+     ],
+     "statement": "meaning[0]",
+     "text": "Nimmt ein Mailprogramm das Angebot an, bevor die Verbindung verschlüsselt ist, könnten Zugangsdaten unverschlüsselt übertragen werden."
+    },
+    {
+     "check": "smtp_auth_before_starttls_passive",
+     "field": "verify",
+     "members": [
+      "92.205.224.174|shodan:92.205.224.174:25"
+     ],
+     "statement": "verify[0]",
+     "text": "Verbindung zum genannten Port aufbauen und EHLO senden; erwartet wird eine Antwort, die AUTH erst nach STARTTLS nennt."
+    },
+    {
+     "check": "smtp_auth_before_starttls_passive",
+     "field": "recommendation",
+     "members": [
+      "92.205.224.174|shodan:92.205.224.174:25"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Prüfen, ob der Mailserver AUTH vor STARTTLS anbietet, und die Anmeldung gegebenenfalls erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen)."
+    }
+   ],
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Prüfen, ob der Mailserver AUTH vor STARTTLS anbietet, und die Anmeldung gegebenenfalls erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen)."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "passiv (Shodan)",
+   "status": "gelb",
+   "subjects": [
+    "smtp_auth_before_starttls_passive|92.205.224.174",
+    "smtp_auth_before_starttls_passive|shodan:92.205.224.174:25"
+   ],
+   "threat": null,
+   "title": "Mailserver auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com): AUTH vor STARTTLS angeboten laut Passivquelle",
+   "urgency": "Mittelfristig",
+   "verify": "Verbindung zum genannten Port aufbauen und EHLO senden; erwartet wird eine Antwort, die AUTH erst nach STARTTLS nennt."
+  },
+  {
    "affected": "92.205.224.174:21 (FTP)",
    "cat": "A",
    "checks": [
@@ -2107,7 +2243,7 @@
    ],
    "evidence": "nmap · hosts/92.205.224.174/phase1/nmap.xml\n92.205.224.174:21/tcp · Dienst: ftp · Produkt: ProFTPD · Zertifikat für: 174.224.205.92.host.secureserver.net · Aussteller: YR1 · gültig bis: 05.12.2026, 17:11 UTC",
    "found": "Der Host 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com) bietet ein älteres Übertragungsprotokoll an: 92.205.224.174:21 (FTP). Ob dort eine Anmeldung ohne Transportverschlüsselung abgelehnt wird, ließ sich von außen nicht feststellen: 92.205.224.174:21 (FTP).",
-   "id": "VS-2026-008",
+   "id": "VS-2026-009",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Servers, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "key": "legacy_protocols_present/scan/hoster:Host Europe GmbH",
    "level": "niedrig",
@@ -2236,7 +2372,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0/dns_records.json\nbergersysteme.com · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere\n\nDNS-Abfragen · phase0a/dns_security.json\nbergersysteme.com · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
    "found": "Für bergersysteme.com ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain bergersysteme.com fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten. Für bergersysteme.com ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain bergersysteme.com fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können.",
-   "id": "VS-2026-009",
+   "id": "VS-2026-010",
    "impact": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen. Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.",
    "key": "mail_transport_enforcement/bergersysteme.com/kunde",
    "level": "niedrig",
@@ -2392,7 +2528,7 @@
    ],
    "evidence": "header_check · hosts/198.202.211.1/phase2/headers_www.bergersysteme.com.json\nwww.bergersysteme.com · Adresse: https://www.bergersysteme.com · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options",
    "found": "Auf www.bergersysteme.com ist keine Content-Security-Policy gesetzt: www.bergersysteme.com. Auf www.bergersysteme.com fehlen einzelne Sicherheits-Header der Webseite: www.bergersysteme.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
-   "id": "VS-2026-010",
+   "id": "VS-2026-011",
    "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/198.202.211.1/platform:webflow.com",
    "level": "niedrig",
@@ -2655,7 +2791,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0a/dns_security.json\nbergersysteme.com · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
    "found": "Für bergersysteme.com ist kein CAA-Eintrag veröffentlicht. Für die Domain bergersysteme.com legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen. Für bergersysteme.com ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain bergersysteme.com lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
-   "id": "VS-2026-011",
+   "id": "VS-2026-012",
    "impact": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf. Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
    "key": "dns_hygiene/bergersysteme.com/kunde",
    "level": "niedrig",
@@ -2810,7 +2946,7 @@
    ],
    "evidence": "Shodan · phase0a/shodan_hosts.json\nQuelle: shodan · 62.217.52.166:25 · VRFY in der EHLO-Antwort: ja · Banner (Auszug): 220 mail.bergersysteme.com ESMTP CipherMail 250-mail.bergersysteme.com 250-PIPELINING 250-SIZE 1024000000 250-VRFY 250-STARTTLS 250-ENHANCEDSTATUSCODES",
    "found": "Laut Passivquelle nennt der Mailserver auf 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com) den Befehl VRFY in seiner Antwort auf EHLO: 62.217.52.166:25 (laut Passivquelle, Hosteintrag aktualisiert am 23.09.2026). Der Host ist vom Prüfstand aus nicht erreichbar; die Angabe der Passivquelle ist deshalb nicht bestätigt.",
-   "id": "VS-2026-012",
+   "id": "VS-2026-013",
    "impact": "Mit VRFY lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte Phishing-Mails und Rateangriffe auf Zugangsdaten.",
    "key": "smtp_commands/62.217.52.166/kunde",
    "level": "niedrig",
@@ -2954,10 +3090,10 @@
    },
    {
     "key": "E",
-    "level": 1,
+    "level": 2,
     "name": "Konfiguration und Informations-Hygiene",
-    "note": "DNS-Absicherung für bergersysteme.com: kein CAA-Eintrag und keine DNSSEC-Signatur; Mailserver auf 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com): VRFY angeboten laut Passivquelle",
-    "status": "blau"
+    "note": "Mailserver auf 92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com): AUTH vor STARTTLS angeboten laut Passivquelle; DNS-Absicherung für bergersysteme.com: kein CAA-Eintrag und keine DNSSEC-Signatur",
+    "status": "gelb"
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von bergersysteme.com am 23.09.2026: 10 Hostnamen auf 8 IP-Adressen, davon 6 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
@@ -2992,13 +3128,13 @@
   "overall_status": "gelb",
   "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration."
  },
- "landscape_lead": "12 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "13 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 17,
-  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
-  "catalog_version": "2026-09-27.2",
+  "after_fp": 18,
+  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
+  "catalog_version": "2026-09-29.1",
   "classification": "Vertraulich",
-  "consolidated": 12,
+  "consolidated": 13,
   "context_fields": [],
   "context_sources": {},
   "customer": "Auftraggeber",
@@ -3007,7 +3143,7 @@
    "bergersysteme.com"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.3.0",
+  "facts_schema_version": "1.4.0",
   "fqdns_total": 10,
   "generated_on": null,
   "generation": null,
@@ -3022,7 +3158,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.2",
+  "policy_version": "2026-09-29.1",
   "positives": 6,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -3111,6 +3247,20 @@
    "st": "gelb"
   },
   {
+   "action": "Prüfen, ob der Mailserver AUTH vor STARTTLS anbietet, und die Anmeldung gegebenenfalls erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen).",
+   "effect": "Verhindert, dass Zugangsdaten unverschlüsselt übertragen werden",
+   "lever": "Anmeldung am Mailserver erst nach STARTTLS anbieten",
+   "operator": "",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-008"
+   ],
+   "sources": [
+    "VS-2026-008:smtp_auth_before_starttls_passive"
+   ],
+   "st": "gelb"
+  },
+  {
    "action": "Anhand einer aktiven Prüfung feststellen, ob Dienst und Version aus der Passivquelle noch zutreffen, und den Patchstand mit den Sicherheitshinweisen des Herstellers abgleichen.",
    "effect": "Klärt, ob ein ungepflegter Dienst erreichbar ist",
    "lever": "Von der Passivquelle gemeldete Dienste prüfen",
@@ -3145,10 +3295,10 @@
    "operator": "hoster",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-008"
+    "VS-2026-009"
    ],
    "sources": [
-    "VS-2026-008:legacy_protocols_present"
+    "VS-2026-009:legacy_protocols_present"
    ],
    "st": "blau"
   },
@@ -3159,10 +3309,10 @@
    "operator": "platform",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-010"
+    "VS-2026-011"
    ],
    "sources": [
-    "VS-2026-010:security_headers_incomplete"
+    "VS-2026-011:security_headers_incomplete"
    ],
    "st": "blau"
   },
@@ -3173,10 +3323,10 @@
    "operator": "platform",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-010"
+    "VS-2026-011"
    ],
    "sources": [
-    "VS-2026-010:csp_missing"
+    "VS-2026-011:csp_missing"
    ],
    "st": "blau"
   },
@@ -3187,10 +3337,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-011"
+    "VS-2026-012"
    ],
    "sources": [
-    "VS-2026-011:caa_missing"
+    "VS-2026-012:caa_missing"
    ],
    "st": "blau"
   },
@@ -3201,10 +3351,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-012"
+    "VS-2026-013"
    ],
    "sources": [
-    "VS-2026-012:smtp_vrfy_enabled_passive"
+    "VS-2026-013:smtp_vrfy_enabled_passive"
    ],
    "st": "blau"
   },
@@ -3215,10 +3365,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-009"
+    "VS-2026-010"
    ],
    "sources": [
-    "VS-2026-009:mta_sts_missing"
+    "VS-2026-010:mta_sts_missing"
    ],
    "st": "blau"
   },
@@ -3229,10 +3379,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-009"
+    "VS-2026-010"
    ],
    "sources": [
-    "VS-2026-009:tls_rpt_missing"
+    "VS-2026-010:tls_rpt_missing"
    ],
    "st": "blau"
   },
@@ -3243,10 +3393,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-011"
+    "VS-2026-012"
    ],
    "sources": [
-    "VS-2026-011:dnssec_missing"
+    "VS-2026-012:dnssec_missing"
    ],
    "st": "blau"
   }
@@ -3502,6 +3652,7 @@
      "2620:cb:2000::1"
     ],
     "operator": "Webflow, Inc (CDN)",
+    "operator_source": "AbuseIPDB",
     "role": "Website · Plattform webflow.com"
    },
    {
@@ -3511,6 +3662,7 @@
     "ip": "62.217.52.162",
     "more_ips": [],
     "operator": "Berger EDV-Systemberatungs GmbH",
+    "operator_source": "AbuseIPDB",
     "role": "Nicht näher bestimmbar"
    },
    {
@@ -3520,6 +3672,7 @@
     "ip": "62.217.52.166",
     "more_ips": [],
     "operator": "Berger EDV-Systemberatungs GmbH (mail.bergersysteme.com)",
+    "operator_source": "AbuseIPDB",
     "role": "Mail-Webzugang laut Passivquelle, E-Mail-Versand laut SPF"
    },
    {
@@ -3529,6 +3682,7 @@
     "ip": "62.217.52.171",
     "more_ips": [],
     "operator": "Berger EDV-Systemberatungs GmbH",
+    "operator_source": "AbuseIPDB",
     "role": "Nicht näher bestimmbar"
    },
    {
@@ -3538,6 +3692,7 @@
     "ip": "79.140.188.181",
     "more_ips": [],
     "operator": "ecotel communication ag (mail2.bergersysteme.com)",
+    "operator_source": "AbuseIPDB",
     "role": "Nicht näher bestimmbar"
    },
    {
@@ -3549,6 +3704,7 @@
      "2a00:1169:118:23d0::"
     ],
     "operator": "Host Europe GmbH (174.224.205.92.host.secureserver.net)",
+    "operator_source": "AbuseIPDB",
     "role": "Dateiaustausch, Mailabruf und Einlieferung, Weiterleitung auf www.bergersysteme.com · geteiltes System beim Hoster"
    },
    {
@@ -3558,6 +3714,7 @@
     "ip": "40.99.150.120",
     "more_ips": [],
     "operator": "Microsoft Corporation",
+    "operator_source": "",
     "role": "Drittanbieter"
    }
   ],
@@ -3568,7 +3725,7 @@
      "Web-, Header-, TLS- und Dienst-Prüfungen"
     ],
     "code": "unreachable_from_scanner",
-    "detail": "Betroffen: 62.217.52.162 (bstasks.bergersysteme.com, ticket.bergersysteme.com), 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com), 62.217.52.171 (bitwarden.bergersysteme.com). Eine Passivquelle meldet dort Dienste (Hosteintrag der Passivquelle aktualisiert vom 21.09.2026 bis 23.09.2026); der Portscan erhielt keine Antwort. Ergebnisse eigener Messungen liegen nicht vor; VS-2026-004, VS-2026-006 und VS-2026-012 beruhen allein auf der Passivquelle.",
+    "detail": "Betroffen: 62.217.52.162 (bstasks.bergersysteme.com, ticket.bergersysteme.com), 62.217.52.166 (mail.bergersysteme.com, owa.bergersysteme.com), 62.217.52.171 (bitwarden.bergersysteme.com). Eine Passivquelle meldet dort Dienste (Hosteintrag der Passivquelle aktualisiert vom 21.09.2026 bis 23.09.2026); der Portscan erhielt keine Antwort. Ergebnisse eigener Messungen liegen nicht vor; VS-2026-004, VS-2026-006 und VS-2026-013 beruhen allein auf der Passivquelle.",
     "refs": [],
     "subjects": [
      "62.217.52.162",
@@ -3843,7 +4000,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 12 Befunde und 6 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 13 Befunde und 6 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -3861,9 +4018,10 @@
    },
    {
     "l": "Befunde im Bericht",
-    "v": "12"
+    "v": "13"
    }
   ],
+  "operator_header": "Netzbetreiber (laut AbuseIPDB)",
   "out_of_scope": [
    "Interne Netzsegmente, Arbeitsplätze und mobile Geräte hinter der Firewall.",
    "Prüfungen mit Anmeldung (kein Login in Portale oder Verwaltungsoberflächen).",

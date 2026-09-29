@@ -7,7 +7,8 @@ level: mittel
 group_by: fqdn
 scope: http.alerts
 applicable_when: null
-when: zap_match(alert, ZAP_DIRECTORY_LISTING)
+# S6d (A7, spec/11 N2): nur Meldungen an der Zielseite, nicht an Abwehr-, Fehler- oder Nebenseiten.
+when: zap_match(alert, ZAP_DIRECTORY_LISTING) and alert.location == "target"
 positive_when: never
 not_testable_when: []
 undetermined: not_testable

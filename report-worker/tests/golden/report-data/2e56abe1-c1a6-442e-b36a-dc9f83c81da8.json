@@ -31,144 +31,168 @@
   "inventory": [
    {
     "host": "20.79.218.75",
+    "operator": "Microsoft Corporation, laut AbuseIPDB",
     "port": "21",
     "ref": "VS-2026-004",
     "svc": "Wing FTP Server, TLS erzwungen"
    },
    {
     "host": "20.79.218.75",
+    "operator": "",
     "port": "22",
     "ref": "",
     "svc": "FortiSSH"
    },
    {
     "host": "20.79.218.75",
+    "operator": "",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd"
    },
    {
     "host": "20.79.218.75",
+    "operator": "",
     "port": "443",
     "ref": "VS-2026-002, VS-2026-008",
     "svc": "Apache httpd, TLS erzwungen"
    },
    {
     "host": "20.79.218.75",
+    "operator": "",
     "port": "8443",
     "ref": "VS-2026-001",
     "svc": "nicht identifiziert (Port 8443)"
    },
    {
     "host": "213.133.104.51",
+    "operator": "Hetzner Online GmbH, laut AbuseIPDB",
     "port": "21",
     "ref": "VS-2026-005",
     "svc": "ProFTPD, TLS erzwungen"
    },
    {
     "host": "213.133.104.51",
+    "operator": "",
     "port": "22",
     "ref": "",
     "svc": "ProFTPD mod_sftp"
    },
    {
     "host": "213.133.104.51",
+    "operator": "",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd"
    },
    {
     "host": "213.133.104.51",
+    "operator": "",
     "port": "110",
     "ref": "VS-2026-005",
     "svc": "Courier pop3d, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "213.133.104.51",
+    "operator": "",
     "port": "143",
     "ref": "VS-2026-005",
     "svc": "Dovecot imapd, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "213.133.104.51",
+    "operator": "",
     "port": "222",
     "ref": "",
     "svc": "OpenSSH 9.2p1"
    },
    {
     "host": "213.133.104.51",
+    "operator": "",
     "port": "443",
     "ref": "",
     "svc": "Apache httpd, TLS erzwungen"
    },
    {
     "host": "213.133.104.51",
+    "operator": "",
     "port": "465",
     "ref": "",
     "svc": "SMTP über TLS (Exim), TLS erzwungen"
    },
    {
     "host": "213.133.104.51",
+    "operator": "",
     "port": "587",
     "ref": "",
     "svc": "SMTP (Exim), Anmeldung erst nach STARTTLS"
    },
    {
     "host": "213.133.104.51",
+    "operator": "",
     "port": "993",
     "ref": "",
     "svc": "IMAP über TLS, TLS erzwungen"
    },
    {
     "host": "213.133.104.51",
+    "operator": "",
     "port": "995",
     "ref": "",
     "svc": "POP3 über TLS, TLS erzwungen"
    },
    {
     "host": "216.150.1.65",
+    "operator": "Vercel, Inc (CDN), laut AbuseIPDB",
     "port": "80",
     "ref": "",
     "svc": "Vercel"
    },
    {
     "host": "216.150.1.65",
+    "operator": "",
     "port": "443",
     "ref": "",
     "svc": "Vercel, TLS erzwungen, Transportverschlüsselung am Namen gemessen an 216.150.1.129"
    },
    {
     "host": "217.72.203.132",
+    "operator": "IONOS SE, laut AbuseIPDB",
     "port": "80",
     "ref": "",
     "svc": "nginx"
    },
    {
     "host": "217.72.203.132",
+    "operator": "",
     "port": "443",
     "ref": "VS-2026-003",
     "svc": "nginx, TLS erzwungen"
    },
    {
     "host": "20.79.218.75",
+    "operator": "",
     "port": "4433",
     "ref": "",
     "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "213.133.104.51",
+    "operator": "",
     "port": "25",
     "ref": "",
     "svc": "SMTP (Exim), laut Passivquelle"
    },
    {
     "host": "2a01:4f8:d0a:2757::2",
+    "operator": "Hetzner Online GmbH, laut AbuseIPDB",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd, laut Passivquelle"
    },
    {
     "host": "2a01:4f8:d0a:2757::2",
+    "operator": "",
     "port": "443",
     "ref": "",
     "svc": "Apache httpd, laut Passivquelle"
@@ -195,7 +219,7 @@
     "note": "Skript von fremder Domain eingebunden.",
     "rule": "zap#10017",
     "what": "„Cross-Domain JavaScript Source File Inclusion“ (ZAP-Regel 10017), 32 Meldungen",
-    "where": "www.heuel.com"
+    "where": "www.heuel.com/en/freight-inquiry.html"
    },
    {
     "count": 17,
@@ -203,7 +227,7 @@
     "note": "Zeitstempel in der Antwort.",
     "rule": "zap#10096",
     "what": "„Timestamp Disclosure - Unix“ (ZAP-Regel 10096), 17 Meldungen",
-    "where": "online.heuel.com (an der Sicherheitsabfrage), www.heuel.com"
+    "where": "online.heuel.com/transportunternehmen/ (an der Sicherheitsabfrage), www.heuel.com/_res/13e5aa58eb2182d8ace63266856c8cc29c47c083/site.webmanifest"
    },
    {
     "count": 1,
@@ -219,7 +243,7 @@
     "note": "Cookie ohne HttpOnly.",
     "rule": "zap#10010",
     "what": "„Cookie No HttpOnly Flag“ (ZAP-Regel 10010), 1 Meldung",
-    "where": "ose.heuel.com"
+    "where": "ose.heuel.com/webmodule-ee/login.seam"
    },
    {
     "count": 299,
@@ -227,7 +251,7 @@
     "note": "Cookie ohne Secure.",
     "rule": "zap#10011",
     "what": "„Cookie Without Secure Flag“ (ZAP-Regel 10011), 299 Meldungen",
-    "where": "ose.heuel.com, www.heuel.com"
+    "where": "ose.heuel.com/webmodule-ee/login.seam, www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fa..."
    },
    {
     "count": 1,
@@ -235,7 +259,7 @@
     "note": "Cookie ohne SameSite.",
     "rule": "zap#10054",
     "what": "„Cookie without SameSite Attribute“ (ZAP-Regel 10054), 1 Meldung",
-    "where": "ose.heuel.com"
+    "where": "ose.heuel.com/webmodule-ee/login.seam"
    },
    {
     "count": 2,
@@ -243,7 +267,7 @@
     "note": "Freizügige Freigabe für fremde Ursprünge (CORS).",
     "rule": "zap#10098",
     "what": "„Cross-Domain Misconfiguration“ (ZAP-Regel 10098), 2 Meldungen",
-    "where": "ose.heuel.com"
+    "where": "ose.heuel.com/webmodule-ee/"
    },
    {
     "count": 6,
@@ -251,7 +275,7 @@
     "note": "Formular ohne Schutz gegen Anfragefälschung (CSRF).",
     "rule": "zap#10202",
     "what": "„Absence of Anti-CSRF Tokens“ (ZAP-Regel 10202), 6 Meldungen",
-    "where": "ose.heuel.com, www.heuel.com"
+    "where": "ose.heuel.com/webmodule-ee/login.seam, www.heuel.com/en/kontakt-heuel-logistics.html"
    },
    {
     "count": 1,
@@ -259,7 +283,7 @@
     "note": "HSTS nicht gesetzt.",
     "rule": "zap#10035",
     "what": "„Strict-Transport-Security Header Not Set“ (ZAP-Regel 10035), 1 Meldung",
-    "where": "online.heuel.com (an der Sicherheitsabfrage)"
+    "where": "online.heuel.com/transportunternehmen/ (an der Sicherheitsabfrage)"
    },
    {
     "count": 1,
@@ -267,7 +291,7 @@
     "note": "Content-Security-Policy fehlt.",
     "rule": "zap#10038",
     "what": "„Content Security Policy (CSP) Header Not Set“ (ZAP-Regel 10038), 1 Meldung",
-    "where": "online.heuel.com (an der Sicherheitsabfrage)"
+    "where": "online.heuel.com/transportunternehmen/ (an der Sicherheitsabfrage)"
    },
    {
     "count": 1,
@@ -293,7 +317,7 @@
     "note": "Skript von fremder Domain eingebunden.",
     "rule": "info_disclosure#10017",
     "what": "www.heuel.com (Cross-Domain JavaScript Source File Inclusion)",
-    "where": "www.heuel.com"
+    "where": "www.heuel.com/en/freight-inquiry.html"
    },
    {
     "count": 16,
@@ -301,7 +325,7 @@
     "note": "Zeitstempel in der Antwort.",
     "rule": "info_disclosure#10096",
     "what": "www.heuel.com (Timestamp Disclosure - Unix)",
-    "where": "www.heuel.com"
+    "where": "www.heuel.com/_res/13e5aa58eb2182d8ace63266856c8cc29c47c083/site.webmanifest"
    },
    {
     "count": 1,
@@ -317,7 +341,7 @@
     "note": "Cookie ohne HttpOnly.",
     "rule": "web_vulnerability_reported#10010",
     "what": "Cookie No HttpOnly Flag auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz mittel, passiv gemeldet von ZAP)",
-    "where": "ose.heuel.com"
+    "where": "ose.heuel.com/webmodule-ee/login.seam"
    },
    {
     "count": 1,
@@ -325,7 +349,7 @@
     "note": "Cookie ohne Secure.",
     "rule": "web_vulnerability_reported#10011",
     "what": "Cookie Without Secure Flag auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz mittel, passiv gemeldet von ZAP)",
-    "where": "ose.heuel.com"
+    "where": "ose.heuel.com/webmodule-ee/login.seam"
    },
    {
     "count": 1,
@@ -333,7 +357,7 @@
     "note": "Cookie ohne SameSite.",
     "rule": "web_vulnerability_reported#10054",
     "what": "Cookie without SameSite Attribute auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz mittel, passiv gemeldet von ZAP)",
-    "where": "ose.heuel.com"
+    "where": "ose.heuel.com/webmodule-ee/login.seam"
    },
    {
     "count": 2,
@@ -341,7 +365,7 @@
     "note": "Freizügige Freigabe für fremde Ursprünge (CORS).",
     "rule": "web_vulnerability_reported#10098",
     "what": "Cross-Domain Misconfiguration auf ose.heuel.com/webmodule-ee/ (Konfidenz mittel, passiv gemeldet von ZAP)",
-    "where": "ose.heuel.com"
+    "where": "ose.heuel.com/webmodule-ee/"
    },
    {
     "count": 1,
@@ -349,7 +373,7 @@
     "note": "Formular ohne Schutz gegen Anfragefälschung (CSRF).",
     "rule": "web_vulnerability_reported#10202",
     "what": "Absence of Anti-CSRF Tokens auf ose.heuel.com/webmodule-ee/login.seam (Konfidenz niedrig, passiv gemeldet von ZAP)",
-    "where": "ose.heuel.com"
+    "where": "ose.heuel.com/webmodule-ee/login.seam"
    },
    {
     "count": 298,
@@ -357,7 +381,7 @@
     "note": "Cookie ohne Secure.",
     "rule": "web_vulnerability_reported#10011",
     "what": "Cookie Without Secure Flag auf www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fahrplan%20Landverkehre%20Jahreswechsel%2025-26.pdf (Konfidenz mittel, passiv gemeldet von ZAP)",
-    "where": "www.heuel.com"
+    "where": "www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fa..."
    },
    {
     "count": 5,
@@ -365,7 +389,7 @@
     "note": "Formular ohne Schutz gegen Anfragefälschung (CSRF).",
     "rule": "web_vulnerability_reported#10202",
     "what": "Absence of Anti-CSRF Tokens auf www.heuel.com/en/kontakt-heuel-logistics.html (Konfidenz niedrig, passiv gemeldet von ZAP)",
-    "where": "www.heuel.com"
+    "where": "www.heuel.com/en/kontakt-heuel-logistics.html"
    },
    {
     "count": 1,
@@ -373,7 +397,7 @@
     "note": "Zeitstempel in der Antwort.",
     "rule": "info_disclosure#10096",
     "what": "online.heuel.com (Timestamp Disclosure - Unix)",
-    "where": "online.heuel.com (an der Sicherheitsabfrage)"
+    "where": "online.heuel.com/transportunternehmen/ (an der Sicherheitsabfrage)"
    },
    {
     "count": 1,
@@ -381,7 +405,7 @@
     "note": "HSTS nicht gesetzt.",
     "rule": "zap_uncovered#10035",
     "what": "Strict-Transport-Security Header Not Set auf online.heuel.com",
-    "where": "online.heuel.com (an der Sicherheitsabfrage)"
+    "where": "online.heuel.com/transportunternehmen/ (an der Sicherheitsabfrage)"
    },
    {
     "count": 1,
@@ -389,7 +413,7 @@
     "note": "Content-Security-Policy fehlt.",
     "rule": "zap_uncovered#10038",
     "what": "Content Security Policy (CSP) Header Not Set auf online.heuel.com",
-    "where": "online.heuel.com (an der Sicherheitsabfrage)"
+    "where": "online.heuel.com/transportunternehmen/ (an der Sicherheitsabfrage)"
    },
    {
     "count": 1,
@@ -2804,8 +2828,8 @@
  "landscape_lead": "9 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 22,
-  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
-  "catalog_version": "2026-09-27.2",
+  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
+  "catalog_version": "2026-09-29.1",
   "classification": "Vertraulich",
   "consolidated": 9,
   "context_fields": [],
@@ -2816,7 +2840,7 @@
    "heuel.com"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.3.0",
+  "facts_schema_version": "1.4.0",
   "fqdns_total": 11,
   "generated_on": null,
   "generation": null,
@@ -2831,7 +2855,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.2",
+  "policy_version": "2026-09-29.1",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -3319,6 +3343,7 @@
     "ip": "195.225.241.75",
     "more_ips": [],
     "operator": "comtrance service GmbH",
+    "operator_source": "AbuseIPDB",
     "role": "Nicht näher bestimmbar"
    },
    {
@@ -3328,6 +3353,7 @@
     "ip": "20.79.218.75",
     "more_ips": [],
     "operator": "Microsoft Corporation",
+    "operator_source": "AbuseIPDB",
     "role": "Dateiaustausch (FTP, SFTP), Webanwendung mit Anmeldung"
    },
    {
@@ -3339,6 +3365,7 @@
      "2a01:4f8:d0a:2757::2"
     ],
     "operator": "Hetzner Online GmbH (www51.your-server.de)",
+    "operator_source": "AbuseIPDB",
     "role": "Dateiaustausch (FTP, SFTP), Mailabruf und Einlieferung, Weiterleitung auf ose.heuel.com · geteiltes System beim Hoster"
    },
    {
@@ -3350,6 +3377,7 @@
      "216.150.16.65"
     ],
     "operator": "Vercel, Inc (CDN)",
+    "operator_source": "AbuseIPDB",
     "role": "Dienst eines Plattformanbieters (funnelcockpit.com), leitet auf die Website weiter · Plattform funnelcockpit.com"
    },
    {
@@ -3359,6 +3387,7 @@
     "ip": "217.72.203.132",
     "more_ips": [],
     "operator": "IONOS SE (ip217-72-203-132.pbiaas.com)",
+    "operator_source": "AbuseIPDB",
     "role": "Website · geteiltes System beim Hoster"
    },
    {
@@ -3368,6 +3397,7 @@
     "ip": "40.99.150.104",
     "more_ips": [],
     "operator": "Microsoft 365 (laut Namensauflösung und SPF)",
+    "operator_source": "",
     "role": "Drittanbieter"
    }
   ],
@@ -3641,6 +3671,7 @@
     "v": "9"
    }
   ],
+  "operator_header": "Netzbetreiber (laut AbuseIPDB)",
   "out_of_scope": [
    "Interne Netzsegmente, Arbeitsplätze und mobile Geräte hinter der Firewall.",
    "Prüfungen mit Anmeldung (kein Login in Portale oder Verwaltungsoberflächen).",

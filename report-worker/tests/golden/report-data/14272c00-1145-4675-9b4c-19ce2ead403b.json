@@ -261,7 +261,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Korrelation hat 1097 Einzelmeldungen der Werkzeuge erfasst, davon 531 gleiche Meldungen der Webanalyse zusammengeführt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 14 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
+  "filtering": "Die Korrelation hat 1097 Einzelmeldungen der Werkzeuge erfasst, davon 531 gleiche Meldungen der Webanalyse zusammengeführt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 15 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -279,74 +279,86 @@
   "inventory": [
    {
     "host": "88.99.35.112",
+    "operator": "Hetzner Online GmbH, laut AbuseIPDB",
     "port": "21",
-    "ref": "VS-2026-007",
+    "ref": "VS-2026-008",
     "svc": "Pure-FTPd"
    },
    {
     "host": "88.99.35.112",
+    "operator": "",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd 2.4.67"
    },
    {
     "host": "88.99.35.112",
+    "operator": "",
     "port": "110",
     "ref": "VS-2026-002",
     "svc": "Dovecot pop3d, STARTTLS"
    },
    {
     "host": "88.99.35.112",
+    "operator": "",
     "port": "143",
     "ref": "VS-2026-002",
     "svc": "Dovecot imapd, STARTTLS"
    },
    {
     "host": "88.99.35.112",
+    "operator": "",
     "port": "443",
-    "ref": "VS-2026-001, VS-2026-004, VS-2026-006, VS-2026-009, VS-2026-010, VS-2026-013, VS-2026-014",
+    "ref": "VS-2026-001, VS-2026-004, VS-2026-006, VS-2026-010, VS-2026-011, VS-2026-014, VS-2026-015",
     "svc": "Apache httpd 2.4.67, TLS erzwungen"
    },
    {
     "host": "88.99.35.112",
+    "operator": "",
     "port": "465",
-    "ref": "VS-2026-012",
+    "ref": "VS-2026-013",
     "svc": "Postfix smtpd, TLS erzwungen"
    },
    {
     "host": "88.99.35.112",
+    "operator": "",
     "port": "587",
-    "ref": "VS-2026-012",
+    "ref": "VS-2026-007, VS-2026-013",
     "svc": "Postfix smtpd, STARTTLS"
    },
    {
     "host": "88.99.35.112",
+    "operator": "",
     "port": "993",
     "ref": "",
     "svc": "IMAP über TLS (Dovecot), TLS erzwungen"
    },
    {
     "host": "88.99.35.112",
+    "operator": "",
     "port": "995",
     "ref": "",
     "svc": "POP3 über TLS (Dovecot), TLS erzwungen"
    },
    {
     "host": "88.99.35.112",
+    "operator": "",
     "port": "10000",
     "ref": "VS-2026-001",
     "svc": "Webmin (MiniServ), TLS erzwungen"
    },
    {
     "host": "88.99.35.112",
+    "operator": "",
     "port": "30000",
     "ref": "VS-2026-003",
     "svc": "OpenSSH 8.4p1"
    },
    {
     "host": "88.99.35.112",
+    "operator": "",
     "port": "25",
-    "ref": "VS-2026-012",
+    "ref": "VS-2026-007, VS-2026-013",
     "svc": "Postfix smtpd, laut Passivquelle"
    }
   ],
@@ -363,7 +375,7 @@
     "note": "Versionsangabe im Seiteninhalt.",
     "rule": "zap#10009",
     "what": "„In Page Banner Information Leak“ (ZAP-Regel 10009), 34 Meldungen",
-    "where": "dortmund-beach.com"
+    "where": "dortmund-beach.com/wp-admin/css/"
    },
    {
     "count": 15,
@@ -379,7 +391,7 @@
     "note": "Weiterleitung mit ungewöhnlich großem Inhalt.",
     "rule": "zap#10044",
     "what": "„Big Redirect Detected (Potential Sensitive Information Leak)“ (ZAP-Regel 10044), 56 Meldungen",
-    "where": "dortmund-beach.com"
+    "where": "dortmund-beach.com/wp-admin"
    },
    {
     "count": 15,
@@ -411,7 +423,7 @@
     "note": "Cookie ohne HttpOnly.",
     "rule": "zap#10010",
     "what": "„Cookie No HttpOnly Flag“ (ZAP-Regel 10010), 6 Meldungen",
-    "where": "dortmund-beach.com"
+    "where": "dortmund-beach.com/wp-login.php"
    },
    {
     "count": 6,
@@ -419,7 +431,7 @@
     "note": "Cookie ohne SameSite.",
     "rule": "zap#10054",
     "what": "„Cookie without SameSite Attribute“ (ZAP-Regel 10054), 6 Meldungen",
-    "where": "dortmund-beach.com"
+    "where": "dortmund-beach.com/wp-login.php"
    },
    {
     "count": 6,
@@ -427,7 +439,7 @@
     "note": "Formular ohne Schutz gegen Anfragefälschung (CSRF).",
     "rule": "zap#10202",
     "what": "„Absence of Anti-CSRF Tokens“ (ZAP-Regel 10202), 6 Meldungen",
-    "where": "dortmund-beach.com"
+    "where": "dortmund-beach.com/wp-login.php"
    },
    {
     "count": 2,
@@ -435,7 +447,7 @@
     "note": "Pfadmanipulation (Path Traversal); aktive Prüfung, nicht bestätigt, Konfidenz niedrig.",
     "rule": "zap#6",
     "what": "„Path Traversal“ (ZAP-Regel 6), 2 Meldungen",
-    "where": "dortmund-beach.com (an Nebenpfaden wp-json)"
+    "where": "dortmund-beach.com/wp-json/oembed/1.0/embed (an Nebenpfaden wp-json)"
    },
    {
     "count": 1,
@@ -477,7 +489,7 @@
     "note": "Versionsangabe im Seiteninhalt.",
     "rule": "info_disclosure#10009",
     "what": "dortmund-beach.com (In Page Banner Information Leak)",
-    "where": "dortmund-beach.com"
+    "where": "dortmund-beach.com/wp-admin/css/"
    },
    {
     "count": 15,
@@ -493,7 +505,7 @@
     "note": "Weiterleitung mit ungewöhnlich großem Inhalt.",
     "rule": "info_disclosure#10044",
     "what": "dortmund-beach.com (Big Redirect Detected (Potential Sensitive Information Leak))",
-    "where": "dortmund-beach.com"
+    "where": "dortmund-beach.com/wp-admin"
    },
    {
     "count": 15,
@@ -525,7 +537,7 @@
     "note": "Cookie ohne HttpOnly.",
     "rule": "web_vulnerability_reported#10010",
     "what": "Cookie No HttpOnly Flag auf dortmund-beach.com/wp-login.php (Konfidenz mittel, passiv gemeldet von ZAP)",
-    "where": "dortmund-beach.com"
+    "where": "dortmund-beach.com/wp-login.php"
    },
    {
     "count": 6,
@@ -533,7 +545,7 @@
     "note": "Cookie ohne SameSite.",
     "rule": "web_vulnerability_reported#10054",
     "what": "Cookie without SameSite Attribute auf dortmund-beach.com/wp-login.php (Konfidenz mittel, passiv gemeldet von ZAP)",
-    "where": "dortmund-beach.com"
+    "where": "dortmund-beach.com/wp-login.php"
    },
    {
     "count": 6,
@@ -541,7 +553,7 @@
     "note": "Formular ohne Schutz gegen Anfragefälschung (CSRF).",
     "rule": "web_vulnerability_reported#10202",
     "what": "Absence of Anti-CSRF Tokens auf dortmund-beach.com/wp-login.php (Konfidenz niedrig, passiv gemeldet von ZAP)",
-    "where": "dortmund-beach.com"
+    "where": "dortmund-beach.com/wp-login.php"
    },
    {
     "count": 2,
@@ -549,7 +561,7 @@
     "note": "Pfadmanipulation (Path Traversal); aktive Prüfung, nicht bestätigt, Konfidenz niedrig.",
     "rule": "web_vulnerability_reported#6",
     "what": "Path Traversal auf dortmund-beach.com/wp-json/oembed/1.0/embed (Konfidenz niedrig, aktiv gemeldet von ZAP)",
-    "where": "dortmund-beach.com (an Nebenpfaden wp-json)"
+    "where": "dortmund-beach.com/wp-json/oembed/1.0/embed (an Nebenpfaden wp-json)"
    },
    {
     "count": 1,
@@ -662,7 +674,7 @@
  "architecture": {
   "lead": "Die geprüfte Angriffsfläche verteilt sich auf 1 System mit folgenden Aufgaben: Dateiaustausch, Fernzugang und Verwaltung, Mailabruf, Einlieferung und Versand laut SPF, Webanwendung mit Anmeldung und Website. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
-   "Beobachtungen ohne Regeltreffer, nicht als Befund bewertet: Anmeldung vor STARTTLS angeboten (88.99.35.112:25, laut Passivquelle); Anmeldung vor STARTTLS angeboten (88.99.35.112:587); readme.html der WordPress-Installation abrufbar (dortmund-beach.com); wp-cron.php der WordPress-Installation von außen aufrufbar (dortmund-beach.com)."
+   "Beobachtungen ohne Regeltreffer, nicht als Befund bewertet: readme.html der WordPress-Installation abrufbar (dortmund-beach.com); wp-cron.php der WordPress-Installation von außen aufrufbar (dortmund-beach.com)."
   ],
   "posture": [
    {
@@ -927,7 +939,7 @@
      {
       "p": "587",
       "s": "Postfix smtpd",
-      "st": "blau"
+      "st": "gelb"
      },
      {
       "p": "993",
@@ -952,7 +964,7 @@
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "blau"
+      "st": "gelb"
      }
     ]
    }
@@ -1568,7 +1580,7 @@
    "checks": [
     "wordpress_plugin_vulnerable"
    ],
-   "evidence": "wpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: betheme · Version: 27.5.3 · bekannte Schwachstellen laut wpscan: 12 · neueste Version laut wpscan: 28.5.9.1 · fehlerbereinigt ab: 28.5.8 · Betheme | Responsive Multipurpose WordPress & WooCommerce Theme <= 27.5.6 - Authenticated (Contributor+) Stored Cross-Site Scripting via Shortcode (CVE-2024-3998) · Betheme < 27.5.7 - Authenticated (Contributor+) PHP Object Injection (CVE-2024-2694), behoben in 27.5.7 · Betheme | Responsive Multipurpose WordPress & WooCommerce Theme < 27.5.6 - Authenticated (Author+) Stored Cross-Site Scripting via SVG File (CVE-2024-5567), behoben in 27.5.6 · Betheme < 27.6.2 - Authenticated (Contributor+) Stored Cross-Site Scripting via Custom JS (CVE-2025-0450), behoben in 27.6.2 · Betheme < 28.0.4 - Authenticated (Contributor+) Stored Cross-Site Scripting (CVE-2025-3077), behoben in 28.0.4 · Betheme < 28.1.4 - Authenticated (Contributor+) Stored Cross-Site Scripting (CVE-2025-7399), behoben in 28.1.4 · Betheme < 28.1.7 - Authenticated (Contributor+) Stored Cross-Site Scripting via 'page_title' (CVE-2025-9371), behoben in 28.1.7 · Betheme < 28.2.1 - Authenticated (Contributor+) Stored Cross-Site Scripting (CVE-2025-63075), behoben in 28.2.1 · Betheme < 28.4.1 - Authenticated (Contributor+) Arbitrary File Deletion via 'mfn-icon-upload' (CVE-2026-6262), behoben in 28.4.1 · Betheme < 28.4.1 - Authenticated (Author+) Arbitrary File Upload to Remote Code Execution via Icon Pack Upload (CVE-2026-6261), behoben in 28.4.1 · Betheme <= 28.5.7 - Authenticated (Contributor+) Remote Code Execution (CVE-2026-65548), behoben in 28.5.8 · Betheme < 28.4.1 - Authenticated (Contributor+) Stored Cross-Site Scripting via 'icon_box_2' Shortcode (CVE-2026-6178), behoben in 28.4.1\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: burst-statistics · Version: 1.7.1 · bekannte Schwachstellen laut wpscan: 1 · neueste Version laut wpscan: 3.7.0 · fehlerbereinigt ab: 2.0.8 · Burst Statistics < 2.0.8 - Cross-Site Request Forgery (CVE-2025-53193), behoben in 2.0.8\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: complianz-gdpr · Version: 7.1.0 · bekannte Schwachstellen laut wpscan: 6 · neueste Version laut wpscan: 7.5.5 · fehlerbereinigt ab: 7.5.2 · Complianz | GDPR/CCPA Cookie Consent < 7.4.4 - Contributor+ Stored XSS (CVE-2025-11185), behoben in 7.4.4 · Complianz – GDPR/CCPA Cookie Consent < 7.4.5 - Contributor+ Stored XSS via Content Filter (CVE-2026-2389), behoben in 7.4.5 · Complianz < 7.4.6 - Unauthenticated Private Post Content Disclosure (CVE-2026-4019), behoben in 7.4.6 · Complianz – GDPR/CCPA Cookie Consent < 7.5.2 - Admin+ PHP Object Injection (CVE-2026-65497), behoben in 7.5.2 · Complianz – GDPR/CCPA Cookie Consent < 7.5.2 - Author+ Server-Side Request Forgery (CVE-2026-65496), behoben in 7.5.2 · Complianz – GDPR/CCPA Cookie Consent < 7.5.2 - Unauthenticated Sensitive Information Exposure (CVE-2026-65498), behoben in 7.5.2\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: revslider · Version: 6.7.11 · bekannte Schwachstellen laut wpscan: 4 · neueste Version laut wpscan: 6.7.35 · fehlerbereinigt ab: 6.7.38 · Hinweis: Verzeichnis von wpscan veraltet · Slider Revolution < 6.7.14 - Authenticated (Administrator+) Stored Cross-Site Scripting (CVE-2024-37449), behoben in 6.7.14 · Slider Revolution < 6.7.19 - Authenticated (Author+) Stored Cross-Site Scripting via SVG File Upload (CVE-2024-8107), behoben in 6.7.19 · Slider Revolution < 6.7.37 - Authenticated (Contributor+) Arbitrary File Read via 'used_svg' and 'used_images' (CVE-2025-9217), behoben in 6.7.37 · Slider Revolution < 6.7.38 - Contributor+ Arbitrary File Read (CVE-2025-10249), behoben in 6.7.38",
+   "evidence": "wpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: betheme · Version: 27.5.3 · bekannte Schwachstellen laut wpscan: 12 · neueste Version laut wpscan: 28.5.9.1 · fehlerbereinigt ab: 28.5.8 · Betheme | Responsive Multipurpose WordPress & WooCommerce Theme <= 27.5.6 - Authenticated (Contributor+) Stored Cross-Site Scripting via Shortcode (CVE-2024-3998) · Betheme < 27.5.7 - Authenticated (Contributor+) PHP Object Injection (CVE-2024-2694), behoben in 27.5.7 · Betheme | Responsive Multipurpose WordPress & WooCommerce Theme < 27.5.6 - Authenticated (Author+) Stored Cross-Site Scripting via SVG File (CVE-2024-5567), behoben in 27.5.6 · Betheme < 27.6.2 - Authenticated (Contributor+) Stored Cross-Site Scripting via Custom JS (CVE-2025-0450), behoben in 27.6.2 · Betheme < 28.0.4 - Authenticated (Contributor+) Stored Cross-Site Scripting (CVE-2025-3077), behoben in 28.0.4 · Betheme < 28.1.4 - Authenticated (Contributor+) Stored Cross-Site Scripting (CVE-2025-7399), behoben in 28.1.4 · Betheme < 28.1.7 - Authenticated (Contributor+) Stored Cross-Site Scripting via 'page_title' (CVE-2025-9371), behoben in 28.1.7 · Betheme < 28.2.1 - Authenticated (Contributor+) Stored Cross-Site Scripting (CVE-2025-63075), behoben in 28.2.1 · Betheme < 28.4.1 - Authenticated (Contributor+) Arbitrary File Deletion via 'mfn-icon-upload' (CVE-2026-6262), behoben in 28.4.1 · Betheme < 28.4.1 - Authenticated (Author+) Arbitrary File Upload to Remote Code Execution via Icon Pack Upload (CVE-2026-6261), behoben in 28.4.1 · Betheme <= 28.5.7 - Authenticated (Contributor+) Remote Code Execution (CVE-2026-65548), behoben in 28.5.8 · Betheme < 28.4.1 - Authenticated (Contributor+) Stored Cross-Site Scripting via 'icon_box_2' Shortcode (CVE-2026-6178), behoben in 28.4.1 · Schweregrad im Feed nicht angegeben\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: burst-statistics · Version: 1.7.1 · bekannte Schwachstellen laut wpscan: 1 · neueste Version laut wpscan: 3.7.0 · fehlerbereinigt ab: 2.0.8 · Burst Statistics < 2.0.8 - Cross-Site Request Forgery (CVE-2025-53193), behoben in 2.0.8 · Schweregrad im Feed nicht angegeben\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: complianz-gdpr · Version: 7.1.0 · bekannte Schwachstellen laut wpscan: 6 · neueste Version laut wpscan: 7.5.5 · fehlerbereinigt ab: 7.5.2 · Complianz | GDPR/CCPA Cookie Consent < 7.4.4 - Contributor+ Stored XSS (CVE-2025-11185), behoben in 7.4.4 · Complianz – GDPR/CCPA Cookie Consent < 7.4.5 - Contributor+ Stored XSS via Content Filter (CVE-2026-2389), behoben in 7.4.5 · Complianz < 7.4.6 - Unauthenticated Private Post Content Disclosure (CVE-2026-4019), behoben in 7.4.6 · Complianz – GDPR/CCPA Cookie Consent < 7.5.2 - Admin+ PHP Object Injection (CVE-2026-65497), behoben in 7.5.2 · Complianz – GDPR/CCPA Cookie Consent < 7.5.2 - Author+ Server-Side Request Forgery (CVE-2026-65496), behoben in 7.5.2 · Complianz – GDPR/CCPA Cookie Consent < 7.5.2 - Unauthenticated Sensitive Information Exposure (CVE-2026-65498), behoben in 7.5.2 · Schweregrad im Feed nicht angegeben\n\nwpscan · hosts/88.99.35.112/phase2/wpscan.json\n88.99.35.112 · Produkt: revslider · Version: 6.7.11 · bekannte Schwachstellen laut wpscan: 4 · neueste Version laut wpscan: 6.7.35 · fehlerbereinigt ab: 6.7.38 · Hinweis: Verzeichnis von wpscan veraltet · Slider Revolution < 6.7.14 - Authenticated (Administrator+) Stored Cross-Site Scripting (CVE-2024-37449), behoben in 6.7.14 · Slider Revolution < 6.7.19 - Authenticated (Author+) Stored Cross-Site Scripting via SVG File Upload (CVE-2024-8107), behoben in 6.7.19 · Slider Revolution < 6.7.37 - Authenticated (Contributor+) Arbitrary File Read via 'used_svg' and 'used_images' (CVE-2025-9217), behoben in 6.7.37 · Slider Revolution < 6.7.38 - Contributor+ Arbitrary File Read (CVE-2025-10249), behoben in 6.7.38 · Schweregrad im Feed nicht angegeben",
    "found": "Auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) sind WordPress-Erweiterungen mit bekannten Schwachstellen im Einsatz: 88.99.35.112: BeTheme 27.5.3 (laut wpscan bekannte Schwachstellen: 12), 88.99.35.112: Burst Statistics 1.7.1 (laut wpscan bekannte Schwachstellen: 1), 88.99.35.112: Complianz 7.1.0 (laut wpscan bekannte Schwachstellen: 6), 88.99.35.112: Slider Revolution 6.7.11 (laut wpscan bekannte Schwachstellen: 4).",
    "id": "VS-2026-004",
    "impact": "Bekannte Schwachstellen in Plugins oder Themes sind öffentlich dokumentiert und lassen sich ohne Zugriff auf den Server nachvollziehen. Eine veraltete Erweiterung bleibt so lange angreifbar, bis die fehlerbereinigte Version eingespielt ist.",
@@ -2204,6 +2216,115 @@
    "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein max-age über null, empfohlen mindestens ein Jahr. HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird X-Frame-Options oder frame-ancestors in der Content-Security-Policy. Erwartet wird X-Content-Type-Options mit dem Wert nosniff. Erwartet wird eine Referrer-Policy. Erwartet wird eine Permissions-Policy."
   },
   {
+   "affected": "88.99.35.112:587 (Submission), 88.99.35.112:25 (laut Passivquelle, Hosteintrag aktualisiert am 17.09.2026)",
+   "cat": "E",
+   "checks": [
+    "smtp_auth_before_starttls",
+    "smtp_auth_before_starttls_passive"
+   ],
+   "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:587/tcp · Dienst: smtp · Produkt: Postfix smtpd · STARTTLS: ja · Anmeldeverfahren: LOGIN, PLAIN · AUTH vor STARTTLS: laut Portscan · Zertifikat für: vsrv2.spacekoeln.de · Aussteller: YR1 · gültig bis: 30.10.2026, 21:10 UTC · SMTP-Befehle: vsrv2.spacekoeln.de, PIPELINING, SIZE 52428800, VRFY, ETRN, STARTTLS, AUTH PLAIN LOGIN, AUTH=PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, CHUNKING\n\nShodan · phase0a/shodan_hosts.json\nQuelle: shodan · 88.99.35.112:25 · Produkt: Postfix smtpd · VRFY in der EHLO-Antwort: ja · AUTH vor STARTTLS in der EHLO-Antwort: ja · Banner (Auszug): 220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-STARTTLS 250-AUTH PLAIN",
+   "found": "Der Mailserver auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet die Anmeldung (AUTH) schon vor STARTTLS an: 88.99.35.112:587 (Submission) und laut Passivquelle 88.99.35.112:25 (Hosteintrag aktualisiert am 17.09.2026, vom Prüfstand aus nicht prüfbar).",
+   "id": "VS-2026-007",
+   "impact": "Nimmt ein Mailprogramm das Angebot an, bevor die Verbindung verschlüsselt ist, könnten Zugangsdaten unverschlüsselt übertragen werden.",
+   "key": "smtp_auth/88.99.35.112/kunde",
+   "level": "mittel",
+   "level_label": "mittel",
+   "missing_headers": [],
+   "operator": "",
+   "operator_note": "",
+   "plan_action": "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen).",
+   "plan_effect": "Verhindert, dass Zugangsdaten unverschlüsselt übertragen werden",
+   "plan_items": [
+    {
+     "action": "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen).",
+     "check": "smtp_auth_before_starttls",
+     "detail": "",
+     "effect": "Verhindert, dass Zugangsdaten unverschlüsselt übertragen werden",
+     "lever": "Anmeldung am Mailserver erst nach STARTTLS anbieten",
+     "per_rule": false,
+     "stage": "mittelfristig"
+    }
+   ],
+   "plan_lever": "Anmeldung am Mailserver erst nach STARTTLS anbieten",
+   "plan_stage": "mittelfristig",
+   "policy": "smtp_auth_before_starttls, smtp_auth_before_starttls_passive",
+   "provenance": [
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "title",
+     "members": [
+      "88.99.35.112|88.99.35.112:587"
+     ],
+     "statement": "short",
+     "text": "AUTH vor STARTTLS angeboten auf 587 und laut Passivquelle 25"
+    },
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "observation",
+     "members": [
+      "88.99.35.112|88.99.35.112:587"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Mailserver auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet die Anmeldung (AUTH) schon vor STARTTLS an: 88.99.35.112:587 (Submission) und laut Passivquelle 88.99.35.112:25 (Hosteintrag aktualisiert am 17.09.2026, vom Prüfstand aus nicht prüfbar)."
+    },
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "meaning",
+     "members": [
+      "88.99.35.112|88.99.35.112:587"
+     ],
+     "statement": "meaning[0]",
+     "text": "Nimmt ein Mailprogramm das Angebot an, bevor die Verbindung verschlüsselt ist, könnten Zugangsdaten unverschlüsselt übertragen werden."
+    },
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "verify",
+     "members": [
+      "88.99.35.112|88.99.35.112:587"
+     ],
+     "statement": "verify[0]",
+     "text": "Verbindung zum genannten Port aufbauen und EHLO senden; erwartet wird eine Antwort, die AUTH erst nach STARTTLS nennt."
+    },
+    {
+     "check": "smtp_auth_before_starttls_passive",
+     "field": "observation_zusatz",
+     "members": [
+      "88.99.35.112|shodan:88.99.35.112:25"
+     ],
+     "statement": "observation[0]",
+     "text": "und laut Passivquelle 88.99.35.112:25 (Hosteintrag aktualisiert am 17.09.2026, vom Prüfstand aus nicht prüfbar)"
+    },
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "recommendation",
+     "members": [
+      "88.99.35.112|88.99.35.112:587"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen)."
+    }
+   ],
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen)."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (nmap), passiv (Shodan)",
+   "status": "gelb",
+   "subjects": [
+    "smtp_auth_before_starttls_passive|88.99.35.112",
+    "smtp_auth_before_starttls_passive|shodan:88.99.35.112:25",
+    "smtp_auth_before_starttls|88.99.35.112",
+    "smtp_auth_before_starttls|88.99.35.112:587"
+   ],
+   "threat": null,
+   "title": "Mailserver auf 88.99.35.112: AUTH vor STARTTLS angeboten auf 587 und laut Passivquelle 25",
+   "urgency": "Mittelfristig",
+   "verify": "Verbindung zum genannten Port aufbauen und EHLO senden; erwartet wird eine Antwort, die AUTH erst nach STARTTLS nennt."
+  },
+  {
    "affected": "88.99.35.112:21 (FTP)",
    "cat": "A",
    "checks": [
@@ -2211,7 +2332,7 @@
    ],
    "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:21/tcp · Dienst: ftp · Produkt: Pure-FTPd · Zertifikat für: vsrv2.spacekoeln.de · Aussteller: YR1 · gültig bis: 30.10.2026, 21:10 UTC",
    "found": "Der Host 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet ein älteres Übertragungsprotokoll an: 88.99.35.112:21 (FTP). Ob dort eine Anmeldung ohne Transportverschlüsselung abgelehnt wird, ließ sich von außen nicht feststellen: 88.99.35.112:21 (FTP).",
-   "id": "VS-2026-007",
+   "id": "VS-2026-008",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Servers, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "key": "legacy_protocols_present/scan/kunde",
    "level": "niedrig",
@@ -2340,7 +2461,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0/dns_records.json\ndortmund-beach.com · MX-Einträge: mail1.spacekoelnsrv1.de, out\n\nDNS-Abfragen · phase0a/dns_security.json\ndortmund-beach.com · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
    "found": "Für dortmund-beach.com ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain dortmund-beach.com fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten. Für dortmund-beach.com ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain dortmund-beach.com fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können.",
-   "id": "VS-2026-008",
+   "id": "VS-2026-009",
    "impact": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen. Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.",
    "key": "mail_transport_enforcement/dortmund-beach.com/kunde",
    "level": "niedrig",
@@ -2495,7 +2616,7 @@
    ],
    "evidence": "testssl.sh\ndortmund-beach.com:443 · Protokolle: TLS 1.2",
    "found": "Der Dienst dortmund-beach.com (+www.dortmund-beach.com) bietet TLS 1.2 an, jedoch keine Unterstützung für TLS 1.3: dortmund-beach.com:443.",
-   "id": "VS-2026-009",
+   "id": "VS-2026-010",
    "impact": "TLS 1.3 vereinfacht den Verbindungsaufbau, entfernt veraltete Verschlüsselungsoptionen und verkleinert die Angriffsfläche gegenüber älteren Protokollversionen. Ohne TLS 1.3 bleibt der Dienst auf den größeren Funktionsumfang von TLS 1.2 angewiesen.",
    "key": "tls_hardening/88.99.35.112/kunde",
    "level": "niedrig",
@@ -2592,7 +2713,7 @@
    ],
    "evidence": "header_check\ndortmund-beach.com · Adresse: https://dortmund-beach.com · Antwort: 200 · Server: Apache/2.4.67 (Debian)",
    "found": "Die Webantwort von dortmund-beach.com nennt in ihren Antwortheadern die Version der eingesetzten Serversoftware: dortmund-beach.com (Server: Apache/2.4.67 (Debian)).",
-   "id": "VS-2026-010",
+   "id": "VS-2026-011",
    "impact": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs.",
    "key": "banner_disclosure/scan/kunde",
    "level": "niedrig",
@@ -2694,7 +2815,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0a/dns_security.json\ndortmund-beach.com · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
    "found": "Für dortmund-beach.com ist kein CAA-Eintrag veröffentlicht. Für die Domain dortmund-beach.com legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen. Für dortmund-beach.com ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain dortmund-beach.com lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
-   "id": "VS-2026-011",
+   "id": "VS-2026-012",
    "impact": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf. Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
    "key": "dns_hygiene/dortmund-beach.com/kunde",
    "level": "niedrig",
@@ -2848,9 +2969,9 @@
     "smtp_vrfy_enabled",
     "smtp_vrfy_enabled_passive"
    ],
-   "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:465/tcp · Dienst: smtp · Produkt: Postfix smtpd · TLS erzwungen: ja · STARTTLS: nein · Anmeldeverfahren: LOGIN, PLAIN · VRFY in der EHLO-Liste: ja · Zertifikat für: vsrv2.spacekoeln.de · Aussteller: YR1 · gültig bis: 30.10.2026, 21:10 UTC · SMTP-Befehle: vsrv2.spacekoeln.de, PIPELINING, SIZE 52428800, VRFY, ETRN, AUTH PLAIN LOGIN, AUTH=PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, CHUNKING\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:587/tcp · Dienst: smtp · Produkt: Postfix smtpd · STARTTLS: ja · Anmeldeverfahren: LOGIN, PLAIN · VRFY in der EHLO-Liste: ja · Zertifikat für: vsrv2.spacekoeln.de · Aussteller: YR1 · gültig bis: 30.10.2026, 21:10 UTC · SMTP-Befehle: vsrv2.spacekoeln.de, PIPELINING, SIZE 52428800, VRFY, ETRN, STARTTLS, AUTH PLAIN LOGIN, AUTH=PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, CHUNKING\n\nShodan · phase0a/shodan_hosts.json\nQuelle: shodan · 88.99.35.112:25 · Produkt: Postfix smtpd · VRFY in der EHLO-Antwort: ja · Banner (Auszug): 220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-STARTTLS 250-AUTH PLAIN",
+   "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:465/tcp · Dienst: smtp · Produkt: Postfix smtpd · TLS erzwungen: ja · STARTTLS: nein · Anmeldeverfahren: LOGIN, PLAIN · VRFY in der EHLO-Liste: ja · Zertifikat für: vsrv2.spacekoeln.de · Aussteller: YR1 · gültig bis: 30.10.2026, 21:10 UTC · SMTP-Befehle: vsrv2.spacekoeln.de, PIPELINING, SIZE 52428800, VRFY, ETRN, AUTH PLAIN LOGIN, AUTH=PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, CHUNKING\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:587/tcp · Dienst: smtp · Produkt: Postfix smtpd · STARTTLS: ja · Anmeldeverfahren: LOGIN, PLAIN · VRFY in der EHLO-Liste: ja · Zertifikat für: vsrv2.spacekoeln.de · Aussteller: YR1 · gültig bis: 30.10.2026, 21:10 UTC · SMTP-Befehle: vsrv2.spacekoeln.de, PIPELINING, SIZE 52428800, VRFY, ETRN, STARTTLS, AUTH PLAIN LOGIN, AUTH=PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, CHUNKING\n\nShodan · phase0a/shodan_hosts.json\nQuelle: shodan · 88.99.35.112:25 · Produkt: Postfix smtpd · VRFY in der EHLO-Antwort: ja · AUTH vor STARTTLS in der EHLO-Antwort: ja · Banner (Auszug): 220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-STARTTLS 250-AUTH PLAIN",
    "found": "Der Mailserver auf 88.99.35.112 (dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) nennt den Befehl VRFY in seiner Antwort auf EHLO: 88.99.35.112:465 (SMTPS), 88.99.35.112:587 (Submission) und laut Passivquelle 88.99.35.112:25 (Hosteintrag aktualisiert am 17.09.2026, vom Prüfstand aus nicht prüfbar). Ob er Anfragen zu Postfachnamen beantwortet, hat der Scan nicht geprüft.",
-   "id": "VS-2026-012",
+   "id": "VS-2026-013",
    "impact": "Beantwortet der Mailserver VRFY, lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte Phishing-Mails und Rateangriffe auf Zugangsdaten.",
    "key": "smtp_commands/88.99.35.112/kunde",
    "level": "niedrig",
@@ -2964,7 +3085,7 @@
    ],
    "evidence": "wpscan\ndortmund-beach.com · Anmeldenamen: 1 (Namen in den Rohdaten) · gefunden über: https://dortmund-beach.com/wp-json/oembed/1.0/embed",
    "found": "Auf dortmund-beach.com lassen sich über WordPress-Schnittstellen gültige Benutzernamen ermitteln: dortmund-beach.com (1 Anmeldename, gefunden über https://dortmund-beach.com/wp-json/oembed/1.0/embed).",
-   "id": "VS-2026-013",
+   "id": "VS-2026-014",
    "impact": "Bekannte Benutzernamen erleichtern Passwort-Rateangriffe und gezieltes Phishing, weil ein Angreifer sich nicht mehr auf Vermutungen verlassen muss, sondern echte Anmeldenamen kennt.",
    "key": "wordpress_user_enumeration/scan/kunde",
    "level": "niedrig",
@@ -3078,7 +3199,7 @@
    ],
    "evidence": "wpscan\ndortmund-beach.com · XML-RPC: https://dortmund-beach.com/xmlrpc.php · belegt durch: direkter Abruf der Adresse",
    "found": "Auf dortmund-beach.com ist die XML-RPC-Schnittstelle von WordPress aus dem Internet erreichbar: dortmund-beach.com.",
-   "id": "VS-2026-014",
+   "id": "VS-2026-015",
    "impact": "Über XML-RPC lassen sich viele Anmeldeversuche in einer einzigen Anfrage bündeln; Sperren gegen wiederholte Fehlversuche auf der Anmeldeseite greifen dort oft nicht. Zusammen mit bekannten Benutzernamen erleichtert das Rateangriffe auf Zugangsdaten.",
    "key": "wordpress_xmlrpc_enabled/scan/kunde",
    "level": "niedrig",
@@ -3204,10 +3325,10 @@
    },
    {
     "key": "E",
-    "level": 1,
+    "level": 2,
     "name": "Konfiguration und Informations-Hygiene",
-    "note": "Versionsangaben in den Antworten der Dienste: Versions- oder Servername im HTTP-Header; DNS-Absicherung für dortmund-beach.com: kein CAA-Eintrag und keine DNSSEC-Signatur",
-    "status": "blau"
+    "note": "Mailserver auf 88.99.35.112: AUTH vor STARTTLS angeboten auf 587 und laut Passivquelle 25; Versionsangaben in den Antworten der Dienste: Versions- oder Servername im HTTP-Header",
+    "status": "gelb"
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von dortmund-beach.com am 18.09.2026: 3 Hostnamen auf 1 IP-Adresse. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
@@ -3242,13 +3363,13 @@
   "overall_status": "rot",
   "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
- "landscape_lead": "14 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "15 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 23,
-  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
-  "catalog_version": "2026-09-27.2",
+  "after_fp": 25,
+  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
+  "catalog_version": "2026-09-29.1",
   "classification": "Vertraulich",
-  "consolidated": 14,
+  "consolidated": 15,
   "context_fields": [],
   "context_sources": {},
   "customer": "Auftraggeber",
@@ -3257,7 +3378,7 @@
    "dortmund-beach.com"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.3.0",
+  "facts_schema_version": "1.4.0",
   "fqdns_total": 3,
   "generated_on": null,
   "generation": null,
@@ -3272,7 +3393,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.2",
+  "policy_version": "2026-09-29.1",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -3417,16 +3538,30 @@
    "st": "gelb"
   },
   {
-   "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
-   "effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
-   "lever": "Nicht benötigte Altprotokolle abschalten",
+   "action": "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen).",
+   "effect": "Verhindert, dass Zugangsdaten unverschlüsselt übertragen werden",
+   "lever": "Anmeldung am Mailserver erst nach STARTTLS anbieten",
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-007"
    ],
    "sources": [
-    "VS-2026-007:legacy_protocols_present"
+    "VS-2026-007:smtp_auth_before_starttls"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
+   "effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
+   "lever": "Nicht benötigte Altprotokolle abschalten",
+   "operator": "",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-008"
+   ],
+   "sources": [
+    "VS-2026-008:legacy_protocols_present"
    ],
    "st": "blau"
   },
@@ -3437,10 +3572,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-010"
+    "VS-2026-011"
    ],
    "sources": [
-    "VS-2026-010:http_header_disclosure"
+    "VS-2026-011:http_header_disclosure"
    ],
    "st": "blau"
   },
@@ -3451,10 +3586,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-011"
+    "VS-2026-012"
    ],
    "sources": [
-    "VS-2026-011:caa_missing"
+    "VS-2026-012:caa_missing"
    ],
    "st": "blau"
   },
@@ -3465,10 +3600,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-012"
+    "VS-2026-013"
    ],
    "sources": [
-    "VS-2026-012:smtp_vrfy_enabled"
+    "VS-2026-013:smtp_vrfy_enabled"
    ],
    "st": "blau"
   },
@@ -3479,10 +3614,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-013"
+    "VS-2026-014"
    ],
    "sources": [
-    "VS-2026-013:wordpress_user_enumeration"
+    "VS-2026-014:wordpress_user_enumeration"
    ],
    "st": "blau"
   },
@@ -3493,10 +3628,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-014"
+    "VS-2026-015"
    ],
    "sources": [
-    "VS-2026-014:wordpress_xmlrpc_enabled"
+    "VS-2026-015:wordpress_xmlrpc_enabled"
    ],
    "st": "blau"
   },
@@ -3507,10 +3642,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-008"
+    "VS-2026-009"
    ],
    "sources": [
-    "VS-2026-008:mta_sts_missing"
+    "VS-2026-009:mta_sts_missing"
    ],
    "st": "blau"
   },
@@ -3521,10 +3656,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-008"
+    "VS-2026-009"
    ],
    "sources": [
-    "VS-2026-008:tls_rpt_missing"
+    "VS-2026-009:tls_rpt_missing"
    ],
    "st": "blau"
   },
@@ -3535,10 +3670,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-009"
+    "VS-2026-010"
    ],
    "sources": [
-    "VS-2026-009:tls_no_13"
+    "VS-2026-010:tls_no_13"
    ],
    "st": "blau"
   },
@@ -3549,10 +3684,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-011"
+    "VS-2026-012"
    ],
    "sources": [
-    "VS-2026-011:dnssec_missing"
+    "VS-2026-012:dnssec_missing"
    ],
    "st": "blau"
   }
@@ -3749,6 +3884,7 @@
     "ip": "88.99.35.112",
     "more_ips": [],
     "operator": "Hetzner Online GmbH (vsrv2.spacekoeln.de)",
+    "operator_source": "AbuseIPDB",
     "role": "Fernzugang und Verwaltung, Dateiaustausch, Mailabruf, Einlieferung und Versand laut SPF, Website, Webanwendung mit Anmeldung"
    }
   ],
@@ -3890,7 +4026,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 14 Befunde und 5 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 15 Befunde und 5 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -3908,9 +4044,10 @@
    },
    {
     "l": "Befunde im Bericht",
-    "v": "14"
+    "v": "15"
    }
   ],
+  "operator_header": "Netzbetreiber (laut AbuseIPDB)",
   "out_of_scope": [
    "Interne Netzsegmente, Arbeitsplätze und mobile Geräte hinter der Firewall.",
    "Prüfungen mit Anmeldung (kein Login in Portale oder Verwaltungsoberflächen).",

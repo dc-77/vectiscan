@@ -1,0 +1,69 @@
+id: smtp_auth_before_starttls_passive
+title: Mailserver bietet die Anmeldung vor STARTTLS an laut Passivquelle
+family: smtp_auth_cleartext
+category: E
+# S6d (A4, Entscheidung DC 29.09.): wie die aktive Pruefung Gelb, Mittelfristig; vom Pruefstand
+# aus nicht bestaetigt (Port 25 nach E5), deshalb mit Pruefschritt. Auf nicht erreichbaren Hosts
+# ein blauer Hinweis (E22).
+scale: hygiene
+level: mittel
+group_by: host
+scope: passive
+applicable_when: null
+item_when: null
+when: passive.source == "shodan" and passive.verified is not True and passive.details["smtp_auth_before_starttls"] is True
+hint_when: host.reach is not None and host.reach.status in ["unreachable_from_scanner", "no_response"]
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [shodan]
+kind: check
+bundle: smtp_auth
+affected_template: "{host_ip}:{port} (laut Passivquelle, {seen_text})"
+evidence: [passive]
+references: [CWE-319, CWE-523]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: S6d (A4)
+  start_level: mittel
+  deviation: null
+texts:
+  short: "AUTH vor STARTTLS angeboten laut Passivquelle"
+  plan:
+    lever: "Anmeldung am Mailserver erst nach STARTTLS anbieten"
+    effect: "Verhindert, dass Zugangsdaten unverschlüsselt übertragen werden"
+  observation:
+    - text: >-
+        Laut Passivquelle bietet der Mailserver auf {group} die Anmeldung (AUTH) schon vor
+        STARTTLS an: {affected}.
+    - when: host.reach is not None and host.reach.status in ["unreachable_from_scanner", "no_response"]
+      quantor: eines
+      text: >-
+        Der Host ist vom Prüfstand aus nicht erreichbar; die Angabe der Passivquelle ist deshalb
+        nicht bestätigt.
+    - when: (host.reach is None or host.reach.status not in ["unreachable_from_scanner", "no_response"]) and passive.port == 25
+      quantor: eines
+      text: >-
+        Port 25 ist vom Prüfstand aus nicht prüfbar; die Angabe der Passivquelle ist deshalb nicht
+        bestätigt.
+    - when: (host.reach is None or host.reach.status not in ["unreachable_from_scanner", "no_response"]) and passive.port != 25
+      quantor: eines
+      text: >-
+        Der Portscan hat den Port nicht bestätigt.
+  meaning: >-
+    Nimmt ein Mailprogramm das Angebot an, bevor die Verbindung verschlüsselt ist, könnten
+    Zugangsdaten unverschlüsselt übertragen werden.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Prüfen, ob der Mailserver AUTH vor STARTTLS anbietet, und die Anmeldung gegebenenfalls erst
+        nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur
+        für verschlüsselte Verbindungen).
+  verify: >-
+    Verbindung zum genannten Port aufbauen und EHLO senden; erwartet wird eine Antwort, die AUTH
+    erst nach STARTTLS nennt.

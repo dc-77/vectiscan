@@ -13,7 +13,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Korrelation hat 49 Einzelmeldungen der Werkzeuge erfasst. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 18 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
+  "filtering": "Die Korrelation hat 49 Einzelmeldungen der Werkzeuge erfasst. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 20 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -31,186 +31,217 @@
   "inventory": [
    {
     "host": "212.227.60.78",
+    "operator": "IONOS SE, laut AbuseIPDB",
     "port": "21",
-    "ref": "VS-2026-010",
+    "ref": "VS-2026-012",
     "svc": "ProFTPD, TLS erzwungen"
    },
    {
     "host": "212.227.60.78",
+    "operator": "",
     "port": "22",
     "ref": "",
     "svc": "OpenSSH 9.6p1"
    },
    {
     "host": "212.227.60.78",
+    "operator": "",
     "port": "25",
-    "ref": "",
+    "ref": "VS-2026-010",
     "svc": "Postfix smtpd, STARTTLS"
    },
    {
     "host": "212.227.60.78",
+    "operator": "",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd"
    },
    {
     "host": "212.227.60.78",
+    "operator": "",
     "port": "106",
     "ref": "",
     "svc": "Dienst ohne Antwort"
    },
    {
     "host": "212.227.60.78",
+    "operator": "",
     "port": "110",
     "ref": "VS-2026-002",
     "svc": "Dovecot pop3d, STARTTLS"
    },
    {
     "host": "212.227.60.78",
+    "operator": "",
     "port": "143",
     "ref": "VS-2026-002",
     "svc": "Dovecot imapd, STARTTLS"
    },
    {
     "host": "212.227.60.78",
+    "operator": "",
     "port": "443",
-    "ref": "VS-2026-004, VS-2026-014",
+    "ref": "VS-2026-004, VS-2026-016",
     "svc": "Apache httpd, TLS erzwungen"
    },
    {
     "host": "212.227.60.78",
+    "operator": "",
     "port": "465",
     "ref": "",
     "svc": "Postfix smtpd, TLS erzwungen"
    },
    {
     "host": "212.227.60.78",
+    "operator": "",
     "port": "993",
     "ref": "",
     "svc": "Dovecot imapd, TLS erzwungen"
    },
    {
     "host": "212.227.60.78",
+    "operator": "",
     "port": "995",
     "ref": "",
     "svc": "Dovecot pop3d, TLS erzwungen"
    },
    {
     "host": "212.227.60.78",
+    "operator": "",
     "port": "8443",
     "ref": "VS-2026-001",
     "svc": "sw-cp-server, TLS erzwungen"
    },
    {
     "host": "51.116.154.224",
+    "operator": "Microsoft Limited, laut AbuseIPDB",
     "port": "80",
     "ref": "",
     "svc": "Titel „Microsoft Azure Web App - Error 404“"
    },
    {
     "host": "51.116.154.224",
+    "operator": "",
     "port": "443",
-    "ref": "VS-2026-015",
+    "ref": "VS-2026-017",
     "svc": "Titel „Microsoft Azure Web App - Error 404“, TLS erzwungen"
    },
    {
     "host": "85.22.47.38",
+    "operator": "Securess Versicherungsmakler GmbH, laut AbuseIPDB",
     "port": "25",
     "ref": "",
     "svc": "SMTP, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "85.22.47.38",
+    "operator": "",
     "port": "443",
     "ref": "VS-2026-006, VS-2026-007",
     "svc": "Apache httpd, TLS erzwungen"
    },
    {
     "host": "85.22.47.39",
+    "operator": "Securess Versicherungsmakler GmbH, laut AbuseIPDB",
     "port": "25",
-    "ref": "VS-2026-018",
+    "ref": "VS-2026-020",
     "svc": "Postfix smtpd, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "85.22.47.39",
+    "operator": "",
     "port": "443",
-    "ref": "VS-2026-008, VS-2026-016",
+    "ref": "VS-2026-008, VS-2026-018",
     "svc": "Apache httpd 2.4.67, TLS erzwungen"
    },
    {
     "host": "85.22.47.39",
+    "operator": "",
     "port": "465",
     "ref": "",
     "svc": "SMTP über TLS, TLS erzwungen"
    },
    {
     "host": "85.22.47.39",
+    "operator": "",
     "port": "587",
-    "ref": "",
+    "ref": "VS-2026-011",
     "svc": "SMTP, STARTTLS"
    },
    {
     "host": "85.22.47.39",
+    "operator": "",
     "port": "993",
     "ref": "",
     "svc": "Dovecot imapd, TLS erzwungen"
    },
    {
     "host": "85.22.47.41",
+    "operator": "Securess Versicherungsmakler GmbH, laut AbuseIPDB",
     "port": "22",
     "ref": "",
     "svc": "OpenSSH 9.2p1"
    },
    {
     "host": "85.22.47.41",
+    "operator": "",
     "port": "80",
     "ref": "VS-2026-003",
     "svc": "nginx 1.22.1"
    },
    {
     "host": "85.22.47.41",
+    "operator": "",
     "port": "443",
-    "ref": "VS-2026-003, VS-2026-009, VS-2026-016",
+    "ref": "VS-2026-003, VS-2026-009, VS-2026-018",
     "svc": "nginx 1.22.1, TLS erzwungen"
    },
    {
     "host": "85.22.47.46",
+    "operator": "Securess Versicherungsmakler GmbH, laut AbuseIPDB",
     "port": "443",
     "ref": "VS-2026-005",
     "svc": "Microsoft HTTPAPI httpd 2.0, TLS erzwungen"
    },
    {
     "host": "212.227.60.78",
+    "operator": "",
     "port": "8880",
     "ref": "VS-2026-001",
     "svc": "Plesk, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "212.227.60.78",
+    "operator": "",
     "port": "18018",
     "ref": "",
     "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "85.22.47.42",
+    "operator": "Securess Versicherungsmakler GmbH, laut AbuseIPDB",
     "port": "80",
     "ref": "",
     "svc": "HTTP, laut Passivquelle"
    },
    {
     "host": "85.22.47.42",
+    "operator": "",
     "port": "443",
     "ref": "",
     "svc": "HTTPS, laut Passivquelle"
    },
    {
     "host": "85.22.47.42",
+    "operator": "",
     "port": "5060",
     "ref": "",
     "svc": "STARFACE PBX, laut Passivquelle"
    },
    {
     "host": "85.22.47.43",
+    "operator": "Securess Versicherungsmakler GmbH, laut AbuseIPDB",
     "port": "443",
     "ref": "",
     "svc": "Outlook Web App, laut Passivquelle"
@@ -551,7 +582,7 @@
  "architecture": {
   "lead": "Die geprüfte Angriffsfläche verteilt sich auf 12 Systeme mit folgenden Aufgaben: Dateiaustausch, E-Mail-Server, E-Mail-Versand laut SPF, Fernzugang und Verwaltung, Mailabruf und Einlieferung und Webanwendung mit Anmeldung. Die Tabellen dieses Kapitels zeigen je Adresse die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
-   "Beobachtungen ohne Regeltreffer, nicht als Befund bewertet: 212.227.60.78:18018 laut Passivquelle, außerhalb des geprüften Portbereichs; 85.22.47.42:443 laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.42:5060 (STARFACE PBX) laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.42:80 laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.43:443 (Outlook Web App) laut Passivquelle, vom Portscan nicht bestätigt; Anmeldung vor STARTTLS angeboten (212.227.60.78:25); Anmeldung vor STARTTLS angeboten (85.22.47.39:587)."
+   "Beobachtungen ohne Regeltreffer, nicht als Befund bewertet: 212.227.60.78:18018 laut Passivquelle, außerhalb des geprüften Portbereichs; 85.22.47.42:443 laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.42:5060 (STARFACE PBX) laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.42:80 laut Passivquelle, vom Portscan nicht bestätigt; 85.22.47.43:443 (Outlook Web App) laut Passivquelle, vom Portscan nicht bestätigt."
   ],
   "posture": [
    {
@@ -1366,7 +1397,7 @@
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "gruen"
+      "st": "gelb"
      },
      {
       "p": "80",
@@ -1479,7 +1510,7 @@
      {
       "p": "587",
       "s": "SMTP",
-      "st": "gruen"
+      "st": "gelb"
      },
      {
       "p": "993",
@@ -3932,6 +3963,200 @@
    "verify": "HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header Strict-Transport-Security. HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header Content-Security-Policy mit einer Regel für Skriptquellen. HTTP-Antwortheader der Endseite von außen abrufen. Erwartet wird X-Frame-Options oder frame-ancestors in der Content-Security-Policy. Erwartet wird X-Content-Type-Options mit dem Wert nosniff. Erwartet wird eine Referrer-Policy. Erwartet wird eine Permissions-Policy."
   },
   {
+   "affected": "212.227.60.78:25 (SMTP)",
+   "cat": "E",
+   "checks": [
+    "smtp_auth_before_starttls"
+   ],
+   "evidence": "nmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:25/tcp · Dienst: smtp · Produkt: Postfix smtpd · STARTTLS: ja · Anmeldeverfahren: CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN · AUTH vor STARTTLS: laut Portscan · Zertifikat für: cool-khorana.212-227-60-78.plesk.page · Aussteller: YR2 · gültig bis: 14.10.2026, 12:16 UTC · SMTP-Befehle: cool-khorana.212-227-60-78.plesk.page, PIPELINING, SIZE 10240000, ETRN, STARTTLS, AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, CHUNKING",
+   "found": "Der Mailserver auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet die Anmeldung (AUTH) schon vor STARTTLS an: 212.227.60.78:25 (SMTP).",
+   "id": "VS-2026-010",
+   "impact": "Nimmt ein Mailprogramm das Angebot an, bevor die Verbindung verschlüsselt ist, könnten Zugangsdaten unverschlüsselt übertragen werden.",
+   "key": "smtp_auth/212.227.60.78/kunde",
+   "level": "mittel",
+   "level_label": "mittel",
+   "missing_headers": [],
+   "operator": "",
+   "operator_note": "",
+   "plan_action": "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen).",
+   "plan_effect": "Verhindert, dass Zugangsdaten unverschlüsselt übertragen werden",
+   "plan_items": [
+    {
+     "action": "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen).",
+     "check": "smtp_auth_before_starttls",
+     "detail": "",
+     "effect": "Verhindert, dass Zugangsdaten unverschlüsselt übertragen werden",
+     "lever": "Anmeldung am Mailserver erst nach STARTTLS anbieten",
+     "per_rule": false,
+     "stage": "mittelfristig"
+    }
+   ],
+   "plan_lever": "Anmeldung am Mailserver erst nach STARTTLS anbieten",
+   "plan_stage": "mittelfristig",
+   "policy": "smtp_auth_before_starttls",
+   "provenance": [
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "title",
+     "members": [
+      "212.227.60.78|212.227.60.78:25"
+     ],
+     "statement": "short",
+     "text": "AUTH vor STARTTLS angeboten"
+    },
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "observation",
+     "members": [
+      "212.227.60.78|212.227.60.78:25"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Mailserver auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet die Anmeldung (AUTH) schon vor STARTTLS an: 212.227.60.78:25 (SMTP)."
+    },
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "meaning",
+     "members": [
+      "212.227.60.78|212.227.60.78:25"
+     ],
+     "statement": "meaning[0]",
+     "text": "Nimmt ein Mailprogramm das Angebot an, bevor die Verbindung verschlüsselt ist, könnten Zugangsdaten unverschlüsselt übertragen werden."
+    },
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "verify",
+     "members": [
+      "212.227.60.78|212.227.60.78:25"
+     ],
+     "statement": "verify[0]",
+     "text": "Verbindung zum genannten Port aufbauen und EHLO senden; erwartet wird eine Antwort, die AUTH erst nach STARTTLS nennt."
+    },
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "recommendation",
+     "members": [
+      "212.227.60.78|212.227.60.78:25"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen)."
+    }
+   ],
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen)."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (nmap)",
+   "status": "gelb",
+   "subjects": [
+    "smtp_auth_before_starttls|212.227.60.78",
+    "smtp_auth_before_starttls|212.227.60.78:25"
+   ],
+   "threat": null,
+   "title": "Mailserver auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de): AUTH vor STARTTLS angeboten",
+   "urgency": "Mittelfristig",
+   "verify": "Verbindung zum genannten Port aufbauen und EHLO senden; erwartet wird eine Antwort, die AUTH erst nach STARTTLS nennt."
+  },
+  {
+   "affected": "85.22.47.39:587 (Submission)",
+   "cat": "E",
+   "checks": [
+    "smtp_auth_before_starttls"
+   ],
+   "evidence": "nmap · hosts/85.22.47.39/phase1/nmap.xml\n85.22.47.39:587/tcp · Dienst: smtp · Kennung: SMTP · STARTTLS: ja · Anmeldeverfahren: LOGIN · AUTH vor STARTTLS: laut Portscan · Zertifikat für: *.securess.de · Aussteller: Sectigo Public Server Authentication CA DV R36 · gültig bis: 12.09.2026, 23:59 UTC · SMTP-Befehle: mail-srv01.securess.de Hello nmap.scanme.org [62.217.52.174], SIZE 52428800, 8BITMIME, PIPELINING, PIPECONNECT, AUTH LOGIN, CHUNKING, STARTTLS, PRDR, SMTPUTF8, HELP Commands (Auszug)",
+   "found": "Der Mailserver auf 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de) bietet die Anmeldung (AUTH) schon vor STARTTLS an: 85.22.47.39:587 (Submission).",
+   "id": "VS-2026-011",
+   "impact": "Nimmt ein Mailprogramm das Angebot an, bevor die Verbindung verschlüsselt ist, könnten Zugangsdaten unverschlüsselt übertragen werden.",
+   "key": "smtp_auth/85.22.47.39/kunde",
+   "level": "mittel",
+   "level_label": "mittel",
+   "missing_headers": [],
+   "operator": "",
+   "operator_note": "",
+   "plan_action": "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen).",
+   "plan_effect": "Verhindert, dass Zugangsdaten unverschlüsselt übertragen werden",
+   "plan_items": [
+    {
+     "action": "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen).",
+     "check": "smtp_auth_before_starttls",
+     "detail": "",
+     "effect": "Verhindert, dass Zugangsdaten unverschlüsselt übertragen werden",
+     "lever": "Anmeldung am Mailserver erst nach STARTTLS anbieten",
+     "per_rule": false,
+     "stage": "mittelfristig"
+    }
+   ],
+   "plan_lever": "Anmeldung am Mailserver erst nach STARTTLS anbieten",
+   "plan_stage": "mittelfristig",
+   "policy": "smtp_auth_before_starttls",
+   "provenance": [
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "title",
+     "members": [
+      "85.22.47.39|85.22.47.39:587"
+     ],
+     "statement": "short",
+     "text": "AUTH vor STARTTLS angeboten"
+    },
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "observation",
+     "members": [
+      "85.22.47.39|85.22.47.39:587"
+     ],
+     "statement": "observation[0]",
+     "text": "Der Mailserver auf 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de) bietet die Anmeldung (AUTH) schon vor STARTTLS an: 85.22.47.39:587 (Submission)."
+    },
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "meaning",
+     "members": [
+      "85.22.47.39|85.22.47.39:587"
+     ],
+     "statement": "meaning[0]",
+     "text": "Nimmt ein Mailprogramm das Angebot an, bevor die Verbindung verschlüsselt ist, könnten Zugangsdaten unverschlüsselt übertragen werden."
+    },
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "verify",
+     "members": [
+      "85.22.47.39|85.22.47.39:587"
+     ],
+     "statement": "verify[0]",
+     "text": "Verbindung zum genannten Port aufbauen und EHLO senden; erwartet wird eine Antwort, die AUTH erst nach STARTTLS nennt."
+    },
+    {
+     "check": "smtp_auth_before_starttls",
+     "field": "recommendation",
+     "members": [
+      "85.22.47.39|85.22.47.39:587"
+     ],
+     "statement": "recommendation[0]",
+     "text": "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen)."
+    }
+   ],
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen)."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (nmap)",
+   "status": "gelb",
+   "subjects": [
+    "smtp_auth_before_starttls|85.22.47.39",
+    "smtp_auth_before_starttls|85.22.47.39:587"
+   ],
+   "threat": null,
+   "title": "Mailserver auf 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de): AUTH vor STARTTLS angeboten",
+   "urgency": "Mittelfristig",
+   "verify": "Verbindung zum genannten Port aufbauen und EHLO senden; erwartet wird eine Antwort, die AUTH erst nach STARTTLS nennt."
+  },
+  {
    "affected": "212.227.60.78:21 (FTP)",
    "cat": "A",
    "checks": [
@@ -3939,7 +4164,7 @@
    ],
    "evidence": "nmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:21/tcp · Dienst: ftp · Produkt: ProFTPD · TLS erzwungen: ja · Zertifikat für: cool-khorana.212-227-60-78.plesk.page · Aussteller: YR2 · gültig bis: 14.10.2026, 12:16 UTC · 21/tcp open ftp ProFTPD (requires SSL)",
    "found": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet zusätzliche Mail- und Dateidienste an: 212.227.60.78:21 (FTP). Eine Anmeldung ist dort nur mit Transportverschlüsselung möglich: 212.227.60.78:21 (FTP).",
-   "id": "VS-2026-010",
+   "id": "VS-2026-012",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Servers, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "key": "legacy_protocols_present/scan/kunde",
    "level": "niedrig",
@@ -4067,7 +4292,7 @@
    ],
    "evidence": "Webabruf · phase0/host_inventory.json\nrdgw-2016.securess.de",
    "found": "Der Hostname von rdgw-2016.securess.de enthält eine Zahlenfolge, die einem gängigen Produktjahr entspricht: rdgw-2016.securess.de (Produktjahr im Hostnamen). Der Hostname allein belegt keine installierte Version, gibt aber einen Anlass für eine Prüfung des Lebenszyklus der zugrunde liegenden Plattform.",
-   "id": "VS-2026-011",
+   "id": "VS-2026-013",
    "impact": "Hostnamen mit einem Produktjahr weisen häufig auf das Beschaffungsjahr oder die Produktgeneration einer Plattform hin. Ist die Plattform tatsächlich so alt wie der Hostname vermuten lässt, kann die Herstellerpflege bereits beendet sein. Ohne eine Versionsprüfung vor Ort bleibt dies ein Verdachtsmoment.",
    "key": "software_lifecycle_hint/scan/kunde",
    "level": "niedrig",
@@ -4176,7 +4401,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0/dns_records.json\nsecuress.de · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere · SPF: v=spf1 a mx ip4:85.22.47.37 include:spf-de.emailsignatures365.com include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all",
    "found": "Der SPF-Eintrag der Domain securess.de setzt bei nicht autorisierten Versendern nur auf eine weiche oder neutrale Fehlbehandlung: securess.de (~all). Empfangende Mailserver dürfen die E-Mail trotzdem zustellen.",
-   "id": "VS-2026-012",
+   "id": "VS-2026-014",
    "impact": "Eine weiche oder neutrale Fehlbehandlung markiert eine E-Mail lediglich als verdächtig, lehnt sie aber nicht ab. Empfangssysteme, die diese Markierung nicht auswerten, stellen gefälschte E-Mails im Namen der Domain trotzdem zu.",
    "key": "mail_policy/securess.de/kunde",
    "level": "niedrig",
@@ -4273,7 +4498,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0/dns_records.json\nsecuress.de · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere\n\nDNS-Abfragen · phase0a/dns_security.json\nsecuress.de · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
    "found": "Für securess.de ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain securess.de fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten. Für securess.de ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain securess.de fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können.",
-   "id": "VS-2026-013",
+   "id": "VS-2026-015",
    "impact": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen. Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.",
    "key": "mail_transport_enforcement/securess.de/kunde",
    "level": "niedrig",
@@ -4429,7 +4654,7 @@
    ],
    "evidence": "header_check\nconnect.securess.de · Adresse: https://connect.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Frame-Options",
    "found": "Auf connect.securess.de ist keine Content-Security-Policy gesetzt: connect.securess.de. Auf connect.securess.de fehlen einzelne Sicherheits-Header der Webseite: connect.securess.de (fehlend: X-Frame-Options, Referrer-Policy, Permissions-Policy).",
-   "id": "VS-2026-014",
+   "id": "VS-2026-016",
    "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/212.227.60.78/kunde",
    "level": "niedrig",
@@ -4659,7 +4884,7 @@
    ],
    "evidence": "header_check\nlogin-kundenportal.securess.de · Adresse: https://login-kundenportal.securess.de · Antwort: 302 (Weiterleitung) · weitergeleitet auf: https://login-kundenportal.securess.de/Account/Login?ReturnUrl=%2F · Strict-Transport-Security: max-age=86400",
    "found": "Der Dienst login-kundenportal.securess.de setzt den HTTP Strict Transport Security Header mit einer Gültigkeitsdauer, die unter dem empfohlenen Richtwert liegt: login-kundenportal.securess.de (max-age 86400).",
-   "id": "VS-2026-015",
+   "id": "VS-2026-017",
    "impact": "Eine kurze Gültigkeitsdauer lässt den Schutz vor Downgrade-Angriffen bereits nach kurzer Zeit ohne erneuten Seitenaufruf ablaufen; wiederkehrende Besucher sind dann für einen Zeitraum wieder ungeschützt.",
    "key": "web_header_hygiene/51.116.154.224/platform:assfinetcloud.de",
    "level": "niedrig",
@@ -4755,7 +4980,7 @@
    ],
    "evidence": "header_check\nftp.securess.de · Adresse: https://ftp.securess.de · Antwort: 301 (Weiterleitung) · weitergeleitet auf: https://www.securess.de/ · Server: nginx/1.22.1\n\nheader_check\nmailcleaner.securess.de · Adresse: https://mailcleaner.securess.de · Antwort: 200 · Server: nginx/1.31.2 · X-Powered-By: PHP/8.4.22\n\nheader_check\nmailin.securess.de · Adresse: https://mailin.securess.de · Antwort: 200 · Server: nginx/1.31.2 · X-Powered-By: PHP/8.4.22\n\nheader_check\nmailout.securess.de · Adresse: https://mailout.securess.de · Antwort: 200 · Server: nginx/1.31.2 · X-Powered-By: PHP/8.4.22\n\nheader_check\nmx1.securess.de · Adresse: https://mx1.securess.de · Antwort: 200 · Server: nginx/1.31.2 · X-Powered-By: PHP/8.4.22\n\nheader_check\nsecuress.de · Adresse: https://securess.de · Antwort: 301 (Weiterleitung) · weitergeleitet auf: https://www.securess.de/ · Server: nginx/1.22.1\n\nund eine weitere Fundstelle gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
    "found": "Die Webantworten von ftp.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mx1.securess.de, securess.de und 1 weitere nennen in ihren Antwortheadern die Version der eingesetzten Serversoftware: ftp.securess.de (Server: nginx/1.22.1), mailcleaner.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), mailin.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), mailout.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), mx1.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), securess.de (Server: nginx/1.22.1), www.securess.de (Server: nginx/1.22.1).",
-   "id": "VS-2026-016",
+   "id": "VS-2026-018",
    "impact": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs.",
    "key": "banner_disclosure/scan/kunde",
    "level": "niedrig",
@@ -4893,7 +5118,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0a/dns_security.json\nsecuress.de · keine CAA-Einträge · DNSSEC: Zone nicht signiert",
    "found": "Für securess.de ist kein CAA-Eintrag veröffentlicht. Für die Domain securess.de legt damit kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen. Für securess.de ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain securess.de lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
-   "id": "VS-2026-017",
+   "id": "VS-2026-019",
    "impact": "Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt dadurch nicht von vornherein auf. Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
    "key": "dns_hygiene/securess.de/kunde",
    "level": "niedrig",
@@ -5048,7 +5273,7 @@
    ],
    "evidence": "nmap · hosts/85.22.47.39/phase1/nmap.xml\n85.22.47.39:25/tcp · Dienst: smtp · Produkt: Postfix smtpd · TLS erzwungen: ja · STARTTLS: ja · Anmeldung vor TLS gesperrt: ja · VRFY in der EHLO-Liste: ja · Zertifikat für: *.securess.de · Aussteller: Sectigo Public Server Authentication CA DV R36 · gültig bis: 12.09.2026, 23:59 UTC · SMTP-Befehle: mx1.securess.de, PIPELINING, SIZE 102400000, VRFY, STARTTLS, ENHANCEDSTATUSCODES, 8BITMIME, CHUNKING",
    "found": "Der Mailserver auf 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de) nennt den Befehl VRFY in seiner Antwort auf EHLO: 85.22.47.39:25 (SMTP). Ob er Anfragen zu Postfachnamen beantwortet, hat der Scan nicht geprüft.",
-   "id": "VS-2026-018",
+   "id": "VS-2026-020",
    "impact": "Beantwortet der Mailserver VRFY, lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte Phishing-Mails und Rateangriffe auf Zugangsdaten.",
    "key": "smtp_commands/85.22.47.39/kunde",
    "level": "niedrig",
@@ -5170,10 +5395,10 @@
    },
    {
     "key": "E",
-    "level": 1,
+    "level": 2,
     "name": "Konfiguration und Informations-Hygiene",
-    "note": "Versionsangaben in den Antworten der Dienste: Versions- oder Servername im HTTP-Header; DNS-Absicherung für securess.de: kein CAA-Eintrag und keine DNSSEC-Signatur",
-    "status": "blau"
+    "note": "Mailserver auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de): AUTH vor STARTTLS angeboten; Mailserver auf 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de): AUTH vor STARTTLS angeboten",
+    "status": "gelb"
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von securess.de am 19.07.2026: 26 Hostnamen auf 12 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
@@ -5208,13 +5433,13 @@
   "overall_status": "rot",
   "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
- "landscape_lead": "18 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "20 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 64,
-  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
-  "catalog_version": "2026-09-27.2",
+  "after_fp": 66,
+  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
+  "catalog_version": "2026-09-29.1",
   "classification": "Vertraulich",
-  "consolidated": 18,
+  "consolidated": 20,
   "context_fields": [],
   "context_sources": {},
   "customer": "Auftraggeber",
@@ -5223,7 +5448,7 @@
    "securess.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.3.0",
+  "facts_schema_version": "1.4.0",
   "fqdns_total": 26,
   "generated_on": null,
   "generation": null,
@@ -5238,7 +5463,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.2",
+  "policy_version": "2026-09-29.1",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -5408,13 +5633,13 @@
     "VS-2026-007",
     "VS-2026-008",
     "VS-2026-009",
-    "VS-2026-014"
+    "VS-2026-016"
    ],
    "sources": [
     "VS-2026-007:security_headers_incomplete",
     "VS-2026-008:security_headers_incomplete",
     "VS-2026-009:security_headers_incomplete",
-    "VS-2026-014:security_headers_incomplete"
+    "VS-2026-016:security_headers_incomplete"
    ],
    "st": "gelb"
   },
@@ -5457,12 +5682,28 @@
    "refs": [
     "VS-2026-008",
     "VS-2026-009",
-    "VS-2026-014"
+    "VS-2026-016"
    ],
    "sources": [
     "VS-2026-008:csp_missing",
     "VS-2026-009:csp_missing",
-    "VS-2026-014:csp_missing"
+    "VS-2026-016:csp_missing"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Die Anmeldung erst nach STARTTLS anbieten (bei Postfix smtpd_tls_auth_only, bei Exim auth_advertise_hosts nur für verschlüsselte Verbindungen).",
+   "effect": "Verhindert, dass Zugangsdaten unverschlüsselt übertragen werden",
+   "lever": "Anmeldung am Mailserver erst nach STARTTLS anbieten",
+   "operator": "",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-010",
+    "VS-2026-011"
+   ],
+   "sources": [
+    "VS-2026-010:smtp_auth_before_starttls",
+    "VS-2026-011:smtp_auth_before_starttls"
    ],
    "st": "gelb"
   },
@@ -5473,10 +5714,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-010"
+    "VS-2026-012"
    ],
    "sources": [
-    "VS-2026-010:legacy_protocols_present"
+    "VS-2026-012:legacy_protocols_present"
    ],
    "st": "blau"
   },
@@ -5487,10 +5728,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-011"
+    "VS-2026-013"
    ],
    "sources": [
-    "VS-2026-011:software_lifecycle_hint"
+    "VS-2026-013:software_lifecycle_hint"
    ],
    "st": "blau"
   },
@@ -5501,10 +5742,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-012"
+    "VS-2026-014"
    ],
    "sources": [
-    "VS-2026-012:spf_softfail"
+    "VS-2026-014:spf_softfail"
    ],
    "st": "blau"
   },
@@ -5515,10 +5756,10 @@
    "operator": "platform",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-015"
+    "VS-2026-017"
    ],
    "sources": [
-    "VS-2026-015:hsts_short"
+    "VS-2026-017:hsts_short"
    ],
    "st": "blau"
   },
@@ -5529,10 +5770,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-016"
+    "VS-2026-018"
    ],
    "sources": [
-    "VS-2026-016:http_header_disclosure"
+    "VS-2026-018:http_header_disclosure"
    ],
    "st": "blau"
   },
@@ -5543,10 +5784,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-017"
+    "VS-2026-019"
    ],
    "sources": [
-    "VS-2026-017:caa_missing"
+    "VS-2026-019:caa_missing"
    ],
    "st": "blau"
   },
@@ -5557,10 +5798,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-018"
+    "VS-2026-020"
    ],
    "sources": [
-    "VS-2026-018:smtp_vrfy_enabled"
+    "VS-2026-020:smtp_vrfy_enabled"
    ],
    "st": "blau"
   },
@@ -5585,10 +5826,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-013"
+    "VS-2026-015"
    ],
    "sources": [
-    "VS-2026-013:mta_sts_missing"
+    "VS-2026-015:mta_sts_missing"
    ],
    "st": "blau"
   },
@@ -5599,10 +5840,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-013"
+    "VS-2026-015"
    ],
    "sources": [
-    "VS-2026-013:tls_rpt_missing"
+    "VS-2026-015:tls_rpt_missing"
    ],
    "st": "blau"
   },
@@ -5613,10 +5854,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-017"
+    "VS-2026-019"
    ],
    "sources": [
-    "VS-2026-017:dnssec_missing"
+    "VS-2026-019:dnssec_missing"
    ],
    "st": "blau"
   }
@@ -5829,6 +6070,7 @@
     "ip": "212.227.60.78",
     "more_ips": [],
     "operator": "IONOS SE",
+    "operator_source": "AbuseIPDB",
     "role": "Fernzugang und Verwaltung, Dateiaustausch, Mailabruf und Einlieferung"
    },
    {
@@ -5838,6 +6080,7 @@
     "ip": "51.116.154.224",
     "more_ips": [],
     "operator": "Microsoft Limited",
+    "operator_source": "AbuseIPDB",
     "role": "Webanwendung mit Anmeldung · Plattform assfinetcloud.de"
    },
    {
@@ -5847,6 +6090,7 @@
     "ip": "85.22.47.36",
     "more_ips": [],
     "operator": "Securess Versicherungsmakler GmbH",
+    "operator_source": "AbuseIPDB",
     "role": "Nicht näher bestimmbar"
    },
    {
@@ -5856,6 +6100,7 @@
     "ip": "85.22.47.38",
     "more_ips": [],
     "operator": "Securess Versicherungsmakler GmbH (85-22-47-38.ip.dokom21.de)",
+    "operator_source": "AbuseIPDB",
     "role": "Nicht näher bestimmbar"
    },
    {
@@ -5865,6 +6110,7 @@
     "ip": "85.22.47.39",
     "more_ips": [],
     "operator": "Securess Versicherungsmakler GmbH (85-22-47-39.ip.dokom21.de)",
+    "operator_source": "AbuseIPDB",
     "role": "Mailabruf und Einlieferung"
    },
    {
@@ -5874,6 +6120,7 @@
     "ip": "85.22.47.40",
     "more_ips": [],
     "operator": "Securess Versicherungsmakler GmbH",
+    "operator_source": "AbuseIPDB",
     "role": "Nicht näher bestimmbar"
    },
    {
@@ -5883,6 +6130,7 @@
     "ip": "85.22.47.41",
     "more_ips": [],
     "operator": "Securess Versicherungsmakler GmbH (85-22-47-41.ip.dokom21.de)",
+    "operator_source": "AbuseIPDB",
     "role": "Fernzugang und Verwaltung, E-Mail-Versand laut SPF"
    },
    {
@@ -5892,6 +6140,7 @@
     "ip": "85.22.47.42",
     "more_ips": [],
     "operator": "Securess Versicherungsmakler GmbH (85-22-47-42.ip.dokom21.de)",
+    "operator_source": "AbuseIPDB",
     "role": "Nicht näher bestimmbar"
    },
    {
@@ -5901,6 +6150,7 @@
     "ip": "85.22.47.43",
     "more_ips": [],
     "operator": "Securess Versicherungsmakler GmbH",
+    "operator_source": "AbuseIPDB",
     "role": "E-Mail-Server"
    },
    {
@@ -5910,6 +6160,7 @@
     "ip": "85.22.47.45",
     "more_ips": [],
     "operator": "Securess Versicherungsmakler GmbH (85-22-47-45.ip.dokom21.de)",
+    "operator_source": "AbuseIPDB",
     "role": "Nicht näher bestimmbar"
    },
    {
@@ -5919,6 +6170,7 @@
     "ip": "85.22.47.46",
     "more_ips": [],
     "operator": "Securess Versicherungsmakler GmbH",
+    "operator_source": "AbuseIPDB",
     "role": "Nicht näher bestimmbar"
    },
    {
@@ -5928,6 +6180,7 @@
     "ip": "85.22.47.47",
     "more_ips": [],
     "operator": "Securess Versicherungsmakler GmbH (85-22-47-47.ip.dokom21.de)",
+    "operator_source": "AbuseIPDB",
     "role": "Nicht näher bestimmbar"
    }
   ],
@@ -5997,7 +6250,7 @@
    },
    {
     "checks": [
-     "Web-, Mail- und Dienst-Prüfungen",
+     "Web-, TLS-, Mail- und Dienst-Prüfungen",
      "Anmeldung über unverschlüsselte Verbindungen",
      "Einträge in Schadcode-Listen",
      "Reputation der Adressen"
@@ -6133,6 +6386,7 @@
      "session_in_url|vermittler.securess.de@212.227.60.78",
      "session_in_url|webmail.securess.de@85.22.47.39",
      "session_in_url|www.securess.de@85.22.47.41",
+     "smtp_auth_before_starttls_passive|85.22.47.39",
      "smtp_vrfy_enabled_passive|85.22.47.39",
      "sri_missing|connect.securess.de@212.227.60.78",
      "sri_missing|eset.securess.de@85.22.47.38",
@@ -6400,7 +6654,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 18 Befunde und 5 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 20 Befunde und 5 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -6418,9 +6672,10 @@
    },
    {
     "l": "Befunde im Bericht",
-    "v": "18"
+    "v": "20"
    }
   ],
+  "operator_header": "Netzbetreiber (laut AbuseIPDB)",
   "out_of_scope": [
    "Interne Netzsegmente, Arbeitsplätze und mobile Geräte hinter der Firewall.",
    "Prüfungen mit Anmeldung (kein Login in Portale oder Verwaltungsoberflächen).",

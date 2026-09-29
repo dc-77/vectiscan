@@ -31,132 +31,154 @@
   "inventory": [
    {
     "host": "188.40.3.130",
+    "operator": "Hetzner Online GmbH, laut AbuseIPDB",
     "port": "21",
     "ref": "VS-2026-012",
     "svc": "ProFTPD, TLS erzwungen"
    },
    {
     "host": "188.40.3.130",
+    "operator": "",
     "port": "22",
     "ref": "",
     "svc": "ProFTPD mod_sftp"
    },
    {
     "host": "188.40.3.130",
+    "operator": "",
     "port": "110",
     "ref": "VS-2026-012",
     "svc": "Courier pop3d, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "188.40.3.130",
+    "operator": "",
     "port": "143",
     "ref": "VS-2026-012",
     "svc": "Dovecot imapd, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "188.40.3.130",
+    "operator": "",
     "port": "222",
     "ref": "",
     "svc": "OpenSSH 9.2p1"
    },
    {
     "host": "188.40.3.130",
+    "operator": "",
     "port": "465",
     "ref": "",
     "svc": "SMTP über TLS (Exim), TLS erzwungen"
    },
    {
     "host": "188.40.3.130",
+    "operator": "",
     "port": "587",
     "ref": "",
     "svc": "SMTP (Exim), Anmeldung erst nach STARTTLS"
    },
    {
     "host": "188.40.3.130",
+    "operator": "",
     "port": "993",
     "ref": "",
     "svc": "IMAP über TLS, TLS erzwungen"
    },
    {
     "host": "188.40.3.130",
+    "operator": "",
     "port": "995",
     "ref": "",
     "svc": "POP3 über TLS, TLS erzwungen"
    },
    {
     "host": "188.40.3.130",
+    "operator": "",
     "port": "3306",
     "ref": "VS-2026-001",
     "svc": "MariaDB 10.11.18"
    },
    {
     "host": "188.40.3.130",
+    "operator": "",
     "port": "5432",
     "ref": "VS-2026-001",
     "svc": "PostgreSQL DB"
    },
    {
     "host": "217.243.248.28",
+    "operator": "Junkerwerk Linder GmbH & Co., laut AbuseIPDB",
     "port": "443",
     "ref": "VS-2026-005, VS-2026-009, VS-2026-016",
     "svc": "Microsoft-IIS/10.0, TLS erzwungen"
    },
    {
     "host": "217.243.248.29",
+    "operator": "Junkerwerk Linder GmbH & Co., laut AbuseIPDB",
     "port": "443",
     "ref": "VS-2026-004, VS-2026-010, VS-2026-013, VS-2026-014, VS-2026-016",
     "svc": "Microsoft IIS httpd 10.0, TLS erzwungen"
    },
    {
     "host": "217.243.248.29",
+    "operator": "",
     "port": "8443",
     "ref": "VS-2026-013, VS-2026-016",
     "svc": "Microsoft IIS httpd 10.0, TLS erzwungen"
    },
    {
     "host": "217.243.248.30",
+    "operator": "Junkerwerk Linder GmbH & Co., laut AbuseIPDB",
     "port": "443",
     "ref": "VS-2026-005, VS-2026-008, VS-2026-011",
     "svc": "Apache httpd, TLS erzwungen"
    },
    {
     "host": "188.40.3.130",
+    "operator": "",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd, laut Passivquelle"
    },
    {
     "host": "188.40.3.130",
+    "operator": "",
     "port": "443",
     "ref": "",
     "svc": "Apache httpd, laut Passivquelle"
    },
    {
     "host": "217.243.248.28",
+    "operator": "",
     "port": "25",
     "ref": "",
     "svc": "SMTP, laut Passivquelle"
    },
    {
     "host": "217.243.248.28",
+    "operator": "",
     "port": "4433",
     "ref": "VS-2026-002",
     "svc": "SonicWall, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "217.243.248.30",
+    "operator": "",
     "port": "25",
     "ref": "VS-2026-006",
     "svc": "Exim smtpd 4.96, laut Passivquelle"
    },
    {
     "host": "2a01:4f8:d0a:3124::2",
+    "operator": "Hetzner Online GmbH, laut AbuseIPDB",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd, laut Passivquelle"
    },
    {
     "host": "2a01:4f8:d0a:3124::2",
+    "operator": "",
     "port": "443",
     "ref": "",
     "svc": "Apache httpd, laut Passivquelle"
@@ -4388,8 +4410,8 @@
  "landscape_lead": "17 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 45,
-  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
-  "catalog_version": "2026-09-27.2",
+  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
+  "catalog_version": "2026-09-29.1",
   "classification": "Vertraulich",
   "consolidated": 17,
   "context_fields": [],
@@ -4400,7 +4422,7 @@
    "junkerwerk.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.3.0",
+  "facts_schema_version": "1.4.0",
   "fqdns_total": 12,
   "generated_on": null,
   "generation": null,
@@ -4415,7 +4437,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.2",
+  "policy_version": "2026-09-29.1",
   "positives": 6,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -5085,6 +5107,7 @@
      "2a01:4f8:d0a:3124::2"
     ],
     "operator": "Hetzner Online GmbH (dedi2230.your-server.de)",
+    "operator_source": "AbuseIPDB",
     "role": "Datenbanken erreichbar, Dateiaustausch (FTP, SFTP), Mailabruf, Einlieferung und Versand laut SPF · geteiltes System beim Hoster"
    },
    {
@@ -5094,6 +5117,7 @@
     "ip": "217.243.248.27",
     "more_ips": [],
     "operator": "Junkerwerk Linder GmbH & Co.",
+    "operator_source": "AbuseIPDB",
     "role": "Nicht näher bestimmbar"
    },
    {
@@ -5103,6 +5127,7 @@
     "ip": "217.243.248.28",
     "more_ips": [],
     "operator": "Junkerwerk Linder GmbH & Co. (junkerwerk-solingen.de)",
+    "operator_source": "AbuseIPDB",
     "role": "Mail- und Kalenderplattform, Mail-Webzugang"
    },
    {
@@ -5112,6 +5137,7 @@
     "ip": "217.243.248.29",
     "more_ips": [],
     "operator": "Junkerwerk Linder GmbH & Co.",
+    "operator_source": "AbuseIPDB",
     "role": "Nicht näher bestimmbar"
    },
    {
@@ -5121,6 +5147,7 @@
     "ip": "217.243.248.30",
     "more_ips": [],
     "operator": "Junkerwerk Linder GmbH & Co.",
+    "operator_source": "AbuseIPDB",
     "role": "Anmeldeportal"
    }
   ],
@@ -5419,6 +5446,7 @@
     "v": "17"
    }
   ],
+  "operator_header": "Netzbetreiber (laut AbuseIPDB)",
   "out_of_scope": [
    "Interne Netzsegmente, Arbeitsplätze und mobile Geräte hinter der Firewall.",
    "Prüfungen mit Anmeldung (kein Login in Portale oder Verwaltungsoberflächen).",

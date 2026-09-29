@@ -276,7 +276,9 @@ def test_unverarbeitete_beobachtungen():
     kinds = {u.kind for u in facts(HL).unprocessed}
     assert "resource_version" in kinds
     db = {u.kind for u in facts(DB).unprocessed}
-    assert {"smtp_auth_before_starttls", "wpscan_readme", "wpscan_wp_cron"} <= db
+    # S6d (A4): AUTH vor STARTTLS ist seit S6d eine Katalogregel, keine unverarbeitete Beobachtung.
+    assert {"wpscan_readme", "wpscan_wp_cron"} <= db
+    assert "smtp_auth_before_starttls" not in db
 
 
 # ---------------------------------------------------------------- E13

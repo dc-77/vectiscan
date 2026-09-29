@@ -123,8 +123,10 @@ def test_dns_records_default_bleibt_unveraendert(tmp_path):
 # --------------------------------------------------------- run_domain_intel
 
 def test_domain_intel_laeuft_nur_kostenfreie_quellen(tmp_path):
-    """Kein Shodan, kein SecurityTrails, kein VirusTotal je Zusatzdomain."""
-    assert set(DOMAIN_INTEL_TOOLS) == {"whois", "dns_security"}
+    """Kein Shodan, kein VirusTotal je Zusatzdomain. S6d (Issue #22, DC 29.09.2026):
+    OTX und SecurityTrails laufen je Domain, SecurityTrails aber nur, wenn es im
+    Paket steht (hier nicht)."""
+    assert set(DOMAIN_INTEL_TOOLS) == {"whois", "dns_security", "otx", "securitytrails"}
 
     with patch("scanner.phase0a.WhoisClient") as whois_cls, \
             patch("scanner.phase0a.run_all_dns_security",

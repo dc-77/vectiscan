@@ -1066,16 +1066,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "www.huendgen-entsorgung.de",
    "host_ip": "18.197.248.23",
-   "id": "cov:2:httpx:18.197.248.23",
+   "id": "cov:2:httpx:18.197.248.23:www.huendgen-entsorgung.de",
    "mode": "active",
    "observed_at": "2026-09-23T19:39:11Z",
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1093,16 +1093,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "exchange.huendgen-entsorgung.de",
    "host_ip": "80.90.145.166",
-   "id": "cov:2:httpx:80.90.145.166",
+   "id": "cov:2:httpx:80.90.145.166:exchange.huendgen-entsorgung.de",
    "mode": "active",
    "observed_at": "2026-09-23T19:45:25Z",
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1914,6 +1914,7 @@
    },
    "zone_transfer": {
     "allowed": false,
+    "not_tested_reason": null,
     "ns_tested": [
      "ns1029.ui-dns.biz",
      "ns1029.ui-dns.com",
@@ -2102,16 +2103,25 @@
     "open": 3
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "amazon.com",
+    "handle": null,
     "isp": "A100 ROW GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Content Delivery Network"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -2182,16 +2192,25 @@
     "open": 5
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "bn-t.de",
+    "handle": null,
     "isp": "bn:t Blatzheim Networks Telecom GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Fixed Line ISP"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -2263,6 +2282,7 @@
      "tool": "redirect_probe",
      "url": "https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -3387,7 +3407,8 @@
    ],
    "url": "https://exchange.huendgen-entsorgung.de",
    "wordpress": null,
-   "x_feserver": "EXCHANGE-2019"
+   "x_feserver": "EXCHANGE-2019",
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -3442,6 +3463,7 @@
      "tool": "header_check",
      "url": "https://www.huendgen-entsorgung.de"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -3577,7 +3599,8 @@
    ],
    "url": "https://www.huendgen-entsorgung.de",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   }
  ],
  "passive": [
@@ -3956,7 +3979,7 @@
    }
   ]
  },
- "schema_version": "1.3.0",
+ "schema_version": "1.4.0",
  "services": [
   {
    "auth_before_starttls": null,
@@ -3981,6 +4004,7 @@
    "host_ip": "18.197.248.23",
    "id": "svc:18.197.248.23:80/tcp",
    "kennung": "nginx",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -3991,6 +4015,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -4024,6 +4049,7 @@
    "host_ip": "18.197.248.23",
    "id": "svc:18.197.248.23:443/tcp",
    "kennung": "nginx",
+   "kennung_source": null,
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -4034,6 +4060,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "https",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -4086,6 +4113,7 @@
    "host_ip": "18.197.248.23",
    "id": "svc:18.197.248.23:8443/tcp",
    "kennung": "nginx",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4096,6 +4124,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -4142,6 +4171,7 @@
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:443/tcp",
    "kennung": "Microsoft-IIS/10.0",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4152,6 +4182,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "https",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -4198,6 +4229,7 @@
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:444/tcp",
    "kennung": "Apache httpd, Titel „Hündgen Entsorgungs GmbH & Co. KG Web Applications Portal“",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4208,6 +4240,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -4241,6 +4274,7 @@
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:1000/tcp",
    "kennung": null,
+   "kennung_source": null,
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -4251,6 +4285,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "cadlock",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -4284,6 +4319,7 @@
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:1001/tcp",
    "kennung": null,
+   "kennung_source": null,
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -4294,6 +4330,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "webpush",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -4327,6 +4364,7 @@
    "host_ip": "80.90.145.166",
    "id": "svc:80.90.145.166:1002/tcp",
    "kennung": null,
+   "kennung_source": null,
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -4337,6 +4375,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "windows-icfw",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -5341,6 +5380,7 @@
    "observed_at": "2026-09-23T19:29:03Z",
    "out_of_scope": [],
    "source": "host_inventory",
+   "synthetic_ipv6": [],
    "targets_source": "orders.json",
    "whois": null
   }
@@ -6691,7 +6731,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": "testssl",
+   "service_name": "http",
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": []
   },
   {
@@ -6778,7 +6822,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": null,
+   "service_name": null,
+   "sni": null,
    "source": "httpx",
+   "starttls": null,
    "vulns": []
   },
   {
@@ -8048,7 +8096,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": "testssl",
+   "service_name": "http",
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": [
     {
      "name": "LUCKY13",

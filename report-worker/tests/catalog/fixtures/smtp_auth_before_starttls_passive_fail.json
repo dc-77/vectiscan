@@ -1,0 +1,26 @@
+{
+ "facts": {
+  "passive": [
+   {
+    "host_ip": "92.205.224.174",
+    "port": 25,
+    "source": "shodan",
+    "service": "smtp",
+    "product": "Postfix smtpd",
+    "details": {"smtp_auth_before_starttls": true},
+    "verified": false,
+    "seen_at": "2026-09-20T08:00:00Z",
+    "confidence": 0.5
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "92.205.224.174",
+  "verified": false,
+  "source_mode": "passive",
+  "positive": false,
+  "members": {"shodan:92.205.224.174:25": "fail"}
+ }
+}

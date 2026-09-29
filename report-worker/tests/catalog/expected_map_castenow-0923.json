@@ -229,13 +229,18 @@
   },
   "VS-2026-041": {
    "checks": [
+    "smtp_auth_before_starttls_passive"
+   ]
+  },
+  "VS-2026-042": {
+   "checks": [
     "smtp_vrfy_enabled_passive"
    ],
    "spec10": "R19",
    "warum": "Shodan last_update heißt „Hosteintrag aktualisiert am“, nicht „gesehen am“.",
    "spec11": "N15"
   },
-  "VS-2026-042": {
+  "VS-2026-043": {
    "checks": [
     "spf_authorizes_shared_host"
    ],
@@ -244,19 +249,14 @@
    "spec11": "N11, vorher T9 (E18)",
    "warum_spec11": "Betreiber des Servers aus rDNS (planwerk6.de), Hetzner nur als Rechenzentrum."
   },
-  "VS-2026-043": {
+  "VS-2026-044": {
    "checks": [
     "spf_softfail"
    ]
   },
-  "VS-2026-044": {
-   "checks": [
-    "tls_rpt_missing"
-   ]
-  },
   "VS-2026-045": {
    "checks": [
-    "tls_weakness_reported"
+    "tls_rpt_missing"
    ]
   },
   "VS-2026-046": {
@@ -271,10 +271,15 @@
   },
   "VS-2026-048": {
    "checks": [
-    "web_vulnerability_reported"
+    "tls_weakness_reported"
    ]
   },
   "VS-2026-049": {
+   "checks": [
+    "web_vulnerability_reported"
+   ]
+  },
+  "VS-2026-050": {
    "checks": [
     "wordpress_user_enumeration"
    ],

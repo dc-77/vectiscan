@@ -110,6 +110,7 @@ HINT_EXCEPTIONS: dict[str, str] = {
     "passive_service_version_unverified": HINT_PHRASE,
     "login_over_http_passive": HINT_PHRASE,
     "smtp_vrfy_enabled_passive": HINT_PHRASE,
+    "smtp_auth_before_starttls_passive": HINT_PHRASE,
     "admin_service_exposed_passive": HINT_PHRASE,
 }
 

@@ -47,7 +47,19 @@ DOMAIN_SCOPED_TOOLS: frozenset[str] = frozenset({
 # DNS, dns_security, Zonentransfer und WHOIS erneut. Alles Kontingentpflichtige
 # (Shodan, SecurityTrails, VirusTotal) und alles, was die Hostentdeckung speist
 # (crtsh, subfinder, gobuster_dns, dnsx), bleibt beim Primaerziel.
-DOMAIN_INTEL_TOOLS: tuple[str, ...] = ("whois", "dns_security")
+# S6d (Issue #22, Entscheidung DC 29.09.2026): OTX und SecurityTrails laufen
+# ebenfalls je weiterer Domain. Die Obergrenze bleibt MAX_EXTRA_DOMAINS (5), also
+# hoechstens fuenf mal drei SecurityTrails-Abrufe je Order; Shodan und
+# VirusTotal bleiben beim Primaerziel.
+DOMAIN_INTEL_TOOLS: tuple[str, ...] = ("whois", "dns_security", "otx", "securitytrails")
+
+# S6d (C6): Werkzeuge, die nur mit den IP-Adressen aus Phase 0b etwas liefern.
+# Der erste Durchgang laeuft vor der Discovery ohne IPs; der IP-Durchgang in
+# worker.py faehrt genau diese Werkzeuge mit den Inventar-IPs. rdap bekam bis
+# S6d nie eine IP (erster Lauf no_ips, IP-Durchgang not_in_package).
+PHASE0A_IP_TOOLS: tuple[str, ...] = ("shodan", "abuseipdb", "rdap")
+# Reine IP-Werkzeuge ohne Domainanteil: im ersten Durchgang ohne IPs zurueckgestellt.
+PHASE0A_DEFERRED_TOOLS: frozenset[str] = frozenset({"rdap"})
 
 
 def run_phase0a(
@@ -57,6 +69,9 @@ def run_phase0a(
     order_id: str,
     config: dict[str, Any],
     progress_callback: Any = None,
+    *,
+    ip_pass: bool = False,
+    defer_ip_tools: bool = False,
 ) -> dict[str, Any]:
     """Run passive intelligence collection for Phase 0a.
 
@@ -67,6 +82,13 @@ def run_phase0a(
         order_id: Order UUID
         config: Package config (determines which tools run)
         progress_callback: Optional callback for progress updates
+        ip_pass: S6d (C6) zweiter Durchgang mit den Inventar-IPs. Er schreibt nur
+            Zeilen der gefilterten Werkzeuge (keine not_in_package-Zeilen fuer den
+            Rest), faehrt dns_security nicht erneut und fuehrt summary.json mit dem
+            ersten Durchgang zusammen, statt sie zu ueberschreiben.
+        defer_ip_tools: S6d (C6) erster Durchgang, dem ein IP-Durchgang folgt:
+            reine IP-Werkzeuge (PHASE0A_DEFERRED_TOOLS) laufen hier nicht und
+            schreiben keine Zeile; sie laufen im IP-Durchgang.
 
     Returns:
         Passive intelligence summary dict with keys:
@@ -377,6 +399,11 @@ def run_phase0a(
             result["per_ip"] = per_ip
         if result:
             _save_json(phase0a_dir, "otx.json", result)
+        else:
+            # S6d (Issue #22): OTX antwortet ohne Schluessel auch fuer unbekannte
+            # Domains mit einem Eintrag (pulse_count 0). None heisst Transport- oder
+            # Lesefehler, also failed statt ok mit no_data (Regel aus S6c/#35).
+            _record_passive("otx", "failed", "otx_no_data")
         return "otx", result or None
 
     def _run_virustotal() -> tuple[str, dict[str, Any] | None]:
@@ -397,9 +424,16 @@ def run_phase0a(
     futures: dict[Any, str] = {}
 
     # A7: nicht gelistete Tools bekommen ihre Zeile, bevor der Pool startet.
-    for passive_tool in PHASE0A_EXPECTED_TOOLS:
-        if passive_tool not in phase0a_tools:
-            _record_passive(passive_tool, "skipped", "not_in_package")
+    # S6d (C6): nicht im IP-Durchgang; dort ist die Werkzeugliste bewusst auf
+    # PHASE0A_IP_TOOLS gefiltert und die uebrigen haben ihre Zeile schon aus dem
+    # ersten Durchgang (vorher entstanden hier Doppelzeilen not_in_package).
+    if not ip_pass:
+        for passive_tool in PHASE0A_EXPECTED_TOOLS:
+            if passive_tool not in phase0a_tools:
+                _record_passive(passive_tool, "skipped", "not_in_package")
+
+    # S6d (C6): reine IP-Werkzeuge warten im ersten Durchgang auf die IPs.
+    deferred = PHASE0A_DEFERRED_TOOLS if (defer_ip_tools and not capped_ips) else frozenset()
 
     with ThreadPoolExecutor(max_workers=8, thread_name_prefix="phase0a") as pool:
         if "whois" in phase0a_tools:
@@ -408,7 +442,7 @@ def run_phase0a(
             futures[pool.submit(_run_shodan)] = "shodan"
         if "abuseipdb" in phase0a_tools:
             futures[pool.submit(_run_abuseipdb)] = "abuseipdb"
-        if "rdap" in phase0a_tools:
+        if "rdap" in phase0a_tools and "rdap" not in deferred:
             futures[pool.submit(_run_rdap)] = "rdap"
         if "securitytrails" in phase0a_tools:
             futures[pool.submit(_run_securitytrails)] = "securitytrails"
@@ -421,7 +455,11 @@ def run_phase0a(
             futures[pool.submit(_run_otx)] = "otx"
         if "virustotal" in phase0a_tools:
             futures[pool.submit(_run_virustotal)] = "virustotal"
-        futures[pool.submit(_run_dns_security)] = "dns_security"
+        # S6d (C6): dns_security ist domainbezogen und lief im ersten Durchgang;
+        # der IP-Durchgang ueberschrieb bisher dns_security.json und schrieb eine
+        # zweite Zeile.
+        if not ip_pass:
+            futures[pool.submit(_run_dns_security)] = "dns_security"
 
         for future in as_completed(futures, timeout=phase0a_timeout):
             tool_name = futures[future]
@@ -479,7 +517,17 @@ def run_phase0a(
              passive_subdomains=len(results["passive_subdomains"]))
 
     # Save combined summary
-    _save_json(phase0a_dir, "summary.json", results)
+    if ip_pass:
+        # S6d (C6): der IP-Durchgang ergaenzt die Zusammenfassung des ersten
+        # Durchgangs (IP-Ergebnisse von Shodan, AbuseIPDB, RDAP), statt sie mit
+        # seinem Teilergebnis zu ueberschreiben. passive_subdomains bleibt aus dem
+        # ersten Durchgang, dort flossen SecurityTrails und Shodan-DNS ein.
+        merged = _load_json(phase0a_dir, "summary.json")
+        merged.update({k: v for k, v in results.items() if k != "passive_subdomains"})
+        merged.setdefault("passive_subdomains", results["passive_subdomains"])
+        _save_json(phase0a_dir, "summary.json", merged)
+    else:
+        _save_json(phase0a_dir, "summary.json", results)
 
     return results
 
@@ -584,6 +632,16 @@ def _save_json(directory: str, filename: str, data: Any) -> None:
         log.warning("phase0a_save_failed", file=filename, error=str(e))
 
 
+def _load_json(directory: str, filename: str) -> dict[str, Any]:
+    """JSON-Datei lesen (best-effort); fehlt sie oder ist sie kaputt: leeres Dict."""
+    try:
+        with open(os.path.join(directory, filename), encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
 def _with_domain(data: Any, domain: str) -> Any:
     """Domain-Etikett in die Datei schreiben (Issue #12).
 
@@ -612,13 +670,14 @@ def run_domain_intel(domain: str, scan_dir: str, order_id: str,
     """Domainbezogene Fakten fuer eine weitere Domain der Order (Issue #12).
 
     Bewusst eine eigene Funktion statt eines zweiten ``run_phase0a``-Aufrufs:
-    der wuerde die kontingentpflichtigen Clients (Shodan, SecurityTrails,
-    VirusTotal) erneut fahren und ``phase0a/summary.json`` ueberschreiben.
+    der wuerde die kontingentpflichtigen Clients (Shodan, VirusTotal) und alle
+    IP-Abfragen erneut fahren und ``phase0a/summary.json`` ueberschreiben.
 
-    Gefahren werden nur die Quellen aus ``DOMAIN_INTEL_TOOLS``, also WHOIS und
-    die DNS-Sicherheitsabfragen. Beide kosten kein Kontingent. Die Dateien
-    bekommen einen Domain-Suffix, die Zeilen das ``_domain``-Etikett; die
-    Dateien ohne Suffix gehoeren weiter dem Primaerziel.
+    Gefahren werden nur die Quellen aus ``DOMAIN_INTEL_TOOLS``: WHOIS, die
+    DNS-Sicherheitsabfragen und seit S6d (Issue #22) OTX und SecurityTrails, diese
+    nur mit dem Domainanteil (keine IP-Abfragen). Die Dateien bekommen einen
+    Domain-Suffix, die Zeilen das ``_domain``-Etikett; die Dateien ohne Suffix
+    gehoeren weiter dem Primaerziel. Die Fehlerregeln sind dieselben wie dort.
     """
     phase0a_dir = os.path.join(scan_dir, "phase0a")
     os.makedirs(phase0a_dir, exist_ok=True)
@@ -637,18 +696,50 @@ def run_domain_intel(domain: str, scan_dir: str, order_id: str,
                     domain)
             except Exception:
                 raw = None
+        else:
+            # S6d (A11): auch eine Zeile ohne Daten traegt das Domain-Etikett; sonst
+            # zaehlte der whois-Ausfall von junkerwerk.hu (f9a2a2f6) zum Primaerziel.
+            raw = domain_labeled_json({"status": status, "reason": reason}, domain)
         record_tool_run(order_id, None, 0, tool, status,
                         reason=reason, raw_output=raw)
 
+    # Grund je Werkzeug, wenn der Abruf keine Daten liefert (Regeln wie im
+    # Primaerziel, S6c/#35 und S6d/#22). dns_security ohne Treffer ist ein
+    # gueltiges Leerergebnis und steht deshalb nicht hier.
+    no_data_reason = {
+        "whois": "whois_no_data",
+        "otx": "otx_no_data",
+        "securitytrails": "securitytrails_no_data",
+    }
+
     for tool in DOMAIN_INTEL_TOOLS:
         # dns_security haengt nicht an phase0a_tools (run_phase0a ruft es
-        # ebenfalls unabhaengig auf); whois schon.
-        if tool == "whois" and "whois" not in enabled:
+        # ebenfalls unabhaengig auf); whois, otx und securitytrails schon.
+        if tool != "dns_security" and tool not in enabled:
             continue
         publish_event(order_id, {"type": "tool_starting", "tool": tool, "host": domain})
         try:
+            data: Any
             if tool == "whois":
                 data = WhoisClient().lookup(domain)
+            elif tool == "otx":
+                # S6d (#22): nur der Domainanteil; die IP-Abfragen gehoeren zum
+                # Auftrag und laufen einmal beim Primaerziel. Struktur wie otx.json.
+                domain_resp = OTXClient().lookup_domain(domain)
+                data = {"domain": domain_resp} if domain_resp else None
+            elif tool == "securitytrails":
+                st = SecurityTrailsClient()
+                if not st.available:
+                    _record(tool, "skipped", reason="no_api_key")
+                    continue
+                # Struktur wie securitytrails.json des Primaerziels.
+                data = {
+                    "domain": st.lookup_domain(domain),
+                    "subdomains": st.get_subdomains(domain),
+                    "dns_history": st.get_dns_history(domain),
+                }
+                if not any(data.get(k) for k in ("domain", "subdomains", "dns_history")):
+                    data = None
             else:
                 data = run_all_dns_security(domain, package)
             if data:
@@ -656,12 +747,12 @@ def run_domain_intel(domain: str, scan_dir: str, order_id: str,
                            _with_domain(data, domain))
                 out[tool] = data
                 _record(tool, "ok", data)
-            elif tool == "whois":
-                # S6c/#35 (spec/09 Teil 2 Punkt 21): ein whois-Abruf ohne Daten ist
+            elif tool in no_data_reason:
+                # S6c/#35 (spec/09 Teil 2 Punkt 21): ein Abruf ohne Daten ist
                 # failed, nicht ok mit no_data (dieselbe Regel wie in run_phase0a).
                 # "empty" waere kein gueltiger Status und wuerde von record_tool_run
                 # still zu "failed" verbogen; hier ist "failed" explizit.
-                _record(tool, "failed", reason="whois_no_data")
+                _record(tool, "failed", reason=no_data_reason[tool])
             else:
                 # dns_security ohne Treffer bleibt ein gueltiges Leerergebnis (ok).
                 _record(tool, "ok", reason="no_data")

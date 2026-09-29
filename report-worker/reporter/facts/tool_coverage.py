@@ -15,12 +15,17 @@ import re
 from dataclasses import dataclass, field
 from typing import Optional
 
+from typing import Any
+
 from reporter.facts.nmap_parse import NmapHost, NmapRun
 from reporter.facts.schema import (
-    CONFIDENCE_DERIVED, CONFIDENCE_TOOL, Blocked, CoverageFact, Evidence,
+    CONFIDENCE_DERIVED, CONFIDENCE_TOOL, Blocked, CoverageFact, Evidence, ProviderBlock,
 )
 from reporter.facts.serialize import excerpt, sort_key
-from reporter.facts.sources import NON_TOOL_ROWS, ScanBundle, ToolRun
+from reporter.facts.sources import NON_TOOL_ROWS, ScanBundle, ToolRun, is_testssl_tool
+
+# S6d (A8): Grund einer Sperre laut Sperrerkennung nach dem Portscan (S6c provider_block_probe).
+PROVIDER_BLOCK_REASON = "provider_block_after_portscan"
 
 WEB_TOOLS = frozenset({
     "header_check", "httpx", "testssl", "zap", "zap_spider", "zap_active", "zap_ajax_spider",
@@ -74,6 +79,34 @@ class HostSignals:
     zap_spider_urls: Optional[int] = None
     zap_alerts_total: Optional[int] = None
     inventory_blocked: Optional[Blocked] = None
+    # S6d (A8): Sperrerkennung nach dem Portscan; (A2) Zustand je zusaetzlichem testssl-Lauf
+    # (Werkzeugname -> "ok" oder Grund, siehe ``testssl_run_state``).
+    provider_block: Optional[ProviderBlock] = None
+    testssl_runs: dict[str, str] = field(default_factory=dict)
+
+
+def testssl_run_state(ts: Any) -> str:
+    """Zustand eines testssl-Laufs aus seiner Ausgabe (S6d, A2, C4).
+
+    testssl gibt als Exit-Code eine Befundzahl zurueck; die Zeile steht deshalb bei einem
+    vollstaendigen Lauf mit Befunden auf ``failed`` (dortmund-beach testssl_587: Exit 8, 235
+    Eintraege). Massgeblich ist die Ausgabe: ``ok`` bei Protokollergebnissen ohne Abbruch; sonst
+    der Grund (``tls_connect_refused``, ``no_tls_on_port``, ``starttls_failed``, ``incomplete``)."""
+    if ts is None:
+        return "no_output"
+    for e in getattr(ts, "entries", []) or []:
+        if e.get("id") == "scanProblem" or str(e.get("severity") or "").upper() == "FATAL":
+            f = str(e.get("finding") or "").lower()
+            if "starttls" in f:
+                return "starttls_failed"
+            if "tls/ssl enabled" in f or "doesn't seem" in f or "no ssl/tls" in f:
+                return "no_tls_on_port"
+            return "tls_connect_refused"
+    if getattr(ts, "connect_failed", False):
+        return "tls_connect_refused"
+    if not ts.has_data or not any(v is not None for v in ts.protocols.values()):
+        return "incomplete"
+    return "ok"
 
 
 def _looks_complete(run: ToolRun) -> bool:
@@ -83,7 +116,7 @@ def _looks_complete(run: ToolRun) -> bool:
     if raw.startswith(("SKIPPED", "FAILED", "TIMEOUT")):
         return False
     tool = run.tool_norm
-    if tool == "testssl":
+    if is_testssl_tool(tool):
         return "Done 20" in raw or " Done " in raw or "Testing protocols" in raw
     if tool == "nmap":
         return "Nmap scan report" in raw or "Nmap done" in raw
@@ -147,9 +180,13 @@ def classify_run(run: ToolRun) -> tuple[str, Optional[str], Optional[str]]:
 
 
 def derive_blocked(sig: HostSignals, runs: list[ToolRun]) -> Blocked:
-    """Blockade in fester Reihenfolge: Inventar, scan_results, abgeleitet."""
+    """Blockade in fester Reihenfolge: Inventar, Sperrerkennung, scan_results, abgeleitet."""
     if sig.inventory_blocked and sig.inventory_blocked.detected:
         return sig.inventory_blocked
+    # S6d (A8): die Sperrerkennung nach dem Portscan (S6c) ist ein Messfakt, keine Ableitung.
+    # Gesperrte Hosts ueberspringen Phase 2; die Ableitung unten griffe dort nie.
+    if sig.provider_block is not None and sig.provider_block.blocked is True:
+        return Blocked(detected=True, reason=PROVIDER_BLOCK_REASON, source="scan_results")
     for r in runs:
         if r.host_ip == sig.ip and r.status == "blocked" and block_evidenced(r):
             return Blocked(detected=True, reason=r.reason or "blocked", source="scan_results")
@@ -290,6 +327,13 @@ def _adjust_with_signals(tool: str, status: str, reason: Optional[str], sig: Hos
             status, reason = "failed", "connect"
         elif status == "failed" and sig.testssl_has_data and not sig.testssl_connect_failed:
             status, reason = "ok", reason
+    elif is_testssl_tool(tool) and status in ("ok", "failed"):
+        # S6d (A2): die Ausgabe des Laufs entscheidet, nicht der Exit-Code (Befundzahl).
+        state = sig.testssl_runs.get(tool)
+        if state == "ok":
+            status, reason = "ok", None
+        elif state:
+            status, reason = "failed", reason or state
     if tool == "header_check" and fqdn is not None:
         reach = sig.headers_reachable.get(fqdn)
         if reach is False and status == "ok":
@@ -308,7 +352,8 @@ def _adjust_with_signals(tool: str, status: str, reason: Optional[str], sig: Hos
     # seine eigene Abdeckung.
     if tool == "zap" and status == "ok" and sig.zap_alerts_total == 0:
         status, reason = "empty", reason or "zap_no_alerts"
-    if blocked is not None and blocked.detected and tool in WEB_TOOLS and status in ("empty", "failed"):
+    if blocked is not None and blocked.detected and (tool in WEB_TOOLS or is_testssl_tool(tool)) \
+            and status in ("empty", "failed"):
         return "blocked", blocked.reason
     return status, reason
 

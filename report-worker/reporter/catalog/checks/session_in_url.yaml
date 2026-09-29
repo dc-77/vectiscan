@@ -9,7 +9,8 @@ scope: http.alerts
 applicable_when: null
 # S6b-2 (spec/09 Q14): nur Meldungen mit Konfidenz High tragen eine Regel; darunter
 # stehen sie als Werkzeugmeldung im Anhang (web_vulnerability_reported).
-when: '(zap_match(alert, ZAP_SESSION_URL)) and alert.confidence == "High"'
+# S6d (A7, spec/11 N2): nur Meldungen an der Zielseite, nicht an Abwehr-, Fehler- oder Nebenseiten.
+when: '(zap_match(alert, ZAP_SESSION_URL)) and alert.confidence == "High" and alert.location == "target"'
 positive_when: never
 not_testable_when: []
 undetermined: not_testable

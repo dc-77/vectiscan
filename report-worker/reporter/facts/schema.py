@@ -93,6 +93,17 @@ Historie:
   ``CoverageFact.run_status`` und ``PathSearchFact.tool_reasons``, ``statistics`` (N13). Der
   DNS-Fakt traegt den Nachweis des Zonentransfers je Domain (N6), ein Windows-Eintrag Shodan
   ``os`` als zweite Quelle (N12).
+- 1.4.0 (S6d, S6c-Rohfelder aus docs/S6C-NEW-RAW-FIELDS.md): keine neue Entitaet, neue optionale
+  Felder und geaenderte Bedeutungen. ``tls[]`` fuehrt einen Eintrag je testssl-Lauf (443, je Port
+  mit ``--starttls``, je SNI) mit ``run``, ``sni``, ``starttls`` und ``service_name``; die
+  Uebertragung ueber das Zertifikat (``assigned_from``) gilt nur noch ohne eigenen Lauf (A2).
+  Neue Felder: ``Provider.netblock_owner``, ``netname``, ``handle``, ``rir``, ``cidr``,
+  ``source_url`` (RDAP, A1), ``Reputation.abuseipdb_max_age_days`` (A10),
+  ``HostFact.provider_block`` und ``provider_block_probes`` (Sperrerkennung, A8, C3),
+  ``ServiceFact.kennung_source`` und ``smtp_source`` (A3, A4), ``HttpFact.xmlrpc_probe`` (A5),
+  ``WebAlert.status``, ``statuses``, ``location`` (A7), ``ZoneTransfer.not_tested_reason`` (A9),
+  ``TargetFact.synthetic_ipv6`` (NAT64, C2), ``HttpResponse.status_basis`` ``redirect_eval``
+  (Endantwort aus header_check, A6).
 """
 from __future__ import annotations
 
@@ -100,7 +111,7 @@ from typing import Any, ClassVar, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-FACTS_SCHEMA_VERSION = "1.3.0"
+FACTS_SCHEMA_VERSION = "1.4.0"
 
 Mode = Literal["active", "passive"]
 
@@ -194,6 +205,17 @@ class DiscoveredName(Base):
     source: str = "gobuster_dns"
 
 
+class SyntheticIp(Base):
+    """Vom Resolver des Pruefstands synthetisierte NAT64-Adresse (64:ff9b::/96, Issue #19).
+
+    Die Adresse gehoert keinem System des Kunden; sie bildet die eingebettete IPv4-Adresse ab und
+    ist kein IPv6-Ziel. Der Scanner fuehrt sie seit S6d im Inventar mit Grund."""
+    ip: str
+    embedded_ipv4: Optional[str] = None
+    fqdns: list[str] = Field(default_factory=list)
+    reason: str = "nat64_synthesized"
+
+
 class TargetFact(Fact):
     domain: str
     is_primary: bool = True
@@ -205,6 +227,8 @@ class TargetFact(Fact):
     # Discovery repariert. ``discovered_total`` zaehlt Inventarnamen plus diese Namen.
     discovered: list[DiscoveredName] = Field(default_factory=list)
     discovered_total: Optional[int] = None
+    # S6d (Issue #19): NAT64-Adressen aus dem Inventar (``synthetic_ipv6``), nur am Primaerziel.
+    synthetic_ipv6: list[SyntheticIp] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------- host / fqdn
@@ -216,6 +240,15 @@ class Provider(Base):
     # S6b-3 (spec/10 Teil 2 CA): Domain des Netzbetreibers laut AbuseIPDB
     # (``vodafone-ip.de`` bei ``isp`` "Castenow GmbH").
     domain: Optional[str] = None
+    # S6d (A1, spec/11 T2, E17): Inhaber des Adressblocks laut RDAP-Antwort der Registry
+    # (``rir`` RIPE, ARIN, APNIC, LACNIC oder AFRINIC laut Antwort). Ohne ``rir`` bleibt die Spalte
+    # "laut AbuseIPDB".
+    netblock_owner: Optional[str] = None
+    netname: Optional[str] = None
+    handle: Optional[str] = None
+    rir: Optional[str] = None
+    cidr: list[str] = Field(default_factory=list)
+    source_url: Optional[str] = None
 
 
 class PortsSummary(Base):
@@ -242,6 +275,8 @@ class Reputation(Base):
     urlhaus_compromised: Optional[bool] = None
     greynoise_classification: Optional[str] = None
     abuseipdb_distinct_users: Optional[int] = None
+    # S6d (A10): Abfragefenster der AbuseIPDB-Abfrage in Tagen (``maxAgeInDays``).
+    abuseipdb_max_age_days: Optional[int] = None
 
 
 SharedKind = Literal["hoster", "platform"]
@@ -311,6 +346,24 @@ class AdditionalIp(Base):
     source: str = "dnsx"
 
 
+class ProviderBlock(Base):
+    """Sperrerkennung nach dem Portscan (S6c ``provider_block_probe``, A8).
+
+    Der Scanner verbindet sich nach dem Portscan erneut mit offenen Ports der Adresse.
+    ``blocked`` True: auch nach dem letzten Versuch keine Verbindung; ``time_to_reachable_s``
+    ist die Wartezeit bis zur ersten gelungenen Verbindung, ``waited_s`` die gesamte Wartezeit
+    der Messung. ``stage`` ``portscan`` ist die Messung nach dem Portscan, ``probes`` die zweite
+    Messung nach den Per-Port-Sonden auf gedrosselten Hosts (C3)."""
+    stage: Literal["portscan", "probes"] = "portscan"
+    blocked: Optional[bool] = None
+    reachable: Optional[bool] = None
+    time_to_reachable_s: Optional[float] = None
+    waited_s: Optional[float] = None
+    checked_ports: list[int] = Field(default_factory=list)
+    attempts: Optional[int] = None
+    checked_at: Optional[str] = None
+
+
 class HostFact(Fact):
     ip: str
     family: Literal[4, 6]
@@ -341,6 +394,9 @@ class HostFact(Fact):
     serves_customer_web: Optional[bool] = None
     # S6b-4 (spec/11 T7): AAAA-Adressen derselben Namen ohne Inventareintrag.
     additional_ips: list[AdditionalIp] = Field(default_factory=list)
+    # S6d (A8, C3): Sperrerkennung nach dem Portscan und nach den Per-Port-Sonden.
+    provider_block: Optional[ProviderBlock] = None
+    provider_block_probes: Optional[ProviderBlock] = None
 
 
 class Alias(Base):
@@ -444,6 +500,11 @@ class ServiceFact(Fact):
     # S6b-4n (spec/11 N11): die fremde Domain laut Zertifikat oder Kennung; ohne sie ist der Dienst
     # kein belegter Dienst einer anderen Domain (castenow 8800, Icecast ohne Domain).
     foreign_domain: Optional[str] = None
+    # S6d (A3): Quelle der Kennung (``nmap``, ``nmap_versionall``, ``ssl-cert``, ``shodan``).
+    kennung_source: Optional[str] = None
+    # S6d (A4): Quelle von ``smtp_vrfy`` und ``auth_before_starttls`` (``nmap`` smtp-commands oder
+    # ``smtp_ehlo``, die EHLO-Sonde vor STARTTLS).
+    smtp_source: Optional[str] = None
 
 
 class TlsCert(Base):
@@ -553,6 +614,13 @@ class TlsFact(Fact):
     # S6b-4 (spec/11 T7): die Adresse, an der testssl tatsaechlich gemessen hat ("-->>"); bei
     # DNS-Rotation weicht sie von der Inventaradresse ab (huendgen 52.59.120.70).
     measured_ip: Optional[str] = None
+    # S6d (A2): der testssl-Lauf dieses Eintrags (``testssl``, ``testssl_587``,
+    # ``testssl_sni_<name>``), der Name des Laufs mit SNI, STARTTLS und der von testssl erkannte
+    # Dienst (``service``: HTTP, smtp, pop3, imap, ftp).
+    run: Optional[str] = None
+    sni: Optional[str] = None
+    starttls: Optional[bool] = None
+    service_name: Optional[str] = None
 
 
 # ---------------------------------------------------------------- http
@@ -610,6 +678,13 @@ class WebAlert(Base):
     run: Optional[Literal["passive", "active"]] = None
     # S6b-3 (spec/10 R15): betroffener Parameter oder Kopf (z. B. Content-Security-Policy).
     param: Optional[str] = None
+    # S6d (A7, spec/11 N2): Statuscode der Antwort je Meldung laut ZAP-Export (S6c). ``location``
+    # ``target`` ist die Zielseite; ``side_path`` Nebenpfade (robots.txt, sitemap.xml),
+    # ``error_page`` Fehlerseiten (4xx ausser 429, 5xx), ``challenge`` Abwehrseiten (429). Nur
+    # Meldungen an der Zielseite tragen Katalogregeln; die uebrigen stehen mit Pfad im Anhang.
+    status: Optional[int] = None
+    statuses: list[int] = Field(default_factory=list)
+    location: Literal["target", "side_path", "error_page", "challenge"] = "target"
 
 
 class WebPath(Base):
@@ -652,7 +727,8 @@ class HttpResponse(Base):
     tool: HeaderTool
     url: Optional[str] = None
     status_code: Optional[int] = None
-    status_basis: Optional[Literal["httpx_chain", "testssl", "location", "inventory", "claimed"]] = None
+    status_basis: Optional[Literal["httpx_chain", "testssl", "location", "inventory", "claimed",
+                                   "redirect_eval"]] = None
     location: Optional[str] = None
     content_type: Optional[str] = None
     challenge: Optional[str] = None
@@ -690,6 +766,9 @@ class HeaderMeasurement(Base):
     # anderen Seite desselben Hosts mit anderem Titel); ``unknown`` ist dann nur an dieser
     # Weiterleitungsseite gemessen.
     client_redirect: Optional[bool] = None
+    # S6d (A6): Endantwort laut header_check (S6c ``redirect_eval``: curl folgt HTTP-Weiterleitungen),
+    # auch wenn sie nicht bewertbar ist (4xx, 429, andere Seite); die Einschraenkung nennt ihren Status.
+    final: Optional[HttpResponse] = None
 
 
 class HttpFact(Fact):
@@ -723,6 +802,19 @@ class HttpFact(Fact):
     header_eval: Optional[HeaderMeasurement] = None
     # S6b-4 (spec/11 T7): Adresse, die httpx fuer den Namen aufgeloest und gemessen hat.
     measured_ip: Optional[str] = None
+    # S6d (A5): Ergebnis der XML-RPC-Sonde auf /xmlrpc.php (S6c ``wordpress_xmlrpc``).
+    xmlrpc_probe: Optional["XmlrpcProbe"] = None
+
+
+class XmlrpcProbe(Base):
+    """Antwort von /xmlrpc.php auf einen ``system.listMethods``-Aufruf (S6c-Sonde, A5).
+
+    ``enabled`` True, wenn die Schnittstelle antwortet (Methodenliste oder XML-RPC-Fehler);
+    ``fault`` True bei einer XML-RPC-Fehlerantwort."""
+    url: Optional[str] = None
+    status: Optional[int] = None
+    enabled: Optional[bool] = None
+    fault: Optional[bool] = None
 
 
 # ---------------------------------------------------------------- dns
@@ -803,6 +895,9 @@ class Bimi(Base):
 class ZoneTransfer(Base):
     allowed: Optional[bool] = None
     ns_tested: list[str] = Field(default_factory=list)
+    # S6d (A9): die Rohausgabe je Domain nennt statt eines Laufs den Grund ("keine Nameserver
+    # ermittelt", "NS-Suche fehlgeschlagen"); dann ist ``allowed`` None und kein Positivbefund moeglich.
+    not_tested_reason: Optional[str] = None
 
 
 class DanglingCname(Base):
@@ -1088,3 +1183,4 @@ class Facts(Base):
 
 TlsCert.model_rebuild()
 WordPressInfo.model_rebuild()
+HttpFact.model_rebuild()

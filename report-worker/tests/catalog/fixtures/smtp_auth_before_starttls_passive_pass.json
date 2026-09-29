@@ -1,0 +1,22 @@
+{
+ "facts": {
+  "passive": [
+   {
+    "host_ip": "195.50.179.4",
+    "port": 25,
+    "source": "shodan",
+    "service": "smtp",
+    "details": {"smtp_auth_before_starttls": false},
+    "verified": false,
+    "seen_at": "2026-09-20T08:00:00Z",
+    "confidence": 0.5
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "195.50.179.4",
+  "positive": false
+ }
+}

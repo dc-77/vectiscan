@@ -94,12 +94,14 @@
   "inventory": [
    {
     "host": "62.217.52.165",
+    "operator": "",
     "port": "80",
     "ref": "",
     "svc": "Golang net/http server"
    },
    {
     "host": "62.217.52.165",
+    "operator": "",
     "port": "443",
     "ref": "VS-2026-002, VS-2026-006",
     "svc": "Golang net/http server, TLS erzwungen"
@@ -1900,8 +1902,8 @@
  "landscape_lead": "8 Befunde in 3 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 19,
-  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
-  "catalog_version": "2026-09-27.2",
+  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
+  "catalog_version": "2026-09-29.1",
   "classification": "Vertraulich",
   "consolidated": 8,
   "context_fields": [],
@@ -1913,7 +1915,7 @@
    "vectiscan.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.3.0",
+  "facts_schema_version": "1.4.0",
   "fqdns_total": 31,
   "generated_on": null,
   "generation": null,
@@ -1928,7 +1930,7 @@
   ],
   "package": "WebCheck",
   "package_label": "WEBCHECK",
-  "policy_version": "2026-09-27.2",
+  "policy_version": "2026-09-29.1",
   "positives": 2,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -2214,6 +2216,7 @@
     "ip": "62.217.52.165",
     "more_ips": [],
     "operator": "unbekannt",
+    "operator_source": "",
     "role": "Website"
    },
    {
@@ -2223,6 +2226,7 @@
     "ip": "62.217.52.177",
     "more_ips": [],
     "operator": "unbekannt",
+    "operator_source": "",
     "role": "Nicht näher bestimmbar"
    }
   ],
@@ -2253,6 +2257,18 @@
      "vectiscan.de"
     ],
     "what": "DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar"
+   },
+   {
+    "checks": [
+     "Registrierungsdaten der Domain"
+    ],
+    "code": "whois_no_data",
+    "detail": "Betroffen: vectigal.tech.",
+    "refs": [],
+    "subjects": [
+     "vectigal.tech"
+    ],
+    "what": "Registrierungsdaten der Domain nicht abrufbar"
    },
    {
     "checks": [
@@ -2555,6 +2571,7 @@
     "v": "8"
    }
   ],
+  "operator_header": "Netzbetreiber (laut AbuseIPDB)",
   "out_of_scope": [
    "Interne Netzsegmente, Arbeitsplätze und mobile Geräte hinter der Firewall.",
    "Prüfungen mit Anmeldung (kein Login in Portale oder Verwaltungsoberflächen).",

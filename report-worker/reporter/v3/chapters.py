@@ -500,6 +500,9 @@ def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
         operator = SYS.network_operator_label(
             lead.provider, platform=bool(lead.cdn_provider or (lead.shared and lead.shared.kind == "platform")),
             customer_domains=list(facts.scan.domains) or [facts.scan.domain]) or UNKNOWN
+        # S6d (A1, E17): Quelle je Zeile (RIR laut RDAP oder AbuseIPDB); der Kopf nennt sie, wenn
+        # alle Zeilen dieselbe haben, sonst steht sie in der Zelle.
+        quelle = SYS.network_operator_source(lead.provider) if operator != UNKNOWN else ""
         if lead.reverse:
             operator = f"{operator} ({lead.reverse})"
         roles = R.role_label(system_roles(facts, members))
@@ -509,8 +512,17 @@ def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
         names = sorted({n for h in members for n in h.fqdns if not n.startswith("*.")}, key=sort_key)
         hosts.append(ScopeHost(
             ip=lead.ip, more_ips=more, fqdns=", ".join(names) or UNKNOWN,
-            operator=operator, role=f"{roles} · {hint}" if hint else roles,
+            operator=operator, operator_source=quelle or "", role=f"{roles} · {hint}" if hint else roles,
             coverage=text, cov=status))
+    quellen = {h.operator_source for h in hosts if h.operator_source}
+    operator_header = "Netzbetreiber (laut AbuseIPDB)"
+    if len(quellen) == 1:
+        operator_header = f"Netzbetreiber (laut {next(iter(quellen))})"
+    elif len(quellen) > 1:
+        operator_header = "Netzbetreiber"
+        for h in hosts:
+            if h.operator_source:
+                h.operator = f"{h.operator}, laut {h.operator_source}"
     for host in sorted((h for h in facts.hosts if h.third_party is not None), key=lambda h: sort_key(h.ip)):
         operator = host.third_party.operator or UNKNOWN
         hosts.append(ScopeHost(
@@ -542,6 +554,7 @@ def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
     return Scope(
         lead=N.scope_lead(counts),
         hosts=hosts,
+        operator_header=operator_header,
         domains=[DomainScope(domain=d, text=t) for d, t in domains] if len(domains) > 1 else [],
         out_of_scope=out_of_scope,
         limitations=limitations(facts, output, model, findings),

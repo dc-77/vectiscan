@@ -320,7 +320,7 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
 
     # ── Phase 0a: Passive Intelligence (no contact to target) ──
     from scanner.phase0a import (run_phase0a, build_passive_intel_for_ai,
-                                 run_domain_intel)
+                                 run_domain_intel, PHASE0A_IP_TOOLS)
 
     phase0a_tools = config.get("phase0a_tools", [])
     phase0a_results: dict[str, Any] = {}
@@ -332,9 +332,11 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
             _check_timeout()
 
         # Phase 0a runs before active discovery — no IPs known yet
+        # S6d (C6): reine IP-Werkzeuge (rdap) warten auf den IP-Durchgang unten.
         phase0a_results = run_phase0a(
             domain, [], scan_dir, order_id, config,
             progress_callback=p0a_callback,
+            defer_ip_tools=True,
         )
 
         # Persist passive intel summary to DB
@@ -343,8 +345,9 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         _check_timeout()
 
     # Issue #12: WHOIS und die DNS-Sicherheitsabfragen fuer jede weitere
-    # Domain der Order. Kontingentpflichtige Quellen bleiben beim Primaerziel
-    # (Entscheidung DC 19.09.2026, siehe phase0a.DOMAIN_INTEL_TOOLS).
+    # Domain der Order, seit S6d (Issue #22, DC 29.09.2026) auch OTX und
+    # SecurityTrails. Shodan und VirusTotal bleiben beim Primaerziel
+    # (siehe phase0a.DOMAIN_INTEL_TOOLS).
     for extra_domain in extra_domains:
         update_progress(order_id, "passive_intel", f"domain_intel:{extra_domain}")
         try:
@@ -407,14 +410,17 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         return
 
     # Re-run Shodan/AbuseIPDB with discovered IPs (if Phase 0a is enabled)
+    # S6d (C6): dazu rdap, das bis hierher nie eine IP bekam. Der IP-Durchgang
+    # schreibt nur Zeilen dieser Werkzeuge und faehrt dns_security nicht erneut.
     if phase0a_tools and hosts:
         discovered_ips = [h["ip"] for h in hosts]
         ip_enrichment = run_phase0a(
             domain, discovered_ips, scan_dir, order_id,
-            {**config, "phase0a_tools": [t for t in phase0a_tools if t in ("shodan", "abuseipdb")]},
+            {**config, "phase0a_tools": [t for t in phase0a_tools if t in PHASE0A_IP_TOOLS]},
+            ip_pass=True,
         )
         # Merge IP-specific results into phase0a_results
-        for key in ("shodan_hosts", "abuseipdb"):
+        for key in ("shodan_hosts", "abuseipdb", "rdap"):
             if key in ip_enrichment:
                 phase0a_results.setdefault(key, {}).update(ip_enrichment[key])
 

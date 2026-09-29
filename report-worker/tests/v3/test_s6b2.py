@@ -176,8 +176,16 @@ def test_ohne_erzeugungsnummer_keine_leere_angabe():
 
 @pytest.mark.parametrize("order", ORDERS)
 def test_whois_ohne_daten_steht_nicht_im_bericht(order):
+    """S6b-2: kein Befund zur Laufzeit der Domain. S6d (A11): ein whois-Abruf ohne Daten, den der
+    Scanner seit S6c ehrlich als ``failed`` fuehrt, steht als Einschraenkung; die alten ``ok``-Zeilen
+    mit "no_data" nicht."""
     data = data_for(order)
-    assert not [lim for lim in data.scope.limitations if "Registrierungsdaten" in (lim.what + lim.detail)]
+    failed = any(c.tool == "whois" and c.status == "failed" for c in facts_for(order).coverage)
+    zeilen = [lim for lim in data.scope.limitations if "Registrierungsdaten" in (lim.what + lim.detail)]
+    if failed:
+        assert [lim.what for lim in zeilen] == ["Registrierungsdaten der Domain nicht abrufbar"]
+    else:
+        assert not zeilen
     assert not [f for f in data.findings if any(p.check == "domain_expiring" for p in f.provenance)]
 
 

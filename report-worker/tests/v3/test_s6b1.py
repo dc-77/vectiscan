@@ -269,7 +269,9 @@ def test_jedes_abdeckungswerkzeug_hat_einen_pruefungsnamen():
     ohne = set()
     for order in order_ids():
         for row in facts_for(order).coverage:
-            if row.tool not in T.TOOL_CHECKS and row.tool not in COV.NO_LIMITATION_TOOLS \
+            # S6d: Werkzeuge mit Port oder Name im Suffix (testssl_587, smtp_ehlo_465) ueber
+            # ``tables.tool_check``.
+            if T.tool_check(row.tool) == T.TOOL_CHECKS_FALLBACK and row.tool not in COV.NO_LIMITATION_TOOLS \
                     and row.tool not in T.OUT_OF_PRODUCT_TOOLS:
                 ohne.add(row.tool)
     assert ohne == set()

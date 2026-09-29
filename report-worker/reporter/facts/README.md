@@ -186,6 +186,41 @@ nur fuer dieselbe Linie, dieselbe Zustaendigkeit und aus testssl mit vollstaendi
 | `path_search[].tool_reasons`, `statistics` | Abbruchgrund je Werkzeug, feroxbuster mit Abschlussstatistik (N13) | feroxbuster, ffuf |
 | nmap-Nachweis mit `?` | geratener Dienstname wie in der nmap-Ausgabe ("8443/tcp open https-alt?") (N15) | nmap XML `method="table"` |
 
+### Seit Schema 1.4.0 (S6d, S6c-Rohfelder aus `docs/S6C-NEW-RAW-FIELDS.md`)
+
+Minor-Bump ohne neue Entitaet. Bedeutung geaendert: `tls[]` fuehrt einen Eintrag je
+testssl-Lauf (443, je Port mit `--starttls`, je SNI); `assigned_from` gilt nur noch ohne eigenen
+Lauf. Ein Lauf zaehlt nach seiner Ausgabe, nicht nach dem Exit-Code (testssl gibt die Befundzahl
+zurueck: dortmund-beach `testssl_587` Exit 8 mit 235 Eintraegen).
+
+| Feld | Inhalt | Quelle |
+|---|---|---|
+| `tls[].run`, `sni`, `starttls`, `service_name` | Lauf, Name des SNI-Laufs, STARTTLS-Port, Dienst laut testssl (A2) | `testssl_<port>.json`, `testssl_sni_<slug>.json`, Zeilen gleichen Namens |
+| `hosts[].provider.netblock_owner`, `netname`, `handle`, `rir`, `cidr`, `source_url` | Inhaber des Adressblocks laut RDAP der Registry (A1, E17) | `phase0a/rdap.json`, Zeile `rdap` |
+| `hosts[].reputation.abuseipdb_max_age_days` | Abfragefenster der Reputation (A10) | AbuseIPDB `maxAgeInDays` |
+| `hosts[].provider_block`, `provider_block_probes` | Sperrerkennung nach dem Portscan und nach den Per-Port-Sonden (A8, C3) | `tech_profile.provider_block`, Zeilen `provider_block_probe`, `provider_block_probe_p2` |
+| `services[].kennung_source`, `smtp_source` | Quelle der Kennung (nmap, nmap_versionall, ssl-cert, testssl, shodan) und der SMTP-Faehigkeiten (nmap, smtp_ehlo) (A3, A4) | `nmap_versionall.xml`, `smtp_ehlo_<port>.json` |
+| `http[].xmlrpc_probe` | Antwort von /xmlrpc.php (A5) | `xmlrpc_probe.json`, Zeile `wordpress_xmlrpc` |
+| `http[].alerts[].status`, `statuses`, `location` | Statuscode und Fundort je ZAP-Meldung (target, side_path, error_page, challenge) (A7) | `zap_alerts.json` (S6c `status`) |
+| `http[].header_eval.final`, `evaluated.status_basis=redirect_eval` | Endantwort von header_check nach HTTP-Weiterleitung (A6) | `headers_<slug>.json` `redirect_eval` |
+| `dns[].zone_transfer.not_tested_reason` | Grund, wenn fuer eine Domain kein AXFR-Lauf stattfand (A9) | `zone_transfer_<domain>.txt` |
+| `targets[].discovered[].source` `discovery_health` | aufgeloeste, nicht uebernommene Namen aus dem Inventar (A9) | `host_inventory.discovery_health.found_not_in_inventory` |
+| `targets[].synthetic_ipv6` | NAT64-Adressen des Resolvers, kein IPv6-Ziel (Issue #19) | `host_inventory.synthetic_ipv6` |
+| `passive[]` `otx`, `securitytrails` je Domain | Passivdaten jeder Zieldomain (Issue #22) | `phase0a/otx_<slug>.json`, `securitytrails_<slug>.json` |
+
+wpscan-Schwachstellen (Issue #16): Weg `hosts/<ip>/phase2/wpscan.json` (bzw. Zeile `wpscan`) ->
+`build._software_from_wpscan` -> `software[].vulnerabilities_count` (Zahl der Eintraege im Feed je
+Plugin, Theme oder Kern) und `software[].vulnerabilities` (Titel, CVE aus `references.cve`,
+`fixed_in`) -> Pruefung `wordpress_plugin_vulnerable` -> Nachweis. Kein Sprachmodell beruehrt Zahl
+oder Kennungen; Anhang A.3 zitiert sie mit Quelle wpscan. Der Feed ist versionsbezogen: in allen 24
+Golden-Tars liegt bei 68 von 71 Eintraegen die installierte Version unter `fixed_in`, die uebrigen
+drei haben keine Version oder kein `fixed_in`. Eine Schwere liefert der Feed nicht; die Reihenfolge
+im Nachweis folgt einem NVD-Wert aus `threats`, sonst dem Feed (S6d, Entscheidung DC 29.09.2026).
+
+Endantwort der Weiterleitungspruefung (`redirect_data.final_response_headers`) zaehlt nur mit dem
+Kennzeichen `final_response_source: document` (S6d C7); die S6c-Werte ohne Kennzeichen sind die
+Header der letzten Ressource der Seite (castenow mail: eine Schriftdatei) und bleiben ungenutzt.
+
 ### Bump-Regel (semver)
 
 - Patch: neue optionale Felder mit Default, neue Warnungstexte.
@@ -288,6 +323,13 @@ hosts/<ip>/phase2/testssl.json            seit S2b ohne Severity-Filter
 hosts/<ip>/phase2/zap_alerts.json         Liste, im Snapshot eine Zusammenfassung
 hosts/<ip>/phase2/zap_spider_urls.json    Liste von URLs
 hosts/<ip>/phase2/{feroxbuster,ffuf_*,wpscan}.json
+hosts/<ip>/phase2/testssl_<port>.json     je weiterem TLS-Port mit --starttls (seit S6c)
+hosts/<ip>/phase2/testssl_sni_<slug>.json je weiterem VHost auf 443 (seit S6c)
+hosts/<ip>/phase2/smtp_ehlo_<port>.json   EHLO vor STARTTLS (seit S6c, nur bei Antwort)
+hosts/<ip>/phase2/xmlrpc_probe.json       XML-RPC-Sonde (seit S6c)
+hosts/<ip>/phase1/nmap_versionall.xml     Nachlauf -sV --version-all fuer Ports ohne Kennung (seit S6c)
+phase0a/rdap.json                         Netzbetreiber je IP (seit S6c, Daten seit S6d C6)
+phase0a/{otx,securitytrails}_<domain>.json   je weiterer Domain (seit S6d C1)
 hosts/<ip>/phase*/screenshot_<vhost>.png  in den Golden-Fixtures entfernt
 ```
 
