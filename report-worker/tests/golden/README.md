@@ -1324,7 +1324,12 @@ erhalten):
   Fixtures mit Anhang B).
 - **A2, A3, A5, A6, A8, A9, A10:** keine Aenderung an den alten Fixtures (Rohfelder fehlen dort).
 
-Seitenerwartung (`render/expected-pages.json`) aus `ops-update-pages` der MR-Pipeline.
+Seitenerwartung (`render/expected-pages.json`) aus `ops-update-pages` der MR-Pipeline 3241 (MR !107):
+eine Seite mehr bei 14272c00, 176db198, 1f8bc977, 1fbc92b9, 2572eebc, 2e56abe1, 31d67a02, 45bb234c,
+4e6b6883, 68d59573 (neuer A4-Befund, Adresse je ZAP-Meldung in Anhang C, Betreiber in Anhang B), zwei
+bei 2d2d4f39, f77ccff2 und ae8d1d70 (dazu zwei A4-Befunde bei securess); neu 4394b0b7 34 Seiten
+(halbleer Seite 16), f9a2a2f6 34, cd28d260 39 (halbleer Seite 28). Die halbleeren Seiten sind
+Darstellung und gehen an S7a.
 
 ## Golden-Facts (S1)
 
