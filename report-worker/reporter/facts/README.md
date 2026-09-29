@@ -208,6 +208,15 @@ zurueck: dortmund-beach `testssl_587` Exit 8 mit 235 Eintraegen).
 | `targets[].synthetic_ipv6` | NAT64-Adressen des Resolvers, kein IPv6-Ziel (Issue #19) | `host_inventory.synthetic_ipv6` |
 | `passive[]` `otx`, `securitytrails` je Domain | Passivdaten jeder Zieldomain (Issue #22) | `phase0a/otx_<slug>.json`, `securitytrails_<slug>.json` |
 
+wpscan-Schwachstellen (Issue #16): Weg `hosts/<ip>/phase2/wpscan.json` (bzw. Zeile `wpscan`) ->
+`build._software_from_wpscan` -> `software[].vulnerabilities_count` (Zahl der Eintraege im Feed je
+Plugin, Theme oder Kern) und `software[].vulnerabilities` (Titel, CVE aus `references.cve`,
+`fixed_in`) -> Pruefung `wordpress_plugin_vulnerable` -> Nachweis. Kein Sprachmodell beruehrt Zahl
+oder Kennungen; Anhang A.3 zitiert sie mit Quelle wpscan. Der Feed ist versionsbezogen: in allen 24
+Golden-Tars liegt bei 68 von 71 Eintraegen die installierte Version unter `fixed_in`, die uebrigen
+drei haben keine Version oder kein `fixed_in`. Eine Schwere liefert der Feed nicht; die Reihenfolge
+im Nachweis folgt einem NVD-Wert aus `threats`, sonst dem Feed (S6d, Entscheidung DC 29.09.2026).
+
 Endantwort der Weiterleitungspruefung (`redirect_data.final_response_headers`) zaehlt nur mit dem
 Kennzeichen `final_response_source: document` (S6d C7); die S6c-Werte ohne Kennzeichen sind die
 Header der letzten Ressource der Seite (castenow mail: eine Schriftdatei) und bleiben ungenutzt.
