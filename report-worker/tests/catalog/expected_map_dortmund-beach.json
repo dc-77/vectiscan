@@ -79,6 +79,16 @@
   },
   "VS-2026-013": {
    "checks": [
+    "smtp_auth_before_starttls"
+   ]
+  },
+  "VS-2026-014": {
+   "checks": [
+    "smtp_auth_before_starttls_passive"
+   ]
+  },
+  "VS-2026-015": {
+   "checks": [
     "smtp_vrfy_enabled"
    ],
    "spec10": "R19",
@@ -86,7 +96,7 @@
    "spec11": "T12",
    "warum_spec11": "VRFY in der EHLO-Liste angeboten; der Scan hat VRFY nicht gesendet, also nicht beantwortet."
   },
-  "VS-2026-014": {
+  "VS-2026-016": {
    "checks": [
     "smtp_vrfy_enabled_passive"
    ],
@@ -94,51 +104,51 @@
    "warum": "Shodan last_update heißt „Hosteintrag aktualisiert am“, nicht „gesehen am“.",
    "spec11": "N15"
   },
-  "VS-2026-015": {
+  "VS-2026-017": {
    "checks": [
     "software_eol"
    ]
   },
-  "VS-2026-016": {
+  "VS-2026-018": {
    "checks": [
     "spf_softfail"
    ]
   },
-  "VS-2026-017": {
+  "VS-2026-019": {
    "checks": [
     "tls_no_13"
    ]
   },
-  "VS-2026-018": {
+  "VS-2026-020": {
    "checks": [
     "tls_rpt_missing"
    ]
   },
-  "VS-2026-019": {
+  "VS-2026-021": {
    "checks": [
     "tls_weakness_reported"
    ]
   },
-  "VS-2026-020": {
+  "VS-2026-022": {
    "checks": [
     "web_vulnerability_reported"
    ]
   },
-  "VS-2026-021": {
+  "VS-2026-023": {
    "checks": [
     "wordpress_plugin_vulnerable"
    ],
    "spec11": "N9, vorher T12 (Teil 3 DB VS-004)",
    "warum": "Produktname aus der Alias-Tabelle statt wpscan-Slug. Vorher: Titel im Plural bei mehreren Erweiterungen."
   },
-  "VS-2026-022": {
+  "VS-2026-024": {
    "checks": [
     "wordpress_user_enumeration"
    ],
    "spec11": "N2, N15 (E25)",
    "warum": "Gruppenname nennt nur Namen mit eigener Header-Messung (vorher mit Aliasnamen ohne Messung). Anmeldenamen nur als Anzahl und Fundweg, kein Name im Kundentext."
   },
-  "VS-2026-023": {
+  "VS-2026-025": {
    "checks": [
     "wordpress_xmlrpc_enabled"
    ],

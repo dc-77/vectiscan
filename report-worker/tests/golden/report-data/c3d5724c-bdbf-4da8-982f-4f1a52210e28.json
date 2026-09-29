@@ -31,90 +31,105 @@
   "inventory": [
    {
     "host": "116.202.77.64",
+    "operator": "Hetzner Online GmbH, laut AbuseIPDB",
     "port": "21",
     "ref": "VS-2026-003",
     "svc": "ProFTPD, TLS erzwungen"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "22",
     "ref": "",
     "svc": "ProFTPD mod_sftp"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "110",
     "ref": "VS-2026-003",
     "svc": "Courier pop3d, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "143",
     "ref": "VS-2026-003",
     "svc": "Dovecot imapd, Anmeldung erst nach STARTTLS"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "222",
     "ref": "",
     "svc": "OpenSSH 9.2p1"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "443",
     "ref": "",
     "svc": "Apache httpd, TLS erzwungen"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "465",
     "ref": "",
     "svc": "SMTP über TLS (Exim), TLS erzwungen"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "587",
     "ref": "",
     "svc": "SMTP (Exim), Anmeldung erst nach STARTTLS"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "993",
     "ref": "",
     "svc": "IMAP über TLS, TLS erzwungen"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "995",
     "ref": "",
     "svc": "POP3 über TLS, TLS erzwungen"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "3306",
     "ref": "VS-2026-001",
     "svc": "MariaDB 10.11.18"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "5432",
     "ref": "VS-2026-001",
     "svc": "PostgreSQL DB"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "25",
     "ref": "",
     "svc": "SMTP (Exim), laut Passivquelle"
    },
    {
     "host": "116.202.77.64",
+    "operator": "",
     "port": "4190",
     "ref": "",
     "svc": "ManageSieve (Dovecot Pigeonhole), laut Passivquelle, außerhalb des geprüften Portbereichs"
@@ -1502,8 +1517,8 @@
  "landscape_lead": "5 Befunde in 3 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 8,
-  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
-  "catalog_version": "2026-09-27.2",
+  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
+  "catalog_version": "2026-09-29.1",
   "classification": "Vertraulich",
   "consolidated": 5,
   "context_fields": [],
@@ -1514,7 +1529,7 @@
    "lumbeck-wolter.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.3.0",
+  "facts_schema_version": "1.4.0",
   "fqdns_total": 2,
   "generated_on": null,
   "generation": null,
@@ -1529,7 +1544,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.2",
+  "policy_version": "2026-09-29.1",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1940,6 +1955,7 @@
      "2a01:4f8:d0a:668b::2"
     ],
     "operator": "Hetzner Online GmbH (dedi5705.your-server.de)",
+    "operator_source": "AbuseIPDB",
     "role": "Datenbanken erreichbar, Dateiaustausch (FTP, SFTP), Mailabruf und Einlieferung, Website · geteiltes System beim Hoster"
    },
    {
@@ -1949,6 +1965,7 @@
     "ip": "52.97.135.104",
     "more_ips": [],
     "operator": "Microsoft 365 (laut Namensauflösung und SPF)",
+    "operator_source": "",
     "role": "Drittanbieter"
    }
   ],
@@ -2067,6 +2084,7 @@
     "v": "5"
    }
   ],
+  "operator_header": "Netzbetreiber (laut AbuseIPDB)",
   "out_of_scope": [
    "Interne Netzsegmente, Arbeitsplätze und mobile Geräte hinter der Firewall.",
    "Prüfungen mit Anmeldung (kein Login in Portale oder Verwaltungsoberflächen).",

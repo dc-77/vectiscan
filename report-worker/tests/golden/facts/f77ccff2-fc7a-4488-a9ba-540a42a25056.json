@@ -1633,16 +1633,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "www.castenow.de",
    "host_ip": "159.69.143.80",
-   "id": "cov:2:httpx:159.69.143.80",
+   "id": "cov:2:httpx:159.69.143.80:www.castenow.de",
    "mode": "active",
    "observed_at": "2026-07-19T23:59:04Z",
    "phase": 2,
    "raw_status": null,
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1660,97 +1660,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "vpn.castenow.de",
    "host_ip": "195.50.179.2",
-   "id": "cov:2:httpx:195.50.179.2",
+   "id": "cov:2:httpx:195.50.179.2:vpn.castenow.de",
    "mode": "active",
    "observed_at": "2026-07-20T00:05:16Z",
    "phase": 2,
    "raw_status": null,
    "reason": null,
    "run_status": null,
-   "scope": "host",
-   "source": "scan_results",
-   "status": "ok",
-   "target": null,
-   "tool": "httpx"
-  },
-  {
-   "confidence": 1.0,
-   "domain": null,
-   "duration_ms": 919,
-   "evidence": [
-    {
-     "excerpt": "{\"tls\":{\"host\":\"owa.castenow.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls12\",\"cipher\":\"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\",\"not_before\":\"2025-0...",
-     "ref": "scan_results:httpx:195.50.179.4",
-     "tool": "httpx"
-    }
-   ],
-   "exit_code": 0,
-   "fqdn": null,
-   "host_ip": "195.50.179.4",
-   "id": "cov:2:httpx:195.50.179.4",
-   "mode": "active",
-   "observed_at": "2026-07-20T00:00:14Z",
-   "phase": 2,
-   "raw_status": null,
-   "reason": null,
-   "run_status": null,
-   "scope": "host",
-   "source": "scan_results",
-   "status": "ok",
-   "target": null,
-   "tool": "httpx"
-  },
-  {
-   "confidence": 1.0,
-   "domain": null,
-   "duration_ms": 882,
-   "evidence": [
-    {
-     "excerpt": "{\"tls\":{\"host\":\"mail.castenow.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls12\",\"cipher\":\"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\",\"not_before\":\"2025-...",
-     "ref": "scan_results:httpx:195.50.179.4",
-     "tool": "httpx"
-    }
-   ],
-   "exit_code": 0,
-   "fqdn": null,
-   "host_ip": "195.50.179.4",
-   "id": "cov:2:httpx:195.50.179.4#2",
-   "mode": "active",
-   "observed_at": "2026-07-20T00:00:15Z",
-   "phase": 2,
-   "raw_status": null,
-   "reason": null,
-   "run_status": null,
-   "scope": "host",
-   "source": "scan_results",
-   "status": "ok",
-   "target": null,
-   "tool": "httpx"
-  },
-  {
-   "confidence": 1.0,
-   "domain": null,
-   "duration_ms": 877,
-   "evidence": [
-    {
-     "excerpt": "{\"tls\":{\"host\":\"mail2.castenow.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls12\",\"cipher\":\"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\",\"not_before\":\"2025...",
-     "ref": "scan_results:httpx:195.50.179.4",
-     "tool": "httpx"
-    }
-   ],
-   "exit_code": 0,
-   "fqdn": null,
-   "host_ip": "195.50.179.4",
-   "id": "cov:2:httpx:195.50.179.4#3",
-   "mode": "active",
-   "observed_at": "2026-07-20T00:00:16Z",
-   "phase": 2,
-   "raw_status": null,
-   "reason": null,
-   "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1768,16 +1687,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "autodiscover.castenow.de",
    "host_ip": "195.50.179.4",
-   "id": "cov:2:httpx:195.50.179.4#4",
+   "id": "cov:2:httpx:195.50.179.4:autodiscover.castenow.de",
    "mode": "active",
    "observed_at": "2026-07-20T00:00:17Z",
    "phase": 2,
    "raw_status": null,
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1786,25 +1705,79 @@
   {
    "confidence": 1.0,
    "domain": null,
-   "duration_ms": 904,
+   "duration_ms": 882,
    "evidence": [
     {
-     "excerpt": "{\"tls\":{\"host\":\"nextcloud.castenow.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_128_GCM_SHA256\",\"not_before\":\"2025-08-25T00:0...",
-     "ref": "scan_results:httpx:195.50.179.5",
+     "excerpt": "{\"tls\":{\"host\":\"mail.castenow.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls12\",\"cipher\":\"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\",\"not_before\":\"2025-...",
+     "ref": "scan_results:httpx:195.50.179.4",
      "tool": "httpx"
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
-   "host_ip": "195.50.179.5",
-   "id": "cov:2:httpx:195.50.179.5",
+   "fqdn": "mail.castenow.de",
+   "host_ip": "195.50.179.4",
+   "id": "cov:2:httpx:195.50.179.4:mail.castenow.de",
    "mode": "active",
-   "observed_at": "2026-07-20T00:01:09Z",
+   "observed_at": "2026-07-20T00:00:15Z",
    "phase": 2,
    "raw_status": null,
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "target": null,
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 877,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"mail2.castenow.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls12\",\"cipher\":\"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\",\"not_before\":\"2025...",
+     "ref": "scan_results:httpx:195.50.179.4",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "mail2.castenow.de",
+   "host_ip": "195.50.179.4",
+   "id": "cov:2:httpx:195.50.179.4:mail2.castenow.de",
+   "mode": "active",
+   "observed_at": "2026-07-20T00:00:16Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "run_status": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "target": null,
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 919,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"owa.castenow.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls12\",\"cipher\":\"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\",\"not_before\":\"2025-0...",
+     "ref": "scan_results:httpx:195.50.179.4",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "owa.castenow.de",
+   "host_ip": "195.50.179.4",
+   "id": "cov:2:httpx:195.50.179.4:owa.castenow.de",
+   "mode": "active",
+   "observed_at": "2026-07-20T00:00:14Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "run_status": null,
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1822,16 +1795,43 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "mailstore.castenow.de",
    "host_ip": "195.50.179.5",
-   "id": "cov:2:httpx:195.50.179.5#2",
+   "id": "cov:2:httpx:195.50.179.5:mailstore.castenow.de",
    "mode": "active",
    "observed_at": "2026-07-20T00:01:10Z",
    "phase": 2,
    "raw_status": null,
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "target": null,
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 904,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"nextcloud.castenow.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_128_GCM_SHA256\",\"not_before\":\"2025-08-25T00:0...",
+     "ref": "scan_results:httpx:195.50.179.5",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "nextcloud.castenow.de",
+   "host_ip": "195.50.179.5",
+   "id": "cov:2:httpx:195.50.179.5:nextcloud.castenow.de",
+   "mode": "active",
+   "observed_at": "2026-07-20T00:01:09Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "run_status": null,
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1849,16 +1849,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "bitwarden.castenow.de",
    "host_ip": "195.50.179.6",
-   "id": "cov:2:httpx:195.50.179.6",
+   "id": "cov:2:httpx:195.50.179.6:bitwarden.castenow.de",
    "mode": "active",
    "observed_at": "2026-07-20T00:07:01Z",
    "phase": 2,
    "raw_status": null,
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1876,16 +1876,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "rdgw.castenow.de",
    "host_ip": "195.50.179.7",
-   "id": "cov:2:httpx:195.50.179.7",
+   "id": "cov:2:httpx:195.50.179.7:rdgw.castenow.de",
    "mode": "active",
    "observed_at": "2026-07-20T00:09:08Z",
    "phase": 2,
    "raw_status": null,
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1903,16 +1903,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "openotp.castenow.de",
    "host_ip": "195.50.179.9",
-   "id": "cov:2:httpx:195.50.179.9",
+   "id": "cov:2:httpx:195.50.179.9:openotp.castenow.de",
    "mode": "active",
    "observed_at": "2026-07-20T00:21:52Z",
    "phase": 2,
    "raw_status": null,
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1930,16 +1930,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "umfrage.castenow.de",
    "host_ip": "3.174.46.10",
-   "id": "cov:2:httpx:3.174.46.10",
+   "id": "cov:2:httpx:3.174.46.10:umfrage.castenow.de",
    "mode": "active",
    "observed_at": "2026-07-20T00:23:22Z",
    "phase": 2,
    "raw_status": null,
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1957,16 +1957,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "ubb-wiki.castenow.de",
    "host_ip": "92.205.163.53",
-   "id": "cov:2:httpx:92.205.163.53",
+   "id": "cov:2:httpx:92.205.163.53:ubb-wiki.castenow.de",
    "mode": "active",
    "observed_at": "2026-07-20T00:13:17Z",
    "phase": 2,
    "raw_status": null,
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -4060,6 +4060,7 @@
    },
    "zone_transfer": {
     "allowed": false,
+    "not_tested_reason": null,
     "ns_tested": [
      "ns1a.dodns.net",
      "ns2a.dodns.net"
@@ -4627,16 +4628,25 @@
     "open": 2
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "hetzner.com",
+    "handle": null,
     "isp": "Hetzner Online GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -4726,16 +4736,25 @@
     "open": 1
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "vodafone-ip.de",
+    "handle": null,
     "isp": "Castenow GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Fixed Line ISP"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -4793,16 +4812,25 @@
     "open": 2
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "vodafone-ip.de",
+    "handle": null,
     "isp": "Castenow GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Fixed Line ISP"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -4858,16 +4886,25 @@
     "open": 1
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "vodafone-ip.de",
+    "handle": null,
     "isp": "Castenow GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Fixed Line ISP"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -4922,16 +4959,25 @@
     "open": 1
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "vodafone-ip.de",
+    "handle": null,
     "isp": "Castenow GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Fixed Line ISP"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -4986,16 +5032,25 @@
     "open": 1
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "vodafone-ip.de",
+    "handle": null,
     "isp": "Castenow GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Fixed Line ISP"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -5050,16 +5105,25 @@
     "open": 1
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "vodafone-ip.de",
+    "handle": null,
     "isp": "Castenow GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Fixed Line ISP"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -5139,16 +5203,25 @@
     "open": 2
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "amazon.com",
+    "handle": null,
     "isp": "Amazon.com, Inc.",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Content Delivery Network"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -5219,16 +5292,25 @@
     "open": 16
    },
    "provider": {
+    "cidr": [],
     "country": "FR",
     "domain": "hosteurope.de",
+    "handle": null,
     "isp": "Host Europe GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -5311,6 +5393,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": {
      "challenge": null,
@@ -5381,7 +5464,8 @@
    ],
    "url": "https://autodiscover.castenow.de",
    "wordpress": null,
-   "x_feserver": "EXCHANGE01"
+   "x_feserver": "EXCHANGE01",
+   "xmlrpc_probe": null
   },
   {
    "alerts": [
@@ -5390,11 +5474,14 @@
      "count": 1,
      "cwe": "CWE-1395",
      "evidence": "[\"ng-version\",\"20.3.18\"]",
+     "location": "target",
      "name": "Vulnerable JS Library",
      "param": null,
      "plugin_id": "10003",
      "risk": "High",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://bitwarden.castenow.de/app/vendor.d6b23dcb0aa4bf26665f.js",
      "urls_sample": [
       "https://bitwarden.castenow.de/app/vendor.d6b23dcb0aa4bf26665f.js"
@@ -5405,11 +5492,14 @@
      "count": 3,
      "cwe": "CWE-525",
      "evidence": null,
+     "location": "target",
      "name": "Re-examine Cache-control Directives",
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://bitwarden.castenow.de",
      "urls_sample": [
       "https://bitwarden.castenow.de",
@@ -5422,11 +5512,14 @@
      "count": 2,
      "cwe": "CWE-319",
      "evidence": null,
+     "location": "side_path",
      "name": "Strict-Transport-Security Header Not Set",
      "param": null,
      "plugin_id": "10035",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://bitwarden.castenow.de/robots.txt",
      "urls_sample": [
       "https://bitwarden.castenow.de/robots.txt",
@@ -5438,11 +5531,14 @@
      "count": 2,
      "cwe": "CWE-693",
      "evidence": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://haveibeenpwned.com; child-src 'self' https://*.duosecurity.com https://*.duo...",
+     "location": "target",
      "name": "CSP: Failure to Define Directive with No Fallback",
      "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://bitwarden.castenow.de",
      "urls_sample": [
       "https://bitwarden.castenow.de",
@@ -5454,11 +5550,14 @@
      "count": 1,
      "cwe": "CWE-497",
      "evidence": "1732584193",
+     "location": "target",
      "name": "Timestamp Disclosure - Unix",
      "param": null,
      "plugin_id": "10096",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://bitwarden.castenow.de/app/vendor.d6b23dcb0aa4bf26665f.js",
      "urls_sample": [
       "https://bitwarden.castenow.de/app/vendor.d6b23dcb0aa4bf26665f.js"
@@ -5469,11 +5568,14 @@
      "count": 2,
      "cwe": null,
      "evidence": "<script defer=\"defer\" src=\"theme_head.6991036cc6ce1ab5eee1.js\"></script>",
+     "location": "target",
      "name": "Modern Web Application",
      "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://bitwarden.castenow.de",
      "urls_sample": [
       "https://bitwarden.castenow.de",
@@ -5506,6 +5608,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": null,
     "framing_protected": null,
@@ -5542,7 +5645,8 @@
    ],
    "url": "https://bitwarden.castenow.de",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -5571,6 +5675,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": {
      "challenge": null,
@@ -5641,7 +5746,8 @@
    ],
    "url": "https://mail.castenow.de",
    "wordpress": null,
-   "x_feserver": "EXCHANGE01"
+   "x_feserver": "EXCHANGE01",
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -5670,6 +5776,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": {
      "challenge": null,
@@ -5740,91 +5847,102 @@
    ],
    "url": "https://mail2.castenow.de",
    "wordpress": null,
-   "x_feserver": "EXCHANGE01"
+   "x_feserver": "EXCHANGE01",
+   "xmlrpc_probe": null
   },
   {
    "alerts": [
     {
      "confidence": "Low",
-     "count": 2,
+     "count": 1,
      "cwe": "CWE-525",
      "evidence": null,
+     "location": "target",
      "name": "Re-examine Cache-control Directives",
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://mailstore.castenow.de/core/img/manifest.json",
      "urls_sample": [
-      "https://mailstore.castenow.de/core/img/manifest.json",
-      "https://mailstore.castenow.de/robots.txt"
+      "https://mailstore.castenow.de/core/img/manifest.json"
      ]
     },
     {
      "confidence": "High",
-     "count": 3,
+     "count": 2,
      "cwe": "CWE-693",
      "evidence": "default-src 'self'; script-src 'self' 'nonce-bwLGiI8TLooYw36MPHo7CCtpYK1ISaouh0C8yrNcDO0='; style-src 'self' 'unsafe-inline'; frame-src *; img-src * data: blob:; font-src 'self' data:; media-src *;...",
+     "location": "target",
      "name": "CSP: Failure to Define Directive with No Fallback",
      "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://mailstore.castenow.de",
      "urls_sample": [
       "https://mailstore.castenow.de",
-      "https://mailstore.castenow.de/",
-      "https://mailstore.castenow.de/sitemap.xml"
+      "https://mailstore.castenow.de/"
      ]
     },
     {
      "confidence": "Low",
-     "count": 3,
+     "count": 2,
      "cwe": "CWE-497",
      "evidence": "1784505674",
+     "location": "target",
      "name": "Timestamp Disclosure - Unix",
      "param": null,
      "plugin_id": "10096",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://mailstore.castenow.de",
      "urls_sample": [
       "https://mailstore.castenow.de",
-      "https://mailstore.castenow.de/",
-      "https://mailstore.castenow.de/sitemap.xml"
-     ]
-    },
-    {
-     "confidence": "Medium",
-     "count": 3,
-     "cwe": null,
-     "evidence": "<noscript> <div id=\"nojavascript\"> <div> This application requires JavaScript for correct operation. Please <a href=\"https://www.enable-javascript.com/\" target=\"_blank\" rel=\"noreferrer noopener\">en...",
-     "name": "Modern Web Application",
-     "param": null,
-     "plugin_id": "10109",
-     "risk": "Informational",
-     "run": "passive",
-     "url": "https://mailstore.castenow.de",
-     "urls_sample": [
-      "https://mailstore.castenow.de",
-      "https://mailstore.castenow.de/",
-      "https://mailstore.castenow.de/sitemap.xml"
+      "https://mailstore.castenow.de/"
      ]
     },
     {
      "confidence": "Medium",
      "count": 2,
      "cwe": null,
+     "evidence": "<noscript> <div id=\"nojavascript\"> <div> This application requires JavaScript for correct operation. Please <a href=\"https://www.enable-javascript.com/\" target=\"_blank\" rel=\"noreferrer noopener\">en...",
+     "location": "target",
+     "name": "Modern Web Application",
+     "param": null,
+     "plugin_id": "10109",
+     "risk": "Informational",
+     "run": "passive",
+     "status": null,
+     "statuses": [],
+     "url": "https://mailstore.castenow.de",
+     "urls_sample": [
+      "https://mailstore.castenow.de",
+      "https://mailstore.castenow.de/"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 1,
+     "cwe": null,
      "evidence": "oc_sessionPassphrase",
+     "location": "target",
      "name": "Session Management Response Identified",
      "param": "oc_sessionPassphrase",
      "plugin_id": "10112",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://mailstore.castenow.de",
      "urls_sample": [
-      "https://mailstore.castenow.de",
-      "https://mailstore.castenow.de/sitemap.xml"
+      "https://mailstore.castenow.de"
      ]
     }
    ],
@@ -5860,6 +5978,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": {
      "challenge": null,
@@ -6065,7 +6184,8 @@
    ],
    "url": "https://mailstore.castenow.de",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [
@@ -6074,11 +6194,14 @@
      "count": 1,
      "cwe": "CWE-1395",
      "evidence": "return\"[Axios v1.9.0] Transitional",
+     "location": "target",
      "name": "Vulnerable JS Library",
      "param": null,
      "plugin_id": "10003",
      "risk": "High",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://nextcloud.castenow.de/dist/core-common.js?v=4f19527a-20",
      "urls_sample": [
       "https://nextcloud.castenow.de/dist/core-common.js?v=4f19527a-20"
@@ -6086,18 +6209,20 @@
     },
     {
      "confidence": "Low",
-     "count": 2,
+     "count": 1,
      "cwe": "CWE-525",
-     "evidence": null,
+     "evidence": "private, max-age=3600, must-revalidate",
+     "location": "target",
      "name": "Re-examine Cache-control Directives",
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://nextcloud.castenow.de/apps/theming/manifest?v=e684f0c8",
      "urls_sample": [
-      "https://nextcloud.castenow.de/apps/theming/manifest?v=e684f0c8",
-      "https://nextcloud.castenow.de/robots.txt"
+      "https://nextcloud.castenow.de/apps/theming/manifest?v=e684f0c8"
      ]
     },
     {
@@ -6105,11 +6230,14 @@
      "count": 1,
      "cwe": "CWE-615",
      "evidence": "tifier: AGPL-3.0-or-later */",
+     "location": "target",
      "name": "Information Disclosure - Suspicious Comments",
      "param": null,
      "plugin_id": "10027",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://nextcloud.castenow.de/apps/theming/js/theming.js?v=4f19527a-20",
      "urls_sample": [
       "https://nextcloud.castenow.de/apps/theming/js/theming.js?v=4f19527a-20"
@@ -6117,14 +6245,17 @@
     },
     {
      "confidence": "High",
-     "count": 14,
+     "count": 13,
      "cwe": "CWE-693",
      "evidence": "default-src 'self'; script-src 'self' 'nonce-TfcH6BVwqyrVUNWozKy1KLT2iX7L8awxjS+IYlLv26s='; style-src 'self' 'unsafe-inline'; frame-src *; img-src * data: blob:; font-src 'self' data:; media-src *;...",
+     "location": "target",
      "name": "CSP: Failure to Define Directive with No Fallback",
      "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://nextcloud.castenow.de",
      "urls_sample": [
       "https://nextcloud.castenow.de",
@@ -6139,11 +6270,14 @@
      "count": 4,
      "cwe": "CWE-497",
      "evidence": "1784505669",
+     "location": "target",
      "name": "Timestamp Disclosure - Unix",
      "param": null,
      "plugin_id": "10096",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://nextcloud.castenow.de/apps/calendar/js/calendar-contacts-menu.js?v=4f19527a-20",
      "urls_sample": [
       "https://nextcloud.castenow.de/apps/calendar/js/calendar-contacts-menu.js?v=4f19527a-20",
@@ -6154,14 +6288,17 @@
     },
     {
      "confidence": "Medium",
-     "count": 12,
+     "count": 11,
      "cwe": null,
      "evidence": "<noscript> <div id=\"nojavascript\"> <div> This application requires JavaScript for correct operation. Please <a href=\"https://www.enable-javascript.com/\" target=\"_blank\" rel=\"noreferrer noopener\">en...",
+     "location": "target",
      "name": "Modern Web Application",
      "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://nextcloud.castenow.de/apps",
      "urls_sample": [
       "https://nextcloud.castenow.de/apps",
@@ -6173,21 +6310,23 @@
     },
     {
      "confidence": "Medium",
-     "count": 5,
+     "count": 4,
      "cwe": null,
      "evidence": "oc_sessionPassphrase",
+     "location": "target",
      "name": "Session Management Response Identified",
      "param": "oc_sessionPassphrase",
      "plugin_id": "10112",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://nextcloud.castenow.de",
      "urls_sample": [
       "https://nextcloud.castenow.de",
       "https://nextcloud.castenow.de/",
       "https://nextcloud.castenow.de/apps/theming/manifest?v=e684f0c8",
-      "https://nextcloud.castenow.de/login",
-      "https://nextcloud.castenow.de/sitemap.xml"
+      "https://nextcloud.castenow.de/login"
      ]
     }
    ],
@@ -6295,6 +6434,7 @@
      "tool": "redirect_probe",
      "url": "https://nextcloud.castenow.de/login"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -6420,7 +6560,8 @@
    ],
    "url": "https://nextcloud.castenow.de",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -6488,6 +6629,7 @@
      "tool": "header_check",
      "url": "https://openotp.castenow.de"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -6602,7 +6744,8 @@
    ],
    "url": "https://openotp.castenow.de",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -6658,6 +6801,7 @@
      "tool": "redirect_probe",
      "url": "https://owa.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fowa.castenow.de%2fowa%2f&reason=0"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -6781,7 +6925,8 @@
    ],
    "url": "https://owa.castenow.de",
    "wordpress": null,
-   "x_feserver": "EXCHANGE01"
+   "x_feserver": "EXCHANGE01",
+   "xmlrpc_probe": null
   },
   {
    "alerts": [
@@ -6790,11 +6935,14 @@
      "count": 1,
      "cwe": "CWE-525",
      "evidence": null,
+     "location": "target",
      "name": "Re-examine Cache-control Directives",
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
       "https://rdgw.castenow.de"
@@ -6805,11 +6953,14 @@
      "count": 1,
      "cwe": "CWE-1021",
      "evidence": null,
+     "location": "target",
      "name": "Missing Anti-clickjacking Header",
      "param": "x-frame-options",
      "plugin_id": "10020",
      "risk": "Medium",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
       "https://rdgw.castenow.de"
@@ -6820,11 +6971,14 @@
      "count": 2,
      "cwe": "CWE-693",
      "evidence": null,
+     "location": "target",
      "name": "X-Content-Type-Options Header Missing",
      "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
       "https://rdgw.castenow.de",
@@ -6833,73 +6987,77 @@
     },
     {
      "confidence": "High",
-     "count": 4,
+     "count": 2,
      "cwe": "CWE-319",
      "evidence": null,
+     "location": "target",
      "name": "Strict-Transport-Security Header Not Set",
      "param": null,
      "plugin_id": "10035",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
       "https://rdgw.castenow.de",
-      "https://rdgw.castenow.de/iisstart.png",
-      "https://rdgw.castenow.de/robots.txt",
-      "https://rdgw.castenow.de/sitemap.xml"
+      "https://rdgw.castenow.de/iisstart.png"
      ]
     },
     {
      "confidence": "High",
-     "count": 4,
+     "count": 2,
      "cwe": "CWE-497",
      "evidence": "Microsoft-IIS/10.0",
+     "location": "target",
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
      "param": null,
      "plugin_id": "10036",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
       "https://rdgw.castenow.de",
-      "https://rdgw.castenow.de/iisstart.png",
-      "https://rdgw.castenow.de/robots.txt",
-      "https://rdgw.castenow.de/sitemap.xml"
+      "https://rdgw.castenow.de/iisstart.png"
      ]
     },
     {
      "confidence": "Medium",
-     "count": 4,
+     "count": 2,
      "cwe": "CWE-497",
      "evidence": "X-Powered-By: ASP.NET",
+     "location": "target",
      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
      "param": null,
      "plugin_id": "10037",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
       "https://rdgw.castenow.de",
-      "https://rdgw.castenow.de/iisstart.png",
-      "https://rdgw.castenow.de/robots.txt",
-      "https://rdgw.castenow.de/sitemap.xml"
+      "https://rdgw.castenow.de/iisstart.png"
      ]
     },
     {
      "confidence": "High",
-     "count": 3,
+     "count": 1,
      "cwe": "CWE-693",
      "evidence": null,
+     "location": "target",
      "name": "Content Security Policy (CSP) Header Not Set",
      "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://rdgw.castenow.de",
      "urls_sample": [
-      "https://rdgw.castenow.de",
-      "https://rdgw.castenow.de/robots.txt",
-      "https://rdgw.castenow.de/sitemap.xml"
+      "https://rdgw.castenow.de"
      ]
     }
    ],
@@ -6950,6 +7108,7 @@
      "tool": "header_check",
      "url": "https://rdgw.castenow.de"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -7081,7 +7240,8 @@
    ],
    "url": "https://rdgw.castenow.de",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [
@@ -7090,11 +7250,14 @@
      "count": 26,
      "cwe": "CWE-525",
      "evidence": null,
+     "location": "target",
      "name": "Re-examine Cache-control Directives",
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://ubb-wiki.castenow.de/login/",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/login/",
@@ -7109,11 +7272,14 @@
      "count": 79,
      "cwe": "CWE-693",
      "evidence": null,
+     "location": "target",
      "name": "X-Content-Type-Options Header Missing",
      "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://ubb-wiki.castenow.de/error_docs/styles.css",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/error_docs/styles.css",
@@ -7128,11 +7294,14 @@
      "count": 2,
      "cwe": "CWE-615",
      "evidence": "//# sourceURL=user-profile-js-extra",
+     "location": "target",
      "name": "Information Disclosure - Suspicious Comments",
      "param": null,
      "plugin_id": "10027",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://ubb-wiki.castenow.de/wp-login.php",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/wp-login.php",
@@ -7144,11 +7313,14 @@
      "count": 2,
      "cwe": "CWE-565",
      "evidence": null,
+     "location": "target",
      "name": "Cookie Poisoning",
      "param": "wp_lang",
      "plugin_id": "10029",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://ubb-wiki.castenow.de/wp-login.php?action=lostpassword&wp_lang=de_DE",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/wp-login.php?action=lostpassword&wp_lang=de_DE",
@@ -7160,11 +7332,14 @@
      "count": 27,
      "cwe": "CWE-20",
      "evidence": null,
+     "location": "target",
      "name": "User Controllable HTML Element Attribute (Potential XSS)",
      "param": "redirect_to",
      "plugin_id": "10031",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F",
@@ -7176,14 +7351,17 @@
     },
     {
      "confidence": "Medium",
-     "count": 126,
+     "count": 123,
      "cwe": "CWE-497",
      "evidence": "X-Powered-By: PHP/8.4.23",
+     "location": "target",
      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
      "param": null,
      "plugin_id": "10037",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://ubb-wiki.castenow.de",
      "urls_sample": [
       "https://ubb-wiki.castenow.de",
@@ -7195,19 +7373,20 @@
     },
     {
      "confidence": "High",
-     "count": 3,
+     "count": 1,
      "cwe": "CWE-693",
      "evidence": null,
+     "location": "target",
      "name": "Content Security Policy (CSP) Header Not Set",
      "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://ubb-wiki.castenow.de/wp-json/wp/v2/users/4",
      "urls_sample": [
-      "https://ubb-wiki.castenow.de/wp-json/wp/v2/users/4",
-      "https://ubb-wiki.castenow.de/wp-sitemap.xml",
-      "https://ubb-wiki.castenow.de/xmlrpc.php?rsd"
+      "https://ubb-wiki.castenow.de/wp-json/wp/v2/users/4"
      ]
     },
     {
@@ -7215,11 +7394,14 @@
      "count": 4,
      "cwe": "CWE-1275",
      "evidence": "Set-Cookie: wordpress_test_cookie",
+     "location": "target",
      "name": "Cookie without SameSite Attribute",
      "param": "wordpress_test_cookie",
      "plugin_id": "10054",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://ubb-wiki.castenow.de/wp-login.php",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/wp-login.php",
@@ -7233,11 +7415,14 @@
      "count": 11,
      "cwe": "CWE-693",
      "evidence": "frame-ancestors 'self';",
+     "location": "target",
      "name": "CSP: Failure to Define Directive with No Fallback",
      "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://ubb-wiki.castenow.de/login/",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/login/",
@@ -7252,11 +7437,14 @@
      "count": 1,
      "cwe": "CWE-497",
      "evidence": "1538461538",
+     "location": "target",
      "name": "Timestamp Disclosure - Unix",
      "param": null,
      "plugin_id": "10096",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://ubb-wiki.castenow.de/wp-includes/css/dist/base-styles/admin-schemes.min.css?ver=7.0.2",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/wp-includes/css/dist/base-styles/admin-schemes.min.css?ver=7.0.2"
@@ -7267,11 +7455,14 @@
      "count": 4,
      "cwe": null,
      "evidence": "wordpress_test_cookie",
+     "location": "target",
      "name": "Session Management Response Identified",
      "param": "wordpress_test_cookie",
      "plugin_id": "10112",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://ubb-wiki.castenow.de/wp-login.php",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/wp-login.php",
@@ -7285,11 +7476,14 @@
      "count": 8,
      "cwe": "CWE-352",
      "evidence": "<form method=\"post\" action=\"\" autocomplete=\"off\">",
+     "location": "target",
      "name": "Absence of Anti-CSRF Tokens",
      "param": null,
      "plugin_id": "10202",
      "risk": "Medium",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://ubb-wiki.castenow.de/login/",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/login/",
@@ -7304,11 +7498,14 @@
      "count": 1,
      "cwe": "CWE-436",
      "evidence": null,
+     "location": "target",
      "name": "Charset Mismatch",
      "param": null,
      "plugin_id": "90011",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://ubb-wiki.castenow.de/wp-json/oembed/1.0/embed?format=xml&url=https%3A%2F%2Fubb-wiki.castenow.de%2Flogin%2F",
      "urls_sample": [
       "https://ubb-wiki.castenow.de/wp-json/oembed/1.0/embed?format=xml&url=https%3A%2F%2Fubb-wiki.castenow.de%2Flogin%2F"
@@ -7371,6 +7568,7 @@
      "tool": "redirect_probe",
      "url": "https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -7547,7 +7745,8 @@
     "version": "7.0.2",
     "version_status": "latest"
    },
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [
@@ -7556,11 +7755,14 @@
      "count": 1,
      "cwe": "CWE-525",
      "evidence": null,
+     "location": "side_path",
      "name": "Re-examine Cache-control Directives",
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://umfrage.castenow.de/robots.txt",
      "urls_sample": [
       "https://umfrage.castenow.de/robots.txt"
@@ -7571,11 +7773,14 @@
      "count": 1,
      "cwe": "CWE-693",
      "evidence": null,
+     "location": "side_path",
      "name": "X-Content-Type-Options Header Missing",
      "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://umfrage.castenow.de/robots.txt",
      "urls_sample": [
       "https://umfrage.castenow.de/robots.txt"
@@ -7586,11 +7791,14 @@
      "count": 1,
      "cwe": "CWE-319",
      "evidence": null,
+     "location": "side_path",
      "name": "Strict-Transport-Security Header Not Set",
      "param": null,
      "plugin_id": "10035",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://umfrage.castenow.de/robots.txt",
      "urls_sample": [
       "https://umfrage.castenow.de/robots.txt"
@@ -7598,38 +7806,43 @@
     },
     {
      "confidence": "High",
-     "count": 7,
+     "count": 5,
      "cwe": "CWE-497",
      "evidence": "Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.5",
+     "location": "target",
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
      "param": null,
      "plugin_id": "10036",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://umfrage.castenow.de",
      "urls_sample": [
       "https://umfrage.castenow.de",
       "https://umfrage.castenow.de/.well-known/",
       "https://umfrage.castenow.de/?url",
       "https://umfrage.castenow.de/npo/",
-      "https://umfrage.castenow.de/robots.txt"
+      "https://umfrage.castenow.de/user"
      ]
     },
     {
      "confidence": "Medium",
-     "count": 3,
+     "count": 2,
      "cwe": null,
      "evidence": "PHPSESSID",
+     "location": "target",
      "name": "Session Management Response Identified",
      "param": "PHPSESSID",
      "plugin_id": "10112",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://umfrage.castenow.de",
      "urls_sample": [
       "https://umfrage.castenow.de",
-      "https://umfrage.castenow.de/.well-known/",
-      "https://umfrage.castenow.de/sitemap.xml"
+      "https://umfrage.castenow.de/.well-known/"
      ]
     }
    ],
@@ -7665,6 +7878,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": {
      "challenge": null,
@@ -7744,7 +7958,8 @@
    ],
    "url": "https://umfrage.castenow.de",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [
@@ -7753,11 +7968,14 @@
      "count": 1,
      "cwe": "CWE-525",
      "evidence": "no-cache",
+     "location": "target",
      "name": "Re-examine Cache-control Directives",
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://vpn.castenow.de",
      "urls_sample": [
       "https://vpn.castenow.de"
@@ -7768,11 +7986,14 @@
      "count": 3,
      "cwe": "CWE-615",
      "evidence": "cument.standardPass.userName.value; documen",
+     "location": "target",
      "name": "Information Disclosure - Suspicious Comments",
      "param": null,
      "plugin_id": "10027",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://vpn.castenow.de",
      "urls_sample": [
       "https://vpn.castenow.de",
@@ -7782,14 +8003,17 @@
     },
     {
      "confidence": "High",
-     "count": 15,
+     "count": 13,
      "cwe": "CWE-319",
      "evidence": null,
+     "location": "target",
      "name": "Strict-Transport-Security Header Not Set",
      "param": null,
      "plugin_id": "10035",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://vpn.castenow.de/VirtualOffice.gif",
      "urls_sample": [
       "https://vpn.castenow.de/VirtualOffice.gif",
@@ -7804,11 +8028,14 @@
      "count": 2,
      "cwe": "CWE-693",
      "evidence": null,
+     "location": "side_path",
      "name": "Content Security Policy (CSP) Header Not Set",
      "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://vpn.castenow.de/robots.txt",
      "urls_sample": [
       "https://vpn.castenow.de/robots.txt",
@@ -7820,11 +8047,14 @@
      "count": 1,
      "cwe": "CWE-693",
      "evidence": "default-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: ws: wss: sonicwall.com *.sonicwall.com;",
+     "location": "target",
      "name": "CSP: Failure to Define Directive with No Fallback",
      "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://vpn.castenow.de",
      "urls_sample": [
       "https://vpn.castenow.de"
@@ -7835,11 +8065,14 @@
      "count": 2,
      "cwe": "CWE-497",
      "evidence": "1948392660",
+     "location": "target",
      "name": "Timestamp Disclosure - Unix",
      "param": null,
      "plugin_id": "10096",
      "risk": "Low",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://vpn.castenow.de",
      "urls_sample": [
       "https://vpn.castenow.de",
@@ -7851,11 +8084,14 @@
      "count": 1,
      "cwe": null,
      "evidence": "<script src=\"/cookies.js\" type=\"text/javascript\"></script>",
+     "location": "target",
      "name": "Modern Web Application",
      "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://vpn.castenow.de",
      "urls_sample": [
       "https://vpn.castenow.de"
@@ -7866,11 +8102,14 @@
      "count": 1,
      "cwe": "CWE-352",
      "evidence": "<form name=\"standardPass\" id=\"standardPass\" action=\"auth.cgi\" method=\"POST\" target=\"sslvpnTgtFrm\">",
+     "location": "target",
      "name": "Absence of Anti-CSRF Tokens",
      "param": null,
      "plugin_id": "10202",
      "risk": "Medium",
      "run": "passive",
+     "status": null,
+     "statuses": [],
      "url": "https://vpn.castenow.de",
      "urls_sample": [
       "https://vpn.castenow.de"
@@ -7924,6 +8163,7 @@
      "tool": "header_check",
      "url": "https://vpn.castenow.de"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -8042,7 +8282,8 @@
    ],
    "url": "https://vpn.castenow.de",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -8139,6 +8380,7 @@
      "tool": "header_check",
      "url": "https://www.castenow.de"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -8270,7 +8512,8 @@
    ],
    "url": "https://www.castenow.de",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   }
  ],
  "passive": [
@@ -9567,7 +9810,7 @@
    }
   ]
  },
- "schema_version": "1.3.0",
+ "schema_version": "1.4.0",
  "services": [
   {
    "auth_before_starttls": null,
@@ -9592,6 +9835,7 @@
    "host_ip": "159.69.143.80",
    "id": "svc:159.69.143.80:80/tcp",
    "kennung": "Apache httpd",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9602,6 +9846,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9648,6 +9893,7 @@
    "host_ip": "159.69.143.80",
    "id": "svc:159.69.143.80:443/tcp",
    "kennung": "Apache httpd, Titel „yak“",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9658,6 +9904,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9704,6 +9951,7 @@
    "host_ip": "195.50.179.2",
    "id": "svc:195.50.179.2:443/tcp",
    "kennung": "Web Server",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9714,6 +9962,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "https",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9774,6 +10023,7 @@
    "host_ip": "195.50.179.4",
    "id": "svc:195.50.179.4:25/tcp",
    "kennung": "Postfix smtpd",
+   "kennung_source": "nmap",
    "login_disabled": true,
    "method": "probed",
    "mode": "active",
@@ -9784,6 +10034,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_source": "nmap",
    "smtp_vrfy": true,
    "source": "nmap",
    "starttls": true,
@@ -9830,6 +10081,7 @@
    "host_ip": "195.50.179.4",
    "id": "svc:195.50.179.4:443/tcp",
    "kennung": "Microsoft IIS httpd 10.0, Titel „Outlook“",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9840,6 +10092,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9886,6 +10139,7 @@
    "host_ip": "195.50.179.5",
    "id": "svc:195.50.179.5:443/tcp",
    "kennung": "Apache httpd, Titel „Nextcloud“",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9896,6 +10150,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9942,6 +10197,7 @@
    "host_ip": "195.50.179.6",
    "id": "svc:195.50.179.6:443/tcp",
    "kennung": "nginx, Titel „Bitwarden Web vault“",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9952,6 +10208,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -10005,6 +10262,7 @@
    "host_ip": "195.50.179.7",
    "id": "svc:195.50.179.7:443/tcp",
    "kennung": "Microsoft IIS httpd 10.0, Titel „IIS Windows Server“",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -10015,6 +10273,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -10061,6 +10320,7 @@
    "host_ip": "195.50.179.9",
    "id": "svc:195.50.179.9:443/tcp",
    "kennung": "Apache httpd",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -10071,6 +10331,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -10104,6 +10365,7 @@
    "host_ip": "3.174.46.10",
    "id": "svc:3.174.46.10:80/tcp",
    "kennung": "Amazon CloudFront httpd, Titel „ERROR: The request could not be satisfied“",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -10114,6 +10376,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -10147,6 +10410,7 @@
    "host_ip": "3.174.46.10",
    "id": "svc:3.174.46.10:443/tcp",
    "kennung": "Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.5",
+   "kennung_source": null,
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -10157,6 +10421,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "https",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -10205,6 +10470,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:21/tcp",
    "kennung": "ProFTPD",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -10215,6 +10481,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ftp",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -10284,6 +10551,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:25/tcp",
    "kennung": "Postfix smtpd",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -10294,6 +10562,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_source": "nmap",
    "smtp_vrfy": false,
    "source": "nmap",
    "starttls": true,
@@ -10327,6 +10596,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:53/tcp",
    "kennung": null,
+   "kennung_source": null,
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -10337,6 +10607,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "domain",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -10370,6 +10641,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:80/tcp",
    "kennung": "nginx",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -10380,6 +10652,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -10413,6 +10686,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:106/tcp",
    "kennung": null,
+   "kennung_source": null,
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -10423,6 +10697,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "tcpwrapped",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -10492,6 +10767,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:110/tcp",
    "kennung": "Dovecot pop3d",
+   "kennung_source": "nmap",
    "login_disabled": false,
    "method": "probed",
    "mode": "active",
@@ -10502,6 +10778,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "pop3",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": true,
@@ -10573,6 +10850,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:143/tcp",
    "kennung": "Dovecot imapd",
+   "kennung_source": "nmap",
    "login_disabled": false,
    "method": "probed",
    "mode": "active",
@@ -10583,6 +10861,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "imap",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": true,
@@ -10628,6 +10907,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:443/tcp",
    "kennung": "nginx",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -10638,6 +10918,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -10706,6 +10987,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:465/tcp",
    "kennung": "Postfix smtpd",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -10716,6 +10998,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_source": "nmap",
    "smtp_vrfy": false,
    "source": "nmap",
    "starttls": false,
@@ -10779,6 +11062,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:587/tcp",
    "kennung": "Postfix smtpd",
+   "kennung_source": "nmap",
    "login_disabled": true,
    "method": "probed",
    "mode": "active",
@@ -10789,6 +11073,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_source": "nmap",
    "smtp_vrfy": false,
    "source": "nmap",
    "starttls": true,
@@ -10859,6 +11144,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:993/tcp",
    "kennung": "Dovecot imapd",
+   "kennung_source": "nmap",
    "login_disabled": false,
    "method": "probed",
    "mode": "active",
@@ -10869,6 +11155,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "imap",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": false,
@@ -10937,6 +11224,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:995/tcp",
    "kennung": "Dovecot pop3d",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -10947,6 +11235,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "pop3",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": false,
@@ -10980,6 +11269,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:8000/tcp",
    "kennung": "Shoutcast DNAS 2.6.1.777, Stream tonausstrom.de",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -10990,6 +11280,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http-alt",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -11023,6 +11314,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:8001/tcp",
    "kennung": null,
+   "kennung_source": null,
    "login_disabled": null,
    "method": "table",
    "mode": "active",
@@ -11033,6 +11325,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "vcom-tunnel",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -11081,6 +11374,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:8443/tcp",
    "kennung": "sw-cp-server",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -11091,6 +11385,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "https-alt",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -11124,6 +11419,7 @@
    "host_ip": "92.205.163.53",
    "id": "svc:92.205.163.53:8800/tcp",
    "kennung": "Icecast streaming media server 2.4.4",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -11134,6 +11430,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -12040,7 +12337,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:00:14Z",
+   "observed_at": "2026-07-20T00:00:17Z",
    "outdated": null,
    "product": "ASP.NET",
    "release_date": null,
@@ -12089,7 +12386,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:00:14Z",
+   "observed_at": "2026-07-20T00:00:17Z",
    "outdated": null,
    "product": "Microsoft Exchange",
    "release_date": null,
@@ -12139,7 +12436,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:00:14Z",
+   "observed_at": "2026-07-20T00:00:17Z",
    "outdated": null,
    "product": "Microsoft IIS",
    "release_date": null,
@@ -12189,7 +12486,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:00:14Z",
+   "observed_at": "2026-07-20T00:00:17Z",
    "outdated": null,
    "product": "Windows Server",
    "release_date": null,
@@ -12233,7 +12530,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:00:14Z",
+   "observed_at": "2026-07-20T00:00:15Z",
    "outdated": null,
    "product": "ASP.NET",
    "release_date": null,
@@ -12282,7 +12579,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:00:14Z",
+   "observed_at": "2026-07-20T00:00:15Z",
    "outdated": null,
    "product": "Microsoft Exchange",
    "release_date": null,
@@ -12332,7 +12629,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:00:14Z",
+   "observed_at": "2026-07-20T00:00:15Z",
    "outdated": null,
    "product": "Microsoft IIS",
    "release_date": null,
@@ -12382,7 +12679,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:00:14Z",
+   "observed_at": "2026-07-20T00:00:15Z",
    "outdated": null,
    "product": "Windows Server",
    "release_date": null,
@@ -12426,7 +12723,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:00:14Z",
+   "observed_at": "2026-07-20T00:00:16Z",
    "outdated": null,
    "product": "ASP.NET",
    "release_date": null,
@@ -12475,7 +12772,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:00:14Z",
+   "observed_at": "2026-07-20T00:00:16Z",
    "outdated": null,
    "product": "Microsoft Exchange",
    "release_date": null,
@@ -12525,7 +12822,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:00:14Z",
+   "observed_at": "2026-07-20T00:00:16Z",
    "outdated": null,
    "product": "Microsoft IIS",
    "release_date": null,
@@ -12575,7 +12872,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:00:14Z",
+   "observed_at": "2026-07-20T00:00:16Z",
    "outdated": null,
    "product": "Windows Server",
    "release_date": null,
@@ -12972,7 +13269,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:01:09Z",
+   "observed_at": "2026-07-20T00:01:10Z",
    "outdated": null,
    "product": "Apache httpd",
    "release_date": null,
@@ -13016,7 +13313,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:01:09Z",
+   "observed_at": "2026-07-20T00:01:10Z",
    "outdated": null,
    "product": "Nextcloud",
    "release_date": null,
@@ -13060,7 +13357,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-20T00:01:09Z",
+   "observed_at": "2026-07-20T00:01:10Z",
    "outdated": null,
    "product": "PHP",
    "release_date": null,
@@ -15000,6 +15297,7 @@
    "observed_at": "2026-07-19T23:40:06Z",
    "out_of_scope": [],
    "source": "host_inventory",
+   "synthetic_ipv6": [],
    "targets_source": "orders.json",
    "whois": null
   }
@@ -15205,7 +15503,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": "testssl",
+   "service_name": null,
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": []
   },
   {
@@ -15290,7 +15592,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": null,
+   "service_name": null,
+   "sni": null,
    "source": "httpx",
+   "starttls": null,
    "vulns": []
   },
   {
@@ -15396,7 +15702,11 @@
     "TLS1.2": true,
     "TLS1.3": false
    },
+   "run": "testssl",
+   "service_name": null,
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": [
     {
      "name": "LUCKY13",
@@ -15485,7 +15795,11 @@
     "TLS1.2": true,
     "TLS1.3": false
    },
+   "run": null,
+   "service_name": null,
+   "sni": null,
    "source": "httpx",
+   "starttls": null,
    "vulns": [
     {
      "name": "LUCKY13",
@@ -15578,7 +15892,11 @@
     "TLS1.2": true,
     "TLS1.3": false
    },
+   "run": "testssl",
+   "service_name": null,
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": [
     {
      "name": "LUCKY13",
@@ -15653,7 +15971,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": "testssl",
+   "service_name": null,
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": []
   },
   {
@@ -15773,7 +16095,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": "testssl",
+   "service_name": null,
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": [
     {
      "name": "BREACH",
@@ -15996,7 +16322,11 @@
     "TLS1.2": true,
     "TLS1.3": false
    },
+   "run": "testssl",
+   "service_name": null,
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": [
     {
      "name": "BEAST",
@@ -16164,7 +16494,11 @@
     "TLS1.2": true,
     "TLS1.3": false
    },
+   "run": "testssl",
+   "service_name": null,
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": [
     {
      "name": "BREACH",
@@ -16277,7 +16611,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": "testssl",
+   "service_name": null,
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": [
     {
      "name": "BREACH",
@@ -16385,49 +16723,15 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": "testssl",
+   "service_name": null,
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": []
   }
  ],
  "unprocessed": [
-  {
-   "confidence": 0.8,
-   "count": 1,
-   "evidence": [
-    {
-     "excerpt": "220 netscope-media.de ESMTP Postfix 250-netscope-media.de 250-PIPELINING 250-SIZE 25600000 250-ETRN 250-STARTTLS 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN 250...",
-     "ref": "phase0a/shodan_hosts.json",
-     "tool": "shodan"
-    }
-   ],
-   "fqdn": null,
-   "host_ip": "92.205.163.53",
-   "id": "unp:smtp_auth_before_starttls:5f3af687",
-   "kind": "smtp_auth_before_starttls",
-   "mode": "active",
-   "observed_at": "2026-07-20T00:25:49Z",
-   "source": "shodan",
-   "what": "92.205.163.53:25 AUTH vor STARTTLS laut Passivquelle"
-  },
-  {
-   "confidence": 0.8,
-   "count": 1,
-   "evidence": [
-    {
-     "excerpt": "CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN",
-     "ref": "hosts/92.205.163.53/phase1/nmap.xml",
-     "tool": "nmap"
-    }
-   ],
-   "fqdn": null,
-   "host_ip": "92.205.163.53",
-   "id": "unp:smtp_auth_before_starttls:f4574066",
-   "kind": "smtp_auth_before_starttls",
-   "mode": "active",
-   "observed_at": "2026-07-20T00:25:49Z",
-   "source": "nmap",
-   "what": "92.205.163.53:25 AUTH vor STARTTLS"
-  },
   {
    "confidence": 0.8,
    "count": 1,

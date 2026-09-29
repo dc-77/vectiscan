@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-27.2 auf tests/golden/facts/1f8bc977-39a7-47c7-b4ad-7b05dbac2d52.json",
+ "source": "reporter.catalog 2026-09-29.1 auf tests/golden/facts/1f8bc977-39a7-47c7-b4ad-7b05dbac2d52.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -545,6 +545,19 @@
   },
   {
    "id": "VS-2026-041",
+   "check": "smtp_auth_before_starttls_passive",
+   "family": "smtp_auth_cleartext",
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "mittel",
+   "group": "92.205.163.53 (ubb-wiki.castenow.de)",
+   "affected": [
+    "92.205.163.53:25 (laut Passivquelle, Hosteintrag aktualisiert am 23.09.2026)"
+   ],
+   "title": "Mailserver bietet die Anmeldung vor STARTTLS an laut Passivquelle"
+  },
+  {
+   "id": "VS-2026-042",
    "check": "smtp_vrfy_enabled_passive",
    "family": "smtp_vrfy",
    "cat": "E",
@@ -557,7 +570,7 @@
    "title": "Mailserver beantwortet den Befehl VRFY laut Passivquelle"
   },
   {
-   "id": "VS-2026-042",
+   "id": "VS-2026-043",
    "check": "spf_authorizes_shared_host",
    "family": "spf_shared_host",
    "cat": "C",
@@ -570,7 +583,7 @@
    "title": "SPF gibt geteilten Server frei"
   },
   {
-   "id": "VS-2026-043",
+   "id": "VS-2026-044",
    "check": "spf_softfail",
    "family": "spf_softfail",
    "cat": "C",
@@ -583,7 +596,7 @@
    "title": "SPF-Eintrag ohne konsequente Durchsetzung"
   },
   {
-   "id": "VS-2026-044",
+   "id": "VS-2026-045",
    "check": "tls_rpt_missing",
    "family": "tls_rpt_missing",
    "cat": "C",
@@ -596,7 +609,7 @@
    "title": "TLS-RPT nicht eingerichtet"
   },
   {
-   "id": "VS-2026-045",
+   "id": "VS-2026-046",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -609,7 +622,7 @@
    "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-046",
+   "id": "VS-2026-047",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -622,7 +635,7 @@
    "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-047",
+   "id": "VS-2026-048",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -636,7 +649,7 @@
    "zustaendig": "platform"
   },
   {
-   "id": "VS-2026-048",
+   "id": "VS-2026-049",
    "check": "web_vulnerability_reported",
    "family": "web_vulnerability_reported",
    "cat": "E",
@@ -651,7 +664,7 @@
    "title": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-049",
+   "id": "VS-2026-050",
    "check": "wordpress_user_enumeration",
    "family": "user_enumeration",
    "cat": "E",

@@ -92,18 +92,23 @@
   },
   "VS-2026-015": {
    "checks": [
+    "smtp_auth_before_starttls_passive"
+   ]
+  },
+  "VS-2026-016": {
+   "checks": [
     "smtp_vrfy_enabled_passive"
    ],
    "spec10": "R19",
    "warum": "Shodan last_update heißt „Hosteintrag aktualisiert am“, nicht „gesehen am“.",
    "spec11": "N15"
   },
-  "VS-2026-016": {
+  "VS-2026-017": {
    "checks": [
     "tls_rpt_missing"
    ]
   },
-  "VS-2026-017": {
+  "VS-2026-018": {
    "checks": [
     "tls_weakness_reported"
    ]

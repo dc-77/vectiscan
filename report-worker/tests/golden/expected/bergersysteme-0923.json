@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-27.2 auf tests/golden/facts/68d59573-7a93-4efa-89cc-e7b10cc4d140.json",
+ "source": "reporter.catalog 2026-09-29.1 auf tests/golden/facts/68d59573-7a93-4efa-89cc-e7b10cc4d140.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -207,6 +207,19 @@
   },
   {
    "id": "VS-2026-015",
+   "check": "smtp_auth_before_starttls_passive",
+   "family": "smtp_auth_cleartext",
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "mittel",
+   "group": "92.205.224.174 (bergersysteme.com, cdn.bergersysteme.com, ftp.bergersysteme.com)",
+   "affected": [
+    "92.205.224.174:25 (laut Passivquelle, Hosteintrag aktualisiert am 23.09.2026)"
+   ],
+   "title": "Mailserver bietet die Anmeldung vor STARTTLS an laut Passivquelle"
+  },
+  {
+   "id": "VS-2026-016",
    "check": "smtp_vrfy_enabled_passive",
    "family": "smtp_vrfy",
    "cat": "E",
@@ -219,7 +232,7 @@
    "title": "Mailserver beantwortet den Befehl VRFY laut Passivquelle"
   },
   {
-   "id": "VS-2026-016",
+   "id": "VS-2026-017",
    "check": "tls_rpt_missing",
    "family": "tls_rpt_missing",
    "cat": "C",
@@ -232,7 +245,7 @@
    "title": "TLS-RPT nicht eingerichtet"
   },
   {
-   "id": "VS-2026-017",
+   "id": "VS-2026-018",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",

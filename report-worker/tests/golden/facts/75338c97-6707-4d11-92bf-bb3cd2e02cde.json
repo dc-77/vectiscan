@@ -1435,25 +1435,25 @@
   {
    "confidence": 1.0,
    "domain": null,
-   "duration_ms": 541,
+   "duration_ms": 512,
    "evidence": [
     {
-     "excerpt": "{\"tls\":{\"host\":\"crm.vectigal.tech\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_128_GCM_SHA256\",\"not_before\":\"2026-08-06T07:42:54...",
+     "excerpt": "{\"tls\":{\"host\":\"10finance.vectigal.tech\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_128_GCM_SHA256\",\"not_before\":\"2026-08-02T07...",
      "ref": "scan_results:httpx:62.217.52.165",
      "tool": "httpx"
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "10finance.vectigal.tech",
    "host_ip": "62.217.52.165",
-   "id": "cov:2:httpx:62.217.52.165",
+   "id": "cov:2:httpx:62.217.52.165:10finance.vectigal.tech",
    "mode": "active",
-   "observed_at": "2026-09-20T09:09:51Z",
+   "observed_at": "2026-09-20T09:09:52Z",
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1471,16 +1471,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "board.vectigal.tech",
    "host_ip": "62.217.52.165",
-   "id": "cov:2:httpx:62.217.52.165#2",
+   "id": "cov:2:httpx:62.217.52.165:board.vectigal.tech",
    "mode": "active",
    "observed_at": "2026-09-20T09:09:51Z",
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1489,25 +1489,25 @@
   {
    "confidence": 1.0,
    "domain": null,
-   "duration_ms": 512,
+   "duration_ms": 541,
    "evidence": [
     {
-     "excerpt": "{\"tls\":{\"host\":\"10finance.vectigal.tech\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_128_GCM_SHA256\",\"not_before\":\"2026-08-02T07...",
+     "excerpt": "{\"tls\":{\"host\":\"crm.vectigal.tech\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_128_GCM_SHA256\",\"not_before\":\"2026-08-06T07:42:54...",
      "ref": "scan_results:httpx:62.217.52.165",
      "tool": "httpx"
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "crm.vectigal.tech",
    "host_ip": "62.217.52.165",
-   "id": "cov:2:httpx:62.217.52.165#3",
+   "id": "cov:2:httpx:62.217.52.165:crm.vectigal.tech",
    "mode": "active",
-   "observed_at": "2026-09-20T09:09:52Z",
+   "observed_at": "2026-09-20T09:09:51Z",
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1525,16 +1525,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "crmviewer.vectigal.tech",
    "host_ip": "62.217.52.165",
-   "id": "cov:2:httpx:62.217.52.165#4",
+   "id": "cov:2:httpx:62.217.52.165:crmviewer.vectigal.tech",
    "mode": "active",
    "observed_at": "2026-09-20T09:09:52Z",
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -1552,16 +1552,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "gutachter.vectigal.tech",
    "host_ip": "62.217.52.165",
-   "id": "cov:2:httpx:62.217.52.165#5",
+   "id": "cov:2:httpx:62.217.52.165:gutachter.vectigal.tech",
    "mode": "active",
    "observed_at": "2026-09-20T09:09:53Z",
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -2452,6 +2452,7 @@
    },
    "zone_transfer": {
     "allowed": false,
+    "not_tested_reason": null,
     "ns_tested": []
    }
   },
@@ -3667,11 +3668,14 @@
     "open": 2
    },
    "provider": null,
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": null,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": null,
     "abuseipdb_total_reports": null,
     "abuseipdb_whitelisted": null,
@@ -3726,6 +3730,8 @@
     "open": 0
    },
    "provider": null,
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": {
     "passive_ports": [],
     "passive_seen_at": null,
@@ -3736,6 +3742,7 @@
    "reputation": {
     "abuseipdb_distinct_users": null,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": null,
     "abuseipdb_total_reports": null,
     "abuseipdb_whitelisted": null,
@@ -3802,6 +3809,7 @@
      "tool": "header_check",
      "url": "https://10finance.vectigal.tech"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -3919,7 +3927,8 @@
    ],
    "url": "https://10finance.vectigal.tech",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -3970,6 +3979,7 @@
      "tool": "header_check",
      "url": "https://board.vectigal.tech"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -4083,7 +4093,8 @@
    ],
    "url": "https://board.vectigal.tech",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -4112,6 +4123,7 @@
     "client_redirect": true,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": {
      "challenge": null,
@@ -4176,7 +4188,8 @@
    ],
    "url": "https://crm.vectigal.tech",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -4227,6 +4240,7 @@
      "tool": "header_check",
      "url": "https://crmviewer.vectigal.tech"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -4340,7 +4354,8 @@
    ],
    "url": "https://crmviewer.vectigal.tech",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -4391,6 +4406,7 @@
      "tool": "header_check",
      "url": "https://gutachter.vectigal.tech"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -4511,7 +4527,8 @@
    ],
    "url": "https://gutachter.vectigal.tech",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -4535,6 +4552,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": null,
     "framing_protected": null,
@@ -4562,7 +4580,8 @@
    "technologies": [],
    "url": "https://test.vectigal.tech",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   }
  ],
  "passive": [
@@ -4769,7 +4788,7 @@
    }
   ]
  },
- "schema_version": "1.3.0",
+ "schema_version": "1.4.0",
  "services": [
   {
    "auth_before_starttls": null,
@@ -4794,6 +4813,7 @@
    "host_ip": "62.217.52.165",
    "id": "svc:62.217.52.165:80/tcp",
    "kennung": "Golang net/http server",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4804,6 +4824,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -4849,6 +4870,7 @@
    "host_ip": "62.217.52.165",
    "id": "svc:62.217.52.165:443/tcp",
    "kennung": "Golang net/http server",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -4859,6 +4881,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -5052,7 +5075,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-20T09:09:51Z",
+   "observed_at": "2026-09-20T09:09:53Z",
    "outdated": null,
    "product": "Node.js",
    "release_date": null,
@@ -5096,7 +5119,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-20T09:09:51Z",
+   "observed_at": "2026-09-20T09:09:53Z",
    "outdated": null,
    "product": "Nuxt.js",
    "release_date": null,
@@ -5140,7 +5163,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-20T09:09:51Z",
+   "observed_at": "2026-09-20T09:09:53Z",
    "outdated": null,
    "product": "Vue.js",
    "release_date": null,
@@ -5186,6 +5209,7 @@
    "observed_at": "2026-09-20T09:07:28Z",
    "out_of_scope": [],
    "source": "host_inventory",
+   "synthetic_ipv6": [],
    "targets_source": "orders.json",
    "whois": null
   },
@@ -5208,6 +5232,7 @@
    "observed_at": "2026-09-20T09:07:28Z",
    "out_of_scope": [],
    "source": "orders.json",
+   "synthetic_ipv6": [],
    "targets_source": "orders.json",
    "whois": null
   }
@@ -5271,7 +5296,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": null,
+   "service_name": null,
+   "sni": null,
    "source": "httpx",
+   "starttls": null,
    "vulns": []
   },
   {
@@ -5331,7 +5360,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": null,
+   "service_name": null,
+   "sni": null,
    "source": "httpx",
+   "starttls": null,
    "vulns": []
   },
   {
@@ -5396,7 +5429,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": null,
+   "service_name": null,
+   "sni": null,
    "source": "httpx",
+   "starttls": null,
    "vulns": []
   },
   {
@@ -5456,7 +5493,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": null,
+   "service_name": null,
+   "sni": null,
    "source": "httpx",
+   "starttls": null,
    "vulns": []
   },
   {
@@ -5516,7 +5557,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": null,
+   "service_name": null,
+   "sni": null,
    "source": "httpx",
+   "starttls": null,
    "vulns": []
   },
   {
@@ -6020,12 +6065,14 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": "testssl",
+   "service_name": "http",
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": []
   }
  ],
  "unprocessed": [],
- "warnings": [
-  "Multi-Target: nur die erste Domain hat eigene DNS- und Passivlaeufe; weitere Domains: vectiscan.de"
- ]
+ "warnings": []
 }

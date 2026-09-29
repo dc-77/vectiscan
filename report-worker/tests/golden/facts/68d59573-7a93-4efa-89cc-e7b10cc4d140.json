@@ -1984,16 +1984,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "www.bergersysteme.com",
    "host_ip": "198.202.211.1",
-   "id": "cov:2:httpx:198.202.211.1",
+   "id": "cov:2:httpx:198.202.211.1:www.bergersysteme.com",
    "mode": "active",
    "observed_at": "2026-09-23T20:14:14Z",
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -2173,16 +2173,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "bergersysteme.com",
    "host_ip": "92.205.224.174",
-   "id": "cov:2:httpx:92.205.224.174",
+   "id": "cov:2:httpx:92.205.224.174:bergersysteme.com",
    "mode": "active",
    "observed_at": "2026-09-23T20:08:02Z",
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -2200,16 +2200,16 @@
     }
    ],
    "exit_code": 0,
-   "fqdn": null,
+   "fqdn": "ftp.bergersysteme.com",
    "host_ip": "92.205.224.174",
-   "id": "cov:2:httpx:92.205.224.174#2",
+   "id": "cov:2:httpx:92.205.224.174:ftp.bergersysteme.com",
    "mode": "active",
    "observed_at": "2026-09-23T20:08:03Z",
    "phase": 2,
    "raw_status": "ok",
    "reason": null,
    "run_status": null,
-   "scope": "host",
+   "scope": "fqdn",
    "source": "scan_results",
    "status": "ok",
    "target": null,
@@ -3988,6 +3988,7 @@
    },
    "zone_transfer": {
     "allowed": false,
+    "not_tested_reason": null,
     "ns_tested": [
      "ns1a.dodns.net",
      "ns2a.dodns.net"
@@ -4434,16 +4435,25 @@
     "open": 4
    },
    "provider": {
+    "cidr": [],
     "country": "US",
     "domain": "webflow.com",
+    "handle": null,
     "isp": "Webflow, Inc",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Content Delivery Network"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": "2026-09-21T16:56:43Z",
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -4509,16 +4519,25 @@
     "open": 0
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "microsoft.com",
+    "handle": null,
     "isp": "Microsoft Corporation",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": null,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -4605,11 +4624,19 @@
     "open": 0
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "bergersysteme.com",
+    "handle": null,
     "isp": "Berger EDV-Systemberatungs GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Fixed Line ISP"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": {
     "passive_ports": [
      80,
@@ -4623,6 +4650,7 @@
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -4678,11 +4706,19 @@
     "open": 0
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "bergersysteme.com",
+    "handle": null,
     "isp": "Berger EDV-Systemberatungs GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Fixed Line ISP"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": {
     "passive_ports": [
      25,
@@ -4696,6 +4732,7 @@
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -4750,11 +4787,19 @@
     "open": 0
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "bergersysteme.com",
+    "handle": null,
     "isp": "Berger EDV-Systemberatungs GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Fixed Line ISP"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": {
     "passive_ports": [
      443
@@ -4767,6 +4812,7 @@
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -4821,11 +4867,19 @@
     "open": 0
    },
    "provider": {
+    "cidr": [],
     "country": "DE",
     "domain": "ecotel.de",
+    "handle": null,
     "isp": "ecotel communication ag",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Fixed Line ISP"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": {
     "passive_ports": [],
     "passive_seen_at": null,
@@ -4836,6 +4890,7 @@
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -4903,16 +4958,25 @@
     "open": 11
    },
    "provider": {
+    "cidr": [],
     "country": "FR",
     "domain": "hosteurope.de",
+    "handle": null,
     "isp": "Host Europe GmbH",
+    "netblock_owner": null,
+    "netname": null,
+    "rir": null,
+    "source_url": null,
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "provider_block": null,
+   "provider_block_probes": null,
    "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_distinct_users": 0,
     "abuseipdb_last_reported_at": null,
+    "abuseipdb_max_age_days": null,
     "abuseipdb_score": 0,
     "abuseipdb_total_reports": 0,
     "abuseipdb_whitelisted": false,
@@ -4991,6 +5055,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": {
      "challenge": null,
@@ -6063,7 +6128,8 @@
    ],
    "url": "https://bergersysteme.com",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -6087,6 +6153,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": null,
     "framing_protected": null,
@@ -6114,7 +6181,8 @@
    "technologies": [],
    "url": "https://bitwarden.bergersysteme.com",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -6138,6 +6206,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": null,
     "framing_protected": null,
@@ -6165,7 +6234,8 @@
    "technologies": [],
    "url": "https://bstasks.bergersysteme.com",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -6194,6 +6264,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": {
      "challenge": null,
@@ -6242,7 +6313,8 @@
    ],
    "url": "https://ftp.bergersysteme.com",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -6266,6 +6338,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": null,
     "framing_protected": null,
@@ -6293,7 +6366,8 @@
    "technologies": [],
    "url": "https://mail.bergersysteme.com",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -6317,6 +6391,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": null,
     "framing_protected": null,
@@ -6344,7 +6419,8 @@
    "technologies": [],
    "url": "https://mail2.bergersysteme.com",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -6368,6 +6444,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": null,
     "framing_protected": null,
@@ -6395,7 +6472,8 @@
    "technologies": [],
    "url": "https://owa.bergersysteme.com",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -6419,6 +6497,7 @@
     "client_redirect": null,
     "complete": false,
     "evaluated": null,
+    "final": null,
     "final_response": null,
     "first": null,
     "framing_protected": null,
@@ -6446,7 +6525,8 @@
    "technologies": [],
    "url": "https://ticket.bergersysteme.com",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   },
   {
    "alerts": [],
@@ -6504,6 +6584,7 @@
      "tool": "header_check",
      "url": "https://www.bergersysteme.com"
     },
+    "final": null,
     "final_response": true,
     "first": {
      "challenge": null,
@@ -7641,7 +7722,8 @@
    ],
    "url": "https://www.bergersysteme.com",
    "wordpress": null,
-   "x_feserver": null
+   "x_feserver": null,
+   "xmlrpc_probe": null
   }
  ],
  "passive": [
@@ -9009,7 +9091,7 @@
    }
   ]
  },
- "schema_version": "1.3.0",
+ "schema_version": "1.4.0",
  "services": [
   {
    "auth_before_starttls": null,
@@ -9034,6 +9116,7 @@
    "host_ip": "198.202.211.1",
    "id": "svc:198.202.211.1:80/tcp",
    "kennung": "Cloudflare http proxy",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9044,6 +9127,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9077,6 +9161,7 @@
    "host_ip": "198.202.211.1",
    "id": "svc:198.202.211.1:443/tcp",
    "kennung": "cloudflare",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9087,6 +9172,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "https",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9120,6 +9206,7 @@
    "host_ip": "198.202.211.1",
    "id": "svc:198.202.211.1:8080/tcp",
    "kennung": "Cloudflare http proxy",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9130,6 +9217,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9163,6 +9251,7 @@
    "host_ip": "198.202.211.1",
    "id": "svc:198.202.211.1:8443/tcp",
    "kennung": "cloudflare",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9173,6 +9262,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "https-alt",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9218,6 +9308,7 @@
    "host_ip": "92.205.224.174",
    "id": "svc:92.205.224.174:21/tcp",
    "kennung": "ProFTPD",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9228,6 +9319,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ftp",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9261,6 +9353,7 @@
    "host_ip": "92.205.224.174",
    "id": "svc:92.205.224.174:22/tcp",
    "kennung": "OpenSSH 9.9",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9271,6 +9364,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "ssh",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9304,6 +9398,7 @@
    "host_ip": "92.205.224.174",
    "id": "svc:92.205.224.174:53/tcp",
    "kennung": null,
+   "kennung_source": null,
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9314,6 +9409,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "domain",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9347,6 +9443,7 @@
    "host_ip": "92.205.224.174",
    "id": "svc:92.205.224.174:80/tcp",
    "kennung": "nginx, Titel „Web Server's Default Page“",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9357,6 +9454,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9421,6 +9519,7 @@
    "host_ip": "92.205.224.174",
    "id": "svc:92.205.224.174:110/tcp",
    "kennung": "Dovecot pop3d",
+   "kennung_source": "nmap",
    "login_disabled": false,
    "method": "probed",
    "mode": "active",
@@ -9431,6 +9530,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "pop3",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": true,
@@ -9497,6 +9597,7 @@
    "host_ip": "92.205.224.174",
    "id": "svc:92.205.224.174:143/tcp",
    "kennung": "Dovecot imapd",
+   "kennung_source": "nmap",
    "login_disabled": false,
    "method": "probed",
    "mode": "active",
@@ -9507,6 +9608,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "imap",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": true,
@@ -9552,6 +9654,7 @@
    "host_ip": "92.205.224.174",
    "id": "svc:92.205.224.174:443/tcp",
    "kennung": "nginx, Titel „Plesk Obsidian 18.0.80“",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9562,6 +9665,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "http",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -9624,6 +9728,7 @@
    "host_ip": "92.205.224.174",
    "id": "svc:92.205.224.174:465/tcp",
    "kennung": "Postfix smtpd",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9634,6 +9739,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "smtp",
+   "smtp_source": "nmap",
    "smtp_vrfy": false,
    "source": "nmap",
    "starttls": false,
@@ -9699,6 +9805,7 @@
    "host_ip": "92.205.224.174",
    "id": "svc:92.205.224.174:993/tcp",
    "kennung": "Dovecot imapd",
+   "kennung_source": "nmap",
    "login_disabled": false,
    "method": "probed",
    "mode": "active",
@@ -9709,6 +9816,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "imap",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": false,
@@ -9772,6 +9880,7 @@
    "host_ip": "92.205.224.174",
    "id": "svc:92.205.224.174:995/tcp",
    "kennung": "Dovecot pop3d",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9782,6 +9891,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "pop3",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": false,
@@ -9827,6 +9937,7 @@
    "host_ip": "92.205.224.174",
    "id": "svc:92.205.224.174:8443/tcp",
    "kennung": "sw-cp-server",
+   "kennung_source": "nmap",
    "login_disabled": null,
    "method": "probed",
    "mode": "active",
@@ -9837,6 +9948,7 @@
    "proto": "tcp",
    "rejects_before_auth": null,
    "service": "https-alt",
+   "smtp_source": null,
    "smtp_vrfy": null,
    "source": "nmap",
    "starttls": null,
@@ -10613,7 +10725,7 @@
    "latest_version": null,
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-23T20:08:02Z",
+   "observed_at": "2026-09-23T20:08:03Z",
    "outdated": null,
    "product": "nginx",
    "release_date": null,
@@ -10852,6 +10964,7 @@
    "observed_at": "2026-09-23T19:51:44Z",
    "out_of_scope": [],
    "source": "host_inventory",
+   "synthetic_ipv6": [],
    "targets_source": "orders.json",
    "whois": null
   }
@@ -12491,7 +12604,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": "testssl",
+   "service_name": "http",
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": [
     {
      "name": "BREACH",
@@ -13770,7 +13887,11 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": "testssl",
+   "service_name": "http",
+   "sni": null,
    "source": "testssl",
+   "starttls": null,
    "vulns": []
   },
   {
@@ -13851,30 +13972,14 @@
     "TLS1.2": true,
     "TLS1.3": true
    },
+   "run": null,
+   "service_name": null,
+   "sni": null,
    "source": "httpx",
+   "starttls": null,
    "vulns": []
   }
  ],
- "unprocessed": [
-  {
-   "confidence": 0.8,
-   "count": 1,
-   "evidence": [
-    {
-     "excerpt": "220 174.224.205.92.host.secureserver.net ESMTP Postfix 250-174.224.205.92.host.secureserver.net 250-PIPELINING 250-SIZE 10240000 250-ETRN 250-STARTTLS 250-AU...",
-     "ref": "phase0a/shodan_hosts.json",
-     "tool": "shodan"
-    }
-   ],
-   "fqdn": null,
-   "host_ip": "92.205.224.174",
-   "id": "unp:smtp_auth_before_starttls:deaf1e71",
-   "kind": "smtp_auth_before_starttls",
-   "mode": "active",
-   "observed_at": "2026-09-23T20:19:37Z",
-   "source": "shodan",
-   "what": "92.205.224.174:25 AUTH vor STARTTLS laut Passivquelle"
-  }
- ],
+ "unprocessed": [],
  "warnings": []
 }

@@ -31,48 +31,56 @@
   "inventory": [
    {
     "host": "18.197.248.23",
+    "operator": "A100 ROW GmbH (Amazon, CDN), laut AbuseIPDB",
     "port": "80",
     "ref": "",
     "svc": "nginx"
    },
    {
     "host": "18.197.248.23",
+    "operator": "",
     "port": "443",
     "ref": "VS-2026-004, VS-2026-010",
     "svc": "nginx, TLS erzwungen, Transportverschlüsselung am Namen gemessen an 52.59.120.70"
    },
    {
     "host": "18.197.248.23",
+    "operator": "",
     "port": "8443",
     "ref": "VS-2026-006",
     "svc": "nginx, TLS erzwungen"
    },
    {
     "host": "80.90.145.166",
+    "operator": "bn:t Blatzheim Networks Telecom GmbH, laut AbuseIPDB",
     "port": "443",
     "ref": "VS-2026-002, VS-2026-003, VS-2026-005, VS-2026-011",
     "svc": "Microsoft-IIS/10.0, TLS erzwungen"
    },
    {
     "host": "80.90.145.166",
+    "operator": "",
     "port": "444",
     "ref": "VS-2026-007",
     "svc": "Apache httpd, TLS erzwungen"
    },
    {
     "host": "80.90.145.166",
+    "operator": "",
     "port": "1000",
     "ref": "VS-2026-001",
     "svc": "nicht identifiziert (Port 1000)"
    },
    {
     "host": "80.90.145.166",
+    "operator": "",
     "port": "1001",
     "ref": "VS-2026-001",
     "svc": "nicht identifiziert (Port 1001)"
    },
    {
     "host": "80.90.145.166",
+    "operator": "",
     "port": "1002",
     "ref": "VS-2026-001",
     "svc": "nicht identifiziert (Port 1002)"
@@ -2427,8 +2435,8 @@
  "landscape_lead": "12 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 18,
-  "catalog_digest": "b4cc5628443d67cd7be58b78e7afb9aa847a6c995513c41641031b32f4f03ea1",
-  "catalog_version": "2026-09-27.2",
+  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
+  "catalog_version": "2026-09-29.1",
   "classification": "Vertraulich",
   "consolidated": 12,
   "context_fields": [],
@@ -2439,7 +2447,7 @@
    "huendgen-entsorgung.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.3.0",
+  "facts_schema_version": "1.4.0",
   "fqdns_total": 3,
   "generated_on": null,
   "generation": null,
@@ -2454,7 +2462,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-27.2",
+  "policy_version": "2026-09-29.1",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -2989,6 +2997,7 @@
      "52.59.120.70"
     ],
     "operator": "A100 ROW GmbH (Amazon, CDN) (eu-staticip.multiscreensite.com)",
+    "operator_source": "AbuseIPDB",
     "role": "Website · Plattform eu-multiscreensite.com"
    },
    {
@@ -2998,6 +3007,7 @@
     "ip": "80.90.145.166",
     "more_ips": [],
     "operator": "bn:t Blatzheim Networks Telecom GmbH (gw-huendgen.bn-online.net)",
+    "operator_source": "AbuseIPDB",
     "role": "Mail-Webzugang, Anmeldeportal (Port 444)"
    }
   ],
@@ -3172,6 +3182,7 @@
     "v": "12"
    }
   ],
+  "operator_header": "Netzbetreiber (laut AbuseIPDB)",
   "out_of_scope": [
    "Interne Netzsegmente, Arbeitsplätze und mobile Geräte hinter der Firewall.",
    "Prüfungen mit Anmeldung (kein Login in Portale oder Verwaltungsoberflächen).",

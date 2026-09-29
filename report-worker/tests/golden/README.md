@@ -1227,6 +1227,105 @@ Jede Aussage aus spec/11 Teil 6 (N1 bis N15, Regressionsstand, E23 bis E26) mit 
 | E26 | Freigabe vor dem Nachscan | Entscheidung DC, nicht Teil der Session |
 | Startprompt | AXFR-Rohausgabe im API-Export | offen, S6c (Scanner unberührt) |
 
+## Die drei Fixtures der S6c-Proben (S6d)
+
+Eigene Testauftraege vom 28.09.2026 (Claude ueber die API, keine Deliverables), die ersten Tars mit
+den Rohfeldern aus `docs/S6C-NEW-RAW-FIELDS.md`. Aufgenommen mit `add-order-to-snapshot.py` und dem
+Matrix-Job `ops-export-golden-tars` (Pipeline 3240, Jobs 24842 bis 24844). Soll-Listen abgeleitet
+(`strict: false`), getestet in `tests/test_s6d_probeauftraege.py`.
+
+| Auftrag | Ziel | Soll-Liste | Befunde rot/gelb/blau | Positive | TLS-Eintraege (davon je Port/SNI) | Gate F/W |
+|---|---|---|---|---|---|---|
+| 4394b0b7 | dortmund-beach.com | `dortmund-beach-0928` | 1/8/7 | 5 | 8 (7) | 0/1 |
+| f9a2a2f6 | junkerwerk.de, junkerwerk.hu | `junkerwerk-0928` | 1/9/8 | 5 | 12 (10) | 0/1 |
+| cd28d260 | castenow.de | `castenow-0928` | 0/11/10 | 9 | 16 (10) | 0/2 |
+
+Warnungen: `auftraggeber_fehlt` (Testauftraege ohne Kundenkontext), bei castenow dazu
+`messadresse_ausserhalb_inventar` (DNS-Rotation umfrage). Datenfallen der Proben:
+
+- **testssl-Exit-Code ist eine Befundzahl.** dortmund-beach `testssl_21/143/465/587/993/995` stehen mit
+  Exit 7 oder 8 auf `failed`, die JSON-Dateien sind vollstaendig (235 Eintraege bei 587). Die Abdeckung
+  wertet seit S6d die Ausgabe (`tool_coverage.testssl_run_state`), der Scanner seit C4 ebenfalls.
+- **rdap lief nie.** Alle drei Proben: erste Zeile `ok`/`no_ips`, zweite `skipped`/`not_in_package`
+  (Verdrahtungsfehler im IP-Durchgang, in S6d als C6 behoben). Die Spalte bleibt "laut AbuseIPDB";
+  die RIR-Quelle ist nur mit dem Fixture `tests/fixtures/facts/rdap_ripe_hetzner.json` belegt (die
+  RIPE-Antwort aus `scan-worker/tests/test_rdap_s6c.py`, 116.202.77.64 lumbeck-wolter).
+- **Endantwort-Header von redirect_probe sind verunreinigt.** castenow mail: `final_response_headers`
+  sind die einer Schriftdatei (`segoeui-regular.ttf`, last wins ueber alle Ressourcen). Ohne das
+  Kennzeichen `final_response_source: document` (C7) bleiben sie ungenutzt; die Endseite kommt aus
+  `header_check.redirect_eval` (curl, `logon.aspx` mit 200).
+- **junkerwerk 188.40.3.130:** die Sperrerkennung um 16:15 fand keine Sperre, ab 16:30 scheiterten
+  testssl 443, header_check und redirect_probe; die sieben Per-Port-Laeufe haben trotzdem Daten.
+  Ursache laut S6c-Messung der Burst der Per-Port-Sonden (C3: nacheinander mit Pause).
+- **smtp_ehlo** lief an 465 und 587 in allen drei Proben in ein Zeitlimit; es gibt keine
+  `smtp_ehlo_<port>.json`. AUTH vor STARTTLS bei dortmund-beach 587 kommt deshalb aus nmap
+  smtp-commands; der EHLO-Pfad ist mit einem veraenderten Bundle getestet.
+- **XML-RPC bei castenow:** die Sonde meldet an ubb-wiki Status 403, `xmlrpc_enabled: false`; kein
+  Befund. Bei dortmund-beach lief die Sonde in ein Zeitlimit (wpscan meldet XML-RPC weiter).
+- **whois der Zusatzdomain:** junkerwerk.hu scheiterte wie junkerwerk.de, die Zeile trug aber kein
+  Domain-Etikett ("FAILED: whois_no_data") und zaehlt deshalb zum Primaerziel. Der Scanner setzt das
+  Etikett seit S6d auch an Zeilen ohne Daten.
+
+## Abgleich S6c-Rohfelder nach S6d
+
+Jeder Punkt aus dem Startprompt S6d (Teil A bis C) mit Stand und Test. Tests ohne Pfad in
+`tests/test_facts_s6d.py`, `tests/v3/test_s6d.py`, `tests/test_s6d_probeauftraege.py`,
+`tests/test_testpaths_s6d.py`, scan-worker-Tests in `scan-worker/tests/test_*_s6d.py`. Fakten 1.4.0,
+Katalog 2026-09-29.1.
+
+| Punkt | Aussage | Stand |
+|---|---|---|
+| A1 | Netzbetreiber aus rdap mit Quelle RIR, Spalte "laut <RIR>" in 2.1 und Anhang B | erledigt (`test_a1_netzbetreiber_laut_rir_mit_rdap_fixture`, `test_a1_spaltenkopf_und_anhang_b_laut_ripe_mit_rdap`); Kopf mit Quelle, wenn alle Zeilen dieselbe haben, sonst Quelle je Zelle; Anhang B ohne neue Spalte, Betreiber in der ersten Zeile je Host (Layout bleibt S7a) |
+| A1 | ohne rdap-Lauf weiter "laut AbuseIPDB", Alias-Tabelle und Anschlussbetreiber bleiben | erledigt (`test_a1_ohne_rdap_bleibt_abuseipdb`, `test_netzbetreiber_ohne_rdap_laut_abuseipdb`); gilt fuer alle 24 Fixtures, weil keines eine `rdap.json` traegt |
+| A2 | TLS je Port und je SNI als eigene `tls[]`-Eintraege, `assigned_from` nur ohne eigenen Lauf | erledigt (`test_a2_eigener_eintrag_je_port_mit_starttls`, `test_a2_sni_lauf_eigener_eintrag`, `test_a2_alte_fixtures_behalten_die_zuordnung_ueber_das_zertifikat`) |
+| A2 | Abdeckung "geprueft TLS-Ports je Host" aus den echten Laeufen, `failed` mit Grund als Einschraenkung | erledigt (`test_a2_gescheiterter_lauf_ohne_fakt_mit_grund`, `test_a2_gescheiterter_port_mit_ursache_in_der_einschraenkung`, `test_a2_abdeckung_nennt_die_gemessenen_ports`); vollstaendiger Lauf trotz Exit 7/8 ist `ok` (`test_a2_vollstaendiger_lauf_trotz_exit_code_ist_ok`) |
+| A2 | Positivbefunde und Befunde je Port aus dem Lauf dieses Ports, Betroffenenliste einmal je Port | erledigt an den Proben (dortmund-beach VS-006 TLS 1.0 an 465 und 587 aus den eigenen Laeufen, CVE-2011-3389 in A.3 aus `testssl_465`/`_587`); `service_cert_expired` bleibt fuer Ports ohne eigenen TLS-Fakt, mit Lauf greift `cert_expired` am Port. Kein Fixture mit abgelaufenem Mailzertifikat und Per-Port-Lauf |
+| A2 | ein TLS-Fakt macht einen Mailport nicht zum "Webserver" | erledigt (`test_a2_mailport_mit_tls_fakt_wird_kein_webserver`); testssl-Dienst (smtp, imap, pop3, ftp) ist eine Kennung (`kennung_source testssl`), Erweiterung zu A3 |
+| A3 | Kennung aus imap-/pop3-capabilities, smtp-commands, ssl-cert und `nmap_versionall.xml` | erledigt (`test_a3_versionall_mit_kennung_ersetzt_die_tabellenangabe`, `test_a3_versionall_ohne_ergebnis_aendert_nichts`); an den Proben lieferte der Nachlauf keine neue Kennung (dortmund-beach Zeitlimit, junkerwerk 993/995 wieder `imaps?`/`pop3s?`) |
+| A4 | Fakten `smtp_auth_before_starttls` und `smtp_vrfy` aus `smtp_ehlo_<port>` (ersetzt die Passivquelle) | erledigt (`test_a4_ehlo_sonde_ersetzt_nmap`); an den Proben ohne EHLO-Antwort (Zeitlimit) bleibt nmap die aktive Quelle (`test_a4_ohne_ehlo_antwort_bleibt_nmap`) |
+| A4 | Katalogregel `smtp_auth_before_starttls` (Gelb, Mittelfristig, Entscheidung DC 29.09.), unprocessed-Art entfaellt | erledigt, Regel aktiv und laut Passivquelle im Buendel `smtp_auth`, Passivport als Portzusatz im Titel ("auf 587 und laut Passivquelle 25"), E22-Hinweis (`test_a4_auth_vor_starttls_als_gelber_befund_mit_passivport`, `test_a4_passivvariante_allein_bei_bergersysteme`, `test_a4_keine_unverarbeitete_beobachtung_mehr`, Fixtures `smtp_auth_before_starttls_*`, Text-Fixture); E5-Zeile bleibt |
+| A5 | `wordpress_xmlrpc_enabled` aus `xmlrpc_probe.json` zusaetzlich zu wpscan, Nachweis nennt die Sonde | erledigt (`test_a5_aktive_xmlrpc_sonde_traegt_den_befund`, `test_a5_abgelehnte_sonde_kein_befund`, `test_a5_sonde_bei_castenow_mit_ablehnung`); castenow ohne Befund, weil die Sonde 403 bekam |
+| A6 | "bewertet an der Endseite" nur mit Endantwort-Headern; Endantwort aus dem neuen Feld | erledigt: HTTP-Weiterleitungen aus `header_check.redirect_eval.final`, clientseitige aus `redirect_data.final_response_headers` nur mit `final_response_source: document` (C7); Nachweis mit erster Antwort und Endseite (`test_a6_endantwort_von_header_check_nach_http_weiterleitung`, `test_a6_endseite_von_header_check_im_nachweis`, `test_a6_endantwort_der_weiterleitungspruefung_nur_mit_kennzeichen`) |
+| A6 | `redirect_eval` mit Status und location in der Einschraenkung; HSTS an der ersten Antwort (E24) | erledigt: nicht bewertbare Endantwort desselben Namens als "Endantwort <Status>" in der Zeile (umfrage nennt das Ziel www, keinen Status); HSTS unveraendert |
+| A7 | Konfidenz und Risiko je Meldung, Konfidenzfilter Q14 wirksam | erledigt; Q14 galt schon je Meldungstyp (hoechste Konfidenz, S6b-2), jetzt innerhalb des Fundorts |
+| A7 | Meldungen an 429, 4xx und Nebenpfaden nicht der Zielseite zugerechnet, mit Pfad im Anhang; Anhang C mit URL je Meldung | erledigt (`test_a7_fundort_aus_dem_statuscode`, `test_a7_castenow_meldungen_tragen_status`, `test_a7_anhang_c_mit_adresse_je_meldung`); ZAP-Regeln mit Befund (csrf, session_in_url, sri, cors, directory_listing) nur `alert.location == "target"`. Abweichung: ein Meldungstyp mit Instanzen an Zielseite und Nebenpfad bleibt eine Meldung mit den Adressen der Zielseite; die Nebenpfad-Instanzen dieses Typs erscheinen nicht getrennt im Anhang. `web_vulnerability_active` ohne Fundortfilter (aktive Einschleusung gilt auch an einer Fehlerseite) |
+| A8 | `provider_block_probe` als Fakt, Einschraenkung mit Dauer und betroffenen Pruefungen, Abdeckung "Portscan vollstaendig; danach abgewiesen" | erledigt (`test_a8_gemessene_sperre_ist_blockade`, `test_a8_gemessene_sperre_mit_dauer_und_ports`); Dauer aus `waited_s` (C3), aelter aus der Zahl der Versuche |
+| A8 | ohne Sperre kein Text | erledigt (`test_a8_ohne_sperre_kein_sperrtext_aber_hinweis_auf_spaete_abweisung`); junkerwerk 188.40.3.130 behaelt die abgeleitete Ursache "Verbindungen nach dem Portscan abgewiesen" mit dem Satz, dass die Sperrerkennung keine Sperre fand |
+| A9 | Zonentransfer-Positiv nur mit dem Fakt der jeweiligen Domain | erledigt; "kein Lauf" ergibt `not_tested_reason` ohne Positivbefund (`test_a9_zonentransfer_ohne_lauf_mit_grund`); in f9a2a2f6 lief der AXFR fuer junkerwerk.hu (`test_a9_zonentransfer_je_domain_mit_eigenem_lauf`), der Positivbefund hat dort einen eigenen Fakt |
+| A9 | `found_not_in_inventory` fuer "gefunden, nicht geprueft" mit Gate-Warnung | erledigt (`test_a9_gefundene_namen_aus_discovery_health`); an den Proben ist die Liste leer |
+| A9 | Hostsuche je Zieldomain im Pruefumfang je Domain | teilweise: die veraltete Mehrziel-Warnung entfaellt (`test_a9_keine_veraltete_mehrziel_warnung`); die Zeile je Domain nennt die Hosts der Zusatzdomain ueber das Inventar, eine eigene Angabe "Hostsuche lief" aus `tool_counts.enum_<domain>` ist Darstellung (S7a) |
+| A10 | Abfragefenster im Reputations-Positivbefund | erledigt (`test_a10_positivbefund_mit_abfragefenster`, `test_a10_ohne_feld_wie_bisher`) |
+| A11 | no_ipv6_route, ZAP unreachable, whois ohne Daten, Zeitlimits von ferox und ffuf als Einschraenkung je Ursache | erledigt: whois neu als "Registrierungsdaten der Domain nicht abrufbar" (`test_a11_whois_und_ehlo_als_einschraenkung`, `test_whois_ohne_daten_steht_nicht_im_bericht` angepasst); EHLO-Sonde ohne Antwort in der Zeile "Ablehnung einer Anmeldung vor STARTTLS nicht belegt" mit Port und Ursache; die neuen Werkzeuge erzeugen keine Sammelzeile (`test_a11_neue_werkzeuge_ohne_sammelzeile`); no_ipv6_route, ZAP und Pfadsuche mit den Bausteinen aus S6b-1 bis S6b-4n |
+| A12 | alle Dateien aus der Uebergabetabelle gelesen, 0 `file_unknown_or_unparsable` an den Proben | erledigt (`test_a12_keine_unbekannten_dateien_an_den_probeauftraegen`, `test_keine_unbekannten_dateien`) |
+| B1 (#16) | Schwachstellenzahl und CVE-Kennungen nur aus dem wpscan-Feed, Kennungen nach Schwere | erledigt: Zahl = Eintraege im Feed, Reihenfolge nach NVD-CVSS aus den threat-Fakten, sonst Feed-Reihenfolge mit "Schweregrad im Feed nicht angegeben" (Entscheidung DC 29.09.; wpscan liefert in keinem der 24 Tars eine Schwere, `enrichment.json` ist leer, Issue #26) (`test_b1_zahl_und_kennungen_aus_dem_feed`, `test_b1_schwere_im_feed_nicht_angegeben`) |
+| B2 (#18) | httpx-Abdeckung je VHost | erledigt (`test_b2_httpx_abdeckung_je_vhost`); der VHost kommt aus `input`/`url` der JSONL-Zeile, demselben Schluessel wie bei `httpx_<slug>.json` (der Dateiname steht in der Zeile nicht, er ist nur ein Eindeutigkeitsmerkmal) |
+| B3 (#4) | Validierungstests in den testpaths, Pipeline zaehlt die Tests | erledigt: Tests liegen seit S5 in `tests/validation`; Sperre `tests/test_testpaths_s6d.py` fuer report-worker und scan-worker; `junitxml` mit `artifacts:reports:junit` in `test-report-worker` und `test-scan-worker` |
+| C1 (#22) | otx, securitytrails je Domain mit `_domain` | erledigt im Scanner (`test_passive_domains_s6d.py`), Berichtsseite liest die Domaindateien (`test_c1_otx_und_securitytrails_je_domain`, `test_c1_domaindateien_werden_gelesen`); whois-Zeilen ohne Daten tragen jetzt ebenfalls das Etikett (`test_zeilen_ohne_daten_tragen_das_etikett`) |
+| C2 (#19) | NAT64-Adressen erkennen, im Inventar mit Grund, nicht als IPv6-Ziel | erledigt (`test_nat64_s6d.py`, handgebaut nach dem S2b-Beleg; `test_c2_nat64_adresse_ist_kein_ipv6_des_systems`) |
+| C3 | Per-Port-Sonden auf gedrosselten Hosts nacheinander mit Pause, konfigurierbar, Messung danach | erledigt (`test_throttle_probes_s6d.py`); `VECTISCAN_THROTTLE_PROBE_PAUSE_S` (5), `VECTISCAN_THROTTLE_PROBE_ORDER` (asc), zweite Messung `provider_block_probe_p2`; Wirkung erst in der Testrunde messbar |
+| C4 | `testssl_<port>` mit `failed` traegt einen Grund | erledigt (`test_testssl_status_s6d.py`): `no_tls_on_port`, `tls_connect_refused`, `starttls_failed`, `incomplete_output`, `invalid_json`, `no_output_file`, `usage_banner`; ein vollstaendiger Lauf ist `ok` unabhaengig vom Exit-Code |
+| C6 | rdap mit den Inventar-IPs (S6c-Defekt, Entscheidung DC 29.09.) | erledigt (`test_passive_domains_s6d.py`: IP-Durchgang faehrt rdap, keine Doppelzeilen, dns_security nicht erneut) |
+| C7 | Endantwort von redirect_probe nur aus Hauptframe-Navigationen (Entscheidung DC 29.09.) | erledigt (`test_redirect_probe_document_s6d.py`), Kennzeichen `final_response_source` |
+
+Aenderungen an den 21 alten Fixtures aus vorhandenen Daten (Soll-Listen neu erzeugt, Markierungen
+erhalten):
+
+- **A4:** AUTH vor STARTTLS wird Befund: aktiv (nmap smtp-commands) bei dortmund-beach 14272c00 und
+  1fbc92b9 (587, dazu Port 25 laut Passivquelle im selben Befund), castenow 2d2d4f39, 4e6b6883 und
+  f77ccff2 (92.205.163.53:25), trunk-immobilien 45bb234c, securess ae8d1d70 (zwei Hosts),
+  krause-computer fb13a98f; nur laut Passivquelle bei castenow 1f8bc977 und bergersysteme 68d59573
+  (Port 25). Bei bergersysteme nennt die E4-Zeile den neuen Passivbefund mit.
+- **A7:** Anhang C nennt je Meldung die Adresse mit Pfad (alle Fixtures mit ZAP-Meldungen im Anhang);
+  Zahl der Zeilen und Meldungen unveraendert. Keine Befundaenderung durch den Fundortfilter.
+- **A11:** vectigal-tech 75338c97 bekommt "Registrierungsdaten der Domain nicht abrufbar" (whois
+  `failed`/`no_data` aus S2b); die uebrigen alten Fixtures fuehren whois als `ok` mit "no_data" und
+  bleiben ohne Zeile.
+- **A1:** Anhang B nennt den Netzbetreiber "laut AbuseIPDB" in der ersten Zeile je Host (alle
+  Fixtures mit Anhang B).
+- **A2, A3, A5, A6, A8, A9, A10:** keine Aenderung an den alten Fixtures (Rohfelder fehlen dort).
+
+Seitenerwartung (`render/expected-pages.json`) aus `ops-update-pages` der MR-Pipeline.
+
 ## Golden-Facts (S1)
 
 `facts/<order>.json` ist die Ausgabe von `reporter/facts/` fuer jede Manifest-Order
