@@ -696,6 +696,10 @@ def run_domain_intel(domain: str, scan_dir: str, order_id: str,
                     domain)
             except Exception:
                 raw = None
+        else:
+            # S6d (A11): auch eine Zeile ohne Daten traegt das Domain-Etikett; sonst
+            # zaehlte der whois-Ausfall von junkerwerk.hu (f9a2a2f6) zum Primaerziel.
+            raw = domain_labeled_json({"status": status, "reason": reason}, domain)
         record_tool_run(order_id, None, 0, tool, status,
                         reason=reason, raw_output=raw)
 

@@ -113,6 +113,31 @@ def test_securitytrails_ohne_daten_ist_failed(tmp_path):
     assert not (tmp_path / "phase0a" / "securitytrails_junkerwerk.hu.json").exists()
 
 
+def test_zeilen_ohne_daten_tragen_das_etikett(tmp_path):
+    """S6d (A11): der whois-Ausfall von junkerwerk.hu (f9a2a2f6) stand ohne Etikett in der Zeile
+    ("FAILED: whois_no_data") und zaehlte im Bericht zum Primaerziel."""
+    calls: list[dict] = []
+    with patch("scanner.phase0a.WhoisClient") as whois_cls, \
+            patch("scanner.phase0a.OTXClient") as otx_cls, \
+            patch("scanner.phase0a.SecurityTrailsClient") as st_cls, \
+            patch("scanner.phase0a.run_all_dns_security", return_value={}), \
+            patch("scanner.phase0a.publish_event"), \
+            patch("scanner.phase0a.record_tool_run", side_effect=_collect(calls)):
+        whois_cls.return_value.lookup.return_value = None
+        otx_cls.return_value.lookup_domain.return_value = None
+        st_cls.return_value.available = True
+        st_cls.return_value.lookup_domain.return_value = None
+        st_cls.return_value.get_subdomains.return_value = []
+        st_cls.return_value.get_dns_history.return_value = {}
+        run_domain_intel("junkerwerk.hu", str(tmp_path), "f9a2a2f6",
+                         {"package": "perimeter", "phase0a_tools": ["whois", "otx", "securitytrails"]})
+    for tool in ("whois", "otx", "securitytrails"):
+        row = _rows(calls, tool)[0]
+        assert row["status"] == "failed", (tool, row)
+        daten = json.loads(row["raw"])
+        assert daten["_domain"] == "junkerwerk.hu" and daten["reason"] == row["reason"]
+
+
 def test_securitytrails_ohne_schluessel_ist_skipped(tmp_path):
     _, calls, mocks = _domain_intel(tmp_path, otx={"pulse_count": 0}, st_available=False)
     rows = _rows(calls, "securitytrails")
