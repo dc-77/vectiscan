@@ -309,6 +309,35 @@ def probe_redirects(
     return results
 
 
+def _main_frame_navigation(response: Any, page: Any) -> bool | None:
+    """S6d (C7): Ist die Antwort eine Navigation im Hauptframe der Seite?
+
+    True/False, wenn Playwright die Angaben liefert; None, wenn sie sich nicht
+    bestimmen laesst (kein request- oder frame-Objekt, Fehler beim Zugriff).
+    Nachgeladene Skripte, Bilder, XHR und Frames zaehlen nicht als Endantwort.
+    """
+    try:
+        request = response.request
+        is_nav = request.is_navigation_request()
+        frame = response.frame
+        main = page.main_frame
+    except Exception:
+        return None
+    try:
+        return bool(is_nav) and frame == main
+    except Exception:
+        return None
+
+
+def _resource_type(response: Any) -> str | None:
+    """S6d (C7): Art der Anfrage laut Playwright (document, script, image, ...)."""
+    try:
+        value = response.request.resource_type
+    except Exception:
+        return None
+    return value if isinstance(value, str) else None
+
+
 def _probe_single_fqdn(
     browser: Any,
     fqdn: str,
@@ -346,26 +375,46 @@ def _probe_single_fqdn(
         final_response_headers: dict[str, str] = {}
         first_status_code: int = 0
         response_chain: list[dict[str, Any]] = []
+        # S6d (C7): Endantwort nur aus Navigationen im Hauptframe. Vorher gewann
+        # die letzte Antwort ueberhaupt, also meist ein Skript, Bild oder
+        # Analytics-Aufruf nach dem Dokument. Laesst sich die Art einer Antwort
+        # nicht bestimmen (kein request-Objekt), bleibt der alte Wert als Rueckfall,
+        # dann aber ohne das Kennzeichen final_response_source.
+        nav_headers: dict[str, str] = {}
+        nav_status: int = 0
+        nav_seen = False
         page = None
 
         try:
             context = browser.new_context(ignore_https_errors=True)
             page = context.new_page()
+            main_page = page
 
             def on_response(response: Any) -> None:
                 nonlocal final_status_code, response_headers
                 nonlocal final_response_headers, first_status_code
+                nonlocal nav_headers, nav_status, nav_seen
                 redirect_chain.append(response.url)
                 final_status_code = response.status
                 try:
                     hdrs = dict(response.headers) if hasattr(response, "headers") else {}
                 except Exception:
                     hdrs = {}
-                response_chain.append({"url": response.url, "status": response.status})
+                navigation = _main_frame_navigation(response, main_page)
+                response_chain.append({
+                    "url": response.url,
+                    "status": response.status,
+                    "resource_type": _resource_type(response),
+                    "navigation": navigation is True,
+                })
                 if not response_headers:
                     response_headers = hdrs
                     first_status_code = response.status
-                # Endantwort: letzte Antwort gewinnt (last-wins).
+                if navigation is True:
+                    nav_headers = hdrs
+                    nav_status = response.status
+                    nav_seen = True
+                # Rueckfall ohne bestimmbare Art: letzte Antwort gewinnt (bis S6c).
                 final_response_headers = hdrs
 
             page.on("response", on_response)
@@ -397,6 +446,14 @@ def _probe_single_fqdn(
             # Take screenshot (best effort) — Phase 5, garantiert final
             screenshot_path = _take_screenshot(page, fqdn, scan_dir, ip)
 
+            # S6d (C7): Endantwort aus der letzten Navigation im Hauptframe.
+            final_status = final_status_code
+            final_source: str | None = None
+            if nav_seen:
+                final_response_headers = nav_headers
+                final_status = nav_status
+                final_source = "document"
+
             return {
                 "final_url": final_url,
                 "final_domain": final_domain,
@@ -409,8 +466,12 @@ def _probe_single_fqdn(
                 # S6c/N3: neue Felder, Bestandsfeld response_headers unveraendert.
                 "first_response_headers": response_headers,
                 "final_response_headers": final_response_headers,
+                # S6d (C7): "document", wenn die Endantwort aus einer Navigation im
+                # Hauptframe stammt; sonst None (Rueckfall, der report-worker nutzt
+                # die Header dann nicht als Endantwort).
+                "final_response_source": final_source,
                 "first_status": first_status_code,
-                "final_status": final_status_code,
+                "final_status": final_status,
                 "response_chain": response_chain,
                 "tech_info": tech_info,
                 "screenshot_path": screenshot_path,

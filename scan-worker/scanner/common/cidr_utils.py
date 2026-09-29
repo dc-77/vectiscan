@@ -16,6 +16,26 @@ _CIDR_RE = re.compile(r"^(\d{1,3}(?:\.\d{1,3}){3})/(\d{1,2})$")
 _IPV4_RE = re.compile(r"^\d{1,3}(?:\.\d{1,3}){3}$")
 
 
+def nat64_embedded_ipv4(ip: str) -> str | None:
+    """S6d (Issue #19): eingebettete IPv4 einer NAT64-Adresse (64:ff9b::/96), sonst None.
+
+    Ein Resolver mit DNS64 synthetisiert fuer Namen ohne eigenen AAAA-Eintrag eine
+    Adresse aus 64:ff9b::/96 plus der IPv4 (S2b-Beleg dortmund-beach.com: der
+    lokale Resolver lieferte 64:ff9b::…, autoritativ hat keine Domain einen
+    AAAA-Eintrag). Solche Adressen sind kein IPv6-Ziel des Kunden. Gleiches Netz
+    wie im SSRF-Guard (``_NAT64_NET``).
+    """
+    from scanner.common.ssrf_guard import _NAT64_NET
+
+    try:
+        addr = ipaddress.ip_address(str(ip).strip())
+    except ValueError:
+        return None
+    if isinstance(addr, ipaddress.IPv6Address) and addr in _NAT64_NET:
+        return str(ipaddress.IPv4Address(int(addr) & 0xFFFFFFFF))
+    return None
+
+
 def is_valid_ipv4(raw: str) -> bool:
     try:
         ipaddress.IPv4Address(raw)

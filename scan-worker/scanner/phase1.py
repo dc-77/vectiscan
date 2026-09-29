@@ -939,7 +939,7 @@ def run_phase1(
     # S6c/Q17: Netze, die nach dem Portscan sperren (Hetzner/your-server.de),
     # werden gedrosselt gescannt. isp/rdns aus dem Web-Probe/Inventar, sonst loest
     # der Throttle-Check rDNS selbst auf.
-    from scanner.net_throttle import (is_throttled_host,
+    from scanner.net_throttle import (is_throttled_host, pause_between_probes,
                                       probe_reachable_after_portscan)
     host_isp = ""
     host_rdns = ""
@@ -972,6 +972,9 @@ def run_phase1(
         if not (provider_block and provider_block.get("blocked")):
             reprobe_ports = _unidentified_ports(nmap_result)
             if reprobe_ports:
+                # S6d (C3): auf gedrosselten Hosts eine Pause zwischen Sperrprobe
+                # und Nachprobe, damit sie nicht direkt auf den Portscan folgt.
+                pause_between_probes(throttle)
                 try:
                     run_nmap_version_reprobe(ip, reprobe_ports, scan_dir, order_id)
                 except Exception as e:

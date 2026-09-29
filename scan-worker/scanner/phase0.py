@@ -18,6 +18,7 @@ from scanner.tools import (run_tool, record_tool_run, classify_exit,
                            domain_labeled_json)
 from scanner.phase0a import domain_slug as _domain_slug
 from scanner.progress import publish_event
+from scanner.common.cidr_utils import nat64_embedded_ipv4
 
 log = structlog.get_logger()
 
@@ -449,7 +450,11 @@ def _found_not_in_inventory(dnsx_results: list[dict[str, Any]] | None,
     for r in (dnsx_results or []):
         raw = r.get("host") or ""
         host_name = str(raw).split()[0].strip().rstrip(".").lower() if raw else ""
-        if host_name and (r.get("a") or r.get("aaaa")):
+        # S6d (Issue #19): eine synthetische NAT64-Adresse ist keine Aufloesung
+        # des Namens; ohne weitere Adresse zaehlt er nicht als gefunden.
+        real = list(r.get("a") or []) + [
+            x for x in (r.get("aaaa") or []) if not nat64_embedded_ipv4(x)]
+        if host_name and real:
             resolved_names.add(host_name)
     in_inventory: set[str] = set()
     for h in inventory.get("hosts", []):
@@ -1036,6 +1041,21 @@ def merge_and_group(
     dnsx_resolved: set[str] = set()  # Track which FQDNs dnsx handled
     dangling_candidates: list[dict[str, Any]] = []  # {fqdn, cname_target}
 
+    # S6d (Issue #19): synthetische NAT64-Adressen (64:ff9b::/96) eines Resolvers
+    # mit DNS64 sind kein IPv6-Ziel. Sie kommen nicht in die Hostliste, sondern mit
+    # Grund in inventory["synthetic_ipv6"] (S2b-Beleg dortmund-beach.com).
+    synthetic_ipv6: dict[str, dict[str, Any]] = {}
+
+    def _add_ip(ip: str, fqdn: str) -> None:
+        embedded = nat64_embedded_ipv4(ip)
+        if embedded is not None:
+            entry = synthetic_ipv6.setdefault(
+                ip, {"ip": ip, "embedded_ipv4": embedded, "fqdns": set(),
+                     "reason": "nat64_synthesized"})
+            entry["fqdns"].add(fqdn)
+            return
+        ip_to_fqdns[ip].add(fqdn)
+
     for entry in dnsx_results:
         host = entry.get("host", "").lower().rstrip(".")
         if not host:
@@ -1051,7 +1071,7 @@ def merge_and_group(
 
         if ips:
             for ip in ips:
-                ip_to_fqdns[ip].add(host)
+                _add_ip(ip, host)
         elif cname and not ips:
             # CNAME exists but dnsx didn't return the final A record —
             # resolve via socket fallback instead of discarding the FQDN
@@ -1076,7 +1096,7 @@ def merge_and_group(
             infos = socket.getaddrinfo(fqdn, None, proto=socket.IPPROTO_TCP)
             resolved_ips = sorted({info[4][0] for info in infos})
             for ip in resolved_ips:
-                ip_to_fqdns[ip].add(fqdn)
+                _add_ip(ip, fqdn)
             resolved_danglings += 1
         except (socket.gaierror, socket.timeout, OSError, UnicodeError):
             true_danglings.append(entry)  # Truly unresolvable
@@ -1114,7 +1134,7 @@ def merge_and_group(
                 infos = socket.getaddrinfo(fqdn, None, proto=socket.IPPROTO_TCP)
                 resolved_ips = sorted({info[4][0] for info in infos})
                 for ip in resolved_ips:
-                    ip_to_fqdns[ip].add(fqdn)
+                    _add_ip(ip, fqdn)
                 resolved_missed += 1
             except (socket.gaierror, socket.timeout, OSError, UnicodeError):
                 pass  # Subdomain doesn't resolve — expected for stale entries
@@ -1136,7 +1156,7 @@ def merge_and_group(
             infos = socket.getaddrinfo(domain, None, proto=socket.IPPROTO_TCP)
             fallback_ips = sorted({info[4][0] for info in infos})
             for fb_ip in fallback_ips:
-                ip_to_fqdns[fb_ip].add(domain.lower())
+                _add_ip(fb_ip, domain.lower())
             log.info("base_domain_fallback", domain=domain, ips=fallback_ips)
         except (socket.gaierror, socket.timeout, OSError, UnicodeError) as e:
             log.warning("base_domain_resolve_failed", domain=domain, error=str(e))
@@ -1252,6 +1272,15 @@ def merge_and_group(
         },
         "skipped_hosts": skipped_hosts,
     }
+    # S6d (Issue #19): nur wenn vorhanden, damit Inventare ohne NAT64 unveraendert
+    # bleiben. Struktur je Adresse: ip, embedded_ipv4, fqdns, reason.
+    if synthetic_ipv6:
+        inventory["synthetic_ipv6"] = [
+            {**e, "fqdns": sorted(e["fqdns"])}
+            for _, e in sorted(synthetic_ipv6.items())
+        ]
+        log.info("nat64_synthesized_filtered", count=len(synthetic_ipv6),
+                 ips=sorted(synthetic_ipv6))
 
     # Save host_inventory.json
     try:

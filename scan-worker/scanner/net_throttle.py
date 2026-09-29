@@ -9,7 +9,9 @@ Phase-2-Werkzeug failed statt leerem ok.
 Die Netzliste ist konfigurierbar (Umgebungsvariable ``VECTISCAN_THROTTLE_NETS``,
 komma-getrennte CIDRs), damit weitere Anbieter ohne Codeaenderung nachgetragen
 werden koennen. Rate und Wiederholungen ebenso (``VECTISCAN_THROTTLE_MAX_RATE``,
-``VECTISCAN_THROTTLE_MAX_RETRIES``).
+``VECTISCAN_THROTTLE_MAX_RETRIES``), seit S6d auch Pause und Reihung der
+Per-Port-Sonden (``VECTISCAN_THROTTLE_PROBE_PAUSE_S``,
+``VECTISCAN_THROTTLE_PROBE_ORDER``).
 """
 
 from __future__ import annotations
@@ -55,6 +57,66 @@ def throttle_max_retries() -> int:
         return int(os.environ.get("VECTISCAN_THROTTLE_MAX_RETRIES", "1"))
     except ValueError:
         return 1
+
+
+# S6d (C3): Messbefund aus JW f9a2a2f6: auf dem gedrosselten Hetzner-Host brachen die
+# gleichzeitigen Per-Port-Sonden (testssl je Port, smtp_ehlo) ab, obwohl die
+# Einzel-Sperrprobe den Host erreichte. Auf gedrosselten Hosts laufen die Sonden
+# deshalb nacheinander mit Pause; Pause und Reihung sind konfigurierbar.
+DEFAULT_PROBE_PAUSE_S = 5.0
+
+
+def throttle_probe_pause_s() -> float:
+    """Pause zwischen zwei Per-Port-Sonden auf einem gedrosselten Host (Sekunden).
+
+    ``VECTISCAN_THROTTLE_PROBE_PAUSE_S``; ungueltig oder negativ: Vorgabe 5.
+    """
+    raw = os.environ.get("VECTISCAN_THROTTLE_PROBE_PAUSE_S", "")
+    if not raw.strip():
+        return DEFAULT_PROBE_PAUSE_S
+    try:
+        value = float(raw)
+    except ValueError:
+        log.warning("throttle_probe_pause_invalid", value=raw)
+        return DEFAULT_PROBE_PAUSE_S
+    return value if value >= 0 else DEFAULT_PROBE_PAUSE_S
+
+
+def throttle_probe_order(ports: list[int]) -> list[int]:
+    """Reihung der Per-Port-Sonden auf einem gedrosselten Host.
+
+    ``VECTISCAN_THROTTLE_PROBE_ORDER``: ``asc`` (Vorgabe), ``desc`` oder eine
+    komma-getrennte Portliste; die genannten Ports laufen zuerst in dieser
+    Reihenfolge, die uebrigen danach aufsteigend. Ein ungueltiger Wert faellt auf
+    ``asc`` zurueck.
+    """
+    uniq = sorted({int(p) for p in ports})
+    raw = os.environ.get("VECTISCAN_THROTTLE_PROBE_ORDER", "").strip().lower()
+    if raw in ("", "asc"):
+        return uniq
+    if raw == "desc":
+        return list(reversed(uniq))
+    wanted: list[int] = []
+    for part in raw.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        if not part.isdigit():
+            log.warning("throttle_probe_order_invalid", value=raw)
+            return uniq
+        port = int(part)
+        if port in uniq and port not in wanted:
+            wanted.append(port)
+    return wanted + [p for p in uniq if p not in wanted]
+
+
+def pause_between_probes(throttled: bool) -> None:
+    """Pause vor der naechsten Per-Port-Sonde, nur auf gedrosselten Hosts."""
+    if not throttled:
+        return
+    pause = throttle_probe_pause_s()
+    if pause > 0:
+        time.sleep(pause)
 
 
 def _reverse_dns(ip: str) -> str:
@@ -122,6 +184,9 @@ def probe_reachable_after_portscan(ip: str, known_ports: Optional[list[int]] = N
         "blocked": not reachable,
         "reachable": reachable,
         "time_to_reachable_s": time_to_reachable,
+        # S6d (A8): Dauer der Messung, auch im gesperrten Fall (dort ist
+        # time_to_reachable_s None); der Bericht nennt sie in der Einschraenkung.
+        "waited_s": round(time.monotonic() - start, 1),
         "checked_ports": ports,
         "attempts": attempts,
         "checked_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
