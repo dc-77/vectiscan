@@ -13,7 +13,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion, darunter: Dienst auf einem üblichen Verwaltungsport oder mit der Kennung einer Verwaltungssoftware ohne belegte Anmeldung, dessen Zweck zu klären ist; Seitentitel einer Verwaltungsoberfläche unter einem Hostnamen der Webseite ohne belegte Anmeldung; Verwaltungsoberfläche des Hosters auf einem geteilten System, mit Empfehlung an den Hoster; Verwaltungsoberfläche, die nur eine Passivquelle mit Kennung meldet und die zuerst zu bestätigen ist."
    }
   ],
-  "filtering": "Die Korrelation hat 348 Einzelmeldungen der Werkzeuge erfasst, davon 87 gleiche Meldungen der Webanalyse und 36 der TLS-Prüfung zusammengeführt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 21 Befunde und 9 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
+  "filtering": "Die Korrelation hat 348 Einzelmeldungen der Werkzeuge erfasst, davon 87 gleiche Meldungen der Webanalyse und 36 der TLS-Prüfung zusammengeführt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 20 Befunde und 9 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund. Grundlage sind die vollständigen Werkzeugausgaben.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -54,14 +54,14 @@
     "host": "18.239.50.54",
     "operator": "",
     "port": "443",
-    "ref": "VS-2026-018",
+    "ref": "VS-2026-017",
     "svc": "Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.8, TLS erzwungen"
    },
    {
     "host": "195.50.179.4",
     "operator": "Castenow GmbH (Anschluss Vodafone), laut AbuseIPDB",
     "port": "443",
-    "ref": "VS-2026-005, VS-2026-010, VS-2026-017",
+    "ref": "VS-2026-005, VS-2026-010, VS-2026-016",
     "svc": "Microsoft-IIS/10.0, TLS erzwungen"
    },
    {
@@ -75,7 +75,7 @@
     "host": "195.50.179.6",
     "operator": "Castenow GmbH (Anschluss Vodafone), laut AbuseIPDB",
     "port": "443",
-    "ref": "VS-2026-005, VS-2026-008, VS-2026-015",
+    "ref": "VS-2026-005, VS-2026-008, VS-2026-014",
     "svc": "nginx, TLS erzwungen"
    },
    {
@@ -124,7 +124,7 @@
     "host": "92.205.163.53",
     "operator": "",
     "port": "443",
-    "ref": "VS-2026-005, VS-2026-016, VS-2026-017, VS-2026-021",
+    "ref": "VS-2026-005, VS-2026-015, VS-2026-016, VS-2026-020",
     "svc": "nginx, TLS erzwungen"
    },
    {
@@ -159,8 +159,8 @@
     "host": "92.205.163.53",
     "operator": "",
     "port": "8000",
-    "ref": "VS-2026-013",
-    "svc": "ERROR: Script execution failed (use -d to debug), Stream tonausstrom.de"
+    "ref": "",
+    "svc": "Shoutcast DNAS 2.6.1.777, Stream tonausstrom.de, Dienst einer weiteren Domain, nicht bewertet"
    },
    {
     "host": "92.205.163.53",
@@ -187,7 +187,7 @@
     "host": "195.50.179.4",
     "operator": "",
     "port": "25",
-    "ref": "VS-2026-020",
+    "ref": "VS-2026-019",
     "svc": "SMTP (CipherMail), laut Passivquelle"
    },
    {
@@ -1321,8 +1321,8 @@
      },
      {
       "p": "8000",
-      "s": "ERROR: Script execution failed (use -d to debug), Stream tonausstrom.de",
-      "st": "blau"
+      "s": "Shoutcast DNAS 2.6.1.777, Stream tonausstrom.de, Dienst einer weiteren Domain, nicht bewertet",
+      "st": "grau"
      },
      {
       "p": "8001",
@@ -1694,7 +1694,7 @@
    "level_label": "erhöht",
    "missing_headers": [],
    "operator": "beim Hoster Host Europe GmbH",
-   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Dienst gehört zum Server und nicht zu Ihrer Website. Auf demselben Server stehen laut Passivquelle 2 weitere Domains. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen. Auf Port 8800 läuft Icecast streaming media server; die Zuordnung zu einer Domain ist nicht belegt, der Dienst ist in diesem Bericht nicht bewertet.",
+   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Dienst gehört zum Server und nicht zu Ihrer Website. Auf demselben Server stehen laut Passivquelle 2 weitere Domains. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen. Auf demselben Server laufen außerdem Dienste weiterer Domains (Port 8000); sie gehören nicht zu Ihrer Website und sind in diesem Bericht nicht bewertet. Auf Port 8800 läuft Icecast streaming media server; die Zuordnung zu einer Domain ist nicht belegt, der Dienst ist in diesem Bericht nicht bewertet.",
    "plan_action": "Den Hoster bitten, die Verwaltungsoberfläche auf die benötigten Quellnetze zu beschränken oder hinter eine zusätzliche Anmeldestufe zu legen.",
    "plan_effect": "Verkleinert die Angriffsfläche des geteilten Servers, auf dem die eigenen Dienste liegen",
    "plan_items": [
@@ -1842,7 +1842,7 @@
    "level_label": "erhöht",
    "missing_headers": [],
    "operator": "beim Hoster Host Europe GmbH",
-   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Dienst gehört zum Server und nicht zu Ihrer Website. Auf demselben Server stehen laut Passivquelle 2 weitere Domains. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen. Auf Port 8800 läuft Icecast streaming media server; die Zuordnung zu einer Domain ist nicht belegt, der Dienst ist in diesem Bericht nicht bewertet.",
+   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Dienst gehört zum Server und nicht zu Ihrer Website. Auf demselben Server stehen laut Passivquelle 2 weitere Domains. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen. Auf demselben Server laufen außerdem Dienste weiterer Domains (Port 8000); sie gehören nicht zu Ihrer Website und sind in diesem Bericht nicht bewertet. Auf Port 8800 läuft Icecast streaming media server; die Zuordnung zu einer Domain ist nicht belegt, der Dienst ist in diesem Bericht nicht bewertet.",
    "plan_action": "Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten Varianten anbieten.",
    "plan_effect": "Schützt Zugangsdaten und Nachrichten auf dem Übertragungsweg",
    "plan_items": [
@@ -1959,7 +1959,7 @@
    "level_label": "erhöht",
    "missing_headers": [],
    "operator": "beim Hoster Host Europe GmbH",
-   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Dienst gehört zum Server und nicht zu Ihrer Website. Auf demselben Server stehen laut Passivquelle 2 weitere Domains. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen. Auf Port 8800 läuft Icecast streaming media server; die Zuordnung zu einer Domain ist nicht belegt, der Dienst ist in diesem Bericht nicht bewertet.",
+   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Dienst gehört zum Server und nicht zu Ihrer Website. Auf demselben Server stehen laut Passivquelle 2 weitere Domains. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen. Auf demselben Server laufen außerdem Dienste weiterer Domains (Port 8000); sie gehören nicht zu Ihrer Website und sind in diesem Bericht nicht bewertet. Auf Port 8800 läuft Icecast streaming media server; die Zuordnung zu einer Domain ist nicht belegt, der Dienst ist in diesem Bericht nicht bewertet.",
    "plan_action": "Klären, welcher Dienst auf dem Port läuft und ob er aus dem Internet erreichbar sein muss; andernfalls den Port schließen.",
    "plan_effect": "Verkleinert die Angriffsfläche um Dienste ohne erkennbaren Zweck",
    "plan_items": [
@@ -3387,7 +3387,7 @@
    "level_label": "niedrig",
    "missing_headers": [],
    "operator": "beim Hoster Host Europe GmbH",
-   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Dienst gehört zum Server und nicht zu Ihrer Website. Auf demselben Server stehen laut Passivquelle 2 weitere Domains. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen. Auf Port 8800 läuft Icecast streaming media server; die Zuordnung zu einer Domain ist nicht belegt, der Dienst ist in diesem Bericht nicht bewertet.",
+   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Dienst gehört zum Server und nicht zu Ihrer Website. Auf demselben Server stehen laut Passivquelle 2 weitere Domains. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen. Auf demselben Server laufen außerdem Dienste weiterer Domains (Port 8000); sie gehören nicht zu Ihrer Website und sind in diesem Bericht nicht bewertet. Auf Port 8800 läuft Icecast streaming media server; die Zuordnung zu einer Domain ist nicht belegt, der Dienst ist in diesem Bericht nicht bewertet.",
    "plan_action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
    "plan_effect": "Verkleinert die Angriffsfläche um selten gepflegte Dienste",
    "plan_items": [
@@ -3501,116 +3501,6 @@
    "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
   },
   {
-   "affected": "92.205.163.53:8000 (ERROR: Script execution failed (use -d to debug), Stream tonausstrom.de)",
-   "cat": "A",
-   "checks": [
-    "http_alt_port"
-   ],
-   "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:8000/tcp · Kennung: ERROR: Script execution failed (use -d to debug), Stream tonausstrom.de · Server-Kennung: ERROR: Script execution failed (use -d to debug) · 8000/tcp open http-alt?",
-   "found": "Der Host 92.205.163.53 (ubb-wiki.castenow.de) beantwortet Anfragen an einen Webdienst auf einem Port außerhalb der üblichen Web- und Verwaltungsports: 92.205.163.53:8000 (ERROR: Script execution failed (use -d to debug), Stream tonausstrom.de).",
-   "id": "VS-2026-013",
-   "impact": "Ein Webdienst auf einem unüblichen Port bleibt bei einer Prüfung der Standardports leicht unbemerkt und vergrößert die Angriffsfläche um eine Anwendung, deren Pflegezustand von außen nicht erkennbar ist.",
-   "key": "windows_edge_exposure/92.205.163.53/hoster:Host Europe GmbH",
-   "level": "niedrig",
-   "level_label": "niedrig",
-   "missing_headers": [],
-   "operator": "beim Hoster Host Europe GmbH",
-   "operator_note": "Dieser Sachverhalt liegt beim Hoster Host Europe GmbH: der Dienst gehört zum Server und nicht zu Ihrer Website. Auf demselben Server stehen laut Passivquelle 2 weitere Domains. Die Empfehlung richtet sich an den Hoster; Sie können sie dort einfordern oder einen eigenen Server in Betracht ziehen. Auf Port 8800 läuft Icecast streaming media server; die Zuordnung zu einer Domain ist nicht belegt, der Dienst ist in diesem Bericht nicht bewertet.",
-   "plan_action": "Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss.",
-   "plan_effect": "Klärt, ob der Dienst aus dem Internet erreichbar sein muss",
-   "plan_items": [
-    {
-     "action": "Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss.",
-     "check": "http_alt_port",
-     "detail": "",
-     "effect": "Klärt, ob der Dienst aus dem Internet erreichbar sein muss",
-     "lever": "Zweck zusätzlicher Webports klären",
-     "per_rule": false,
-     "stage": "mittelfristig"
-    }
-   ],
-   "plan_lever": "Zweck zusätzlicher Webports klären",
-   "plan_stage": "mittelfristig",
-   "policy": "http_alt_port",
-   "provenance": [
-    {
-     "check": "http_alt_port",
-     "field": "title",
-     "members": [
-      "92.205.163.53|92.205.163.53:8000"
-     ],
-     "statement": "short",
-     "text": "zusätzlicher Webport"
-    },
-    {
-     "check": "http_alt_port",
-     "field": "observation",
-     "members": [
-      "92.205.163.53|92.205.163.53:8000"
-     ],
-     "statement": "observation[0]",
-     "text": "Der Host 92.205.163.53 (ubb-wiki.castenow.de) beantwortet Anfragen an einen Webdienst auf einem Port außerhalb der üblichen Web- und Verwaltungsports: 92.205.163.53:8000 (ERROR: Script execution failed (use -d to debug), Stream tonausstrom.de)."
-    },
-    {
-     "check": "http_alt_port",
-     "field": "meaning",
-     "members": [
-      "92.205.163.53|92.205.163.53:8000"
-     ],
-     "statement": "meaning[0]",
-     "text": "Ein Webdienst auf einem unüblichen Port bleibt bei einer Prüfung der Standardports leicht unbemerkt und vergrößert die Angriffsfläche um eine Anwendung, deren Pflegezustand von außen nicht erkennbar ist."
-    },
-    {
-     "check": "http_alt_port",
-     "field": "verify",
-     "members": [
-      "92.205.163.53|92.205.163.53:8000"
-     ],
-     "statement": "verify[0]",
-     "text": "Portscan des Hosts von einer externen Adresse wiederholen; erwartet wird, dass der Port nur noch für berechtigte Quellnetze erreichbar oder vollständig geschlossen ist."
-    },
-    {
-     "check": "http_alt_port",
-     "field": "recommendation",
-     "members": [
-      "92.205.163.53|92.205.163.53:8000"
-     ],
-     "statement": "recommendation[1]",
-     "text": "Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss."
-    },
-    {
-     "check": "http_alt_port",
-     "field": "recommendation",
-     "members": [
-      "92.205.163.53|92.205.163.53:8000"
-     ],
-     "statement": "recommendation[2]",
-     "text": "Nicht mehr benötigte Dienste abschalten und den zugehörigen Port schließen; weiterhin benötigte Dienste auf feste Quellnetze beschränken."
-    }
-   ],
-   "recommendation": [
-    [
-     "Mittelfristig",
-     "Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss."
-    ],
-    [
-     "Strategisch",
-     "Nicht mehr benötigte Dienste abschalten und den zugehörigen Port schließen; weiterhin benötigte Dienste auf feste Quellnetze beschränken."
-    ]
-   ],
-   "scale": "hygiene",
-   "source": "aktiv (nmap)",
-   "status": "blau",
-   "subjects": [
-    "http_alt_port|92.205.163.53",
-    "http_alt_port|92.205.163.53:8000"
-   ],
-   "threat": null,
-   "title": "Webdienste auf 92.205.163.53 (ubb-wiki.castenow.de): zusätzlicher Webport (beim Hoster Host Europe GmbH)",
-   "urgency": "Mittelfristig",
-   "verify": "Portscan des Hosts von einer externen Adresse wiederholen; erwartet wird, dass der Port nur noch für berechtigte Quellnetze erreichbar oder vollständig geschlossen ist."
-  },
-  {
    "affected": "castenow.de",
    "cat": "C",
    "checks": [
@@ -3619,7 +3509,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0/dns_records.json\ncastenow.de · MX-Einträge: mx01.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com und 1 weitere\n\nDNS-Abfragen · phase0a/dns_security.json\ncastenow.de · MTA-STS: DNS-Eintrag nicht vorhanden, Richtlinie nicht vorhanden · TLS-RPT: kein Eintrag",
    "found": "Für castenow.de ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain castenow.de fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten. Für castenow.de ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain castenow.de fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene oder herabgestufte Transportverschlüsselung schicken können.",
-   "id": "VS-2026-014",
+   "id": "VS-2026-013",
    "impact": "Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen. Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.",
    "key": "mail_transport_enforcement/castenow.de/kunde",
    "level": "niedrig",
@@ -3774,7 +3664,7 @@
    ],
    "evidence": "testssl.sh · hosts/195.50.179.6/phase2/testssl.json\nbitwarden.castenow.de · bewertet an der Endseite: https://bitwarden.castenow.de/ · Antwort: 200 · fehlende Header: Permissions-Policy",
    "found": "Auf bitwarden.castenow.de fehlen einzelne Sicherheits-Header der Webseite: bitwarden.castenow.de (fehlend: Permissions-Policy).",
-   "id": "VS-2026-015",
+   "id": "VS-2026-014",
    "impact": "Es fehlt nur die Permissions-Policy, die festlegt, welche Browserfunktionen wie Kamera, Mikrofon oder Standort eingebettete Inhalte nutzen dürfen. Die Auswirkung ist gering; die übrigen grundlegenden Sicherheits-Header sind gesetzt.",
    "key": "web_header_hygiene/195.50.179.6/kunde",
    "level": "niedrig",
@@ -3882,7 +3772,7 @@
    ],
    "evidence": "header_check · hosts/92.205.163.53/phase2/headers_ubb-wiki.castenow.de.json\nubb-wiki.castenow.de · Adresse: https://ubb-wiki.castenow.de · Antwort: 302 · weitergeleitet auf: https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F · bewertet an der Endseite: https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F · Antwort: 200 · Content-Security-Policy: frame-ancestors 'self'; · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options",
    "found": "Auf ubb-wiki.castenow.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src): ubb-wiki.castenow.de. Auf ubb-wiki.castenow.de fehlen einzelne Sicherheits-Header der Webseite: ubb-wiki.castenow.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
-   "id": "VS-2026-016",
+   "id": "VS-2026-015",
    "impact": "Eine Richtlinie ohne Regel für Skriptquellen schränkt nicht ein, welche Skripte eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit die zweite Verteidigungslinie; der Schutz vor Einbettung in fremde Seiten bleibt davon unberührt. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/92.205.163.53/kunde",
    "level": "niedrig",
@@ -4112,7 +4002,7 @@
    ],
    "evidence": "header_check · hosts/195.50.179.4/phase2/headers_mail.castenow.de.json\nmail.castenow.de · Adresse: https://mail.castenow.de · Antwort: 302 · weitergeleitet auf: https://mail.castenow.de/owa/ · Server: Microsoft-IIS/10.0 · X-FEServer (interner Servername): EXCHANGE-SE · bewertet an der Endseite: https://mail.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.castenow.de%2fowa%2f&reason=0 · Antwort: 200 · X-Powered-By: ASP.NET · X-AspNet-Version: 4.0.30319\n\nheader_check · hosts/195.50.179.4/phase2/headers_mail2.castenow.de.json\nmail2.castenow.de · Adresse: https://mail2.castenow.de · Antwort: 302 · weitergeleitet auf: https://mail2.castenow.de/owa/ · Server: Microsoft-IIS/10.0 · X-FEServer (interner Servername): EXCHANGE-SE · bewertet an der Endseite: https://mail2.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail2.castenow.de%2fowa%2f&reason=0 · Antwort: 200 · X-Powered-By: ASP.NET · X-AspNet-Version: 4.0.30319\n\nheader_check · hosts/92.205.163.53/phase2/headers_ubb-wiki.castenow.de.json\nubb-wiki.castenow.de · Adresse: https://ubb-wiki.castenow.de · Antwort: 302 · weitergeleitet auf: https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F · Server: nginx · bewertet an der Endseite: https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F · Antwort: 200 · X-Powered-By: PHP/8.4.25, PleskLin",
    "found": "Die Webantworten von mail.castenow.de, mail2.castenow.de und ubb-wiki.castenow.de nennen in ihren Antwortheadern die Version der eingesetzten Serversoftware: mail.castenow.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319), mail2.castenow.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET, X-AspNet-Version: 4.0.30319), ubb-wiki.castenow.de (Server: nginx, X-Powered-By: PHP/8.4.25, PleskLin). Der Antwortheader X-FEServer nennt den internen Namen des Frontend-Servers: mail.castenow.de (X-FEServer: EXCHANGE-SE), mail2.castenow.de (X-FEServer: EXCHANGE-SE).",
-   "id": "VS-2026-017",
+   "id": "VS-2026-016",
    "impact": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs. Ein interner Servername verrät das Namensschema der Serverlandschaft; das erleichtert die Aufklärung vor einem gezielten Angriff.",
    "key": "banner_disclosure/scan/kunde",
    "level": "niedrig",
@@ -4244,7 +4134,7 @@
    ],
    "evidence": "header_check · hosts/18.239.50.54/phase2/headers_umfrage.castenow.de.json\numfrage.castenow.de · Adresse: https://umfrage.castenow.de · Antwort: 301 (Weiterleitung) · weitergeleitet auf: https://www.castenow.de/ · Server: Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.8",
    "found": "Die Webantwort von umfrage.castenow.de nennt in ihren Antwortheadern die Version der eingesetzten Serversoftware: umfrage.castenow.de (Server: Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.8).",
-   "id": "VS-2026-018",
+   "id": "VS-2026-017",
    "impact": "Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines Angriffs.",
    "key": "banner_disclosure/scan/platform:umfrageonline.com",
    "level": "niedrig",
@@ -4340,7 +4230,7 @@
    ],
    "evidence": "DNS-Abfragen · phase0a/dns_security.json\ncastenow.de · DNSSEC: Zone nicht signiert",
    "found": "Für castenow.de ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain castenow.de lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit prüfen.",
-   "id": "VS-2026-019",
+   "id": "VS-2026-018",
    "impact": "Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.",
    "key": "dns_hygiene/castenow.de/kunde",
    "level": "niedrig",
@@ -4436,7 +4326,7 @@
    ],
    "evidence": "Shodan · phase0a/shodan_hosts.json\nQuelle: shodan · 195.50.179.4:25 · VRFY in der EHLO-Antwort: ja · Banner (Auszug): 220 ciphermail.castenow.de ESMTP CipherMail 250-ciphermail.castenow.de 250-PIPELINING 250-SIZE 31457280 250-VRFY 250-STARTTLS 250-ENHANCEDSTATUSCODES",
    "found": "Laut Passivquelle nennt der Mailserver auf 195.50.179.4 (mail.castenow.de, mail2.castenow.de, owa.castenow.de) den Befehl VRFY in seiner Antwort auf EHLO: 195.50.179.4:25 (laut Passivquelle, Hosteintrag aktualisiert am 28.09.2026). Port 25 ist vom Prüfstand aus nicht prüfbar; die Angabe der Passivquelle ist deshalb nicht bestätigt.",
-   "id": "VS-2026-020",
+   "id": "VS-2026-019",
    "impact": "Mit VRFY lassen sich gültige Postfachnamen ermitteln. Das erleichtert gezielte Phishing-Mails und Rateangriffe auf Zugangsdaten.",
    "key": "smtp_commands/195.50.179.4/kunde",
    "level": "niedrig",
@@ -4555,7 +4445,7 @@
    ],
    "evidence": "wpscan\nubb-wiki.castenow.de · Anmeldenamen: 1 (Namen in den Rohdaten) · gefunden über: https://ubb-wiki.castenow.de/wp-json/oembed/1.0/embed",
    "found": "Auf ubb-wiki.castenow.de lassen sich über WordPress-Schnittstellen gültige Benutzernamen ermitteln: ubb-wiki.castenow.de (1 Anmeldename, gefunden über https://ubb-wiki.castenow.de/wp-json/oembed/1.0/embed).",
-   "id": "VS-2026-021",
+   "id": "VS-2026-020",
    "impact": "Bekannte Benutzernamen erleichtern Passwort-Rateangriffe und gezieltes Phishing, weil ein Angreifer sich nicht mehr auf Vermutungen verlassen muss, sondern echte Anmeldenamen kennt.",
    "key": "wordpress_user_enumeration/scan/kunde",
    "level": "niedrig",
@@ -4731,13 +4621,13 @@
   "overall_status": "gelb",
   "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
- "landscape_lead": "21 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "20 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 46,
+  "after_fp": 45,
   "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
   "catalog_version": "2026-09-29.1",
   "classification": "Vertraulich",
-  "consolidated": 21,
+  "consolidated": 20,
   "context_fields": [],
   "context_sources": {},
   "customer": "Auftraggeber",
@@ -4928,14 +4818,14 @@
    "refs": [
     "VS-2026-009",
     "VS-2026-010",
-    "VS-2026-015",
-    "VS-2026-016"
+    "VS-2026-014",
+    "VS-2026-015"
    ],
    "sources": [
     "VS-2026-009:security_headers_incomplete",
     "VS-2026-010:security_headers_incomplete",
-    "VS-2026-015:security_headers_incomplete",
-    "VS-2026-016:security_headers_incomplete"
+    "VS-2026-014:security_headers_incomplete",
+    "VS-2026-015:security_headers_incomplete"
    ],
    "st": "gelb"
   },
@@ -4996,30 +4886,16 @@
    "st": "blau"
   },
   {
-   "action": "Beim Hoster einfordern: Prüfen, ob die genannte Anwendung aus dem gesamten Internet erreichbar sein muss.",
-   "effect": "Klärt, ob der Dienst aus dem Internet erreichbar sein muss",
-   "lever": "Zweck zusätzlicher Webports klären",
-   "operator": "hoster",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-013"
-   ],
-   "sources": [
-    "VS-2026-013:http_alt_port"
-   ],
-   "st": "blau"
-  },
-  {
    "action": "Die bestehende Content-Security-Policy um eine Regel für Skriptquellen (script-src oder default-src) ergänzen, die nur die tatsächlich benötigten Ursprünge zulässt.",
    "effect": "Begrenzt die Wirkung eingeschleuster Skripte im Browser",
    "lever": "Inhaltsrichtlinie für die Webseiten einführen",
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-016"
+    "VS-2026-015"
    ],
    "sources": [
-    "VS-2026-016:csp_missing"
+    "VS-2026-015:csp_missing"
    ],
    "st": "blau"
   },
@@ -5030,10 +4906,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-017"
+    "VS-2026-016"
    ],
    "sources": [
-    "VS-2026-017:http_header_disclosure"
+    "VS-2026-016:http_header_disclosure"
    ],
    "st": "blau"
   },
@@ -5044,10 +4920,10 @@
    "operator": "platform",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-018"
+    "VS-2026-017"
    ],
    "sources": [
-    "VS-2026-018:http_header_disclosure"
+    "VS-2026-017:http_header_disclosure"
    ],
    "st": "blau"
   },
@@ -5058,10 +4934,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-020"
+    "VS-2026-019"
    ],
    "sources": [
-    "VS-2026-020:smtp_vrfy_enabled_passive"
+    "VS-2026-019:smtp_vrfy_enabled_passive"
    ],
    "st": "blau"
   },
@@ -5072,10 +4948,10 @@
    "operator": "",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-021"
+    "VS-2026-020"
    ],
    "sources": [
-    "VS-2026-021:wordpress_user_enumeration"
+    "VS-2026-020:wordpress_user_enumeration"
    ],
    "st": "blau"
   },
@@ -5086,10 +4962,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-014"
+    "VS-2026-013"
    ],
    "sources": [
-    "VS-2026-014:mta_sts_missing"
+    "VS-2026-013:mta_sts_missing"
    ],
    "st": "blau"
   },
@@ -5100,10 +4976,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-014"
+    "VS-2026-013"
    ],
    "sources": [
-    "VS-2026-014:tls_rpt_missing"
+    "VS-2026-013:tls_rpt_missing"
    ],
    "st": "blau"
   },
@@ -5114,10 +4990,10 @@
    "operator": "",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-019"
+    "VS-2026-018"
    ],
    "sources": [
-    "VS-2026-019:dnssec_missing"
+    "VS-2026-018:dnssec_missing"
    ],
    "st": "blau"
   }
@@ -5826,7 +5702,7 @@
      "Webanalyse"
     ],
     "code": "webport_unanalysed",
-    "detail": "Betroffen: 92.205.163.53 (Port 8000, 8443).",
+    "detail": "Betroffen: 92.205.163.53 (Port 8443).",
     "refs": [],
     "subjects": [
      "92.205.163.53"
@@ -5886,7 +5762,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 21 Befunde und 9 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 20 Befunde und 9 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -5904,7 +5780,7 @@
    },
    {
     "l": "Befunde im Bericht",
-    "v": "21"
+    "v": "20"
    }
   ],
   "operator_header": "Netzbetreiber (laut AbuseIPDB)",

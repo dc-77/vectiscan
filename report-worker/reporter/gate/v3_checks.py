@@ -713,6 +713,41 @@ def zusage_im_kundentext(data: Any) -> list[Defect]:
     return out
 
 
+# S7a Punkt 0: Fehlertexte eines Werkzeugs im Kundentext ("ERROR: Script execution failed (use -d
+# to debug)" als Dienstkennung bei castenow cd28d260). Anders als die Zusagen gelten hier auch
+# Nachweis, Service-Karte und die Anhaenge B und C als Kundentext; aus dem Durchlauf fallen nur
+# Herkunfts- und Schluesselfelder.
+_OHNE_KUNDENTEXT_WERKZEUG = {"provenance", "meta", "refs", "subjects", "checks", "sources", "key", "rule",
+                             "message"}
+
+
+def _alle_texte(obj: Any, pfad: str = ""):
+    if hasattr(obj, "model_dump"):
+        obj = obj.model_dump()
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if k not in _OHNE_KUNDENTEXT_WERKZEUG:
+                yield from _alle_texte(v, f"{pfad}.{k}")
+    elif isinstance(obj, list):
+        for i, v in enumerate(obj):
+            yield from _alle_texte(v, f"{pfad}[{i}]")
+    elif isinstance(obj, str):
+        yield pfad, obj
+
+
+def werkzeugfehler_im_kundentext(data: Any) -> list[Defect]:
+    from reporter.facts.tool_errors import tool_error_in
+
+    out: list[Defect] = []
+    for pfad, text in _alle_texte(data):
+        treffer = tool_error_in(text)
+        if treffer:
+            out.append(Defect(engine=ENGINE_V3, check="werkzeugfehler_im_kundentext", severity=SEVERITY_ERROR,
+                              message=f"{pfad}: Fehlertext eines Werkzeugs „{treffer}“ im Kundentext",
+                              detail={"where": pfad, "text": treffer}))
+    return out
+
+
 _CVE_ID = re.compile(r"CVE-\d{4}-\d{4,}", re.I)
 
 
@@ -968,4 +1003,6 @@ def run_all(data: Any, facts: Any, output: Any, *, strict: bool = False) -> list
     # S6b-4n (spec/11 N6, E25): Positivbefund gegen Rohfakt, Anmeldenamen im Kundentext.
     defects.extend(positiv_ohne_rohfakt(data, facts, output))
     defects.extend(anmeldename_im_kundentext(data, facts))
+    # S7a Punkt 0: Werkzeug-Fehlertexte als Kennung oder Nachweis.
+    defects.extend(werkzeugfehler_im_kundentext(data))
     return defects

@@ -60,6 +60,7 @@ nicht zwei; woher ein Eintrag kommt, steht deshalb am Eintrag (`engine`).
 | CVE im Befund ohne Zeile in A.3 (`cve_ohne_a3`) | Fehler | S6b-3 (spec/10 R14): dortmund-beach zitierte 17 CVE aus wpscan bei leerem A.3. |
 | Gefundene Namen nicht geprüft (`namen_nicht_geprueft`) | Warnung | S6b-3 (spec/10 R5): bis S6c die Hostsuche repariert; Kapitel 2 nennt die Namen. |
 | Frist zwischen Scan- und Berichtstag abgelaufen (`frist_vor_berichtsdatum`) | Warnung | S6b-3 (spec/10 R18): Hinweis an den Admin im Review, den Stand beim Kunden zu prüfen (castenow mailstore 24.09. bei Bericht vom 26.09.). |
+| Fehlertext eines Werkzeugs im Kundentext (`werkzeugfehler_im_kundentext`) | Fehler | S7a Punkt 0: castenow cd28d260 zeigte an 92.205.163.53:8000 „ERROR: Script execution failed (use -d to debug)“ als Dienstkennung. Muster in `reporter/facts/tool_errors.py`, dieselbe Liste filtert die Kennung schon im nmap-Leser. Geprüft werden alle Kundentexte einschließlich Nachweis, Service-Karte und der Anhänge; echte Fehlerseiten eines Servers („ERROR: The request could not be satisfied“ von CloudFront) treffen die Muster nicht. |
 
 ## Wo die Liste landet
 
