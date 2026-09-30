@@ -955,6 +955,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -967,6 +968,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -982,6 +984,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -994,6 +997,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1006,6 +1010,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1018,6 +1023,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1036,6 +1042,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1048,6 +1055,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -1060,6 +1068,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -1072,6 +1081,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -1094,6 +1104,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "159.69.143.80",
+      "more": [],
       "ok": true,
       "pulls": [
        "cert_expired",
@@ -1118,6 +1129,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "195.50.179.2",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -1142,6 +1154,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "195.50.179.4",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -1166,6 +1179,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "195.50.179.5",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -1190,6 +1204,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "195.50.179.6",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -1214,6 +1229,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "195.50.179.7",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -1238,6 +1254,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "195.50.179.9",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -1262,6 +1279,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "213.23.169.167",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -1286,6 +1304,11 @@
        "tls_no_fallback_scsv"
       ],
       "l": "54.230.172.14",
+      "more": [
+       "54.230.172.35: nicht prüfbar",
+       "54.230.172.38: nicht prüfbar",
+       "54.230.172.97: nicht prüfbar"
+      ],
       "ok": true,
       "pulls": [
        "cert_expired",
@@ -1309,79 +1332,8 @@
        "tls_weakness",
        "tls_no_fallback_scsv"
       ],
-      "l": "54.230.172.35",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "54.230.172.35"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
-      "l": "54.230.172.38",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "54.230.172.38"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
-      "l": "54.230.172.97",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "54.230.172.97"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
       "l": "92.205.163.53",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -1408,6 +1360,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1454,6 +1407,7 @@
        "header_duplicate"
       ],
       "l": "159.69.143.80",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1471,6 +1425,7 @@
        "header_duplicate"
       ],
       "l": "195.50.179.2",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1488,6 +1443,7 @@
        "header_duplicate"
       ],
       "l": "195.50.179.4",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1505,6 +1461,7 @@
        "header_duplicate"
       ],
       "l": "195.50.179.5",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1522,6 +1479,7 @@
        "header_duplicate"
       ],
       "l": "195.50.179.6",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1539,6 +1497,7 @@
        "header_duplicate"
       ],
       "l": "195.50.179.7",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1556,6 +1515,7 @@
        "header_duplicate"
       ],
       "l": "195.50.179.9",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1573,6 +1533,7 @@
        "header_duplicate"
       ],
       "l": "213.23.169.167",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1590,6 +1551,11 @@
        "header_duplicate"
       ],
       "l": "54.230.172.14",
+      "more": [
+       "54.230.172.35: nicht prüfbar",
+       "54.230.172.38: nicht prüfbar",
+       "54.230.172.97: nicht prüfbar"
+      ],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1606,58 +1572,8 @@
        "hsts_short",
        "header_duplicate"
       ],
-      "l": "54.230.172.35",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "54.230.172.35"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
-      "l": "54.230.172.38",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "54.230.172.38"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
-      "l": "54.230.172.97",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "54.230.172.97"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
       "l": "92.205.163.53",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1763,199 +1679,245 @@
    {
     "host": "159.69.143.80",
     "label": "yak.planwerk6.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "195.50.179.2",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Web Server",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    },
    {
     "host": "195.50.179.4",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "443",
       "s": "Microsoft IIS httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    },
    {
     "host": "195.50.179.5",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "195.50.179.6",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "195.50.179.7",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Microsoft IIS httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    },
    {
     "host": "195.50.179.9",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "54.230.172.14",
     "label": "server-54-230-172-14.dus51.r.cloudfront.net",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "Amazon CloudFront httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.5",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "92.205.163.53",
     "label": "53.163.205.92.host.secureserver.net",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "21",
       "s": "ProFTPD",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "53",
       "s": "DNS",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "80",
       "s": "nginx",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "106",
       "s": "Dienst ohne Antwort",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "110",
       "s": "Dovecot pop3d",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "465",
       "s": "Postfix smtpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "587",
       "s": "Postfix smtpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "993",
       "s": "Dovecot imapd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "995",
       "s": "Dovecot pop3d",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "8000",
       "s": "Shoutcast DNAS 2.6.1.777, Stream tonausstrom.de, Dienst einer weiteren Domain, nicht bewertet",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "8001",
       "s": "nicht identifiziert (Port 8001)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "8443",
       "s": "sw-cp-server",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "8800",
       "s": "Icecast streaming media server, Zuordnung nicht belegt, nicht bewertet",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "8880",
       "s": "Plesk",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Gelb in Kürze oder mittelfristig · Blau geplante Verbesserung · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "159.69.143.80 (yak.planwerk6.de)",
@@ -7036,6 +6998,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von castenow.de am 22.07.2026: 15 Hostnamen auf 13 IP-Adressen, davon 4 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 10 Systeme (159.69.143.80, 195.50.179.2, 195.50.179.4, 195.50.179.5, 195.50.179.6, 195.50.179.7, 195.50.179.9, 213.23.169.167, 54.230.172.14 mit 54.230.172.35, 54.230.172.38 und 54.230.172.97 und 92.205.163.53) liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung.",
   "levers": [
    {
     "effect": "Begrenzt den Zugriff auf Software ohne Sicherheitsupdates bis zur Ablösung",

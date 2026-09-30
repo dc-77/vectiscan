@@ -114,6 +114,20 @@
     "svc": "sw-cp-server, TLS erzwungen"
    },
    {
+    "host": "212.227.60.78",
+    "operator": "",
+    "port": "8880",
+    "ref": "VS-2026-001",
+    "svc": "Plesk, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
+    "host": "212.227.60.78",
+    "operator": "",
+    "port": "18018",
+    "ref": "",
+    "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
     "host": "51.116.154.224",
     "operator": "Microsoft Limited, laut AbuseIPDB",
     "port": "80",
@@ -198,27 +212,6 @@
     "svc": "nginx 1.22.1, TLS erzwungen"
    },
    {
-    "host": "85.22.47.46",
-    "operator": "Securess Versicherungsmakler GmbH, laut AbuseIPDB",
-    "port": "443",
-    "ref": "VS-2026-005",
-    "svc": "Microsoft HTTPAPI httpd 2.0, TLS erzwungen"
-   },
-   {
-    "host": "212.227.60.78",
-    "operator": "",
-    "port": "8880",
-    "ref": "VS-2026-001",
-    "svc": "Plesk, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "212.227.60.78",
-    "operator": "",
-    "port": "18018",
-    "ref": "",
-    "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
     "host": "85.22.47.42",
     "operator": "Securess Versicherungsmakler GmbH, laut AbuseIPDB",
     "port": "80",
@@ -245,6 +238,13 @@
     "port": "443",
     "ref": "",
     "svc": "Outlook Web App, laut Passivquelle"
+   },
+   {
+    "host": "85.22.47.46",
+    "operator": "Securess Versicherungsmakler GmbH, laut AbuseIPDB",
+    "port": "443",
+    "ref": "VS-2026-005",
+    "svc": "Microsoft HTTPAPI httpd 2.0, TLS erzwungen"
    }
   ],
   "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
@@ -596,6 +596,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -608,6 +609,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -623,6 +625,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -635,6 +638,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -647,6 +651,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -659,6 +664,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -677,6 +683,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -689,6 +696,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -701,6 +709,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -713,6 +722,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -735,6 +745,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "212.227.60.78",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -759,6 +770,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "51.116.154.224",
+      "more": [],
       "ok": true,
       "pulls": [
        "cert_expired",
@@ -783,6 +795,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.36",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -807,6 +820,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.38",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -831,6 +845,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.39",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -855,6 +870,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.40",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -879,6 +895,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.41",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -903,6 +920,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.42",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -927,6 +945,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.43",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -951,6 +970,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.45",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -975,6 +995,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.46",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -999,6 +1020,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.47",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -1025,6 +1047,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1085,6 +1108,7 @@
        "header_duplicate"
       ],
       "l": "212.227.60.78",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1102,6 +1126,7 @@
        "header_duplicate"
       ],
       "l": "51.116.154.224",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1119,6 +1144,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.36",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1136,6 +1162,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.38",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1153,6 +1180,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.39",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1170,6 +1198,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.40",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1187,6 +1216,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.41",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1204,6 +1234,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.42",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1221,6 +1252,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.43",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1238,6 +1270,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.45",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1255,6 +1288,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.46",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1272,6 +1306,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.47",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1409,208 +1444,255 @@
    {
     "host": "212.227.60.78",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "21",
       "s": "ProFTPD",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "22",
       "s": "OpenSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "106",
       "s": "Dienst ohne Antwort",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "110",
       "s": "Dovecot pop3d",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "465",
       "s": "Postfix smtpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "993",
       "s": "Dovecot imapd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "995",
       "s": "Dovecot pop3d",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "8443",
       "s": "sw-cp-server",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "8880",
       "s": "Plesk",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "18018",
       "s": "unbekannt",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "51.116.154.224",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "Titel „Microsoft Azure Web App - Error 404“",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Titel „Microsoft Azure Web App - Error 404“",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "85.22.47.38",
     "label": "85-22-47-38.ip.dokom21.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "25",
       "s": "SMTP",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "85.22.47.39",
     "label": "85-22-47-39.ip.dokom21.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "465",
       "s": "SMTP über TLS",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "587",
       "s": "SMTP",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "993",
       "s": "Dovecot imapd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "85.22.47.41",
     "label": "85-22-47-41.ip.dokom21.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "22",
       "s": "OpenSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "80",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    },
    {
     "host": "85.22.47.42",
     "label": "85-22-47-42.ip.dokom21.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "HTTP",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "HTTPS",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "5060",
       "s": "STARFACE PBX",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "85.22.47.43",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Outlook Web App",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "85.22.47.46",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Microsoft HTTPAPI httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Rot unverzüglich · Gelb in Kürze oder mittelfristig · Blau geplante Verbesserung · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "212.227.60.78",
@@ -5429,6 +5511,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von securess.de am 19.07.2026: 26 Hostnamen auf 12 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 12 Systeme (212.227.60.78, 51.116.154.224, 85.22.47.36, 85.22.47.38, 85.22.47.39, 85.22.47.40, 85.22.47.41, 85.22.47.42, 85.22.47.43, 85.22.47.45, 85.22.47.46 und 85.22.47.47) liegt keine oder nur eine teilweise aktive Prüfung vor. 3 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Rot = unverzüglich handeln · Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugang zur Verwaltung der Systeme",

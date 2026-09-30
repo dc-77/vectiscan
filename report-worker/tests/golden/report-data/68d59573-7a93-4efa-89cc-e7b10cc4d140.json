@@ -46,6 +46,62 @@
    {
     "host": "198.202.211.1",
     "operator": "",
+    "port": "2052",
+    "ref": "",
+    "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
+    "host": "198.202.211.1",
+    "operator": "",
+    "port": "2053",
+    "ref": "",
+    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
+    "host": "198.202.211.1",
+    "operator": "",
+    "port": "2082",
+    "ref": "",
+    "svc": "HTTP, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
+    "host": "198.202.211.1",
+    "operator": "",
+    "port": "2083",
+    "ref": "",
+    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
+    "host": "198.202.211.1",
+    "operator": "",
+    "port": "2086",
+    "ref": "",
+    "svc": "HTTP, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
+    "host": "198.202.211.1",
+    "operator": "",
+    "port": "2087",
+    "ref": "",
+    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
+    "host": "198.202.211.1",
+    "operator": "",
+    "port": "2095",
+    "ref": "",
+    "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
+    "host": "198.202.211.1",
+    "operator": "",
+    "port": "2096",
+    "ref": "",
+    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
+    "host": "198.202.211.1",
+    "operator": "",
     "port": "8080",
     "ref": "",
     "svc": "Cloudflare http proxy"
@@ -56,6 +112,48 @@
     "port": "8443",
     "ref": "",
     "svc": "cloudflare, TLS erzwungen"
+   },
+   {
+    "host": "198.202.211.1",
+    "operator": "",
+    "port": "8880",
+    "ref": "",
+    "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
+    "host": "62.217.52.162",
+    "operator": "Berger EDV-Systemberatungs GmbH, laut AbuseIPDB",
+    "port": "80",
+    "ref": "",
+    "svc": "Apache httpd, laut Passivquelle"
+   },
+   {
+    "host": "62.217.52.162",
+    "operator": "",
+    "port": "443",
+    "ref": "VS-2026-006",
+    "svc": "Apache httpd, laut Passivquelle"
+   },
+   {
+    "host": "62.217.52.166",
+    "operator": "Berger EDV-Systemberatungs GmbH, laut AbuseIPDB",
+    "port": "25",
+    "ref": "VS-2026-013",
+    "svc": "SMTP (CipherMail), laut Passivquelle"
+   },
+   {
+    "host": "62.217.52.166",
+    "operator": "",
+    "port": "443",
+    "ref": "VS-2026-004",
+    "svc": "Microsoft IIS httpd 10.0, laut Passivquelle"
+   },
+   {
+    "host": "62.217.52.171",
+    "operator": "Berger EDV-Systemberatungs GmbH, laut AbuseIPDB",
+    "port": "443",
+    "ref": "",
+    "svc": "nginx, laut Passivquelle"
    },
    {
     "host": "92.205.224.174",
@@ -70,6 +168,13 @@
     "port": "22",
     "ref": "",
     "svc": "OpenSSH 9.9"
+   },
+   {
+    "host": "92.205.224.174",
+    "operator": "",
+    "port": "25",
+    "ref": "VS-2026-008",
+    "svc": "Postfix smtpd, laut Passivquelle"
    },
    {
     "host": "92.205.224.174",
@@ -133,111 +238,6 @@
     "port": "8443",
     "ref": "VS-2026-001",
     "svc": "sw-cp-server, TLS erzwungen"
-   },
-   {
-    "host": "198.202.211.1",
-    "operator": "",
-    "port": "2052",
-    "ref": "",
-    "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "198.202.211.1",
-    "operator": "",
-    "port": "2053",
-    "ref": "",
-    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "198.202.211.1",
-    "operator": "",
-    "port": "2082",
-    "ref": "",
-    "svc": "HTTP, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "198.202.211.1",
-    "operator": "",
-    "port": "2083",
-    "ref": "",
-    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "198.202.211.1",
-    "operator": "",
-    "port": "2086",
-    "ref": "",
-    "svc": "HTTP, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "198.202.211.1",
-    "operator": "",
-    "port": "2087",
-    "ref": "",
-    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "198.202.211.1",
-    "operator": "",
-    "port": "2095",
-    "ref": "",
-    "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "198.202.211.1",
-    "operator": "",
-    "port": "2096",
-    "ref": "",
-    "svc": "Cloudflare, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "198.202.211.1",
-    "operator": "",
-    "port": "8880",
-    "ref": "",
-    "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "62.217.52.162",
-    "operator": "Berger EDV-Systemberatungs GmbH, laut AbuseIPDB",
-    "port": "80",
-    "ref": "",
-    "svc": "Apache httpd, laut Passivquelle"
-   },
-   {
-    "host": "62.217.52.162",
-    "operator": "",
-    "port": "443",
-    "ref": "VS-2026-006",
-    "svc": "Apache httpd, laut Passivquelle"
-   },
-   {
-    "host": "62.217.52.166",
-    "operator": "Berger EDV-Systemberatungs GmbH, laut AbuseIPDB",
-    "port": "25",
-    "ref": "VS-2026-013",
-    "svc": "SMTP (CipherMail), laut Passivquelle"
-   },
-   {
-    "host": "62.217.52.166",
-    "operator": "",
-    "port": "443",
-    "ref": "VS-2026-004",
-    "svc": "Microsoft IIS httpd 10.0, laut Passivquelle"
-   },
-   {
-    "host": "62.217.52.171",
-    "operator": "Berger EDV-Systemberatungs GmbH, laut AbuseIPDB",
-    "port": "443",
-    "ref": "",
-    "svc": "nginx, laut Passivquelle"
-   },
-   {
-    "host": "92.205.224.174",
-    "operator": "",
-    "port": "25",
-    "ref": "VS-2026-008",
-    "svc": "Postfix smtpd, laut Passivquelle"
    },
    {
     "host": "92.205.224.174",
@@ -354,6 +354,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -366,6 +367,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -381,6 +383,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -393,6 +396,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -405,6 +409,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -417,6 +422,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -435,6 +441,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -447,6 +454,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -459,6 +467,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -471,6 +480,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -493,6 +503,9 @@
        "tls_no_fallback_scsv"
       ],
       "l": "198.202.211.1",
+      "more": [
+       "2620:cb:2000::1: nicht prüfbar"
+      ],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -516,55 +529,8 @@
        "tls_weakness",
        "tls_no_fallback_scsv"
       ],
-      "l": "2620:cb:2000::1",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "2620:cb:2000::1"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
-      "l": "2a00:1169:118:23d0::",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "2a00:1169:118:23d0::"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
       "l": "62.217.52.162",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -589,6 +555,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "62.217.52.166",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -613,6 +580,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "62.217.52.171",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -637,6 +605,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "79.140.188.181",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -661,6 +630,9 @@
        "tls_no_fallback_scsv"
       ],
       "l": "92.205.224.174",
+      "more": [
+       "2a00:1169:118:23d0::: nicht prüfbar"
+      ],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -687,6 +659,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -724,6 +697,9 @@
        "header_duplicate"
       ],
       "l": "198.202.211.1",
+      "more": [
+       "2620:cb:2000::1: nicht prüfbar"
+      ],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -740,41 +716,8 @@
        "hsts_short",
        "header_duplicate"
       ],
-      "l": "2620:cb:2000::1",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "2620:cb:2000::1"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
-      "l": "2a00:1169:118:23d0::",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "2a00:1169:118:23d0::"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
       "l": "62.217.52.162",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -792,6 +735,7 @@
        "header_duplicate"
       ],
       "l": "62.217.52.166",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -809,6 +753,7 @@
        "header_duplicate"
       ],
       "l": "62.217.52.171",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -826,6 +771,7 @@
        "header_duplicate"
       ],
       "l": "79.140.188.181",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -843,6 +789,9 @@
        "header_duplicate"
       ],
       "l": "92.205.224.174",
+      "more": [
+       "2a00:1169:118:23d0::: nicht prüfbar"
+      ],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -883,190 +832,231 @@
    {
     "host": "198.202.211.1",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "Cloudflare http proxy",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "cloudflare",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "8080",
       "s": "Cloudflare http proxy",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "8443",
       "s": "cloudflare",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2052",
       "s": "unbekannt",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2053",
       "s": "Cloudflare",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2082",
       "s": "HTTP",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2083",
       "s": "Cloudflare",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2086",
       "s": "HTTP",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2087",
       "s": "Cloudflare",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2095",
       "s": "unbekannt",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2096",
       "s": "Cloudflare",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "8880",
       "s": "HTTPS",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "62.217.52.162",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "62.217.52.166",
     "label": "mail.bergersysteme.com",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "25",
       "s": "SMTP (CipherMail)",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "443",
       "s": "Microsoft IIS httpd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "62.217.52.171",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "nginx",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "92.205.224.174",
     "label": "174.224.205.92.host.secureserver.net",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "21",
       "s": "ProFTPD",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "22",
       "s": "OpenSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "53",
       "s": "DNS",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "80",
       "s": "nginx",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "110",
       "s": "Dovecot pop3d",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "465",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "993",
       "s": "Dovecot imapd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "995",
       "s": "Dovecot pop3d",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "8443",
       "s": "sw-cp-server",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "8880",
       "s": "Plesk",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Gelb in Kürze oder mittelfristig · Blau geplante Verbesserung · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "198.202.211.1",
@@ -3104,6 +3094,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von bergersysteme.com am 23.09.2026: 10 Hostnamen auf 8 IP-Adressen, davon 6 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 6 Systeme (198.202.211.1 mit 2620:cb:2000::1, 62.217.52.162, 62.217.52.166, 62.217.52.171, 79.140.188.181 und 92.205.224.174 mit 2a00:1169:118:23d0::) liegt keine oder nur eine teilweise aktive Prüfung vor. 24 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung.",
   "levers": [
    {
     "effect": "Verkleinert die Angriffsfläche des geteilten Servers, auf dem die eigenen Dienste liegen",

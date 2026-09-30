@@ -81,6 +81,10 @@ ERLAUBT: tuple[tuple[str, str], ...] = (
     ("IP-Adresse Hostnamen Netzbetreiber (laut AbuseIPDB) / Rolle", "Spalte nennt die Quelle AbuseIPDB (spec/11 T2, E17)"),
     ("Einschränkung Auswirkung auf die Ergebnisse", "neue Spalte Betroffene Pruefungen"),
     ("Einschränkung Betroffene Prüfungen Auswirkung", "neue Spalte Betroffene Pruefungen"),
+    # S7a (spec/10 R20, Entscheidung DC 30.09.): die Farberklaerung unter den Hebeln nennt nur
+    # vorkommende Farben und Gelb nach der Stufe der Gelb-Befunde.
+    ("Rot = unverzüglich handeln", "S7a: Legende aus den Reportdaten"),
+    ("Diese Seite nennt bewusst keine CVSS-Werte", "S7a: Legende aus den Reportdaten"),
 )
 
 

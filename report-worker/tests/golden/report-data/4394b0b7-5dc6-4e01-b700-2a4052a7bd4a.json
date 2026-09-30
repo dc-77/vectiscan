@@ -303,6 +303,13 @@
    {
     "host": "88.99.35.112",
     "operator": "",
+    "port": "25",
+    "ref": "VS-2026-009, VS-2026-014",
+    "svc": "Postfix smtpd, laut Passivquelle"
+   },
+   {
+    "host": "88.99.35.112",
+    "operator": "",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd 2.4.67"
@@ -369,13 +376,6 @@
     "port": "30000",
     "ref": "VS-2026-003",
     "svc": "OpenSSH 8.4p1"
-   },
-   {
-    "host": "88.99.35.112",
-    "operator": "",
-    "port": "25",
-    "ref": "VS-2026-009, VS-2026-014",
-    "svc": "Postfix smtpd, laut Passivquelle"
    }
   ],
   "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
@@ -832,6 +832,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -844,6 +845,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -859,6 +861,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -871,6 +874,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -883,6 +887,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -895,6 +900,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -913,6 +919,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -925,6 +932,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -937,6 +945,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -949,6 +958,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -971,6 +981,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "88.99.35.112",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -997,6 +1008,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1022,6 +1034,7 @@
        "header_duplicate"
       ],
       "l": "88.99.35.112",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1051,71 +1064,85 @@
    {
     "host": "88.99.35.112",
     "label": "vsrv2.spacekoeln.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "21",
       "s": "Pure-FTPd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "110",
       "s": "Dovecot pop3d",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "465",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "587",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "993",
       "s": "IMAP über TLS (Dovecot)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "995",
       "s": "POP3 über TLS (Dovecot)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "10000",
       "s": "Webmin (MiniServ)",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "30000",
       "s": "OpenSSH",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Rot unverzüglich · Gelb in Kürze oder mittelfristig · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "88.99.35.112 (vsrv2.spacekoeln.de)",
@@ -3913,6 +3940,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von dortmund-beach.com am 28.09.2026: 3 Hostnamen auf 1 IP-Adresse. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 1 System (88.99.35.112) liegt nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Rot = unverzüglich handeln · Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugang zur Verwaltung der Systeme",

@@ -344,6 +344,8 @@ def build_glance(items: list[Consolidated], findings: list[Finding], counts: N.C
             key=key, name=CATEGORY_NAMES[key], status=status,
             level=L.BAR_BY_STATUS[status], note=note))
     overall_status = min((c.status for c in categories), key=lambda s: L.STATUS_RANK[s])
+    farben = {c.status for c in categories} | {f.status for f in findings}
+    gelb_kurz = any(f.status == "gelb" and f.urgency == L.URGENCY_BY_STAGE["in_kuerze"] for f in findings)
     return Glance(
         overall=L.OVERALL_BY_STATUS[overall_status],
         overall_status=overall_status,
@@ -352,6 +354,7 @@ def build_glance(items: list[Consolidated], findings: list[Finding], counts: N.C
         levers=[],
         context=N.context(counts),
         coverage_warning=N.coverage_warning(counts, gap_systems),
+        legend=N.glance_legend(farben, gelb_kurz),
     )
 
 
@@ -1059,44 +1062,99 @@ CDN_PRODUCT = re.compile(r"cloudflare|akamai|fastly|cloudfront", re.I)
 CDN_NAMES = {"cloudflare": "Cloudflare", "akamai": "Akamai", "fastly": "Fastly", "cloudfront": "Amazon CloudFront"}
 
 
+def system_leads(facts: FS.Facts) -> dict[str, str]:
+    """Adresse -> erste Adresse ihres Systems, wie Kapitel 2.1 (S7a, spec/10 R20): IPv4 und IPv6
+    mit gleichem rDNS und die weiteren A- und AAAA-Eintraege derselben Namen."""
+    out: dict[str, str] = {}
+    for members in _systems(facts):
+        lead = members[0].ip
+        for h in members:
+            out[h.ip] = lead
+        for h in members:
+            for a in h.additional_ips:
+                out.setdefault(a.ip, lead)
+    return out
+
+
+def _worst(befunde: list[Finding]) -> Optional[Finding]:
+    return min(befunde, key=lambda f: L.STATUS_RANK[f.status]) if befunde else None
+
+
+def _card_ports(facts: FS.Facts, ip: str, refs: dict[tuple[str, int], list[Finding]],
+                gemessen: set[tuple[str, int]]) -> list[tuple[ServicePort, bool]]:
+    """(Port, nur laut Passivquelle) einer Adresse in Kartenreihenfolge."""
+    out: list[tuple[ServicePort, bool]] = []
+    for svc in sorted((s for s in facts.services if s.host_ip == ip and s.state == "open"),
+                      key=lambda s: s.port):
+        label = service_display(svc)
+        schwer = _worst(refs.get((ip, svc.port), []))
+        if svc.foreign:
+            # S6b-4n (spec/11 N11): Dienste weiterer Domains stehen grau, nicht bewertet.
+            out.append((ServicePort(p=str(svc.port), s=foreign_service_label(svc, label), st="grau"), False))
+            continue
+        if schwer is not None:
+            # S6b-4 (spec/11 T16): die Ampel des schwersten Befunds, auch fuer service_unidentified.
+            port = ServicePort(p=str(svc.port), s=label, st=schwer.status, stage=schwer.urgency)
+        elif svc.unidentified:
+            # S6b-3 (spec/10 R9): ein Dienst ohne Kennung ist nicht "unauffällig".
+            port = ServicePort(p=str(svc.port), s=label, st="grau")
+        elif (ip, svc.port) in gemessen:
+            port = ServicePort(p=str(svc.port), s=label, st="gruen")
+        else:
+            # S7a (spec/10 R20): nur im Portscan erfasst, keine Messung am Port.
+            port = ServicePort(p=str(svc.port), s=label, st="grau")
+        out.append((port, False))
+    seen = {p.p for p, _ in out}
+    for pv in sorted((p for p in facts.passive if p.host_ip == ip and p.port), key=lambda p: p.port or 0):
+        if str(pv.port) in seen:
+            continue
+        seen.add(str(pv.port))
+        # S6b-4 (spec/11 T16): ein Passivport mit Befund traegt dessen Ampel (junkerwerk
+        # SonicWall 4433 stand grau neben Gelb VS-002).
+        schwer = _worst(refs.get((ip, pv.port), []))
+        out.append((ServicePort(p=str(pv.port), s=passive_service_label(pv),
+                                st=schwer.status if schwer else "grau",
+                                stage=schwer.urgency if schwer else ""), schwer is None))
+    return out
+
+
 def build_services(facts: FS.Facts, items: list[Consolidated],
                    findings: list[Finding]) -> list[ServiceCard]:
-    """Service-Karte: Farbe je Port nach Ampel des schwersten Befunds (Legende nach Ampel)."""
+    """Service-Karte: Farbe je Port nach Ampel des schwersten Befunds (Legende nach Ampel).
+
+    S7a (spec/10 R20): ein Block je System (IPv4 und IPv6 desselben Systems zusammen, JW und HL);
+    Gruen nur mit einer Messung am Port, sonst grau. Ports einer weiteren Adresse, die nur eine
+    Passivquelle kennt, stehen als eine Zeile im Block statt als eigene Karte."""
     refs = finding_ports(facts, items, findings)
+    gemessen = COV.measured_ports(facts)
     cards: list[ServiceCard] = []
-    for host in sorted(facts.hosts, key=lambda h: (h.family, h.ip)):
-        if host.third_party is not None:
-            continue
-        ports: list[ServicePort] = []
-        for svc in sorted((s for s in facts.services if s.host_ip == host.ip and s.state == "open"),
-                          key=lambda s: s.port):
-            label = service_display(svc)
-            befunde = refs.get((host.ip, svc.port), [])
-            colour = min((f.status for f in befunde), key=lambda s: L.STATUS_RANK[s]) if befunde else "gruen"
-            if svc.foreign:
-                # S6b-4n (spec/11 N11): Dienste weiterer Domains stehen grau, nicht bewertet.
-                ports.append(ServicePort(p=str(svc.port), s=foreign_service_label(svc, label), st="grau"))
+    for members in _systems(facts):
+        lead = members[0]
+        ports = [p for p, _ in _card_ports(facts, lead.ip, refs, gemessen)]
+        notes: list[str] = []
+        for h in members[1:]:
+            weitere = _card_ports(facts, h.ip, refs, gemessen)
+            if not weitere:
                 continue
-            if svc.unidentified and not befunde:
-                # S6b-3 (spec/10 R9): ein Dienst ohne Kennung ist nicht "unauffällig". S6b-4
-                # (spec/11 T16): mit dem Befund service_unidentified gilt dessen Ampel.
-                colour = "grau"
-            ports.append(ServicePort(p=str(svc.port), s=label, st=colour))
-        seen = {p.p for p in ports}
-        for pv in sorted((p for p in facts.passive if p.host_ip == host.ip and p.port),
-                         key=lambda p: p.port or 0):
-            if str(pv.port) in seen:
+            if all(passiv for _, passiv in weitere):
+                nummern = [p.p for p, _ in weitere]
+                liste = nummern[0] if len(nummern) == 1 else ", ".join(nummern[:-1]) + " und " + nummern[-1]
+                dienste = ", ".join(dict.fromkeys(p.s for p, _ in weitere))
+                wort = "Port" if len(nummern) == 1 else "Ports"
+                notes.append(f"{h.ip}: {wort} {liste} laut Passivquelle ({dienste}), nicht geprüft")
                 continue
-            seen.add(str(pv.port))
-            # S6b-4 (spec/11 T16): ein Passivport mit Befund traegt dessen Ampel (junkerwerk
-            # SonicWall 4433 stand grau neben Gelb VS-002).
-            befunde = refs.get((host.ip, pv.port), [])
-            farbe = min((f.status for f in befunde), key=lambda s: L.STATUS_RANK[s]) if befunde else "grau"
-            ports.append(ServicePort(p=str(pv.port), s=passive_service_label(pv), st=farbe))
-        if not ports:
+            ports.extend(ServicePort(p=p.p, s=f"{p.s}, an {h.ip}", st=p.st, stage=p.stage) for p, _ in weitere)
+        if not ports and not notes:
             continue
-        cards.append(ServiceCard(host=host.ip, label=host.reverse or "", ports=ports))
+        cards.append(ServiceCard(host=lead.ip, label=lead.reverse or "", ports=ports,
+                                 more_ips=[h.ip for h in members[1:]], notes=notes))
     return cards
+
+
+def services_legend(cards: list[ServiceCard]) -> str:
+    farben = {p.st for c in cards for p in c.ports} | ({"grau"} if any(c.notes for c in cards) else set())
+    gelb = {p.stage for c in cards for p in c.ports if p.st == "gelb" and p.stage}
+    return N.services_note(farben, gelb)
 
 
 # S6b-3 (spec/10 R8): nicht anwendbar mit eigenem Grund steht als "entfällt (Grund)".
@@ -1161,6 +1219,22 @@ POSTURE_SOFT: dict[str, tuple[str, str]] = {"SPF": ("spf_softfail", "softfail")}
 POSTURE_TLS_ITEMS = frozenset({"Zertifikate"})
 
 
+def _posture_systeme(items: list[PostureItem], leads: dict[str, str]) -> list[PostureItem]:
+    """S7a (spec/10 R20, HL und JW): der Eintrag einer weiteren Adresse desselben Systems steht
+    unter dem der ersten Adresse, wenn er nichts Schlechteres sagt (kein ✘); der Zustand ``v`` der
+    ersten Adresse bleibt, damit das Gate ihn weiter gegen die Befunde pruefen kann."""
+    by_label = {it.l: it for it in items}
+    out: list[PostureItem] = []
+    for it in items:
+        lead = leads.get(it.l)
+        haupt = by_label.get(lead) if lead and lead != it.l else None
+        if haupt is not None and it.ok is not False:
+            haupt.more.append(f"{it.l}: {it.v}")
+            continue
+        out.append(it)
+    return out
+
+
 def build_posture(output: CatalogOutput, model: COV.Model | None = None,
                   facts: FS.Facts | None = None,
                   findings: list[Finding] | None = None) -> list[PostureBlock]:
@@ -1218,6 +1292,8 @@ def build_posture(output: CatalogOutput, model: COV.Model | None = None,
                     ok, text = None, f"am Namen gemessen ({', '.join(anderswo)})"
                 items.append(PostureItem(l=host, ok=ok, v=text, checks=item_checks, subjects=[host],
                                          pulls=item_pulls))
+            if facts is not None:
+                items = _posture_systeme(items, system_leads(facts))
         for label, checks in spec["items"]:  # type: ignore[index]
             results = [r for cid in checks for r in by_check.get(cid, [])]
             ok, text = _result_state(results, by_check.get(checks[0], []))
@@ -1483,12 +1559,13 @@ def build_architecture(facts: FS.Facts, output: CatalogOutput, items: list[Conso
     notes.extend(cdn_edge_notes(facts))
     # facts.warnings sind Hinweise des Faktenbauers an den Betreiber, keine Kundentexte.
     # Was davon den Kunden betrifft, steht ueber die Abdeckungsgruende in Kapitel 2.
+    services = build_services(facts, items, findings)
     return Architecture(
         # S6b-2 (Nachtrag S6b-1): Kapitel 3 zaehlt in Systemen wie Kapitel 2.1.
         lead=N.architecture_lead(len(model.system_rows()), roles),
         tech=build_tech(facts, findings),
-        services=build_services(facts, items, findings),
-        services_note=N.SERVICES_NOTE,
+        services=services,
+        services_note=services_legend(services),
         posture=build_posture(output, model, facts, findings),
         screens_lead=N.SCREENS_LEAD,
         screens=build_screens(facts),

@@ -37,6 +37,109 @@ JW_0923 = "31d67a02-b485-4d05-b228-dbdde092cc68"
 HL = "2e56abe1-c1a6-442e-b36a-dc9f83c81da8"
 
 
+# ---------------------------------------------------------------- Punkt 4: Service-Karte, Posture, Anhang B
+
+DB_0923 = "1fbc92b9-34ab-414e-8843-a1f1e9f15431"
+DB_0928 = "4394b0b7-5dc6-4e01-b700-2a4052a7bd4a"
+
+
+def _karte(order_id: str, host: str) -> dict[str, tuple[str, str]]:
+    card = next(c for c in data_for(order_id).architecture.services if c.host == host)
+    return {p.p: (p.st, p.s) for p in card.ports}
+
+
+def test_gruen_nur_mit_messung_am_port():
+    from reporter.v3 import coverage as COV
+    from tests.v3.conftest import facts_for
+
+    # Vor S6c ohne testssl je Port: IMAPS und POP3S nur im Portscan erfasst, grau.
+    assert _karte(DB_0923, "88.99.35.112")["993"][0] == "grau"
+    # Mit testssl je Port (S6c-Probe) sind 993 und 995 gemessen.
+    assert {("88.99.35.112", 993), ("88.99.35.112", 995)} <= COV.measured_ports(facts_for(DB_0928))
+    assert ("88.99.35.112", 993) not in COV.measured_ports(facts_for(DB_0923))
+
+
+@pytest.mark.parametrize("order_id", order_ids())
+def test_gruen_immer_mit_messung(order_id):
+    from reporter.v3 import coverage as COV
+    from tests.v3.conftest import facts_for
+
+    gemessen = COV.measured_ports(facts_for(order_id))
+    for card in data_for(order_id).architecture.services:
+        for p in card.ports:
+            if p.st == "gruen":
+                ip = next((a for a in [card.host, *card.more_ips] if p.s.endswith(f", an {a}")), card.host)
+                assert (ip, int(p.p)) in gemessen, (card.host, p.p, p.s)
+
+
+def test_befundports_nach_t16():
+    assert _karte(JW_0923, "217.243.248.28")["4433"][0] == "gelb"
+    for port in ("1000", "1001", "1002"):
+        assert _karte(HE, "80.90.145.166")[port][0] == "gelb"
+    assert _karte(DB_0923, "88.99.35.112")["30000"][0] == "gelb"
+
+
+@pytest.mark.parametrize("order_id", order_ids())
+def test_ein_block_je_system(order_id):
+    from reporter.v3.chapters import system_leads
+    from tests.v3.conftest import facts_for
+
+    leads = system_leads(facts_for(order_id))
+    data = data_for(order_id)
+    karten = [c.host for c in data.architecture.services]
+    assert all(leads.get(h, h) == h for h in karten), karten
+    for block in data.architecture.posture:
+        for it in block.items:
+            if leads.get(it.l, it.l) != it.l:
+                assert it.ok is False, (block.short, it.l, it.v)
+    zeilen = [r.host for r in data.appendix.inventory]
+    for i, host in enumerate(zeilen):
+        lead = leads.get(host, host)
+        if lead != host and lead in zeilen:
+            assert zeilen.index(lead) < i
+            assert all(leads.get(h, h) == lead for h in zeilen[zeilen.index(lead):i + 1])
+
+
+def test_ipv6_im_block_des_systems():
+    card = next(c for c in data_for(JW_0923).architecture.services if c.host == "188.40.3.130")
+    assert card.more_ips == ["2a01:4f8:d0a:3124::2"]
+    assert card.notes == ["2a01:4f8:d0a:3124::2: Ports 80 und 443 laut Passivquelle (Apache httpd), nicht geprüft"]
+    posture = [it for b in data_for(HL).architecture.posture for it in b.items if it.l == "213.133.104.51"]
+    assert posture and all(it.more == ["2a01:4f8:d0a:2757::2: nicht prüfbar"] for it in posture)
+    zeilen = [r for r in data_for(HL).appendix.inventory if r.host == "2a01:4f8:d0a:2757::2"]
+    assert zeilen[0].operator == "IPv6-Adresse von 213.133.104.51"
+
+
+# ---------------------------------------------------------------- Punkt 3: Legenden
+
+def test_legende_nennt_nur_vorkommende_farben_und_die_gelb_stufe():
+    from reporter.v3.narrative import glance_legend, services_note
+
+    assert services_note({"gelb", "grau"}, {"Mittelfristig"}) == (
+        "Farbe je Port nach Ampel des schwersten Befunds am Port: Gelb mittelfristig · Grau: nur im "
+        "Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.")
+    assert services_note({"gelb"}, {"In Kürze"}).endswith(": Gelb in Kürze.")
+    assert "Gelb in Kürze oder mittelfristig" in services_note({"gelb"}, {"In Kürze", "Mittelfristig"})
+    assert glance_legend({"gelb", "blau"}, False) == (
+        "Gelb = Handlungsbedarf im nächsten Wartungszyklus · Blau = geplante Verbesserung.")
+    assert glance_legend({"rot", "gelb", "gruen"}, True).startswith("Rot = unverzüglich handeln · Gelb = Handlungsbedarf in Wochen")
+
+
+@pytest.mark.parametrize("order_id", order_ids())
+def test_legende_passt_zur_karte_und_zu_den_befunden(order_id):
+    data = data_for(order_id)
+    note = data.architecture.services_note
+    farben = {p.st for c in data.architecture.services for p in c.ports}
+    for farbe, wort in (("rot", "Rot "), ("gelb", "Gelb "), ("blau", "Blau "), ("gruen", "Grün:")):
+        assert (wort in note) == (farbe in farben), (farbe, note)
+    stufen = {p.stage for c in data.architecture.services for p in c.ports if p.st == "gelb"}
+    if "gelb" in farben and "In Kürze" not in stufen:
+        assert "Gelb in Kürze" not in note
+    gelb_kurz = any(f.status == "gelb" and f.urgency == "In Kürze" for f in data.findings)
+    if any(f.status == "gelb" for f in data.findings):
+        assert ("Handlungsbedarf in Wochen" in data.glance.legend) == gelb_kurz
+
+
 # ---------------------------------------------------------------- Punkt 2: Bilder
 
 def _bilder(order_id: str) -> dict:

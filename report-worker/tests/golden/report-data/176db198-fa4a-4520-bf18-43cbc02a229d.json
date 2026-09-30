@@ -46,69 +46,6 @@
    {
     "host": "104.16.10.6",
     "operator": "",
-    "port": "8080",
-    "ref": "",
-    "svc": "Cloudflare http proxy"
-   },
-   {
-    "host": "104.16.10.6",
-    "operator": "",
-    "port": "8443",
-    "ref": "",
-    "svc": "Cloudflare http proxy, TLS erzwungen"
-   },
-   {
-    "host": "20.79.218.75",
-    "operator": "Microsoft Corporation, laut AbuseIPDB",
-    "port": "21",
-    "ref": "VS-2026-004",
-    "svc": "TLS-Dienst, Zertifikat *.heuel.com"
-   },
-   {
-    "host": "20.79.218.75",
-    "operator": "",
-    "port": "22",
-    "ref": "",
-    "svc": "FortiSSH"
-   },
-   {
-    "host": "20.79.218.75",
-    "operator": "",
-    "port": "80",
-    "ref": "",
-    "svc": "Apache httpd"
-   },
-   {
-    "host": "20.79.218.75",
-    "operator": "",
-    "port": "443",
-    "ref": "VS-2026-002",
-    "svc": "Apache httpd, TLS erzwungen"
-   },
-   {
-    "host": "20.79.218.75",
-    "operator": "",
-    "port": "8443",
-    "ref": "VS-2026-001",
-    "svc": "nicht identifiziert (Port 8443)"
-   },
-   {
-    "host": "217.72.203.132",
-    "operator": "IONOS SE, laut AbuseIPDB",
-    "port": "80",
-    "ref": "",
-    "svc": "nginx"
-   },
-   {
-    "host": "217.72.203.132",
-    "operator": "",
-    "port": "443",
-    "ref": "VS-2026-003",
-    "svc": "nginx, TLS erzwungen"
-   },
-   {
-    "host": "104.16.10.6",
-    "operator": "",
     "port": "2052",
     "ref": "",
     "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
@@ -172,9 +109,58 @@
    {
     "host": "104.16.10.6",
     "operator": "",
+    "port": "8080",
+    "ref": "",
+    "svc": "Cloudflare http proxy"
+   },
+   {
+    "host": "104.16.10.6",
+    "operator": "",
+    "port": "8443",
+    "ref": "",
+    "svc": "Cloudflare http proxy, TLS erzwungen"
+   },
+   {
+    "host": "104.16.10.6",
+    "operator": "",
     "port": "8880",
     "ref": "",
     "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
+    "host": "20.79.218.75",
+    "operator": "Microsoft Corporation, laut AbuseIPDB",
+    "port": "21",
+    "ref": "VS-2026-004",
+    "svc": "TLS-Dienst, Zertifikat *.heuel.com"
+   },
+   {
+    "host": "20.79.218.75",
+    "operator": "",
+    "port": "22",
+    "ref": "",
+    "svc": "FortiSSH"
+   },
+   {
+    "host": "20.79.218.75",
+    "operator": "",
+    "port": "80",
+    "ref": "",
+    "svc": "Apache httpd"
+   },
+   {
+    "host": "20.79.218.75",
+    "operator": "",
+    "port": "443",
+    "ref": "VS-2026-002",
+    "svc": "Apache httpd, TLS erzwungen"
+   },
+   {
+    "host": "20.79.218.75",
+    "operator": "",
+    "port": "8443",
+    "ref": "VS-2026-001",
+    "svc": "nicht identifiziert (Port 8443)"
    },
    {
     "host": "213.133.104.51",
@@ -255,7 +241,7 @@
    },
    {
     "host": "2a01:4f8:d0a:2757::2",
-    "operator": "Hetzner Online GmbH, laut AbuseIPDB",
+    "operator": "IPv6-Adresse von 213.133.104.51",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd, laut Passivquelle"
@@ -266,6 +252,20 @@
     "port": "443",
     "ref": "",
     "svc": "Apache httpd, laut Passivquelle"
+   },
+   {
+    "host": "217.72.203.132",
+    "operator": "IONOS SE, laut AbuseIPDB",
+    "port": "80",
+    "ref": "",
+    "svc": "nginx"
+   },
+   {
+    "host": "217.72.203.132",
+    "operator": "",
+    "port": "443",
+    "ref": "VS-2026-003",
+    "svc": "nginx, TLS erzwungen"
    }
   ],
   "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
@@ -894,6 +894,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -906,6 +907,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -921,6 +923,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -933,6 +936,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -945,6 +949,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -957,6 +962,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -975,6 +981,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -987,6 +994,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -999,6 +1007,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -1011,6 +1020,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -1033,6 +1043,11 @@
        "tls_no_fallback_scsv"
       ],
       "l": "104.16.10.6",
+      "more": [
+       "104.16.11.6: nicht prüfbar",
+       "2606:4700::6810:a06: nicht prüfbar",
+       "2606:4700::6810:b06: nicht prüfbar"
+      ],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -1056,31 +1071,8 @@
        "tls_weakness",
        "tls_no_fallback_scsv"
       ],
-      "l": "104.16.11.6",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "104.16.11.6"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
       "l": "195.225.241.75",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -1105,6 +1097,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "20.79.218.75",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -1129,6 +1122,9 @@
        "tls_no_fallback_scsv"
       ],
       "l": "213.133.104.51",
+      "more": [
+       "2a01:4f8:d0a:2757::2: nicht prüfbar"
+      ],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -1153,6 +1149,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "217.72.203.132",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -1170,78 +1167,6 @@
      },
      {
       "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
-      "l": "2606:4700::6810:a06",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "2606:4700::6810:a06"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
-      "l": "2606:4700::6810:b06",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "2606:4700::6810:b06"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
-      "l": "2a01:4f8:d0a:2757::2",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "2a01:4f8:d0a:2757::2"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
        "cert_expired",
        "cert_expiring",
        "cert_expiring_later",
@@ -1251,6 +1176,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1288,6 +1214,11 @@
        "header_duplicate"
       ],
       "l": "104.16.10.6",
+      "more": [
+       "104.16.11.6: nicht prüfbar",
+       "2606:4700::6810:a06: nicht prüfbar",
+       "2606:4700::6810:b06: nicht prüfbar"
+      ],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1304,24 +1235,8 @@
        "hsts_short",
        "header_duplicate"
       ],
-      "l": "104.16.11.6",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "104.16.11.6"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
       "l": "195.225.241.75",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1339,6 +1254,7 @@
        "header_duplicate"
       ],
       "l": "20.79.218.75",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1356,6 +1272,9 @@
        "header_duplicate"
       ],
       "l": "213.133.104.51",
+      "more": [
+       "2a01:4f8:d0a:2757::2: nicht prüfbar"
+      ],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1373,63 +1292,13 @@
        "header_duplicate"
       ],
       "l": "217.72.203.132",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
        "217.72.203.132"
       ],
       "v": "Handlungsbedarf"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
-      "l": "2606:4700::6810:a06",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "2606:4700::6810:a06"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
-      "l": "2606:4700::6810:b06",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "2606:4700::6810:b06"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
-      "l": "2a01:4f8:d0a:2757::2",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "2a01:4f8:d0a:2757::2"
-      ],
-      "v": "nicht prüfbar"
      }
     ],
     "name": "Sicherheits-Header",
@@ -1480,205 +1349,233 @@
    {
     "host": "104.16.10.6",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "Cloudflare http proxy",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Cloudflare http proxy",
-      "st": "gruen"
+      "st": "gruen",
+      "stage": ""
      },
      {
       "p": "8080",
       "s": "Cloudflare http proxy",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "8443",
       "s": "Cloudflare http proxy",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2052",
       "s": "unbekannt",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2053",
       "s": "Cloudflare",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2082",
       "s": "HTTP",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2083",
       "s": "Cloudflare",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2086",
       "s": "HTTP",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2087",
       "s": "Cloudflare",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2095",
       "s": "unbekannt",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "2096",
       "s": "Cloudflare",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "6443",
       "s": "Cloudflare",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "8880",
       "s": "HTTPS",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "20.79.218.75",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "21",
       "s": "TLS-Dienst, Zertifikat *.heuel.com",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "22",
       "s": "FortiSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "8443",
       "s": "nicht identifiziert (Port 8443)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    },
    {
     "host": "213.133.104.51",
     "label": "www51.your-server.de",
+    "more_ips": [
+     "2a01:4f8:d0a:2757::2"
+    ],
+    "notes": [
+     "2a01:4f8:d0a:2757::2: Ports 80 und 443 laut Passivquelle (Apache httpd), nicht geprüft"
+    ],
     "ports": [
      {
       "p": "21",
       "s": "FTP",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "22",
       "s": "SSH",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "25",
       "s": "SMTP (Exim)",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "110",
       "s": "POP3",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "143",
       "s": "IMAP",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "465",
       "s": "SMTP über TLS (Exim)",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "587",
       "s": "SMTP (Exim)",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "993",
       "s": "IMAP über TLS",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "995",
       "s": "POP3 über TLS",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "217.72.203.132",
     "label": "ip217-72-203-132.pbiaas.com",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "nginx",
-      "st": "gruen"
+      "st": "gruen",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
-     }
-    ]
-   },
-   {
-    "host": "2a01:4f8:d0a:2757::2",
-    "label": "www51.your-server.de",
-    "ports": [
-     {
-      "p": "80",
-      "s": "Apache httpd",
-      "st": "grau"
-     },
-     {
-      "p": "443",
-      "s": "Apache httpd",
-      "st": "grau"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Gelb in Kürze oder mittelfristig · Blau geplante Verbesserung · Grün: tiefer geprüft, kein Befund · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "104.16.10.6",
@@ -3088,6 +2985,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von heuel.com am 22.05.2026: 11 Hostnamen auf 9 IP-Adressen, davon 3 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 5 Systeme (104.16.10.6 mit 104.16.11.6, 2606:4700::6810:a06 und 2606:4700::6810:b06, 195.225.241.75, 20.79.218.75, 213.133.104.51 mit 2a01:4f8:d0a:2757::2 und 217.72.203.132) liegt keine oder nur eine teilweise aktive Prüfung vor. 3 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung.",
   "levers": [
    {
     "effect": "Verkleinert die Angriffsfläche um Dienste ohne erkennbaren Zweck",

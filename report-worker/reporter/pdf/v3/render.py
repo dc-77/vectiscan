@@ -84,6 +84,26 @@ def css_string(value: Any) -> Markup:
     return Markup(text.replace("\\", "\\\\").replace('"', '\\"'))
 
 
+# S7a (spec/10 R20): IPv6-Adressen brechen nicht mitten in der Adresse um (heuel 2.1).
+_IP_RE = re.compile(r"(?<![\w:.])(?:(?:\d{1,3}\.){3}\d{1,3}|(?:[0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{1,4})(?![\w.])")
+
+
+def ipfest(value: Any) -> Markup:
+    """IP-Adressen im Text als nicht umbrechbare Einheit (``<span class="ip">``), Rest maskiert."""
+    text = str(value)
+    out: list[Any] = []
+    pos = 0
+    for m in _IP_RE.finditer(text):
+        adresse = m.group(0)
+        if ":" in adresse and adresse.count(":") < 4 and "::" not in adresse:
+            continue  # Uhrzeit oder Verhaeltnis, keine IPv6-Adresse
+        out.append(escape(text[pos:m.start()]))
+        out.append(Markup('<span class="ip">') + escape(m.group(0)) + Markup("</span>"))
+        pos = m.end()
+    out.append(escape(text[pos:]))
+    return Markup("").join(out)
+
+
 def dot_br(value: Any) -> Markup:
     """``a · b · c`` zu Zeilenumbruechen, mit Maskierung der Teile."""
     parts = str(value).split(" · ")
@@ -105,6 +125,7 @@ def env() -> Environment:
         )
         _ENV.filters["css_string"] = css_string
         _ENV.filters["dot_br"] = dot_br
+        _ENV.filters["ipfest"] = ipfest
     return _ENV
 
 

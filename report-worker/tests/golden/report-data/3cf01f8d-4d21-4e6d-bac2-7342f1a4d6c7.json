@@ -196,6 +196,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -208,6 +209,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -223,6 +225,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -235,6 +238,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -247,6 +251,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -259,6 +264,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -277,6 +283,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -289,6 +296,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -301,6 +309,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -313,6 +322,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -335,6 +345,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "18.197.248.23",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -359,6 +370,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "80.90.145.166",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -385,6 +397,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -411,6 +424,7 @@
        "header_duplicate"
       ],
       "l": "18.197.248.23",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -428,6 +442,7 @@
        "header_duplicate"
       ],
       "l": "80.90.145.166",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -466,57 +481,69 @@
    {
     "host": "18.197.248.23",
     "label": "eu-staticip.multiscreensite.com",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "nginx",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "8443",
       "s": "nginx",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "80.90.145.166",
     "label": "gw-huendgen.bn-online.net",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Microsoft-IIS/10.0",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "444",
       "s": "Apache httpd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "1000",
       "s": "nicht identifiziert (Port 1000)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "1001",
       "s": "nicht identifiziert (Port 1001)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "1002",
       "s": "nicht identifiziert (Port 1002)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Gelb in Kürze oder mittelfristig · Blau geplante Verbesserung · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "18.197.248.23 (eu-staticip.multiscreensite.com)",
@@ -2406,6 +2433,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von huendgen-entsorgung.de am 23.09.2026: 3 Hostnamen auf 3 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 2 Systeme (18.197.248.23 mit 52.59.120.70 und 80.90.145.166) liegt nur eine teilweise aktive Prüfung vor. 2 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung.",
   "levers": [
    {
     "effect": "Begrenzt den Zugriff auf Software ohne Sicherheitsupdates bis zur Ablösung",

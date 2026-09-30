@@ -1345,6 +1345,41 @@ def sammelbegriffe(checks: set[str] | list[str]) -> list[str]:
     return namen
 
 
+def measured_ports(facts: FS.Facts) -> set[tuple[str, int]]:
+    """(Adresse, Port) mit einer Messung ueber den Portscan hinaus (S7a, spec/10 R20).
+
+    Ein eigener testssl-Lauf am Port, eine Header- oder Webanalyse an einer Adresse dieses Ports
+    oder die EHLO-Sonde. Kennung, Banner und Skriptausgaben von nmap gehoeren zum Portscan; ein
+    Port nur mit ihnen steht auf der Service-Karte grau (junkerwerk 188.40.3.130: 22, 80, 222 und
+    die Mailports standen gruen ohne Tiefenpruefung). Messungen an einer anderen Adresse desselben
+    Namens (DNS-Rotation) zaehlen fuer die Inventaradresse nicht."""
+    out: set[tuple[str, int]] = set()
+    for t in facts.tls:
+        if t.source != "testssl" or t.assigned_from or not t.host_ip or not t.port:
+            continue
+        if t.measured_ip and t.measured_ip != t.host_ip:
+            continue
+        out.add((t.host_ip, t.port))
+    for h in facts.http:
+        if not h.host_ip or not (h.reachable is True or h.status_code):
+            continue
+        if getattr(h, "measured_ip", None) and h.measured_ip != h.host_ip:
+            continue
+        for url in [h.url, *[a.url for a in h.alerts], *[u for a in h.alerts for u in a.urls_sample]]:
+            if not url:
+                continue
+            try:
+                parts = urlsplit(url)
+                port = parts.port or (443 if parts.scheme == "https" else 80)
+            except ValueError:
+                continue
+            out.add((h.host_ip, port))
+    for s in facts.services:
+        if s.smtp_source == "smtp_ehlo":
+            out.add((s.host_ip, s.port))
+    return out
+
+
 def web_ports_unanalysed(facts: FS.Facts) -> dict[str, list[int]]:
     """Offene Webdienste auf weiteren Ports, an denen keine Header- und Webanalyse lief (spec/11 T13).
 

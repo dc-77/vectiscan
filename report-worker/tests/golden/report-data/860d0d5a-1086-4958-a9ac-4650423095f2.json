@@ -55,6 +55,13 @@
    {
     "host": "188.40.3.130",
     "operator": "",
+    "port": "25",
+    "ref": "",
+    "svc": "SMTP (Exim), laut Passivquelle"
+   },
+   {
+    "host": "188.40.3.130",
+    "operator": "",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd"
@@ -130,11 +137,39 @@
     "svc": "PostgreSQL DB"
    },
    {
+    "host": "2a01:4f8:d0a:3124::2",
+    "operator": "IPv6-Adresse von 188.40.3.130",
+    "port": "80",
+    "ref": "",
+    "svc": "Apache httpd, laut Passivquelle"
+   },
+   {
+    "host": "2a01:4f8:d0a:3124::2",
+    "operator": "",
+    "port": "443",
+    "ref": "",
+    "svc": "Apache httpd, laut Passivquelle"
+   },
+   {
     "host": "217.243.248.28",
     "operator": "Junkerwerk Linder GmbH & Co., laut AbuseIPDB",
+    "port": "25",
+    "ref": "",
+    "svc": "SMTP, laut Passivquelle"
+   },
+   {
+    "host": "217.243.248.28",
+    "operator": "",
     "port": "443",
     "ref": "VS-2026-006, VS-2026-008, VS-2026-014",
     "svc": "Microsoft-IIS/10.0, TLS erzwungen"
+   },
+   {
+    "host": "217.243.248.28",
+    "operator": "",
+    "port": "4433",
+    "ref": "VS-2026-002",
+    "svc": "SonicWall, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "217.243.248.29",
@@ -149,41 +184,6 @@
     "port": "8443",
     "ref": "VS-2026-011, VS-2026-014",
     "svc": "Microsoft IIS httpd 10.0, TLS erzwungen"
-   },
-   {
-    "host": "188.40.3.130",
-    "operator": "",
-    "port": "25",
-    "ref": "",
-    "svc": "SMTP (Exim), laut Passivquelle"
-   },
-   {
-    "host": "217.243.248.28",
-    "operator": "",
-    "port": "25",
-    "ref": "",
-    "svc": "SMTP, laut Passivquelle"
-   },
-   {
-    "host": "217.243.248.28",
-    "operator": "",
-    "port": "4433",
-    "ref": "VS-2026-002",
-    "svc": "SonicWall, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "2a01:4f8:d0a:3124::2",
-    "operator": "Hetzner Online GmbH, laut AbuseIPDB",
-    "port": "80",
-    "ref": "",
-    "svc": "Apache httpd, laut Passivquelle"
-   },
-   {
-    "host": "2a01:4f8:d0a:3124::2",
-    "operator": "",
-    "port": "443",
-    "ref": "",
-    "svc": "Apache httpd, laut Passivquelle"
    }
   ],
   "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
@@ -514,6 +514,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -527,6 +528,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -543,6 +545,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -556,6 +559,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -569,6 +573,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -582,6 +587,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -601,6 +607,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -614,6 +621,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -627,6 +635,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -640,6 +649,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -663,6 +673,9 @@
        "tls_no_fallback_scsv"
       ],
       "l": "188.40.3.130",
+      "more": [
+       "2a01:4f8:d0a:3124::2: nicht prüfbar"
+      ],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -687,6 +700,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "217.243.248.28",
+      "more": [],
       "ok": true,
       "pulls": [
        "cert_expired",
@@ -711,6 +725,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "217.243.248.29",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -728,30 +743,6 @@
      },
      {
       "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
-      "l": "2a01:4f8:d0a:3124::2",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "2a01:4f8:d0a:3124::2"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
        "cert_expired",
        "cert_expiring",
        "cert_expiring_later",
@@ -761,6 +752,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -793,6 +785,9 @@
        "header_duplicate"
       ],
       "l": "188.40.3.130",
+      "more": [
+       "2a01:4f8:d0a:3124::2: nicht prüfbar"
+      ],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -810,6 +805,7 @@
        "header_duplicate"
       ],
       "l": "217.243.248.28",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -827,29 +823,13 @@
        "header_duplicate"
       ],
       "l": "217.243.248.29",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
        "217.243.248.29"
       ],
       "v": "Handlungsbedarf"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
-      "l": "2a01:4f8:d0a:3124::2",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "2a01:4f8:d0a:3124::2"
-      ],
-      "v": "nicht prüfbar"
      }
     ],
     "name": "Sicherheits-Header",
@@ -884,134 +864,147 @@
    {
     "host": "188.40.3.130",
     "label": "dedi2230.your-server.de",
+    "more_ips": [
+     "2a01:4f8:d0a:3124::2"
+    ],
+    "notes": [
+     "2a01:4f8:d0a:3124::2: Ports 80 und 443 laut Passivquelle (Apache httpd), nicht geprüft"
+    ],
     "ports": [
      {
       "p": "21",
       "s": "ProFTPD",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "22",
       "s": "ProFTPD mod_sftp",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "110",
       "s": "Courier pop3d",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "222",
       "s": "OpenSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "465",
       "s": "SMTP über TLS (Exim)",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "587",
       "s": "SMTP (Exim)",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "993",
       "s": "IMAP über TLS",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "995",
       "s": "POP3 über TLS",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "3306",
       "s": "MariaDB 10.11.18",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "5432",
       "s": "PostgreSQL DB",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "25",
       "s": "SMTP (Exim)",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "217.243.248.28",
     "label": "junkerwerk-solingen.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Microsoft-IIS/10.0",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "25",
       "s": "SMTP",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "4433",
       "s": "SonicWall",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    },
    {
     "host": "217.243.248.29",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Microsoft IIS httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "8443",
       "s": "Microsoft IIS httpd",
-      "st": "blau"
-     }
-    ]
-   },
-   {
-    "host": "2a01:4f8:d0a:3124::2",
-    "label": "dedi2230.your-server.de",
-    "ports": [
-     {
-      "p": "80",
-      "s": "Apache httpd",
-      "st": "grau"
-     },
-     {
-      "p": "443",
-      "s": "Apache httpd",
-      "st": "grau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Rot unverzüglich · Gelb in Kürze oder mittelfristig · Blau geplante Verbesserung · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "188.40.3.130 (dedi2230.your-server.de)",
@@ -4119,6 +4112,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von junkerwerk.de und junkerwerk.hu am 20.09.2026: 7 Hostnamen auf 4 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 3 Systeme (188.40.3.130 mit 2a01:4f8:d0a:3124::2, 217.243.248.28 und 217.243.248.29) liegt nur eine teilweise aktive Prüfung vor. 1 weiterer gefundener Name ist nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Rot = unverzüglich handeln · Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung · Grün = positiv.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugriff auf die Datenbanken",

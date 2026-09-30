@@ -314,6 +314,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -326,6 +327,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -341,6 +343,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -353,6 +356,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -365,6 +369,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -377,6 +382,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -395,6 +401,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -407,6 +414,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -419,6 +427,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -431,6 +440,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -453,6 +463,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "5.199.141.24",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -479,6 +490,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -507,6 +519,7 @@
        "header_duplicate"
       ],
       "l": "5.199.141.24",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -526,81 +539,97 @@
    {
     "host": "5.199.141.24",
     "label": "home4.publishsoft.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "21",
       "s": "ProFTPD",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "22",
       "s": "OpenSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "80",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "110",
       "s": "Dovecot pop3d",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "465",
       "s": "Postfix smtpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "587",
       "s": "Postfix smtpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "993",
       "s": "Dovecot imapd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "995",
       "s": "Dovecot pop3d",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "3306",
       "s": "MariaDB 5.5.68",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "8443",
       "s": "sw-cp-server",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "8880",
       "s": "Plesk",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Rot unverzüglich · Gelb in Kürze oder mittelfristig · Blau geplante Verbesserung · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "5.199.141.24 (home4.publishsoft.de)",
@@ -2559,6 +2588,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von trunk-immobilien.de am 11.05.2026: 5 Hostnamen auf 1 IP-Adresse. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 1 System (5.199.141.24) liegt nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Rot = unverzüglich handeln · Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugriff auf die Datenbanken",

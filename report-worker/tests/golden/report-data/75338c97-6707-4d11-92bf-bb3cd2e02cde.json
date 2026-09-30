@@ -234,6 +234,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -247,6 +248,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -263,6 +265,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -276,6 +279,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -289,6 +293,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -302,6 +307,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -321,6 +327,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -334,6 +341,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -347,6 +355,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -360,6 +369,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -383,6 +393,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "62.217.52.165",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -407,6 +418,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "62.217.52.177",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -433,6 +445,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -488,6 +501,7 @@
        "header_duplicate"
       ],
       "l": "62.217.52.165",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -505,6 +519,7 @@
        "header_duplicate"
       ],
       "l": "62.217.52.177",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -570,21 +585,25 @@
    {
     "host": "62.217.52.165",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "Golang net/http server",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Golang net/http server",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Gelb in Kürze · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "62.217.52.165",
@@ -1879,6 +1898,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von vectigal.tech und vectiscan.de am 20.09.2026: 31 Hostnamen auf 2 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 2 Systeme (62.217.52.165 und 62.217.52.177) liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung · Grün = positiv.",
   "levers": [
    {
     "effect": "Schützt die Authentizität der eigenen E-Mail",
