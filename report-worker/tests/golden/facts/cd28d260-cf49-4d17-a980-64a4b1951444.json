@@ -5559,6 +5559,7 @@
      "evidence": "[\"ng-version\",\"21.2.17\"]",
      "location": "target",
      "name": "Vulnerable JS Library",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10003",
      "risk": "Medium",
@@ -5579,6 +5580,7 @@
      "evidence": null,
      "location": "target",
      "name": "Re-examine Cache-control Directives",
+     "other_locations": [],
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
@@ -5603,6 +5605,7 @@
      "evidence": null,
      "location": "error_page",
      "name": "Strict-Transport-Security Header Not Set",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10035",
      "risk": "Low",
@@ -5624,6 +5627,7 @@
      "evidence": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://haveibeenpwned.com; child-src 'self' https://*.duosecurity.com https://*.duo...",
      "location": "target",
      "name": "CSP: Failure to Define Directive with No Fallback",
+     "other_locations": [],
      "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
@@ -5645,6 +5649,7 @@
      "evidence": "1732584193",
      "location": "target",
      "name": "Timestamp Disclosure - Unix",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10096",
      "risk": "Low",
@@ -5666,6 +5671,7 @@
      "evidence": "<script defer=\"defer\" src=\"theme_head.6991036cc6ce1ab5eee1.js\"></script>",
      "location": "target",
      "name": "Modern Web Application",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
@@ -5687,6 +5693,7 @@
      "evidence": "10.0.0.0",
      "location": "target",
      "name": "Private IP Disclosure",
+     "other_locations": [],
      "param": null,
      "plugin_id": "2",
      "risk": "Low",
@@ -5924,6 +5931,7 @@
      "evidence": "no-cache, no-store",
      "location": "target",
      "name": "Re-examine Cache-control Directives",
+     "other_locations": [],
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
@@ -5944,6 +5952,7 @@
      "evidence": null,
      "location": "target",
      "name": "X-Content-Type-Options Header Missing",
+     "other_locations": [],
      "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
@@ -5965,6 +5974,7 @@
      "evidence": "lear the cache. See bug 41770 and 5840 for",
      "location": "target",
      "name": "Information Disclosure - Suspicious Comments",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10027",
      "risk": "Informational",
@@ -5985,6 +5995,28 @@
      "evidence": null,
      "location": "target",
      "name": "Strict-Transport-Security Header Not Set",
+     "other_locations": [
+      {
+       "location": "error_page",
+       "status": 500,
+       "url": "https://mail.castenow.de/owa/auth/"
+      },
+      {
+       "location": "error_page",
+       "status": 500,
+       "url": "https://mail.castenow.de/owa/auth/15.2.2562/"
+      },
+      {
+       "location": "error_page",
+       "status": 500,
+       "url": "https://mail.castenow.de/owa/auth/15.2.2562/themes/"
+      },
+      {
+       "location": "error_page",
+       "status": 500,
+       "url": "https://mail.castenow.de/owa/auth/15.2.2562/themes/resources/"
+      }
+     ],
      "param": null,
      "plugin_id": "10035",
      "risk": "Low",
@@ -6006,6 +6038,38 @@
      "evidence": "Microsoft-IIS/10.0",
      "location": "target",
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": 302,
+       "url": "https://mail.castenow.de/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": 302,
+       "url": "https://mail.castenow.de/sitemap.xml"
+      },
+      {
+       "location": "error_page",
+       "status": 500,
+       "url": "https://mail.castenow.de/owa/auth/"
+      },
+      {
+       "location": "error_page",
+       "status": 500,
+       "url": "https://mail.castenow.de/owa/auth/15.2.2562/"
+      },
+      {
+       "location": "error_page",
+       "status": 500,
+       "url": "https://mail.castenow.de/owa/auth/15.2.2562/themes/"
+      },
+      {
+       "location": "error_page",
+       "status": 500,
+       "url": "https://mail.castenow.de/owa/auth/15.2.2562/themes/resources/"
+      }
+     ],
      "param": null,
      "plugin_id": "10036",
      "risk": "Low",
@@ -6032,6 +6096,28 @@
      "evidence": "X-Powered-By: ASP.NET",
      "location": "target",
      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+     "other_locations": [
+      {
+       "location": "error_page",
+       "status": 500,
+       "url": "https://mail.castenow.de/owa/auth/"
+      },
+      {
+       "location": "error_page",
+       "status": 500,
+       "url": "https://mail.castenow.de/owa/auth/15.2.2562/"
+      },
+      {
+       "location": "error_page",
+       "status": 500,
+       "url": "https://mail.castenow.de/owa/auth/15.2.2562/themes/"
+      },
+      {
+       "location": "error_page",
+       "status": 500,
+       "url": "https://mail.castenow.de/owa/auth/15.2.2562/themes/resources/"
+      }
+     ],
      "param": null,
      "plugin_id": "10037",
      "risk": "Low",
@@ -6058,6 +6144,7 @@
      "evidence": null,
      "location": "target",
      "name": "Content Security Policy (CSP) Header Not Set",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
@@ -6078,6 +6165,7 @@
      "evidence": "; script-src-attr 'none'",
      "location": "target",
      "name": "CSP: Failure to Define Directive with No Fallback",
+     "other_locations": [],
      "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
@@ -6099,6 +6187,7 @@
      "evidence": "4.0.30319",
      "location": "target",
      "name": "X-AspNet-Version Response Header",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10061",
      "risk": "Low",
@@ -6119,6 +6208,7 @@
      "evidence": "<noscript> <div id=\"dvErr\"> <table cellpadding=\"0\" cellspacing=\"0\"> <tr> <td><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5...",
      "location": "target",
      "name": "Modern Web Application",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
@@ -6139,6 +6229,7 @@
      "evidence": "HTTP/1.1 500 Internal Server Error",
      "location": "error_page",
      "name": "Application Error Disclosure",
+     "other_locations": [],
      "param": null,
      "plugin_id": "90022",
      "risk": "Low",
@@ -6352,6 +6443,7 @@
      "evidence": "no-cache, no-store",
      "location": "target",
      "name": "Re-examine Cache-control Directives",
+     "other_locations": [],
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
@@ -6372,6 +6464,7 @@
      "evidence": null,
      "location": "target",
      "name": "X-Content-Type-Options Header Missing",
+     "other_locations": [],
      "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
@@ -6393,6 +6486,7 @@
      "evidence": "lear the cache. See bug 41770 and 5840 for",
      "location": "target",
      "name": "Information Disclosure - Suspicious Comments",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10027",
      "risk": "Informational",
@@ -6413,6 +6507,7 @@
      "evidence": null,
      "location": "target",
      "name": "Strict-Transport-Security Header Not Set",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10035",
      "risk": "Low",
@@ -6434,6 +6529,18 @@
      "evidence": "Microsoft-IIS/10.0",
      "location": "target",
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": 302,
+       "url": "https://mail2.castenow.de/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": 302,
+       "url": "https://mail2.castenow.de/sitemap.xml"
+      }
+     ],
      "param": null,
      "plugin_id": "10036",
      "risk": "Low",
@@ -6459,6 +6566,7 @@
      "evidence": "X-Powered-By: ASP.NET",
      "location": "target",
      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10037",
      "risk": "Low",
@@ -6484,6 +6592,7 @@
      "evidence": null,
      "location": "target",
      "name": "Content Security Policy (CSP) Header Not Set",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
@@ -6504,6 +6613,7 @@
      "evidence": "; script-src-attr 'none'",
      "location": "target",
      "name": "CSP: Failure to Define Directive with No Fallback",
+     "other_locations": [],
      "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
@@ -6524,6 +6634,7 @@
      "evidence": "4.0.30319",
      "location": "target",
      "name": "X-AspNet-Version Response Header",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10061",
      "risk": "Low",
@@ -6544,6 +6655,7 @@
      "evidence": "<noscript> <div id=\"dvErr\"> <table cellpadding=\"0\" cellspacing=\"0\"> <tr> <td><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5...",
      "location": "target",
      "name": "Modern Web Application",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
@@ -7755,6 +7867,13 @@
      "evidence": null,
      "location": "target",
      "name": "Re-examine Cache-control Directives",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": 200,
+       "url": "https://mailstore.castenow.de/robots.txt"
+      }
+     ],
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
@@ -7775,6 +7894,7 @@
      "evidence": "default-src 'self'; script-src 'self' 'nonce-Z4VU6zbYrfZ5uo7ZKdAZnh9q6/k38BhExvbOM7Vdoo0='; style-src 'self' 'unsafe-inline'; frame-src *; img-src * data: blob:; font-src 'self' data:; media-src *;...",
      "location": "error_page",
      "name": "CSP: Failure to Define Directive with No Fallback",
+     "other_locations": [],
      "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
@@ -7797,6 +7917,7 @@
      "evidence": "1790618562",
      "location": "error_page",
      "name": "Timestamp Disclosure - Unix",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10096",
      "risk": "Low",
@@ -7819,6 +7940,7 @@
      "evidence": "<noscript> <div id=\"nojavascript\"> <div> This application requires JavaScript for correct operation. Please <a href=\"https://www.enable-javascript.com/\" target=\"_blank\" rel=\"noreferrer noopener\">en...",
      "location": "error_page",
      "name": "Modern Web Application",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
@@ -7841,6 +7963,7 @@
      "evidence": "oc_sessionPassphrase",
      "location": "error_page",
      "name": "Session Management Response Identified",
+     "other_locations": [],
      "param": "oc_sessionPassphrase",
      "plugin_id": "10112",
      "risk": "Informational",
@@ -8107,6 +8230,7 @@
      "evidence": null,
      "location": "target",
      "name": "Re-examine Cache-control Directives",
+     "other_locations": [],
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
@@ -8131,6 +8255,7 @@
      "evidence": null,
      "location": "target",
      "name": "X-Content-Type-Options Header Missing",
+     "other_locations": [],
      "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
@@ -8155,6 +8280,7 @@
      "evidence": "//# sourceURL=user-profile-js-extra",
      "location": "target",
      "name": "Information Disclosure - Suspicious Comments",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10027",
      "risk": "Informational",
@@ -8177,6 +8303,7 @@
      "evidence": null,
      "location": "target",
      "name": "Cookie Poisoning",
+     "other_locations": [],
      "param": "wp_lang",
      "plugin_id": "10029",
      "risk": "Informational",
@@ -8196,6 +8323,7 @@
      "evidence": null,
      "location": "target",
      "name": "User Controllable HTML Element Attribute (Potential XSS)",
+     "other_locations": [],
      "param": "redirect_to",
      "plugin_id": "10031",
      "risk": "Informational",
@@ -8220,6 +8348,23 @@
      "evidence": "X-Powered-By: PHP/8.4.25",
      "location": "target",
      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": 302,
+       "url": "https://ubb-wiki.castenow.de/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": 301,
+       "url": "https://ubb-wiki.castenow.de/sitemap.xml"
+      },
+      {
+       "location": "error_page",
+       "status": 404,
+       "url": "https://ubb-wiki.castenow.de/wp-sitemap.xml"
+      }
+     ],
      "param": null,
      "plugin_id": "10037",
      "risk": "Low",
@@ -8246,6 +8391,18 @@
      "evidence": null,
      "location": "target",
      "name": "Content Security Policy (CSP) Header Not Set",
+     "other_locations": [
+      {
+       "location": "error_page",
+       "status": 404,
+       "url": "https://ubb-wiki.castenow.de/wp-sitemap.xml"
+      },
+      {
+       "location": "error_page",
+       "status": 403,
+       "url": "https://ubb-wiki.castenow.de/xmlrpc.php?rsd"
+      }
+     ],
      "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
@@ -8264,6 +8421,7 @@
      "evidence": "Set-Cookie: wordpress_test_cookie",
      "location": "target",
      "name": "Cookie without SameSite Attribute",
+     "other_locations": [],
      "param": "wordpress_test_cookie",
      "plugin_id": "10054",
      "risk": "Low",
@@ -8287,6 +8445,7 @@
      "evidence": "frame-ancestors 'self';",
      "location": "target",
      "name": "CSP: Failure to Define Directive with No Fallback",
+     "other_locations": [],
      "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
@@ -8311,6 +8470,7 @@
      "evidence": "1538461538",
      "location": "target",
      "name": "Timestamp Disclosure - Unix",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10096",
      "risk": "Low",
@@ -8329,6 +8489,7 @@
      "evidence": "user_password-13",
      "location": "target",
      "name": "Authentication Request Identified",
+     "other_locations": [],
      "param": "user_password-13",
      "plugin_id": "10111",
      "risk": "Informational",
@@ -8351,6 +8512,7 @@
      "evidence": "wordpress_test_cookie",
      "location": "target",
      "name": "Session Management Response Identified",
+     "other_locations": [],
      "param": "wordpress_test_cookie",
      "plugin_id": "10112",
      "risk": "Informational",
@@ -8374,6 +8536,7 @@
      "evidence": "<form method=\"post\" action=\"\" autocomplete=\"off\">",
      "location": "target",
      "name": "Absence of Anti-CSRF Tokens",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10202",
      "risk": "Medium",
@@ -8398,6 +8561,7 @@
      "evidence": null,
      "location": "target",
      "name": "Path Traversal",
+     "other_locations": [],
      "param": "url",
      "plugin_id": "6",
      "risk": "High",
@@ -8417,6 +8581,7 @@
      "evidence": null,
      "location": "target",
      "name": "Charset Mismatch",
+     "other_locations": [],
      "param": null,
      "plugin_id": "90011",
      "risk": "Informational",
@@ -8694,6 +8859,7 @@
      "evidence": null,
      "location": "side_path",
      "name": "Re-examine Cache-control Directives",
+     "other_locations": [],
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
@@ -8714,6 +8880,7 @@
      "evidence": null,
      "location": "side_path",
      "name": "X-Content-Type-Options Header Missing",
+     "other_locations": [],
      "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
@@ -8734,6 +8901,7 @@
      "evidence": null,
      "location": "side_path",
      "name": "Strict-Transport-Security Header Not Set",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10035",
      "risk": "Low",
@@ -8754,6 +8922,18 @@
      "evidence": "Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.8",
      "location": "target",
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": 200,
+       "url": "https://umfrage.castenow.de/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": 301,
+       "url": "https://umfrage.castenow.de/sitemap.xml"
+      }
+     ],
      "param": null,
      "plugin_id": "10036",
      "risk": "Low",
@@ -8778,6 +8958,13 @@
      "evidence": "PHPSESSID",
      "location": "target",
      "name": "Session Management Response Identified",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": 301,
+       "url": "https://umfrage.castenow.de/sitemap.xml"
+      }
+     ],
      "param": "PHPSESSID",
      "plugin_id": "10112",
      "risk": "Informational",
@@ -10411,7 +10598,7 @@
    }
   ]
  },
- "schema_version": "1.4.0",
+ "schema_version": "1.5.0",
  "services": [
   {
    "auth_before_starttls": null,

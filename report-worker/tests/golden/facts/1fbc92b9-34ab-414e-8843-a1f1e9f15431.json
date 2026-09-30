@@ -1749,6 +1749,7 @@
      "evidence": "Apache/2.4.67",
      "location": "target",
      "name": "In Page Banner Information Leak",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10009",
      "risk": "Low",
@@ -1771,6 +1772,7 @@
      "evidence": "Set-Cookie: wordpress_test_cookie",
      "location": "target",
      "name": "Cookie No HttpOnly Flag",
+     "other_locations": [],
      "param": "wordpress_test_cookie",
      "plugin_id": "10010",
      "risk": "Low",
@@ -1793,6 +1795,23 @@
      "evidence": null,
      "location": "target",
      "name": "Re-examine Cache-control Directives",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/wp-sitemap.xml"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/xmlrpc.php?rsd"
+      }
+     ],
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
@@ -1815,6 +1834,7 @@
      "evidence": "<script type=\"text/plain\" data-usercentrics=\"Google Analytics\" async src=\"//www.googletagmanager.com/gtag/js?id=UA-4628890-1\"></script>",
      "location": "target",
      "name": "Cross-Domain JavaScript Source File Inclusion",
+     "other_locations": [],
      "param": "//www.googletagmanager.com/gtag/js?id=UA-4628890-1",
      "plugin_id": "10017",
      "risk": "Low",
@@ -1837,6 +1857,7 @@
      "evidence": null,
      "location": "target",
      "name": "Missing Anti-clickjacking Header",
+     "other_locations": [],
      "param": "x-frame-options",
      "plugin_id": "10020",
      "risk": "Medium",
@@ -1859,6 +1880,23 @@
      "evidence": null,
      "location": "target",
      "name": "X-Content-Type-Options Header Missing",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/wp-sitemap.xml"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/xmlrpc.php?rsd"
+      }
+     ],
      "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
@@ -1881,6 +1919,7 @@
      "evidence": null,
      "location": "target",
      "name": "Cookie Poisoning",
+     "other_locations": [],
      "param": "wp_lang",
      "plugin_id": "10029",
      "risk": "Informational",
@@ -1901,6 +1940,7 @@
      "evidence": null,
      "location": "target",
      "name": "User Controllable HTML Element Attribute (Potential XSS)",
+     "other_locations": [],
      "param": "redirect_to",
      "plugin_id": "10031",
      "risk": "Informational",
@@ -1923,6 +1963,33 @@
      "evidence": "max-age=0",
      "location": "target",
      "name": "Strict-Transport-Security Disabled",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/sitemap.xml"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/wp-sitemap.xml"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/xmlrpc.php"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/xmlrpc.php?rsd"
+      }
+     ],
      "param": null,
      "plugin_id": "10035",
      "risk": "Low",
@@ -1945,6 +2012,33 @@
      "evidence": "Apache/2.4.67 (Debian)",
      "location": "target",
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/sitemap.xml"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/wp-sitemap.xml"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/xmlrpc.php"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://dortmund-beach.com/xmlrpc.php?rsd"
+      }
+     ],
      "param": null,
      "plugin_id": "10036",
      "risk": "Low",
@@ -1967,6 +2061,7 @@
      "evidence": null,
      "location": "target",
      "name": "Content Security Policy (CSP) Header Not Set",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
@@ -1989,6 +2084,7 @@
      "evidence": null,
      "location": "target",
      "name": "Big Redirect Detected (Potential Sensitive Information Leak)",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10044",
      "risk": "Low",
@@ -2011,6 +2107,7 @@
      "evidence": "Set-Cookie: wordpress_test_cookie",
      "location": "target",
      "name": "Cookie without SameSite Attribute",
+     "other_locations": [],
      "param": "wordpress_test_cookie",
      "plugin_id": "10054",
      "risk": "Low",
@@ -2033,6 +2130,7 @@
      "evidence": "1718879507",
      "location": "target",
      "name": "Timestamp Disclosure - Unix",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10096",
      "risk": "Low",
@@ -2055,6 +2153,7 @@
      "evidence": "<a class=\"responsive-menu-toggle \" href=\"#\" aria-label=\"mobile menu\"><i class=\"icon-menu-fine\" aria-hidden=\"true\"></i></a>",
      "location": "target",
      "name": "Modern Web Application",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
@@ -2077,6 +2176,7 @@
      "evidence": "wordpress_test_cookie",
      "location": "target",
      "name": "Session Management Response Identified",
+     "other_locations": [],
      "param": "wordpress_test_cookie",
      "plugin_id": "10112",
      "risk": "Informational",
@@ -2099,6 +2199,7 @@
      "evidence": "<form name=\"loginform\" id=\"loginform\" action=\"https://dortmund-beach.com/wp-login.php\" method=\"post\">",
      "location": "target",
      "name": "Absence of Anti-CSRF Tokens",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10202",
      "risk": "Medium",
@@ -2121,6 +2222,7 @@
      "evidence": null,
      "location": "target",
      "name": "Path Traversal",
+     "other_locations": [],
      "param": "url",
      "plugin_id": "6",
      "risk": "High",
@@ -2140,6 +2242,7 @@
      "evidence": null,
      "location": "target",
      "name": "Charset Mismatch",
+     "other_locations": [],
      "param": null,
      "plugin_id": "90011",
      "risk": "Informational",
@@ -2922,7 +3025,7 @@
    }
   ]
  },
- "schema_version": "1.4.0",
+ "schema_version": "1.5.0",
  "services": [
   {
    "auth_before_starttls": null,

@@ -5448,7 +5448,7 @@
    "securess.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 26,
   "generated_on": null,
   "generation": null,

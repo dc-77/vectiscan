@@ -395,6 +395,54 @@
     "where": "online.heuel.com (an der Sicherheitsabfrage)"
    },
    {
+    "count": 6,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "„Strict-Transport-Security Header Not Set“ (ZAP-Regel 10035) an Nebenpfaden, 6 Meldungen",
+    "where": "edi.heuel.com/robots.txt, edi.heuel.com/sitemap.xml, online.heuel.com/robots.txt, online.heuel.com/sitemap.xml, ose.heuel.com/robots.txt, ose.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 4,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "„Content Security Policy (CSP) Header Not Set“ (ZAP-Regel 10038) an Nebenpfaden, 4 Meldungen",
+    "where": "edi.heuel.com/robots.txt, edi.heuel.com/sitemap.xml, ose.heuel.com/robots.txt, ose.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 2,
+    "message": "Cookie with SameSite Attribute None",
+    "note": "Cookie mit abgeschaltetem SameSite-Schutz; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10054",
+    "what": "„Cookie with SameSite Attribute None“ (ZAP-Regel 10054) an Nebenpfaden, 2 Meldungen",
+    "where": "online.heuel.com/robots.txt, online.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 3,
+    "message": "CSP: Failure to Define Directive with No Fallback",
+    "note": "Content-Security-Policy lückenhaft; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10055",
+    "what": "„CSP: Failure to Define Directive with No Fallback“ (ZAP-Regel 10055) an Nebenpfaden, 3 Meldungen",
+    "where": "online.heuel.com/sitemap.xml, www.heuel.com/robots.txt, www.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 2,
+    "message": "Timestamp Disclosure - Unix",
+    "note": "Zeitstempel in der Antwort; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10096",
+    "what": "„Timestamp Disclosure - Unix“ (ZAP-Regel 10096) an Nebenpfaden, 2 Meldungen",
+    "where": "online.heuel.com/robots.txt, online.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 2,
+    "message": "Private IP Disclosure",
+    "note": "Private IP-Adresse in der Antwort; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#2",
+    "what": "„Private IP Disclosure“ (ZAP-Regel 2) an Nebenpfaden, 2 Meldungen",
+    "where": "ose.heuel.com/robots.txt, ose.heuel.com/sitemap.xml"
+   },
+   {
     "count": 1,
     "message": "Cloudflare Bot Management",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
@@ -579,6 +627,158 @@
     "rule": "zap_uncovered#10055",
     "what": "CSP: Failure to Define Directive with No Fallback auf online.heuel.com",
     "where": "online.heuel.com (an der Sicherheitsabfrage)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "edi.heuel.com/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "edi.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Nebenpfad",
+    "where": "edi.heuel.com/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Nebenpfad",
+    "where": "edi.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "online.heuel.com/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "online.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Cookie with SameSite Attribute None",
+    "note": "Cookie mit abgeschaltetem SameSite-Schutz; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10054",
+    "what": "Nebenpfad",
+    "where": "online.heuel.com/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Cookie with SameSite Attribute None",
+    "note": "Cookie mit abgeschaltetem SameSite-Schutz; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10054",
+    "what": "Nebenpfad",
+    "where": "online.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "CSP: Failure to Define Directive with No Fallback",
+    "note": "Content-Security-Policy lückenhaft; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10055",
+    "what": "Nebenpfad",
+    "where": "online.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
+    "note": "Zeitstempel in der Antwort; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10096",
+    "what": "Nebenpfad",
+    "where": "online.heuel.com/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
+    "note": "Zeitstempel in der Antwort; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10096",
+    "what": "Nebenpfad",
+    "where": "online.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "ose.heuel.com/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "ose.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Nebenpfad",
+    "where": "ose.heuel.com/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Nebenpfad",
+    "where": "ose.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Private IP Disclosure",
+    "note": "Private IP-Adresse in der Antwort; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#2",
+    "what": "Nebenpfad",
+    "where": "ose.heuel.com/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Private IP Disclosure",
+    "note": "Private IP-Adresse in der Antwort; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#2",
+    "what": "Nebenpfad",
+    "where": "ose.heuel.com/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "CSP: Failure to Define Directive with No Fallback",
+    "note": "Content-Security-Policy lückenhaft; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10055",
+    "what": "Nebenpfad",
+    "where": "www.heuel.com/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "CSP: Failure to Define Directive with No Fallback",
+    "note": "Content-Security-Policy lückenhaft; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10055",
+    "what": "Nebenpfad",
+    "where": "www.heuel.com/sitemap.xml"
    },
    {
     "count": 1,
@@ -2925,7 +3125,7 @@
    "heuel.com"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 11,
   "generated_on": null,
   "generation": null,

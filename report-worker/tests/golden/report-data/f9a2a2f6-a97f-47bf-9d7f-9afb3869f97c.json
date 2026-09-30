@@ -227,6 +227,38 @@
     "where": "cloud.junkerwerk.de, outlook.junkerwerk.de"
    },
    {
+    "count": 16,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "„Server Leaks Version Information via \"Server\" HTTP Response Header Field“ (ZAP-Regel 10036) an Nebenpfaden und Fehlerseiten, 16 Meldungen",
+    "where": "autodiscover.junkerwerk.de/robots.txt (Status 302), autodiscover.junkerwerk.de/sitemap.xml (Status 302), cloud.junkerwerk.de/robots.txt (Status 404), cloud.junkerwerk.de/sitemap.xml (Status 404), mail.junkerwerk.de/owa/auth/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/ (Status 500) und 10 weitere"
+   },
+   {
+    "count": 10,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "„Strict-Transport-Security Header Not Set“ (ZAP-Regel 10035) an Fehlerseiten, 10 Meldungen",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404), cloud.junkerwerk.de/sitemap.xml (Status 404), mail.junkerwerk.de/owa/auth/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500) und 4 weitere"
+   },
+   {
+    "count": 10,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "„Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)“ (ZAP-Regel 10037) an Fehlerseiten, 10 Meldungen",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404), cloud.junkerwerk.de/sitemap.xml (Status 404), mail.junkerwerk.de/owa/auth/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500) und 4 weitere"
+   },
+   {
+    "count": 2,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "„Content Security Policy (CSP) Header Not Set“ (ZAP-Regel 10038) an Fehlerseiten, 2 Meldungen",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404), cloud.junkerwerk.de/sitemap.xml (Status 404)"
+   },
+   {
     "count": 1,
     "message": "Windows Server",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
@@ -315,6 +347,310 @@
     "rule": "tls_weakness_reported",
     "what": "outlook.junkerwerk.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "outlook.junkerwerk.de"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "autodiscover.junkerwerk.de/robots.txt (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "autodiscover.junkerwerk.de/sitemap.xml (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/sitemap.xml (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/sitemap.xml (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/sitemap.xml (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/sitemap.xml (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail.junkerwerk.de/robots.txt (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail.junkerwerk.de/sitemap.xml (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "outlook.junkerwerk.de/robots.txt (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "outlook.junkerwerk.de/sitemap.xml (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
    },
    {
     "count": 1,
@@ -4445,7 +4781,7 @@
    "junkerwerk.hu"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 12,
   "generated_on": null,
   "generation": null,

@@ -241,6 +241,54 @@
     "where": "openotp.junkerwerk.de/openid/login_uid.php"
    },
    {
+    "count": 8,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "„Server Leaks Version Information via \"Server\" HTTP Response Header Field“ (ZAP-Regel 10036) an Nebenpfaden, 8 Meldungen",
+    "where": "autodiscover.junkerwerk.de/robots.txt, autodiscover.junkerwerk.de/sitemap.xml, cloud.junkerwerk.de/robots.txt, cloud.junkerwerk.de/sitemap.xml, mail.junkerwerk.de/robots.txt, mail.junkerwerk.de/sitemap.xml und 2 weitere"
+   },
+   {
+    "count": 3,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "„Strict-Transport-Security Header Not Set“ (ZAP-Regel 10035) an Nebenpfaden, 3 Meldungen",
+    "where": "cloud.junkerwerk.de/robots.txt, cloud.junkerwerk.de/sitemap.xml, openotp.junkerwerk.de/robots.txt"
+   },
+   {
+    "count": 2,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "„Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)“ (ZAP-Regel 10037) an Nebenpfaden, 2 Meldungen",
+    "where": "cloud.junkerwerk.de/robots.txt, cloud.junkerwerk.de/sitemap.xml"
+   },
+   {
+    "count": 2,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "„Content Security Policy (CSP) Header Not Set“ (ZAP-Regel 10038) an Nebenpfaden, 2 Meldungen",
+    "where": "cloud.junkerwerk.de/robots.txt, cloud.junkerwerk.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "X-Content-Type-Options Header Missing",
+    "note": "X-Content-Type-Options fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10021",
+    "what": "„X-Content-Type-Options Header Missing“ (ZAP-Regel 10021) an Nebenpfaden, 1 Meldung",
+    "where": "openotp.junkerwerk.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "CSP: Failure to Define Directive with No Fallback",
+    "note": "Content-Security-Policy lückenhaft; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10055",
+    "what": "„CSP: Failure to Define Directive with No Fallback“ (ZAP-Regel 10055) an Nebenpfaden, 1 Meldung",
+    "where": "openotp.junkerwerk.de/sitemap.xml"
+   },
+   {
     "count": 1,
     "message": "Windows Server",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
@@ -353,6 +401,142 @@
     "rule": "web_vulnerability_reported#10202",
     "what": "Absence of Anti-CSRF Tokens auf openotp.junkerwerk.de/openid/login_uid.php (Konfidenz niedrig, passiv gemeldet von ZAP)",
     "where": "openotp.junkerwerk.de/openid/login_uid.php"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "autodiscover.junkerwerk.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "autodiscover.junkerwerk.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "cloud.junkerwerk.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "cloud.junkerwerk.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "cloud.junkerwerk.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "cloud.junkerwerk.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Nebenpfad",
+    "where": "cloud.junkerwerk.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Nebenpfad",
+    "where": "cloud.junkerwerk.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Nebenpfad",
+    "where": "cloud.junkerwerk.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Nebenpfad",
+    "where": "cloud.junkerwerk.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail.junkerwerk.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail.junkerwerk.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "X-Content-Type-Options Header Missing",
+    "note": "X-Content-Type-Options fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10021",
+    "what": "Nebenpfad",
+    "where": "openotp.junkerwerk.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "openotp.junkerwerk.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "CSP: Failure to Define Directive with No Fallback",
+    "note": "Content-Security-Policy lückenhaft; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10055",
+    "what": "Nebenpfad",
+    "where": "openotp.junkerwerk.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "outlook.junkerwerk.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "outlook.junkerwerk.de/sitemap.xml"
    },
    {
     "count": 1,
@@ -4546,7 +4730,7 @@
    "junkerwerk.hu"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 12,
   "generated_on": null,
   "generation": null,

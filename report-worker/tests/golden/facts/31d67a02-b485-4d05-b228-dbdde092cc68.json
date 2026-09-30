@@ -4014,6 +4014,7 @@
      "evidence": "no-cache, no-store",
      "location": "target",
      "name": "Re-examine Cache-control Directives",
+     "other_locations": [],
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
@@ -4032,6 +4033,7 @@
      "evidence": null,
      "location": "target",
      "name": "X-Content-Type-Options Header Missing",
+     "other_locations": [],
      "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
@@ -4051,6 +4053,7 @@
      "evidence": "lear the cache. See bug 41770 and 5840 for",
      "location": "target",
      "name": "Information Disclosure - Suspicious Comments",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10027",
      "risk": "Informational",
@@ -4069,6 +4072,7 @@
      "evidence": null,
      "location": "target",
      "name": "Strict-Transport-Security Header Not Set",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10035",
      "risk": "Low",
@@ -4091,6 +4095,18 @@
      "evidence": "Microsoft-IIS/10.0",
      "location": "target",
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://autodiscover.junkerwerk.de/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://autodiscover.junkerwerk.de/sitemap.xml"
+      }
+     ],
      "param": null,
      "plugin_id": "10036",
      "risk": "Low",
@@ -4113,6 +4129,7 @@
      "evidence": "X-Powered-By: ASP.NET",
      "location": "target",
      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10037",
      "risk": "Low",
@@ -4135,6 +4152,7 @@
      "evidence": null,
      "location": "target",
      "name": "Content Security Policy (CSP) Header Not Set",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
@@ -4153,6 +4171,7 @@
      "evidence": "4.0.30319",
      "location": "target",
      "name": "X-AspNet-Version Response Header",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10061",
      "risk": "Low",
@@ -4171,6 +4190,7 @@
      "evidence": "<noscript> <div id=\"dvErr\"> <table cellpadding=\"0\" cellspacing=\"0\"> <tr> <td><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5...",
      "location": "target",
      "name": "Modern Web Application",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
@@ -4189,6 +4209,7 @@
      "evidence": "HTTP/1.1 500 Internal Server Error",
      "location": "target",
      "name": "Application Error Disclosure",
+     "other_locations": [],
      "param": null,
      "plugin_id": "90022",
      "risk": "Low",
@@ -4364,6 +4385,7 @@
      "evidence": null,
      "location": "target",
      "name": "Re-examine Cache-control Directives",
+     "other_locations": [],
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
@@ -4382,6 +4404,7 @@
      "evidence": null,
      "location": "target",
      "name": "Missing Anti-clickjacking Header",
+     "other_locations": [],
      "param": "x-frame-options",
      "plugin_id": "10020",
      "risk": "Medium",
@@ -4400,6 +4423,7 @@
      "evidence": null,
      "location": "target",
      "name": "X-Content-Type-Options Header Missing",
+     "other_locations": [],
      "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
@@ -4419,6 +4443,18 @@
      "evidence": null,
      "location": "target",
      "name": "Strict-Transport-Security Header Not Set",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://cloud.junkerwerk.de/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://cloud.junkerwerk.de/sitemap.xml"
+      }
+     ],
      "param": null,
      "plugin_id": "10035",
      "risk": "Low",
@@ -4438,6 +4474,18 @@
      "evidence": "Microsoft-IIS/10.0",
      "location": "target",
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://cloud.junkerwerk.de/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://cloud.junkerwerk.de/sitemap.xml"
+      }
+     ],
      "param": null,
      "plugin_id": "10036",
      "risk": "Low",
@@ -4457,6 +4505,18 @@
      "evidence": "X-Powered-By: ASP.NET",
      "location": "target",
      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://cloud.junkerwerk.de/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://cloud.junkerwerk.de/sitemap.xml"
+      }
+     ],
      "param": null,
      "plugin_id": "10037",
      "risk": "Low",
@@ -4476,6 +4536,18 @@
      "evidence": null,
      "location": "target",
      "name": "Content Security Policy (CSP) Header Not Set",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://cloud.junkerwerk.de/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://cloud.junkerwerk.de/sitemap.xml"
+      }
+     ],
      "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
@@ -4795,6 +4867,7 @@
      "evidence": "no-cache, no-store",
      "location": "target",
      "name": "Re-examine Cache-control Directives",
+     "other_locations": [],
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
@@ -4813,6 +4886,7 @@
      "evidence": null,
      "location": "target",
      "name": "X-Content-Type-Options Header Missing",
+     "other_locations": [],
      "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
@@ -4832,6 +4906,7 @@
      "evidence": "lear the cache. See bug 41770 and 5840 for",
      "location": "target",
      "name": "Information Disclosure - Suspicious Comments",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10027",
      "risk": "Informational",
@@ -4850,6 +4925,7 @@
      "evidence": null,
      "location": "target",
      "name": "Strict-Transport-Security Header Not Set",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10035",
      "risk": "Low",
@@ -4872,6 +4948,18 @@
      "evidence": "Microsoft-IIS/10.0",
      "location": "target",
      "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://outlook.junkerwerk.de/robots.txt"
+      },
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://outlook.junkerwerk.de/sitemap.xml"
+      }
+     ],
      "param": null,
      "plugin_id": "10036",
      "risk": "Low",
@@ -4894,6 +4982,7 @@
      "evidence": "X-Powered-By: ASP.NET",
      "location": "target",
      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10037",
      "risk": "Low",
@@ -4916,6 +5005,7 @@
      "evidence": null,
      "location": "target",
      "name": "Content Security Policy (CSP) Header Not Set",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
@@ -4934,6 +5024,7 @@
      "evidence": "4.0.30319",
      "location": "target",
      "name": "X-AspNet-Version Response Header",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10061",
      "risk": "Low",
@@ -4952,6 +5043,7 @@
      "evidence": "<noscript> <div id=\"dvErr\"> <table cellpadding=\"0\" cellspacing=\"0\"> <tr> <td><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5...",
      "location": "target",
      "name": "Modern Web Application",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
@@ -4970,6 +5062,7 @@
      "evidence": "HTTP/1.1 500 Internal Server Error",
      "location": "target",
      "name": "Application Error Disclosure",
+     "other_locations": [],
      "param": null,
      "plugin_id": "90022",
      "risk": "Low",
@@ -7132,7 +7225,7 @@
    }
   ]
  },
- "schema_version": "1.4.0",
+ "schema_version": "1.5.0",
  "services": [
   {
    "auth_before_starttls": null,

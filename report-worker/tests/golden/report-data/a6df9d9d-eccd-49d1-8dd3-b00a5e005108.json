@@ -206,6 +206,30 @@
     "rule": "zap#10055",
     "what": "„CSP: Failure to Define Directive with No Fallback“ (ZAP-Regel 10055), 7 Meldungen",
     "where": "openotp.junkerwerk.hu"
+   },
+   {
+    "count": 1,
+    "message": "X-Content-Type-Options Header Missing",
+    "note": "X-Content-Type-Options fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10021",
+    "what": "„X-Content-Type-Options Header Missing“ (ZAP-Regel 10021) an Nebenpfaden, 1 Meldung",
+    "where": "openotp.junkerwerk.hu/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "„Strict-Transport-Security Header Not Set“ (ZAP-Regel 10035) an Nebenpfaden, 1 Meldung",
+    "where": "openotp.junkerwerk.hu/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "CSP: Failure to Define Directive with No Fallback",
+    "note": "Content-Security-Policy lückenhaft; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10055",
+    "what": "„CSP: Failure to Define Directive with No Fallback“ (ZAP-Regel 10055) an Nebenpfaden, 1 Meldung",
+    "where": "openotp.junkerwerk.hu/sitemap.xml"
    }
   ],
   "tool_messages": [
@@ -272,6 +296,30 @@
     "rule": "zap_uncovered#10055",
     "what": "CSP: Failure to Define Directive with No Fallback auf openotp.junkerwerk.hu",
     "where": "openotp.junkerwerk.hu"
+   },
+   {
+    "count": 1,
+    "message": "X-Content-Type-Options Header Missing",
+    "note": "X-Content-Type-Options fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10021",
+    "what": "Nebenpfad",
+    "where": "openotp.junkerwerk.hu/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "openotp.junkerwerk.hu/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "CSP: Failure to Define Directive with No Fallback",
+    "note": "Content-Security-Policy lückenhaft; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10055",
+    "what": "Nebenpfad",
+    "where": "openotp.junkerwerk.hu/sitemap.xml"
    }
   ],
   "tools": [
@@ -2471,7 +2519,7 @@
    "junkerwerk.hu"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 3,
   "generated_on": null,
   "generation": null,

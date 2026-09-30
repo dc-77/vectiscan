@@ -450,6 +450,30 @@
     "where": "dortmund-beach.com/wp-json/oembed/1.0/embed (an Nebenpfaden wp-json)"
    },
    {
+    "count": 3,
+    "message": "X-Content-Type-Options Header Missing",
+    "note": "X-Content-Type-Options fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10021",
+    "what": "„X-Content-Type-Options Header Missing“ (ZAP-Regel 10021) an Nebenpfaden, 3 Meldungen",
+    "where": "dortmund-beach.com/robots.txt (Status 200), dortmund-beach.com/wp-sitemap.xml (Status 200), dortmund-beach.com/xmlrpc.php (Status 200)"
+   },
+   {
+    "count": 5,
+    "message": "Strict-Transport-Security Disabled",
+    "note": "HSTS abgeschaltet (max-age=0); ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "„Strict-Transport-Security Disabled“ (ZAP-Regel 10035) an Nebenpfaden, 5 Meldungen",
+    "where": "dortmund-beach.com/robots.txt (Status 200), dortmund-beach.com/sitemap.xml (Status 302), dortmund-beach.com/wp-sitemap.xml (Status 200), dortmund-beach.com/xmlrpc.php, dortmund-beach.com/xmlrpc.php (Status 200)"
+   },
+   {
+    "count": 5,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "„Server Leaks Version Information via \"Server\" HTTP Response Header Field“ (ZAP-Regel 10036) an Nebenpfaden, 5 Meldungen",
+    "where": "dortmund-beach.com/robots.txt (Status 200), dortmund-beach.com/sitemap.xml (Status 302), dortmund-beach.com/wp-sitemap.xml (Status 200), dortmund-beach.com/xmlrpc.php, dortmund-beach.com/xmlrpc.php (Status 200)"
+   },
+   {
     "count": 1,
     "message": "Google Analytics",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
@@ -578,6 +602,110 @@
     "rule": "web_vulnerability_reported#6",
     "what": "Path Traversal auf dortmund-beach.com/wp-json/oembed/1.0/embed (Konfidenz niedrig, aktiv gemeldet von ZAP)",
     "where": "dortmund-beach.com/wp-json/oembed/1.0/embed (an Nebenpfaden wp-json)"
+   },
+   {
+    "count": 1,
+    "message": "X-Content-Type-Options Header Missing",
+    "note": "X-Content-Type-Options fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10021",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/robots.txt (Status 200)"
+   },
+   {
+    "count": 1,
+    "message": "X-Content-Type-Options Header Missing",
+    "note": "X-Content-Type-Options fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10021",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/wp-sitemap.xml (Status 200)"
+   },
+   {
+    "count": 1,
+    "message": "X-Content-Type-Options Header Missing",
+    "note": "X-Content-Type-Options fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10021",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/xmlrpc.php (Status 200)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Disabled",
+    "note": "HSTS abgeschaltet (max-age=0); ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/robots.txt (Status 200)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Disabled",
+    "note": "HSTS abgeschaltet (max-age=0); ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/sitemap.xml (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Disabled",
+    "note": "HSTS abgeschaltet (max-age=0); ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/wp-sitemap.xml (Status 200)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Disabled",
+    "note": "HSTS abgeschaltet (max-age=0); ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/xmlrpc.php"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Disabled",
+    "note": "HSTS abgeschaltet (max-age=0); ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/xmlrpc.php (Status 200)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/robots.txt (Status 200)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/sitemap.xml (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/wp-sitemap.xml (Status 200)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/xmlrpc.php"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/xmlrpc.php (Status 200)"
    },
    {
     "count": 1,
@@ -3828,7 +3956,7 @@
    "dortmund-beach.com"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 3,
   "generated_on": null,
   "generation": null,

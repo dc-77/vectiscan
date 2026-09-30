@@ -998,6 +998,9 @@ def build_findings(
     # Positivbefund, X-AspNet-Version an mail und mail2 neben dem Befund).
     bewertet = bewertete_namen(output)
     tool_findings = [t for t in tool_findings if not meldung_bewertet(t, bewertet)]
+    # S7a Punkt 6: Einzelmeldungen an Nebenpfaden, Fehler- und Abwehrseiten als eigene Zeile, auch
+    # wenn ein Befund den Header am Namen bewertet (die Zeile sagt, wo die Meldung entstand).
+    tool_findings.extend(nebenpfad_messages(facts))
     for ref in cve_refs:
         erste = ref.cve.split(",")[0].strip()
         befunde: list[str] = []
@@ -1259,6 +1262,56 @@ def uncovered_zap_messages(output: CatalogOutput, facts: FS.Facts,
     return out
 
 
+# S7a Punkt 6 (Antwort DC auf Frage 2 der S6d-Session): Einzelmeldungen eines Meldungstyps an
+# nachrangigen Fundorten. Bis S6d fielen sie im Faktenbau weg, sobald derselbe Typ auch an der
+# Zielseite auftrat (castenow mail: HSTS an /robots.txt und /sitemap.xml mit Status 302).
+NEBENPFAD_REGEL = "zap_nebenpfad"
+FUNDORT_ART = {"side_path": "Nebenpfad", "error_page": "Fehlerseite", "challenge": "Sicherheitsabfrage"}
+_FUNDORT_PLURAL = {"Nebenpfad": "Nebenpfaden", "Fehlerseite": "Fehlerseiten",
+                   "Sicherheitsabfrage": "Sicherheitsabfragen"}
+_FUNDORT_REIHE = ("Nebenpfad", "Fehlerseite", "Sicherheitsabfrage")
+
+
+def _instanz_ort(fqdn: str, inst: FS.WebAlertInstance) -> str:
+    from urllib.parse import urlsplit
+    try:
+        parts = urlsplit(inst.url)
+        name = fqdn or parts.hostname or ""
+        path = parts.path or "/"
+    except ValueError:
+        return fqdn
+    ort = f"{name}{path}" if path != "/" else name
+    if len(ort) > 90:
+        ort = ort[:87] + "..."
+    return f"{ort} (Status {inst.status})" if inst.status is not None else ort
+
+
+def nebenpfad_messages(facts: FS.Facts) -> list[ToolFinding]:
+    """Je ZAP-Meldung (Low bis High) die Einzelmeldungen aus ``WebAlert.other_locations``."""
+    out: list[ToolFinding] = []
+    for h in facts.http:
+        for a in h.alerts:
+            if not a.other_locations or a.risk not in ("Low", "Medium", "High"):
+                continue
+            kennung = f"#{a.plugin_id}" if a.plugin_id else f"#{a.name}"
+            note = (zap_note(a) or "Werkzeugmeldung.").rstrip(".") + "; ohne eigenen Befund."
+            for inst in a.other_locations:
+                art = FUNDORT_ART.get(inst.location)
+                if art is None:
+                    continue
+                out.append(ToolFinding(what=art, where=_instanz_ort(h.fqdn or "", inst), note=note,
+                                       rule=f"{NEBENPFAD_REGEL}{kennung}", message=a.name, count=1))
+    return out
+
+
+def _fundort_arten(rows: list[ToolFinding]) -> str:
+    arten = [a for a in _FUNDORT_REIHE if any(r.what == a for r in rows)]
+    namen = [_FUNDORT_PLURAL[a] for a in arten]
+    if len(namen) > 1:
+        return "an " + ", ".join(namen[:-1]) + " und " + namen[-1]
+    return "an " + namen[0] if namen else ""
+
+
 # ---------------------------------------------------------------- Anhang: eine Zeile je Meldung
 
 # Nachtrag S6b-2 (Entscheidung DC 26.09.): hoechstens sechs Betroffene je Zeile.
@@ -1296,6 +1349,11 @@ def summarize_tool_messages(messages: list[ToolFinding]) -> list[ToolFinding]:
         first = rows[0]
         if rule == "technik":
             what = first.what
+        elif rule.startswith(NEBENPFAD_REGEL + "#") and name:
+            # S7a Punkt 6: eigene Zeile je Meldung an nachrangigen Fundorten, mit Pfad und Status.
+            kennung = rule.split("#", 1)[1]
+            regel = f" (ZAP-Regel {kennung})" if kennung and kennung != name else ""
+            what = f"„{name}“{regel} {_fundort_arten(rows)}"
         elif name:
             kennung = rule.split("#", 1)[1] if "#" in rule else ""
             what = f"„{name}“" + (f" (ZAP-Regel {kennung})" if kennung else "")

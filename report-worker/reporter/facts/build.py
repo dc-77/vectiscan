@@ -2556,6 +2556,8 @@ def _zap_alerts_by_host(ctx: _Ctx, h) -> dict[str, list[S.WebAlert]]:
     statuses: dict[tuple[str, str], set[int]] = defaultdict(set)
     rank: dict[tuple[str, str], tuple[int, int]] = {}
     ort: dict[tuple[str, str], str] = {}
+    # S7a Punkt 6: jede Einzelmeldung mit Fundort, Adresse und Status, auch die nachrangigen.
+    instanzen: dict[tuple[str, str], set[tuple[str, str, Optional[int]]]] = defaultdict(set)
     for a in raw_alerts:
         if not isinstance(a, dict):
             continue
@@ -2578,6 +2580,8 @@ def _zap_alerts_by_host(ctx: _Ctx, h) -> dict[str, list[S.WebAlert]]:
         # Meldung nur an Abwehr-, Fehler- oder Nebenseiten traegt diesen Fundort und keine Regel.
         # S6b-2 (spec/09 Q14): innerhalb des Fundorts die hoechste Konfidenz der Einzelmeldungen.
         rang = (_ZAP_LOCATION_RANK[loc], _ZAP_CONFIDENCE_RANK.get((conf or "").lower(), 0))
+        if url:
+            instanzen[key].add((loc, url, status))
         bisher = rank.get(key)
         if bisher is not None and rang < bisher:
             continue
@@ -2611,6 +2615,10 @@ def _zap_alerts_by_host(ctx: _Ctx, h) -> dict[str, list[S.WebAlert]]:
         alert.urls_sample = sample[:5]
         alert.statuses = sorted(statuses.get(key, set()))
         alert.location = ort.get(key, "target")  # type: ignore[assignment]
+        andere = sorted(((loc, u, st) for loc, u, st in instanzen.get(key, set()) if loc != alert.location),
+                        key=lambda x: (-_ZAP_LOCATION_RANK[x[0]], sort_key(x[1]), x[2] or 0))
+        alert.other_locations = [S.WebAlertInstance(location=loc, url=u, status=st)  # type: ignore[arg-type]
+                                 for loc, u, st in andere[:10]]
         by_host[host].append(alert)
     for host in by_host:
         by_host[host].sort(key=lambda x: sort_key(x.plugin_id, x.name, x.url))

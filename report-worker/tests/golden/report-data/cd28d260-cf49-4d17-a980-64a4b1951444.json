@@ -308,6 +308,38 @@
     "where": "umfrage.castenow.de/robots.txt (an Nebenpfaden robots.txt)"
    },
    {
+    "count": 4,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "„Strict-Transport-Security Header Not Set“ (ZAP-Regel 10035) an Fehlerseiten, 4 Meldungen",
+    "where": "mail.castenow.de/owa/auth/ (Status 500), mail.castenow.de/owa/auth/15.2.2562/ (Status 500), mail.castenow.de/owa/auth/15.2.2562/themes/ (Status 500), mail.castenow.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 10,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "„Server Leaks Version Information via \"Server\" HTTP Response Header Field“ (ZAP-Regel 10036) an Nebenpfaden und Fehlerseiten, 10 Meldungen",
+    "where": "mail.castenow.de/owa/auth/ (Status 500), mail.castenow.de/owa/auth/15.2.2562/ (Status 500), mail.castenow.de/owa/auth/15.2.2562/themes/ (Status 500), mail.castenow.de/owa/auth/15.2.2562/themes/resources/ (Status 500), mail.castenow.de/robots.txt (Status 302), mail.castenow.de/sitemap.xml (Status 302) und 4 weitere"
+   },
+   {
+    "count": 7,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "„Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)“ (ZAP-Regel 10037) an Nebenpfaden und Fehlerseiten, 7 Meldungen",
+    "where": "mail.castenow.de/owa/auth/ (Status 500), mail.castenow.de/owa/auth/15.2.2562/ (Status 500), mail.castenow.de/owa/auth/15.2.2562/themes/ (Status 500), mail.castenow.de/owa/auth/15.2.2562/themes/resources/ (Status 500), ubb-wiki.castenow.de/robots.txt (Status 302), ubb-wiki.castenow.de/sitemap.xml (Status 301) und 1 weitere"
+   },
+   {
+    "count": 2,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "„Content Security Policy (CSP) Header Not Set“ (ZAP-Regel 10038) an Fehlerseiten, 2 Meldungen",
+    "where": "ubb-wiki.castenow.de/wp-sitemap.xml (Status 404), ubb-wiki.castenow.de/xmlrpc.php (Status 403)"
+   },
+   {
     "count": 2,
     "message": "PHP",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
@@ -476,6 +508,190 @@
     "rule": "zap_uncovered#10021",
     "what": "X-Content-Type-Options Header Missing auf umfrage.castenow.de",
     "where": "umfrage.castenow.de/robots.txt (an Nebenpfaden robots.txt)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "mail.castenow.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "mail.castenow.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "mail.castenow.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "mail.castenow.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail.castenow.de/robots.txt (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail.castenow.de/sitemap.xml (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "mail.castenow.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "mail.castenow.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "mail.castenow.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "mail.castenow.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "mail.castenow.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "mail.castenow.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "mail.castenow.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "mail.castenow.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail2.castenow.de/robots.txt (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail2.castenow.de/sitemap.xml (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Nebenpfad",
+    "where": "ubb-wiki.castenow.de/robots.txt (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Nebenpfad",
+    "where": "ubb-wiki.castenow.de/sitemap.xml (Status 301)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "ubb-wiki.castenow.de/wp-sitemap.xml (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Fehlerseite",
+    "where": "ubb-wiki.castenow.de/wp-sitemap.xml (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Fehlerseite",
+    "where": "ubb-wiki.castenow.de/xmlrpc.php (Status 403)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "umfrage.castenow.de/robots.txt (Status 200)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "umfrage.castenow.de/sitemap.xml (Status 301)"
    },
    {
     "count": 1,
@@ -4636,7 +4852,7 @@
    "castenow.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 9,
   "generated_on": null,
   "generation": null,

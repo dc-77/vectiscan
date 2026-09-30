@@ -309,6 +309,46 @@
     "where": "umfrage.castenow.de/robots.txt (an Nebenpfaden robots.txt)"
    },
    {
+    "count": 8,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "„Server Leaks Version Information via \"Server\" HTTP Response Header Field“ (ZAP-Regel 10036) an Nebenpfaden, 8 Meldungen",
+    "where": "mail.castenow.de/robots.txt, mail.castenow.de/sitemap.xml, mail2.castenow.de/robots.txt, mail2.castenow.de/sitemap.xml, owa.castenow.de/robots.txt, owa.castenow.de/sitemap.xml und 2 weitere"
+   },
+   {
+    "count": 1,
+    "message": "CSP: Failure to Define Directive with No Fallback",
+    "note": "Content-Security-Policy lückenhaft; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10055",
+    "what": "„CSP: Failure to Define Directive with No Fallback“ (ZAP-Regel 10055) an Nebenpfaden, 1 Meldung",
+    "where": "mailstore.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
+    "note": "Zeitstempel in der Antwort; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10096",
+    "what": "„Timestamp Disclosure - Unix“ (ZAP-Regel 10096) an Nebenpfaden, 1 Meldung",
+    "where": "mailstore.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 3,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "„Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)“ (ZAP-Regel 10037) an Nebenpfaden, 3 Meldungen",
+    "where": "ubb-wiki.castenow.de/robots.txt, ubb-wiki.castenow.de/sitemap.xml, ubb-wiki.castenow.de/wp-sitemap.xml"
+   },
+   {
+    "count": 2,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "„Content Security Policy (CSP) Header Not Set“ (ZAP-Regel 10038) an Nebenpfaden, 2 Meldungen",
+    "where": "ubb-wiki.castenow.de/wp-sitemap.xml, ubb-wiki.castenow.de/xmlrpc.php"
+   },
+   {
     "count": 2,
     "message": "PHP",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
@@ -485,6 +525,126 @@
     "rule": "zap_uncovered#10021",
     "what": "X-Content-Type-Options Header Missing auf umfrage.castenow.de",
     "where": "umfrage.castenow.de/robots.txt (an Nebenpfaden robots.txt)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail2.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail2.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "CSP: Failure to Define Directive with No Fallback",
+    "note": "Content-Security-Policy lückenhaft; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10055",
+    "what": "Nebenpfad",
+    "where": "mailstore.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
+    "note": "Zeitstempel in der Antwort; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10096",
+    "what": "Nebenpfad",
+    "where": "mailstore.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "owa.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "owa.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Nebenpfad",
+    "where": "ubb-wiki.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Nebenpfad",
+    "where": "ubb-wiki.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Nebenpfad",
+    "where": "ubb-wiki.castenow.de/wp-sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Nebenpfad",
+    "where": "ubb-wiki.castenow.de/wp-sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Nebenpfad",
+    "where": "ubb-wiki.castenow.de/xmlrpc.php"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "umfrage.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "umfrage.castenow.de/sitemap.xml"
    },
    {
     "count": 1,
@@ -4483,7 +4643,7 @@
    "castenow.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 9,
   "generated_on": null,
   "generation": null,
