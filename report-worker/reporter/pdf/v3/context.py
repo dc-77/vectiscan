@@ -30,6 +30,10 @@ TOP_N_HAUPTTEIL = 15
 # halb leer (f77ccff2 Seite 11: 129 mm frei, Block 140 mm hoch).
 CAT_KEEP = 6
 
+# S7a (spec/11 N9): Plakette in der Technologietabelle nur fuer diese Staende; "aktuell" und
+# "unbekannt" stehen als Text, Zielversion, Luecken und Quelle im Hinweis.
+TECH_PILLS = ("veraltet", "LTS")
+
 # Dringlichkeitswort -> Rang. Aus derselben Tabelle wie die Reportdaten, damit eine
 # Umbenennung nicht an zwei Stellen gepflegt werden muss.
 _URGENCY_RANK: dict[str, int] = {
@@ -170,4 +174,5 @@ def build_context(data: ReportData | dict, *, variant: Variant,
         # die Dringlichkeiten der Befunde (S6, reporter/v3/levels.py).
         "stage_box": V3T.stage_box(),
         "cat_keep": CAT_KEEP,
+        "tech_pills": TECH_PILLS,
     }

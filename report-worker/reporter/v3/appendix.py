@@ -154,7 +154,8 @@ def build_appendix(facts: FS.Facts, output: CatalogOutput, findings: list[Findin
                    cve_refs: list[CveRef], tool_findings: list[ToolFinding],
                    tool_messages: list[ToolFinding] | None,
                    counts: N.Counts, scan_date: str, provider: str,
-                   port_refs: dict[tuple[str, int], list[Finding]] | None = None) -> Appendix:
+                   port_refs: dict[tuple[str, int], list[Finding]] | None = None,
+                   plan_stages: list[str] | None = None) -> Appendix:
     has_red = any(f.status == "rot" for f in findings)
     # S6 (spec/08 Punkt 9): Die Freischaltung der Scanner-Adresse wird nur
     # empfohlen, wenn eine Blockade belegt ist. Vorher stand der Satz in jedem
@@ -172,6 +173,6 @@ def build_appendix(facts: FS.Facts, output: CatalogOutput, findings: list[Findin
         tool_messages=list(tool_messages or []),
         dkim_selectors=C.dkim_selectors_for_appendix(facts, output),
         filtering=N.filtering(counts),
-        repeat=N.repeat(counts, has_red, has_gaps),
+        repeat=N.repeat(counts, has_red, has_gaps, plan_stages),
         disclaimer=N.disclaimer(scan_date, provider),
     )

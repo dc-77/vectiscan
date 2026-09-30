@@ -636,7 +636,7 @@
     "spf_missing"
    ],
    "evidence": "DNS-Abfragen · phase0/dns_records_vectiscan.de.json\nvectiscan.de · MX-Einträge: mx00.udag.de, mx01.udag.de · kein SPF-Eintrag",
-   "found": "Für die Domain vectiscan.de liegt kein SPF-Eintrag vor: vectiscan.de. Empfangende Mailserver können damit nicht prüfen, welche Server im Namen der Domain versenden dürfen.",
+   "found": "Für die Domain vectiscan.de liegt kein SPF-Eintrag vor. Empfangende Mailserver können damit nicht prüfen, welche Server im Namen der Domain versenden dürfen.",
    "id": "VS-2026-001",
    "impact": "Ohne SPF akzeptieren viele Empfangssysteme E-Mails im Namen der Domain unabhängig vom tatsächlich sendenden Server. Das erleichtert Absenderfälschung für Phishing- und Betrugsversuche gegenüber Kunden, Lieferanten und Mitarbeitenden.",
    "key": "mail_records/vectiscan.de/kunde",
@@ -678,7 +678,7 @@
       "vectiscan.de|vectiscan.de"
      ],
      "statement": "observation[0]",
-     "text": "Für die Domain vectiscan.de liegt kein SPF-Eintrag vor: vectiscan.de. Empfangende Mailserver können damit nicht prüfen, welche Server im Namen der Domain versenden dürfen."
+     "text": "Für die Domain vectiscan.de liegt kein SPF-Eintrag vor. Empfangende Mailserver können damit nicht prüfen, welche Server im Namen der Domain versenden dürfen."
     },
     {
      "check": "spf_missing",
@@ -1902,8 +1902,8 @@
  "landscape_lead": "8 Befunde in 3 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 19,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 8,
   "context_fields": [],
@@ -1930,7 +1930,7 @@
   ],
   "package": "WebCheck",
   "package_label": "WEBCHECK",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 2,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",

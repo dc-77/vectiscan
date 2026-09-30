@@ -2627,7 +2627,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check · hosts/217.243.248.29/phase2/headers_cloud.junkerwerk.de.json\ncloud.junkerwerk.de · Adresse: https://cloud.junkerwerk.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options",
-   "found": "Der Dienst cloud.junkerwerk.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: cloud.junkerwerk.de. Auf cloud.junkerwerk.de ist keine Content-Security-Policy gesetzt: cloud.junkerwerk.de. Auf cloud.junkerwerk.de fehlen einzelne Sicherheits-Header der Webseite: cloud.junkerwerk.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Der Dienst cloud.junkerwerk.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt. Auf cloud.junkerwerk.de ist keine Content-Security-Policy gesetzt. Auf cloud.junkerwerk.de fehlen einzelne Sicherheits-Header der Webseite: cloud.junkerwerk.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-009",
    "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/217.243.248.29/kunde",
@@ -2710,7 +2710,7 @@
       "cloud.junkerwerk.de@217.243.248.29|cloud.junkerwerk.de@217.243.248.29"
      ],
      "statement": "observation[0]",
-     "text": "Der Dienst cloud.junkerwerk.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: cloud.junkerwerk.de."
+     "text": "Der Dienst cloud.junkerwerk.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt."
     },
     {
      "check": "csp_missing",
@@ -2719,7 +2719,7 @@
       "cloud.junkerwerk.de@217.243.248.29|cloud.junkerwerk.de@217.243.248.29"
      ],
      "statement": "observation[0]",
-     "text": "Auf cloud.junkerwerk.de ist keine Content-Security-Policy gesetzt: cloud.junkerwerk.de."
+     "text": "Auf cloud.junkerwerk.de ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -4154,8 +4154,8 @@
  "landscape_lead": "16 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 41,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 16,
   "context_fields": [],
@@ -4182,7 +4182,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -4712,7 +4712,7 @@
       "junkerwerk.de"
      ],
      "statement": "positive.text",
-     "text": "Für die Domain junkerwerk.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+     "text": "Für die Domain junkerwerk.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht."
     },
     {
      "check": "dkim_missing",
@@ -4721,14 +4721,14 @@
       "junkerwerk.hu"
      ],
      "statement": "positive.text",
-     "text": "Für die Domain junkerwerk.hu (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+     "text": "Für die Domain junkerwerk.hu (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht."
     }
    ],
    "subjects": [
     "junkerwerk.de",
     "junkerwerk.hu"
    ],
-   "text": "Für die Domain junkerwerk.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht. Für die Domain junkerwerk.hu (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+   "text": "Für die Domain junkerwerk.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht. Für die Domain junkerwerk.hu (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht.",
    "title": "DKIM vorhanden"
   },
   {

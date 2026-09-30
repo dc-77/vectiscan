@@ -585,7 +585,9 @@ _EOL_STATUS = {
     # S6b-4n (spec/11 N9): die Plakette sagt nur "LTS"; Datum und Quelle stehen im Hinweis.
     "lts": ("LTS", "gruen"),
     "outdated": ("veraltet", "gelb"),
-    "insecure": ("unsicher", "rot"),
+    # S7a (spec/11 N9): Plakette nur "veraltet" oder "LTS"; ein Kern mit bekannten Luecken ist
+    # veraltet wie eine Erweiterung laut wpscan (gelb), die Luecken stehen im Hinweis.
+    "insecure": ("veraltet", "gelb"),
 }
 
 # S6b-4 (spec/11 T15): Slug und Anzeigename derselben Komponente in einer Zeile (DB: Slider
@@ -749,7 +751,7 @@ def _patch_status(facts: FS.Facts, gruppe: list[FS.SoftwareFact],
         if status == "outdated":
             return "outdated", "veraltet", "Kernversion laut wpscan"
         if status == "insecure":
-            return "insecure", "unsicher", "Kernversion laut wpscan"
+            return "insecure", "veraltet", "Kernversion mit bekannten Lücken laut wpscan"
     if sw.eol.status == "supported":
         if getattr(sw.eol, "lts_since", None) and sw.eol.date:
             quelle = str(sw.eol.source or "").split(",")[0].strip().replace(" LTS", "")

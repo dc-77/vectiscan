@@ -144,6 +144,20 @@ def exchange_evidence(facts: FS.Facts, host: FS.HostFact) -> list[str]:
     return out[:3]
 
 
+TITEL_MAX = 120
+
+
+def titelzitat(title: str) -> str:
+    """Seitentitel als Zitat (S7a, spec/10 R20 HE): bis 120 Zeichen vollstaendig, darueber an der
+    Wortgrenze gekuerzt mit Auslassungszeichen. Bis S7a schnitt ``title[:60]`` mitten im Titel ab
+    ("... Entsorgung in Wesseling" ohne "/ Bonn")."""
+    title = " ".join((title or "").split())
+    if len(title) <= TITEL_MAX:
+        return title
+    kurz = title[:TITEL_MAX].rsplit(" ", 1)[0].rstrip(" ,;:/-|")
+    return kurz + " …"
+
+
 def redirect_target(facts: FS.Facts, fq: FS.FqdnFact) -> Optional[str]:
     """Ziel einer Weiterleitung auf einen anderen Host, laut Inventar oder Weiterleitungspruefung
     (S6b-4n, spec/11 N4: heuel online endet im Inventar auf sich selbst, die Probe auf www)."""
@@ -262,12 +276,12 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
         if rolle == "anmeldeportal" and fq.name in wordpress:
             rolle = "redaktion"
         if rolle:
-            add(rolle, f"{fq.name}: Titel „{title[:60]}“")
+            add(rolle, f"{fq.name}: Titel „{titelzitat(title)}“")
             status = fq.http_status if isinstance(fq.http_status, int) else None
             fehlerseite.setdefault(rolle, []).append(status if status and status >= 400 else 0)
             continue
         if fq.http_status == 200 and title and not NOT_WEBSITE.search(title):
-            add("website", f"{fq.name}: Seite „{title[:60]}“")
+            add("website", f"{fq.name}: Seite „{titelzitat(title)}“")
     for sw in facts.software:
         if sw.host_ip == host.ip and sw.family in SOFTWARE_ROLES:
             add(SOFTWARE_ROLES[sw.family], f"{sw.product} ({', '.join(sw.detection_sources)})")
@@ -277,7 +291,7 @@ def host_roles(facts: FS.Facts, host: FS.HostFact) -> list[Role]:
             continue
         rolle = next((key for key, rx in TITLE_RULES if rx.search(s.fp_title)), None)
         if rolle:
-            add(rolle, f"Port {s.port}: Titel „{s.fp_title[:60]}“")
+            add(rolle, f"Port {s.port}: Titel „{titelzitat(s.fp_title)}“")
             fehlerseite.setdefault(rolle, []).append(0)
             details.setdefault(rolle, []).append(f"Port {s.port}")
     # Server-Rollen aus den Diensten. S6b-4n (spec/11 N4, N14): auf geteilten Systemen nur die

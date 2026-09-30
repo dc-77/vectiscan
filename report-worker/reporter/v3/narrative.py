@@ -379,13 +379,20 @@ def filtering(c: Counts) -> str:
     )
 
 
-def repeat(c: Counts, has_red: bool, has_gaps: bool) -> list[str]:
+def repeat(c: Counts, has_red: bool, has_gaps: bool, stages: list[str] | None = None) -> list[str]:
+    """Anhang E. S7a (spec/10 R20, HL): die Stufe im zweiten Satz nur, wenn der Plan sie hat;
+    ``stages`` sind die Prioritaeten der Planzeilen (ohne Angabe wie bisher In Kuerze)."""
     out: list[str] = []
     if has_red:
         out.append("Nachprüfung der Sofortmaßnahmen nach ihrer Umsetzung, gezielt auf die "
                    "betroffenen Dienste.")
-    out.append("Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, "
-               "spätestens in zwölf Monaten.")
+    vorhanden = set(stages) if stages is not None else {"In Kürze"}
+    stufe = next((s for s in ("In Kürze", "Mittelfristig") if s in vorhanden), None)
+    if stufe:
+        out.append(f"Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe {stufe}, "
+                   "spätestens in zwölf Monaten.")
+    else:
+        out.append("Wiederholung des Scans spätestens in zwölf Monaten.")
     out.append("Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei "
                "jedem Verdacht auf einen Vorfall.")
     if has_gaps:

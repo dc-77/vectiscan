@@ -3636,7 +3636,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check\nwww.securess.de · Adresse: https://www.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options\n\nheader_check\nftp.securess.de · Adresse: https://ftp.securess.de · Antwort: 301 (Weiterleitung) · weitergeleitet auf: https://www.securess.de/ · Strict-Transport-Security: nicht gesetzt\n\nheader_check\nsecuress.de · Adresse: https://securess.de · Antwort: 301 (Weiterleitung) · weitergeleitet auf: https://www.securess.de/ · Strict-Transport-Security: nicht gesetzt",
-   "found": "Der Dienst 85.22.47.41 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: ftp.securess.de, securess.de, www.securess.de. Auf www.securess.de ist keine Content-Security-Policy gesetzt: www.securess.de. Auf www.securess.de fehlen einzelne Sicherheits-Header der Webseite: www.securess.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Der Dienst 85.22.47.41 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: ftp.securess.de, securess.de, www.securess.de. Auf www.securess.de ist keine Content-Security-Policy gesetzt. Auf www.securess.de fehlen einzelne Sicherheits-Header der Webseite: www.securess.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-009",
    "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/85.22.47.41/kunde",
@@ -3732,7 +3732,7 @@
       "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
      ],
      "statement": "observation[0]",
-     "text": "Auf www.securess.de ist keine Content-Security-Policy gesetzt: www.securess.de."
+     "text": "Auf www.securess.de ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -4653,7 +4653,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check\nconnect.securess.de · Adresse: https://connect.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Frame-Options",
-   "found": "Auf connect.securess.de ist keine Content-Security-Policy gesetzt: connect.securess.de. Auf connect.securess.de fehlen einzelne Sicherheits-Header der Webseite: connect.securess.de (fehlend: X-Frame-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Auf connect.securess.de ist keine Content-Security-Policy gesetzt. Auf connect.securess.de fehlen einzelne Sicherheits-Header der Webseite: connect.securess.de (fehlend: X-Frame-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-016",
    "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/212.227.60.78/kunde",
@@ -4717,7 +4717,7 @@
       "connect.securess.de@212.227.60.78|connect.securess.de@212.227.60.78"
      ],
      "statement": "observation[0]",
-     "text": "Auf connect.securess.de ist keine Content-Security-Policy gesetzt: connect.securess.de."
+     "text": "Auf connect.securess.de ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -5436,8 +5436,8 @@
  "landscape_lead": "20 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 66,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 20,
   "context_fields": [],
@@ -5463,7 +5463,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -5931,13 +5931,13 @@
       "securess.de"
      ],
      "statement": "positive.text",
-     "text": "Für die Domain securess.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+     "text": "Für die Domain securess.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht."
     }
    ],
    "subjects": [
     "securess.de"
    ],
-   "text": "Für die Domain securess.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+   "text": "Für die Domain securess.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht.",
    "title": "DKIM vorhanden"
   },
   {

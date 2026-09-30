@@ -2037,7 +2037,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check · hosts/88.99.35.112/phase2/headers_dortmund-beach.com.json\ndortmund-beach.com · Adresse: https://dortmund-beach.com · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: max-age=0 · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options",
-   "found": "HSTS abgeschaltet: der Dienst dortmund-beach.com setzt den Header Strict-Transport-Security mit max-age=0 und hebt die Festlegung auf die verschlüsselte Verbindung damit auf: dortmund-beach.com. Auf dortmund-beach.com ist keine Content-Security-Policy gesetzt: dortmund-beach.com. Auf dortmund-beach.com fehlen einzelne Sicherheits-Header der Webseite: dortmund-beach.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "HSTS abgeschaltet: der Dienst dortmund-beach.com setzt den Header Strict-Transport-Security mit max-age=0 und hebt die Festlegung auf die verschlüsselte Verbindung damit auf. Auf dortmund-beach.com ist keine Content-Security-Policy gesetzt. Auf dortmund-beach.com fehlen einzelne Sicherheits-Header der Webseite: dortmund-beach.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-006",
    "impact": "Mit max-age=0 löscht der Browser eine bestehende Festlegung auf die verschlüsselte Verbindung; jeder spätere Aufruf über HTTP kann wieder unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/88.99.35.112/kunde",
@@ -2120,7 +2120,7 @@
       "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
      ],
      "statement": "observation[1]",
-     "text": "HSTS abgeschaltet: der Dienst dortmund-beach.com setzt den Header Strict-Transport-Security mit max-age=0 und hebt die Festlegung auf die verschlüsselte Verbindung damit auf: dortmund-beach.com."
+     "text": "HSTS abgeschaltet: der Dienst dortmund-beach.com setzt den Header Strict-Transport-Security mit max-age=0 und hebt die Festlegung auf die verschlüsselte Verbindung damit auf."
     },
     {
      "check": "csp_missing",
@@ -2129,7 +2129,7 @@
       "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
      ],
      "statement": "observation[0]",
-     "text": "Auf dortmund-beach.com ist keine Content-Security-Policy gesetzt: dortmund-beach.com."
+     "text": "Auf dortmund-beach.com ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -3334,7 +3334,7 @@
     "wordpress_xmlrpc_enabled"
    ],
    "evidence": "wpscan\ndortmund-beach.com · XML-RPC: https://dortmund-beach.com/xmlrpc.php · belegt durch: direkter Abruf der Adresse",
-   "found": "Auf dortmund-beach.com ist die XML-RPC-Schnittstelle von WordPress aus dem Internet erreichbar: dortmund-beach.com.",
+   "found": "Auf dortmund-beach.com ist die XML-RPC-Schnittstelle von WordPress aus dem Internet erreichbar.",
    "id": "VS-2026-015",
    "impact": "Über XML-RPC lassen sich viele Anmeldeversuche in einer einzigen Anfrage bündeln; Sperren gegen wiederholte Fehlversuche auf der Anmeldeseite greifen dort oft nicht. Zusammen mit bekannten Benutzernamen erleichtert das Rateangriffe auf Zugangsdaten.",
    "key": "wordpress_xmlrpc_enabled/scan/kunde",
@@ -3381,7 +3381,7 @@
       "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
      ],
      "statement": "observation[0]",
-     "text": "Auf dortmund-beach.com ist die XML-RPC-Schnittstelle von WordPress aus dem Internet erreichbar: dortmund-beach.com."
+     "text": "Auf dortmund-beach.com ist die XML-RPC-Schnittstelle von WordPress aus dem Internet erreichbar."
     },
     {
      "check": "wordpress_xmlrpc_enabled",
@@ -3502,8 +3502,8 @@
  "landscape_lead": "15 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 25,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 15,
   "context_fields": [],
@@ -3529,7 +3529,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",

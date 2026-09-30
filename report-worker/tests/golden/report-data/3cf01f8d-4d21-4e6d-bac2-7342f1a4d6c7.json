@@ -608,7 +608,7 @@
   "observed": [
    {
     "evidence": [
-     "www.huendgen-entsorgung.de: Seite „Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal“"
+     "www.huendgen-entsorgung.de: Seite „Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn“"
     ],
     "meaning": "Außendarstellung des Unternehmens. Betroffen wären vor allem Seiteninhalte und Formulareingaben.",
     "role_keys": [
@@ -1116,7 +1116,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check · hosts/80.90.145.166/phase2/headers_exchange.huendgen-entsorgung.de.json\nexchange.huendgen-entsorgung.de · Adresse: https://exchange.huendgen-entsorgung.de · Antwort: 302 · weitergeleitet auf: https://exchange.huendgen-entsorgung.de/owa/ · Strict-Transport-Security: nicht gesetzt\n\nWeiterleitungsprüfung · hosts/80.90.145.166/phase1/tech_profile.json\nexchange.huendgen-entsorgung.de · bewertet an der Endseite: https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0 · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options",
-   "found": "Der Dienst exchange.huendgen-entsorgung.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: exchange.huendgen-entsorgung.de. Auf exchange.huendgen-entsorgung.de ist keine Content-Security-Policy gesetzt: exchange.huendgen-entsorgung.de. Auf exchange.huendgen-entsorgung.de fehlen einzelne Sicherheits-Header der Webseite: exchange.huendgen-entsorgung.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Der Dienst exchange.huendgen-entsorgung.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt. Auf exchange.huendgen-entsorgung.de ist keine Content-Security-Policy gesetzt. Auf exchange.huendgen-entsorgung.de fehlen einzelne Sicherheits-Header der Webseite: exchange.huendgen-entsorgung.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-005",
    "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/80.90.145.166/kunde",
@@ -1198,7 +1198,7 @@
       "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
      ],
      "statement": "observation[0]",
-     "text": "Der Dienst exchange.huendgen-entsorgung.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: exchange.huendgen-entsorgung.de."
+     "text": "Der Dienst exchange.huendgen-entsorgung.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt."
     },
     {
      "check": "csp_missing",
@@ -1207,7 +1207,7 @@
       "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
      ],
      "statement": "observation[0]",
-     "text": "Auf exchange.huendgen-entsorgung.de ist keine Content-Security-Policy gesetzt: exchange.huendgen-entsorgung.de."
+     "text": "Auf exchange.huendgen-entsorgung.de ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -1896,7 +1896,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check · hosts/18.197.248.23/phase2/headers_www.huendgen-entsorgung.de.json\nwww.huendgen-entsorgung.de · Adresse: https://www.huendgen-entsorgung.de · Antwort: 200 · Content-Security-Policy: frame-ancestors 'self' · fehlende Header: Permissions-Policy, Referrer-Policy",
-   "found": "Auf www.huendgen-entsorgung.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src): www.huendgen-entsorgung.de. Auf www.huendgen-entsorgung.de fehlen einzelne Sicherheits-Header der Webseite: www.huendgen-entsorgung.de (fehlend: Referrer-Policy, Permissions-Policy).",
+   "found": "Auf www.huendgen-entsorgung.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src). Auf www.huendgen-entsorgung.de fehlen einzelne Sicherheits-Header der Webseite: www.huendgen-entsorgung.de (fehlend: Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-010",
    "impact": "Eine Richtlinie ohne Regel für Skriptquellen schränkt nicht ein, welche Skripte eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit die zweite Verteidigungslinie; der Schutz vor Einbettung in fremde Seiten bleibt davon unberührt. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/18.197.248.23/platform:eu-multiscreensite.com",
@@ -1959,7 +1959,7 @@
       "www.huendgen-entsorgung.de@18.197.248.23|www.huendgen-entsorgung.de@18.197.248.23"
      ],
      "statement": "observation[1]",
-     "text": "Auf www.huendgen-entsorgung.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src): www.huendgen-entsorgung.de."
+     "text": "Auf www.huendgen-entsorgung.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src)."
     },
     {
      "check": "security_headers_incomplete",
@@ -2435,8 +2435,8 @@
  "landscape_lead": "12 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 18,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 12,
   "context_fields": [],
@@ -2462,7 +2462,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -2899,13 +2899,13 @@
       "huendgen-entsorgung.de"
      ],
      "statement": "positive.text",
-     "text": "Für die Domain huendgen-entsorgung.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+     "text": "Für die Domain huendgen-entsorgung.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht."
     }
    ],
    "subjects": [
     "huendgen-entsorgung.de"
    ],
-   "text": "Für die Domain huendgen-entsorgung.de ist ein SPF-Eintrag veröffentlicht. Für die Domain huendgen-entsorgung.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+   "text": "Für die Domain huendgen-entsorgung.de ist ein SPF-Eintrag veröffentlicht. Für die Domain huendgen-entsorgung.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht.",
    "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
   },
   {

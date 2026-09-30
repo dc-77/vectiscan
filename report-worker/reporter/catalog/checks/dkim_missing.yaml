@@ -71,4 +71,4 @@ texts:
   positive:
     title: DKIM vorhanden
     text: >-
-      Für die Domain {passed} ist eine DKIM-Signatur veröffentlicht.
+      Für die Domain {passed} ist ein DKIM-Schlüssel veröffentlicht.

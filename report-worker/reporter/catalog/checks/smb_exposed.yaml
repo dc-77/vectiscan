@@ -52,8 +52,9 @@ texts:
     - stage: mittelfristig
       text: >-
         Fernzugriff auf Dateifreigaben ausschließlich über ein VPN zulassen.
+  # S7a (spec/11 Teil 5): keine festen Portnummern; ein Host kann nur 445 oder nur 139 anbieten.
   verify: >-
-    Portscan der Ports 139 und 445 von einer externen Adresse aus wiederholen; erwartet wird der
+    Portscan der genannten SMB-Ports von einer externen Adresse aus wiederholen; erwartet wird der
     Zustand gefiltert oder geschlossen.
   positive:
     title: Kein SMB-Dienst aus dem Internet erreichbar

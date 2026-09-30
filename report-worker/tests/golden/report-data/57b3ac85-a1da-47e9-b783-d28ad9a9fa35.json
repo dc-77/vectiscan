@@ -1517,8 +1517,8 @@
  "landscape_lead": "5 Befunde in 3 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 8,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 5,
   "context_fields": [],
@@ -1544,7 +1544,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1857,13 +1857,13 @@
       "lumbeck-wolter.de"
      ],
      "statement": "positive.text",
-     "text": "Für die Domain lumbeck-wolter.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+     "text": "Für die Domain lumbeck-wolter.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht."
     }
    ],
    "subjects": [
     "lumbeck-wolter.de"
    ],
-   "text": "Für die Domain lumbeck-wolter.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+   "text": "Für die Domain lumbeck-wolter.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht.",
    "title": "DKIM vorhanden"
   },
   {

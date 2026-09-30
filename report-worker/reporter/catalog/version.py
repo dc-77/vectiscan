@@ -130,13 +130,18 @@ Bump-Historie:
                   (`reputation_window`); neue Abdeckungsgruende `provider_block_after_portscan`,
                   `no_tls_on_port`, `tls_connect_refused`, `starttls_failed`, `incomplete`,
                   `whois_no_data`. Einstufungen der bestehenden Pruefungen unveraendert.
+    2026-09-29.2  S7a (Darstellung, spec/10 R20): Textkorrekturen ohne Aenderung von Bedingung
+                  oder Einstufung. `dkim_missing` Positivtext "DKIM-Schluessel veroeffentlicht"
+                  statt "DKIM-Signatur" (im DNS steht der oeffentliche Schluessel, die Signatur
+                  traegt jede einzelne Mail); `smb_exposed` Verifikation ohne feste Portnummern
+                  ("die genannten SMB-Ports"), weil ein Host nur 139 oder nur 445 anbieten kann.
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-29.1"
+CATALOG_VERSION = "2026-09-29.2"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"

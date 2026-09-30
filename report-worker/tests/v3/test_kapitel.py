@@ -105,8 +105,9 @@ def test_technik_status_und_farbe_passen_zusammen(data):
     # S6b-4 (spec/11 T11, T15): Langzeitpflege mit Quelle ist gruen, eine laut wpscan veraltete
     # Erweiterung gelb ("veraltet, 12 bekannte Lücken, aktuell 28.5.10"), ein unsicherer Kern rot.
     # S6b-4n (spec/11 N9): Plakette nur "veraltet" oder "LTS", Rest in der Hinweisspalte.
+    # S7a: ein Kern mit bekannten Luecken heisst "veraltet" (gelb), die Luecken stehen im Hinweis.
     erlaubt = {("aktuell", "gruen"), ("veraltet", "rot"), ("unbekannt", "grau"),
-               ("LTS", "gruen"), ("unsicher", "rot")}
+               ("LTS", "gruen")}
     for block in data.architecture.tech:
         for row in block.rows:
             ok = (row.status, row.st) in erlaubt or (row.st == "gelb" and row.status.startswith("veraltet"))

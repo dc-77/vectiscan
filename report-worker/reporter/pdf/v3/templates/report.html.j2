@@ -289,7 +289,8 @@ tr{break-inside:avoid;}
  <h4>{{ h.host }}</h4>
  <table style="margin-top:0.5mm;margin-bottom:2.5mm;font-size:8.2pt">
   <thead><tr><th style="width:40mm">Komponente</th><th style="width:30mm">Version</th><th style="width:36mm">Erkennung (Quelle, Konfidenz)</th><th style="width:26mm">Patch-Status</th><th style="width:36mm">Hinweis</th></tr></thead>
-  {% for r in h.rows %}<tr><td>{{ r.c }}</td><td class="mono">{{ r.v }}</td><td class="small">{{ r.src }}, {{ r.conf }}</td><td><span class="pill p-{{ r.st }}">{{ r.status }}</span></td><td class="small">{{ r.note }}</td></tr>{% endfor %}
+  {# S7a (spec/11 N9): Plakette nur fuer "veraltet" und "LTS"; Zielversion, Luecken und Quelle stehen im Hinweis. #}
+  {% for r in h.rows %}<tr><td>{{ r.c }}</td><td class="mono">{{ r.v }}</td><td class="small">{{ r.src }}, {{ r.conf }}</td><td>{% if r.status in tech_pills %}<span class="pill p-{{ r.st }}">{{ r.status }}</span>{% else %}<span class="small">{{ r.status }}</span>{% endif %}</td><td class="small">{{ r.note }}</td></tr>{% endfor %}
  </table>
  {% endfor %}
  <ul>{% for n in a.notes %}<li>{{ n }}</li>{% endfor %}</ul>

@@ -1820,7 +1820,7 @@
   "observed": [
    {
     "evidence": [
-     "www.castenow.de: Seite „CASTENOW │Agentur für Employer Branding & Markenführung | CA“",
+     "www.castenow.de: Seite „CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW“",
      "SPF-Eintrag von castenow.de: a"
     ],
     "meaning": "Außendarstellung des Unternehmens. Betroffen wären vor allem die Seiteninhalte.",
@@ -3987,7 +3987,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check · hosts/92.205.163.53/phase2/headers_ubb-wiki.castenow.de.json\nubb-wiki.castenow.de · Adresse: https://ubb-wiki.castenow.de · Antwort: 302 · weitergeleitet auf: https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F · bewertet an der Endseite: https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F · Antwort: 200 · Content-Security-Policy: frame-ancestors 'self'; · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options",
-   "found": "Auf ubb-wiki.castenow.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src): ubb-wiki.castenow.de. Auf ubb-wiki.castenow.de fehlen einzelne Sicherheits-Header der Webseite: ubb-wiki.castenow.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Auf ubb-wiki.castenow.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src). Auf ubb-wiki.castenow.de fehlen einzelne Sicherheits-Header der Webseite: ubb-wiki.castenow.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-015",
    "impact": "Eine Richtlinie ohne Regel für Skriptquellen schränkt nicht ein, welche Skripte eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit die zweite Verteidigungslinie; der Schutz vor Einbettung in fremde Seiten bleibt davon unberührt. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/92.205.163.53/kunde",
@@ -4051,7 +4051,7 @@
       "ubb-wiki.castenow.de@92.205.163.53|ubb-wiki.castenow.de@92.205.163.53"
      ],
      "statement": "observation[1]",
-     "text": "Auf ubb-wiki.castenow.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src): ubb-wiki.castenow.de."
+     "text": "Auf ubb-wiki.castenow.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src)."
     },
     {
      "check": "security_headers_incomplete",
@@ -4840,8 +4840,8 @@
  "landscape_lead": "20 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 45,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 20,
   "context_fields": [],
@@ -4867,7 +4867,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 9,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -5427,13 +5427,13 @@
       "castenow.de"
      ],
      "statement": "positive.text",
-     "text": "Für die Domain castenow.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+     "text": "Für die Domain castenow.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht."
     }
    ],
    "subjects": [
     "castenow.de"
    ],
-   "text": "Für die Domain castenow.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+   "text": "Für die Domain castenow.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht.",
    "title": "DKIM vorhanden"
   },
   {

@@ -249,7 +249,8 @@ def build_report_data(
         findings=finding_list,
         appendix=build_appendix(facts, output, finding_list, cve_refs, tool_findings, tool_messages,
                                 counts, scan_date, T.PROVIDER["provider"],
-                                port_refs=C.finding_ports(facts, finding_items, finding_list)),
+                                port_refs=C.finding_ports(facts, finding_items, finding_list),
+                                plan_stages=[row.prio for row in plan]),
     )
 
     if prose:

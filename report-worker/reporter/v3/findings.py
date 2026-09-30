@@ -405,6 +405,31 @@ class Rendered:
                           members=self.members, text=self.text)
 
 
+_SATZGRENZE = re.compile(r"(?<=\.)\s+(?=[A-ZÄÖÜ])")
+_NACH_DOPPELPUNKT = re.compile(r"^(?P<vor>.*\S):\s+(?P<nach>[^:()]+?)\.$", re.S)
+
+
+def ohne_doppelten_betroffenen(satz: str) -> str:
+    """S7a (spec/10 R20, HE und BS): "Auf ose.heuel.com ist keine Content-Security-Policy gesetzt:
+    ose.heuel.com." wiederholt den Betroffenen. Nennt die Liste nach dem letzten Doppelpunkt nur
+    Namen, die im Satz davor schon stehen, entfaellt sie; eine Liste mit Zusatzangaben in
+    Klammern ("mail.x.de (fehlend: ...)") bleibt. Eine Aussage aus mehreren Saetzen wird je Satz
+    geprueft ("... vor: vectiscan.de. Empfangende Mailserver ...")."""
+    saetze = _SATZGRENZE.split(satz)
+    if len(saetze) > 1:
+        return " ".join(ohne_doppelten_betroffenen(x) for x in saetze)
+    m = _NACH_DOPPELPUNKT.match(satz.strip())
+    if not m:
+        return satz
+    vor, nach = m.group("vor"), m.group("nach")
+    namen = [t.strip() for t in re.split(r",\s*|\s+und\s+", nach) if t.strip()]
+    if not namen or len(set(namen)) != len(namen):
+        return satz
+    if all(re.search(r"(?<![\w.-])" + re.escape(n) + r"(?![\w-]|\.\w)", vor) for n in namen):
+        return vor + "."
+    return satz
+
+
 def select_statements(hit: RuleHit, name: str, values: dict[str, Any],
                       where: str) -> list[Rendered]:
     """Die Aussagen eines Felds, deren Bedingung gilt, gerendert.
@@ -423,6 +448,8 @@ def select_statements(hit: RuleHit, name: str, values: dict[str, Any],
             betroffen = _clean_labels([m.label for _, m in gilt])
             werte = dict(values, affected=betroffen, count=len(betroffen))
         rendered = _render(text, werte, f"{where}.{hit.check.id}.{sid}")
+        if name in ("observation", "meaning"):
+            rendered = ohne_doppelten_betroffenen(rendered)
         stage = ""
         effect = ""
         if name == "recommendation":
