@@ -12,7 +12,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from reporter.v3.orthography import DASHES
 
@@ -26,7 +26,8 @@ SPARSE_SKIP = (1,)
 REQUIRED_FONTS = ("Inter", "DejaVu Sans Mono")
 
 _STYLE = re.compile(r"<style>.*?</style>", re.S)
-_EVIDENCE = re.compile(r'<div class="ev">.*?</div>', re.S)
+# S7a: ein langer Nachweis traegt zusaetzlich die Klasse "lang" (darf umbrechen).
+_EVIDENCE = re.compile(r'<div class="ev(?: lang)?">.*?</div>', re.S)
 _TAG = re.compile(r"<[^>]+>")
 
 
@@ -120,6 +121,13 @@ class Layout:
     overflow: tuple[str, ...] = ()
     # Nachtrag 3 (Entscheidung DC 25.09.): Ursache je halbleerer Seite, als Satz.
     sparse_causes: tuple[str, ...] = ()
+    # S7a Punkt 1 (spec/10 R20, spec/11 Teil 5): Ueberschrift mit Einleitung am Seitenende, waehrend
+    # Tabelle, Liste oder Bilder erst auf der Folgeseite stehen (3.4 bei HE und BS, Massnahmenplan
+    # bei JW); Kopf einer Befundkarte allein am Seitenfuss (CA VS-003, LW VS-001); Hebel nicht auf
+    # einer anderen Seite als ihre Ueberschrift (Hebel 2 und 3 allein oben auf Seite 3).
+    intro_pages: tuple[int, ...] = ()
+    card_head_pages: tuple[int, ...] = ()
+    lever_pages: tuple[int, ...] = ()
 
 
 # Bloecke, die in der Ursachenmeldung mit Namen stehen (Klasse im Template).
@@ -205,6 +213,25 @@ def _cause_safe(page_no: int, free_mm: float, next_page: Any, B: Any) -> str:
         return f"Seite {page_no}: {free_mm:.0f} mm frei, Ursache nicht bestimmbar"
 
 
+_UEBERSCHRIFTEN = ("h2", "h3", "h4")
+# Bloecke, die zu einer Ueberschrift gehoeren und nicht fuer sich stehen sollen.
+_FOLGEBLOECKE = ("table", "ul", "ol", "img")
+
+
+def _folgeblock_oben(page_box: Any, B: Any) -> bool:
+    """Beginnt die Seite mit Tabelle, Liste oder Bild (statt mit Fliesstext oder Ueberschrift)?"""
+    found = _first_line(page_box, [], B)
+    if found is None:
+        return False
+    line, ancestors = found
+    if isinstance(line, B.ReplacedBox):
+        return True
+    tags = [getattr(a, "element_tag", "") for a in ancestors]
+    if any(t in _UEBERSCHRIFTEN for t in tags):
+        return False
+    return any(t in _FOLGEBLOECKE or t in ("td", "th", "li") for t in tags)
+
+
 def layout_scan(document: Any) -> Layout | None:
     """Fuellhoehe je Seite, Kicker ohne Ueberschrift, Boxen ausserhalb des Satzspiegels."""
     try:
@@ -217,6 +244,13 @@ def layout_scan(document: Any) -> Layout | None:
         events: list[tuple[int, str, int]] = []
         heading_last: list[int] = []
         overflow: set[str] = set()
+        # S7a: je Seite, ob nach der letzten Ueberschrift nur Fliesstext folgte (Einleitung).
+        nur_einleitung: dict[int, bool] = {}
+        kopf_seite: Optional[int] = None
+        kopf_offen = False
+        karten_kopf: set[int] = set()
+        hebel_kopf: Optional[int] = None
+        hebel_seiten: set[int] = set()
         for index, page in enumerate(document.pages, start=1):
             page_box = page._page_box
             top = page_box.content_box_y()
@@ -225,16 +259,36 @@ def layout_scan(document: Any) -> Layout | None:
             bottom = top
             last_kind = ""
             seen: set[tuple[str, int]] = set()
+            nach_ueberschrift: Optional[bool] = None
             for child in page_box.children:
                 if isinstance(child, B.MarginBox):
                     continue
                 for box in child.descendants():
+                    tag = getattr(box, "element_tag", "")
                     if isinstance(box, (B.LineBox, B.ReplacedBox)):
                         bottom = max(bottom, box.position_y + box.margin_height())
                         last_kind = "text"
+                        if nach_ueberschrift is not None and tag not in _UEBERSCHRIFTEN:
+                            # Fliesstext (p) nach der Ueberschrift ist Einleitung; alles andere
+                            # (Tabellenzelle, Listenpunkt, Bild, Karte) ist Inhalt des Abschnitts.
+                            if isinstance(box, B.ReplacedBox) or tag not in ("p", "span", "b", "a"):
+                                nach_ueberschrift = False
                     element = getattr(box, "element", None)
-                    tag = getattr(box, "element_tag", "")
                     klassen = _classes(box)
+                    if tag in _UEBERSCHRIFTEN and isinstance(box, B.BlockBox):
+                        nach_ueberschrift = True
+                    if isinstance(box, B.BlockBox) and element is not None:
+                        if "hebel" in klassen and hebel_kopf is None:
+                            hebel_kopf = index
+                        if "lever" in klassen:
+                            hebel_seiten.add(index)
+                        if "hd" in klassen and ("hd", id(element)) not in seen:
+                            seen.add(("hd", id(element)))
+                            kopf_seite, kopf_offen = index, True
+                        if "lab" in klassen and kopf_offen and _snippet(element) == "Was wurde gefunden":
+                            if kopf_seite is not None and kopf_seite != index:
+                                karten_kopf.add(kopf_seite)
+                            kopf_offen = False
                     if element is not None and "kicker" in klassen and ("kicker", id(element)) not in seen:
                         seen.add(("kicker", id(element)))
                         events.append((index, "kicker", id(element)))
@@ -251,6 +305,8 @@ def layout_scan(document: Any) -> Layout | None:
             free_mm.append(max(0.0, height - (bottom - top)) * PX_MM)
             if last_kind == "heading":
                 heading_last.append(index)
+            elif nach_ueberschrift:
+                nur_einleitung[index] = True
         kicker_pages: list[int] = []
         for i, (page_no, kind, _) in enumerate(events):
             if kind != "kicker":
@@ -261,9 +317,16 @@ def layout_scan(document: Any) -> Layout | None:
         pages = document.pages
         causes = tuple(_cause_safe(p, free_mm[p - 1], pages[p], B)
                        for p in sparse_from_fill(tuple(fill)) if p < len(pages))
+        # S7a: Ueberschrift mit Einleitung am Seitenende, wenn die Folgeseite mit dem Inhalt des
+        # Abschnitts (Tabelle, Liste, Bild) beginnt.
+        intro = tuple(p for p in sorted(nur_einleitung)
+                      if p < len(pages) and _folgeblock_oben(pages[p]._page_box, B))
+        # Hebel getrennt von ihrer Ueberschrift (Hebel 2 und 3 allein oben auf Seite 3).
+        hebel = tuple(sorted(p for p in hebel_seiten if hebel_kopf is not None and p != hebel_kopf))
         return Layout(fill=tuple(fill), kicker_pages=tuple(kicker_pages),
                       heading_pages=tuple(heading_last), overflow=tuple(sorted(overflow)),
-                      sparse_causes=causes)
+                      sparse_causes=causes, intro_pages=intro,
+                      card_head_pages=tuple(sorted(karten_kopf)), lever_pages=hebel)
     except (AttributeError, TypeError):
         return None
 

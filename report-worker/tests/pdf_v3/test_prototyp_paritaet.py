@@ -85,6 +85,10 @@ ERLAUBT: tuple[tuple[str, str], ...] = (
     # vorkommende Farben und Gelb nach der Stufe der Gelb-Befunde.
     ("Rot = unverzüglich handeln", "S7a: Legende aus den Reportdaten"),
     ("Diese Seite nennt bewusst keine CVSS-Werte", "S7a: Legende aus den Reportdaten"),
+    # S7a (spec/10 R20): der Kopf eines langen Kategorieblocks steht als Tabellenkopf und wiederholt
+    # sich auf der Folgeseite; im Textauszug rueckt er deshalb in dieselbe Zeile wie die Eintraege.
+    ("Wirksame Schutzmaßnahmen GRÜN", "S7a: Kopf langer Kategorieblöcke als Tabellenkopf"),
+    ("Kat. A Kein direkt exponiertes RDP", "S7a: Kopf langer Kategorieblöcke als Tabellenkopf"),
 )
 
 

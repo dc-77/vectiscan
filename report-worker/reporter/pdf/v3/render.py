@@ -68,6 +68,10 @@ class RenderResult:
     layout_ok: bool = False
     # Nachtrag 3: Ursache je halbleerer Seite ("Seite 25: 120 mm frei, ...").
     sparse_causes: tuple[str, ...] = ()
+    # S7a Punkt 1: Einleitung ohne Inhalt, Befundkopf ohne Koerper, Hebel ausserhalb von Kapitel 1.
+    intro_pages: tuple[int, ...] = ()
+    card_head_pages: tuple[int, ...] = ()
+    lever_pages: tuple[int, ...] = ()
 
 
 # ----------------------------------------------------------------- Jinja-Filter
@@ -220,6 +224,12 @@ def render_report_v3(data: ReportData | dict, output_path: str | Path, *,
             warnings.append(f"außerhalb des Satzspiegels: {where}")
         for cause in layout.sparse_causes:
             warnings.append(f"halbleer {cause}")
+        for page in layout.intro_pages:
+            warnings.append(f"Überschrift mit Einleitung am Seitenende auf Seite {page}")
+        for page in layout.card_head_pages:
+            warnings.append(f"Kopf einer Befundkarte allein am Seitenfuß auf Seite {page}")
+        for page in layout.lever_pages:
+            warnings.append(f"Hebel getrennt von ihrer Überschrift auf Seite {page}")
 
     result = RenderResult(pdf_path=out, pages=len(document.pages),
                           words_per_page=words, sparse_pages=sparse,
@@ -229,7 +239,10 @@ def render_report_v3(data: ReportData | dict, output_path: str | Path, *,
                           heading_pages=layout.heading_pages if layout else (),
                           overflow=layout.overflow if layout else (),
                           layout_ok=layout is not None,
-                          sparse_causes=layout.sparse_causes if layout else ())
+                          sparse_causes=layout.sparse_causes if layout else (),
+                          intro_pages=layout.intro_pages if layout else (),
+                          card_head_pages=layout.card_head_pages if layout else (),
+                          lever_pages=layout.lever_pages if layout else ())
     log.info("pdf_v3_rendered", path=str(out), pages=result.pages,
              package=variant.key, defects=len(defects), warnings=len(warnings),
              sparse=list(sparse))

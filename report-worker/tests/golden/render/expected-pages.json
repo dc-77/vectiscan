@@ -1,58 +1,102 @@
 {
  "0bf16342-ed96-4b0e-a596-05aee3a62cb5": {
-  "pages": 33,
+  "pages": 34,
+  "shots": {
+   "pages": 34,
+   "sparse": []
+  },
   "sparse": []
  },
  "14272c00-1145-4675-9b4c-19ce2ead403b": {
   "pages": 30,
+  "shots": {
+   "pages": 31,
+   "sparse": []
+  },
   "sparse": []
  },
  "176db198-fa4a-4520-bf18-43cbc02a229d": {
   "pages": 23,
+  "shots": {
+   "pages": 23,
+   "sparse": []
+  },
   "sparse": []
  },
  "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52": {
-  "pages": 36,
+  "pages": 37,
+  "shots": {
+   "pages": 38,
+   "sparse": []
+  },
   "sparse": []
  },
  "1fbc92b9-34ab-414e-8843-a1f1e9f15431": {
   "pages": 30,
+  "shots": {
+   "pages": 31,
+   "sparse": []
+  },
   "sparse": []
  },
  "2572eebc-6135-40e6-b1d2-e9dfccc20ae6": {
   "pages": 33,
+  "shots": {
+   "pages": 33,
+   "sparse": []
+  },
   "sparse": []
  },
  "2d2d4f39-0816-46a0-ba96-4d36b248a86c": {
-  "pages": 47,
-  "sparse": [
-   30
-  ]
+  "pages": 46,
+  "shots": {
+   "pages": 47,
+   "sparse": []
+  },
+  "sparse": []
  },
  "2e56abe1-c1a6-442e-b36a-dc9f83c81da8": {
-  "pages": 25,
+  "pages": 24,
+  "shots": {
+   "pages": 24,
+   "sparse": []
+  },
   "sparse": []
  },
  "31d67a02-b485-4d05-b228-dbdde092cc68": {
   "pages": 31,
+  "shots": {
+   "pages": 32,
+   "sparse": []
+  },
   "sparse": []
  },
  "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7": {
-  "pages": 24,
+  "pages": 25,
+  "shots": {
+   "pages": 25,
+   "sparse": []
+  },
   "sparse": []
  },
  "4394b0b7-5dc6-4e01-b700-2a4052a7bd4a": {
-  "pages": 34,
-  "sparse": [
-   16
-  ]
+  "pages": 33,
+  "shots": {
+   "pages": 34,
+   "sparse": []
+  },
+  "sparse": []
  },
  "45bb234c-d556-4a80-9c78-3ce221ea28a6": {
-  "pages": 23,
+  "pages": 24,
   "sparse": []
  },
  "4e6b6883-a6c8-4204-8b13-b37f907322ca": {
   "pages": 48,
+  "shots": {
+   "pages": 49,
+   "sparse": []
+  },
   "sparse": []
  },
  "57b3ac85-a1da-47e9-b783-d28ad9a9fa35": {
@@ -61,22 +105,42 @@
  },
  "68d59573-7a93-4efa-89cc-e7b10cc4d140": {
   "pages": 28,
+  "shots": {
+   "pages": 29,
+   "sparse": []
+  },
   "sparse": []
  },
  "75338c97-6707-4d11-92bf-bb3cd2e02cde": {
   "pages": 18,
+  "shots": {
+   "pages": 18,
+   "sparse": []
+  },
   "sparse": []
  },
  "860d0d5a-1086-4958-a9ac-4650423095f2": {
   "pages": 31,
+  "shots": {
+   "pages": 32,
+   "sparse": []
+  },
   "sparse": []
  },
  "a6df9d9d-eccd-49d1-8dd3-b00a5e005108": {
   "pages": 22,
+  "shots": {
+   "pages": 23,
+   "sparse": []
+  },
   "sparse": []
  },
  "ae8d1d70-7925-4e3c-84de-3113f3e57b60": {
   "pages": 37,
+  "shots": {
+   "pages": 38,
+   "sparse": []
+  },
   "sparse": []
  },
  "c3d5724c-bdbf-4da8-982f-4f1a52210e28": {
@@ -84,23 +148,35 @@
   "sparse": []
  },
  "cd28d260-cf49-4d17-a980-64a4b1951444": {
-  "pages": 39,
-  "sparse": [
-   28
-  ]
+  "pages": 38,
+  "shots": {
+   "pages": 38,
+   "sparse": []
+  },
+  "sparse": []
  },
  "f77ccff2-fc7a-4488-a9ba-540a42a25056": {
-  "pages": 47,
-  "sparse": [
-   30
-  ]
+  "pages": 46,
+  "shots": {
+   "pages": 47,
+   "sparse": []
+  },
+  "sparse": []
  },
  "f9a2a2f6-a97f-47bf-9d7f-9afb3869f97c": {
   "pages": 34,
+  "shots": {
+   "pages": 34,
+   "sparse": []
+  },
   "sparse": []
  },
  "fb13a98f-22c6-4d17-875c-eeeb14643beb": {
   "pages": 27,
+  "shots": {
+   "pages": 28,
+   "sparse": []
+  },
   "sparse": []
  }
 }

@@ -83,16 +83,18 @@ tr{break-inside:avoid;}
 
 /* ---- Ampel ---- */
 .ampel{width:100%;border-collapse:collapse;margin:2mm 0 3.5mm;font-size:9pt;}
-.ampel td{border-bottom:0.5pt solid var(--line);padding:1.7mm 2mm 1.7mm 0;vertical-align:middle;}
+.ampel td{border-bottom:0.5pt solid var(--line);padding:1.2mm 2mm 1.2mm 0;vertical-align:middle;}
+/* S7a (spec/10 R20): Kapitel 1 auf einer Seite; die Notiz der Ampel etwas dichter. */
+.ampel td.small{font-size:8pt;line-height:1.32;}
 .ampel .name{font-weight:600;color:var(--navy);}
-.seg{display:inline-block;width:9mm;height:3.2mm;margin-right:1mm;background:var(--line);border-radius:1px;vertical-align:middle;}
+.seg{display:inline-block;width:5.5mm;height:3.2mm;margin-right:1mm;background:var(--line);border-radius:1px;vertical-align:middle;}
 .seg.on-rot{background:var(--rot);} .seg.on-gelb{background:var(--gelb);} .seg.on-blau{background:var(--blau);} .seg.on-gruen{background:var(--gruen);}
 .overall{display:flex;align-items:center;gap:5mm;background:var(--bg-dark);color:#fff;border-radius:3px;padding:3mm 4.5mm;margin:0 0 3mm;}
 .overall .lbl{font-size:7.5pt;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted2);}
 .overall .val{font-size:20pt;font-weight:700;letter-spacing:0.02em;line-height:1;}
 .overall .txt{font-size:8.9pt;color:#E2E8F0;line-height:1.4;flex:1;}
 .v-rot{color:#F87171;} .v-gelb{color:#FBBF24;} .v-blau{color:#60A5FA;} .v-gruen{color:#4ADE80;}
-.lever{border-left:2.2pt solid var(--cyan-line);background:var(--off2);padding:2.2mm 3.5mm 2mm;margin:0 0 2mm;break-inside:avoid;}
+.lever{border-left:2.2pt solid var(--cyan-line);background:var(--off2);padding:1.8mm 3.5mm 1.6mm;margin:0 0 1.6mm;break-inside:avoid;line-height:1.38;}
 .lever .n{font-size:8pt;font-weight:700;color:var(--cyan-deep);letter-spacing:0.1em;}
 .lever .ti{font-size:10.2pt;font-weight:600;color:var(--navy);margin:0.3mm 0 0.8mm;}
 .lever .ef{font-size:9pt;color:var(--body);} .lever .rf{font-size:7.8pt;color:var(--muted);margin-top:1mm;}
@@ -138,6 +140,7 @@ tr{break-inside:avoid;}
 .cat .h .nm{font-size:10pt;font-weight:600;color:var(--navy);flex:1;}
 .cat .h .ct{font-size:8pt;color:var(--muted);}
 .cat table{margin:0;} .cat td{padding:1.2mm 2mm 1.2mm 0;font-size:8.8pt;}
+.cat th.cath{padding:0;border-bottom:none;font-weight:inherit;color:inherit;font-size:inherit;}
 
 /* ---- Findings ---- */
 .fd{border:0.6pt solid var(--line2);border-radius:3px;margin:0 0 4mm;break-inside:auto;}
@@ -151,6 +154,12 @@ tr{break-inside:avoid;}
 .fd .bd{padding:2.5mm 4mm 1mm;}
 .fd .lab{font-size:7.2pt;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--cyan-deep);margin:1.8mm 0 0.6mm;break-after:avoid;}
 .ev{break-inside:avoid;}
+/* S7a (spec/10 R20): ein langer Nachweis darf umbrechen (dortmund-beach 4394b0b7 VS-005: 135 mm
+   Nachweis auf der Folgeseite, davor 138 mm leer); je Seite mindestens vier Zeilen. */
+.ev.lang{break-inside:auto;orphans:4;widows:4;}
+/* S7a (spec/11 Teil 5, CA VS-003, LW VS-001): der Kopf einer Befundkarte steht nie allein am
+   Seitenfuss, er bleibt mit dem Anfang von "Was wurde gefunden" zusammen. */
+.fd .kopf{break-inside:avoid;break-after:avoid;}
 .fd p{font-size:8.9pt;margin:0 0 3pt;}
 .ev{font-family:"DejaVu Sans Mono",monospace;font-size:7.3pt;line-height:1.35;background:var(--off);border-radius:2px;padding:1.6mm 2.5mm;white-space:pre-wrap;color:var(--ink);margin:0 0 1mm;}
 .rec{margin:0 0 1.5mm;} .rec .u{display:inline-block;min-width:24mm;font-weight:600;color:var(--navy);font-size:8.6pt;}
@@ -161,6 +170,11 @@ tr{break-inside:avoid;}
    duerfen nicht allein auf einer Seite landen. Ohne diese Regel entsteht bei
    datenreichen Auftraegen eine Seite mit 46 Woertern (Sparse-Pruefung). */
 .wrapup{margin-top:2mm;break-before:avoid;break-inside:avoid;}
+.hebel{break-inside:avoid;}
+/* S7a (spec/10 R20): eine Einleitung vor Tabelle oder Bildraster bleibt mit deren erster Zeile
+   zusammen; vorher standen Ueberschrift und Einleitung allein am Seitenende (3.4, Massnahmenplan,
+   Anhang B, Werkzeugmeldungen). */
+.intro{break-after:avoid;}
 
 /* ---- Appendix ---- */
 /* S6b-1 (spec/09 Teil 3): kein erzwungener Umbruch vor Anhang D bis F; der Block samt
@@ -202,12 +216,18 @@ tr{break-inside:avoid;}
  <div class="overall"><div><div class="lbl">Gesamtbewertung</div><div class="val v-{{ g.overall_status }}">{{ g.overall }}</div></div><div class="txt">{{ g.overall_text }}</div></div>
  <table class="ampel">
   {% for c in g.categories %}
-  <tr><td style="width:52mm" class="name"><span class="dot d-{{ c.status }}"></span>{{ c.name }}</td>
-      <td style="width:42mm">{% for i in range(4) %}<span class="seg {% if i < c.level %}on-{{ c.status }}{% endif %}"></span>{% endfor %}</td>
+  {# S7a (spec/10 R20): Balken schmaler, Notiz breiter; bei 58 mm brachen zwei Befundtitel in vier
+     bis sechs Zeilen um, und Kapitel 1 lief bei 22 von 24 Auftraegen auf Seite 3 ueber. #}
+  <tr><td style="width:46mm" class="name"><span class="dot d-{{ c.status }}"></span>{{ c.name }}</td>
+      <td style="width:28mm">{% for i in range(4) %}<span class="seg {% if i < c.level %}on-{{ c.status }}{% endif %}"></span>{% endfor %}</td>
       <td style="width:16mm"><span class="pill p-{{ c.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU','gruen':'GRÜN','grau':'OFFEN'}[c.status] }}</span></td>
-      <td class="small" style="color:#475569;width:58mm">{{ c.note }}</td></tr>
+      <td class="small" style="color:#475569;width:78mm">{{ c.note }}</td></tr>
   {% endfor %}
  </table>
+ {# S7a (spec/10 R20): Ueberschrift, Hebel und Abschlusszeile als ein Block. Passt er nicht mehr auf
+    Seite 2 (lange Prosa in der Gesamtbewertung), wandert er geschlossen auf Seite 3; nie stehen
+    Hebel 2 und 3 allein oben auf Seite 3. #}
+ <div class="hebel">
  <h3>Die drei wichtigsten Hebel</h3>
  {% for l in g.levers %}
  <div class="lever"><div class="n">HEBEL {{ l.n }}</div><div class="ti">{{ l.title }}</div><div class="ef">{{ l.effect|dot_br }}</div><div class="rf">Adressiert: {{ l.refs|join(', ') }}</div></div>
@@ -215,6 +235,7 @@ tr{break-inside:avoid;}
  <div class="wrapup">
  <p class="small">{{ distribution_line }}</p>{% if excluded_note %}<p class="small">{{ excluded_note }}</p>{% endif %}
  <p class="small" style="margin-top:2mm">{% if g.legend %}{{ g.legend }} {% endif %}Diese Seite nennt bewusst keine CVSS-Werte; Umsetzungsdetails ab Kapitel 5.</p>
+ </div>
  </div>
 </section>
 
@@ -229,7 +250,7 @@ tr{break-inside:avoid;}
  <p>{{ g.context }}</p>
  {% if g.coverage_warning %}<div class="box warn"><div class="t">Hinweis zur Abdeckung</div>{{ g.coverage_warning }}</div>{% endif %}
  <h3>Was der Scan über Ihr Unternehmen zeigt</h3>
- <p>{{ b.lead }}</p>
+ <p class="intro">{{ b.lead }}</p>
  <table>
   <thead><tr><th style="width:54mm">Beobachtetes System</th><th style="width:114mm">Bedeutung für das Risiko</th></tr></thead>
   {% for o in b.observed %}<tr><td><b>{{ o.system }}</b></td><td>{{ o.meaning }}</td></tr>{% endfor %}
@@ -312,7 +333,7 @@ tr{break-inside:avoid;}
  </table>
  {% if show_screens %}
  <h3>3.4 Gesichtete Web-Oberflächen</h3>
- <p>{{ a.screens_lead }}</p>
+ <p class="intro">{{ a.screens_lead }}</p>
  <table class="shots">
   {% for row in a.screens|batch(3) %}<tr>{% for sc in row %}<td><img src="vectiscan-screenshot:{{ sc.key or sc.file }}" alt="{{ sc.host }}"><div class="cap"><b>{{ sc.head or sc.host }}</b>{% for r in sc.redirects %}<br>{{ r }}{% endfor %}<br>{{ sc.what }}</div></td>{% endfor %}</tr>{% endfor %}
  </table>
@@ -321,20 +342,26 @@ tr{break-inside:avoid;}
 <!-- ===================== 4 BEFUND-LANDSCHAFT ===================== -->
  <div class="sec-head" style="margin-top:7mm"><div class="kicker">Kapitel 4 · Für die IT-Leitung</div><h2>Befund-Landschaft</h2></div>
  <p class="lead">{{ landscape_lead }}</p>
+ {# S7a (spec/10 R20): ein langer Kategorieblock bricht um; sein Kopf steht dann als Tabellenkopf
+    und wiederholt sich auf der Folgeseite. Kurze Bloecke bleiben ganz und brauchen das nicht. #}
  {% for c in g.categories %}
  {% set fs = findings|selectattr('cat','equalto',c.key)|list %}
- <div class="cat{% if fs|length > cat_keep %} lang{% endif %}"><div class="h"><span class="k">KATEGORIE {{ c.key }}</span><span class="nm">{{ c.name }}</span><span class="pill p-{{ c.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU','gruen':'GRÜN','grau':'OFFEN'}[c.status] }}</span><span class="ct">{{ fs|length }} Befund{{ 'e' if fs|length != 1 else '' }}</span></div>
-  <table><colgroup><col style="width:24mm"><col style="width:22mm"><col style="width:122mm"></colgroup>{% for f in fs %}<tr><td class="mono">{{ f.id }}</td><td><span class="pill p-{{ f.status }}">{{ f.urgency }}</span></td><td>{{ f.title }}</td></tr>{% endfor %}</table>
+ {% set lang = fs|length > cat_keep %}
+ {% set kopf %}<div class="h"><span class="k">KATEGORIE {{ c.key }}</span><span class="nm">{{ c.name }}</span><span class="pill p-{{ c.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU','gruen':'GRÜN','grau':'OFFEN'}[c.status] }}</span><span class="ct">{{ fs|length }} Befund{{ 'e' if fs|length != 1 else '' }}</span></div>{% endset %}
+ <div class="cat{% if lang %} lang{% endif %}">{% if not lang %}{{ kopf }}{% endif %}
+  <table><colgroup><col style="width:24mm"><col style="width:22mm"><col style="width:122mm"></colgroup>{% if lang %}<thead><tr><th colspan="3" class="cath">{{ kopf }}</th></tr></thead>{% endif %}{% for f in fs %}<tr><td class="mono">{{ f.id }}</td><td><span class="pill p-{{ f.status }}">{{ f.urgency }}</span></td><td>{{ f.title }}</td></tr>{% endfor %}</table>
  </div>
  {% endfor %}
- <div class="cat{% if positives|length > cat_keep %} lang{% endif %}"><div class="h"><span class="k">POSITIV</span><span class="nm">Wirksame Schutzmaßnahmen</span><span class="pill p-gruen">GRÜN</span><span class="ct">{{ positives|length }} {{ "Feststellung" if positives|length == 1 else "Feststellungen" }}</span></div>
-  <table><colgroup><col style="width:24mm"><col style="width:144mm"></colgroup>{% for p in positives %}<tr><td><span class="dot d-gruen"></span><span class="small">Kat. {{ p.cat }}</span></td><td><b>{{ p.title }}</b><br><span class="small">{{ p.text }}</span></td></tr>{% endfor %}</table>
+ {% set lang = positives|length > cat_keep %}
+ {% set kopf %}<div class="h"><span class="k">POSITIV</span><span class="nm">Wirksame Schutzmaßnahmen</span><span class="pill p-gruen">GRÜN</span><span class="ct">{{ positives|length }} {{ "Feststellung" if positives|length == 1 else "Feststellungen" }}</span></div>{% endset %}
+ <div class="cat{% if lang %} lang{% endif %}">{% if not lang %}{{ kopf }}{% endif %}
+  <table><colgroup><col style="width:24mm"><col style="width:144mm"></colgroup>{% if lang %}<thead><tr><th colspan="2" class="cath">{{ kopf }}</th></tr></thead>{% endif %}{% for p in positives %}<tr><td><span class="dot d-gruen"></span><span class="small">Kat. {{ p.cat }}</span></td><td><b>{{ p.title }}</b><br><span class="small">{{ p.text }}</span></td></tr>{% endfor %}</table>
  </div>
 </section>
 
 <!-- ===================== 5 MASSNAHMENPLAN ===================== -->
  <div class="sec-head" style="margin-top:6mm"><div class="kicker">Kapitel 5 · Für IT-Leitung und Umsetzung</div><h2>Maßnahmenplan</h2></div>
- <p class="lead">Priorisiert nach Dringlichkeit und Wirkung. Der Plan nennt bewusst keine Aufwände oder Kosten: Diese hängen von Umgebung, Verträgen und Dienstleistern ab und gehören in die Planung des Umsetzers. Die technischen Details je Maßnahme stehen im jeweiligen Befund in Kapitel 6.</p>
+ <p class="lead intro">Priorisiert nach Dringlichkeit und Wirkung. Der Plan nennt bewusst keine Aufwände oder Kosten: Diese hängen von Umgebung, Verträgen und Dienstleistern ab und gehören in die Planung des Umsetzers. Die technischen Details je Maßnahme stehen im jeweiligen Befund in Kapitel 6.</p>
  <table>
   <thead><tr><th style="width:22mm">Priorität</th><th style="width:84mm">Maßnahme</th><th style="width:26mm">Befunde</th><th style="width:36mm">Erwarteter Effekt</th></tr></thead>
   {% for p in plan %}<tr><td><span class="pill p-{{ p.st }}">{{ p.prio }}</span></td><td>{{ p.action }}</td><td class="mono" style="font-size:7.6pt">{% for r in p.refs %}{{ r }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td><td class="small">{{ p.effect|dot_br }}</td></tr>{% endfor %}
@@ -347,7 +374,7 @@ tr{break-inside:avoid;}
    ein gekappter Befund im Anhang dieselben Felder in derselben Form traegt. #}
 {% macro finding_block(f) -%}
  <div class="fd s-{{ f.status }}">
-  <div style="break-inside:avoid">
+  <div class="kopf">
   <div class="hd"><span class="id">{{ f.id }}</span><span class="ti">{{ f.title }}</span></div>
   <div class="meta"><span class="pill p-{{ f.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU'}[f.status] }}</span><span><b>{{ f.urgency }}</b></span><span>· Kategorie {{ f.cat }}</span>{% if f.operator %}<span class="pill p-grau">{{ f.operator }}</span>{% endif %}
    <span class="sc">{% if f.scale == 'exposure' %}Exposition: {{ f.level_label or f.level }}{% else %}Hygiene: {{ f.level_label or f.level }}{% endif %}</span></div>
@@ -357,7 +384,8 @@ tr{break-inside:avoid;}
   </div></div>
   <div class="bd" style="padding-top:0">
    <div class="lab">Was wurde gefunden</div><p>{{ f.found }}</p>
-   <div class="lab">Nachweis</div><div class="ev">{{ f.evidence }}</div>
+   {% set ev_zeilen = (f.evidence.splitlines()|length) + (f.evidence|length) // 100 %}
+   <div class="lab">Nachweis</div><div class="ev{% if ev_zeilen > 12 %} lang{% endif %}">{{ f.evidence }}</div>
    {% if f.threat %}<div class="lab">Threat Intelligence</div><p>{% for c in f.threat.cves %}{{ c }}{% if not loop.last %}; {% endif %}{% endfor %}{% if f.threat.kev %} · CISA KEV: {{ f.threat.kev }}{% endif %}{% if f.threat.note %} · {{ f.threat.note }}{% endif %}</p>{% endif %}
    <div class="lab">Auswirkung</div><p>{{ f.impact }}</p>
    <div class="lab">Empfehlung</div><div class="rec">{% for u,t in f.recommendation %}<div><span class="u">{{ u }}:</span> {{ t }}</div>{% endfor %}</div>
@@ -378,8 +406,11 @@ tr{break-inside:avoid;}
 
 {% if findings_more %}
 <!-- ============== ANHANG ZU KAPITEL 6: WEITERE SACHVERHALTE ============== -->
-<section class="sec">
- <div class="sec-head"><div class="kicker">{{ txt.MORE_KICKER }}</div><h2>{{ txt.MORE_TITLE }}</h2></div>
+{# S7a (spec/10 R20): kein erzwungener Seitenwechsel; er liess die letzte Seite von Kapitel 6 bei
+   castenow f77ccff2 und 2d2d4f39 zu zwei Dritteln leer. Die Befundkarten halten ihren Kopf selbst
+   zusammen, der Anhang fliesst wie Kapitel 2 bis 5 an. #}
+<section>
+ <div class="sec-head" style="margin-top:7mm"><div class="kicker">{{ txt.MORE_KICKER }}</div><h2>{{ txt.MORE_TITLE }}</h2></div>
  <p class="lead">{{ txt.MORE_LEAD }}</p>
  {% for f in findings_more %}{{ finding_block(f) }}{% endfor %}
 </section>
@@ -392,7 +423,7 @@ tr{break-inside:avoid;}
  {% for t in ap.triage %}<tr><td><span class="pill p-{{ t.st }}">{{ t.l }}</span></td><td>{{ t.t }}</td></tr>{% endfor %}</table>
  {% if ap.overall_rule %}<p>{{ ap.overall_rule }}</p>{% endif %}
  <h3>A.2 Eigene Einstufung: Exposition und Hygiene</h3>
- <p>Der Bericht vergibt keine eigenen CVSS-Werte. Erreichbare Dienste werden nach Exposition eingestuft, Konfigurations- und Best-Practice-Abweichungen nach der VectiScan-Hygiene-Skala. Ein CVSS-Basiswert erscheint nur dort, wo eine Fremdbewertung zu einer zitierten CVE vorliegt (A.3); fehlt er, stammt die Schwachstellennummer aus dem Prüfwerkzeug und die Einstufung aus dem zugehörigen Befund.</p>
+ <p class="intro">Der Bericht vergibt keine eigenen CVSS-Werte. Erreichbare Dienste werden nach Exposition eingestuft, Konfigurations- und Best-Practice-Abweichungen nach der VectiScan-Hygiene-Skala. Ein CVSS-Basiswert erscheint nur dort, wo eine Fremdbewertung zu einer zitierten CVE vorliegt (A.3); fehlt er, stammt die Schwachstellennummer aus dem Prüfwerkzeug und die Einstufung aus dem zugehörigen Befund.</p>
  <table><thead><tr><th style="width:18mm">Stufe</th><th style="width:150mm">Exposition</th></tr></thead>
  {% for h in ap.exposure_scale %}<tr><td><b>{{ h.l }}</b></td><td>{{ h.t }}</td></tr>{% endfor %}</table>
  <table><thead><tr><th style="width:18mm">Stufe</th><th style="width:150mm">Hygiene</th></tr></thead>
@@ -408,7 +439,7 @@ tr{break-inside:avoid;}
  {% endif %}
  {% if show_inventory %}
  <div class="sec-head" style="margin-top:6mm"><div class="kicker">Anhang {{ ltr.inventory }}</div><h2>Service-Inventar</h2></div>
- <p>Alle erkannten Dienste je Host, als Nachschlagewerk für den Maßnahmenplan. Einträge aus Passivquellen sind gekennzeichnet.</p>
+ <p class="intro">Alle erkannten Dienste je Host, als Nachschlagewerk für den Maßnahmenplan. Einträge aus Passivquellen sind gekennzeichnet.</p>
  <table><thead><tr><th style="width:36mm">Host</th><th style="width:14mm">Port</th><th style="width:82mm">Dienst</th><th style="width:36mm">Befund</th></tr></thead>
  {% for r in ap.inventory %}<tr><td class="mono wrap"><span class="ip">{{ r.host }}</span>{% if r.operator %}<br><span class="small">{{ r.operator }}</span>{% endif %}</td><td class="mono">{{ r.port }}</td><td>{{ r.svc }}</td><td class="mono" style="font-size:7.6pt">{{ r.ref }}</td></tr>{% endfor %}</table>
  {% endif %}
@@ -422,7 +453,7 @@ tr{break-inside:avoid;}
  {% endif %}
  {% if show_tool_findings %}
  <h4>{{ txt.TOOL_FINDINGS_TITLE }}</h4>
- <p class="small">{{ txt.TOOL_FINDINGS_LEAD }}</p>
+ <p class="small intro">{{ txt.TOOL_FINDINGS_LEAD }}</p>
  <table style="table-layout:fixed"><thead><tr><th style="width:66mm">Meldung</th><th style="width:52mm">Betrifft</th><th style="width:50mm">Hinweis</th></tr></thead>
  {% for t in ap.tool_findings %}<tr><td style="overflow-wrap:anywhere">{{ t.what }}</td><td class="small" style="overflow-wrap:anywhere">{{ t.where }}</td><td class="small" style="overflow-wrap:anywhere">{{ t.note }}</td></tr>{% endfor %}</table>
  {% endif %}

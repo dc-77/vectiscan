@@ -104,6 +104,13 @@ def pruefe(order_id: str, result, soll: dict | None) -> list[str]:
         fehler.append(f"{order_id[:8]} Layoutpruefung nicht verfuegbar")
     fehler += [f"{order_id[:8]} Kicker ohne Überschrift auf Seite {p}" for p in result.kicker_pages]
     fehler += [f"{order_id[:8]} außerhalb des Satzspiegels: {w}" for w in result.overflow]
+    # S7a Punkt 1 (spec/10 R20): dieselbe Strenge fuer die neuen Umbruchfaelle.
+    fehler += [f"{order_id[:8]} Überschrift mit Einleitung am Seitenende auf Seite {p}"
+               for p in result.intro_pages]
+    fehler += [f"{order_id[:8]} Kopf einer Befundkarte allein am Seitenfuß auf Seite {p}"
+               for p in result.card_head_pages]
+    fehler += [f"{order_id[:8]} Hebel getrennt von ihrer Überschrift auf Seite {p}"
+               for p in result.lever_pages]
     if order_id == REFERENZ_ORDER and result.sparse_pages:
         fehler.append(f"{order_id[:8]} halbleere Seiten {list(result.sparse_pages)} "
                       "im Referenzauftrag")
@@ -220,26 +227,42 @@ def _selftest() -> int:
     return 1 if fehler else 0
 
 
+def mit_bildern(data) -> bool:
+    """Hat der Bericht Bildnachweise (Kapitel 3.4)? Nur dann gibt es eine zweite Erwartung."""
+    return bool(getattr(data.architecture, "screens", None))
+
+
 def _update_pages() -> int:
     """Seitenzahlen und bekannte halbleere Seiten festschreiben.
 
     Laeuft ueber alle Golden-Auftraege, nicht nur die drei des Selbsttests: die Datei
-    ist der Erwartungswert fuer tests/pdf_v3/test_pdf.py.
+    ist der Erwartungswert fuer tests/pdf_v3/test_pdf.py. S7a: Auftraege mit Bildnachweisen
+    bekommen einen zweiten Eintrag ``shots`` mit Platzhalterbildern (Kapitel 3.4 wie im echten
+    Bericht).
     """
     from reporter.pdf.v3 import render_report_v3
+    from reporter.pdf.v3.screenshots import placeholder_screenshots
     from reporter.v3.golden import order_ids
 
     SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
     werte: dict[str, dict] = {}
     with tempfile.TemporaryDirectory() as tmp:
         for order_id in order_ids():
-            result = render_report_v3(_golden_data(order_id), Path(tmp) / "x.pdf")
+            data = _golden_data(order_id)
+            result = render_report_v3(data, Path(tmp) / "x.pdf")
             werte[order_id] = {"pages": result.pages,
                                "sparse": list(result.sparse_pages)}
             print(f"{order_id[:8]} -> {result.pages} Seiten, "
                   f"halbleer {list(result.sparse_pages)}")
             for cause in result.sparse_causes:
                 print(f"{order_id[:8]}    {cause}")
+            if mit_bildern(data):
+                bilder = render_report_v3(data, Path(tmp) / "y.pdf", resolver=placeholder_screenshots)
+                werte[order_id]["shots"] = {"pages": bilder.pages, "sparse": list(bilder.sparse_pages)}
+                print(f"{order_id[:8]} -> mit Bildern {bilder.pages} Seiten, "
+                      f"halbleer {list(bilder.sparse_pages)}")
+                for cause in bilder.sparse_causes:
+                    print(f"{order_id[:8]}    mit Bildern: {cause}")
     PAGES_FILE.write_text(json.dumps(werte, indent=1, sort_keys=True) + "\n",
                           encoding="utf-8")
     print(f"geschrieben {PAGES_FILE}", file=sys.stderr)
