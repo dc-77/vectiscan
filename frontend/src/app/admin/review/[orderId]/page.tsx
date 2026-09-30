@@ -11,7 +11,7 @@ import {
 import { useOrderProgress } from '@/lib/websocket';
 import TargetReviewCard from '@/components/TargetReviewCard';
 import ScanAuthorizationUpload from '@/components/ScanAuthorizationUpload';
-import ReportDefectsPanel from '@/components/admin/ReportDefectsPanel';
+import ReportDefectsPanel, { DeadlineHints } from '@/components/admin/ReportDefectsPanel';
 import UnprocessedPanel from '@/components/admin/UnprocessedPanel';
 import CustomerContextForm from '@/components/admin/CustomerContextForm';
 
@@ -204,6 +204,10 @@ export default function AdminReviewOrderPage() {
             {error}
           </div>
         )}
+
+        {/* S7a Punkt 8 (E27): Fristen, die bei einer Freigabe heute anders ausfielen; ueber den
+            Reitern, weil die Freigabe nicht im Reiter Defekte passiert. */}
+        <DeadlineHints hints={report?.deadlineHints ?? []} />
 
         {/* Reiter */}
         <div className="flex border-b border-gray-800 overflow-x-auto">

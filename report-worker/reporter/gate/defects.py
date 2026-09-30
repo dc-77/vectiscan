@@ -157,4 +157,16 @@ def payload(defects: Sequence[Defect], *, engine: str, level: str,
             "warnings": len(warnings),
             "unprocessed": sum(int(u.get("count", 1) or 1) for u in unprocessed),
         },
+        # S7a Punkt 8 (E27): Fristen nahe einer Schwelle, damit die API sie fuer den Freigabetag
+        # nachrechnen kann (``api/src/lib/fristen.ts``).
+        **_fristen(facts),
     }
+
+
+def _fristen(facts: Any) -> dict[str, Any]:
+    # Nur mit einem Faktenmodell; Tests und Altpfade reichen teils nur die Beobachtungen durch.
+    if facts is None or not all(hasattr(facts, a) for a in ("scan", "tls", "services", "hosts", "targets")):
+        return {}
+    from reporter.gate import fristen as FR
+
+    return FR.nutzlast(facts)

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ConfirmDialog } from '@/components/ds';
-import { requeueReport, type ReviewReport } from '@/lib/api';
+import { requeueReport, type DeadlineHint, type ReviewReport } from '@/lib/api';
 
 // S5: Defektliste des letzten Berichtslaufs.
 //
@@ -23,7 +23,60 @@ const CHECK_LABELS: Record<string, string> = {
   unprocessed_ueber_schwelle: 'Viele Beobachtungen ohne Regel',
   auftraggeber_fehlt: 'Auftraggeber fehlt',
   render: 'Darstellung',
+  // S7a: Klartext auch fuer die Hinweise, die bisher mit ihrem technischen Namen standen.
+  frist_vor_berichtsdatum: 'Frist vor dem Berichtsdatum',
+  fristregel_am_berichtsdatum: 'Frist am Berichtsdatum',
+  messadresse_ausserhalb_inventar: 'Messung an anderer Adresse',
+  firmenname_nicht_bestaetigt: 'Firmenname nicht bestätigt',
+  werkzeugfehler_im_kundentext: 'Werkzeugfehler im Kundentext',
 };
+
+// S7a Punkt 8 (E27): Klartext der Fristregeln fuer die Hinweise zum Freigabetag.
+const FRIST_LABELS: Record<string, string> = {
+  cert_expired: 'Zertifikat abgelaufen',
+  service_cert_expired: 'Zertifikat am Dienst abgelaufen',
+  cert_expiring_sofort: 'Zertifikat läuft in höchstens 7 Tagen ab',
+  cert_expiring: 'Zertifikat läuft in höchstens 14 Tagen ab',
+  cert_expiring_later: 'Zertifikat läuft in höchstens 30 Tagen ab',
+  domain_expiring: 'Domain läuft in höchstens 30 Tagen ab',
+};
+
+function fristRegel(regel: string | null): string {
+  return regel ? (FRIST_LABELS[regel] || regel) : 'keine Fristregel';
+}
+
+function tage(n: number): string {
+  return n === 1 || n === -1 ? `${n} Tag` : `${n} Tage`;
+}
+
+function datumDe(iso: string): string {
+  const [j, m, t] = iso.split('-');
+  return j && m && t ? `${t}.${m}.${j}` : iso;
+}
+
+export function DeadlineHints({ hints }: { hints: DeadlineHint[] }) {
+  if (hints.length === 0) return null;
+  return (
+    <div className="bg-amber-400/5 border border-amber-400/30 rounded-lg px-4 py-3 text-xs text-slate-300 space-y-2"
+         data-testid="deadline-hints">
+      <div className="text-amber-300 font-medium">
+        Fristen zum Freigabetag {datumDe(hints[0].freigabetag)}
+      </div>
+      <p className="text-slate-400">
+        Bei einer Freigabe heute fiele eine Fristregel anders aus als am Scantag. Stufe und
+        Regelauslösung bleiben am Scantag; den Stand beim Kunden vor der Freigabe prüfen.
+      </p>
+      <ul className="space-y-1">
+        {hints.map(h => (
+          <li key={`${h.subjekt}-${h.gueltigBis}`}>
+            <span className="font-mono text-white">{h.subjekt}</span> (gültig bis {datumDe(h.gueltigBis)}):
+            am Scantag {tage(h.tageScantag)}, {fristRegel(h.regelScantag)}; heute {tage(h.tageFreigabe)}, {fristRegel(h.regelFreigabe)}.
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export default function ReportDefectsPanel({
   orderId, report, onChanged,
