@@ -1031,8 +1031,10 @@
    {
     "also": [],
     "file": "88.99.35.112__dortmund-beach.com.png",
+    "head": "",
     "host": "dortmund-beach.com",
     "key": "1fbc92b9-34ab-414e-8843-a1f1e9f15431/88.99.35.112__dortmund-beach.com.png",
+    "redirects": [],
     "what": "Dortmund Beach Design | Webdesign | Corporate Design"
    }
   ],
@@ -3497,7 +3499,7 @@
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "15 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {

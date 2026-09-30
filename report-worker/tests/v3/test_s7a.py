@@ -31,6 +31,51 @@ def test_anhang_c_castenow_nebenpfade_mit_pfad_und_status():
 
 HE = "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7"
 KRAUSE = "fb13a98f-22c6-4d17-875c-eeeb14643beb"
+CA_0923 = "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52"
+JW_0928 = "f9a2a2f6-a97f-47bf-9d7f-9afb3869f97c"
+JW_0923 = "31d67a02-b485-4d05-b228-dbdde092cc68"
+HL = "2e56abe1-c1a6-442e-b36a-dc9f83c81da8"
+
+
+# ---------------------------------------------------------------- Punkt 2: Bilder
+
+def _bilder(order_id: str) -> dict:
+    return {s.host: s for s in data_for(order_id).architecture.screens}
+
+
+def test_drei_owa_fotos_bei_castenow_werden_eins():
+    owa = [s for s in _bilder(CA_0923).values() if "Anmeldeseite" in s.head]
+    assert len(owa) == 1
+    assert owa[0].head == "mail, mail2 und owa zeigen dieselbe Anmeldeseite"
+    assert owa[0].what == "Outlook (/owa/auth/logon.aspx)"
+    assert _bilder(CA)["mail.castenow.de"].head == "mail und mail2 zeigen dieselbe Anmeldeseite"
+
+
+def test_owa_fotos_bei_junkerwerk_werden_eins():
+    assert _bilder(JW_0928)["mail.junkerwerk.de"].head == (
+        "autodiscover, mail und outlook zeigen dieselbe Anmeldeseite")
+    assert _bilder(JW_0923)["outlook.junkerwerk.de"].head == (
+        "autodiscover und outlook zeigen dieselbe Anmeldeseite")
+
+
+def test_weiterleitung_steht_in_der_unterschrift_der_endadresse():
+    bilder = _bilder(HL)
+    # S6b-4n (N4) bleibt: das Bild gehoert dem Host, der antwortet; online bekommt kein eigenes Bild.
+    assert set(bilder) == {"edi.heuel.com", "ose.heuel.com", "www.heuel.com"}
+    assert bilder["www.heuel.com"].redirects == ["online.heuel.com, weitergeleitet auf www.heuel.com"]
+    assert bilder["ose.heuel.com"].redirects == ["webportal.heuel.com, weitergeleitet auf ose.heuel.com"]
+    for order_id in (CA, CA_0923):
+        assert _bilder(order_id)["www.castenow.de"].redirects == [
+            "umfrage.castenow.de, weitergeleitet auf www.castenow.de"]
+
+
+@pytest.mark.parametrize("order_id", order_ids())
+def test_jeder_name_und_jedes_bild_einmal(order_id):
+    screens = data_for(order_id).architecture.screens
+    assert len({s.file for s in screens}) == len(screens)
+    namen = [n for s in screens for n in [s.host, *s.also]]
+    namen += [r.split(",", 1)[0] for s in screens for r in s.redirects]
+    assert len(namen) == len(set(namen)), namen
 
 
 # ---------------------------------------------------------------- Punkt 3: Wortlaut

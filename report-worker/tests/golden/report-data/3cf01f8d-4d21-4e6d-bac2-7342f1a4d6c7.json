@@ -445,15 +445,19 @@
    {
     "also": [],
     "file": "80.90.145.166__exchange.huendgen-entsorgung.de.png",
+    "head": "",
     "host": "exchange.huendgen-entsorgung.de",
     "key": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/80.90.145.166__exchange.huendgen-entsorgung.de.png",
+    "redirects": [],
     "what": "Outlook (exchange.huendgen-entsorgung.de/owa/auth/logon.aspx)"
    },
    {
     "also": [],
     "file": "18.197.248.23__www.huendgen-entsorgung.de.png",
+    "head": "",
     "host": "www.huendgen-entsorgung.de",
     "key": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/18.197.248.23__www.huendgen-entsorgung.de.png",
+    "redirects": [],
     "what": "Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn"
    }
   ],
@@ -2430,7 +2434,7 @@
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
-  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "12 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {

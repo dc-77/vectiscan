@@ -312,7 +312,7 @@ tr{break-inside:avoid;}
  <h3>3.4 Gesichtete Web-Oberflächen</h3>
  <p>{{ a.screens_lead }}</p>
  <table class="shots">
-  {% for row in a.screens|batch(3) %}<tr>{% for sc in row %}<td><img src="vectiscan-screenshot:{{ sc.key or sc.file }}" alt="{{ sc.host }}"><div class="cap"><b>{{ sc.host }}</b>{% if sc.also %} <span>(auch {{ sc.also|join(', ') }})</span>{% endif %}<br>{{ sc.what }}</div></td>{% endfor %}</tr>{% endfor %}
+  {% for row in a.screens|batch(3) %}<tr>{% for sc in row %}<td><img src="vectiscan-screenshot:{{ sc.key or sc.file }}" alt="{{ sc.host }}"><div class="cap"><b>{{ sc.head or sc.host }}</b>{% for r in sc.redirects %}<br>{{ r }}{% endfor %}<br>{{ sc.what }}</div></td>{% endfor %}</tr>{% endfor %}
  </table>
  {% endif %}
 

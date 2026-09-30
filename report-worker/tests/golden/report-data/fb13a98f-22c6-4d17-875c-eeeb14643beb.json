@@ -703,71 +703,91 @@
    {
     "also": [],
     "file": "87.79.190.79__filebrowser.krause-computer.de.png",
+    "head": "",
     "host": "filebrowser.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__filebrowser.krause-computer.de.png",
+    "redirects": [],
     "what": "Login - File Browser (filebrowser.krause-computer.de/login)"
    },
    {
     "also": [],
     "file": "37.114.55.171__jitsi.krause-computer.de.png",
+    "head": "",
     "host": "jitsi.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__jitsi.krause-computer.de.png",
+    "redirects": [],
     "what": "Jitsi Meet"
    },
    {
     "also": [],
     "file": "85.13.167.158__krause-computer.de.png",
+    "head": "",
     "host": "krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/85.13.167.158__krause-computer.de.png",
+    "redirects": [],
     "what": "Computer-Service Krause · Ihr kompetenter IT-Partner"
    },
    {
     "also": [],
     "file": "37.114.55.171__mx.krause-computer.de.png",
+    "head": "",
     "host": "mx.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__mx.krause-computer.de.png",
+    "redirects": [],
     "what": "Jitsi Meet"
    },
    {
     "also": [],
     "file": "87.79.190.79__navidrome.krause-computer.de.png",
+    "head": "",
     "host": "navidrome.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__navidrome.krause-computer.de.png",
+    "redirects": [],
     "what": "Navidrome (navidrome.krause-computer.de/app/)"
    },
    {
     "also": [],
     "file": "87.79.190.79__nextcloud.krause-computer.de.png",
+    "head": "",
     "host": "nextcloud.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__nextcloud.krause-computer.de.png",
+    "redirects": [],
     "what": "Login · Nextcloud (nextcloud.krause-computer.de/login)"
    },
    {
     "also": [],
     "file": "37.114.55.171__nospamproxy.krause-computer.de.png",
+    "head": "",
     "host": "nospamproxy.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__nospamproxy.krause-computer.de.png",
+    "redirects": [],
     "what": "Jitsi Meet"
    },
    {
     "also": [],
     "file": "37.114.55.171__rustdesk.krause-computer.de.png",
+    "head": "",
     "host": "rustdesk.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__rustdesk.krause-computer.de.png",
+    "redirects": [],
     "what": "Jitsi Meet"
    },
    {
     "also": [],
     "file": "85.13.167.158__www.krause-computer.de.png",
+    "head": "",
     "host": "www.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/85.13.167.158__www.krause-computer.de.png",
+    "redirects": [],
     "what": "Computer-Service Krause · Ihr kompetenter IT-Partner"
    },
    {
     "also": [],
     "file": "87.79.190.79__youtube.krause-computer.de.png",
+    "head": "",
     "host": "youtube.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__youtube.krause-computer.de.png",
+    "redirects": [],
     "what": "yt-dlp Web UI"
    }
   ],
@@ -3457,7 +3477,7 @@
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "2 Befunde erfordern unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "2 Befunde erfordern unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "14 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {

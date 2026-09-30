@@ -1260,6 +1260,31 @@ def screen_caption(fq: FS.FqdnFact) -> str:
     return titel
 
 
+def _seite(fq: FS.FqdnFact) -> Optional[str]:
+    """Gleiche Seite auf demselben Host trotz Namen im Inhalt (S7a, spec/10 R20): Titel und Pfad der
+    Endadresse laut redirect_probe. Exchange liefert unter mail, mail2 und owa dieselbe
+    Anmeldemaske mit dem jeweiligen Namen in Adresse und Inhalt; ``body_hash`` unterscheidet sich."""
+    titel = " ".join((fq.probe_title or fq.title or "").split()).lower()
+    ziel = urlsplit(fq.probe_final_url or fq.final_url or "")
+    pfad = (ziel.path or "/").rstrip("/") or "/"
+    if not titel or pfad == "/":
+        return None
+    return f"seite:{fq.host_ip}|{titel}|{pfad}"
+
+
+def _kurznamen(namen: list[str], domains: list[str]) -> list[str]:
+    """"mail", "mail2" und "owa" statt der vollen Namen, wenn alle unter derselben Zieldomain liegen."""
+    for dom in domains:
+        suffix = "." + dom.lower()
+        if all(n.lower().endswith(suffix) for n in namen):
+            return [n[: -len(suffix)] for n in namen]
+    return namen
+
+
+def _aufzaehlung(teile: list[str]) -> str:
+    return teile[0] if len(teile) == 1 else ", ".join(teile[:-1]) + " und " + teile[-1]
+
+
 def build_screens(facts: FS.Facts) -> list[Screenshot]:
     """Sichtnachweise aus den Fakten, jede Seite einmal.
 
@@ -1268,6 +1293,11 @@ def build_screens(facts: FS.Facts) -> list[Screenshot]:
     in den Bericht geht. S6b-1 (spec/09 Teil 3): Namen mit derselben Seite (gleicher
     Inhalt oder gleiches Weiterleitungsziel) teilen sich ein Bild; die Unterschrift nennt
     die weiteren Namen. Bevorzugt wird der Name, auf den die Weiterleitung zeigt.
+
+    S7a (spec/10 R20): dieselbe Seite unter mehreren Namen desselben Hosts ist ein Bild ("mail,
+    mail2 und owa zeigen dieselbe Anmeldeseite", drei OWA-Fotos bei castenow); ein Name, der auf
+    einen anderen Host mit eigenem Bild weiterleitet, steht in dessen Unterschrift ("online.heuel.com,
+    weitergeleitet auf www.heuel.com") statt still zu entfallen. Werte aus redirect_probe.
     """
     def eigenes_bild(fq: FS.FqdnFact) -> bool:
         # Ein Name ohne eigene Probe erbt das Hostbild eines anderen Namens
@@ -1279,10 +1309,15 @@ def build_screens(facts: FS.Facts) -> list[Screenshot]:
                   if fq.screenshot_key and not fq.wildcard and eigenes_bild(fq)
                   and next((h for h in facts.hosts if h.ip == fq.host_ip and h.third_party is None), None)]
     # S6b-4n (spec/11 N4): ein Bild zeigt die Antwort seines Hosts. Leitet ein Name auf einen anderen
-    # Host weiter und hat das Ziel ein eigenes Bild, entfaellt das Bild der Weiterleitung (heuel online
-    # zeigte www); ohne eigenes Bild des Ziels sagt die Unterschrift, dass es die Zielseite zeigt.
+    # Host weiter und hat das Ziel ein eigenes Bild, steht die Weiterleitung nur in dessen Unterschrift
+    # (S7a); ohne eigenes Bild des Ziels zeigt das Bild der Weiterleitung die Zielseite.
     mit_bild = {fq.name.lower() for fq in kandidaten}
     ziele = {fq.name: R.redirect_target(facts, fq) for fq in kandidaten}
+    umgeleitet: dict[str, list[str]] = {}
+    for fq in kandidaten:
+        ziel = ziele[fq.name]
+        if ziel and ziel in mit_bild and fq.name not in umgeleitet.setdefault(ziel, []):
+            umgeleitet[ziel].append(fq.name)
     kandidaten = [fq for fq in kandidaten if not (ziele[fq.name] and ziele[fq.name] in mit_bild)]
 
     def rang(fq: FS.FqdnFact) -> tuple:
@@ -1290,29 +1325,44 @@ def build_screens(facts: FS.Facts) -> list[Screenshot]:
         return (0 if ziel == fq.name.lower() else 1, len(fq.name), fq.name)
 
     # Gleiche Bilddatei (Hündgen: der Apex traegt das Bild von www als Hostbild), gleicher
-    # Inhalt oder gleiches Weiterleitungsziel ergeben eine Gruppe.
+    # Inhalt, gleiches Weiterleitungsziel oder dieselbe Seite desselben Hosts ergeben eine Gruppe.
     groups: dict[str, list[FS.FqdnFact]] = {}
     alias: dict[str, str] = {}
     for fq in kandidaten:
-        keys = [f"shot:{fq.screenshot_key}"] + ([k] if (k := _same_page_key(fq)) else [])
+        keys = [f"shot:{fq.screenshot_key}"] + [k for k in (_same_page_key(fq), _seite(fq)) if k]
         ziel = next((alias[k] for k in keys if k in alias), keys[0])
         for k in keys:
             alias.setdefault(k, ziel)
         groups.setdefault(ziel, []).append(fq)
+    domains = list(facts.scan.domains) or ([facts.scan.domain] if facts.scan.domain else [])
+    login = {h.fqdn for h in facts.http if h.fqdn and h.login_form}
     out: list[Screenshot] = []
     for members in groups.values():
         members.sort(key=rang)
         fq = members[0]
+        weitere = sorted({m.name for m in members[1:] if m.host_ip == fq.host_ip} - {fq.name}, key=sort_key)
         was = screen_caption(fq)
+        kopf = ""
+        if weitere:
+            namen = sorted([fq.name] + weitere, key=sort_key)
+            seite = "Anmeldeseite" if any(n in login for n in namen) else "Seite"
+            kopf = f"{_aufzaehlung(_kurznamen(namen, domains))} zeigen dieselbe {seite}"
+            titel = clean_foreign_text(fq.probe_title) if fq.probe_title else ""
+            pfad = urlsplit(fq.probe_final_url or "").path
+            if titel:
+                was = f"{titel} ({pfad})" if pfad not in ("", "/") else titel
         if ziele.get(fq.name):
-            was = f"Weiterleitung auf {ziele[fq.name]}, das Bild zeigt die Zielseite: {was}"
+            kopf = kopf or f"{fq.name}, weitergeleitet auf {ziele[fq.name]}"
         out.append(Screenshot(
             file=fq.screenshot_key.rsplit("/", 1)[-1],
             key=fq.screenshot_key,
             host=fq.name,
             what=was,
             # S6b-4n (spec/11 N4): weitere Namen nur vom selben Host.
-            also=sorted({m.name for m in members[1:] if m.host_ip == fq.host_ip} - {fq.name}, key=sort_key)))
+            also=weitere,
+            head=kopf,
+            redirects=[f"{n}, weitergeleitet auf {fq.name}"
+                       for n in sorted(umgeleitet.get(fq.name.lower(), []), key=sort_key)]))
     return sorted(out, key=lambda s: s.host)
 
 

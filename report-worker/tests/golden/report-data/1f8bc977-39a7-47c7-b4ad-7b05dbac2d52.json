@@ -1268,50 +1268,51 @@
    {
     "also": [],
     "file": "195.50.179.6__bitwarden.castenow.de.png",
+    "head": "",
     "host": "bitwarden.castenow.de",
     "key": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52/195.50.179.6__bitwarden.castenow.de.png",
+    "redirects": [],
     "what": "Bitwarden Web vault"
    },
    {
     "also": [],
-    "file": "195.50.179.4__mail.castenow.de.png",
-    "host": "mail.castenow.de",
-    "key": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52/195.50.179.4__mail.castenow.de.png",
-    "what": "Outlook (mail.castenow.de/owa/auth/logon.aspx)"
-   },
-   {
-    "also": [],
-    "file": "195.50.179.4__mail2.castenow.de.png",
-    "host": "mail2.castenow.de",
-    "key": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52/195.50.179.4__mail2.castenow.de.png",
-    "what": "Outlook (mail2.castenow.de/owa/auth/logon.aspx)"
-   },
-   {
-    "also": [],
     "file": "195.50.179.5__mailstore.castenow.de.png",
+    "head": "",
     "host": "mailstore.castenow.de",
     "key": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52/195.50.179.5__mailstore.castenow.de.png",
+    "redirects": [],
     "what": "Nextcloud"
    },
    {
-    "also": [],
+    "also": [
+     "mail.castenow.de",
+     "mail2.castenow.de"
+    ],
     "file": "195.50.179.4__owa.castenow.de.png",
+    "head": "mail, mail2 und owa zeigen dieselbe Anmeldeseite",
     "host": "owa.castenow.de",
     "key": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52/195.50.179.4__owa.castenow.de.png",
-    "what": "Outlook (owa.castenow.de/owa/auth/logon.aspx)"
+    "redirects": [],
+    "what": "Outlook (/owa/auth/logon.aspx)"
    },
    {
     "also": [],
     "file": "92.205.163.53__ubb-wiki.castenow.de.png",
+    "head": "",
     "host": "ubb-wiki.castenow.de",
     "key": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52/92.205.163.53__ubb-wiki.castenow.de.png",
+    "redirects": [],
     "what": "Login · ubb-wiki | castenow.de (ubb-wiki.castenow.de/login/)"
    },
    {
     "also": [],
     "file": "159.69.143.80__www.castenow.de.png",
+    "head": "",
     "host": "www.castenow.de",
     "key": "1f8bc977-39a7-47c7-b4ad-7b05dbac2d52/159.69.143.80__www.castenow.de.png",
+    "redirects": [
+     "umfrage.castenow.de, weitergeleitet auf www.castenow.de"
+    ],
     "what": "CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW"
    }
   ],
@@ -4626,7 +4627,7 @@
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "19 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {

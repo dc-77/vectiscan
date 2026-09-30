@@ -1060,38 +1060,33 @@
   "screens": [
    {
     "also": [],
-    "file": "217.243.248.28__autodiscover.junkerwerk.de.png",
-    "host": "autodiscover.junkerwerk.de",
-    "key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.28__autodiscover.junkerwerk.de.png",
-    "what": "Outlook (autodiscover.junkerwerk.de/owa/auth/logon.aspx)"
-   },
-   {
-    "also": [],
     "file": "217.243.248.29__cloud.junkerwerk.de.png",
+    "head": "",
     "host": "cloud.junkerwerk.de",
     "key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.29__cloud.junkerwerk.de.png",
+    "redirects": [],
     "what": "IIS Windows Server"
    },
    {
-    "also": [],
+    "also": [
+     "autodiscover.junkerwerk.de",
+     "outlook.junkerwerk.de"
+    ],
     "file": "217.243.248.28__mail.junkerwerk.de.png",
+    "head": "autodiscover, mail und outlook zeigen dieselbe Anmeldeseite",
     "host": "mail.junkerwerk.de",
     "key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.28__mail.junkerwerk.de.png",
-    "what": "Outlook (mail.junkerwerk.de/owa/auth/logon.aspx)"
+    "redirects": [],
+    "what": "Outlook (/owa/auth/logon.aspx)"
    },
    {
     "also": [],
     "file": "217.243.248.30__openotp.junkerwerk.de.png",
+    "head": "",
     "host": "openotp.junkerwerk.de",
     "key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.30__openotp.junkerwerk.de.png",
+    "redirects": [],
     "what": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal"
-   },
-   {
-    "also": [],
-    "file": "217.243.248.28__outlook.junkerwerk.de.png",
-    "host": "outlook.junkerwerk.de",
-    "key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.28__outlook.junkerwerk.de.png",
-    "what": "Outlook (outlook.junkerwerk.de/owa/auth/logon.aspx)"
    }
   ],
   "screens_lead": "Sichtprüfung der erreichbaren Web-Oberflächen der geprüften Hosts.",
@@ -4712,7 +4707,7 @@
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "17 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {

@@ -860,15 +860,21 @@
    {
     "also": [],
     "file": "92.205.224.174__ftp.bergersysteme.com.png",
+    "head": "",
     "host": "ftp.bergersysteme.com",
     "key": "68d59573-7a93-4efa-89cc-e7b10cc4d140/92.205.224.174__ftp.bergersysteme.com.png",
+    "redirects": [],
     "what": "403 Forbidden"
    },
    {
     "also": [],
     "file": "198.202.211.1__www.bergersysteme.com.png",
+    "head": "",
     "host": "www.bergersysteme.com",
     "key": "68d59573-7a93-4efa-89cc-e7b10cc4d140/198.202.211.1__www.bergersysteme.com.png",
+    "redirects": [
+     "bergersysteme.com, weitergeleitet auf www.bergersysteme.com"
+    ],
     "what": "Berger Systeme"
    }
   ],
@@ -3126,7 +3132,7 @@
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
-  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration."
+  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration."
  },
  "landscape_lead": "13 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {

@@ -1289,92 +1289,118 @@
    {
     "also": [],
     "file": "212.227.60.78__connect.securess.de.png",
+    "head": "",
     "host": "connect.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__connect.securess.de.png",
+    "redirects": [],
     "what": "SECURESS|connect: SECURESS"
    },
    {
     "also": [],
     "file": "85.22.47.38__eset.securess.de.png",
+    "head": "",
     "host": "eset.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.38__eset.securess.de.png",
+    "redirects": [],
     "what": "403 Forbidden"
    },
    {
     "also": [],
     "file": "85.22.47.41__ftp.securess.de.png",
+    "head": "",
     "host": "ftp.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__ftp.securess.de.png",
+    "redirects": [],
     "what": "NinjaFirewall 403 Forbidden"
    },
    {
     "also": [],
     "file": "51.116.154.224__login-kundenportal.securess.de.png",
+    "head": "",
     "host": "login-kundenportal.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/51.116.154.224__login-kundenportal.securess.de.png",
+    "redirects": [],
     "what": "Login Kundenportal (login-kundenportal.securess.de/Account/Login)"
    },
    {
     "also": [],
     "file": "85.22.47.39__mailcleaner.securess.de.png",
+    "head": "",
     "host": "mailcleaner.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailcleaner.securess.de.png",
+    "redirects": [],
     "what": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
    },
    {
     "also": [],
     "file": "85.22.47.39__mailin.securess.de.png",
+    "head": "",
     "host": "mailin.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailin.securess.de.png",
+    "redirects": [],
     "what": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
    },
    {
     "also": [],
     "file": "85.22.47.39__mailout.securess.de.png",
+    "head": "",
     "host": "mailout.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailout.securess.de.png",
+    "redirects": [],
     "what": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
    },
    {
     "also": [],
     "file": "85.22.47.39__mx1.securess.de.png",
+    "head": "",
     "host": "mx1.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mx1.securess.de.png",
+    "redirects": [],
     "what": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
    },
    {
     "also": [],
     "file": "85.22.47.38__openotp.securess.de.png",
+    "head": "",
     "host": "openotp.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.38__openotp.securess.de.png",
+    "redirects": [],
     "what": "403 Forbidden"
    },
    {
     "also": [],
     "file": "212.227.60.78__partner.securess.de.png",
+    "head": "",
     "host": "partner.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__partner.securess.de.png",
+    "redirects": [],
     "what": "Page Not Found"
    },
    {
     "also": [],
     "file": "85.22.47.41__securess.de.png",
+    "head": "",
     "host": "securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__securess.de.png",
+    "redirects": [],
     "what": "NinjaFirewall 403 Forbidden"
    },
    {
     "also": [],
     "file": "212.227.60.78__vermittler.securess.de.png",
+    "head": "",
     "host": "vermittler.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__vermittler.securess.de.png",
+    "redirects": [],
     "what": "Page Not Found"
    },
    {
     "also": [],
     "file": "85.22.47.41__www.securess.de.png",
+    "head": "",
     "host": "www.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__www.securess.de.png",
+    "redirects": [],
     "what": "NinjaFirewall 403 Forbidden"
    }
   ],
@@ -5431,7 +5457,7 @@
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "20 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {

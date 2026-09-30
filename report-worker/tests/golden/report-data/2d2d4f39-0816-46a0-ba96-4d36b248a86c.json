@@ -1674,72 +1674,87 @@
   "screens": [
    {
     "also": [],
-    "file": "195.50.179.4__autodiscover.castenow.de.png",
-    "host": "autodiscover.castenow.de",
-    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.4__autodiscover.castenow.de.png",
-    "what": "Outlook (autodiscover.castenow.de/owa/auth/logon.aspx)"
-   },
-   {
-    "also": [],
     "file": "195.50.179.6__bitwarden.castenow.de.png",
+    "head": "",
     "host": "bitwarden.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.6__bitwarden.castenow.de.png",
+    "redirects": [],
     "what": "Bitwarden Web vault"
    },
    {
     "also": [],
     "file": "195.50.179.5__mailstore.castenow.de.png",
+    "head": "",
     "host": "mailstore.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.5__mailstore.castenow.de.png",
+    "redirects": [],
     "what": "Nextcloud"
    },
    {
     "also": [],
     "file": "195.50.179.5__nextcloud.castenow.de.png",
+    "head": "",
     "host": "nextcloud.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.5__nextcloud.castenow.de.png",
+    "redirects": [],
     "what": "Login · Nextcloud (nextcloud.castenow.de/login)"
    },
    {
     "also": [],
     "file": "195.50.179.9__openotp.castenow.de.png",
+    "head": "",
     "host": "openotp.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.9__openotp.castenow.de.png",
+    "redirects": [],
     "what": "Castenow GmbH Web Applications Portal"
    },
    {
-    "also": [],
+    "also": [
+     "autodiscover.castenow.de"
+    ],
     "file": "195.50.179.4__owa.castenow.de.png",
+    "head": "autodiscover und owa zeigen dieselbe Anmeldeseite",
     "host": "owa.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.4__owa.castenow.de.png",
-    "what": "Outlook (owa.castenow.de/owa/auth/logon.aspx)"
+    "redirects": [],
+    "what": "Outlook (/owa/auth/logon.aspx)"
    },
    {
     "also": [],
     "file": "195.50.179.7__rdgw.castenow.de.png",
+    "head": "",
     "host": "rdgw.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.7__rdgw.castenow.de.png",
+    "redirects": [],
     "what": "IIS Windows Server"
    },
    {
     "also": [],
     "file": "92.205.163.53__ubb-wiki.castenow.de.png",
+    "head": "",
     "host": "ubb-wiki.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/92.205.163.53__ubb-wiki.castenow.de.png",
+    "redirects": [],
     "what": "Login · My CMS (ubb-wiki.castenow.de/login/)"
    },
    {
     "also": [],
     "file": "195.50.179.2__vpn.castenow.de.png",
+    "head": "",
     "host": "vpn.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.2__vpn.castenow.de.png",
+    "redirects": [],
     "what": "SonicWall - Virtual Office"
    },
    {
     "also": [],
     "file": "159.69.143.80__www.castenow.de.png",
+    "head": "",
     "host": "www.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/159.69.143.80__www.castenow.de.png",
+    "redirects": [
+     "umfrage.castenow.de, weitergeleitet auf www.castenow.de"
+    ],
     "what": "CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW"
    }
   ],
@@ -7049,7 +7064,7 @@
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
-  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "28 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {

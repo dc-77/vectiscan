@@ -522,36 +522,46 @@
    {
     "also": [],
     "file": "62.217.52.165__10finance.vectigal.tech.png",
+    "head": "",
     "host": "10finance.vectigal.tech",
     "key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__10finance.vectigal.tech.png",
+    "redirects": [],
     "what": "10FINANCE Stabilitäts-Quickcheck"
    },
    {
     "also": [],
     "file": "62.217.52.165__board.vectigal.tech.png",
+    "head": "",
     "host": "board.vectigal.tech",
     "key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__board.vectigal.tech.png",
+    "redirects": [],
     "what": "Paperclip (board.vectigal.tech/auth)"
    },
    {
     "also": [],
     "file": "62.217.52.165__crm.vectigal.tech.png",
+    "head": "",
     "host": "crm.vectigal.tech",
     "key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__crm.vectigal.tech.png",
+    "redirects": [],
     "what": "Sign in or Create an account (crm.vectigal.tech/welcome)"
    },
    {
     "also": [],
     "file": "62.217.52.165__crmviewer.vectigal.tech.png",
+    "head": "",
     "host": "crmviewer.vectigal.tech",
     "key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__crmviewer.vectigal.tech.png",
+    "redirects": [],
     "what": "Streamlit"
    },
    {
     "also": [],
     "file": "62.217.52.165__gutachter.vectigal.tech.png",
+    "head": "",
     "host": "gutachter.vectigal.tech",
     "key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__gutachter.vectigal.tech.png",
+    "redirects": [],
     "what": "gutachter.ai"
    }
   ],
@@ -1897,7 +1907,7 @@
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
-  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration."
+  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration."
  },
  "landscape_lead": "8 Befunde in 3 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {

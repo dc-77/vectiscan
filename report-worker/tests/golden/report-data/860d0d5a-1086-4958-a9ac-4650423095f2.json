@@ -860,24 +860,23 @@
   "screens": [
    {
     "also": [],
-    "file": "217.243.248.28__autodiscover.junkerwerk.de.png",
-    "host": "autodiscover.junkerwerk.de",
-    "key": "860d0d5a-1086-4958-a9ac-4650423095f2/217.243.248.28__autodiscover.junkerwerk.de.png",
-    "what": "Outlook (autodiscover.junkerwerk.de/owa/auth/logon.aspx)"
-   },
-   {
-    "also": [],
     "file": "217.243.248.29__cloud.junkerwerk.de.png",
+    "head": "",
     "host": "cloud.junkerwerk.de",
     "key": "860d0d5a-1086-4958-a9ac-4650423095f2/217.243.248.29__cloud.junkerwerk.de.png",
+    "redirects": [],
     "what": "IIS Windows Server"
    },
    {
-    "also": [],
+    "also": [
+     "autodiscover.junkerwerk.de"
+    ],
     "file": "217.243.248.28__outlook.junkerwerk.de.png",
+    "head": "autodiscover und outlook zeigen dieselbe Anmeldeseite",
     "host": "outlook.junkerwerk.de",
     "key": "860d0d5a-1086-4958-a9ac-4650423095f2/217.243.248.28__outlook.junkerwerk.de.png",
-    "what": "Outlook (outlook.junkerwerk.de/owa/auth/logon.aspx)"
+    "redirects": [],
+    "what": "Outlook (/owa/auth/logon.aspx)"
    }
   ],
   "screens_lead": "Sichtprüfung der erreichbaren Web-Oberflächen der geprüften Hosts.",
@@ -4149,7 +4148,7 @@
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "16 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {

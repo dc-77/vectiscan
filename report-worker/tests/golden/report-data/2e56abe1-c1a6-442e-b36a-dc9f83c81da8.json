@@ -935,22 +935,32 @@
    {
     "also": [],
     "file": "20.79.218.75__edi.heuel.com.png",
+    "head": "",
     "host": "edi.heuel.com",
     "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/20.79.218.75__edi.heuel.com.png",
+    "redirects": [],
     "what": "403 Forbidden"
    },
    {
     "also": [],
     "file": "20.79.218.75__ose.heuel.com.png",
+    "head": "",
     "host": "ose.heuel.com",
     "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/20.79.218.75__ose.heuel.com.png",
+    "redirects": [
+     "webportal.heuel.com, weitergeleitet auf ose.heuel.com"
+    ],
     "what": "Webmodule (ose.heuel.com/webmodule-ee/login.seam)"
    },
    {
     "also": [],
     "file": "217.72.203.132__www.heuel.com.png",
+    "head": "",
     "host": "www.heuel.com",
     "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/217.72.203.132__www.heuel.com.png",
+    "redirects": [
+     "online.heuel.com, weitergeleitet auf www.heuel.com"
+    ],
     "what": "Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS"
    }
   ],
@@ -2823,7 +2833,7 @@
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
-  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration."
+  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration."
  },
  "landscape_lead": "9 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {

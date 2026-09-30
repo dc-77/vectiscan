@@ -245,6 +245,11 @@ class Screenshot(Base):
     # der Basisname; bei Berichten ueber mehrere Laeufe laesst sich der Schluessel
     # daraus nicht rekonstruieren, und der Renderer (S4) braucht ihn zum Laden.
     key: str = ""
+    # S7a (spec/10 R20): fette Kopfzeile der Unterschrift ("mail, mail2 und owa zeigen dieselbe
+    # Anmeldeseite"); leer heisst: der Name aus ``host``. ``redirects`` nennt Namen, die auf diese
+    # Seite weiterleiten ("online.heuel.com, weitergeleitet auf www.heuel.com").
+    head: str = ""
+    redirects: list[str] = Field(default_factory=list)
 
 
 class Architecture(Base):
