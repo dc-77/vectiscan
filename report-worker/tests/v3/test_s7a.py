@@ -110,6 +110,52 @@ def test_ipv6_im_block_des_systems():
     assert zeilen[0].operator == "IPv6-Adresse von 213.133.104.51"
 
 
+# ---------------------------------------------------------------- Punkt 7: Hostsuche je Zieldomain
+
+def _hostsuche(order_id: str) -> dict[str, str]:
+    return {d.domain: d.search for d in data_for(order_id).scope.domains}
+
+
+def test_hostsuche_je_domain_bei_mehrzielauftraegen():
+    assert _hostsuche(JW_0928) == {
+        "junkerwerk.de": "Hostsuche: 10 Namen gefunden, 10 geprüft, 0 gefunden und nicht geprüft.",
+        "junkerwerk.hu": "Hostsuche: 2 Namen gefunden, 2 geprüft, 0 gefunden und nicht geprüft.",
+    }
+
+
+def test_hostsuche_ohne_lauf_der_zusatzdomain():
+    # 23.09.: fuer junkerwerk.hu lief keine Hostsuche (spec/10 Teil 2 JW: "keine eigenen Hosts
+    # ermittelt" war unscharf).
+    assert _hostsuche(JW_0923)["junkerwerk.hu"] == "Hostsuche: für diese Domain nicht gelaufen."
+
+
+def test_hostsuche_einzelziel_mit_drittanbieter_und_offenen_namen():
+    assert _hostsuche(CA) == {"castenow.de": (
+        "Hostsuche: 10 Namen gefunden, 9 geprüft, 1 beim Drittanbieter nicht geprüft, "
+        "0 gefunden und nicht geprüft.")}
+    bs = _hostsuche("68d59573-7a93-4efa-89cc-e7b10cc4d140")["bergersysteme.com"]
+    assert bs.endswith("24 gefunden und nicht geprüft.")
+    # Die Liste "gefunden, nicht geprüft" in 2.2 bleibt.
+    zeilen = [l for l in data_for("68d59573-7a93-4efa-89cc-e7b10cc4d140").scope.limitations
+              if "nicht geprüft" in l.what or "gefunden" in l.what.lower()]
+    assert zeilen
+
+
+def test_ohne_discovery_health_keine_hostsuche_zeile():
+    assert data_for("45bb234c-d556-4a80-9c78-3ce221ea28a6").scope.domains == []
+
+
+@pytest.mark.parametrize("order_id", order_ids())
+def test_hostsuche_zaehlt_geprueft_wie_der_pruefumfang(order_id):
+    import re
+
+    for d in data_for(order_id).scope.domains:
+        m = re.search(r"(\d+) geprüft", d.search)
+        n = re.search(r"\((\d+) Hostnamen?\)", d.text)
+        if m and n:
+            assert m.group(1) == n.group(1), (d.domain, d.text, d.search)
+
+
 # ---------------------------------------------------------------- Punkt 3: Legenden
 
 def test_legende_nennt_nur_vorkommende_farben_und_die_gelb_stufe():

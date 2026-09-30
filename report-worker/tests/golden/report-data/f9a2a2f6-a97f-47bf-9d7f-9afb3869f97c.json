@@ -5373,10 +5373,12 @@
   "domains": [
    {
     "domain": "junkerwerk.de",
+    "search": "Hostsuche: 10 Namen gefunden, 10 geprüft, 0 gefunden und nicht geprüft.",
     "text": "Hostermittlung, Portscan und Tiefenprüfung (10 Hostnamen), DNS- und E-Mail-Einträge"
    },
    {
     "domain": "junkerwerk.hu",
+    "search": "Hostsuche: 2 Namen gefunden, 2 geprüft, 0 gefunden und nicht geprüft.",
     "text": "Hostermittlung, Portscan und Tiefenprüfung (2 Hostnamen), DNS- und E-Mail-Einträge"
    }
   ],

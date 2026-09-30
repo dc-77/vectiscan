@@ -4041,7 +4041,13 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
-  "domains": [],
+  "domains": [
+   {
+    "domain": "dortmund-beach.com",
+    "search": "Hostsuche: 3 Namen gefunden, 3 geprüft, 0 gefunden und nicht geprüft.",
+    "text": "Hostermittlung, Portscan und Tiefenprüfung (3 Hostnamen), DNS- und E-Mail-Einträge"
+   }
+  ],
   "hosts": [
    {
     "cov": "teil",

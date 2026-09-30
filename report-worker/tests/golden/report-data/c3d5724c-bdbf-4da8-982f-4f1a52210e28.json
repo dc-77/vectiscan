@@ -1938,7 +1938,13 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
-  "domains": [],
+  "domains": [
+   {
+    "domain": "lumbeck-wolter.de",
+    "search": "Hostsuche: 5 Namen gefunden, 2 geprüft, 1 beim Drittanbieter nicht geprüft, 2 gefunden und nicht geprüft.",
+    "text": "Hostermittlung, Portscan und Tiefenprüfung (2 Hostnamen), DNS- und E-Mail-Einträge"
+   }
+  ],
   "hosts": [
    {
     "cov": "teil",

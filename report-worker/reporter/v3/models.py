@@ -157,6 +157,8 @@ class Limitation(Base):
 class DomainScope(Base):
     domain: str
     text: str
+    # S7a Punkt 7: "Hostsuche: n Namen gefunden, m geprüft, k gefunden und nicht geprüft".
+    search: str = ""
 
 
 class MethodPhase(Base):

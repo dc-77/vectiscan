@@ -6170,7 +6170,13 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
-  "domains": [],
+  "domains": [
+   {
+    "domain": "securess.de",
+    "search": "Hostsuche: 29 Namen gefunden, 26 geprüft, 3 gefunden und nicht geprüft.",
+    "text": "Hostermittlung, Portscan und Tiefenprüfung (26 Hostnamen), DNS- und E-Mail-Einträge"
+   }
+  ],
   "hosts": [
    {
     "cov": "teil",

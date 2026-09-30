@@ -252,7 +252,7 @@ tr{break-inside:avoid;}
  </table>
  {% if s.domains %}
  <h4>Prüfumfang je Zieldomain</h4>
- <ul>{% for d in s.domains %}<li><b>{{ d.domain }}:</b> {{ d.text }}</li>{% endfor %}</ul>
+ <ul>{% for d in s.domains %}<li><b>{{ d.domain }}:</b> {{ d.text }}{% if d.search %}<br>{{ d.search }}{% endif %}</li>{% endfor %}</ul>
  {% endif %}
  <p><b>Prüfzeitraum:</b> {{ period_note }}</p>
  <h4>Nicht Bestandteil dieser Prüfung</h4>

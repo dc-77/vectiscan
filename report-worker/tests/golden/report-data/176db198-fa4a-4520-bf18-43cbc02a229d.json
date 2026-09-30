@@ -3439,7 +3439,13 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
-  "domains": [],
+  "domains": [
+   {
+    "domain": "heuel.com",
+    "search": "Hostsuche: 14 Namen gefunden, 11 geprüft, 1 beim Drittanbieter nicht geprüft, 2 gefunden und nicht geprüft.",
+    "text": "Hostermittlung, Portscan und Tiefenprüfung (11 Hostnamen), DNS- und E-Mail-Einträge"
+   }
+  ],
   "hosts": [
    {
     "cov": "teil",

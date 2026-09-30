@@ -2231,10 +2231,12 @@
   "domains": [
    {
     "domain": "vectigal.tech",
+    "search": "Hostsuche: 31 Namen gefunden, 31 geprüft, 0 gefunden und nicht geprüft.",
     "text": "Hostermittlung, Portscan und Tiefenprüfung (31 Hostnamen), DNS- und E-Mail-Einträge"
    },
    {
     "domain": "vectiscan.de",
+    "search": "Hostsuche: für diese Domain nicht gelaufen.",
     "text": "nur DNS- und E-Mail-Einträge; für diese Domain wurden keine eigenen Hosts ermittelt"
    }
   ],

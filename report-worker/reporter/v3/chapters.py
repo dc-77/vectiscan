@@ -483,6 +483,13 @@ def _shared_hint(host: FS.HostFact) -> str:
 
 # ---------------------------------------------------------------- Kapitel 2
 
+def _domain_scope(facts: FS.Facts, domains: list[tuple[str, str]]) -> list[DomainScope]:
+    eintraege = [DomainScope(domain=d, text=t, search=COV.host_search(facts, d)) for d, t in domains]
+    if len(eintraege) > 1 or any(e.search for e in eintraege):
+        return eintraege
+    return []
+
+
 def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
                 model: COV.Model, findings: list[Finding] | None = None) -> Scope:
     hosts: list[ScopeHost] = []
@@ -558,7 +565,9 @@ def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
         lead=N.scope_lead(counts),
         hosts=hosts,
         operator_header=operator_header,
-        domains=[DomainScope(domain=d, text=t) for d, t in domains] if len(domains) > 1 else [],
+        # S7a Punkt 7: je Zieldomain die Hostsuche, auch bei Einzelzielen; ohne Hostsuche-Angabe
+        # (Auftraege vor S6c) weiter nur bei mehreren Zieldomains.
+        domains=_domain_scope(facts, domains),
         out_of_scope=out_of_scope,
         limitations=limitations(facts, output, model, findings),
         method_phases=[MethodPhase(n=n, name=name, text=text)

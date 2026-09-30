@@ -3638,7 +3638,13 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
-  "domains": [],
+  "domains": [
+   {
+    "domain": "bergersysteme.com",
+    "search": "Hostsuche: 35 Namen gefunden, 10 geprüft, 1 beim Drittanbieter nicht geprüft, 24 gefunden und nicht geprüft.",
+    "text": "Hostermittlung, Portscan und Tiefenprüfung (10 Hostnamen), DNS- und E-Mail-Einträge"
+   }
+  ],
   "hosts": [
    {
     "cov": "teil",

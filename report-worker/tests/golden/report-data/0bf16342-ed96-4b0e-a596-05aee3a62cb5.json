@@ -5313,10 +5313,12 @@
   "domains": [
    {
     "domain": "junkerwerk.de",
+    "search": "Hostsuche: 13 Namen gefunden, 12 geprüft, 1 gefunden und nicht geprüft.",
     "text": "Hostermittlung, Portscan und Tiefenprüfung (12 Hostnamen), DNS- und E-Mail-Einträge"
    },
    {
     "domain": "junkerwerk.hu",
+    "search": "Hostsuche: für diese Domain nicht gelaufen.",
     "text": "keine eigenen Ergebnisse"
    }
   ],

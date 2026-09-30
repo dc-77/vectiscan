@@ -4825,10 +4825,12 @@
   "domains": [
    {
     "domain": "junkerwerk.de",
+    "search": "Hostsuche: 8 Namen gefunden, 7 geprüft, 1 gefunden und nicht geprüft.",
     "text": "Hostermittlung, Portscan und Tiefenprüfung (7 Hostnamen), DNS- und E-Mail-Einträge"
    },
    {
     "domain": "junkerwerk.hu",
+    "search": "Hostsuche: für diese Domain nicht gelaufen.",
     "text": "nur DNS- und E-Mail-Einträge; für diese Domain wurden keine eigenen Hosts ermittelt"
    }
   ],
