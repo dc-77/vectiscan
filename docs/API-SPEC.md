@@ -290,6 +290,8 @@ Auth via JWT (`Authorization`-Header oder `?token=…`) **oder**
 Optional `?version=N` für eine bestimmte Report-Version (sonst neueste).
 
 **Response:** Binary PDF, `Content-Disposition: attachment; filename="vectiscan-<domain>-<package>-<YYYY-MM-DD>-<HHMM>-v<N>.pdf"`.
+`<N>` ist seit S7a die Auslieferungsversion wie auf dem Deckblatt („Version n“, `reports.delivery_version`;
+bei einem Entwurf die nächste), nicht mehr die Erzeugungsnummer `reports.version` aus der Fußzeile.
 
 **Errors:** 401, 403 (ungültiges Token), 404 (Report fehlt), 410 (Token abgelaufen).
 
@@ -345,11 +347,14 @@ Vergleich erfolgt titelbasiert (case-insensitive).
 ```json
 {
   "versions": [
-    { "version", "createdAt", "findingsCount", "excludedCount",
+    { "version", "deliveryVersion", "createdAt", "findingsCount", "excludedCount",
       "excludedFindings", "fileSizeBytes", "isCurrent" }
   ]
 }
 ```
+
+`version` ist die Erzeugungsnummer (Fußzeile), `deliveryVersion` die Auslieferungsversion wie
+auf dem Deckblatt (S7a).
 
 ### POST /api/orders/:id/findings/:findingId/exclude
 **Auth required + Ownership.** Body: `{ "reason"?: "..." }`. Markiert

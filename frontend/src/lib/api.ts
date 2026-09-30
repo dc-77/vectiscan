@@ -1265,7 +1265,10 @@ export async function deleteFindingOverride(
 // --- Report Versions ---
 
 export interface ReportVersion {
+  /** Erzeugungsnummer (Fusszeile "Erzeugung m"). */
   version: number;
+  /** S7a Punkt 9: Auslieferungsversion wie auf dem Deckblatt ("Version n"). */
+  deliveryVersion?: number;
   createdAt: string;
   findingsCount: number;
   excludedCount: number;

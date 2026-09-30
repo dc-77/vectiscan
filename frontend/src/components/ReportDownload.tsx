@@ -19,9 +19,10 @@ export default function ReportDownload({ orderId, domain, onNewScan }: Props) {
       <h3 className="text-lg font-semibold text-white">Report fertig</h3>
       <p className="text-sm text-gray-400">{fileName}</p>
       <div className="flex flex-col items-center gap-3">
+        {/* S7a Punkt 9: den Namen setzt die API (Content-Disposition mit der Auslieferungsversion). */}
         <a
           href={getReportDownloadUrl(orderId)}
-          download={fileName}
+          download
           className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
         >
           PDF herunterladen

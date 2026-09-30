@@ -49,18 +49,41 @@ const RESULTS_SELECT_LEGACY =
    WHERE order_id = $1
    ORDER BY phase ASC, created_at ASC`;
 
+/**
+ * S7a Punkt 9 (spec/10 Teil 2 DB): Auslieferungsversion einer Berichtszeile, dieselbe Zahl wie
+ * "Version n" auf dem Deckblatt. Freigegebene Zeilen tragen sie in `delivery_version`; ein
+ * Entwurf zeigt die naechste (MAX der vorher freigegebenen + 1, wie
+ * report-worker/reporter/worker.py::_next_delivery_version). Die Erzeugungsnummer `version`
+ * steht nur in der Fusszeile.
+ */
+export const DELIVERY_COLUMNS = `r.delivery_version,
+          (SELECT COALESCE(MAX(r2.delivery_version), 0) + 1 FROM reports r2
+            WHERE r2.order_id = r.order_id AND r2.created_at < r.created_at) AS next_delivery_version`;
+
+export function deliveryNumber(report: Record<string, unknown>): number {
+  const geliefert = Number(report.delivery_version);
+  if (report.delivery_version !== null && report.delivery_version !== undefined && geliefert > 0) {
+    return geliefert;
+  }
+  const naechste = Number(report.next_delivery_version);
+  return naechste > 0 ? naechste : 1;
+}
+
+/** Download-Name mit der Auslieferungsversion statt der Erzeugungsnummer (bis S7a "v3" bei "Version 1"). */
+export function reportFileName(report: Record<string, unknown>): string {
+  const domain = report.target_url as string;
+  const createdAt = report.created_at as Date;
+  const pkg = (report.package as string) || 'perimeter';
+  const dateStr = createdAt.toISOString().slice(0, 10);
+  const timeStr = createdAt.toISOString().slice(11, 16).replace(':', '');
+  return `vectiscan-${domain}-${pkg}-${dateStr}-${timeStr}-v${deliveryNumber(report)}.pdf`;
+}
+
 async function streamReport(reply: FastifyReply, report: Record<string, unknown>) {
   const bucket = report.minio_bucket as string;
   const objectPath = report.minio_path as string;
-  const domain = report.target_url as string;
   const recordedSize = report.file_size_bytes as number;
-  const createdAt = report.created_at as Date;
-  const pkg = (report.package as string) || 'perimeter';
-  const version = (report.version as number) || 1;
-
-  const dateStr = createdAt.toISOString().slice(0, 10);
-  const timeStr = createdAt.toISOString().slice(11, 16).replace(':', '');
-  const fileName = `vectiscan-${domain}-${pkg}-${dateStr}-${timeStr}-v${version}.pdf`;
+  const fileName = reportFileName(report);
 
   // VEC-486: Content-Length MUSS aus dem Objekt kommen, das wir gleich streamen —
   // NICHT aus reports.file_size_bytes. Die DB-Spalte ist eine Momentaufnahme des
@@ -749,7 +772,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const downloadToken = queryParams.download_token;
     if (downloadToken) {
       const tokenCheck = await query(
-        `SELECT r.id, r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.expires_at, r.version, o.target_url, o.package
+        `SELECT r.id, r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.expires_at, r.version,
+                ${DELIVERY_COLUMNS}, o.target_url, o.package
          FROM reports r JOIN orders o ON r.order_id = o.id
          WHERE r.order_id = $1 AND r.download_token = $2
          LIMIT 1`,
@@ -830,7 +854,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     if (requestedVersion) {
       try {
         result = await query(
-          `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version, o.target_url, o.package
+          `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version,
+                  ${DELIVERY_COLUMNS}, o.target_url, o.package
            FROM reports r JOIN orders o ON r.order_id = o.id
            WHERE r.order_id = $1 AND r.version = $2`,
           [id, requestedVersion],
@@ -846,7 +871,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       }
     } else {
       result = await query(
-        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version, o.target_url, o.package
+        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version,
+                ${DELIVERY_COLUMNS}, o.target_url, o.package
          FROM reports r JOIN orders o ON r.order_id = o.id
          WHERE r.order_id = $1 ORDER BY r.created_at DESC LIMIT 1`,
         [id],
@@ -1421,9 +1447,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     let versions: Array<Record<string, unknown>>;
     try {
       const result = await query(
-        `SELECT version, created_at, file_size_bytes, excluded_findings, severity_counts
-         FROM reports WHERE order_id = $1
-         ORDER BY version DESC`,
+        `SELECT r.version, r.created_at, r.file_size_bytes, r.excluded_findings, r.severity_counts,
+                ${DELIVERY_COLUMNS}
+         FROM reports r WHERE r.order_id = $1
+         ORDER BY r.version DESC`,
         [id],
       );
       versions = result.rows as Array<Record<string, unknown>>;
@@ -1444,6 +1471,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       data: {
         versions: versions.map((row, idx) => ({
           version: row.version ?? 1,
+          // S7a Punkt 9: Auslieferungsversion wie auf dem Deckblatt; `version` ist die Erzeugung.
+          deliveryVersion: deliveryNumber(row),
           createdAt: row.created_at ? (row.created_at as Date).toISOString() : null,
           findingsCount: sumSeverityCounts(row.severity_counts),
           excludedCount: (row.excluded_findings as string[] || []).length,
