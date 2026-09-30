@@ -225,6 +225,38 @@ verbleibenden „transienter Fehler ohne Folge-Regenerate"-Fall aktiv sichtbar.
   Absender-Domain verifiziert sein (vgl. VEC-226). Bis dahin ist die Regel aktiv
   und in Grafana sichtbar, die Mail-Zustellung hängt am selben Domain-Gate.
 
+## report-worker: Speicher mit WeasyPrint (Issue #24)
+
+Der report-worker ist in `docker-compose.yml` auf 1 CPU und **1 GB** begrenzt
+(`deploy.resources.limits`). Seit dem Renderer v3 (S4) setzt WeasyPrint den Bericht
+und dekodiert dafür die Bildnachweise; der Resolver rechnet sie vorher auf 900 Pixel
+Breite herunter (`reporter/pdf/v3/screenshots.py::downscale`).
+
+**Messweg:** manueller Job `ops-render-v3` mit `RENDER_ORDER_ID=<uuid>` (API-Pipeline
+auf einem Branch, nicht auf `main`, sonst laufen Builds und `deploy-auto` mit). Der Job
+rendert im laufenden Container aus dem Roh-Tar samt Bildern aus MinIO, schreibt alle
+2 Sekunden `docker stats` mit und gibt den Spitzenwert als „Spitze“ im Log aus.
+Auftrag, Status und `reports` bleiben unberührt.
+
+**Messung S7a (01.10.2026, laufendes Abbild von S6d, drei größte Golden-Aufträge):**
+
+| Auftrag | Seiten | Spitze | Anteil am Limit |
+|---|---|---|---|
+| 4e6b6883 (castenow, 22.07.) | 49 | 350 MiB | 34 % |
+| f77ccff2 (castenow, 19.07.) | 48 | 352 MiB | 34 % |
+| 2d2d4f39 (castenow, 22.07.) | 48 | 354 MiB | 35 % |
+
+Frühere Werte: 339 MiB (4e6b6883, 44 Seiten) und 297 MiB (14272c00) beim ersten
+`ops-render-v3` am 20.09.2026, 286 bis 340 MiB in `ops-facts-prod`
+(`speicher_mib` aus `ru_maxrss`). Die Messung mit `docker stats` hat bei einem Render
+von rund 15 Sekunden nur fünf bis sieben Punkte; eine kurze Spitze zwischen zwei
+Punkten ist möglich, `ru_maxrss` aus `ops-facts-prod` liegt aber im selben Bereich.
+
+**Entscheidung:** Die Grenze von 1 GB bleibt. Der größte Bericht braucht rund ein
+Drittel, S7a ändert nur Satz und Umbruch (keine größeren Bilder, keine zweite
+Bildkopie). Neu messen, wenn sich Bildgröße, Bildzahl je Bericht (heute bis 13)
+oder die WeasyPrint-Version ändern.
+
 ## Betrieb / Troubleshooting
 
 ```bash

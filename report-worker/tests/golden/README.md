@@ -1331,6 +1331,79 @@ bei 2d2d4f39, f77ccff2 und ae8d1d70 (dazu zwei A4-Befunde bei securess); neu 439
 (halbleer Seite 16), f9a2a2f6 34, cd28d260 39 (halbleer Seite 28). Die halbleeren Seiten sind
 Darstellung und gehen an S7a.
 
+## Darstellung nach S7a
+
+Startprompt `report-prototype/spec/prompts/S7a.md` (spec/10 R20, spec/11 Teil 5 und N9, E27).
+S7a aendert Darstellung, Reihenfolge, Umbrueche, Beschriftung und Anhaenge. Befunde und
+Einstufungen bleiben gleich, geprueft von `tests/v3/test_befundzahlen_s7a.py` gegen
+`befundzahlen.json` (Stand vor S7a). Einzige Ausnahme ist Punkt 0 bei cd28d260.
+
+**Golden-Daten, die sich aendern:**
+
+- **Punkt 0:** `facts/cd28d260...` (Port 8000: Kennung Shoutcast statt nmap-Fehlertext, `foreign`),
+  `report-data/cd28d260...`, `expected/castenow-0928.json` und `expected_map_castenow-0928.json`.
+  Der blaue Befund `http_alt_port` entfaellt, die IDs danach ruecken nach (Entscheidung DC 30.09.,
+  wie bei 1f8bc977 vom 23.09.).
+- **Punkt 6:** Fakten 1.5.0. `WebAlert.other_locations` kommt in allen Fakten dazu (leer oder mit
+  Einzelmeldungen an Nebenpfaden, Fehler- und Abwehrseiten). `facts-vor-s7a.json` haelt die
+  Pruefsummen ohne dieses Feld; `tests/test_facts_s7a.py` belegt, dass sonst nichts anders ist.
+- **Katalog 2026-09-29.2:** nur Texte (DKIM-Schluessel, SMB-Verifikation ohne feste Ports). Die
+  Reportdaten aller 24 Auftraege tragen die neue Version.
+- **Reportdaten:** alle 24 neu (`python -m reporter.v3 --golden-all`), weil sich Legenden,
+  Service-Karte, Posture, Anhang C, Kapitel 2 und die Bildunterschriften aendern.
+- **Seitenerwartung:** `render/expected-pages.json` hat je Auftrag mit Bildnachweisen einen zweiten
+  Eintrag `shots` (Platzhalterbilder im Seitenverhaeltnis der Aufnahmen). Golden-Laeufe ohne Bilder
+  lassen Kapitel 3.4 weg; der Umbruch um die Bilder (CA 19 in Produktion) war vorher nie geprueft.
+
+**Abgleich der Punkte:**
+
+| Punkt | Aussage | Stand |
+|---|---|---|
+| 0 | Keine Dienstkennung aus Werkzeug-Fehlertexten | erledigt: Musterliste `reporter/facts/tool_errors.py` im nmap-Leser und in der Kennung, CloudFront-Titel "ERROR: The request could not be satisfied" bleibt (Gegenprobe); Gate `werkzeugfehler_im_kundentext` (Fehler); `tests/test_tool_errors_s7a.py` |
+| 1 | Umbrueche und halbleere Seiten | erledigt: keine halbleere Seite in den 24 Auftraegen, ohne und mit Bildern; neue Layoutpruefungen (Ueberschrift mit Einleitung am Seitenende, Befundkopf allein, Hebel getrennt) in der Golden-Pruefung als Fehler; `tests/pdf_v3/test_layout_s7a.py` |
+| 2 | Bilder: Endadresse und gleiche Fotos | erledigt: "mail, mail2 und owa zeigen dieselbe Anmeldeseite" (1f8bc977), "online.heuel.com, weitergeleitet auf www.heuel.com" (2e56abe1), umfrage bei castenow, webportal bei heuel; `tests/v3/test_s7a.py` |
+| 3 | Legende, DKIM, Anhang E, Doppelpunkt, Titel, Verifikation | erledigt: Legende nur mit vorkommenden Farben und der Gelb-Stufe (Entscheidung DC 30.09.), "DKIM-Schluessel veroeffentlicht", Anhang E nur mit einer Stufe des Plans, "gesetzt: ose.heuel.com." ohne Wiederholung, Titel bis 120 Zeichen ("Swisttal / Bonn"), SMB-Verifikation ohne feste Ports |
+| 4 | Service-Karte, Posture, Anhang B, Anhang C | erledigt: ein Block je System (IPv4 und IPv6), IPv6 umbruchfest, gruen nur mit Messung am Port (`coverage.measured_ports`), JW 4433, HE 1000 bis 1002 und DB 30000 gelb nach T16; Anhang C ohne Spaltenueberlauf |
+| 5 | Technologietabelle | erledigt: Plakette nur "veraltet" und "LTS", Zielversion, Luecken und Quelle im Hinweis |
+| 6 | Nebenpfad-Instanzen in Anhang C | erledigt: eigene Zeile je ZAP-Regel "an Nebenpfaden und Fehlerseiten" mit Pfad und Status, ohne Befund (cd28d260 mail.castenow.de /robots.txt, /sitemap.xml mit 302) |
+| 7 | Hostsuche je Zieldomain | erledigt: "Hostsuche: n Namen gefunden, m geprueft, k gefunden und nicht geprueft" (Entscheidung DC 30.09.), "fuer diese Domain nicht gelaufen" bei junkerwerk.hu am 23.09.; ohne `discovery_health` keine Zeile (45bb234c) |
+| 8 | E27 Admin-Hinweis | erledigt: Gate-Warnung `fristregel_am_berichtsdatum`, Fristen in `orders.report_defects`, Nachrechnung fuer den Freigabetag in der API, Hinweis ueber den Reitern des Admin-Reviews; Fixture 2e56abe1 mit Berichtsdatum 27.09.2026 |
+| 9 | Download-Name | erledigt in der API: Auslieferungsversion statt Erzeugung (`api/src/__tests__/report-filename.test.ts`) |
+
+**Seiten je Auftrag** (Golden-Lauf, fester Stichtag 19.09.2026; "mit Bildern" neu seit S7a):
+
+| Auftrag | vorher | halbleer vorher | nachher | mit Bildern | Erklaerung |
+|---|---|---|---|---|---|
+| 45bb234c | 23 | | 24 | (keine Bilder) | Umbruchregeln (Einleitung bei der Tabelle, langer Nachweis bricht um) verschieben eine Tabelle |
+| 176db198 | 23 | | 23 | 23 | Anhang C mit 6 Nebenpfad-Zeilen, Hostsuche-Zeile; gleicht sich mit der dichteren Kapitel-1-Seite aus |
+| fb13a98f | 27 | | 27 | 28 | unveraendert; mit Bildern eine Seite fuer Kapitel 3.4 |
+| ae8d1d70 | 37 | | 37 | 38 | unveraendert; mit Bildern eine Seite fuer Kapitel 3.4 (13 Bilder) |
+| f77ccff2 | 47 | 30 | 46 | 47 | halbleere Seite 30 behoben: kein erzwungener Seitenwechsel vor dem Anhang zu Kapitel 6 |
+| 4e6b6883 | 48 | | 48 | 49 | 6 Nebenpfad-Zeilen gegen 3 zusammengefasste Bilder |
+| 2d2d4f39 | 47 | 30 | 46 | 47 | halbleere Seite 30 behoben wie f77ccff2 |
+| 0bf16342 | 33 | | 34 | 34 | 6 Nebenpfad-Zeilen in Anhang C, zwei Hostsuche-Zeilen |
+| 2572eebc | 33 | | 33 | 33 | unveraendert |
+| a6df9d9d | 22 | | 22 | 23 | 3 Nebenpfad-Zeilen; mit Bildern eine Seite fuer Kapitel 3.4 |
+| 14272c00 | 30 | | 30 | 31 | 3 Nebenpfad-Zeilen gegen die dichtere Kapitel-1-Seite |
+| 75338c97 | 18 | | 18 | 18 | unveraendert (WebCheck) |
+| 57b3ac85 | 17 | | 17 | (keine Bilder) | unveraendert |
+| 860d0d5a | 31 | | 31 | 32 | 4 Nebenpfad-Zeilen, zwei Hostsuche-Zeilen, OWA-Fotos zusammengefasst |
+| 1fbc92b9 | 30 | | 30 | 31 | 3 Nebenpfad-Zeilen gegen die dichtere Kapitel-1-Seite |
+| c3d5724c | 17 | | 17 | (keine Bilder) | unveraendert |
+| 31d67a02 | 31 | | 31 | 32 | 4 Nebenpfad-Zeilen, IPv6 im Block von 188.40.3.130, OWA-Fotos zusammengefasst |
+| 3cf01f8d | 24 | | 25 | 25 | Einleitung von Anhang B und der Werkzeugmeldungen bleibt bei der Tabelle (vorher allein am Seitenende) |
+| 1f8bc977 | 36 | | 37 | 38 | 5 Nebenpfad-Zeilen; drei OWA-Fotos werden eines |
+| 2e56abe1 | 25 | | 24 | 24 | Hebel wieder auf Seite 2, IPv6 im Block von 213.133.104.51 |
+| 68d59573 | 28 | | 28 | 29 | unveraendert; mit Bildern eine Seite fuer Kapitel 3.4 |
+| 4394b0b7 | 34 | 16 | 33 | 34 | halbleere Seite 16 behoben: langer Nachweis von VS-005 (135 mm) bricht um |
+| f9a2a2f6 | 34 | | 34 | 34 | 4 Nebenpfad-Zeilen, drei OWA-Fotos werden eines |
+| cd28d260 | 39 | 28 | 38 | 38 | halbleere Seite 28 behoben; Punkt 0 (ein Befund weniger), 4 Nebenpfad-Zeilen |
+
+Keine verbleibende halbleere Seite, deshalb kein Grund je Rest. Kapitel 1 passt in allen 24
+Auftraegen auf Seite 2 (vorher in 22 nicht: Hebel 3, bei DB und BS Hebel 2 und 3 auf Seite 3).
+Schreibt die Prosa-KI eine laengere Gesamtbewertung (bis 900 Zeichen), wandern Ueberschrift, Hebel
+und Abschlusszeile zusammen auf Seite 3; Seite 2 ist dann zu rund zwei Dritteln gefuellt.
+
 ## Golden-Facts (S1)
 
 `facts/<order>.json` ist die Ausgabe von `reporter/facts/` fuer jede Manifest-Order
