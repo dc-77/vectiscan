@@ -468,7 +468,7 @@ export default function ScanDetailPage() {
                 }`}>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-slate-200">v{rv.version}</span>
+                      <span className="text-sm text-slate-200">Version {rv.deliveryVersion ?? rv.version} · Erzeugung {rv.version}</span>
                       {rv.isCurrent && (
                         <span className="px-1.5 py-0.5 bg-blue-600/30 text-blue-300 text-xs rounded">Aktuell</span>
                       )}

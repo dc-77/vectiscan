@@ -105,8 +105,9 @@ def test_technik_status_und_farbe_passen_zusammen(data):
     # S6b-4 (spec/11 T11, T15): Langzeitpflege mit Quelle ist gruen, eine laut wpscan veraltete
     # Erweiterung gelb ("veraltet, 12 bekannte Lücken, aktuell 28.5.10"), ein unsicherer Kern rot.
     # S6b-4n (spec/11 N9): Plakette nur "veraltet" oder "LTS", Rest in der Hinweisspalte.
+    # S7a: ein Kern mit bekannten Luecken heisst "veraltet" (gelb), die Luecken stehen im Hinweis.
     erlaubt = {("aktuell", "gruen"), ("veraltet", "rot"), ("unbekannt", "grau"),
-               ("LTS", "gruen"), ("unsicher", "rot")}
+               ("LTS", "gruen")}
     for block in data.architecture.tech:
         for row in block.rows:
             ok = (row.status, row.st) in erlaubt or (row.st == "gelb" and row.status.startswith("veraltet"))
@@ -131,9 +132,16 @@ def test_dienstkarten_faerben_befundports(data):
 
 
 def test_screens_kommen_aus_den_faktenschluesseln(data):
-    keys = {f.screenshot_key.rsplit("/", 1)[-1]
+    keys = {f.screenshot_key.rsplit("/", 1)[-1]: f.name
             for f in facts_for(MULTI).fqdns if f.screenshot_key}
-    assert {s.file for s in data.architecture.screens} == keys
+    screens = data.architecture.screens
+    assert {s.file for s in screens} <= set(keys)
+    # S7a (spec/10 R20): dieselbe Seite unter mehreren Namen ist ein Bild; jeder Name steht dann
+    # in dessen Unterschrift (weitere Namen oder Weiterleitung).
+    genannt = {n for s in screens for n in [s.host, *s.also]}
+    genannt |= {r.split(",", 1)[0] for s in screens for r in s.redirects}
+    for datei, name in keys.items():
+        assert datei in {s.file for s in screens} or name in genannt, (datei, name)
 
 
 def test_posture_hat_vier_bloecke_mit_items(data):

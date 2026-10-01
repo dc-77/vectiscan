@@ -2355,6 +2355,7 @@
      "evidence": null,
      "location": "side_path",
      "name": "Re-examine Cache-control Directives",
+     "other_locations": [],
      "param": "cache-control",
      "plugin_id": "10015",
      "risk": "Informational",
@@ -2373,6 +2374,7 @@
      "evidence": null,
      "location": "target",
      "name": "Multiple X-Frame-Options Header Entries",
+     "other_locations": [],
      "param": "x-frame-options",
      "plugin_id": "10020",
      "risk": "Medium",
@@ -2395,6 +2397,13 @@
      "evidence": null,
      "location": "target",
      "name": "X-Content-Type-Options Header Missing",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://openotp.junkerwerk.hu/robots.txt"
+      }
+     ],
      "param": "x-content-type-options",
      "plugin_id": "10021",
      "risk": "Low",
@@ -2413,6 +2422,7 @@
      "evidence": "// when user clicks on anchor li",
      "location": "target",
      "name": "Information Disclosure - Suspicious Comments",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10027",
      "risk": "Informational",
@@ -2431,6 +2441,13 @@
      "evidence": null,
      "location": "target",
      "name": "Strict-Transport-Security Header Not Set",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://openotp.junkerwerk.hu/robots.txt"
+      }
+     ],
      "param": null,
      "plugin_id": "10035",
      "risk": "Low",
@@ -2453,6 +2470,7 @@
      "evidence": null,
      "location": "target",
      "name": "Content Security Policy (CSP) Header Not Set",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10038",
      "risk": "Medium",
@@ -2475,6 +2493,13 @@
      "evidence": "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: www.google.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com maps.googleapis.com maps.gstatic.com",
      "location": "target",
      "name": "CSP: Failure to Define Directive with No Fallback",
+     "other_locations": [
+      {
+       "location": "side_path",
+       "status": null,
+       "url": "https://openotp.junkerwerk.hu/sitemap.xml"
+      }
+     ],
      "param": "Content-Security-Policy",
      "plugin_id": "10055",
      "risk": "Medium",
@@ -2497,6 +2522,7 @@
      "evidence": "<a class=\"locale_lang\" onclick=\"jslang.menu();\"><img width=20 src=\"../images/countries/en.svg\"></a>",
      "location": "target",
      "name": "Modern Web Application",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10109",
      "risk": "Informational",
@@ -2518,6 +2544,7 @@
      "evidence": "password",
      "location": "target",
      "name": "Authentication Request Identified",
+     "other_locations": [],
      "param": "login",
      "plugin_id": "10111",
      "risk": "Informational",
@@ -2536,6 +2563,7 @@
      "evidence": "<form name=\"form\" method=\"POST\" autocomplete=\"OFF\">",
      "location": "target",
      "name": "Absence of Anti-CSRF Tokens",
+     "other_locations": [],
      "param": null,
      "plugin_id": "10202",
      "risk": "Medium",
@@ -3320,7 +3348,7 @@
    }
   ]
  },
- "schema_version": "1.4.0",
+ "schema_version": "1.5.0",
  "services": [
   {
    "auth_before_starttls": null,

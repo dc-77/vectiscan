@@ -38,6 +38,26 @@ def no_screenshots(key: str) -> bytes | None:
     return None
 
 
+# S7a Punkt 1: Golden-Laeufe ohne Bilder lassen Kapitel 3.4 weg, die Fuellpruefung sah den Umbruch
+# um die Bilder deshalb nie (CA 19 in Produktion). Ein graues Bild im Seitenverhaeltnis der
+# Aufnahmen (1440 x 900, auf MAX_WIDTH verkleinert) setzt Kapitel 3.4 so wie im echten Bericht.
+PLACEHOLDER_SIZE = (MAX_WIDTH, round(MAX_WIDTH * 900 / 1440))
+_PLACEHOLDER_PNG: bytes | None = None
+
+
+def placeholder_screenshots(key: str) -> bytes | None:
+    """Resolver fuer die Seitenerwartung mit Bildern: ein graues PNG je Schluessel."""
+    global _PLACEHOLDER_PNG
+    if not key:
+        return None
+    if _PLACEHOLDER_PNG is None:
+        from PIL import Image
+        buf = io.BytesIO()
+        Image.new("RGB", PLACEHOLDER_SIZE, (226, 232, 240)).save(buf, format="PNG")
+        _PLACEHOLDER_PNG = buf.getvalue()
+    return _PLACEHOLDER_PNG
+
+
 def downscale(data: bytes, max_width: int = MAX_WIDTH) -> bytes:
     """Auf Rasterbreite herunterrechnen, wenn Pillow da ist. Sonst unveraendert."""
     try:

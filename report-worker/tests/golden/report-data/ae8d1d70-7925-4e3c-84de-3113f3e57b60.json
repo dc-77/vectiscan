@@ -114,6 +114,20 @@
     "svc": "sw-cp-server, TLS erzwungen"
    },
    {
+    "host": "212.227.60.78",
+    "operator": "",
+    "port": "8880",
+    "ref": "VS-2026-001",
+    "svc": "Plesk, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
+    "host": "212.227.60.78",
+    "operator": "",
+    "port": "18018",
+    "ref": "",
+    "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
     "host": "51.116.154.224",
     "operator": "Microsoft Limited, laut AbuseIPDB",
     "port": "80",
@@ -198,27 +212,6 @@
     "svc": "nginx 1.22.1, TLS erzwungen"
    },
    {
-    "host": "85.22.47.46",
-    "operator": "Securess Versicherungsmakler GmbH, laut AbuseIPDB",
-    "port": "443",
-    "ref": "VS-2026-005",
-    "svc": "Microsoft HTTPAPI httpd 2.0, TLS erzwungen"
-   },
-   {
-    "host": "212.227.60.78",
-    "operator": "",
-    "port": "8880",
-    "ref": "VS-2026-001",
-    "svc": "Plesk, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "212.227.60.78",
-    "operator": "",
-    "port": "18018",
-    "ref": "",
-    "svc": "unbekannt, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
     "host": "85.22.47.42",
     "operator": "Securess Versicherungsmakler GmbH, laut AbuseIPDB",
     "port": "80",
@@ -245,6 +238,13 @@
     "port": "443",
     "ref": "",
     "svc": "Outlook Web App, laut Passivquelle"
+   },
+   {
+    "host": "85.22.47.46",
+    "operator": "Securess Versicherungsmakler GmbH, laut AbuseIPDB",
+    "port": "443",
+    "ref": "VS-2026-005",
+    "svc": "Microsoft HTTPAPI httpd 2.0, TLS erzwungen"
    }
   ],
   "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
@@ -596,6 +596,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -608,6 +609,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -623,6 +625,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -635,6 +638,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -647,6 +651,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -659,6 +664,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -677,6 +683,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -689,6 +696,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -701,6 +709,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -713,6 +722,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -735,6 +745,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "212.227.60.78",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -759,6 +770,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "51.116.154.224",
+      "more": [],
       "ok": true,
       "pulls": [
        "cert_expired",
@@ -783,6 +795,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.36",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -807,6 +820,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.38",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -831,6 +845,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.39",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -855,6 +870,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.40",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -879,6 +895,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.41",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -903,6 +920,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.42",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -927,6 +945,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.43",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -951,6 +970,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.45",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -975,6 +995,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.46",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -999,6 +1020,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.22.47.47",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -1025,6 +1047,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1085,6 +1108,7 @@
        "header_duplicate"
       ],
       "l": "212.227.60.78",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1102,6 +1126,7 @@
        "header_duplicate"
       ],
       "l": "51.116.154.224",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1119,6 +1144,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.36",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1136,6 +1162,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.38",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1153,6 +1180,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.39",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1170,6 +1198,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.40",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1187,6 +1216,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.41",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1204,6 +1234,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.42",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1221,6 +1252,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.43",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1238,6 +1270,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.45",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1255,6 +1288,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.46",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1272,6 +1306,7 @@
        "header_duplicate"
       ],
       "l": "85.22.47.47",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1289,92 +1324,118 @@
    {
     "also": [],
     "file": "212.227.60.78__connect.securess.de.png",
+    "head": "",
     "host": "connect.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__connect.securess.de.png",
+    "redirects": [],
     "what": "SECURESS|connect: SECURESS"
    },
    {
     "also": [],
     "file": "85.22.47.38__eset.securess.de.png",
+    "head": "",
     "host": "eset.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.38__eset.securess.de.png",
+    "redirects": [],
     "what": "403 Forbidden"
    },
    {
     "also": [],
     "file": "85.22.47.41__ftp.securess.de.png",
+    "head": "",
     "host": "ftp.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__ftp.securess.de.png",
+    "redirects": [],
     "what": "NinjaFirewall 403 Forbidden"
    },
    {
     "also": [],
     "file": "51.116.154.224__login-kundenportal.securess.de.png",
+    "head": "",
     "host": "login-kundenportal.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/51.116.154.224__login-kundenportal.securess.de.png",
+    "redirects": [],
     "what": "Login Kundenportal (login-kundenportal.securess.de/Account/Login)"
    },
    {
     "also": [],
     "file": "85.22.47.39__mailcleaner.securess.de.png",
+    "head": "",
     "host": "mailcleaner.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailcleaner.securess.de.png",
+    "redirects": [],
     "what": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
    },
    {
     "also": [],
     "file": "85.22.47.39__mailin.securess.de.png",
+    "head": "",
     "host": "mailin.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailin.securess.de.png",
+    "redirects": [],
     "what": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
    },
    {
     "also": [],
     "file": "85.22.47.39__mailout.securess.de.png",
+    "head": "",
     "host": "mailout.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailout.securess.de.png",
+    "redirects": [],
     "what": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
    },
    {
     "also": [],
     "file": "85.22.47.39__mx1.securess.de.png",
+    "head": "",
     "host": "mx1.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mx1.securess.de.png",
+    "redirects": [],
     "what": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
    },
    {
     "also": [],
     "file": "85.22.47.38__openotp.securess.de.png",
+    "head": "",
     "host": "openotp.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.38__openotp.securess.de.png",
+    "redirects": [],
     "what": "403 Forbidden"
    },
    {
     "also": [],
     "file": "212.227.60.78__partner.securess.de.png",
+    "head": "",
     "host": "partner.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__partner.securess.de.png",
+    "redirects": [],
     "what": "Page Not Found"
    },
    {
     "also": [],
     "file": "85.22.47.41__securess.de.png",
+    "head": "",
     "host": "securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__securess.de.png",
+    "redirects": [],
     "what": "NinjaFirewall 403 Forbidden"
    },
    {
     "also": [],
     "file": "212.227.60.78__vermittler.securess.de.png",
+    "head": "",
     "host": "vermittler.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__vermittler.securess.de.png",
+    "redirects": [],
     "what": "Page Not Found"
    },
    {
     "also": [],
     "file": "85.22.47.41__www.securess.de.png",
+    "head": "",
     "host": "www.securess.de",
     "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__www.securess.de.png",
+    "redirects": [],
     "what": "NinjaFirewall 403 Forbidden"
    }
   ],
@@ -1383,208 +1444,255 @@
    {
     "host": "212.227.60.78",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "21",
       "s": "ProFTPD",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "22",
       "s": "OpenSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "106",
       "s": "Dienst ohne Antwort",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "110",
       "s": "Dovecot pop3d",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "465",
       "s": "Postfix smtpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "993",
       "s": "Dovecot imapd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "995",
       "s": "Dovecot pop3d",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "8443",
       "s": "sw-cp-server",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "8880",
       "s": "Plesk",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "18018",
       "s": "unbekannt",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "51.116.154.224",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "Titel „Microsoft Azure Web App - Error 404“",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Titel „Microsoft Azure Web App - Error 404“",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "85.22.47.38",
     "label": "85-22-47-38.ip.dokom21.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "25",
       "s": "SMTP",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "85.22.47.39",
     "label": "85-22-47-39.ip.dokom21.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "465",
       "s": "SMTP über TLS",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "587",
       "s": "SMTP",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "993",
       "s": "Dovecot imapd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "85.22.47.41",
     "label": "85-22-47-41.ip.dokom21.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "22",
       "s": "OpenSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "80",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    },
    {
     "host": "85.22.47.42",
     "label": "85-22-47-42.ip.dokom21.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "HTTP",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "HTTPS",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "5060",
       "s": "STARFACE PBX",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "85.22.47.43",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Outlook Web App",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "85.22.47.46",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Microsoft HTTPAPI httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Rot unverzüglich · Gelb in Kürze oder mittelfristig · Blau geplante Verbesserung · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "212.227.60.78",
@@ -3636,7 +3744,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check\nwww.securess.de · Adresse: https://www.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options\n\nheader_check\nftp.securess.de · Adresse: https://ftp.securess.de · Antwort: 301 (Weiterleitung) · weitergeleitet auf: https://www.securess.de/ · Strict-Transport-Security: nicht gesetzt\n\nheader_check\nsecuress.de · Adresse: https://securess.de · Antwort: 301 (Weiterleitung) · weitergeleitet auf: https://www.securess.de/ · Strict-Transport-Security: nicht gesetzt",
-   "found": "Der Dienst 85.22.47.41 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: ftp.securess.de, securess.de, www.securess.de. Auf www.securess.de ist keine Content-Security-Policy gesetzt: www.securess.de. Auf www.securess.de fehlen einzelne Sicherheits-Header der Webseite: www.securess.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Der Dienst 85.22.47.41 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: ftp.securess.de, securess.de, www.securess.de. Auf www.securess.de ist keine Content-Security-Policy gesetzt. Auf www.securess.de fehlen einzelne Sicherheits-Header der Webseite: www.securess.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-009",
    "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/85.22.47.41/kunde",
@@ -3732,7 +3840,7 @@
       "www.securess.de@85.22.47.41|www.securess.de@85.22.47.41"
      ],
      "statement": "observation[0]",
-     "text": "Auf www.securess.de ist keine Content-Security-Policy gesetzt: www.securess.de."
+     "text": "Auf www.securess.de ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -4653,7 +4761,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check\nconnect.securess.de · Adresse: https://connect.securess.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Frame-Options",
-   "found": "Auf connect.securess.de ist keine Content-Security-Policy gesetzt: connect.securess.de. Auf connect.securess.de fehlen einzelne Sicherheits-Header der Webseite: connect.securess.de (fehlend: X-Frame-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Auf connect.securess.de ist keine Content-Security-Policy gesetzt. Auf connect.securess.de fehlen einzelne Sicherheits-Header der Webseite: connect.securess.de (fehlend: X-Frame-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-016",
    "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/212.227.60.78/kunde",
@@ -4717,7 +4825,7 @@
       "connect.securess.de@212.227.60.78|connect.securess.de@212.227.60.78"
      ],
      "statement": "observation[0]",
-     "text": "Auf connect.securess.de ist keine Content-Security-Policy gesetzt: connect.securess.de."
+     "text": "Auf connect.securess.de ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -5403,6 +5511,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von securess.de am 19.07.2026: 26 Hostnamen auf 12 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 12 Systeme (212.227.60.78, 51.116.154.224, 85.22.47.36, 85.22.47.38, 85.22.47.39, 85.22.47.40, 85.22.47.41, 85.22.47.42, 85.22.47.43, 85.22.47.45, 85.22.47.46 und 85.22.47.47) liegt keine oder nur eine teilweise aktive Prüfung vor. 3 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Rot = unverzüglich handeln · Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugang zur Verwaltung der Systeme",
@@ -5431,13 +5540,13 @@
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "20 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 66,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 20,
   "context_fields": [],
@@ -5448,7 +5557,7 @@
    "securess.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 26,
   "generated_on": null,
   "generation": null,
@@ -5463,7 +5572,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -5931,13 +6040,13 @@
       "securess.de"
      ],
      "statement": "positive.text",
-     "text": "Für die Domain securess.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+     "text": "Für die Domain securess.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht."
     }
    ],
    "subjects": [
     "securess.de"
    ],
-   "text": "Für die Domain securess.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+   "text": "Für die Domain securess.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht.",
    "title": "DKIM vorhanden"
   },
   {
@@ -6061,7 +6170,13 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
-  "domains": [],
+  "domains": [
+   {
+    "domain": "securess.de",
+    "search": "Hostsuche: 29 Namen gefunden, 26 geprüft, 3 gefunden und nicht geprüft.",
+    "text": "Hostermittlung, Portscan und Tiefenprüfung (26 Hostnamen), DNS- und E-Mail-Einträge"
+   }
+  ],
   "hosts": [
    {
     "cov": "teil",

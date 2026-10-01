@@ -289,6 +289,51 @@ SERVICES_NOTE = (
     "Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund."
 )
 
+
+def _gelb_stufe(stufen: set[str]) -> str:
+    kurz, mittel = "In Kürze" in stufen, "Mittelfristig" in stufen
+    if kurz and mittel:
+        return "in Kürze oder mittelfristig"
+    return "mittelfristig" if mittel else "in Kürze"
+
+
+def services_note(farben: set[str], gelb_stufen: set[str]) -> str:
+    """Legende der Service-Karte (S7a, spec/10 R20 und R20-Punkt 4, Entscheidung DC 30.09.).
+
+    Nur Farben, die auf der Karte vorkommen; Gelb mit der Stufe der gelben Befunde an den Ports
+    (HE, HL, CA trugen "Gelb in Kürze" neben Gelb Mittelfristig); Grün nur mit Messung am Port,
+    Grau auch fuer Ports, die nur der Portscan erfasst hat."""
+    teile: list[str] = []
+    if "rot" in farben:
+        teile.append("Rot unverzüglich")
+    if "gelb" in farben:
+        teile.append(f"Gelb {_gelb_stufe(gelb_stufen)}")
+    if "blau" in farben:
+        teile.append("Blau geplante Verbesserung")
+    if "gruen" in farben:
+        teile.append("Grün: tiefer geprüft, kein Befund")
+    if "grau" in farben:
+        teile.append("Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund")
+    if not teile:
+        return ""
+    return "Farbe je Port nach Ampel des schwersten Befunds am Port: " + " · ".join(teile) + "."
+
+
+def glance_legend(farben: set[str], gelb_kurz: bool) -> str:
+    """Farberklaerung unter den Hebeln in Kapitel 1 (S7a, Entscheidung DC 30.09.): nur vorkommende
+    Farben; "Gelb = Handlungsbedarf in Wochen" nur bei einem Gelb-Befund der Stufe In Kürze."""
+    teile: list[str] = []
+    if "rot" in farben:
+        teile.append("Rot = unverzüglich handeln")
+    if "gelb" in farben:
+        teile.append("Gelb = Handlungsbedarf in Wochen" if gelb_kurz
+                     else "Gelb = Handlungsbedarf im nächsten Wartungszyklus")
+    if "blau" in farben:
+        teile.append("Blau = geplante Verbesserung")
+    if "gruen" in farben:
+        teile.append("Grün = positiv")
+    return (" · ".join(teile) + ".") if teile else ""
+
 SCREENS_LEAD = "Sichtprüfung der erreichbaren Web-Oberflächen der geprüften Hosts."
 
 
@@ -379,13 +424,20 @@ def filtering(c: Counts) -> str:
     )
 
 
-def repeat(c: Counts, has_red: bool, has_gaps: bool) -> list[str]:
+def repeat(c: Counts, has_red: bool, has_gaps: bool, stages: list[str] | None = None) -> list[str]:
+    """Anhang E. S7a (spec/10 R20, HL): die Stufe im zweiten Satz nur, wenn der Plan sie hat;
+    ``stages`` sind die Prioritaeten der Planzeilen (ohne Angabe wie bisher In Kuerze)."""
     out: list[str] = []
     if has_red:
         out.append("Nachprüfung der Sofortmaßnahmen nach ihrer Umsetzung, gezielt auf die "
                    "betroffenen Dienste.")
-    out.append("Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, "
-               "spätestens in zwölf Monaten.")
+    vorhanden = set(stages) if stages is not None else {"In Kürze"}
+    stufe = next((s for s in ("In Kürze", "Mittelfristig") if s in vorhanden), None)
+    if stufe:
+        out.append(f"Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe {stufe}, "
+                   "spätestens in zwölf Monaten.")
+    else:
+        out.append("Wiederholung des Scans spätestens in zwölf Monaten.")
     out.append("Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei "
                "jedem Verdacht auf einen Vorfall.")
     if has_gaps:

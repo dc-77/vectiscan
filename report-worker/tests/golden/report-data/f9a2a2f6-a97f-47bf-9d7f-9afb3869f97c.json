@@ -55,6 +55,13 @@
    {
     "host": "188.40.3.130",
     "operator": "",
+    "port": "25",
+    "ref": "",
+    "svc": "SMTP (Exim), laut Passivquelle"
+   },
+   {
+    "host": "188.40.3.130",
+    "operator": "",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd"
@@ -130,11 +137,39 @@
     "svc": "PostgreSQL DB"
    },
    {
+    "host": "2a01:4f8:d0a:3124::2",
+    "operator": "IPv6-Adresse von 188.40.3.130",
+    "port": "80",
+    "ref": "",
+    "svc": "Apache httpd, laut Passivquelle"
+   },
+   {
+    "host": "2a01:4f8:d0a:3124::2",
+    "operator": "",
+    "port": "443",
+    "ref": "",
+    "svc": "Apache httpd, laut Passivquelle"
+   },
+   {
     "host": "217.243.248.28",
     "operator": "Junkerwerk Linder GmbH & Co., laut AbuseIPDB",
+    "port": "25",
+    "ref": "",
+    "svc": "SMTP, laut Passivquelle"
+   },
+   {
+    "host": "217.243.248.28",
+    "operator": "",
     "port": "443",
     "ref": "VS-2026-007, VS-2026-009, VS-2026-016",
     "svc": "Microsoft-IIS/10.0, TLS erzwungen"
+   },
+   {
+    "host": "217.243.248.28",
+    "operator": "",
+    "port": "4433",
+    "ref": "VS-2026-002",
+    "svc": "SonicWall, laut Passivquelle, außerhalb des geprüften Portbereichs"
    },
    {
     "host": "217.243.248.29",
@@ -149,41 +184,6 @@
     "port": "8443",
     "ref": "VS-2026-006, VS-2026-012, VS-2026-016",
     "svc": "Microsoft IIS httpd 10.0, TLS erzwungen"
-   },
-   {
-    "host": "188.40.3.130",
-    "operator": "",
-    "port": "25",
-    "ref": "",
-    "svc": "SMTP (Exim), laut Passivquelle"
-   },
-   {
-    "host": "217.243.248.28",
-    "operator": "",
-    "port": "25",
-    "ref": "",
-    "svc": "SMTP, laut Passivquelle"
-   },
-   {
-    "host": "217.243.248.28",
-    "operator": "",
-    "port": "4433",
-    "ref": "VS-2026-002",
-    "svc": "SonicWall, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "2a01:4f8:d0a:3124::2",
-    "operator": "Hetzner Online GmbH, laut AbuseIPDB",
-    "port": "80",
-    "ref": "",
-    "svc": "Apache httpd, laut Passivquelle"
-   },
-   {
-    "host": "2a01:4f8:d0a:3124::2",
-    "operator": "",
-    "port": "443",
-    "ref": "",
-    "svc": "Apache httpd, laut Passivquelle"
    }
   ],
   "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
@@ -225,6 +225,38 @@
     "rule": "tls_weakness_reported",
     "what": "„LUCKY13“, 3 Meldungen",
     "where": "cloud.junkerwerk.de, outlook.junkerwerk.de"
+   },
+   {
+    "count": 16,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "„Server Leaks Version Information via \"Server\" HTTP Response Header Field“ (ZAP-Regel 10036) an Nebenpfaden und Fehlerseiten, 16 Meldungen",
+    "where": "autodiscover.junkerwerk.de/robots.txt (Status 302), autodiscover.junkerwerk.de/sitemap.xml (Status 302), cloud.junkerwerk.de/robots.txt (Status 404), cloud.junkerwerk.de/sitemap.xml (Status 404), mail.junkerwerk.de/owa/auth/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/ (Status 500) und 10 weitere"
+   },
+   {
+    "count": 10,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "„Strict-Transport-Security Header Not Set“ (ZAP-Regel 10035) an Fehlerseiten, 10 Meldungen",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404), cloud.junkerwerk.de/sitemap.xml (Status 404), mail.junkerwerk.de/owa/auth/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500) und 4 weitere"
+   },
+   {
+    "count": 10,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "„Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)“ (ZAP-Regel 10037) an Fehlerseiten, 10 Meldungen",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404), cloud.junkerwerk.de/sitemap.xml (Status 404), mail.junkerwerk.de/owa/auth/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500), mail.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500) und 4 weitere"
+   },
+   {
+    "count": 2,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "„Content Security Policy (CSP) Header Not Set“ (ZAP-Regel 10038) an Fehlerseiten, 2 Meldungen",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404), cloud.junkerwerk.de/sitemap.xml (Status 404)"
    },
    {
     "count": 1,
@@ -315,6 +347,310 @@
     "rule": "tls_weakness_reported",
     "what": "outlook.junkerwerk.de:443: LUCKY13 (Hinweis der TLS-Analyse)",
     "where": "outlook.junkerwerk.de"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "autodiscover.junkerwerk.de/robots.txt (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "autodiscover.junkerwerk.de/sitemap.xml (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/sitemap.xml (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/sitemap.xml (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/sitemap.xml (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/robots.txt (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Fehlerseite",
+    "where": "cloud.junkerwerk.de/sitemap.xml (Status 404)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail.junkerwerk.de/robots.txt (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "mail.junkerwerk.de/sitemap.xml (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "mail.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "outlook.junkerwerk.de/robots.txt (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "outlook.junkerwerk.de/sitemap.xml (Status 302)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/themes/ (Status 500)"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Fehlerseite",
+    "where": "outlook.junkerwerk.de/owa/auth/15.2.2562/themes/resources/ (Status 500)"
    },
    {
     "count": 1,
@@ -410,6 +746,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -423,6 +760,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -439,6 +777,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -452,6 +791,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -465,6 +805,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -478,6 +819,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -497,6 +839,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -510,6 +853,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -523,6 +867,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -536,6 +881,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -559,6 +905,9 @@
        "tls_no_fallback_scsv"
       ],
       "l": "188.40.3.130",
+      "more": [
+       "2a01:4f8:d0a:3124::2: nicht prüfbar"
+      ],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -583,6 +932,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "217.243.248.27",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -607,6 +957,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "217.243.248.28",
+      "more": [],
       "ok": true,
       "pulls": [
        "cert_expired",
@@ -631,6 +982,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "217.243.248.29",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -648,30 +1000,6 @@
      },
      {
       "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
-      "l": "2a01:4f8:d0a:3124::2",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "2a01:4f8:d0a:3124::2"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
        "cert_expired",
        "cert_expiring",
        "cert_expiring_later",
@@ -681,6 +1009,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -718,6 +1047,9 @@
        "header_duplicate"
       ],
       "l": "188.40.3.130",
+      "more": [
+       "2a01:4f8:d0a:3124::2: nicht prüfbar"
+      ],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -735,6 +1067,7 @@
        "header_duplicate"
       ],
       "l": "217.243.248.27",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -752,6 +1085,7 @@
        "header_duplicate"
       ],
       "l": "217.243.248.28",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -769,29 +1103,13 @@
        "header_duplicate"
       ],
       "l": "217.243.248.29",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
        "217.243.248.29"
       ],
       "v": "Handlungsbedarf"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
-      "l": "2a01:4f8:d0a:3124::2",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "2a01:4f8:d0a:3124::2"
-      ],
-      "v": "nicht prüfbar"
      }
     ],
     "name": "Sicherheits-Header",
@@ -802,31 +1120,24 @@
   "screens": [
    {
     "also": [],
-    "file": "217.243.248.28__autodiscover.junkerwerk.de.png",
-    "host": "autodiscover.junkerwerk.de",
-    "key": "f9a2a2f6-a97f-47bf-9d7f-9afb3869f97c/217.243.248.28__autodiscover.junkerwerk.de.png",
-    "what": "Outlook (autodiscover.junkerwerk.de/owa/auth/logon.aspx)"
-   },
-   {
-    "also": [],
     "file": "217.243.248.29__cloud.junkerwerk.de.png",
+    "head": "",
     "host": "cloud.junkerwerk.de",
     "key": "f9a2a2f6-a97f-47bf-9d7f-9afb3869f97c/217.243.248.29__cloud.junkerwerk.de.png",
+    "redirects": [],
     "what": "IIS Windows Server"
    },
    {
-    "also": [],
+    "also": [
+     "autodiscover.junkerwerk.de",
+     "outlook.junkerwerk.de"
+    ],
     "file": "217.243.248.28__mail.junkerwerk.de.png",
+    "head": "autodiscover, mail und outlook zeigen dieselbe Anmeldeseite",
     "host": "mail.junkerwerk.de",
     "key": "f9a2a2f6-a97f-47bf-9d7f-9afb3869f97c/217.243.248.28__mail.junkerwerk.de.png",
-    "what": "Outlook (mail.junkerwerk.de/owa/auth/logon.aspx)"
-   },
-   {
-    "also": [],
-    "file": "217.243.248.28__outlook.junkerwerk.de.png",
-    "host": "outlook.junkerwerk.de",
-    "key": "f9a2a2f6-a97f-47bf-9d7f-9afb3869f97c/217.243.248.28__outlook.junkerwerk.de.png",
-    "what": "Outlook (outlook.junkerwerk.de/owa/auth/logon.aspx)"
+    "redirects": [],
+    "what": "Outlook (/owa/auth/logon.aspx)"
    }
   ],
   "screens_lead": "Sichtprüfung der erreichbaren Web-Oberflächen der geprüften Hosts.",
@@ -834,134 +1145,147 @@
    {
     "host": "188.40.3.130",
     "label": "dedi2230.your-server.de",
+    "more_ips": [
+     "2a01:4f8:d0a:3124::2"
+    ],
+    "notes": [
+     "2a01:4f8:d0a:3124::2: Ports 80 und 443 laut Passivquelle (Apache httpd), nicht geprüft"
+    ],
     "ports": [
      {
       "p": "21",
       "s": "ProFTPD",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "22",
       "s": "ProFTPD mod_sftp",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "110",
       "s": "Courier pop3d",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "222",
       "s": "OpenSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "465",
       "s": "SMTP über TLS (Exim)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "587",
       "s": "SMTP (Exim)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "993",
       "s": "IMAP über TLS",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "995",
       "s": "POP3 über TLS",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "3306",
       "s": "MariaDB 10.11.18",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "5432",
       "s": "PostgreSQL DB",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "25",
       "s": "SMTP (Exim)",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "217.243.248.28",
     "label": "junkerwerk-solingen.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Microsoft-IIS/10.0",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "25",
       "s": "SMTP",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "4433",
       "s": "SonicWall",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    },
    {
     "host": "217.243.248.29",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Microsoft IIS httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "8443",
       "s": "Microsoft IIS httpd",
-      "st": "gelb"
-     }
-    ]
-   },
-   {
-    "host": "2a01:4f8:d0a:3124::2",
-    "label": "dedi2230.your-server.de",
-    "ports": [
-     {
-      "p": "80",
-      "s": "Apache httpd",
-      "st": "grau"
-     },
-     {
-      "p": "443",
-      "s": "Apache httpd",
-      "st": "grau"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Rot unverzüglich · Gelb in Kürze oder mittelfristig · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "188.40.3.130 (dedi2230.your-server.de)",
@@ -2800,7 +3124,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check · hosts/217.243.248.29/phase2/headers_cloud.junkerwerk.de.json\ncloud.junkerwerk.de · Adresse: https://cloud.junkerwerk.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options",
-   "found": "Der Dienst cloud.junkerwerk.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: cloud.junkerwerk.de. Auf cloud.junkerwerk.de ist keine Content-Security-Policy gesetzt: cloud.junkerwerk.de. Auf cloud.junkerwerk.de fehlen einzelne Sicherheits-Header der Webseite: cloud.junkerwerk.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Der Dienst cloud.junkerwerk.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt. Auf cloud.junkerwerk.de ist keine Content-Security-Policy gesetzt. Auf cloud.junkerwerk.de fehlen einzelne Sicherheits-Header der Webseite: cloud.junkerwerk.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-010",
    "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/217.243.248.29/kunde",
@@ -2883,7 +3207,7 @@
       "cloud.junkerwerk.de@217.243.248.29|cloud.junkerwerk.de@217.243.248.29"
      ],
      "statement": "observation[0]",
-     "text": "Der Dienst cloud.junkerwerk.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: cloud.junkerwerk.de."
+     "text": "Der Dienst cloud.junkerwerk.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt."
     },
     {
      "check": "csp_missing",
@@ -2892,7 +3216,7 @@
       "cloud.junkerwerk.de@217.243.248.29|cloud.junkerwerk.de@217.243.248.29"
      ],
      "statement": "observation[0]",
-     "text": "Auf cloud.junkerwerk.de ist keine Content-Security-Policy gesetzt: cloud.junkerwerk.de."
+     "text": "Auf cloud.junkerwerk.de ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -4398,6 +4722,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von junkerwerk.de und junkerwerk.hu am 28.09.2026: 12 Hostnamen auf 5 IP-Adressen, davon 2 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 4 Systeme (188.40.3.130 mit 2a01:4f8:d0a:3124::2, 217.243.248.27, 217.243.248.28 und 217.243.248.29) liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Rot = unverzüglich handeln · Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung · Grün = positiv.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugriff auf die Datenbanken",
@@ -4427,13 +4752,13 @@
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "18 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 50,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 18,
   "context_fields": [],
@@ -4445,7 +4770,7 @@
    "junkerwerk.hu"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 12,
   "generated_on": null,
   "generation": null,
@@ -4460,7 +4785,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -4925,7 +5250,7 @@
       "junkerwerk.de"
      ],
      "statement": "positive.text",
-     "text": "Für die Domain junkerwerk.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+     "text": "Für die Domain junkerwerk.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht."
     },
     {
      "check": "dkim_missing",
@@ -4934,14 +5259,14 @@
       "junkerwerk.hu"
      ],
      "statement": "positive.text",
-     "text": "Für die Domain junkerwerk.hu (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+     "text": "Für die Domain junkerwerk.hu (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht."
     }
    ],
    "subjects": [
     "junkerwerk.de",
     "junkerwerk.hu"
    ],
-   "text": "Für die Domain junkerwerk.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht. Für die Domain junkerwerk.hu (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+   "text": "Für die Domain junkerwerk.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht. Für die Domain junkerwerk.hu (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht.",
    "title": "DKIM vorhanden"
   },
   {
@@ -5048,10 +5373,12 @@
   "domains": [
    {
     "domain": "junkerwerk.de",
+    "search": "Hostsuche: 10 Namen gefunden, 10 geprüft, 0 gefunden und nicht geprüft.",
     "text": "Hostermittlung, Portscan und Tiefenprüfung (10 Hostnamen), DNS- und E-Mail-Einträge"
    },
    {
     "domain": "junkerwerk.hu",
+    "search": "Hostsuche: 2 Namen gefunden, 2 geprüft, 0 gefunden und nicht geprüft.",
     "text": "Hostermittlung, Portscan und Tiefenprüfung (2 Hostnamen), DNS- und E-Mail-Einträge"
    }
   ],

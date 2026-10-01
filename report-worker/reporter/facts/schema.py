@@ -104,6 +104,11 @@ Historie:
   ``WebAlert.status``, ``statuses``, ``location`` (A7), ``ZoneTransfer.not_tested_reason`` (A9),
   ``TargetFact.synthetic_ipv6`` (NAT64, C2), ``HttpResponse.status_basis`` ``redirect_eval``
   (Endantwort aus header_check, A6).
+- 1.5.0 (S7a Punkt 6, Entscheidung DC 30.09.): neues optionales Feld ``WebAlert.other_locations``.
+  Ein Meldungstyp mit Einzelmeldungen an mehreren Fundorten behaelt die Zielseite als Fundort der
+  Meldung wie bisher; die Einzelmeldungen an Nebenpfaden, Fehler- und Abwehrseiten stehen nun mit
+  Adresse und Statuscode in ``other_locations`` (``WebAlertInstance``), statt verworfen zu werden.
+  Anhang C nennt sie als eigene Zeile ohne Befund. Uebrige Felder unveraendert.
 """
 from __future__ import annotations
 
@@ -111,7 +116,7 @@ from typing import Any, ClassVar, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-FACTS_SCHEMA_VERSION = "1.4.0"
+FACTS_SCHEMA_VERSION = "1.5.0"
 
 Mode = Literal["active", "passive"]
 
@@ -662,6 +667,13 @@ class Tech(Base):
     version: Optional[str] = None
 
 
+class WebAlertInstance(Base):
+    """Einzelmeldung eines ZAP-Alert-Typs an einem nachrangigen Fundort (S7a Punkt 6)."""
+    location: Literal["target", "side_path", "error_page", "challenge"]
+    url: str
+    status: Optional[int] = None
+
+
 class WebAlert(Base):
     """Ein ZAP-Alert-Typ je VHost: ``count`` = Anzahl betroffener URLs, ``urls_sample`` die ersten fuenf."""
     plugin_id: Optional[str] = None
@@ -685,6 +697,10 @@ class WebAlert(Base):
     status: Optional[int] = None
     statuses: list[int] = Field(default_factory=list)
     location: Literal["target", "side_path", "error_page", "challenge"] = "target"
+    # S7a Punkt 6: Einzelmeldungen desselben Typs an nachrangigen Fundorten (Nebenpfad, Fehler-
+    # und Abwehrseite), die neben ``location`` auftraten; je Adresse und Status einmal, hoechstens
+    # zehn, sortiert nach Fundort und Adresse. Leer, wenn alle Einzelmeldungen einen Fundort haben.
+    other_locations: list[WebAlertInstance] = Field(default_factory=list)
 
 
 class WebPath(Base):

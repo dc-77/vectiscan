@@ -14,6 +14,7 @@ import { requireAuth } from '../middleware/requireAuth.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { audit } from '../lib/audit.js';
 import { sanitizeCustomerContext, type CustomerContext } from '../lib/customerContext.js';
+import { fristHinweise } from '../lib/fristen.js';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const VALID_POLICIES = new Set(['enumerate', 'scoped', 'ip_only']);
@@ -76,6 +77,8 @@ async function loadReportReview(orderId: string): Promise<Record<string, unknown
     unprocessed: payload.unprocessed ?? [],
     counts: payload.counts ?? { errors: 0, warnings: 0, unprocessed: 0 },
     customerContext: order.customer_context ?? null,
+    // S7a Punkt 8 (E27): Fristregeln, die bei einer Freigabe heute anders ausfielen als am Scantag.
+    deadlineHints: fristHinweise(payload),
   };
 }
 

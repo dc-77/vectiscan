@@ -1265,7 +1265,10 @@ export async function deleteFindingOverride(
 // --- Report Versions ---
 
 export interface ReportVersion {
+  /** Erzeugungsnummer (Fusszeile "Erzeugung m"). */
   version: number;
+  /** S7a Punkt 9: Auslieferungsversion wie auf dem Deckblatt ("Version n"). */
+  deliveryVersion?: number;
   createdAt: string;
   findingsCount: number;
   excludedCount: number;
@@ -1369,6 +1372,20 @@ export interface ScanAuthorization {
   created_at: string;
 }
 
+/**
+ * S7a Punkt 8 (E27): Fristregel, die bei einer Freigabe heute anders ausfiele als am Scantag
+ * (api/src/lib/fristen.ts). Stufe und Regelausloesung des Berichts bleiben am Scantag.
+ */
+export interface DeadlineHint {
+  subjekt: string;
+  gueltigBis: string;
+  tageScantag: number;
+  tageFreigabe: number;
+  regelScantag: string | null;
+  regelFreigabe: string | null;
+  freigabetag: string;
+}
+
 /** S5: Berichtsstand einer Order im Admin-Review. */
 export interface ReviewReport {
   status: string;
@@ -1379,6 +1396,8 @@ export interface ReviewReport {
   unprocessed: UnprocessedObservation[];
   counts: { errors: number; warnings: number; unprocessed: number };
   customerContext: CustomerContext | null;
+  /** S7a Punkt 8 (E27): leer bei aelteren Laeufen ohne Fristen in der Defektliste. */
+  deadlineHints?: DeadlineHint[];
 }
 
 export interface ReviewDetail {

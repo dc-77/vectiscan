@@ -119,6 +119,39 @@ describe('S5 — Admin-Review liefert den Berichtsstand', () => {
     expect(report.customerContext.firmenname).toBe('Beispiel GmbH');
   });
 
+  it('S7a Punkt 8 (E27): liefert Fristhinweise fuer eine Freigabe heute', async () => {
+    jest.useFakeTimers({ now: new Date('2026-09-27T10:00:00Z'), doNotFake: ['nextTick', 'setImmediate'] });
+    try {
+      mockQueries([
+        rowsFor(/FROM scan_targets/, []),
+        rowsFor(/FROM scan_target_hosts/, []),
+        rowsFor(/FROM scan_authorizations/, []),
+        rowsFor(/report_defects, customer_context FROM orders/, [{
+          status: 'pending_review',
+          report_defects: {
+            ...DEFECTS_PAYLOAD,
+            fristen_scantag: '2026-09-23',
+            fristen_schwellen: { sofort: 7, bald: 14, spaeter: 30, domain: 30 },
+            fristen: [{ art: 'tls', subjekt: 'online.heuel.com:443', gueltig_bis: '2026-10-25', tage_scantag: 31 }],
+          },
+          customer_context: null,
+        }]),
+      ]);
+
+      const res = await server.inject({
+        method: 'GET', url: `/api/admin/review/order/${ORDER_ID}`, headers: AUTH_HEADER,
+      });
+
+      expect(res.statusCode).toBe(200);
+      const hints = res.json().data.report.deadlineHints;
+      expect(hints).toHaveLength(1);
+      expect(hints[0]).toMatchObject({ subjekt: 'online.heuel.com:443', tageFreigabe: 27,
+                                       regelFreigabe: 'cert_expiring_later', freigabetag: '2026-09-27' });
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it('faellt fuer alte Laeufe auf reports.validation_warnings zurueck', async () => {
     mockQueries([
       rowsFor(/FROM scan_targets/, []),

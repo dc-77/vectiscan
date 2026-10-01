@@ -61,8 +61,10 @@ def am_27(order: str):
 
 def test_imaps_und_pop3s_mit_kennung_statt_nicht_identifiziert():
     k = karte(data_for(DB), "88.99.35.112")
-    assert k["993"] == ("IMAP über TLS (Dovecot)", "gruen")
-    assert k["995"] == ("POP3 über TLS (Dovecot)", "gruen")
+    # S7a (spec/10 R20): Kennung bleibt; ohne eigenen testssl-Lauf am Port (Auftrag vor S6c) ist der
+    # Dienst nur im Portscan erfasst und steht grau, nicht gruen.
+    assert k["993"] == ("IMAP über TLS (Dovecot)", "grau")
+    assert k["995"] == ("POP3 über TLS (Dovecot)", "grau")
     assert not any("nicht identifiziert" in s for s, _ in karte(data_for(LW), "116.202.77.64").values())
 
 

@@ -713,6 +713,41 @@ def zusage_im_kundentext(data: Any) -> list[Defect]:
     return out
 
 
+# S7a Punkt 0: Fehlertexte eines Werkzeugs im Kundentext ("ERROR: Script execution failed (use -d
+# to debug)" als Dienstkennung bei castenow cd28d260). Anders als die Zusagen gelten hier auch
+# Nachweis, Service-Karte und die Anhaenge B und C als Kundentext; aus dem Durchlauf fallen nur
+# Herkunfts- und Schluesselfelder.
+_OHNE_KUNDENTEXT_WERKZEUG = {"provenance", "meta", "refs", "subjects", "checks", "sources", "key", "rule",
+                             "message"}
+
+
+def _alle_texte(obj: Any, pfad: str = ""):
+    if hasattr(obj, "model_dump"):
+        obj = obj.model_dump()
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if k not in _OHNE_KUNDENTEXT_WERKZEUG:
+                yield from _alle_texte(v, f"{pfad}.{k}")
+    elif isinstance(obj, list):
+        for i, v in enumerate(obj):
+            yield from _alle_texte(v, f"{pfad}[{i}]")
+    elif isinstance(obj, str):
+        yield pfad, obj
+
+
+def werkzeugfehler_im_kundentext(data: Any) -> list[Defect]:
+    from reporter.facts.tool_errors import tool_error_in
+
+    out: list[Defect] = []
+    for pfad, text in _alle_texte(data):
+        treffer = tool_error_in(text)
+        if treffer:
+            out.append(Defect(engine=ENGINE_V3, check="werkzeugfehler_im_kundentext", severity=SEVERITY_ERROR,
+                              message=f"{pfad}: Fehlertext eines Werkzeugs „{treffer}“ im Kundentext",
+                              detail={"where": pfad, "text": treffer}))
+    return out
+
+
 _CVE_ID = re.compile(r"CVE-\d{4}-\d{4,}", re.I)
 
 
@@ -774,6 +809,35 @@ def frist_vor_berichtsdatum(data: Any) -> list[Defect]:
                                            f"{data.meta.report_date}; Stand beim Kunden prüfen"),
                                   detail={"frist": frist.isoformat()}))
                 break
+    return out
+
+
+def fristregel_am_berichtsdatum(data: Any, facts: Any) -> list[Defect]:
+    """E27 (spec/11 Teil 6, S7a Punkt 8): eine Fristregel fiele am Berichtsdatum anders aus als am
+    Scantag (heuel online.heuel.com: 31 Tage am Scantag, am Berichtsdatum unter der Schwelle von
+    30 Tagen). Stufe und Regelausloesung bleiben am Scantag; Hinweis an den Admin, keine Aenderung
+    am Bericht. Die Einordnung steht in ``reporter/gate/fristen.py``."""
+    from datetime import date
+
+    from reporter.gate import fristen as FR
+
+    try:
+        t, m, j = (int(x) for x in str(data.meta.report_date).split("."))
+        bericht = date(j, m, t)
+    except (ValueError, AttributeError):
+        return []
+    out: list[Defect] = []
+    for f in FR.abweichungen(facts, bericht):
+        bis = ".".join(reversed(f["gueltig_bis"].split("-")))
+        tage = lambda n: "1 Tag" if n == 1 else f"{n} Tage"  # noqa: E731
+        out.append(Defect(
+            engine=ENGINE_V3, check="fristregel_am_berichtsdatum", severity=SEVERITY_WARNING,
+            message=(f"{f['subjekt']} (gültig bis {bis}): am Scantag {tage(f['tage_scantag'])}, "
+                     f"{FR.regel_text(f['regel_scantag'])}; am Berichtsdatum {data.meta.report_date} "
+                     f"{tage(f['tage_stichtag'])}, {FR.regel_text(f['regel_stichtag'])}. Stufe und "
+                     "Regelauslösung bleiben am Scantag (E27); Stand beim Kunden vor der Freigabe prüfen"),
+            detail={k: f[k] for k in ("subjekt", "gueltig_bis", "tage_scantag", "tage_stichtag",
+                                      "regel_scantag", "regel_stichtag")}))
     return out
 
 
@@ -968,4 +1032,8 @@ def run_all(data: Any, facts: Any, output: Any, *, strict: bool = False) -> list
     # S6b-4n (spec/11 N6, E25): Positivbefund gegen Rohfakt, Anmeldenamen im Kundentext.
     defects.extend(positiv_ohne_rohfakt(data, facts, output))
     defects.extend(anmeldename_im_kundentext(data, facts))
+    # S7a Punkt 0: Werkzeug-Fehlertexte als Kennung oder Nachweis.
+    defects.extend(werkzeugfehler_im_kundentext(data))
+    # S7a Punkt 8 (E27): Fristregel am Berichtsdatum anders als am Scantag.
+    defects.extend(fristregel_am_berichtsdatum(data, facts))
     return defects

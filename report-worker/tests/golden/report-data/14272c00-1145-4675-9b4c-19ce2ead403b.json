@@ -287,6 +287,13 @@
    {
     "host": "88.99.35.112",
     "operator": "",
+    "port": "25",
+    "ref": "VS-2026-007, VS-2026-013",
+    "svc": "Postfix smtpd, laut Passivquelle"
+   },
+   {
+    "host": "88.99.35.112",
+    "operator": "",
     "port": "80",
     "ref": "",
     "svc": "Apache httpd 2.4.67"
@@ -353,13 +360,6 @@
     "port": "30000",
     "ref": "VS-2026-003",
     "svc": "OpenSSH 8.4p1"
-   },
-   {
-    "host": "88.99.35.112",
-    "operator": "",
-    "port": "25",
-    "ref": "VS-2026-007, VS-2026-013",
-    "svc": "Postfix smtpd, laut Passivquelle"
    }
   ],
   "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
@@ -448,6 +448,30 @@
     "rule": "zap#6",
     "what": "„Path Traversal“ (ZAP-Regel 6), 2 Meldungen",
     "where": "dortmund-beach.com/wp-json/oembed/1.0/embed (an Nebenpfaden wp-json)"
+   },
+   {
+    "count": 3,
+    "message": "X-Content-Type-Options Header Missing",
+    "note": "X-Content-Type-Options fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10021",
+    "what": "„X-Content-Type-Options Header Missing“ (ZAP-Regel 10021) an Nebenpfaden, 3 Meldungen",
+    "where": "dortmund-beach.com/robots.txt, dortmund-beach.com/wp-sitemap.xml, dortmund-beach.com/xmlrpc.php"
+   },
+   {
+    "count": 5,
+    "message": "Strict-Transport-Security Disabled",
+    "note": "HSTS abgeschaltet (max-age=0); ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "„Strict-Transport-Security Disabled“ (ZAP-Regel 10035) an Nebenpfaden, 5 Meldungen",
+    "where": "dortmund-beach.com/robots.txt, dortmund-beach.com/sitemap.xml, dortmund-beach.com/wp-sitemap.xml, dortmund-beach.com/xmlrpc.php"
+   },
+   {
+    "count": 5,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "„Server Leaks Version Information via \"Server\" HTTP Response Header Field“ (ZAP-Regel 10036) an Nebenpfaden, 5 Meldungen",
+    "where": "dortmund-beach.com/robots.txt, dortmund-beach.com/sitemap.xml, dortmund-beach.com/wp-sitemap.xml, dortmund-beach.com/xmlrpc.php"
    },
    {
     "count": 1,
@@ -562,6 +586,110 @@
     "rule": "web_vulnerability_reported#6",
     "what": "Path Traversal auf dortmund-beach.com/wp-json/oembed/1.0/embed (Konfidenz niedrig, aktiv gemeldet von ZAP)",
     "where": "dortmund-beach.com/wp-json/oembed/1.0/embed (an Nebenpfaden wp-json)"
+   },
+   {
+    "count": 1,
+    "message": "X-Content-Type-Options Header Missing",
+    "note": "X-Content-Type-Options fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10021",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "X-Content-Type-Options Header Missing",
+    "note": "X-Content-Type-Options fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10021",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/wp-sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "X-Content-Type-Options Header Missing",
+    "note": "X-Content-Type-Options fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10021",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/xmlrpc.php"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Disabled",
+    "note": "HSTS abgeschaltet (max-age=0); ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Disabled",
+    "note": "HSTS abgeschaltet (max-age=0); ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Disabled",
+    "note": "HSTS abgeschaltet (max-age=0); ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/wp-sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Disabled",
+    "note": "HSTS abgeschaltet (max-age=0); ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/xmlrpc.php"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Disabled",
+    "note": "HSTS abgeschaltet (max-age=0); ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/xmlrpc.php"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/wp-sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/xmlrpc.php"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "dortmund-beach.com/xmlrpc.php"
    },
    {
     "count": 1,
@@ -688,6 +816,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -700,6 +829,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -715,6 +845,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -727,6 +858,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -739,6 +871,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -751,6 +884,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -769,6 +903,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -781,6 +916,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -793,6 +929,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -805,6 +942,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -827,6 +965,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "88.99.35.112",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -853,6 +992,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -878,6 +1018,7 @@
        "header_duplicate"
       ],
       "l": "88.99.35.112",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -895,8 +1036,10 @@
    {
     "also": [],
     "file": "88.99.35.112__dortmund-beach.com.png",
+    "head": "",
     "host": "dortmund-beach.com",
     "key": "14272c00-1145-4675-9b4c-19ce2ead403b/88.99.35.112__dortmund-beach.com.png",
+    "redirects": [],
     "what": "Dortmund Beach Design | Webdesign | Corporate Design"
    }
   ],
@@ -905,71 +1048,85 @@
    {
     "host": "88.99.35.112",
     "label": "vsrv2.spacekoeln.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "21",
       "s": "Pure-FTPd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "110",
       "s": "Dovecot pop3d",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "465",
       "s": "Postfix smtpd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "587",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "993",
       "s": "IMAP über TLS (Dovecot)",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "995",
       "s": "POP3 über TLS (Dovecot)",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "10000",
       "s": "Webmin (MiniServ)",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "30000",
       "s": "OpenSSH",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Rot unverzüglich · Gelb in Kürze oder mittelfristig · Blau geplante Verbesserung · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "88.99.35.112 (vsrv2.spacekoeln.de)",
@@ -1901,7 +2058,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check\ndortmund-beach.com · Adresse: https://dortmund-beach.com · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: max-age=0 · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options",
-   "found": "HSTS abgeschaltet: der Dienst dortmund-beach.com setzt den Header Strict-Transport-Security mit max-age=0 und hebt die Festlegung auf die verschlüsselte Verbindung damit auf: dortmund-beach.com. Auf dortmund-beach.com ist keine Content-Security-Policy gesetzt: dortmund-beach.com. Auf dortmund-beach.com fehlen einzelne Sicherheits-Header der Webseite: dortmund-beach.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "HSTS abgeschaltet: der Dienst dortmund-beach.com setzt den Header Strict-Transport-Security mit max-age=0 und hebt die Festlegung auf die verschlüsselte Verbindung damit auf. Auf dortmund-beach.com ist keine Content-Security-Policy gesetzt. Auf dortmund-beach.com fehlen einzelne Sicherheits-Header der Webseite: dortmund-beach.com (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-006",
    "impact": "Mit max-age=0 löscht der Browser eine bestehende Festlegung auf die verschlüsselte Verbindung; jeder spätere Aufruf über HTTP kann wieder unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/88.99.35.112/kunde",
@@ -1984,7 +2141,7 @@
       "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
      ],
      "statement": "observation[1]",
-     "text": "HSTS abgeschaltet: der Dienst dortmund-beach.com setzt den Header Strict-Transport-Security mit max-age=0 und hebt die Festlegung auf die verschlüsselte Verbindung damit auf: dortmund-beach.com."
+     "text": "HSTS abgeschaltet: der Dienst dortmund-beach.com setzt den Header Strict-Transport-Security mit max-age=0 und hebt die Festlegung auf die verschlüsselte Verbindung damit auf."
     },
     {
      "check": "csp_missing",
@@ -1993,7 +2150,7 @@
       "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
      ],
      "statement": "observation[0]",
-     "text": "Auf dortmund-beach.com ist keine Content-Security-Policy gesetzt: dortmund-beach.com."
+     "text": "Auf dortmund-beach.com ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -3198,7 +3355,7 @@
     "wordpress_xmlrpc_enabled"
    ],
    "evidence": "wpscan\ndortmund-beach.com · XML-RPC: https://dortmund-beach.com/xmlrpc.php · belegt durch: direkter Abruf der Adresse",
-   "found": "Auf dortmund-beach.com ist die XML-RPC-Schnittstelle von WordPress aus dem Internet erreichbar: dortmund-beach.com.",
+   "found": "Auf dortmund-beach.com ist die XML-RPC-Schnittstelle von WordPress aus dem Internet erreichbar.",
    "id": "VS-2026-015",
    "impact": "Über XML-RPC lassen sich viele Anmeldeversuche in einer einzigen Anfrage bündeln; Sperren gegen wiederholte Fehlversuche auf der Anmeldeseite greifen dort oft nicht. Zusammen mit bekannten Benutzernamen erleichtert das Rateangriffe auf Zugangsdaten.",
    "key": "wordpress_xmlrpc_enabled/scan/kunde",
@@ -3245,7 +3402,7 @@
       "dortmund-beach.com@88.99.35.112|dortmund-beach.com@88.99.35.112"
      ],
      "statement": "observation[0]",
-     "text": "Auf dortmund-beach.com ist die XML-RPC-Schnittstelle von WordPress aus dem Internet erreichbar: dortmund-beach.com."
+     "text": "Auf dortmund-beach.com ist die XML-RPC-Schnittstelle von WordPress aus dem Internet erreichbar."
     },
     {
      "check": "wordpress_xmlrpc_enabled",
@@ -3333,6 +3490,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von dortmund-beach.com am 18.09.2026: 3 Hostnamen auf 1 IP-Adresse. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 1 System (88.99.35.112) liegt nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Rot = unverzüglich handeln · Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugang zur Verwaltung der Systeme",
@@ -3361,13 +3519,13 @@
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "15 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 25,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 15,
   "context_fields": [],
@@ -3378,7 +3536,7 @@
    "dortmund-beach.com"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 3,
   "generated_on": null,
   "generation": null,
@@ -3393,7 +3551,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -3875,7 +4033,13 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
-  "domains": [],
+  "domains": [
+   {
+    "domain": "dortmund-beach.com",
+    "search": "Hostsuche: 3 Namen gefunden, 3 geprüft, 0 gefunden und nicht geprüft.",
+    "text": "Hostermittlung, Portscan und Tiefenprüfung (3 Hostnamen), DNS- und E-Mail-Einträge"
+   }
+  ],
   "hosts": [
    {
     "cov": "teil",

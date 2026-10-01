@@ -68,6 +68,10 @@ class RenderResult:
     layout_ok: bool = False
     # Nachtrag 3: Ursache je halbleerer Seite ("Seite 25: 120 mm frei, ...").
     sparse_causes: tuple[str, ...] = ()
+    # S7a Punkt 1: Einleitung ohne Inhalt, Befundkopf ohne Koerper, Hebel ausserhalb von Kapitel 1.
+    intro_pages: tuple[int, ...] = ()
+    card_head_pages: tuple[int, ...] = ()
+    lever_pages: tuple[int, ...] = ()
 
 
 # ----------------------------------------------------------------- Jinja-Filter
@@ -82,6 +86,26 @@ def css_string(value: Any) -> Markup:
     """
     text = _CTRL.sub("", str(value))
     return Markup(text.replace("\\", "\\\\").replace('"', '\\"'))
+
+
+# S7a (spec/10 R20): IPv6-Adressen brechen nicht mitten in der Adresse um (heuel 2.1).
+_IP_RE = re.compile(r"(?<![\w:.])(?:(?:\d{1,3}\.){3}\d{1,3}|(?:[0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{1,4})(?![\w.])")
+
+
+def ipfest(value: Any) -> Markup:
+    """IP-Adressen im Text als nicht umbrechbare Einheit (``<span class="ip">``), Rest maskiert."""
+    text = str(value)
+    out: list[Any] = []
+    pos = 0
+    for m in _IP_RE.finditer(text):
+        adresse = m.group(0)
+        if ":" in adresse and adresse.count(":") < 4 and "::" not in adresse:
+            continue  # Uhrzeit oder Verhaeltnis, keine IPv6-Adresse
+        out.append(escape(text[pos:m.start()]))
+        out.append(Markup('<span class="ip">') + escape(m.group(0)) + Markup("</span>"))
+        pos = m.end()
+    out.append(escape(text[pos:]))
+    return Markup("").join(out)
 
 
 def dot_br(value: Any) -> Markup:
@@ -105,6 +129,7 @@ def env() -> Environment:
         )
         _ENV.filters["css_string"] = css_string
         _ENV.filters["dot_br"] = dot_br
+        _ENV.filters["ipfest"] = ipfest
     return _ENV
 
 
@@ -199,6 +224,12 @@ def render_report_v3(data: ReportData | dict, output_path: str | Path, *,
             warnings.append(f"außerhalb des Satzspiegels: {where}")
         for cause in layout.sparse_causes:
             warnings.append(f"halbleer {cause}")
+        for page in layout.intro_pages:
+            warnings.append(f"Überschrift mit Einleitung am Seitenende auf Seite {page}")
+        for page in layout.card_head_pages:
+            warnings.append(f"Kopf einer Befundkarte allein am Seitenfuß auf Seite {page}")
+        for page in layout.lever_pages:
+            warnings.append(f"Hebel getrennt von ihrer Überschrift auf Seite {page}")
 
     result = RenderResult(pdf_path=out, pages=len(document.pages),
                           words_per_page=words, sparse_pages=sparse,
@@ -208,7 +239,10 @@ def render_report_v3(data: ReportData | dict, output_path: str | Path, *,
                           heading_pages=layout.heading_pages if layout else (),
                           overflow=layout.overflow if layout else (),
                           layout_ok=layout is not None,
-                          sparse_causes=layout.sparse_causes if layout else ())
+                          sparse_causes=layout.sparse_causes if layout else (),
+                          intro_pages=layout.intro_pages if layout else (),
+                          card_head_pages=layout.card_head_pages if layout else (),
+                          lever_pages=layout.lever_pages if layout else ())
     log.info("pdf_v3_rendered", path=str(out), pages=result.pages,
              package=variant.key, defects=len(defects), warnings=len(warnings),
              sparse=list(sparse))

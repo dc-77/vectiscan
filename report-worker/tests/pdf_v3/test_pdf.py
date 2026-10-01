@@ -86,6 +86,25 @@ def test_seitenzahl_entspricht_dem_erwartungswert(weasy, tmp_path):
     assert not fehler, fehler
 
 
+def test_seitenzahl_mit_bildern_entspricht_dem_erwartungswert(weasy, tmp_path):
+    """S7a Punkt 1: Kapitel 3.4 mit Platzhalterbildern wie im echten Bericht (CA 19 in Produktion,
+    im Golden-Lauf ohne Bilder nie sichtbar)."""
+    from reporter.pdf.v3.__main__ import mit_bildern, pruefe
+    from reporter.pdf.v3.screenshots import placeholder_screenshots
+    from reporter.v3.golden import build_golden_report_data
+
+    erwartet = json.loads(PAGES_FILE.read_text(encoding="utf-8"))
+    fehler: list[str] = []
+    for order_id, soll in erwartet.items():
+        if not mit_bildern(build_golden_report_data(order_id)):
+            assert "shots" not in soll, order_id
+            continue
+        assert "shots" in soll, f"{order_id[:8]}: python -m reporter.pdf.v3 --update-pages"
+        result = _render(tmp_path, order_id, resolver=placeholder_screenshots)
+        fehler += [f"mit Bildern: {f}" for f in pruefe(order_id, result, soll["shots"])]
+    assert not fehler, fehler
+
+
 def test_halbleere_seiten_nur_die_bekannten(weasy, tmp_path):
     """Eine neue halbleere Seite ist ein Fehler, eine bekannte ist festgeschrieben."""
     erwartet = json.loads(PAGES_FILE.read_text(encoding="utf-8"))

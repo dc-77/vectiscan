@@ -48,8 +48,9 @@ def cov(facts: S.Facts, tool: str, ip: str | None = None) -> list[S.CoverageFact
 
 
 def test_schema_1_4_0():
-    assert S.FACTS_SCHEMA_VERSION == "1.4.0"
-    assert all(facts_for(o).schema_version == "1.4.0" for o in PROBEN)
+    # S7a: das Schema steht seit S7a auf 1.5.0 (additives Feld); die S6d-Felder bleiben enthalten.
+    assert tuple(int(x) for x in S.FACTS_SCHEMA_VERSION.split(".")) >= (1, 4, 0)
+    assert all(facts_for(o).schema_version == S.FACTS_SCHEMA_VERSION for o in PROBEN)
 
 
 # ---------------------------------------------------------------- A12 bekannte Dateien

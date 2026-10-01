@@ -344,6 +344,8 @@ def build_glance(items: list[Consolidated], findings: list[Finding], counts: N.C
             key=key, name=CATEGORY_NAMES[key], status=status,
             level=L.BAR_BY_STATUS[status], note=note))
     overall_status = min((c.status for c in categories), key=lambda s: L.STATUS_RANK[s])
+    farben = {c.status for c in categories} | {f.status for f in findings}
+    gelb_kurz = any(f.status == "gelb" and f.urgency == L.URGENCY_BY_STAGE["in_kuerze"] for f in findings)
     return Glance(
         overall=L.OVERALL_BY_STATUS[overall_status],
         overall_status=overall_status,
@@ -352,6 +354,7 @@ def build_glance(items: list[Consolidated], findings: list[Finding], counts: N.C
         levers=[],
         context=N.context(counts),
         coverage_warning=N.coverage_warning(counts, gap_systems),
+        legend=N.glance_legend(farben, gelb_kurz),
     )
 
 
@@ -480,6 +483,13 @@ def _shared_hint(host: FS.HostFact) -> str:
 
 # ---------------------------------------------------------------- Kapitel 2
 
+def _domain_scope(facts: FS.Facts, domains: list[tuple[str, str]]) -> list[DomainScope]:
+    eintraege = [DomainScope(domain=d, text=t, search=COV.host_search(facts, d)) for d, t in domains]
+    if len(eintraege) > 1 or any(e.search for e in eintraege):
+        return eintraege
+    return []
+
+
 def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
                 model: COV.Model, findings: list[Finding] | None = None) -> Scope:
     hosts: list[ScopeHost] = []
@@ -555,7 +565,9 @@ def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
         lead=N.scope_lead(counts),
         hosts=hosts,
         operator_header=operator_header,
-        domains=[DomainScope(domain=d, text=t) for d, t in domains] if len(domains) > 1 else [],
+        # S7a Punkt 7: je Zieldomain die Hostsuche, auch bei Einzelzielen; ohne Hostsuche-Angabe
+        # (Auftraege vor S6c) weiter nur bei mehreren Zieldomains.
+        domains=_domain_scope(facts, domains),
         out_of_scope=out_of_scope,
         limitations=limitations(facts, output, model, findings),
         method_phases=[MethodPhase(n=n, name=name, text=text)
@@ -585,7 +597,9 @@ _EOL_STATUS = {
     # S6b-4n (spec/11 N9): die Plakette sagt nur "LTS"; Datum und Quelle stehen im Hinweis.
     "lts": ("LTS", "gruen"),
     "outdated": ("veraltet", "gelb"),
-    "insecure": ("unsicher", "rot"),
+    # S7a (spec/11 N9): Plakette nur "veraltet" oder "LTS"; ein Kern mit bekannten Luecken ist
+    # veraltet wie eine Erweiterung laut wpscan (gelb), die Luecken stehen im Hinweis.
+    "insecure": ("veraltet", "gelb"),
 }
 
 # S6b-4 (spec/11 T15): Slug und Anzeigename derselben Komponente in einer Zeile (DB: Slider
@@ -749,7 +763,7 @@ def _patch_status(facts: FS.Facts, gruppe: list[FS.SoftwareFact],
         if status == "outdated":
             return "outdated", "veraltet", "Kernversion laut wpscan"
         if status == "insecure":
-            return "insecure", "unsicher", "Kernversion laut wpscan"
+            return "insecure", "veraltet", "Kernversion mit bekannten Lücken laut wpscan"
     if sw.eol.status == "supported":
         if getattr(sw.eol, "lts_since", None) and sw.eol.date:
             quelle = str(sw.eol.source or "").split(",")[0].strip().replace(" LTS", "")
@@ -1057,44 +1071,99 @@ CDN_PRODUCT = re.compile(r"cloudflare|akamai|fastly|cloudfront", re.I)
 CDN_NAMES = {"cloudflare": "Cloudflare", "akamai": "Akamai", "fastly": "Fastly", "cloudfront": "Amazon CloudFront"}
 
 
+def system_leads(facts: FS.Facts) -> dict[str, str]:
+    """Adresse -> erste Adresse ihres Systems, wie Kapitel 2.1 (S7a, spec/10 R20): IPv4 und IPv6
+    mit gleichem rDNS und die weiteren A- und AAAA-Eintraege derselben Namen."""
+    out: dict[str, str] = {}
+    for members in _systems(facts):
+        lead = members[0].ip
+        for h in members:
+            out[h.ip] = lead
+        for h in members:
+            for a in h.additional_ips:
+                out.setdefault(a.ip, lead)
+    return out
+
+
+def _worst(befunde: list[Finding]) -> Optional[Finding]:
+    return min(befunde, key=lambda f: L.STATUS_RANK[f.status]) if befunde else None
+
+
+def _card_ports(facts: FS.Facts, ip: str, refs: dict[tuple[str, int], list[Finding]],
+                gemessen: set[tuple[str, int]]) -> list[tuple[ServicePort, bool]]:
+    """(Port, nur laut Passivquelle) einer Adresse in Kartenreihenfolge."""
+    out: list[tuple[ServicePort, bool]] = []
+    for svc in sorted((s for s in facts.services if s.host_ip == ip and s.state == "open"),
+                      key=lambda s: s.port):
+        label = service_display(svc)
+        schwer = _worst(refs.get((ip, svc.port), []))
+        if svc.foreign:
+            # S6b-4n (spec/11 N11): Dienste weiterer Domains stehen grau, nicht bewertet.
+            out.append((ServicePort(p=str(svc.port), s=foreign_service_label(svc, label), st="grau"), False))
+            continue
+        if schwer is not None:
+            # S6b-4 (spec/11 T16): die Ampel des schwersten Befunds, auch fuer service_unidentified.
+            port = ServicePort(p=str(svc.port), s=label, st=schwer.status, stage=schwer.urgency)
+        elif svc.unidentified:
+            # S6b-3 (spec/10 R9): ein Dienst ohne Kennung ist nicht "unauffällig".
+            port = ServicePort(p=str(svc.port), s=label, st="grau")
+        elif (ip, svc.port) in gemessen:
+            port = ServicePort(p=str(svc.port), s=label, st="gruen")
+        else:
+            # S7a (spec/10 R20): nur im Portscan erfasst, keine Messung am Port.
+            port = ServicePort(p=str(svc.port), s=label, st="grau")
+        out.append((port, False))
+    seen = {p.p for p, _ in out}
+    for pv in sorted((p for p in facts.passive if p.host_ip == ip and p.port), key=lambda p: p.port or 0):
+        if str(pv.port) in seen:
+            continue
+        seen.add(str(pv.port))
+        # S6b-4 (spec/11 T16): ein Passivport mit Befund traegt dessen Ampel (junkerwerk
+        # SonicWall 4433 stand grau neben Gelb VS-002).
+        schwer = _worst(refs.get((ip, pv.port), []))
+        out.append((ServicePort(p=str(pv.port), s=passive_service_label(pv),
+                                st=schwer.status if schwer else "grau",
+                                stage=schwer.urgency if schwer else ""), schwer is None))
+    return out
+
+
 def build_services(facts: FS.Facts, items: list[Consolidated],
                    findings: list[Finding]) -> list[ServiceCard]:
-    """Service-Karte: Farbe je Port nach Ampel des schwersten Befunds (Legende nach Ampel)."""
+    """Service-Karte: Farbe je Port nach Ampel des schwersten Befunds (Legende nach Ampel).
+
+    S7a (spec/10 R20): ein Block je System (IPv4 und IPv6 desselben Systems zusammen, JW und HL);
+    Gruen nur mit einer Messung am Port, sonst grau. Ports einer weiteren Adresse, die nur eine
+    Passivquelle kennt, stehen als eine Zeile im Block statt als eigene Karte."""
     refs = finding_ports(facts, items, findings)
+    gemessen = COV.measured_ports(facts)
     cards: list[ServiceCard] = []
-    for host in sorted(facts.hosts, key=lambda h: (h.family, h.ip)):
-        if host.third_party is not None:
-            continue
-        ports: list[ServicePort] = []
-        for svc in sorted((s for s in facts.services if s.host_ip == host.ip and s.state == "open"),
-                          key=lambda s: s.port):
-            label = service_display(svc)
-            befunde = refs.get((host.ip, svc.port), [])
-            colour = min((f.status for f in befunde), key=lambda s: L.STATUS_RANK[s]) if befunde else "gruen"
-            if svc.foreign:
-                # S6b-4n (spec/11 N11): Dienste weiterer Domains stehen grau, nicht bewertet.
-                ports.append(ServicePort(p=str(svc.port), s=foreign_service_label(svc, label), st="grau"))
+    for members in _systems(facts):
+        lead = members[0]
+        ports = [p for p, _ in _card_ports(facts, lead.ip, refs, gemessen)]
+        notes: list[str] = []
+        for h in members[1:]:
+            weitere = _card_ports(facts, h.ip, refs, gemessen)
+            if not weitere:
                 continue
-            if svc.unidentified and not befunde:
-                # S6b-3 (spec/10 R9): ein Dienst ohne Kennung ist nicht "unauffällig". S6b-4
-                # (spec/11 T16): mit dem Befund service_unidentified gilt dessen Ampel.
-                colour = "grau"
-            ports.append(ServicePort(p=str(svc.port), s=label, st=colour))
-        seen = {p.p for p in ports}
-        for pv in sorted((p for p in facts.passive if p.host_ip == host.ip and p.port),
-                         key=lambda p: p.port or 0):
-            if str(pv.port) in seen:
+            if all(passiv for _, passiv in weitere):
+                nummern = [p.p for p, _ in weitere]
+                liste = nummern[0] if len(nummern) == 1 else ", ".join(nummern[:-1]) + " und " + nummern[-1]
+                dienste = ", ".join(dict.fromkeys(p.s for p, _ in weitere))
+                wort = "Port" if len(nummern) == 1 else "Ports"
+                notes.append(f"{h.ip}: {wort} {liste} laut Passivquelle ({dienste}), nicht geprüft")
                 continue
-            seen.add(str(pv.port))
-            # S6b-4 (spec/11 T16): ein Passivport mit Befund traegt dessen Ampel (junkerwerk
-            # SonicWall 4433 stand grau neben Gelb VS-002).
-            befunde = refs.get((host.ip, pv.port), [])
-            farbe = min((f.status for f in befunde), key=lambda s: L.STATUS_RANK[s]) if befunde else "grau"
-            ports.append(ServicePort(p=str(pv.port), s=passive_service_label(pv), st=farbe))
-        if not ports:
+            ports.extend(ServicePort(p=p.p, s=f"{p.s}, an {h.ip}", st=p.st, stage=p.stage) for p, _ in weitere)
+        if not ports and not notes:
             continue
-        cards.append(ServiceCard(host=host.ip, label=host.reverse or "", ports=ports))
+        cards.append(ServiceCard(host=lead.ip, label=lead.reverse or "", ports=ports,
+                                 more_ips=[h.ip for h in members[1:]], notes=notes))
     return cards
+
+
+def services_legend(cards: list[ServiceCard]) -> str:
+    farben = {p.st for c in cards for p in c.ports} | ({"grau"} if any(c.notes for c in cards) else set())
+    gelb = {p.stage for c in cards for p in c.ports if p.st == "gelb" and p.stage}
+    return N.services_note(farben, gelb)
 
 
 # S6b-3 (spec/10 R8): nicht anwendbar mit eigenem Grund steht als "entfällt (Grund)".
@@ -1159,6 +1228,22 @@ POSTURE_SOFT: dict[str, tuple[str, str]] = {"SPF": ("spf_softfail", "softfail")}
 POSTURE_TLS_ITEMS = frozenset({"Zertifikate"})
 
 
+def _posture_systeme(items: list[PostureItem], leads: dict[str, str]) -> list[PostureItem]:
+    """S7a (spec/10 R20, HL und JW): der Eintrag einer weiteren Adresse desselben Systems steht
+    unter dem der ersten Adresse, wenn er nichts Schlechteres sagt (kein ✘); der Zustand ``v`` der
+    ersten Adresse bleibt, damit das Gate ihn weiter gegen die Befunde pruefen kann."""
+    by_label = {it.l: it for it in items}
+    out: list[PostureItem] = []
+    for it in items:
+        lead = leads.get(it.l)
+        haupt = by_label.get(lead) if lead and lead != it.l else None
+        if haupt is not None and it.ok is not False:
+            haupt.more.append(f"{it.l}: {it.v}")
+            continue
+        out.append(it)
+    return out
+
+
 def build_posture(output: CatalogOutput, model: COV.Model | None = None,
                   facts: FS.Facts | None = None,
                   findings: list[Finding] | None = None) -> list[PostureBlock]:
@@ -1216,6 +1301,8 @@ def build_posture(output: CatalogOutput, model: COV.Model | None = None,
                     ok, text = None, f"am Namen gemessen ({', '.join(anderswo)})"
                 items.append(PostureItem(l=host, ok=ok, v=text, checks=item_checks, subjects=[host],
                                          pulls=item_pulls))
+            if facts is not None:
+                items = _posture_systeme(items, system_leads(facts))
         for label, checks in spec["items"]:  # type: ignore[index]
             results = [r for cid in checks for r in by_check.get(cid, [])]
             ok, text = _result_state(results, by_check.get(checks[0], []))
@@ -1258,6 +1345,31 @@ def screen_caption(fq: FS.FqdnFact) -> str:
     return titel
 
 
+def _seite(fq: FS.FqdnFact) -> Optional[str]:
+    """Gleiche Seite auf demselben Host trotz Namen im Inhalt (S7a, spec/10 R20): Titel und Pfad der
+    Endadresse laut redirect_probe. Exchange liefert unter mail, mail2 und owa dieselbe
+    Anmeldemaske mit dem jeweiligen Namen in Adresse und Inhalt; ``body_hash`` unterscheidet sich."""
+    titel = " ".join((fq.probe_title or fq.title or "").split()).lower()
+    ziel = urlsplit(fq.probe_final_url or fq.final_url or "")
+    pfad = (ziel.path or "/").rstrip("/") or "/"
+    if not titel or pfad == "/":
+        return None
+    return f"seite:{fq.host_ip}|{titel}|{pfad}"
+
+
+def _kurznamen(namen: list[str], domains: list[str]) -> list[str]:
+    """"mail", "mail2" und "owa" statt der vollen Namen, wenn alle unter derselben Zieldomain liegen."""
+    for dom in domains:
+        suffix = "." + dom.lower()
+        if all(n.lower().endswith(suffix) for n in namen):
+            return [n[: -len(suffix)] for n in namen]
+    return namen
+
+
+def _aufzaehlung(teile: list[str]) -> str:
+    return teile[0] if len(teile) == 1 else ", ".join(teile[:-1]) + " und " + teile[-1]
+
+
 def build_screens(facts: FS.Facts) -> list[Screenshot]:
     """Sichtnachweise aus den Fakten, jede Seite einmal.
 
@@ -1266,6 +1378,11 @@ def build_screens(facts: FS.Facts) -> list[Screenshot]:
     in den Bericht geht. S6b-1 (spec/09 Teil 3): Namen mit derselben Seite (gleicher
     Inhalt oder gleiches Weiterleitungsziel) teilen sich ein Bild; die Unterschrift nennt
     die weiteren Namen. Bevorzugt wird der Name, auf den die Weiterleitung zeigt.
+
+    S7a (spec/10 R20): dieselbe Seite unter mehreren Namen desselben Hosts ist ein Bild ("mail,
+    mail2 und owa zeigen dieselbe Anmeldeseite", drei OWA-Fotos bei castenow); ein Name, der auf
+    einen anderen Host mit eigenem Bild weiterleitet, steht in dessen Unterschrift ("online.heuel.com,
+    weitergeleitet auf www.heuel.com") statt still zu entfallen. Werte aus redirect_probe.
     """
     def eigenes_bild(fq: FS.FqdnFact) -> bool:
         # Ein Name ohne eigene Probe erbt das Hostbild eines anderen Namens
@@ -1277,10 +1394,15 @@ def build_screens(facts: FS.Facts) -> list[Screenshot]:
                   if fq.screenshot_key and not fq.wildcard and eigenes_bild(fq)
                   and next((h for h in facts.hosts if h.ip == fq.host_ip and h.third_party is None), None)]
     # S6b-4n (spec/11 N4): ein Bild zeigt die Antwort seines Hosts. Leitet ein Name auf einen anderen
-    # Host weiter und hat das Ziel ein eigenes Bild, entfaellt das Bild der Weiterleitung (heuel online
-    # zeigte www); ohne eigenes Bild des Ziels sagt die Unterschrift, dass es die Zielseite zeigt.
+    # Host weiter und hat das Ziel ein eigenes Bild, steht die Weiterleitung nur in dessen Unterschrift
+    # (S7a); ohne eigenes Bild des Ziels zeigt das Bild der Weiterleitung die Zielseite.
     mit_bild = {fq.name.lower() for fq in kandidaten}
     ziele = {fq.name: R.redirect_target(facts, fq) for fq in kandidaten}
+    umgeleitet: dict[str, list[str]] = {}
+    for fq in kandidaten:
+        ziel = ziele[fq.name]
+        if ziel and ziel in mit_bild and fq.name not in umgeleitet.setdefault(ziel, []):
+            umgeleitet[ziel].append(fq.name)
     kandidaten = [fq for fq in kandidaten if not (ziele[fq.name] and ziele[fq.name] in mit_bild)]
 
     def rang(fq: FS.FqdnFact) -> tuple:
@@ -1288,29 +1410,44 @@ def build_screens(facts: FS.Facts) -> list[Screenshot]:
         return (0 if ziel == fq.name.lower() else 1, len(fq.name), fq.name)
 
     # Gleiche Bilddatei (Hündgen: der Apex traegt das Bild von www als Hostbild), gleicher
-    # Inhalt oder gleiches Weiterleitungsziel ergeben eine Gruppe.
+    # Inhalt, gleiches Weiterleitungsziel oder dieselbe Seite desselben Hosts ergeben eine Gruppe.
     groups: dict[str, list[FS.FqdnFact]] = {}
     alias: dict[str, str] = {}
     for fq in kandidaten:
-        keys = [f"shot:{fq.screenshot_key}"] + ([k] if (k := _same_page_key(fq)) else [])
+        keys = [f"shot:{fq.screenshot_key}"] + [k for k in (_same_page_key(fq), _seite(fq)) if k]
         ziel = next((alias[k] for k in keys if k in alias), keys[0])
         for k in keys:
             alias.setdefault(k, ziel)
         groups.setdefault(ziel, []).append(fq)
+    domains = list(facts.scan.domains) or ([facts.scan.domain] if facts.scan.domain else [])
+    login = {h.fqdn for h in facts.http if h.fqdn and h.login_form}
     out: list[Screenshot] = []
     for members in groups.values():
         members.sort(key=rang)
         fq = members[0]
+        weitere = sorted({m.name for m in members[1:] if m.host_ip == fq.host_ip} - {fq.name}, key=sort_key)
         was = screen_caption(fq)
+        kopf = ""
+        if weitere:
+            namen = sorted([fq.name] + weitere, key=sort_key)
+            seite = "Anmeldeseite" if any(n in login for n in namen) else "Seite"
+            kopf = f"{_aufzaehlung(_kurznamen(namen, domains))} zeigen dieselbe {seite}"
+            titel = clean_foreign_text(fq.probe_title) if fq.probe_title else ""
+            pfad = urlsplit(fq.probe_final_url or "").path
+            if titel:
+                was = f"{titel} ({pfad})" if pfad not in ("", "/") else titel
         if ziele.get(fq.name):
-            was = f"Weiterleitung auf {ziele[fq.name]}, das Bild zeigt die Zielseite: {was}"
+            kopf = kopf or f"{fq.name}, weitergeleitet auf {ziele[fq.name]}"
         out.append(Screenshot(
             file=fq.screenshot_key.rsplit("/", 1)[-1],
             key=fq.screenshot_key,
             host=fq.name,
             what=was,
             # S6b-4n (spec/11 N4): weitere Namen nur vom selben Host.
-            also=sorted({m.name for m in members[1:] if m.host_ip == fq.host_ip} - {fq.name}, key=sort_key)))
+            also=weitere,
+            head=kopf,
+            redirects=[f"{n}, weitergeleitet auf {fq.name}"
+                       for n in sorted(umgeleitet.get(fq.name.lower(), []), key=sort_key)]))
     return sorted(out, key=lambda s: s.host)
 
 
@@ -1431,12 +1568,13 @@ def build_architecture(facts: FS.Facts, output: CatalogOutput, items: list[Conso
     notes.extend(cdn_edge_notes(facts))
     # facts.warnings sind Hinweise des Faktenbauers an den Betreiber, keine Kundentexte.
     # Was davon den Kunden betrifft, steht ueber die Abdeckungsgruende in Kapitel 2.
+    services = build_services(facts, items, findings)
     return Architecture(
         # S6b-2 (Nachtrag S6b-1): Kapitel 3 zaehlt in Systemen wie Kapitel 2.1.
         lead=N.architecture_lead(len(model.system_rows()), roles),
         tech=build_tech(facts, findings),
-        services=build_services(facts, items, findings),
-        services_note=N.SERVICES_NOTE,
+        services=services,
+        services_note=services_legend(services),
         posture=build_posture(output, model, facts, findings),
         screens_lead=N.SCREENS_LEAD,
         screens=build_screens(facts),

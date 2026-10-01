@@ -333,7 +333,10 @@ def test_hl_ipv6_geschwister_in_einer_zeile():
 
 
 def test_eine_zieldomain_ohne_domainliste():
-    assert data_for(LW).scope.domains == []
+    # S7a Punkt 7: mit Hostsuche-Angabe steht auch eine einzelne Zieldomain in der Liste.
+    domains = data_for(LW).scope.domains
+    assert [d.domain for d in domains] == ["lumbeck-wolter.de"]
+    assert domains[0].search.startswith("Hostsuche: ")
 
 
 # ---------------------------------------------------------------- Q15 Kundenkontext

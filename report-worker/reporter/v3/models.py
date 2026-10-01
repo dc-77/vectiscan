@@ -104,6 +104,9 @@ class Glance(Base):
     levers: list[Lever] = Field(default_factory=list)
     context: str = ""
     coverage_warning: str = ""
+    # S7a (spec/10 R20, Entscheidung DC 30.09.): Farberklaerung unter den Hebeln, nur mit den
+    # vorkommenden Farben; Gelb "in Wochen" nur bei einem Gelb-Befund der Stufe In Kürze.
+    legend: str = ""
 
 
 class ObservedSystem(Base):
@@ -154,6 +157,8 @@ class Limitation(Base):
 class DomainScope(Base):
     domain: str
     text: str
+    # S7a Punkt 7: "Hostsuche: n Namen gefunden, m geprüft, k gefunden und nicht geprüft".
+    search: str = ""
 
 
 class MethodPhase(Base):
@@ -207,12 +212,19 @@ class ServicePort(Base):
     p: str
     s: str
     st: str
+    # S7a (spec/10 R20): Dringlichkeit des schwersten Befunds am Port (nicht gerendert, fuer die
+    # Legende "Gelb in Kürze" oder "Gelb mittelfristig").
+    stage: str = ""
 
 
 class ServiceCard(Base):
     host: str
     label: str = ""
     ports: list[ServicePort] = Field(default_factory=list)
+    # S7a (spec/10 R20): weitere Adressen desselben Systems (IPv6, weitere A-Eintraege) im selben
+    # Block; ``notes`` fasst ihre nur aus einer Passivquelle bekannten Ports zusammen.
+    more_ips: list[str] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
 
 
 class PostureItem(Base):
@@ -226,6 +238,9 @@ class PostureItem(Base):
     # S6b-4 (spec/11 T16): Regeln, die den Eintrag nur auf Handlungsbedarf ziehen koennen
     # (Zertifikatsregeln an der Transportzeile eines Hosts); "unauffaellig" sagt ueber sie nichts.
     pulls: list[str] = Field(default_factory=list)
+    # S7a (spec/10 R20): Zustand weiterer Adressen desselben Systems ("2a01:...: nicht prüfbar");
+    # der Zustand ``v`` bleibt der der ersten Adresse.
+    more: list[str] = Field(default_factory=list)
 
 
 class PostureBlock(Base):
@@ -245,6 +260,11 @@ class Screenshot(Base):
     # der Basisname; bei Berichten ueber mehrere Laeufe laesst sich der Schluessel
     # daraus nicht rekonstruieren, und der Renderer (S4) braucht ihn zum Laden.
     key: str = ""
+    # S7a (spec/10 R20): fette Kopfzeile der Unterschrift ("mail, mail2 und owa zeigen dieselbe
+    # Anmeldeseite"); leer heisst: der Name aus ``host``. ``redirects`` nennt Namen, die auf diese
+    # Seite weiterleiten ("online.heuel.com, weitergeleitet auf www.heuel.com").
+    head: str = ""
+    redirects: list[str] = Field(default_factory=list)
 
 
 class Architecture(Base):

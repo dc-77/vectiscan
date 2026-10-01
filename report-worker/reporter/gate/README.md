@@ -60,6 +60,8 @@ nicht zwei; woher ein Eintrag kommt, steht deshalb am Eintrag (`engine`).
 | CVE im Befund ohne Zeile in A.3 (`cve_ohne_a3`) | Fehler | S6b-3 (spec/10 R14): dortmund-beach zitierte 17 CVE aus wpscan bei leerem A.3. |
 | Gefundene Namen nicht geprüft (`namen_nicht_geprueft`) | Warnung | S6b-3 (spec/10 R5): bis S6c die Hostsuche repariert; Kapitel 2 nennt die Namen. |
 | Frist zwischen Scan- und Berichtstag abgelaufen (`frist_vor_berichtsdatum`) | Warnung | S6b-3 (spec/10 R18): Hinweis an den Admin im Review, den Stand beim Kunden zu prüfen (castenow mailstore 24.09. bei Bericht vom 26.09.). |
+| Fristregel am Berichtsdatum anders als am Scantag (`fristregel_am_berichtsdatum`) | Warnung | S7a Punkt 8 (Entscheidung E27): Stufe und Regelauslösung bleiben am Scantag, der Admin sieht im Review, wenn eine Fristregel (`cert_expired`, `service_cert_expired`, `cert_expiring`, `cert_expiring_later`, `domain_expiring`) am Berichtsdatum anders ausfiele (heuel online.heuel.com: 31 Tage am Scantag, Schwelle 30). Die Einordnung steht in `reporter/gate/fristen.py`; dieselben Fristen gehen als `fristen` in `orders.report_defects`, damit die API sie für den Freigabetag nachrechnet (`api/src/lib/fristen.ts`). |
+| Fehlertext eines Werkzeugs im Kundentext (`werkzeugfehler_im_kundentext`) | Fehler | S7a Punkt 0: castenow cd28d260 zeigte an 92.205.163.53:8000 „ERROR: Script execution failed (use -d to debug)“ als Dienstkennung. Muster in `reporter/facts/tool_errors.py`, dieselbe Liste filtert die Kennung schon im nmap-Leser. Geprüft werden alle Kundentexte einschließlich Nachweis, Service-Karte und der Anhänge; echte Fehlerseiten eines Servers („ERROR: The request could not be satisfied“ von CloudFront) treffen die Muster nicht. |
 
 ## Wo die Liste landet
 

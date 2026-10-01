@@ -11,6 +11,7 @@ from __future__ import annotations
 from reporter.catalog.schema import CatalogOutput
 from reporter.facts import schema as FS
 from reporter.facts import systems as SYS
+from reporter.facts.serialize import sort_key
 from reporter.v3 import chapters as C
 from reporter.v3 import coverage as COV
 from reporter.v3 import levels as L
@@ -77,6 +78,16 @@ def build_inventory(facts: FS.Facts,
         rows.append(InventoryRow(host=pv.host_ip, port=str(pv.port),
                                  svc=f"{name}, laut Passivquelle{wo}",
                                  ref=ref(pv.host_ip, pv.port)))
+    # S7a (spec/10 R20): die Adressen eines Systems als ein Block, erste Adresse zuerst (IPv6 von
+    # junkerwerk und heuel stand bisher nach allen IPv4-Adressen).
+    leads = C.system_leads(facts)
+    reihe = {ip: i for i, ip in enumerate(dict.fromkeys(leads.values()))}
+
+    def block(r: InventoryRow) -> tuple:
+        lead = leads.get(r.host, r.host)
+        return (reihe.get(lead, len(reihe)), sort_key(lead), r.host != lead, sort_key(r.host), int(r.port))
+
+    rows.sort(key=block)
     # S6d (A1, E17): Netzbetreiber mit Quelle (RIR laut RDAP, sonst AbuseIPDB) in der ersten Zeile
     # jedes Hosts.
     by_ip = {h.ip: h for h in facts.hosts}
@@ -86,6 +97,10 @@ def build_inventory(facts: FS.Facts,
         if r.host in gesehen:
             continue
         gesehen.add(r.host)
+        lead = leads.get(r.host)
+        if lead and lead != r.host:
+            r.operator = f"{'IPv6-Adresse' if ':' in r.host else 'weitere Adresse'} von {lead}"
+            continue
         h = by_ip.get(r.host)
         if h is None:
             continue
@@ -154,7 +169,8 @@ def build_appendix(facts: FS.Facts, output: CatalogOutput, findings: list[Findin
                    cve_refs: list[CveRef], tool_findings: list[ToolFinding],
                    tool_messages: list[ToolFinding] | None,
                    counts: N.Counts, scan_date: str, provider: str,
-                   port_refs: dict[tuple[str, int], list[Finding]] | None = None) -> Appendix:
+                   port_refs: dict[tuple[str, int], list[Finding]] | None = None,
+                   plan_stages: list[str] | None = None) -> Appendix:
     has_red = any(f.status == "rot" for f in findings)
     # S6 (spec/08 Punkt 9): Die Freischaltung der Scanner-Adresse wird nur
     # empfohlen, wenn eine Blockade belegt ist. Vorher stand der Satz in jedem
@@ -172,6 +188,6 @@ def build_appendix(facts: FS.Facts, output: CatalogOutput, findings: list[Findin
         tool_messages=list(tool_messages or []),
         dkim_selectors=C.dkim_selectors_for_appendix(facts, output),
         filtering=N.filtering(counts),
-        repeat=N.repeat(counts, has_red, has_gaps),
+        repeat=N.repeat(counts, has_red, has_gaps, plan_stages),
         disclaimer=N.disclaimer(scan_date, provider),
     )

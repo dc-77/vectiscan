@@ -149,6 +149,13 @@
     "svc": "Proxmox Virtual Environment REST API 3.0"
    },
    {
+    "host": "37.114.55.171",
+    "operator": "",
+    "port": "3478",
+    "ref": "",
+    "svc": "STUN, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
     "host": "85.13.167.158",
     "operator": "Neue Medien Muennich GmbH, laut AbuseIPDB",
     "port": "21",
@@ -266,13 +273,6 @@
     "port": "987",
     "ref": "",
     "svc": "OpenSSH 10.0p2"
-   },
-   {
-    "host": "37.114.55.171",
-    "operator": "",
-    "port": "3478",
-    "ref": "",
-    "svc": "STUN, laut Passivquelle, außerhalb des geprüften Portbereichs"
    }
   ],
   "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
@@ -403,6 +403,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -415,6 +416,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -430,6 +432,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -442,6 +445,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -454,6 +458,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -466,6 +471,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -484,6 +490,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -496,6 +503,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -508,6 +516,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -520,6 +529,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -542,6 +552,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "37.114.55.171",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -566,6 +577,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "85.13.167.158",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -590,6 +602,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "87.79.190.79",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -616,6 +629,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -652,6 +666,7 @@
        "header_duplicate"
       ],
       "l": "37.114.55.171",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -669,6 +684,7 @@
        "header_duplicate"
       ],
       "l": "85.13.167.158",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -686,6 +702,7 @@
        "header_duplicate"
       ],
       "l": "87.79.190.79",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -703,71 +720,91 @@
    {
     "also": [],
     "file": "87.79.190.79__filebrowser.krause-computer.de.png",
+    "head": "",
     "host": "filebrowser.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__filebrowser.krause-computer.de.png",
+    "redirects": [],
     "what": "Login - File Browser (filebrowser.krause-computer.de/login)"
    },
    {
     "also": [],
     "file": "37.114.55.171__jitsi.krause-computer.de.png",
+    "head": "",
     "host": "jitsi.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__jitsi.krause-computer.de.png",
+    "redirects": [],
     "what": "Jitsi Meet"
    },
    {
     "also": [],
     "file": "85.13.167.158__krause-computer.de.png",
+    "head": "",
     "host": "krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/85.13.167.158__krause-computer.de.png",
+    "redirects": [],
     "what": "Computer-Service Krause · Ihr kompetenter IT-Partner"
    },
    {
     "also": [],
     "file": "37.114.55.171__mx.krause-computer.de.png",
+    "head": "",
     "host": "mx.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__mx.krause-computer.de.png",
+    "redirects": [],
     "what": "Jitsi Meet"
    },
    {
     "also": [],
     "file": "87.79.190.79__navidrome.krause-computer.de.png",
+    "head": "",
     "host": "navidrome.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__navidrome.krause-computer.de.png",
+    "redirects": [],
     "what": "Navidrome (navidrome.krause-computer.de/app/)"
    },
    {
     "also": [],
     "file": "87.79.190.79__nextcloud.krause-computer.de.png",
+    "head": "",
     "host": "nextcloud.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__nextcloud.krause-computer.de.png",
+    "redirects": [],
     "what": "Login · Nextcloud (nextcloud.krause-computer.de/login)"
    },
    {
     "also": [],
     "file": "37.114.55.171__nospamproxy.krause-computer.de.png",
+    "head": "",
     "host": "nospamproxy.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__nospamproxy.krause-computer.de.png",
+    "redirects": [],
     "what": "Jitsi Meet"
    },
    {
     "also": [],
     "file": "37.114.55.171__rustdesk.krause-computer.de.png",
+    "head": "",
     "host": "rustdesk.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__rustdesk.krause-computer.de.png",
+    "redirects": [],
     "what": "Jitsi Meet"
    },
    {
     "also": [],
     "file": "85.13.167.158__www.krause-computer.de.png",
+    "head": "",
     "host": "www.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/85.13.167.158__www.krause-computer.de.png",
+    "redirects": [],
     "what": "Computer-Service Krause · Ihr kompetenter IT-Partner"
    },
    {
     "also": [],
     "file": "87.79.190.79__youtube.krause-computer.de.png",
+    "head": "",
     "host": "youtube.krause-computer.de",
     "key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__youtube.krause-computer.de.png",
+    "redirects": [],
     "what": "yt-dlp Web UI"
    }
   ],
@@ -776,153 +813,185 @@
    {
     "host": "37.114.55.171",
     "label": "mx.krause-computer.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "22",
       "s": "OpenSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "26",
       "s": "SMTP",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "80",
       "s": "nginx",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "111",
       "s": "RPCBIND",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "987",
       "s": "OpenSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "3128",
       "s": "Proxmox Virtual Environment REST API",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "3478",
       "s": "STUN",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "85.13.167.158",
     "label": "dd55420.kasserver.com",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "21",
       "s": "Nagios NSCA",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "22",
       "s": "OpenSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "110",
       "s": "Dovecot pop3d",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "139",
       "s": "Samba smbd",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "445",
       "s": "Samba smbd",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      },
      {
       "p": "465",
       "s": "Postfix smtpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "587",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "993",
       "s": "IMAP über TLS",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "995",
       "s": "POP3 über TLS",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "3306",
       "s": "MariaDB 10.11.14",
-      "st": "rot"
+      "st": "rot",
+      "stage": "Unverzüglich"
      }
     ]
    },
    {
     "host": "87.79.190.79",
     "label": "xdsl-87-79-190-79.nc.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "nginx",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "987",
       "s": "OpenSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Rot unverzüglich · Gelb in Kürze oder mittelfristig · Blau geplante Verbesserung · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "37.114.55.171 (mx.krause-computer.de)",
@@ -1343,7 +1412,7 @@
       "85.13.167.158|85.13.167.158:445"
      ],
      "statement": "verify[0]",
-     "text": "Portscan der Ports 139 und 445 von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen."
+     "text": "Portscan der genannten SMB-Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen."
     },
     {
      "check": "smb_exposed",
@@ -1401,7 +1470,7 @@
    "threat": null,
    "title": "Fernwartung und Dateifreigabe aus dem Internet erreichbar: Dateifreigabe (SMB) erreichbar",
    "urgency": "Unverzüglich",
-   "verify": "Portscan der Ports 139 und 445 von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen."
+   "verify": "Portscan der genannten SMB-Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen."
   },
   {
    "affected": "37.114.55.171:111 (rpcbind), 37.114.55.171:3128 (Proxmox), 37.114.55.171:443 (nginx)",
@@ -1782,7 +1851,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check\nyoutube.krause-computer.de · Adresse: https://youtube.krause-computer.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options\n\nheader_check\nfilebrowser.krause-computer.de · Adresse: https://filebrowser.krause-computer.de · Antwort: 200 (keine Webseite) · Strict-Transport-Security: nicht gesetzt\n\nheader_check\nnavidrome.krause-computer.de · Adresse: https://navidrome.krause-computer.de · Antwort: 302 (Weiterleitung) · Strict-Transport-Security: nicht gesetzt",
-   "found": "Der Dienst 87.79.190.79 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: filebrowser.krause-computer.de, navidrome.krause-computer.de, youtube.krause-computer.de. Auf youtube.krause-computer.de ist keine Content-Security-Policy gesetzt: youtube.krause-computer.de. Auf youtube.krause-computer.de fehlen einzelne Sicherheits-Header der Webseite: youtube.krause-computer.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Der Dienst 87.79.190.79 liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: filebrowser.krause-computer.de, navidrome.krause-computer.de, youtube.krause-computer.de. Auf youtube.krause-computer.de ist keine Content-Security-Policy gesetzt. Auf youtube.krause-computer.de fehlen einzelne Sicherheits-Header der Webseite: youtube.krause-computer.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-006",
    "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/87.79.190.79/platform:skclient.de",
@@ -1878,7 +1947,7 @@
       "youtube.krause-computer.de@87.79.190.79|youtube.krause-computer.de@87.79.190.79"
      ],
      "statement": "observation[0]",
-     "text": "Auf youtube.krause-computer.de ist keine Content-Security-Policy gesetzt: youtube.krause-computer.de."
+     "text": "Auf youtube.krause-computer.de ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -2503,7 +2572,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check\njitsi.krause-computer.de · Adresse: https://jitsi.krause-computer.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options",
-   "found": "Auf jitsi.krause-computer.de ist keine Content-Security-Policy gesetzt: jitsi.krause-computer.de. Auf jitsi.krause-computer.de fehlen einzelne Sicherheits-Header der Webseite: jitsi.krause-computer.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Auf jitsi.krause-computer.de ist keine Content-Security-Policy gesetzt. Auf jitsi.krause-computer.de fehlen einzelne Sicherheits-Header der Webseite: jitsi.krause-computer.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-010",
    "impact": "Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/37.114.55.171/kunde",
@@ -2568,7 +2637,7 @@
       "jitsi.krause-computer.de@37.114.55.171|jitsi.krause-computer.de@37.114.55.171"
      ],
      "statement": "observation[0]",
-     "text": "Auf jitsi.krause-computer.de ist keine Content-Security-Policy gesetzt: jitsi.krause-computer.de."
+     "text": "Auf jitsi.krause-computer.de ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -3429,6 +3498,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von krause-computer.de am 26.05.2026: 11 Hostnamen auf 3 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 3 Systeme (37.114.55.171, 85.13.167.158 und 87.79.190.79) liegt nur eine teilweise aktive Prüfung vor. 2 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Rot = unverzüglich handeln · Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung.",
   "levers": [
    {
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts · Entzieht Angreifern den direkten Zugriff auf die Datenbanken",
@@ -3457,13 +3527,13 @@
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "2 Befunde erfordern unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "2 Befunde erfordern unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "14 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 27,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 14,
   "context_fields": [],
@@ -3474,7 +3544,7 @@
    "krause-computer.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 11,
   "generated_on": null,
   "generation": null,
@@ -3489,7 +3559,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -3981,7 +4051,13 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
-  "domains": [],
+  "domains": [
+   {
+    "domain": "krause-computer.de",
+    "search": "Hostsuche: 13 Namen gefunden, 11 geprüft, 2 gefunden und nicht geprüft.",
+    "text": "Hostermittlung, Portscan und Tiefenprüfung (11 Hostnamen), DNS- und E-Mail-Einträge"
+   }
+  ],
   "hosts": [
    {
     "cov": "teil",

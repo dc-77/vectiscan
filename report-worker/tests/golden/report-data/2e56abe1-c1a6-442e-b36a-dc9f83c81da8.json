@@ -60,6 +60,13 @@
    {
     "host": "20.79.218.75",
     "operator": "",
+    "port": "4433",
+    "ref": "",
+    "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
+   },
+   {
+    "host": "20.79.218.75",
+    "operator": "",
     "port": "8443",
     "ref": "VS-2026-001",
     "svc": "nicht identifiziert (Port 8443)"
@@ -77,6 +84,13 @@
     "port": "22",
     "ref": "",
     "svc": "ProFTPD mod_sftp"
+   },
+   {
+    "host": "213.133.104.51",
+    "operator": "",
+    "port": "25",
+    "ref": "",
+    "svc": "SMTP (Exim), laut Passivquelle"
    },
    {
     "host": "213.133.104.51",
@@ -142,6 +156,20 @@
     "svc": "POP3 über TLS, TLS erzwungen"
    },
    {
+    "host": "2a01:4f8:d0a:2757::2",
+    "operator": "IPv6-Adresse von 213.133.104.51",
+    "port": "80",
+    "ref": "",
+    "svc": "Apache httpd, laut Passivquelle"
+   },
+   {
+    "host": "2a01:4f8:d0a:2757::2",
+    "operator": "",
+    "port": "443",
+    "ref": "",
+    "svc": "Apache httpd, laut Passivquelle"
+   },
+   {
     "host": "216.150.1.65",
     "operator": "Vercel, Inc (CDN), laut AbuseIPDB",
     "port": "80",
@@ -168,34 +196,6 @@
     "port": "443",
     "ref": "VS-2026-003",
     "svc": "nginx, TLS erzwungen"
-   },
-   {
-    "host": "20.79.218.75",
-    "operator": "",
-    "port": "4433",
-    "ref": "",
-    "svc": "HTTPS, laut Passivquelle, außerhalb des geprüften Portbereichs"
-   },
-   {
-    "host": "213.133.104.51",
-    "operator": "",
-    "port": "25",
-    "ref": "",
-    "svc": "SMTP (Exim), laut Passivquelle"
-   },
-   {
-    "host": "2a01:4f8:d0a:2757::2",
-    "operator": "Hetzner Online GmbH, laut AbuseIPDB",
-    "port": "80",
-    "ref": "",
-    "svc": "Apache httpd, laut Passivquelle"
-   },
-   {
-    "host": "2a01:4f8:d0a:2757::2",
-    "operator": "",
-    "port": "443",
-    "ref": "",
-    "svc": "Apache httpd, laut Passivquelle"
    }
   ],
   "overall_rule": "Die Gesamtbewertung ist die schlechteste Ampel der fünf Kategorien: HOCH bei mindestens einem roten Befund, MITTEL bei mindestens einem gelben, NIEDRIG bei nur blauen Befunden und GERING ohne Befund.",
@@ -511,6 +511,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -523,6 +524,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -538,6 +540,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -550,6 +553,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -562,6 +566,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -574,6 +579,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -592,6 +598,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -604,6 +611,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -616,6 +624,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -628,6 +637,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -650,6 +660,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "195.225.241.75",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -674,6 +685,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "20.79.218.75",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -698,6 +710,9 @@
        "tls_no_fallback_scsv"
       ],
       "l": "213.133.104.51",
+      "more": [
+       "2a01:4f8:d0a:2757::2: nicht prüfbar"
+      ],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -722,6 +737,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "216.150.1.65",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -746,6 +762,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "217.72.203.132",
+      "more": [],
       "ok": true,
       "pulls": [
        "cert_expired",
@@ -763,30 +780,6 @@
      },
      {
       "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
-      "l": "2a01:4f8:d0a:2757::2",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "2a01:4f8:d0a:2757::2"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
        "cert_expired",
        "cert_expiring",
        "cert_expiring_later",
@@ -796,6 +789,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -833,6 +827,7 @@
        "header_duplicate"
       ],
       "l": "195.225.241.75",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -850,6 +845,7 @@
        "header_duplicate"
       ],
       "l": "20.79.218.75",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -867,6 +863,9 @@
        "header_duplicate"
       ],
       "l": "213.133.104.51",
+      "more": [
+       "2a01:4f8:d0a:2757::2: nicht prüfbar"
+      ],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -884,6 +883,7 @@
        "header_duplicate"
       ],
       "l": "216.150.1.65",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -901,29 +901,13 @@
        "header_duplicate"
       ],
       "l": "217.72.203.132",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
        "217.72.203.132"
       ],
       "v": "Handlungsbedarf"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
-      "l": "2a01:4f8:d0a:2757::2",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "2a01:4f8:d0a:2757::2"
-      ],
-      "v": "nicht prüfbar"
      }
     ],
     "name": "Sicherheits-Header",
@@ -935,22 +919,32 @@
    {
     "also": [],
     "file": "20.79.218.75__edi.heuel.com.png",
+    "head": "",
     "host": "edi.heuel.com",
     "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/20.79.218.75__edi.heuel.com.png",
+    "redirects": [],
     "what": "403 Forbidden"
    },
    {
     "also": [],
     "file": "20.79.218.75__ose.heuel.com.png",
+    "head": "",
     "host": "ose.heuel.com",
     "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/20.79.218.75__ose.heuel.com.png",
+    "redirects": [
+     "webportal.heuel.com, weitergeleitet auf ose.heuel.com"
+    ],
     "what": "Webmodule (ose.heuel.com/webmodule-ee/login.seam)"
    },
    {
     "also": [],
     "file": "217.72.203.132__www.heuel.com.png",
+    "head": "",
     "host": "www.heuel.com",
     "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/217.72.203.132__www.heuel.com.png",
+    "redirects": [
+     "online.heuel.com, weitergeleitet auf www.heuel.com"
+    ],
     "what": "Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS"
    }
   ],
@@ -959,155 +953,173 @@
    {
     "host": "20.79.218.75",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "21",
       "s": "Wing FTP Server",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "22",
       "s": "FortiSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "8443",
       "s": "nicht identifiziert (Port 8443)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "4433",
       "s": "HTTPS",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "213.133.104.51",
     "label": "www51.your-server.de",
+    "more_ips": [
+     "2a01:4f8:d0a:2757::2"
+    ],
+    "notes": [
+     "2a01:4f8:d0a:2757::2: Ports 80 und 443 laut Passivquelle (Apache httpd), nicht geprüft"
+    ],
     "ports": [
      {
       "p": "21",
       "s": "ProFTPD",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "22",
       "s": "ProFTPD mod_sftp",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "110",
       "s": "Courier pop3d",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "222",
       "s": "OpenSSH",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "gruen",
+      "stage": ""
      },
      {
       "p": "465",
       "s": "SMTP über TLS (Exim)",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "587",
       "s": "SMTP (Exim)",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "993",
       "s": "IMAP über TLS",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "995",
       "s": "POP3 über TLS",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "25",
       "s": "SMTP (Exim)",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "216.150.1.65",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "Vercel",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Vercel",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      }
     ]
    },
    {
     "host": "217.72.203.132",
     "label": "ip217-72-203-132.pbiaas.com",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "nginx",
-      "st": "gruen"
+      "st": "gruen",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
-     }
-    ]
-   },
-   {
-    "host": "2a01:4f8:d0a:2757::2",
-    "label": "www51.your-server.de",
-    "ports": [
-     {
-      "p": "80",
-      "s": "Apache httpd",
-      "st": "grau"
-     },
-     {
-      "p": "443",
-      "s": "Apache httpd",
-      "st": "grau"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Gelb in Kürze oder mittelfristig · Blau geplante Verbesserung · Grün: tiefer geprüft, kein Befund · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "20.79.218.75",
@@ -1322,7 +1334,7 @@
    },
    {
     "evidence": [
-     "www.heuel.com: Seite „Spedition für Stückguttransporte,  LTL/FTL in Deutschland un“"
+     "www.heuel.com: Seite „Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS“"
     ],
     "meaning": "Außendarstellung des Unternehmens. Betroffen wären vor allem Seiteninhalte und Formulareingaben.",
     "role_keys": [
@@ -1452,7 +1464,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check · hosts/20.79.218.75/phase2/headers_ose.heuel.com.json\nose.heuel.com · Adresse: https://ose.heuel.com · Antwort: 200 · weitergeleitet auf: https://ose.heuel.com/webmodule-ee/login.seam · Strict-Transport-Security: nicht gesetzt\n\nZAP · hosts/20.79.218.75/phase2/zap_alerts.json\nose.heuel.com · Einzelmeldungen an: https://ose.heuel.com/webmodule-ee/login.seam · nur einzelne Header belegt: Content-Security-Policy, X-Content-Type-Options, X-Frame-Options · nur an der Weiterleitungsseite gemessen: Referrer-Policy, Permissions-Policy · Content-Security-Policy: nicht gesetzt · fehlende Header: X-Content-Type-Options, X-Frame-Options",
-   "found": "Der Dienst ose.heuel.com liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: ose.heuel.com. Auf ose.heuel.com ist keine Content-Security-Policy gesetzt: ose.heuel.com. Auf ose.heuel.com fehlen einzelne Sicherheits-Header der Webseite: ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options).",
+   "found": "Der Dienst ose.heuel.com liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt. Auf ose.heuel.com ist keine Content-Security-Policy gesetzt. Auf ose.heuel.com fehlen einzelne Sicherheits-Header der Webseite: ose.heuel.com (fehlend: X-Frame-Options, X-Content-Type-Options).",
    "id": "VS-2026-002",
    "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert.",
    "key": "web_header_hygiene/20.79.218.75/kunde",
@@ -1533,7 +1545,7 @@
       "ose.heuel.com@20.79.218.75|ose.heuel.com@20.79.218.75"
      ],
      "statement": "observation[0]",
-     "text": "Der Dienst ose.heuel.com liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: ose.heuel.com."
+     "text": "Der Dienst ose.heuel.com liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt."
     },
     {
      "check": "csp_missing",
@@ -1542,7 +1554,7 @@
       "ose.heuel.com@20.79.218.75|ose.heuel.com@20.79.218.75"
      ],
      "statement": "observation[0]",
-     "text": "Auf ose.heuel.com ist keine Content-Security-Policy gesetzt: ose.heuel.com."
+     "text": "Auf ose.heuel.com ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -2795,6 +2807,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von heuel.com am 23.09.2026: 11 Hostnamen auf 7 IP-Adressen, davon 3 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 4 Systeme (195.225.241.75, 20.79.218.75, 213.133.104.51 mit 2a01:4f8:d0a:2757::2 und 216.150.1.65 mit 216.150.16.65) liegt keine oder nur eine teilweise aktive Prüfung vor. 3 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung.",
   "levers": [
    {
     "effect": "Verkleinert die Angriffsfläche um Dienste ohne erkennbaren Zweck",
@@ -2823,13 +2836,13 @@
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
-  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration."
+  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration."
  },
  "landscape_lead": "9 Befunde in 4 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 22,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 9,
   "context_fields": [],
@@ -2840,7 +2853,7 @@
    "heuel.com"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 11,
   "generated_on": null,
   "generation": null,
@@ -2855,7 +2868,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -3216,13 +3229,13 @@
       "heuel.com"
      ],
      "statement": "positive.text",
-     "text": "Für die Domain heuel.com (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+     "text": "Für die Domain heuel.com (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht."
     }
    ],
    "subjects": [
     "heuel.com"
    ],
-   "text": "Für die Domain heuel.com (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+   "text": "Für die Domain heuel.com (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht.",
    "title": "DKIM vorhanden"
   },
   {
@@ -3334,7 +3347,13 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
-  "domains": [],
+  "domains": [
+   {
+    "domain": "heuel.com",
+    "search": "Hostsuche: 14 Namen gefunden, 11 geprüft, 1 beim Drittanbieter nicht geprüft, 2 gefunden und nicht geprüft.",
+    "text": "Hostermittlung, Portscan und Tiefenprüfung (11 Hostnamen), DNS- und E-Mail-Einträge"
+   }
+  ],
   "hosts": [
    {
     "cov": "keine",

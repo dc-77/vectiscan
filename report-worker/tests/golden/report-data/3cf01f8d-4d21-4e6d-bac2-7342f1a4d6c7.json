@@ -196,6 +196,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -208,6 +209,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -223,6 +225,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -235,6 +238,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -247,6 +251,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -259,6 +264,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -277,6 +283,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -289,6 +296,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -301,6 +309,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -313,6 +322,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -335,6 +345,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "18.197.248.23",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -359,6 +370,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "80.90.145.166",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -385,6 +397,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -411,6 +424,7 @@
        "header_duplicate"
       ],
       "l": "18.197.248.23",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -428,6 +442,7 @@
        "header_duplicate"
       ],
       "l": "80.90.145.166",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -445,15 +460,19 @@
    {
     "also": [],
     "file": "80.90.145.166__exchange.huendgen-entsorgung.de.png",
+    "head": "",
     "host": "exchange.huendgen-entsorgung.de",
     "key": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/80.90.145.166__exchange.huendgen-entsorgung.de.png",
+    "redirects": [],
     "what": "Outlook (exchange.huendgen-entsorgung.de/owa/auth/logon.aspx)"
    },
    {
     "also": [],
     "file": "18.197.248.23__www.huendgen-entsorgung.de.png",
+    "head": "",
     "host": "www.huendgen-entsorgung.de",
     "key": "3cf01f8d-4d21-4e6d-bac2-7342f1a4d6c7/18.197.248.23__www.huendgen-entsorgung.de.png",
+    "redirects": [],
     "what": "Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn"
    }
   ],
@@ -462,57 +481,69 @@
    {
     "host": "18.197.248.23",
     "label": "eu-staticip.multiscreensite.com",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "nginx",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "8443",
       "s": "nginx",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "80.90.145.166",
     "label": "gw-huendgen.bn-online.net",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Microsoft-IIS/10.0",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "444",
       "s": "Apache httpd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "1000",
       "s": "nicht identifiziert (Port 1000)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "1001",
       "s": "nicht identifiziert (Port 1001)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "1002",
       "s": "nicht identifiziert (Port 1002)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Gelb in Kürze oder mittelfristig · Blau geplante Verbesserung · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "18.197.248.23 (eu-staticip.multiscreensite.com)",
@@ -608,7 +639,7 @@
   "observed": [
    {
     "evidence": [
-     "www.huendgen-entsorgung.de: Seite „Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal“"
+     "www.huendgen-entsorgung.de: Seite „Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn“"
     ],
     "meaning": "Außendarstellung des Unternehmens. Betroffen wären vor allem Seiteninhalte und Formulareingaben.",
     "role_keys": [
@@ -1116,7 +1147,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check · hosts/80.90.145.166/phase2/headers_exchange.huendgen-entsorgung.de.json\nexchange.huendgen-entsorgung.de · Adresse: https://exchange.huendgen-entsorgung.de · Antwort: 302 · weitergeleitet auf: https://exchange.huendgen-entsorgung.de/owa/ · Strict-Transport-Security: nicht gesetzt\n\nWeiterleitungsprüfung · hosts/80.90.145.166/phase1/tech_profile.json\nexchange.huendgen-entsorgung.de · bewertet an der Endseite: https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0 · Antwort: 200 · Content-Security-Policy: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options",
-   "found": "Der Dienst exchange.huendgen-entsorgung.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: exchange.huendgen-entsorgung.de. Auf exchange.huendgen-entsorgung.de ist keine Content-Security-Policy gesetzt: exchange.huendgen-entsorgung.de. Auf exchange.huendgen-entsorgung.de fehlen einzelne Sicherheits-Header der Webseite: exchange.huendgen-entsorgung.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Der Dienst exchange.huendgen-entsorgung.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt. Auf exchange.huendgen-entsorgung.de ist keine Content-Security-Policy gesetzt. Auf exchange.huendgen-entsorgung.de fehlen einzelne Sicherheits-Header der Webseite: exchange.huendgen-entsorgung.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-005",
    "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/80.90.145.166/kunde",
@@ -1198,7 +1229,7 @@
       "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
      ],
      "statement": "observation[0]",
-     "text": "Der Dienst exchange.huendgen-entsorgung.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: exchange.huendgen-entsorgung.de."
+     "text": "Der Dienst exchange.huendgen-entsorgung.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt."
     },
     {
      "check": "csp_missing",
@@ -1207,7 +1238,7 @@
       "exchange.huendgen-entsorgung.de@80.90.145.166|exchange.huendgen-entsorgung.de@80.90.145.166"
      ],
      "statement": "observation[0]",
-     "text": "Auf exchange.huendgen-entsorgung.de ist keine Content-Security-Policy gesetzt: exchange.huendgen-entsorgung.de."
+     "text": "Auf exchange.huendgen-entsorgung.de ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -1896,7 +1927,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check · hosts/18.197.248.23/phase2/headers_www.huendgen-entsorgung.de.json\nwww.huendgen-entsorgung.de · Adresse: https://www.huendgen-entsorgung.de · Antwort: 200 · Content-Security-Policy: frame-ancestors 'self' · fehlende Header: Permissions-Policy, Referrer-Policy",
-   "found": "Auf www.huendgen-entsorgung.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src): www.huendgen-entsorgung.de. Auf www.huendgen-entsorgung.de fehlen einzelne Sicherheits-Header der Webseite: www.huendgen-entsorgung.de (fehlend: Referrer-Policy, Permissions-Policy).",
+   "found": "Auf www.huendgen-entsorgung.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src). Auf www.huendgen-entsorgung.de fehlen einzelne Sicherheits-Header der Webseite: www.huendgen-entsorgung.de (fehlend: Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-010",
    "impact": "Eine Richtlinie ohne Regel für Skriptquellen schränkt nicht ein, welche Skripte eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit die zweite Verteidigungslinie; der Schutz vor Einbettung in fremde Seiten bleibt davon unberührt. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/18.197.248.23/platform:eu-multiscreensite.com",
@@ -1959,7 +1990,7 @@
       "www.huendgen-entsorgung.de@18.197.248.23|www.huendgen-entsorgung.de@18.197.248.23"
      ],
      "statement": "observation[1]",
-     "text": "Auf www.huendgen-entsorgung.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src): www.huendgen-entsorgung.de."
+     "text": "Auf www.huendgen-entsorgung.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src)."
     },
     {
      "check": "security_headers_incomplete",
@@ -2402,6 +2433,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von huendgen-entsorgung.de am 23.09.2026: 3 Hostnamen auf 3 IP-Adressen, davon 1 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 2 Systeme (18.197.248.23 mit 52.59.120.70 und 80.90.145.166) liegt nur eine teilweise aktive Prüfung vor. 2 weitere gefundene Namen sind nicht geprüft. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung.",
   "levers": [
    {
     "effect": "Begrenzt den Zugriff auf Software ohne Sicherheitsupdates bis zur Ablösung",
@@ -2430,13 +2462,13 @@
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
-  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "12 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 18,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 12,
   "context_fields": [],
@@ -2447,7 +2479,7 @@
    "huendgen-entsorgung.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 3,
   "generated_on": null,
   "generation": null,
@@ -2462,7 +2494,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -2899,13 +2931,13 @@
       "huendgen-entsorgung.de"
      ],
      "statement": "positive.text",
-     "text": "Für die Domain huendgen-entsorgung.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+     "text": "Für die Domain huendgen-entsorgung.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht."
     }
    ],
    "subjects": [
     "huendgen-entsorgung.de"
    ],
-   "text": "Für die Domain huendgen-entsorgung.de ist ein SPF-Eintrag veröffentlicht. Für die Domain huendgen-entsorgung.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+   "text": "Für die Domain huendgen-entsorgung.de ist ein SPF-Eintrag veröffentlicht. Für die Domain huendgen-entsorgung.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht.",
    "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
   },
   {
@@ -2986,7 +3018,13 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
-  "domains": [],
+  "domains": [
+   {
+    "domain": "huendgen-entsorgung.de",
+    "search": "Hostsuche: 5 Namen gefunden, 3 geprüft, 2 gefunden und nicht geprüft.",
+    "text": "Hostermittlung, Portscan und Tiefenprüfung (3 Hostnamen), DNS- und E-Mail-Einträge"
+   }
+  ],
   "hosts": [
    {
     "cov": "teil",

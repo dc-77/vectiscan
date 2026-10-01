@@ -338,6 +338,54 @@
     "where": "umfrage.castenow.de/robots.txt (an Nebenpfaden robots.txt)"
    },
    {
+    "count": 8,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "„Server Leaks Version Information via \"Server\" HTTP Response Header Field“ (ZAP-Regel 10036) an Nebenpfaden, 8 Meldungen",
+    "where": "autodiscover.castenow.de/robots.txt, autodiscover.castenow.de/sitemap.xml, owa.castenow.de/robots.txt, owa.castenow.de/sitemap.xml, rdgw.castenow.de/robots.txt, rdgw.castenow.de/sitemap.xml und 2 weitere"
+   },
+   {
+    "count": 2,
+    "message": "CSP: Failure to Define Directive with No Fallback",
+    "note": "Content-Security-Policy lückenhaft; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10055",
+    "what": "„CSP: Failure to Define Directive with No Fallback“ (ZAP-Regel 10055) an Nebenpfaden, 2 Meldungen",
+    "where": "mailstore.castenow.de/sitemap.xml, nextcloud.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
+    "note": "Zeitstempel in der Antwort; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10096",
+    "what": "„Timestamp Disclosure - Unix“ (ZAP-Regel 10096) an Nebenpfaden, 1 Meldung",
+    "where": "mailstore.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 4,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "„Strict-Transport-Security Header Not Set“ (ZAP-Regel 10035) an Nebenpfaden, 4 Meldungen",
+    "where": "rdgw.castenow.de/robots.txt, rdgw.castenow.de/sitemap.xml, vpn.castenow.de/robots.txt, vpn.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 5,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "„Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)“ (ZAP-Regel 10037) an Nebenpfaden, 5 Meldungen",
+    "where": "rdgw.castenow.de/robots.txt, rdgw.castenow.de/sitemap.xml, ubb-wiki.castenow.de/robots.txt, ubb-wiki.castenow.de/sitemap.xml, ubb-wiki.castenow.de/wp-sitemap.xml"
+   },
+   {
+    "count": 4,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "„Content Security Policy (CSP) Header Not Set“ (ZAP-Regel 10038) an Nebenpfaden, 4 Meldungen",
+    "where": "rdgw.castenow.de/robots.txt, rdgw.castenow.de/sitemap.xml, ubb-wiki.castenow.de/wp-sitemap.xml, ubb-wiki.castenow.de/xmlrpc.php"
+   },
+   {
     "count": 2,
     "message": "PHP",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
@@ -597,6 +645,198 @@
    },
    {
     "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "autodiscover.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "autodiscover.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "CSP: Failure to Define Directive with No Fallback",
+    "note": "Content-Security-Policy lückenhaft; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10055",
+    "what": "Nebenpfad",
+    "where": "mailstore.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Timestamp Disclosure - Unix",
+    "note": "Zeitstempel in der Antwort; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10096",
+    "what": "Nebenpfad",
+    "where": "mailstore.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "CSP: Failure to Define Directive with No Fallback",
+    "note": "Content-Security-Policy lückenhaft; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10055",
+    "what": "Nebenpfad",
+    "where": "nextcloud.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "owa.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "owa.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "rdgw.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "rdgw.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "rdgw.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "rdgw.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Nebenpfad",
+    "where": "rdgw.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Nebenpfad",
+    "where": "rdgw.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Nebenpfad",
+    "where": "rdgw.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Nebenpfad",
+    "where": "rdgw.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Nebenpfad",
+    "where": "ubb-wiki.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Nebenpfad",
+    "where": "ubb-wiki.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+    "note": "Technikangabe im X-Powered-By-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10037",
+    "what": "Nebenpfad",
+    "where": "ubb-wiki.castenow.de/wp-sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Nebenpfad",
+    "where": "ubb-wiki.castenow.de/wp-sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Content Security Policy (CSP) Header Not Set",
+    "note": "Content-Security-Policy fehlt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10038",
+    "what": "Nebenpfad",
+    "where": "ubb-wiki.castenow.de/xmlrpc.php"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "umfrage.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+    "note": "Serverversion im Server-Header; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10036",
+    "what": "Nebenpfad",
+    "where": "umfrage.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "vpn.castenow.de/robots.txt"
+   },
+   {
+    "count": 1,
+    "message": "Strict-Transport-Security Header Not Set",
+    "note": "HSTS nicht gesetzt; ohne eigenen Befund.",
+    "rule": "zap_nebenpfad#10035",
+    "what": "Nebenpfad",
+    "where": "vpn.castenow.de/sitemap.xml"
+   },
+   {
+    "count": 1,
     "message": "PHP",
     "note": "Nur laut httpx, ohne Version und ohne zweite Quelle; nicht in der Technologietabelle.",
     "rule": "technik",
@@ -715,6 +955,7 @@
        "spf_authorizes_shared_host"
       ],
       "l": "SPF",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -727,6 +968,7 @@
        "dkim_missing"
       ],
       "l": "DKIM",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -742,6 +984,7 @@
        "mail_spoofing_unprotected"
       ],
       "l": "DMARC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -754,6 +997,7 @@
        "mta_sts_missing"
       ],
       "l": "MTA-STS",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -766,6 +1010,7 @@
        "tls_rpt_missing"
       ],
       "l": "TLS-RPT",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -778,6 +1023,7 @@
        "dane_missing"
       ],
       "l": "DANE",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -796,6 +1042,7 @@
        "dnssec_missing"
       ],
       "l": "DNSSEC",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -808,6 +1055,7 @@
        "caa_missing"
       ],
       "l": "CAA",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -820,6 +1068,7 @@
        "dns_zone_transfer"
       ],
       "l": "Abruf der gesamten Zone",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -832,6 +1081,7 @@
        "dns_dangling_cname"
       ],
       "l": "Verwaiste Einträge",
+      "more": [],
       "ok": true,
       "pulls": [],
       "subjects": [
@@ -854,6 +1104,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "159.69.143.80",
+      "more": [],
       "ok": true,
       "pulls": [
        "cert_expired",
@@ -878,6 +1129,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "195.50.179.2",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -902,6 +1154,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "195.50.179.4",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -926,6 +1179,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "195.50.179.5",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -950,6 +1204,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "195.50.179.6",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -974,6 +1229,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "195.50.179.7",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -998,6 +1254,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "195.50.179.9",
+      "more": [],
       "ok": false,
       "pulls": [
        "cert_expired",
@@ -1022,6 +1279,7 @@
        "tls_no_fallback_scsv"
       ],
       "l": "213.23.169.167",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -1046,6 +1304,11 @@
        "tls_no_fallback_scsv"
       ],
       "l": "54.230.172.14",
+      "more": [
+       "54.230.172.35: nicht prüfbar",
+       "54.230.172.38: nicht prüfbar",
+       "54.230.172.97: nicht prüfbar"
+      ],
       "ok": true,
       "pulls": [
        "cert_expired",
@@ -1069,79 +1332,8 @@
        "tls_weakness",
        "tls_no_fallback_scsv"
       ],
-      "l": "54.230.172.35",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "54.230.172.35"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
-      "l": "54.230.172.38",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "54.230.172.38"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
-      "l": "54.230.172.97",
-      "ok": null,
-      "pulls": [
-       "cert_expired",
-       "cert_expiring",
-       "cert_expiring_later",
-       "cert_chain_incomplete",
-       "cert_hostname_mismatch",
-       "cert_self_signed",
-       "service_cert_expired"
-      ],
-      "subjects": [
-       "54.230.172.97"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "tls_legacy_protocols",
-       "tls_no_13",
-       "tls_weak_ciphers",
-       "tls_weakness",
-       "tls_no_fallback_scsv"
-      ],
       "l": "92.205.163.53",
+      "more": [],
       "ok": null,
       "pulls": [
        "cert_expired",
@@ -1168,6 +1360,7 @@
        "service_cert_expired"
       ],
       "l": "Zertifikate",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1214,6 +1407,7 @@
        "header_duplicate"
       ],
       "l": "159.69.143.80",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1231,6 +1425,7 @@
        "header_duplicate"
       ],
       "l": "195.50.179.2",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1248,6 +1443,7 @@
        "header_duplicate"
       ],
       "l": "195.50.179.4",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1265,6 +1461,7 @@
        "header_duplicate"
       ],
       "l": "195.50.179.5",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1282,6 +1479,7 @@
        "header_duplicate"
       ],
       "l": "195.50.179.6",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1299,6 +1497,7 @@
        "header_duplicate"
       ],
       "l": "195.50.179.7",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1316,6 +1515,7 @@
        "header_duplicate"
       ],
       "l": "195.50.179.9",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1333,6 +1533,7 @@
        "header_duplicate"
       ],
       "l": "213.23.169.167",
+      "more": [],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1350,6 +1551,11 @@
        "header_duplicate"
       ],
       "l": "54.230.172.14",
+      "more": [
+       "54.230.172.35: nicht prüfbar",
+       "54.230.172.38: nicht prüfbar",
+       "54.230.172.97: nicht prüfbar"
+      ],
       "ok": null,
       "pulls": [],
       "subjects": [
@@ -1366,58 +1572,8 @@
        "hsts_short",
        "header_duplicate"
       ],
-      "l": "54.230.172.35",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "54.230.172.35"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
-      "l": "54.230.172.38",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "54.230.172.38"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
-      "l": "54.230.172.97",
-      "ok": null,
-      "pulls": [],
-      "subjects": [
-       "54.230.172.97"
-      ],
-      "v": "nicht prüfbar"
-     },
-     {
-      "checks": [
-       "security_headers_incomplete",
-       "csp_missing",
-       "csp_weak",
-       "hsts_missing",
-       "hsts_short",
-       "header_duplicate"
-      ],
       "l": "92.205.163.53",
+      "more": [],
       "ok": false,
       "pulls": [],
       "subjects": [
@@ -1434,72 +1590,87 @@
   "screens": [
    {
     "also": [],
-    "file": "195.50.179.4__autodiscover.castenow.de.png",
-    "host": "autodiscover.castenow.de",
-    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.4__autodiscover.castenow.de.png",
-    "what": "Outlook (autodiscover.castenow.de/owa/auth/logon.aspx)"
-   },
-   {
-    "also": [],
     "file": "195.50.179.6__bitwarden.castenow.de.png",
+    "head": "",
     "host": "bitwarden.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.6__bitwarden.castenow.de.png",
+    "redirects": [],
     "what": "Bitwarden Web vault"
    },
    {
     "also": [],
     "file": "195.50.179.5__mailstore.castenow.de.png",
+    "head": "",
     "host": "mailstore.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.5__mailstore.castenow.de.png",
+    "redirects": [],
     "what": "Nextcloud"
    },
    {
     "also": [],
     "file": "195.50.179.5__nextcloud.castenow.de.png",
+    "head": "",
     "host": "nextcloud.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.5__nextcloud.castenow.de.png",
+    "redirects": [],
     "what": "Login · Nextcloud (nextcloud.castenow.de/login)"
    },
    {
     "also": [],
     "file": "195.50.179.9__openotp.castenow.de.png",
+    "head": "",
     "host": "openotp.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.9__openotp.castenow.de.png",
+    "redirects": [],
     "what": "Castenow GmbH Web Applications Portal"
    },
    {
-    "also": [],
+    "also": [
+     "autodiscover.castenow.de"
+    ],
     "file": "195.50.179.4__owa.castenow.de.png",
+    "head": "autodiscover und owa zeigen dieselbe Anmeldeseite",
     "host": "owa.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.4__owa.castenow.de.png",
-    "what": "Outlook (owa.castenow.de/owa/auth/logon.aspx)"
+    "redirects": [],
+    "what": "Outlook (/owa/auth/logon.aspx)"
    },
    {
     "also": [],
     "file": "195.50.179.7__rdgw.castenow.de.png",
+    "head": "",
     "host": "rdgw.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.7__rdgw.castenow.de.png",
+    "redirects": [],
     "what": "IIS Windows Server"
    },
    {
     "also": [],
     "file": "92.205.163.53__ubb-wiki.castenow.de.png",
+    "head": "",
     "host": "ubb-wiki.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/92.205.163.53__ubb-wiki.castenow.de.png",
+    "redirects": [],
     "what": "Login · My CMS (ubb-wiki.castenow.de/login/)"
    },
    {
     "also": [],
     "file": "195.50.179.2__vpn.castenow.de.png",
+    "head": "",
     "host": "vpn.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.2__vpn.castenow.de.png",
+    "redirects": [],
     "what": "SonicWall - Virtual Office"
    },
    {
     "also": [],
     "file": "159.69.143.80__www.castenow.de.png",
+    "head": "",
     "host": "www.castenow.de",
     "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/159.69.143.80__www.castenow.de.png",
+    "redirects": [
+     "umfrage.castenow.de, weitergeleitet auf www.castenow.de"
+    ],
     "what": "CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW"
    }
   ],
@@ -1508,199 +1679,245 @@
    {
     "host": "159.69.143.80",
     "label": "yak.planwerk6.de",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "Apache httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "195.50.179.2",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Web Server",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    },
    {
     "host": "195.50.179.4",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "443",
       "s": "Microsoft IIS httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    },
    {
     "host": "195.50.179.5",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "195.50.179.6",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "195.50.179.7",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Microsoft IIS httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    },
    {
     "host": "195.50.179.9",
     "label": "",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "443",
       "s": "Apache httpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "54.230.172.14",
     "label": "server-54-230-172-14.dus51.r.cloudfront.net",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "80",
       "s": "Amazon CloudFront httpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "443",
       "s": "Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.5",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      }
     ]
    },
    {
     "host": "92.205.163.53",
     "label": "53.163.205.92.host.secureserver.net",
+    "more_ips": [],
+    "notes": [],
     "ports": [
      {
       "p": "21",
       "s": "ProFTPD",
-      "st": "blau"
+      "st": "blau",
+      "stage": "Mittelfristig"
      },
      {
       "p": "25",
       "s": "Postfix smtpd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "53",
       "s": "DNS",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "80",
       "s": "nginx",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "106",
       "s": "Dienst ohne Antwort",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "110",
       "s": "Dovecot pop3d",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "143",
       "s": "Dovecot imapd",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "443",
       "s": "nginx",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "Mittelfristig"
      },
      {
       "p": "465",
       "s": "Postfix smtpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "587",
       "s": "Postfix smtpd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "993",
       "s": "Dovecot imapd",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "995",
       "s": "Dovecot pop3d",
-      "st": "gruen"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "8000",
       "s": "Shoutcast DNAS 2.6.1.777, Stream tonausstrom.de, Dienst einer weiteren Domain, nicht bewertet",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "8001",
       "s": "nicht identifiziert (Port 8001)",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "8443",
       "s": "sw-cp-server",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      },
      {
       "p": "8800",
       "s": "Icecast streaming media server, Zuordnung nicht belegt, nicht bewertet",
-      "st": "grau"
+      "st": "grau",
+      "stage": ""
      },
      {
       "p": "8880",
       "s": "Plesk",
-      "st": "gelb"
+      "st": "gelb",
+      "stage": "In Kürze"
      }
     ]
    }
   ],
-  "services_note": "Farbe je Port nach Ampel des schwersten Befunds: Rot unverzüglich · Gelb in Kürze · Blau geplante Verbesserung · Grün: kein Befund · Grau: nur aus einer Passivquelle bekannt, ohne Befund.",
+  "services_note": "Farbe je Port nach Ampel des schwersten Befunds am Port: Gelb in Kürze oder mittelfristig · Blau geplante Verbesserung · Grau: nur im Portscan erfasst oder nur aus einer Passivquelle bekannt, ohne Befund.",
   "tech": [
    {
     "host": "159.69.143.80 (yak.planwerk6.de)",
@@ -2030,7 +2247,7 @@
   "observed": [
    {
     "evidence": [
-     "www.castenow.de: Seite „CASTENOW │Agentur für Employer Branding & Markenführung | CA“",
+     "www.castenow.de: Seite „CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW“",
      "SPF-Eintrag von castenow.de: a"
     ],
     "meaning": "Außendarstellung des Unternehmens. Betroffen wären vor allem die Seiteninhalte.",
@@ -4120,7 +4337,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check\nvpn.castenow.de · Adresse: https://vpn.castenow.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Frame-Options",
-   "found": "Der Dienst vpn.castenow.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: vpn.castenow.de. Auf vpn.castenow.de ist keine Content-Security-Policy gesetzt: vpn.castenow.de. Auf vpn.castenow.de fehlen einzelne Sicherheits-Header der Webseite: vpn.castenow.de (fehlend: X-Frame-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Der Dienst vpn.castenow.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt. Auf vpn.castenow.de ist keine Content-Security-Policy gesetzt. Auf vpn.castenow.de fehlen einzelne Sicherheits-Header der Webseite: vpn.castenow.de (fehlend: X-Frame-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-013",
    "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/195.50.179.2/kunde",
@@ -4202,7 +4419,7 @@
       "vpn.castenow.de@195.50.179.2|vpn.castenow.de@195.50.179.2"
      ],
      "statement": "observation[0]",
-     "text": "Der Dienst vpn.castenow.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: vpn.castenow.de."
+     "text": "Der Dienst vpn.castenow.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt."
     },
     {
      "check": "csp_missing",
@@ -4211,7 +4428,7 @@
       "vpn.castenow.de@195.50.179.2|vpn.castenow.de@195.50.179.2"
      ],
      "statement": "observation[0]",
-     "text": "Auf vpn.castenow.de ist keine Content-Security-Policy gesetzt: vpn.castenow.de."
+     "text": "Auf vpn.castenow.de ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -4721,7 +4938,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check\nrdgw.castenow.de · Adresse: https://rdgw.castenow.de · Antwort: 200 · Content-Security-Policy: nicht gesetzt · Strict-Transport-Security: nicht gesetzt · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options, X-Frame-Options",
-   "found": "Der Dienst rdgw.castenow.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: rdgw.castenow.de. Auf rdgw.castenow.de ist keine Content-Security-Policy gesetzt: rdgw.castenow.de. Auf rdgw.castenow.de fehlen einzelne Sicherheits-Header der Webseite: rdgw.castenow.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Der Dienst rdgw.castenow.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt. Auf rdgw.castenow.de ist keine Content-Security-Policy gesetzt. Auf rdgw.castenow.de fehlen einzelne Sicherheits-Header der Webseite: rdgw.castenow.de (fehlend: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-015",
    "impact": "Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift. Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit eine zweite Verteidigungslinie. Ohne X-Frame-Options oder frame-ancestors in der Content-Security-Policy lässt sich die Seite in fremde Seiten einbetten; auf Anmeldeseiten ermöglicht das Clickjacking. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/195.50.179.7/kunde",
@@ -4804,7 +5021,7 @@
       "rdgw.castenow.de@195.50.179.7|rdgw.castenow.de@195.50.179.7"
      ],
      "statement": "observation[0]",
-     "text": "Der Dienst rdgw.castenow.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt: rdgw.castenow.de."
+     "text": "Der Dienst rdgw.castenow.de liefert seine Antworten ohne den HTTP Strict Transport Security Header, der Browser dauerhaft auf die verschlüsselte Verbindung festlegt."
     },
     {
      "check": "csp_missing",
@@ -4813,7 +5030,7 @@
       "rdgw.castenow.de@195.50.179.7|rdgw.castenow.de@195.50.179.7"
      ],
      "statement": "observation[0]",
-     "text": "Auf rdgw.castenow.de ist keine Content-Security-Policy gesetzt: rdgw.castenow.de."
+     "text": "Auf rdgw.castenow.de ist keine Content-Security-Policy gesetzt."
     },
     {
      "check": "security_headers_incomplete",
@@ -5976,7 +6193,7 @@
     "security_headers_incomplete"
    ],
    "evidence": "header_check\nubb-wiki.castenow.de · Adresse: https://ubb-wiki.castenow.de · Antwort: 302 · weitergeleitet auf: https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F\n\nWeiterleitungsprüfung · hosts/92.205.163.53/phase1/tech_profile.json\nubb-wiki.castenow.de · bewertet an der Endseite: https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F · Antwort: 200 · Content-Security-Policy: frame-ancestors 'self'; · fehlende Header: Permissions-Policy, Referrer-Policy, X-Content-Type-Options",
-   "found": "Auf ubb-wiki.castenow.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src): ubb-wiki.castenow.de. Auf ubb-wiki.castenow.de fehlen einzelne Sicherheits-Header der Webseite: ubb-wiki.castenow.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
+   "found": "Auf ubb-wiki.castenow.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src). Auf ubb-wiki.castenow.de fehlen einzelne Sicherheits-Header der Webseite: ubb-wiki.castenow.de (fehlend: X-Content-Type-Options, Referrer-Policy, Permissions-Policy).",
    "id": "VS-2026-023",
    "impact": "Eine Richtlinie ohne Regel für Skriptquellen schränkt nicht ein, welche Skripte eine Seite laden darf. Bei einer erfolgreichen Einschleusung von Fremdinhalten fehlt damit die zweite Verteidigungslinie; der Schutz vor Einbettung in fremde Seiten bleibt davon unberührt. Ohne X-Content-Type-Options können ältere Browser Inhalte anders deuten, als der Server sie ausliefert. Ohne Referrer-Policy gilt die Voreinstellung des Browsers; ältere Browser geben beim Wechsel auf fremde Seiten die vollständige Adresse der Seite samt Parametern weiter. Ohne Permissions-Policy legt die Seite nicht fest, welche Browserfunktionen eingebettete Inhalte nutzen dürfen.",
    "key": "web_header_hygiene/92.205.163.53/kunde",
@@ -6040,7 +6257,7 @@
       "ubb-wiki.castenow.de@92.205.163.53|ubb-wiki.castenow.de@92.205.163.53"
      ],
      "statement": "observation[1]",
-     "text": "Auf ubb-wiki.castenow.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src): ubb-wiki.castenow.de."
+     "text": "Auf ubb-wiki.castenow.de ist eine Content-Security-Policy gesetzt, die keine Regel für Skriptquellen enthält (weder script-src noch default-src)."
     },
     {
      "check": "security_headers_incomplete",
@@ -6781,6 +6998,7 @@
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von castenow.de am 22.07.2026: 15 Hostnamen auf 13 IP-Adressen, davon 4 nur aus DNS oder ohne Antwort. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
   "coverage_warning": "Für 10 Systeme (159.69.143.80, 195.50.179.2, 195.50.179.4, 195.50.179.5, 195.50.179.6, 195.50.179.7, 195.50.179.9, 213.23.169.167, 54.230.172.14 mit 54.230.172.35, 54.230.172.38 und 54.230.172.97 und 92.205.163.53) liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "legend": "Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung.",
   "levers": [
    {
     "effect": "Begrenzt den Zugriff auf Software ohne Sicherheitsupdates bis zur Ablösung",
@@ -6809,13 +7027,13 @@
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
-  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header und die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "28 Befunde in 5 von 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 77,
-  "catalog_digest": "82f6439d7138d816a12d9726daed0df6e7047ebf19f69033d702377923fb2b53",
-  "catalog_version": "2026-09-29.1",
+  "catalog_digest": "67bf5ef68fd8c08362424ba03e57c82e3690dcb6faefa19901e2d022344a0d6c",
+  "catalog_version": "2026-09-29.2",
   "classification": "Vertraulich",
   "consolidated": 28,
   "context_fields": [],
@@ -6826,7 +7044,7 @@
    "castenow.de"
   ],
   "excluded_ids": [],
-  "facts_schema_version": "1.4.0",
+  "facts_schema_version": "1.5.0",
   "fqdns_total": 15,
   "generated_on": null,
   "generation": null,
@@ -6841,7 +7059,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-29.1",
+  "policy_version": "2026-09-29.2",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -7423,13 +7641,13 @@
       "castenow.de"
      ],
      "statement": "positive.text",
-     "text": "Für die Domain castenow.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht."
+     "text": "Für die Domain castenow.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht."
     }
    ],
    "subjects": [
     "castenow.de"
    ],
-   "text": "Für die Domain castenow.de (Selektoren hse1, hse2) ist eine DKIM-Signatur veröffentlicht.",
+   "text": "Für die Domain castenow.de (Selektoren hse1, hse2) ist ein DKIM-Schlüssel veröffentlicht.",
    "title": "DKIM vorhanden"
   },
   {
@@ -7625,7 +7843,13 @@
     "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
    ]
   },
-  "domains": [],
+  "domains": [
+   {
+    "domain": "castenow.de",
+    "search": "Hostsuche: 15 Namen gefunden, 15 geprüft, 0 gefunden und nicht geprüft.",
+    "text": "Hostermittlung, Portscan und Tiefenprüfung (15 Hostnamen), DNS- und E-Mail-Einträge"
+   }
+  ],
   "hosts": [
    {
     "cov": "teil",

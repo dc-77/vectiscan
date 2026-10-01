@@ -177,20 +177,6 @@
   },
   {
    "id": "VS-2026-013",
-   "check": "http_alt_port",
-   "family": "http_alt_port",
-   "cat": "A",
-   "scale": "hygiene",
-   "level": "niedrig",
-   "group": "92.205.163.53 (ubb-wiki.castenow.de)",
-   "affected": [
-    "92.205.163.53:8000 (ERROR: Script execution failed (use -d to debug), Stream tonausstrom.de)"
-   ],
-   "title": "Webdienst auf unüblichem Port erreichbar",
-   "zustaendig": "hoster"
-  },
-  {
-   "id": "VS-2026-014",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -203,7 +189,7 @@
    "title": "Webdienst gibt Versionskennung oder internen Servernamen preis"
   },
   {
-   "id": "VS-2026-015",
+   "id": "VS-2026-014",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -216,7 +202,7 @@
    "title": "Webdienst gibt Versionskennung oder internen Servernamen preis"
   },
   {
-   "id": "VS-2026-016",
+   "id": "VS-2026-015",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -229,7 +215,7 @@
    "title": "Webdienst gibt Versionskennung oder internen Servernamen preis"
   },
   {
-   "id": "VS-2026-017",
+   "id": "VS-2026-016",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -243,7 +229,7 @@
    "zustaendig": "platform"
   },
   {
-   "id": "VS-2026-018",
+   "id": "VS-2026-017",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -257,7 +243,7 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-019",
+   "id": "VS-2026-018",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -272,7 +258,7 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-020",
+   "id": "VS-2026-019",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -286,7 +272,7 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-021",
+   "id": "VS-2026-020",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -299,7 +285,7 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-022",
+   "id": "VS-2026-021",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -313,7 +299,7 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-023",
+   "id": "VS-2026-022",
    "check": "js_library_outdated",
    "family": "js_library_outdated",
    "cat": "D",
@@ -326,7 +312,7 @@
    "title": "Veraltete JavaScript-Bibliothek eingebunden"
   },
   {
-   "id": "VS-2026-024",
+   "id": "VS-2026-023",
    "check": "legacy_protocols_present",
    "family": "legacy_protocols_present",
    "cat": "A",
@@ -340,7 +326,7 @@
    "zustaendig": "hoster"
   },
   {
-   "id": "VS-2026-025",
+   "id": "VS-2026-024",
    "check": "login_portal_exposed",
    "family": "login_portal_exposed",
    "cat": "A",
@@ -353,7 +339,7 @@
    "title": "Anmeldeportal aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-026",
+   "id": "VS-2026-025",
    "check": "login_portal_exposed",
    "family": "login_portal_exposed",
    "cat": "A",
@@ -366,7 +352,7 @@
    "title": "Anmeldeportal aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-027",
+   "id": "VS-2026-026",
    "check": "login_portal_exposed",
    "family": "login_portal_exposed",
    "cat": "A",
@@ -379,7 +365,7 @@
    "title": "Anmeldeportal aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-028",
+   "id": "VS-2026-027",
    "check": "login_portal_exposed",
    "family": "login_portal_exposed",
    "cat": "A",
@@ -392,7 +378,7 @@
    "title": "Anmeldeportal aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-029",
+   "id": "VS-2026-028",
    "check": "mail_plaintext",
    "family": "mail_plaintext",
    "cat": "A",
@@ -407,7 +393,7 @@
    "zustaendig": "hoster"
   },
   {
-   "id": "VS-2026-030",
+   "id": "VS-2026-029",
    "check": "mta_sts_missing",
    "family": "mta_sts_missing",
    "cat": "C",
@@ -420,7 +406,7 @@
    "title": "MTA-STS nicht wirksam veröffentlicht"
   },
   {
-   "id": "VS-2026-031",
+   "id": "VS-2026-030",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -433,7 +419,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-032",
+   "id": "VS-2026-031",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -446,7 +432,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-033",
+   "id": "VS-2026-032",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -459,7 +445,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-034",
+   "id": "VS-2026-033",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -472,7 +458,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-035",
+   "id": "VS-2026-034",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -485,7 +471,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-036",
+   "id": "VS-2026-035",
    "check": "service_unidentified",
    "family": "service_unidentified",
    "cat": "A",
@@ -499,7 +485,7 @@
    "zustaendig": "hoster"
   },
   {
-   "id": "VS-2026-037",
+   "id": "VS-2026-036",
    "check": "smtp_auth_before_starttls_passive",
    "family": "smtp_auth_cleartext",
    "cat": "E",
@@ -512,7 +498,7 @@
    "title": "Mailserver bietet die Anmeldung vor STARTTLS an laut Passivquelle"
   },
   {
-   "id": "VS-2026-038",
+   "id": "VS-2026-037",
    "check": "smtp_vrfy_enabled_passive",
    "family": "smtp_vrfy",
    "cat": "E",
@@ -525,7 +511,7 @@
    "title": "Mailserver beantwortet den Befehl VRFY laut Passivquelle"
   },
   {
-   "id": "VS-2026-039",
+   "id": "VS-2026-038",
    "check": "spf_authorizes_shared_host",
    "family": "spf_shared_host",
    "cat": "C",
@@ -538,7 +524,7 @@
    "title": "SPF gibt geteilten Server frei"
   },
   {
-   "id": "VS-2026-040",
+   "id": "VS-2026-039",
    "check": "spf_softfail",
    "family": "spf_softfail",
    "cat": "C",
@@ -551,7 +537,7 @@
    "title": "SPF-Eintrag ohne konsequente Durchsetzung"
   },
   {
-   "id": "VS-2026-041",
+   "id": "VS-2026-040",
    "check": "tls_rpt_missing",
    "family": "tls_rpt_missing",
    "cat": "C",
@@ -564,7 +550,7 @@
    "title": "TLS-RPT nicht eingerichtet"
   },
   {
-   "id": "VS-2026-042",
+   "id": "VS-2026-041",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -577,7 +563,7 @@
    "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-043",
+   "id": "VS-2026-042",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -590,7 +576,7 @@
    "title": "TLS-Hinweis der Analyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-044",
+   "id": "VS-2026-043",
    "check": "tls_weakness_reported",
    "family": "tls_weakness",
    "cat": "D",
@@ -604,7 +590,7 @@
    "zustaendig": "platform"
   },
   {
-   "id": "VS-2026-045",
+   "id": "VS-2026-044",
    "check": "web_vulnerability_reported",
    "family": "web_vulnerability_reported",
    "cat": "E",
@@ -619,7 +605,7 @@
    "title": "Werkzeugmeldung der Webanalyse ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-046",
+   "id": "VS-2026-045",
    "check": "wordpress_user_enumeration",
    "family": "user_enumeration",
    "cat": "E",

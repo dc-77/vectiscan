@@ -67,7 +67,7 @@
   },
   "VS-2026-013": {
    "checks": [
-    "http_alt_port"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-014": {
@@ -87,7 +87,7 @@
   },
   "VS-2026-017": {
    "checks": [
-    "http_header_disclosure"
+    "info_disclosure"
    ]
   },
   "VS-2026-018": {
@@ -112,17 +112,17 @@
   },
   "VS-2026-022": {
    "checks": [
-    "info_disclosure"
+    "js_library_outdated"
    ]
   },
   "VS-2026-023": {
    "checks": [
-    "js_library_outdated"
+    "legacy_protocols_present"
    ]
   },
   "VS-2026-024": {
    "checks": [
-    "legacy_protocols_present"
+    "login_portal_exposed"
    ]
   },
   "VS-2026-025": {
@@ -142,17 +142,17 @@
   },
   "VS-2026-028": {
    "checks": [
-    "login_portal_exposed"
+    "mail_plaintext"
    ]
   },
   "VS-2026-029": {
    "checks": [
-    "mail_plaintext"
+    "mta_sts_missing"
    ]
   },
   "VS-2026-030": {
    "checks": [
-    "mta_sts_missing"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-031": {
@@ -177,37 +177,37 @@
   },
   "VS-2026-035": {
    "checks": [
-    "security_headers_incomplete"
+    "service_unidentified"
    ]
   },
   "VS-2026-036": {
    "checks": [
-    "service_unidentified"
+    "smtp_auth_before_starttls_passive"
    ]
   },
   "VS-2026-037": {
    "checks": [
-    "smtp_auth_before_starttls_passive"
+    "smtp_vrfy_enabled_passive"
    ]
   },
   "VS-2026-038": {
    "checks": [
-    "smtp_vrfy_enabled_passive"
+    "spf_authorizes_shared_host"
    ]
   },
   "VS-2026-039": {
    "checks": [
-    "spf_authorizes_shared_host"
+    "spf_softfail"
    ]
   },
   "VS-2026-040": {
    "checks": [
-    "spf_softfail"
+    "tls_rpt_missing"
    ]
   },
   "VS-2026-041": {
    "checks": [
-    "tls_rpt_missing"
+    "tls_weakness_reported"
    ]
   },
   "VS-2026-042": {
@@ -222,15 +222,10 @@
   },
   "VS-2026-044": {
    "checks": [
-    "tls_weakness_reported"
-   ]
-  },
-  "VS-2026-045": {
-   "checks": [
     "web_vulnerability_reported"
    ]
   },
-  "VS-2026-046": {
+  "VS-2026-045": {
    "checks": [
     "wordpress_user_enumeration"
    ]

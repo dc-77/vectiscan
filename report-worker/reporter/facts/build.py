@@ -32,6 +32,7 @@ from reporter.facts.testssl_parse import (
 from reporter.facts.tool_coverage import (WEB_PORTS, HostSignals, build_coverage, derive_blocked,
                                           testssl_run_state)
 from reporter.facts.versions import Normalized, debian_eol, debian_release, lookup_eol, normalize, split_name_version
+from reporter.facts.tool_errors import is_tool_error
 
 GENERATOR_NAME = "reporter.facts"
 GENERATOR_VERSION = "1.0.0"
@@ -1003,8 +1004,8 @@ def service_kennung(p: Any, flags: Any) -> tuple[Optional[str], Optional[bool]]:
     (``method=table``, Name mit ``?``) ohne jede dieser Angaben ist nicht identifiziert;
     der Portname aus der Tabelle ist dann keine Aussage ueber den Dienst.
     """
-    product = (p.product or "").strip()
-    title = (flags.fp_title or "").strip()
+    product = "" if is_tool_error(p.product) else (p.product or "").strip()
+    title = "" if is_tool_error(flags.fp_title) else (flags.fp_title or "").strip()
     if title and re.match(r"^\s*\d{3}\b|^(forbidden|not found|index of)", title, re.I):
         title = ""
     if product:
@@ -1014,7 +1015,7 @@ def service_kennung(p: Any, flags: Any) -> tuple[Optional[str], Optional[bool]]:
         if title and re.search(r"apache|nginx|iis|httpd|lighttpd|caddy", product, re.I):
             name = f"{name}, Titel „{title}“"
         return name, False
-    server = (flags.fp_server or "").strip()
+    server = "" if is_tool_error(flags.fp_server) else (flags.fp_server or "").strip()
     stream = (flags.fp_stream or "").strip()
     if server:
         name = server
@@ -2555,6 +2556,8 @@ def _zap_alerts_by_host(ctx: _Ctx, h) -> dict[str, list[S.WebAlert]]:
     statuses: dict[tuple[str, str], set[int]] = defaultdict(set)
     rank: dict[tuple[str, str], tuple[int, int]] = {}
     ort: dict[tuple[str, str], str] = {}
+    # S7a Punkt 6: jede Einzelmeldung mit Fundort, Adresse und Status, auch die nachrangigen.
+    instanzen: dict[tuple[str, str], set[tuple[str, str, Optional[int]]]] = defaultdict(set)
     for a in raw_alerts:
         if not isinstance(a, dict):
             continue
@@ -2577,6 +2580,8 @@ def _zap_alerts_by_host(ctx: _Ctx, h) -> dict[str, list[S.WebAlert]]:
         # Meldung nur an Abwehr-, Fehler- oder Nebenseiten traegt diesen Fundort und keine Regel.
         # S6b-2 (spec/09 Q14): innerhalb des Fundorts die hoechste Konfidenz der Einzelmeldungen.
         rang = (_ZAP_LOCATION_RANK[loc], _ZAP_CONFIDENCE_RANK.get((conf or "").lower(), 0))
+        if url:
+            instanzen[key].add((loc, url, status))
         bisher = rank.get(key)
         if bisher is not None and rang < bisher:
             continue
@@ -2610,6 +2615,10 @@ def _zap_alerts_by_host(ctx: _Ctx, h) -> dict[str, list[S.WebAlert]]:
         alert.urls_sample = sample[:5]
         alert.statuses = sorted(statuses.get(key, set()))
         alert.location = ort.get(key, "target")  # type: ignore[assignment]
+        andere = sorted(((loc, u, st) for loc, u, st in instanzen.get(key, set()) if loc != alert.location),
+                        key=lambda x: (-_ZAP_LOCATION_RANK[x[0]], sort_key(x[1]), x[2] or 0))
+        alert.other_locations = [S.WebAlertInstance(location=loc, url=u, status=st)  # type: ignore[arg-type]
+                                 for loc, u, st in andere[:10]]
         by_host[host].append(alert)
     for host in by_host:
         by_host[host].sort(key=lambda x: sort_key(x.plugin_id, x.name, x.url))
@@ -3477,7 +3486,8 @@ def _identify_web_services(services: list[S.ServiceFact], http: list[S.HttpFact]
             port = parts.port or (443 if parts.scheme == "https" else 80)
         except ValueError:
             continue
-        answered.setdefault((h.host_ip, port), h.server_header)
+        # S7a Punkt 0: ein Werkzeug-Fehlertext ist keine Server-Kennung.
+        answered.setdefault((h.host_ip, port), None if is_tool_error(h.server_header) else h.server_header)
     # S6d (A2, A3): seit S6c misst testssl auch Mail- und FTP-Ports. Ein TLS-Fakt macht einen Port
     # nur zum Webserver, wenn testssl dort HTTP erkannt hat (oder keinen Dienst nennt, wie bei den
     # 443-Laeufen vor S6c); nennt testssl einen anderen Dienst, ist das dessen Kennung.

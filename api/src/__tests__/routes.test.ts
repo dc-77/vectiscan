@@ -510,6 +510,9 @@ describe('API Routes', () => {
           file_size_bytes: 245760,
           created_at: new Date('2026-03-12T15:00:00Z'),
           target_url: 'example.com',
+          // S7a Punkt 9: dritte Erzeugung, erste Auslieferung.
+          version: 3,
+          delivery_version: 1,
         }],
         command: 'SELECT',
         rowCount: 1,
@@ -525,6 +528,7 @@ describe('API Routes', () => {
       expect(res.statusCode).toBe(200);
       expect(res.headers['content-type']).toBe('application/pdf');
       expect(res.headers['content-disposition']).toContain('example.com');
+      expect(res.headers['content-disposition']).toMatch(/-v1\.pdf"$/);
     });
 
     it('should accept token as query parameter', async () => {

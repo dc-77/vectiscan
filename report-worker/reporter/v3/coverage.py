@@ -1345,6 +1345,41 @@ def sammelbegriffe(checks: set[str] | list[str]) -> list[str]:
     return namen
 
 
+def measured_ports(facts: FS.Facts) -> set[tuple[str, int]]:
+    """(Adresse, Port) mit einer Messung ueber den Portscan hinaus (S7a, spec/10 R20).
+
+    Ein eigener testssl-Lauf am Port, eine Header- oder Webanalyse an einer Adresse dieses Ports
+    oder die EHLO-Sonde. Kennung, Banner und Skriptausgaben von nmap gehoeren zum Portscan; ein
+    Port nur mit ihnen steht auf der Service-Karte grau (junkerwerk 188.40.3.130: 22, 80, 222 und
+    die Mailports standen gruen ohne Tiefenpruefung). Messungen an einer anderen Adresse desselben
+    Namens (DNS-Rotation) zaehlen fuer die Inventaradresse nicht."""
+    out: set[tuple[str, int]] = set()
+    for t in facts.tls:
+        if t.source != "testssl" or t.assigned_from or not t.host_ip or not t.port:
+            continue
+        if t.measured_ip and t.measured_ip != t.host_ip:
+            continue
+        out.add((t.host_ip, t.port))
+    for h in facts.http:
+        if not h.host_ip or not (h.reachable is True or h.status_code):
+            continue
+        if getattr(h, "measured_ip", None) and h.measured_ip != h.host_ip:
+            continue
+        for url in [h.url, *[a.url for a in h.alerts], *[u for a in h.alerts for u in a.urls_sample]]:
+            if not url:
+                continue
+            try:
+                parts = urlsplit(url)
+                port = parts.port or (443 if parts.scheme == "https" else 80)
+            except ValueError:
+                continue
+            out.add((h.host_ip, port))
+    for s in facts.services:
+        if s.smtp_source == "smtp_ehlo":
+            out.add((s.host_ip, s.port))
+    return out
+
+
 def web_ports_unanalysed(facts: FS.Facts) -> dict[str, list[int]]:
     """Offene Webdienste auf weiteren Ports, an denen keine Header- und Webanalyse lief (spec/11 T13).
 
@@ -1391,6 +1426,52 @@ def hosts_without_lookup(facts: FS.Facts) -> list[str]:
 
 # ---------------------------------------------------------------- Pruefumfang je Domain
 
+def _namen(n: int) -> str:
+    return "1 Name" if n == 1 else f"{n} Namen"
+
+
+def host_search(facts: FS.Facts, dom: str) -> str:
+    """Zeile "Hostsuche: ..." je Zieldomain (S7a Punkt 7, A9-Rest; Entscheidung DC 30.09.).
+
+    Gezaehlt werden Namen mit Adresse wie in ``names_found``: geprueft (Inventar auf eigenen
+    Adressen), beim Drittanbieter (Inventar oder Fund auf dessen Adresse) und gefunden, aber nicht
+    ins Inventar gekommen (``targets[].discovered``). Ob die Hostsuche fuer die Domain lief, sagt
+    ``discovery_health``: am Primaerziel mit jedem Werkzeuglauf, an einer Zusatzdomain mit dem
+    Schluessel ``enum_<domain>``. Dessen Zahl wird nicht verwendet; gobuster der Zusatzdomain
+    lieferte die Namen der Primaerdomain mit (junkerwerk f9a2a2f6: 12 statt 2). Ohne
+    ``discovery_health`` (Auftraege vor S6c) entfaellt die Zeile."""
+    dh = next((t.discovery_health for t in facts.targets if t.discovery_health), None)
+    if not dh:
+        return ""
+    zaehler = dh.get("tool_counts") or {}
+    primaer = next((t.domain for t in facts.targets if t.is_primary), None) or facts.scan.domain
+    if dom == primaer:
+        lief = any(not k.startswith("enum_") for k in zaehler)
+    else:
+        lief = f"enum_{dom}" in zaehler
+    if not lief:
+        return "Hostsuche: für diese Domain nicht gelaufen."
+    fremd = {h.ip for h in facts.hosts if h.third_party is not None}
+    eigene = {h.ip for h in facts.hosts if h.third_party is None}
+    namen = [f for f in facts.fqdns if not f.wildcard and SYS.under(f.name, [dom])]
+    geprueft = {f.name.lower() for f in namen if f.host_ip in eigene}
+    dritt = {f.name.lower() for f in namen if f.host_ip in fremd} - geprueft
+    offen: set[str] = set()
+    for t in facts.targets:
+        for d in t.discovered:
+            name = d.fqdn.lower()
+            if not d.ips or not SYS.under(name, [dom]) or name in geprueft:
+                continue
+            (dritt if d.third_party else offen).add(name)
+    offen -= dritt
+    gesamt = len(geprueft) + len(dritt) + len(offen)
+    teile = [f"{_namen(gesamt)} gefunden", f"{len(geprueft)} geprüft"]
+    if dritt:
+        teile.append(f"{len(dritt)} beim Drittanbieter nicht geprüft")
+    teile.append(f"{len(offen)} gefunden und nicht geprüft")
+    return "Hostsuche: " + ", ".join(teile) + "."
+
+
 def domain_scope(facts: FS.Facts) -> list[tuple[str, str]]:
     """Was je Zieldomain geprueft wurde (spec/09 Q16). junkerwerk.hu hatte nur DNS."""
     out: list[tuple[str, str]] = []
@@ -1412,4 +1493,5 @@ def domain_scope(facts: FS.Facts) -> list[tuple[str, str]]:
 
 __all__ = ["HostCoverage", "Model", "COV_DOT", "HOST_CAUSES", "TOOL_CAUSES", "E5_CAUSE", "E5_CHECK",
            "check_name", "family_check_name", "host_coverage", "build_model", "limitations", "domain_scope",
+           "host_search",
            "tls_service_ports", "tls_tested", "tls_untested_ports", "HEADER_REASONS", "DISCOVERED_CAUSE"]

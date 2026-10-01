@@ -23,7 +23,9 @@ from tests.pdf_v3.conftest import html_for, weasyprint_or_skip
 from tests.v3.conftest import data_for
 
 F77 = "f77ccff2-fc7a-4488-a9ba-540a42a25056"
-CAT = re.compile(r'<div class="(cat(?: lang)?)"><div class="h"><span class="k">(KATEGORIE [A-E]|POSITIV)</span>')
+# S7a: ein langer Block traegt seinen Kopf im Tabellenkopf (wiederholt sich auf der Folgeseite).
+CAT = re.compile(r'<div class="(cat(?: lang)?)">(?:\s*<table><colgroup>(?:<col [^>]*>)+</colgroup><thead><tr>'
+                 r'<th colspan="\d" class="cath">)?<div class="h"><span class="k">(KATEGORIE [A-E]|POSITIV)</span>')
 
 
 def test_langer_kategorieblock_darf_umbrechen():

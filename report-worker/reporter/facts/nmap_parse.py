@@ -18,6 +18,8 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from reporter.facts.serialize import iso_utc
+from reporter.facts.tool_errors import clean as _clean_tool_error
+from reporter.facts.tool_errors import is_tool_error
 
 IMPLICIT_TLS_SERVICES = frozenset({
     "https", "imaps", "pop3s", "smtps", "ftps", "ldapssl", "ldaps", "ssl", "ms-wbt-server-ssl",
@@ -181,6 +183,7 @@ def parse_nmap_xml(text: str | bytes | None) -> Optional[NmapRun]:
                 for s in p.findall("script"):
                     np.scripts.append(NmapScript(id=s.get("id", ""), output=s.get("output", "") or "",
                                                  elems=_script_elems(s)))
+                _drop_tool_errors(np)
                 host.ports.append(np)
         osm = h.find("os/osmatch")
         if osm is not None:
@@ -199,6 +202,21 @@ def parse_nmap_xml(text: str | bytes | None) -> Optional[NmapRun]:
         except ValueError:
             pass
     return run
+
+
+def _drop_tool_errors(port: NmapPort) -> None:
+    """S7a Punkt 0: Fehlermeldungen des Werkzeugs sind keine Beobachtung am Dienst.
+
+    Eine Skriptausgabe wie "ERROR: Script execution failed (use -d to debug)" faellt ganz
+    weg; damit zaehlt sie weder als Server-Kennung (``_fingerprint``) noch als Skript mit
+    Ausgabe (``service_kennung``) noch als Nachweis. Dasselbe gilt fuer Produkt, Version
+    und Zusatzangabe der Dienstkennung. Echte Fehlerseiten eines Servers (CloudFront
+    "ERROR: The request could not be satisfied") treffen die Muster nicht.
+    """
+    port.scripts = [sc for sc in port.scripts if not is_tool_error(sc.output)]
+    port.product = _clean_tool_error(port.product)
+    port.version = _clean_tool_error(port.version)
+    port.extrainfo = _clean_tool_error(port.extrainfo)
 
 
 def _script_elems(script: ET.Element) -> dict[str, str]:
@@ -309,6 +327,8 @@ def parse_nmap_text(text: str | None, host_ip: str) -> Optional[NmapRun]:
             continue
         if line and not line.startswith("|"):
             cur_script = None
+    for port in host.ports:
+        _drop_tool_errors(port)
     host.ports.sort(key=lambda x: (x.proto, x.port))
     run.hosts.append(host)
     run.hosts_total = 1
@@ -503,6 +523,9 @@ def derive_service_flags(port: NmapPort) -> ServiceFlags:
         _cert_details(f, port)
     fp = _fingerprint(port)
     f.fp_server, f.fp_title, f.fp_login = fp
+    # S7a Punkt 0: zweite Sperre, falls ein Fehlertext ueber den Fingerprint kommt.
+    f.fp_server = _clean_tool_error(f.fp_server)
+    f.fp_title = _clean_tool_error(f.fp_title)
     f.fp_stream = _stream_name(port)
     if not f.fp_server:
         f.fp_server = _stream_server(port)
