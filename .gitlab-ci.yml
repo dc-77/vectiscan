@@ -20,7 +20,19 @@ stages:
   - scan
   - test
   - deploy
+  # Swarm, vect-prod (ci/swarm.yml). Vor ops, damit ops-Jobs beider Ziele
+  # am Ende stehen; swarm:deploy:prod blockiert nicht (allow_failure).
+  - deploy-prod
   - ops
+
+# =============================================================================
+# SWARM -- Umzug von docker02 in den Swarm-Cluster (06.10.2026)
+# =============================================================================
+# Zweites Ziel neben docker02, geschaltet ueber die Projektvariable
+# VECTISCAN_SWARM=an. Solange sie fehlt, laeuft daraus kein einziger Job.
+# Jobs, Felder und Begruendungen in ci/swarm.yml, Ablauf in docs/UMZUG-swarm.md.
+include:
+  - local: /ci/swarm.yml
 
 # =============================================================================
 # WORKFLOW — welche Pipelines ueberhaupt entstehen
@@ -252,7 +264,7 @@ test-edge:
   script:
     # Runner ist Shell-Executor (image: wird ignoriert); System-Python ist PEP-668
     # externally-managed → venv wie bei test-scan-worker/test-report-worker.
-    - python3 -m venv .venv && . .venv/bin/activate && pip install pyyaml pytest && pytest tests/test_edge_admin_guard.py tests/test_compose_images.py -v
+    - python3 -m venv .venv && . .venv/bin/activate && pip install pyyaml pytest && pytest tests/test_edge_admin_guard.py tests/test_compose_images.py tests/test_stack_swarm.py -v
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
