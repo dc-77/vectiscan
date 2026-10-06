@@ -31,20 +31,27 @@
 #   postgres, redis, minio   Zustand gehoert auf den Datenknoten, nicht in den
 #                            Swarm (Named Volumes sind dort je Knoten eine
 #                            eigene Instanz). Siehe unten.
-#   uptime-kuma, loki,       bleiben vorerst auf docker02. Logs, Kennzahlen,
-#   promtail, grafana        Erreichbarkeit und Alarme liefert im Swarm der
-#                            Stack monitoring fuer jede Anwendung von selbst.
-#   keycloak, oauth2-proxy   schuetzen nur Kuma und Grafana, bleiben mit ihnen.
-#   twenty (CRM)             eigener Umzug; die api erreicht es ueber
-#                            CRM_WEBHOOK_URL (Prod) oder bleibt im Trockenmodus.
+#   uptime-kuma, loki,       ersetzt durch den Stack monitoring
+#   promtail, grafana        (vectigal/monitoring-services): Logs, Kennzahlen,
+#                            Erreichbarkeit und Alarme bekommt jeder Dienst
+#                            hier ohne eigene Zeile; die beiden Log-Alarme von
+#                            VectiScan stehen dort in loki/rules/fake/vectiscan.yml.
+#   keycloak, oauth2-proxy   ersetzt durch den Stack identity: Grafana meldet
+#                            sich am Realm vect-prod an, Zugang ueber die Gruppe
+#                            grafana-editoren. Die App selbst nutzt kein Keycloak.
+#   twenty (CRM)             eigener Umzug, laeuft vorerst auf docker02; die api
+#                            erreicht es ueber CRM_WEBHOOK_URL (Prod) oder bleibt
+#                            im Trockenmodus.
 #
 # DATENBANK DIREKT, NICHT UEBER DEN POOLER (Analyse 06.10.2026)
 #   - neun Verbindungen setzen statement_timeout ueber den Startparameter
 #     `options`, und pgbouncer.ini ignoriert genau den;
 #   - der report-worker haelt waehrend der KI-Aufrufe eine Transaktion offen,
 #     das bindet unter pool_mode = transaction eine Server-Verbindung;
-#   - in Spitzen rund 80 Client-Verbindungen (precheck bis 20 Threads je
-#     Worker), und das Budget des Poolers ist mit 60 von 60 voll.
+#   - in Spitzen 52 bis 73 Verbindungen in Prod (PRECHECK_CIDR_MAX_PARALLEL
+#     10 je Replik), und das Budget des Poolers ist mit 60 von 60 voll.
+#   Die Instanz 5433 hat max_connections 100, belegt sind schon 37 (06.10.2026);
+#   docs/UMZUG-swarm.md, Abschnitt 1.1, rechnet das durch.
 #   DATABASE_URL zeigt deshalb auf datenknoten:5432 (Test) bzw. :5433 (Prod).
 #
 # REDIS: ZWEI INSTANZEN, WIE IN data-services VORGESEHEN
@@ -506,6 +513,9 @@ services:
     configs: *secrets-entrypoint
     environment:
       REDIS_EVENT_PREFIX: ${REDIS_EVENT_PREFIX}
+      # Threads je Replik bei CIDR-Zielen, je Thread eigene Verbindungen.
+      # docker02: 2 Worker x 20, hier 3 Repliken x 10 (Verbindungsbudget).
+      PRECHECK_CIDR_MAX_PARALLEL: ${PRECHECK_CIDR_MAX_PARALLEL:-10}
     secrets:
       - database_url
       - redis_url

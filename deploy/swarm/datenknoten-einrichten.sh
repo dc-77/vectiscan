@@ -6,6 +6,7 @@
 #
 #   bash deploy/swarm/datenknoten-einrichten.sh test     # Instanz 5432
 #   bash deploy/swarm/datenknoten-einrichten.sh prod     # Instanz 5433
+#   bash deploy/swarm/datenknoten-einrichten.sh prod 80  # nach Anhebung von max_connections
 #
 # ACHTUNG: 5432 ist vectigal_test, 5433 vectigal_prod -- anders herum als im
 # Planungsdokument.
@@ -17,18 +18,24 @@
 # beim Start der api brauchen aber Eigentuemerrechte (ALTER TABLE, Trigger,
 # Funktionen in plpgsql), deshalb gehoert die Datenbank der Rolle.
 #
-# Danach zeigt das Skript, wie voll die Instanz ist: VectiScan verbindet am
-# Pooler vorbei und kommt in Spitzen auf rund 80 bis 100 Verbindungen
-# (precheck mit 20 Threads je Replik). Reicht max_connections nicht, scheitern
-# die Verbindungen aller Anwendungen dieser Instanz, nicht nur die von
-# VectiScan.
+# Die Rolle bekommt eine Verbindungsgrenze (Vorgabe Test 40, Prod 55; 55 passt
+# in die 100 Verbindungen von 5433 neben den 37 vom 06.10.2026, 80 erst nach
+# einer Anhebung von max_connections).
+# VectiScan verbindet am Pooler vorbei und kommt in Prod in Spitzen auf 52 bis
+# 73 Verbindungen (docs/UMZUG-swarm.md, Abschnitt 1.1). Ohne Grenze naehme ein
+# Ausreisser der ganzen Instanz die Verbindungen weg, also allen Anwendungen
+# darauf; mit Grenze scheitert nur VectiScan selbst. Danach zeigt das Skript,
+# wie voll die Instanz ist.
 # =============================================================================
 set -euo pipefail
 
 case "${1:-}" in
-  test) PORT=5432 ;;
-  prod) PORT=5433 ;;
-  *) echo "Aufruf: $0 test|prod"; exit 2 ;;
+  test) PORT=5432; GRENZE="${2:-40}" ;;
+  prod) PORT=5433; GRENZE="${2:-55}" ;;
+  *) echo "Aufruf: $0 test|prod [verbindungsgrenze]"; exit 2 ;;
+esac
+case "$GRENZE" in
+  ''|*[!0-9]*) echo "Verbindungsgrenze muss eine Zahl sein: '$GRENZE'"; exit 2 ;;
 esac
 
 psql_su() { sudo -u postgres psql -p "$PORT" -v ON_ERROR_STOP=1 "$@"; }
@@ -44,6 +51,9 @@ else
   echo "  angelegt. Jetzt das Passwort setzen (zweimal eingeben):"
   psql_su -c "\\password vectiscan"
 fi
+
+psql_su -c "ALTER ROLE vectiscan CONNECTION LIMIT $GRENZE"
+echo "  Verbindungsgrenze: $(psql_su -Atc "SELECT rolconnlimit FROM pg_roles WHERE rolname = 'vectiscan'")"
 
 echo "== 3. Datenbank vectiscan =="
 if [ "$(psql_su -Atc "SELECT 1 FROM pg_database WHERE datname = 'vectiscan'")" = "1" ]; then

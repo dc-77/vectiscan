@@ -7,6 +7,7 @@ schreibt `scan_target_hosts`-Eintraege und publisht Events.
 
 from __future__ import annotations
 
+import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
@@ -26,7 +27,10 @@ from scanner.precheck import (
 log = structlog.get_logger()
 
 PRECHECK_TIMEOUT_PER_TARGET = 180  # 3 Min
-CIDR_MAX_PARALLEL = 20
+# Jeder Thread oeffnet eigene Datenbankverbindungen (precheck/writer.py). Im
+# Swarm teilen sich alle Anwendungen eine Postgres-Instanz mit 100 Verbindungen,
+# deshalb dort kleiner gesetzt (stack.yml); ohne Variable wie bisher 20.
+CIDR_MAX_PARALLEL = int(os.environ.get("PRECHECK_CIDR_MAX_PARALLEL", "20"))
 
 
 def _publish(owner_id: str, target_id: str, phase: str, message: str) -> None:

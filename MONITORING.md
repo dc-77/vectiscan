@@ -1,5 +1,13 @@
 # VectiScan — Monitoring, Logging & Alerting Runbook
 
+> **Im Swarm gilt dieses Runbook nicht.** Seit dem Umzug (Entscheidung
+> 06.10.2026) übernimmt dort der Stack `monitoring` der Plattform Logs,
+> Kennzahlen, Erreichbarkeit und Alarme, die Anmeldung an Grafana läuft über
+> den Stack `identity`. Uptime-Kuma, Loki, Promtail, Grafana, Keycloak und
+> oauth2-proxy gibt es nur noch auf docker02, bis das Prod-Fenster durch ist.
+> Wie die Abfragen und die beiden Alarme unten (VEC-173, VEC-229) übersetzt
+> sind, steht in [docs/UMZUG-swarm.md](docs/UMZUG-swarm.md), Abschnitt 1.6.
+
 Ticket: VEC-85 (Teil von VEC-52, A5 — Produktions-Infra). Deckt die Akzeptanz
 **„Uptime/Health-Monitoring + Log-Aggregation + Alerting"** ab. Komplett
 **self-hosted und spend-frei** auf `vectigal-docker02`.

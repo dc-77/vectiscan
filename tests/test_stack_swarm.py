@@ -157,6 +157,21 @@ def test_prod_mit_drei_repliken():
     assert _werte("swarm:deploy:prod")["REPLICAS"] == "3"
 
 
+def test_precheck_mit_begrenzter_parallelitaet():
+    # Jeder Thread oeffnet eigene Verbindungen; 3 Repliken x 20 wie auf
+    # docker02 sprengten das Budget der Instanz (docs/UMZUG-swarm.md, 1.1).
+    env = _stack()["services"]["precheck-worker"]["environment"]
+    assert env["PRECHECK_CIDR_MAX_PARALLEL"] == "${PRECHECK_CIDR_MAX_PARALLEL:-10}"
+
+
+def test_ueberwachung_und_anmeldung_kommen_von_der_plattform():
+    # Entscheidung 06.10.2026: Stack monitoring und Stack identity statt
+    # eigener Instanzen. Kehrt einer davon in die Stack-Datei zurueck, laeuft
+    # er doppelt neben der Plattform.
+    eigene = {"uptime-kuma", "loki", "promtail", "grafana", "keycloak", "keycloak-db", "oauth2-proxy"}
+    assert not eigene & set(_stack()["services"])
+
+
 # --- Trennung der Felder -------------------------------------------------------
 
 def test_testfeld_traegt_kein_prod_merkmal():
