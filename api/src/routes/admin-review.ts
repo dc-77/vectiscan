@@ -10,6 +10,7 @@ import { randomUUID } from 'crypto';
 import { query } from '../lib/db.js';
 import { scanQueue, publishEvent, enqueuePrecheck } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
+import { AUTH_BUCKET } from '../lib/buckets.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { audit } from '../lib/audit.js';
@@ -22,7 +23,6 @@ const VALID_DOCUMENT_TYPES = new Set([
   'whois_screenshot', 'signed_authorization', 'email_thread',
   'scan_agreement', 'other',
 ]);
-const AUTH_BUCKET = 'scan-authorizations';
 
 /**
  * S5: Berichtsstand einer Order fuer das Admin-Review.

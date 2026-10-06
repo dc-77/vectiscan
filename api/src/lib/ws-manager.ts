@@ -14,6 +14,7 @@ import { query } from './db.js';
 import { sendScanCompleteEmail } from './email.js';
 import { audit } from './audit.js';
 import { computeTimeToValue } from './timeToValue.js';
+import { EVENT_CHANNEL_PREFIX, eventChannel } from './events.js';
 
 /** Map of orderId -> Set of connected WebSocket clients */
 const clients = new Map<string, Set<WebSocket>>();
@@ -41,7 +42,7 @@ export async function initWsManager(log: FastifyBaseLogger): Promise<void> {
   });
   await emailSubscriber.connect();
 
-  await emailSubscriber.pSubscribe('scan:events:*', async (message, channel) => {
+  await emailSubscriber.pSubscribe(`${EVENT_CHANNEL_PREFIX}scan:events:*`, async (message, channel) => {
     try {
       const event = JSON.parse(message);
       if (event.type === 'status' && event.status === 'report_complete' && event.orderId) {
@@ -51,7 +52,7 @@ export async function initWsManager(log: FastifyBaseLogger): Promise<void> {
       log.error({ err, channel }, 'Error processing email notification event');
     }
   });
-  log.info('Email notification subscriber: listening on scan:events:*');
+  log.info(`Email notification subscriber: listening on ${EVENT_CHANNEL_PREFIX}scan:events:*`);
 }
 
 /**
@@ -263,7 +264,7 @@ export function subscribe(orderId: string, ws: WebSocket): void {
     clients.set(orderId, new Set());
 
     // Subscribe to Redis channel for this order (channel name kept for backward compat)
-    const channel = `scan:events:${orderId}`;
+    const channel = eventChannel(orderId);
     subscriber?.subscribe(channel, (message) => {
       const sockets = clients.get(orderId);
       if (!sockets) return;
@@ -290,7 +291,7 @@ export function unsubscribe(orderId: string, ws: WebSocket): void {
 
   if (sockets.size === 0) {
     clients.delete(orderId);
-    const channel = `scan:events:${orderId}`;
+    const channel = eventChannel(orderId);
     subscriber?.unsubscribe(channel).catch((err) => {
       logger?.error({ err, orderId }, 'Failed to unsubscribe from Redis channel');
     });

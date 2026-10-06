@@ -13,6 +13,15 @@ from minio import Minio
 
 log = structlog.get_logger()
 
+# Swarm (06.10.2026): Auf dem gemeinsamen MinIO darf der Schluessel eines
+# Feldes nur Buckets mit seinem Praefix anfassen (vect-prod-, vect-test-;
+# README von vectigal/data-services, "Buckets und Schluessel"). Auf docker02
+# bleibt der Wert leer und jeder Name, wie er war. api und report-worker lesen
+# dieselbe Variable.
+BUCKET_PREFIX = os.environ.get("MINIO_BUCKET_PREFIX", "")
+RAWDATA_BUCKET = f"{BUCKET_PREFIX}scan-rawdata"
+SCREENSHOTS_BUCKET = f"{BUCKET_PREFIX}scan-screenshots"
+
 
 # F-PH9-001: Modul-Level-Bucket-Cache. Bucket-Existence-Check beim
 # Worker-Start einmalig durchgefuehrt + Ergebnis gecached, danach pro Scan
@@ -52,7 +61,7 @@ def ensure_bucket(client: Minio, bucket: str) -> None:
             raise
 
 
-def prewarm_buckets(buckets: tuple[str, ...] = ("scan-rawdata", "scan-screenshots")) -> None:
+def prewarm_buckets(buckets: tuple[str, ...] = (RAWDATA_BUCKET, SCREENSHOTS_BUCKET)) -> None:
     """Beim Worker-Start einmalig alle Standard-Buckets verifizieren/anlegen.
 
     F-PH9-001: Spart pro Scan zwei MinIO-Roundtrips (bucket_exists +
@@ -100,7 +109,7 @@ def upload_screenshots(scan_dir: str, order_id: str) -> dict[str, str]:
     bekommen (vorher: 1 Screenshot pro IP ueberschrieben).
     """
     out: dict[str, str] = {}
-    bucket = "scan-screenshots"
+    bucket = SCREENSHOTS_BUCKET
     try:
         # Setup-Phase: Bucket verifizieren (per Modul-Cache schnell).
         primary_client = get_minio_client()
@@ -249,7 +258,7 @@ def upload_to_minio(archive_path: str, order_id: str) -> str:
     Returns the MinIO object path.
     """
     client = get_minio_client()
-    bucket = "scan-rawdata"
+    bucket = RAWDATA_BUCKET
 
     # F-PH9-001: Bucket-Check via Modul-Cache — pro Worker einmalig.
     ensure_bucket(client, bucket)

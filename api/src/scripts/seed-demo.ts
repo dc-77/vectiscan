@@ -22,13 +22,13 @@ import path from 'path';
 import { pool, query } from '../lib/db.js';
 import { hashPassword } from '../lib/auth.js';
 import { minioClient } from '../lib/minio.js';
+import { REPORTS_BUCKET } from '../lib/buckets.js';
 import { generateDemoReportPdf, DemoFindingsData } from './demoReportPdf.js';
 
 // ── Feste IDs (Idempotenz) ───────────────────────────────────────────────────
 const DEMO_CUSTOMER_ID = 'd0000000-0000-4000-a000-000000000001';
 const DEMO_USER_ID = 'd0000000-0000-4000-a000-000000000002';
 const DEMO_EMAIL = 'demo@vectiscan.tech';
-const REPORTS_BUCKET = 'scan-reports';
 
 interface PkgSpec {
   pkg: 'webcheck' | 'perimeter' | 'compliance';

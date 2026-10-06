@@ -51,8 +51,11 @@ def _get_redis():
     """Lazy import + connection. Returns None on failure (graceful degradation)."""
     try:
         import redis
+        # Swarm (06.10.2026): Cache-Schluessel gehoeren auf die Cache-Instanz
+        # (allkeys-lru), nicht auf die Warteschlangen-Instanz (noeviction, 256 MB),
+        # die alle Anwendungen teilen. Ohne REDIS_CACHE_URL wie bisher REDIS_URL.
         return redis.from_url(
-            os.environ.get("REDIS_URL", "redis://localhost:6379"),
+            os.environ.get("REDIS_CACHE_URL") or os.environ.get("REDIS_URL", "redis://localhost:6379"),
             socket_connect_timeout=5.0,
         )
     except Exception as exc:
