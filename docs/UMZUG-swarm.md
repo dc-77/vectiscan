@@ -222,6 +222,17 @@ laufen `swarm:build`, `swarm:trivy`, `swarm:lint` und `swarm:deploy:test`
 mit. Der Build dauert so lange wie der für docker02 und läuft parallel auf dem
 Runner `vectigal-docker`.
 
+`main` muss ein geschützter Branch sein (Settings, Repository, Protected
+branches; Push und Merge für Maintainers, eingerichtet am 07.10.2026). Zwei
+Gründe: Der Deploy-Runner auf docker-swarm-01 nimmt nur Jobs von geschützten
+Refs an, sonst bleibt `swarm:deploy:test` als „stuck“ stehen. Und alle
+Variablen mit Scope `vect-test` und `vect-prod` sind Protected, auf einem
+ungeschützten Branch kämen sie gar nicht an. Der Schutz wirkt erst ab der
+nächsten Pipeline, deshalb blieb Pipeline 3359 hängen. Seitdem kommen auch vier
+ältere Protected-Variablen ohne Scope bei docker02 an, darunter
+`STRIPE_PRICE_PERIMETER_ONETIME`; ohne sie lehnte die api den Einzelkauf von
+Perimeter mit 503 `price_not_configured` ab (`api/src/routes/orders.ts`).
+
 Vorher eine Sache klären: Mit dem Schalter bindet jede Pipeline das private
 Projekt `vectigal/ci-templates` ein. GitLab lädt die Vorlage mit den Rechten
 dessen, der die Pipeline auslöst, bei einem Push also mit den Rechten dessen,
