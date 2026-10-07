@@ -42,9 +42,17 @@ MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY", "minioadmin")
 MINIO_SECURE = os.environ.get("MINIO_SECURE", "false").lower() == "true"
 
 QUEUE_NAME = "report-pending"
-RAWDATA_BUCKET = "scan-rawdata"
-REPORTS_BUCKET = "scan-reports"
-DEBUG_BUCKET = "scan-debug"
+# Swarm (06.10.2026): Bucket-Praefix je Feld auf dem gemeinsamen MinIO
+# (vect-prod-, vect-test-), leer auf docker02. REPORTS_BUCKET landet auch in
+# reports.minio_bucket, die api liest den Namen von dort.
+BUCKET_PREFIX = os.environ.get("MINIO_BUCKET_PREFIX", "")
+RAWDATA_BUCKET = f"{BUCKET_PREFIX}scan-rawdata"
+REPORTS_BUCKET = f"{BUCKET_PREFIX}scan-reports"
+DEBUG_BUCKET = f"{BUCKET_PREFIX}scan-debug"
+# Swarm (06.10.2026): Pub/Sub kennt keine Datenbank-Nummer. Auf dem
+# gemeinsamen Redis empfingen Test und Prod sonst gegenseitig ihre Ereignisse.
+# Leer auf docker02; api und Worker muessen denselben Wert sehen.
+EVENT_PREFIX = os.environ.get("REDIS_EVENT_PREFIX", "")
 BLPOP_TIMEOUT = 5  # seconds
 
 
@@ -808,7 +816,7 @@ def _update_order_status(
         }
         if error_message:
             event["error"] = error_message
-        r.publish(f"scan:events:{order_id}", json.dumps(event))
+        r.publish(f"{EVENT_PREFIX}scan:events:{order_id}", json.dumps(event))
     except Exception as e:
         log.error("redis_publish_failed", order_id=order_id, error=str(e))
 

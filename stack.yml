@@ -1,0 +1,575 @@
+# =============================================================================
+# stack.yml -- VectiScan im Docker Swarm, beide Felder (vect-test, vect-prod)
+# =============================================================================
+# Ausgerollt mit `docker stack deploy` ueber vectigal/ci-templates v4, Jobs in
+# ci/swarm.yml. docker-compose.yml bleibt daneben: sie beschreibt den Stand auf
+# vectigal-docker02 und ist bis zum Prod-Fenster die Produktion. Ablauf und
+# Vorbedingungen: docs/UMZUG-swarm.md.
+#
+# Was sich je Feld unterscheidet, kommt aus ci/swarm.yml als Variable:
+#
+#   ROUTER               vectiscan-test | vectiscan-prod      Traefik-Router
+#   WEB_RULE             Host-Regel des Frontends (Prod mit vectiscan.de + www)
+#   API_HOST             scan-api-test.vectigal.tech | scan-api.vectigal.tech
+#   FRONTEND_URL         https://scan-test.vectigal.tech | https://scan.vectigal.tech
+#   FRONTEND_IMAGE       frontend-test | frontend
+#   MINIO_BUCKET_PREFIX  vect-test- | vect-prod-
+#   REDIS_EVENT_PREFIX   vect-test: | vect-prod:
+#   REPLICAS             1 | 3     alle Dienste, die mehrfach laufen duerfen
+#   EXTRA_REPLICAS       0 | 1     zap-2, zap-3, zap-4
+#   RES_* / HEAVY_RES_*  0 | Prod-Werte (Test haelt keinen Platz fuer Prod)
+#
+# DREI REPLIKEN, WO ES GEHT (Vorgabe 06.10.2026: produktiv und umfangreich
+# genutzt). frontend, webcheck-core, scan-worker, precheck-worker und
+# report-worker laufen in Prod dreimal, je Knoten einmal (max_replicas_per_node),
+# damit ein Knotenausfall ein Drittel kostet und nicht alles. Die Worker holen
+# ihre Auftraege per BLPOP aus Redis, mehrere Konsumenten je Liste sind dort
+# vorgesehen. Ausnahmen: die api (siehe unten) und die ZAP-Instanzen, von
+# denen jeder Scan-Worker genau seine eigene braucht.
+#
+# WAS HIER NICHT STEHT, UND WARUM
+#   postgres, redis, minio   Zustand gehoert auf den Datenknoten, nicht in den
+#                            Swarm (Named Volumes sind dort je Knoten eine
+#                            eigene Instanz). Siehe unten.
+#   uptime-kuma, loki,       ersetzt durch den Stack monitoring
+#   promtail, grafana        (vectigal/monitoring-services): Logs, Kennzahlen,
+#                            Erreichbarkeit und Alarme bekommt jeder Dienst
+#                            hier ohne eigene Zeile; die beiden Log-Alarme von
+#                            VectiScan stehen dort in loki/rules/fake/vectiscan.yml.
+#   keycloak, oauth2-proxy   ersetzt durch den Stack identity: Grafana meldet
+#                            sich am Realm vect-prod an, Zugang ueber die Gruppe
+#                            grafana-editoren. Die App selbst nutzt kein Keycloak.
+#   twenty (CRM)             eigener Umzug, laeuft vorerst auf docker02; die api
+#                            erreicht es ueber CRM_WEBHOOK_URL (Prod) oder bleibt
+#                            im Trockenmodus.
+#
+# DATENBANK DIREKT, NICHT UEBER DEN POOLER (Analyse 06.10.2026)
+#   - neun Verbindungen setzen statement_timeout ueber den Startparameter
+#     `options`, und pgbouncer.ini ignoriert genau den;
+#   - der report-worker haelt waehrend der KI-Aufrufe eine Transaktion offen,
+#     das bindet unter pool_mode = transaction eine Server-Verbindung;
+#   - in Spitzen 52 bis 73 Verbindungen in Prod (PRECHECK_CIDR_MAX_PARALLEL
+#     10 je Replik), und das Budget des Poolers ist mit 60 von 60 voll.
+#   Die Instanz 5433 hat max_connections 100, belegt sind schon 37 (06.10.2026);
+#   docs/UMZUG-swarm.md, Abschnitt 1.1, rechnet das durch.
+#   DATABASE_URL zeigt deshalb auf datenknoten:5432 (Test) bzw. :5433 (Prod).
+#
+# REDIS: ZWEI INSTANZEN, WIE IN data-services VORGESEHEN
+#   REDIS_URL        redis-queue :6380 -- die Listen scan-pending,
+#                    report-pending, precheck-pending, diagnose-pending und
+#                    Pub/Sub. noeviction, 256 MB, von allen Anwendungen geteilt.
+#   REDIS_CACHE_URL  redis-cache :6379 -- KI-Cache, NVD, EPSS, KEV, CWE. Das
+#                    sind zehn bis einige hundert MB mit TTL; auf der
+#                    Queue-Instanz liefen dann die Warteschlangen aller
+#                    Anwendungen in OOM.
+#   Die Datenbank-Nummer (0 Prod, 1 Test) trennt die Listen. Pub/Sub kennt
+#   keine Nummer, deshalb REDIS_EVENT_PREFIX vor scan:events:<id>.
+#
+# MINIO: das gemeinsame auf dem Datenknoten, Schluessel je Feld mit
+#   Praefix-Policy. MINIO_BUCKET_PREFIX macht aus scan-rawdata
+#   vect-prod-scan-rawdata; api und Worker legen ihre Buckets selbst an.
+#
+# GEHEIMNISSE als Docker-Secrets. Die Anwendung liest nur Umgebungsvariablen,
+# deshalb startet jeder Dienst mit Geheimnissen ueber
+# deploy/swarm/secrets-entrypoint.sh (als Swarm-Config eingehaengt, kein
+# Umbau der Images). `command` nennt dabei den Startbefehl des Images, weil
+# ein eigenes `entrypoint` den des Images ersetzt. Ein Secret mit dem Wert "-"
+# gilt als nicht gesetzt: Docker-Secrets duerfen nicht leer sein, die
+# optionalen Schluessel (SHODAN_API_KEY & Co.) sind es auf docker02 aber.
+#
+# GENAU EINE api. Der Scheduler laeuft je Instanz im Minutentakt und legte
+# doppelte Auftraege an, Mails gingen je Instanz einmal raus, und die
+# Migrationen beim Start nehmen keine Sperre (Analyse 06.10.2026). Mehr
+# Instanzen erst, wenn das im Code geloest ist.
+#
+# SCAN-WORKER: ein Dienst mit REPLICAS Repliken, jede an ihrem eigenen ZAP.
+# Auf docker02 sind es drei Dienste mit fest verdrahtetem ZAP_BASE_URL; ohne
+# diese Paarung teilten sich mehrere Worker einen ZAP und stuenden sich in
+# dessen Kontexten im Weg. Hier traegt jede Replik ihre Slot-Nummer im Namen
+# ({{.Task.Slot}}, Swarm setzt sie beim Start ein): Replik 1 spricht mit
+# zap-1, Replik 2 mit zap-2 und so fort. Der Slot bleibt einer Replik auch
+# beim Neuplatzieren nach einem Knotenausfall. Deshalb muss es zu jeder
+# Replik ein zap-<n> geben: REPLICAS hoeher als 4 braucht ein zap-5.
+# zap-4 gehoert ausserdem zum Pool (ZAP_POOL_ENABLED, heute aus).
+# Ein Neustart beendet den laufenden Scan (sys.exit bei SIGTERM, bis zu
+# 120 min Laufzeit) -- deshalb prueft der Deploy-Job vorher auf aktive Scans.
+#
+# LABELS ALS LISTE, nicht als Mapping: der Routername traegt das Feld und
+# steht im SCHLUESSEL des Labels. Compose interpoliert nur Werte; in der
+# Listenform ist der ganze Eintrag ein Wert, damit greift ${ROUTER} auch dort.
+# KEIN certresolver: die Zertifikate kommen vom cert-renewer des edge-Stacks.
+# =============================================================================
+
+networks:
+  proxy-net:
+    external: true
+  # Stack-eigenes Overlay, heisst im Swarm <stack>_vectiscan-internal und ist
+  # damit je Feld ein eigenes. attachable fuer Wegwerf-Container bei der
+  # Fehlersuche (zap-N, webcheck-core sind nur hier erreichbar).
+  vectiscan-internal:
+    driver: overlay
+    attachable: true
+
+configs:
+  secrets_entrypoint:
+    file: ./deploy/swarm/secrets-entrypoint.sh
+    name: ${CONFIG_SECRETS_ENTRYPOINT}
+
+secrets:
+  database_url:
+    external: true
+    name: ${SECRET_DATABASE_URL}
+  redis_url:
+    external: true
+    name: ${SECRET_REDIS_URL}
+  redis_cache_url:
+    external: true
+    name: ${SECRET_REDIS_CACHE_URL}
+  minio_access_key:
+    external: true
+    name: ${SECRET_MINIO_ACCESS_KEY}
+  minio_secret_key:
+    external: true
+    name: ${SECRET_MINIO_SECRET_KEY}
+  jwt_secret:
+    external: true
+    name: ${SECRET_JWT_SECRET}
+  admin_password:
+    external: true
+    name: ${SECRET_ADMIN_PASSWORD}
+  anthropic_api_key:
+    external: true
+    name: ${SECRET_ANTHROPIC_API_KEY}
+  resend_api_key:
+    external: true
+    name: ${SECRET_RESEND_API_KEY}
+  stripe_secret_key:
+    external: true
+    name: ${SECRET_STRIPE_SECRET_KEY}
+  stripe_webhook_secret:
+    external: true
+    name: ${SECRET_STRIPE_WEBHOOK_SECRET}
+  crm_api_key:
+    external: true
+    name: ${SECRET_CRM_API_KEY}
+  webcheck_turnstile_secret:
+    external: true
+    name: ${SECRET_WEBCHECK_TURNSTILE_SECRET}
+  shodan_api_key:
+    external: true
+    name: ${SECRET_SHODAN_API_KEY}
+  abuseipdb_api_key:
+    external: true
+    name: ${SECRET_ABUSEIPDB_API_KEY}
+  securitytrails_api_key:
+    external: true
+    name: ${SECRET_SECURITYTRAILS_API_KEY}
+  nvd_api_key:
+    external: true
+    name: ${SECRET_NVD_API_KEY}
+  wpscan_api_token:
+    external: true
+    name: ${SECRET_WPSCAN_API_TOKEN}
+
+# --- gemeinsame Bausteine ----------------------------------------------------
+# `<<:` mischt nur die oberste Ebene; was ein Dienst daneben selbst setzt,
+# steht dort vollstaendig.
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+# Den Datenknoten im Container aufloesbar machen (Postgres, Redis, MinIO).
+# Die Knoten kennen ihn aus ihrer /etc/hosts, Container erben die nicht, und
+# einen internen DNS gibt es bewusst nicht (ci-templates/docs/STANDORTE.md).
+# Die Adresse kommt aus der Gruppenvariable DATENKNOTEN_ADDR; fehlt sie,
+# bricht der Deploy ab.
+x-datenknoten: &datenknoten
+  - "datenknoten:${DATENKNOTEN_ADDR:?Gruppenvariable DATENKNOTEN_ADDR fehlt}"
+
+x-secrets-entrypoint: &secrets-entrypoint
+  - source: secrets_entrypoint
+    target: /run/vectiscan/secrets-entrypoint.sh
+    mode: 0444
+
+x-update: &update
+  # stop-first: zwei Instanzen derselben Aufgabe nebeneinander hiessen zwei
+  # Migrationslaeufe (api) oder zwei Konsumenten auf einem ZAP (scan-worker).
+  order: stop-first
+  parallelism: 1
+  delay: 15s
+  failure_action: rollback
+
+x-rollback: &rollback
+  parallelism: 1
+  order: stop-first
+
+x-restart: &restart
+  condition: any
+  delay: 10s
+
+# Umgebung und Secrets der Scan-Worker, die sich nur in ZAP_BASE_URL und
+# WORKER_ID unterscheiden. Werte und Vorgaben wie in docker-compose.yml.
+x-scan-env: &scan-env
+  MINIO_ENDPOINT: datenknoten
+  MINIO_PORT: "9000"
+  MINIO_BUCKET_PREFIX: ${MINIO_BUCKET_PREFIX}
+  REDIS_EVENT_PREFIX: ${REDIS_EVENT_PREFIX}
+  ZAP_POOL: ${ZAP_POOL:-zap-1,zap-2,zap-3,zap-4}
+  ZAP_POOL_ENABLED: ${ZAP_POOL_ENABLED:-false}
+  ZAP_ACTIVE_SCAN_TIMEOUT_SEC: ${ZAP_ACTIVE_SCAN_TIMEOUT_SEC:-900}
+  ZAP_MAX_PARALLEL_PER_ORDER: ${ZAP_MAX_PARALLEL_PER_ORDER:-3}
+  PHASE1_MAX_WORKERS: ${PHASE1_MAX_WORKERS:-3}
+  PHASE2_STAGE2_WAF_SAFE: ${PHASE2_STAGE2_WAF_SAFE:-true}
+  VECTISCAN_THROTTLE_PROBE_PAUSE_S: ${VECTISCAN_THROTTLE_PROBE_PAUSE_S:-5}
+  VECTISCAN_THROTTLE_PROBE_ORDER: ${VECTISCAN_THROTTLE_PROBE_ORDER:-asc}
+  # vpn-gw gibt es im Swarm nicht (in docker-compose.yml auskommentiert).
+  VPN_ENABLED: "false"
+
+x-scan-secrets: &scan-secrets
+  - database_url
+  - redis_url
+  - redis_cache_url
+  - minio_access_key
+  - minio_secret_key
+  - anthropic_api_key
+  - shodan_api_key
+  - abuseipdb_api_key
+  - securitytrails_api_key
+  - nvd_api_key
+  - wpscan_api_token
+
+x-zap: &zap
+  image: ghcr.io/dc-77/vectiscan/zap-stable:2.17.0@sha256:71db37cd5b75663b35758d10aaec05bf6fbac23f5020e3046c70e628a5f84efa
+  command: >
+    zap.sh -daemon
+    -port 8090
+    -host 0.0.0.0
+    -config api.disablekey=true
+    -config api.addrs.addr.name=.*
+    -config api.addrs.addr.regex=true
+    -config api.incerrordetails=true
+    -config scanner.maxScanDurationInMins=12
+    -config ajaxSpider.maxDuration=4
+    -config connection.timeoutInSecs=20
+  networks: [vectiscan-internal]
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://127.0.0.1:8090/JSON/core/view/version/"]
+    interval: 30s
+    timeout: 10s
+    retries: 5
+    start_period: 60s
+  logging: *logging
+
+x-zap-deploy: &zap-deploy
+  update_config: *update
+  rollback_config: *rollback
+  restart_policy: *restart
+  resources:
+    limits: { cpus: "1.0", memory: 1536M }
+    reservations:
+      cpus: "${HEAVY_RES_CPUS:-0.25}"
+      memory: "${HEAVY_RES_MEM:-512M}"
+
+# Je Knoten hoechstens eine Replik: ein Knotenausfall kostet dann ein Drittel.
+# Faellt ein Knoten aus, meldet der Dienst 2/3 -- die dritte Replik hat keinen
+# zulaessigen Platz, und das ist die Zusage, nicht ihr Bruch.
+x-verteilt: &verteilt
+  max_replicas_per_node: 1
+
+services:
+
+  # --- Frontend (Next.js) -----------------------------------------------------
+  # NEXT_PUBLIC_API_URL ist beim Build eingebacken, deshalb je Feld ein eigenes
+  # Image (FRONTEND_IMAGE, Build-Jobs in ci/swarm.yml). Keine Geheimnisse,
+  # also kein eigener Einsprungpunkt.
+  frontend:
+    image: ${CI_REGISTRY_IMAGE}/${FRONTEND_IMAGE}:${TAG:-latest}
+    networks: [proxy-net, vectiscan-internal]
+    # Einen eigenen Gesundheitsendpunkt hat das Frontend nicht; die Startseite
+    # wird dynamisch gerendert und beweist damit, dass der Server antwortet.
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>{process.exit(r.status<500?0:1)}).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging: *logging
+    deploy:
+      replicas: ${REPLICAS:-3}
+      placement: *verteilt
+      update_config: *update
+      rollback_config: *rollback
+      restart_policy: *restart
+      resources:
+        limits: { cpus: "1", memory: 512M }
+        reservations:
+          cpus: "${RES_CPUS:-0.1}"
+          memory: "${RES_MEM:-128M}"
+      labels:
+        - traefik.enable=true
+        # VEC-34: oeffentlich. Prod bedient zusaetzlich vectiscan.de und www
+        # (VEC-160/VEC-269), deshalb steht die ganze Host-Regel in WEB_RULE.
+        - traefik.http.routers.${ROUTER}-web.rule=${WEB_RULE}
+        - traefik.http.routers.${ROUTER}-web.entrypoints=websecure
+        - traefik.http.routers.${ROUTER}-web.middlewares=security-headers@file,rate-limit@file
+        - traefik.http.routers.${ROUTER}-web.service=${ROUTER}-web
+        # SICHERHEITSKRITISCH (VEC-160/VEC-167): der Admin-Router muss JEDEN
+        # Host des oeffentlichen Routers abdecken, die Host-Gruppe steht in
+        # Klammern vor dem Pfad (&& bindet staerker als ||), der Pfad-Matcher
+        # ist case-insensitiv, und die Prioritaet liegt ueber der Laenge der
+        # oeffentlichen Regel. Kein Auth-Gate am Rand: /admin schuetzt das
+        # App-JWT (Auth-Konsolidierung Juli 2026). Geprueft in
+        # tests/test_edge_admin_guard.py, auch fuer diese Datei.
+        - traefik.http.routers.${ROUTER}-web-admin.rule=(${WEB_RULE}) && PathRegexp(`(?i)^/admin`)
+        - traefik.http.routers.${ROUTER}-web-admin.entrypoints=websecure
+        - traefik.http.routers.${ROUTER}-web-admin.priority=100
+        - traefik.http.routers.${ROUTER}-web-admin.middlewares=security-headers@file
+        - traefik.http.routers.${ROUTER}-web-admin.service=${ROUTER}-web
+        - traefik.http.services.${ROUTER}-web.loadbalancer.server.port=3000
+
+  # --- API (Fastify) ------------------------------------------------------------
+  api:
+    image: ${CI_REGISTRY_IMAGE}/api:${TAG:-latest}
+    entrypoint: ["/bin/sh", "/run/vectiscan/secrets-entrypoint.sh"]
+    command: ["node", "dist/server.js"]
+    networks: [proxy-net, vectiscan-internal]
+    extra_hosts: *datenknoten
+    configs: *secrets-entrypoint
+    environment:
+      MINIO_ENDPOINT: datenknoten
+      MINIO_PORT: "9000"
+      MINIO_BUCKET_PREFIX: ${MINIO_BUCKET_PREFIX}
+      REDIS_EVENT_PREFIX: ${REDIS_EVENT_PREFIX}
+      # Adressen in Mails und Stripe-Rueckspruengen. docker-compose.yml reicht
+      # sie nicht durch, dort gelten die Vorgaben im Code (scan., scan-api.) --
+      # im Testfeld wiesen die Links sonst auf Prod.
+      FRONTEND_URL: ${FRONTEND_URL}
+      API_URL: https://${API_HOST}
+      APP_BASE_URL: ${FRONTEND_URL}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      # Wie der Export im docker02-Deploy (.gitlab-ci.yml, .deploy-base): die
+      # Form mit Anzeigename, nicht der Wert der CI-Variablen.
+      RESEND_FROM_EMAIL: "VectiScan <noreply@vectiscan.de>"
+      SALES_LEAD_EMAIL: ${SALES_LEAD_EMAIL:-support@vectiscan.de,kontakt@vectigal.ai}
+      STRIPE_PRICE_PERIMETER: ${STRIPE_PRICE_PERIMETER:-}
+      STRIPE_PRICE_DEFAULT: ${STRIPE_PRICE_DEFAULT:-}
+      STRIPE_PRICE_PERIMETER_ONETIME: ${STRIPE_PRICE_PERIMETER_ONETIME:-}
+      # Twenty laeuft vorerst weiter auf docker02. Leer = crm.ts im
+      # Trockenmodus, so im Testfeld; der Prod-Job setzt die oeffentliche
+      # Adresse. Bewusst NICHT ${CRM_WEBHOOK_URL}: diese Projektvariable gibt es
+      # ungescopt mit der Prod-Adresse (VEC-304), das Testfeld schriebe sonst
+      # Leads ins produktive CRM.
+      CRM_WEBHOOK_URL: ${SWARM_CRM_WEBHOOK_URL:-}
+      SALES_NOTIFY_URL: ${SALES_NOTIFY_URL:-}
+      WEBCHECK_CORE_URL: http://webcheck-core:3000
+    secrets:
+      - database_url
+      - redis_url
+      - minio_access_key
+      - minio_secret_key
+      - jwt_secret
+      - admin_password
+      - resend_api_key
+      - stripe_secret_key
+      - stripe_webhook_secret
+      - crm_api_key
+      - webcheck_turnstile_secret
+    # 127.0.0.1 statt localhost: localhost kann im Container zuerst auf ::1
+    # aufloesen. /health prueft nur den Prozess, nicht die Datenbank; die
+    # Migrationen beim Start (initDb) laufen davor, start_period gibt Zeit.
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    logging: *logging
+    deploy:
+      # GENAU EINE, siehe Kopf.
+      replicas: 1
+      update_config: *update
+      rollback_config: *rollback
+      restart_policy: *restart
+      resources:
+        limits: { cpus: "1", memory: 512M }
+        reservations:
+          cpus: "${RES_CPUS:-0.1}"
+          memory: "${RES_MEM:-128M}"
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.${ROUTER}-api.rule=Host(`${API_HOST}`)
+        - traefik.http.routers.${ROUTER}-api.entrypoints=websecure
+        - traefik.http.routers.${ROUTER}-api.middlewares=security-headers@file,rate-limit@file
+        - traefik.http.routers.${ROUTER}-api.service=${ROUTER}-api
+        # VEC-370: /api/admin ohne Auth-Gate am Rand, das App-JWT
+        # (requireAdmin) entscheidet. Eigener Router, damit dort kein
+        # rate-limit greift, mit Prioritaet ueber der oeffentlichen Regel.
+        - traefik.http.routers.${ROUTER}-api-admin.rule=Host(`${API_HOST}`) && PathRegexp(`(?i)^/api/admin`)
+        - traefik.http.routers.${ROUTER}-api-admin.entrypoints=websecure
+        - traefik.http.routers.${ROUTER}-api-admin.priority=100
+        - traefik.http.routers.${ROUTER}-api-admin.middlewares=security-headers@file
+        - traefik.http.routers.${ROUTER}-api-admin.service=${ROUTER}-api
+        # VEC-358: Preflight fuer /api/admin, harmlos, nur OPTIONS.
+        - traefik.http.routers.${ROUTER}-api-admin-preflight.rule=Host(`${API_HOST}`) && PathRegexp(`(?i)^/api/admin`) && Method(`OPTIONS`)
+        - traefik.http.routers.${ROUTER}-api-admin-preflight.entrypoints=websecure
+        - traefik.http.routers.${ROUTER}-api-admin-preflight.priority=110
+        - traefik.http.routers.${ROUTER}-api-admin-preflight.middlewares=security-headers@file
+        - traefik.http.routers.${ROUTER}-api-admin-preflight.service=${ROUTER}-api
+        - traefik.http.services.${ROUTER}-api.loadbalancer.server.port=4000
+        - traefik.http.services.${ROUTER}-api.loadbalancer.healthcheck.path=/health
+        - traefik.http.services.${ROUTER}-api.loadbalancer.healthcheck.interval=15s
+
+  # --- webcheck-core: interner Live-Check-Kern (VEC-363) ----------------------
+  # Nur ueber die /api/live-check-Fassade der api erreichbar, keine Labels.
+  # Die optionalen Drittanbieter-Schluessel sind heute leer (Spike VEC-362)
+  # und deshalb hier nicht verdrahtet.
+  webcheck-core:
+    image: ghcr.io/dc-77/vectiscan/web-check:2.1.9@sha256:91d8f872ea4c038a2b6d3915d90b9869423d0122aaba94ae2025f70c76700e06
+    environment:
+      PORT: "3000"
+      DISABLE_GUI: "true"
+    networks: [vectiscan-internal]
+    logging: *logging
+    deploy:
+      # Zustandslos: die api ruft je Anfrage einen Endpunkt auf.
+      replicas: ${REPLICAS:-3}
+      placement: *verteilt
+      update_config: *update
+      rollback_config: *rollback
+      restart_policy: *restart
+      resources:
+        limits: { cpus: "1", memory: 1G }
+        reservations:
+          cpus: "${RES_CPUS:-0.1}"
+          memory: "${RES_MEM:-128M}"
+
+  # --- Scan-Worker und ihre ZAP-Instanzen ---------------------------------------
+  # Der Startbefehl ist der ENTRYPOINT des Images. Zur Paarung mit zap-<slot>
+  # siehe Kopf.
+  scan-worker:
+    image: ${CI_REGISTRY_IMAGE}/scan-worker:${TAG:-latest}
+    entrypoint: ["/bin/sh", "/run/vectiscan/secrets-entrypoint.sh"]
+    command: ["python3", "-m", "scanner"]
+    networks: [vectiscan-internal]
+    extra_hosts: *datenknoten
+    configs: *secrets-entrypoint
+    environment:
+      <<: *scan-env
+      ZAP_BASE_URL: "http://zap-{{.Task.Slot}}:8090"
+      WORKER_ID: "scan-worker-{{.Task.Slot}}"
+    secrets: *scan-secrets
+    logging: *logging
+    deploy:
+      replicas: ${REPLICAS:-3}
+      placement: *verteilt
+      update_config: *update
+      rollback_config: *rollback
+      restart_policy: *restart
+      resources:
+        limits: { cpus: "2", memory: 3G }
+        reservations:
+          cpus: "${HEAVY_RES_CPUS:-0.25}"
+          memory: "${HEAVY_RES_MEM:-512M}"
+
+  zap-1:
+    <<: *zap
+    deploy:
+      <<: *zap-deploy
+      replicas: 1
+
+  zap-2:
+    <<: *zap
+    deploy:
+      <<: *zap-deploy
+      replicas: ${EXTRA_REPLICAS:-1}
+
+  zap-3:
+    <<: *zap
+    deploy:
+      <<: *zap-deploy
+      replicas: ${EXTRA_REPLICAS:-1}
+
+  # Nur im Pool-Modus benutzt; laeuft in Prod mit, wie auf docker02, damit das
+  # Einschalten von ZAP_POOL_ENABLED keinen Umbau braucht.
+  zap-4:
+    <<: *zap
+    deploy:
+      <<: *zap-deploy
+      replicas: ${EXTRA_REPLICAS:-1}
+
+  # --- Precheck-Worker: scan-worker-Image mit anderem Startbefehl -------------
+  # Auf docker02 zwei Dienste (precheck-worker-1/-2) mit gleicher Aufgabe, hier
+  # einer mit REPLICAS Repliken. Jede Replik arbeitet bei CIDR-Zielen mit bis
+  # zu 20 Threads und je einer Datenbankverbindung (precheck/runner.py).
+  precheck-worker:
+    image: ${CI_REGISTRY_IMAGE}/scan-worker:${TAG:-latest}
+    entrypoint: ["/bin/sh", "/run/vectiscan/secrets-entrypoint.sh"]
+    command: ["python3", "-m", "scanner.precheck_worker"]
+    networks: [vectiscan-internal]
+    extra_hosts: *datenknoten
+    configs: *secrets-entrypoint
+    environment:
+      REDIS_EVENT_PREFIX: ${REDIS_EVENT_PREFIX}
+      # Threads je Replik bei CIDR-Zielen, je Thread eigene Verbindungen.
+      # docker02: 2 Worker x 20, hier 3 Repliken x 10 (Verbindungsbudget).
+      PRECHECK_CIDR_MAX_PARALLEL: ${PRECHECK_CIDR_MAX_PARALLEL:-10}
+    secrets:
+      - database_url
+      - redis_url
+    logging: *logging
+    deploy:
+      replicas: ${REPLICAS:-3}
+      placement: *verteilt
+      update_config: *update
+      rollback_config: *rollback
+      restart_policy: *restart
+      resources:
+        limits: { cpus: "1", memory: 512M }
+        reservations:
+          cpus: "${RES_CPUS:-0.1}"
+          memory: "${RES_MEM:-128M}"
+
+  # --- Report-Worker ----------------------------------------------------------
+  report-worker:
+    image: ${CI_REGISTRY_IMAGE}/report-worker:${TAG:-latest}
+    entrypoint: ["/bin/sh", "/run/vectiscan/secrets-entrypoint.sh"]
+    command: ["python3", "-m", "reporter"]
+    networks: [vectiscan-internal]
+    extra_hosts: *datenknoten
+    configs: *secrets-entrypoint
+    environment:
+      MINIO_ENDPOINT: datenknoten
+      MINIO_PORT: "9000"
+      MINIO_BUCKET_PREFIX: ${MINIO_BUCKET_PREFIX}
+      REDIS_EVENT_PREFIX: ${REDIS_EVENT_PREFIX}
+      # Die drei Schalter der Berichtskette (S6, 22.09.2026), gelesen in
+      # report-worker/reporter/engine.py. Rueckweg bei einem Vorfall ueber die
+      # CI-Variablen, Erklaerung in docker-compose.yml.
+      VECTISCAN_REPORT_ENGINE: ${VECTISCAN_REPORT_ENGINE:-catalog}
+      VECTISCAN_REPORT_LAYOUT: ${VECTISCAN_REPORT_LAYOUT:-v3}
+      VECTISCAN_VALIDATION_LEVEL: ${VECTISCAN_VALIDATION_LEVEL:-strict}
+      VECTISCAN_FACTS_EXPORT: ${VECTISCAN_FACTS_EXPORT:-}
+      VECTISCAN_TOOLRUN_RAW_MAX: ${VECTISCAN_TOOLRUN_RAW_MAX:-1048576}
+    secrets:
+      - database_url
+      - redis_url
+      - redis_cache_url
+      - minio_access_key
+      - minio_secret_key
+      - anthropic_api_key
+    logging: *logging
+    deploy:
+      # Zustandslos, arbeitet je Auftrag in einem eigenen mkdtemp-Verzeichnis.
+      replicas: ${REPLICAS:-3}
+      placement: *verteilt
+      update_config: *update
+      rollback_config: *rollback
+      restart_policy: *restart
+      resources:
+        limits: { cpus: "1", memory: 1G }
+        reservations:
+          cpus: "${HEAVY_RES_CPUS:-0.25}"
+          memory: "${HEAVY_RES_MEM:-512M}"

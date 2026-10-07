@@ -11,6 +11,15 @@ import structlog
 
 log = structlog.get_logger()
 
+# Swarm (06.10.2026): Pub/Sub kennt keine Datenbank-Nummer. Auf dem
+# gemeinsamen Redis empfingen Test und Prod sonst gegenseitig ihre Ereignisse.
+# Leer auf docker02; api und Worker muessen denselben Wert sehen.
+EVENT_PREFIX = os.environ.get("REDIS_EVENT_PREFIX", "")
+
+
+def _event_channel(order_id: str) -> str:
+    return f"{EVENT_PREFIX}scan:events:{order_id}"
+
 
 def _get_redis() -> redis.Redis:
     return redis.from_url(os.environ.get("REDIS_URL", "redis://localhost:6379"))
@@ -66,7 +75,7 @@ def update_progress(
         r = _get_redis()
         payload = json.dumps(progress_data)
         r.set(f"order:progress:{order_id}", payload, ex=3600)
-        r.publish(f"scan:events:{order_id}", json.dumps({
+        r.publish(_event_channel(order_id), json.dumps({
             "type": "progress",
             **progress_data,
         }))
@@ -135,7 +144,7 @@ def set_scan_complete(order_id: str) -> None:
             data["status"] = "scan_complete"
             data["updatedAt"] = datetime.now(timezone.utc).isoformat()
             r.set(f"order:progress:{order_id}", json.dumps(data), ex=3600)
-        r.publish(f"scan:events:{order_id}", json.dumps({
+        r.publish(_event_channel(order_id), json.dumps({
             "type": "status",
             "orderId": order_id,
             "status": "scan_complete",
@@ -169,7 +178,7 @@ def set_scan_failed(order_id: str, error_message: str) -> None:
             "updatedAt": datetime.now(timezone.utc).isoformat(),
         }
         r.set(f"order:progress:{order_id}", json.dumps(data), ex=3600)
-        r.publish(f"scan:events:{order_id}", json.dumps({
+        r.publish(_event_channel(order_id), json.dumps({
             "type": "error",
             **data,
         }))
@@ -197,7 +206,7 @@ def set_discovered_hosts(order_id: str, host_inventory: dict) -> None:
     # Publish hosts discovered event
     try:
         r = _get_redis()
-        r.publish(f"scan:events:{order_id}", json.dumps({
+        r.publish(_event_channel(order_id), json.dumps({
             "type": "hosts_discovered",
             "orderId": order_id,
             "hostsTotal": len(hosts),
@@ -216,7 +225,7 @@ def publish_event(order_id: str, event: dict) -> None:
             event["updatedAt"] = datetime.now(timezone.utc).isoformat()
         if "orderId" not in event:
             event["orderId"] = order_id
-        r.publish(f"scan:events:{order_id}", json.dumps(event))
+        r.publish(_event_channel(order_id), json.dumps(event))
     except Exception as e:
         log.error("publish_event_failed", order_id=order_id, event_type=event.get("type"), error=str(e))
 
@@ -244,7 +253,7 @@ def publish_tool_output(
             r.set(f"order:progress:{order_id}", json.dumps(data), ex=3600)
 
         # Also publish for WebSocket consumers
-        r.publish(f"scan:events:{order_id}", json.dumps({
+        r.publish(_event_channel(order_id), json.dumps({
             "type": "tool_output",
             "orderId": order_id,
             "tool": tool,

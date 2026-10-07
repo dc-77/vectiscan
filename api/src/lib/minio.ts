@@ -1,4 +1,5 @@
 import { Client } from 'minio';
+import { RAWDATA_BUCKET, REPORTS_BUCKET, AUTH_BUCKET } from './buckets.js';
 
 export const minioClient = new Client({
   endPoint: process.env.MINIO_ENDPOINT || 'localhost',
@@ -8,7 +9,7 @@ export const minioClient = new Client({
   secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
 });
 
-const BUCKETS = ['scan-rawdata', 'scan-reports', 'scan-authorizations'];
+const BUCKETS = [RAWDATA_BUCKET, REPORTS_BUCKET, AUTH_BUCKET];
 
 export async function initBuckets(): Promise<void> {
   for (const bucket of BUCKETS) {

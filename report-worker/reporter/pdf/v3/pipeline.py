@@ -21,8 +21,9 @@ from reporter.v3.models import ReportData
 
 log = structlog.get_logger()
 
-RAWDATA_BUCKET = "scan-rawdata"
-DEBUG_BUCKET = "scan-debug"
+# Praefix je Feld wie in reporter/worker.py (Swarm, 06.10.2026).
+RAWDATA_BUCKET = f"{os.environ.get('MINIO_BUCKET_PREFIX', '')}scan-rawdata"
+DEBUG_BUCKET = f"{os.environ.get('MINIO_BUCKET_PREFIX', '')}scan-debug"
 DEBUG_PREFIX = "v3"
 
 

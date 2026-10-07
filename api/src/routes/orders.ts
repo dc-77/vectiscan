@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyReply } from 'fastify';
 import { query } from '../lib/db.js';
 import { scanQueue, reportQueue, publishEvent, getProgressFromRedis, enqueuePrecheck } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
+import { RAWDATA_BUCKET, REPORTS_BUCKET, SCREENSHOTS_BUCKET, DEBUG_BUCKET } from '../lib/buckets.js';
 import { isValidDomain, isValidTarget, validateTargetBatch } from '../lib/validate.js';
 import { generateToken } from '../services/VerificationService.js';
 import { verifyJwt } from '../lib/auth.js';
@@ -985,7 +986,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       }
       try {
         const objKey = `${id}/${safe}.png`;
-        const stream = await minioClient.getObject('scan-screenshots', objKey);
+        const stream = await minioClient.getObject(SCREENSHOTS_BUCKET, objKey);
         reply.header('Content-Type', 'image/png');
         reply.header('Cache-Control', 'private, max-age=3600');
         return reply.send(stream);
@@ -1134,7 +1135,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     let claudeDebug = null;
     if (user.role === 'admin') {
       try {
-        const stream = await minioClient.getObject('scan-debug', `${id}-claude.json`);
+        const stream = await minioClient.getObject(DEBUG_BUCKET, `${id}-claude.json`);
         const chunks: Buffer[] = [];
         for await (const chunk of stream) {
           chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
@@ -2038,10 +2039,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
 
       // Clean up MinIO objects (best-effort, don't block on errors)
       try {
-        await minioClient.removeObject('scan-rawdata', `${id}.tar.gz`);
+        await minioClient.removeObject(RAWDATA_BUCKET, `${id}.tar.gz`);
       } catch { /* ignore — file may not exist */ }
       try {
-        await minioClient.removeObject('scan-reports', `${id}.pdf`);
+        await minioClient.removeObject(REPORTS_BUCKET, `${id}.pdf`);
       } catch { /* ignore — file may not exist */ }
 
       // Delete audit_log entries (no CASCADE on this FK)

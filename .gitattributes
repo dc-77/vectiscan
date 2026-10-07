@@ -32,3 +32,10 @@ report-prototype/spec/**/*.md text eol=lf
 # Runner gruen (dieselbe Falle wie der EOL-Feed-Hash in S1).
 api/src/lib/catalog.generated.ts text eol=lf
 frontend/src/lib/catalog.generated.ts text eol=lf
+
+# Swarm (06.10.2026): Stack-Datei, Swarm-Pipeline und die Skripte unter
+# deploy/swarm laufen unter Linux. CRLF bricht /bin/sh im Container und laesst
+# den Lint der Pipeline (swarm:lint) abbrechen.
+stack.yml text eol=lf
+ci/*.yml text eol=lf
+deploy/swarm/*.sh text eol=lf

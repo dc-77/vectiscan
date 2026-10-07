@@ -1,4 +1,5 @@
 import { createClient } from 'redis';
+import { eventChannel } from './events.js';
 
 let redisClient: ReturnType<typeof createClient> | null = null;
 
@@ -36,8 +37,9 @@ export async function enqueuePrecheck(job: PrecheckJob): Promise<void> {
 
 export async function publishEvent(orderId: string, event: Record<string, unknown>): Promise<void> {
   const client = await getRedisClient();
-  // Channel name kept as scan:events:{id} for backward compat with workers
-  await client.publish(`scan:events:${orderId}`, JSON.stringify(event));
+  // Channel name kept as scan:events:{id} for backward compat with workers,
+  // im Swarm mit Feld-Praefix davor (lib/events.ts)
+  await client.publish(eventChannel(orderId), JSON.stringify(event));
 }
 
 export async function getProgressFromRedis(orderId: string): Promise<Record<string, unknown> | null> {

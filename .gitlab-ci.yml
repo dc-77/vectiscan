@@ -20,7 +20,26 @@ stages:
   - scan
   - test
   - deploy
+  # Swarm, vect-prod (ci/swarm.yml). Vor ops, damit ops-Jobs beider Ziele
+  # am Ende stehen; swarm:deploy:prod blockiert nicht (allow_failure).
+  - deploy-prod
   - ops
+
+# =============================================================================
+# SWARM -- Umzug von docker02 in den Swarm-Cluster (06.10.2026)
+# =============================================================================
+# Zweites Ziel neben docker02, geschaltet ueber die Projektvariable
+# VECTISCAN_SWARM=an. Solange sie fehlt, wird ci/swarm.yml gar nicht erst
+# eingebunden, und damit auch nicht vectigal/ci-templates. Das ist Absicht:
+# ci-templates ist privat, und ein include gelingt nur, wenn der Ausloeser der
+# Pipeline es lesen darf. Die Projekt-Bots von vectiscan duerfen das nicht --
+# eine Pipeline, die etwa ops-rotate-crm-api-key mit GL_WRITE_TOKEN anstoesst,
+# scheiterte sonst schon beim Anlegen (Pruefung 07.10.2026, docs/UMZUG-swarm.md,
+# Abschnitt 1.7). Jobs, Felder und Begruendungen in ci/swarm.yml.
+include:
+  - local: /ci/swarm.yml
+    rules:
+      - if: $VECTISCAN_SWARM == "an"
 
 # =============================================================================
 # WORKFLOW — welche Pipelines ueberhaupt entstehen
@@ -252,7 +271,7 @@ test-edge:
   script:
     # Runner ist Shell-Executor (image: wird ignoriert); System-Python ist PEP-668
     # externally-managed → venv wie bei test-scan-worker/test-report-worker.
-    - python3 -m venv .venv && . .venv/bin/activate && pip install pyyaml pytest && pytest tests/test_edge_admin_guard.py tests/test_compose_images.py -v
+    - python3 -m venv .venv && . .venv/bin/activate && pip install pyyaml pytest && pytest tests/test_edge_admin_guard.py tests/test_compose_images.py tests/test_stack_swarm.py -v
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"

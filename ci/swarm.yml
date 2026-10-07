@@ -1,0 +1,264 @@
+# =============================================================================
+# ci/swarm.yml -- VectiScan im Docker Swarm, zwei Felder (vect-test, vect-prod)
+# =============================================================================
+# Eingebunden aus .gitlab-ci.yml. Die Jobs fuer docker02 dort bleiben
+# unangetastet: bis zum Prod-Fenster ist docker02 die Produktion, und ein Push
+# auf main rollt sie weiter aus. Ablauf, Vorbedingungen und Variablen:
+# docs/UMZUG-swarm.md.
+#
+# Eigene Datei statt Bloecke in .gitlab-ci.yml aus zwei Gruenden: Der Umzug
+# laesst sich spaeter in einem Schritt zurueckbauen oder zur einzigen Pipeline
+# machen, und tests/test_compose_images.py liest .gitlab-ci.yml mit
+# yaml.safe_load -- das scheitert an `!reference`, das hier gebraucht wird.
+#
+#   Push auf main -> swarm:build (api, scan-worker, report-worker,
+#                    frontend, frontend-test) -> swarm:trivy -> swarm:lint
+#                 -> swarm:deploy:test (automatisch)
+#                 -> swarm:deploy:prod (manuell, Stage deploy-prod)
+#
+# SCHALTER: Nichts hier laeuft, solange die Projektvariable VECTISCAN_SWARM
+# nicht auf "an" steht. Damit kann die Datei auf main liegen, bevor Datenbank,
+# MinIO-Schluessel und Variablen fuer die Felder stehen; sonst waere jede
+# Pipeline von main rot.
+#
+# NUR PUSH-PIPELINES bauen und deployen automatisch. vectiscan startet viele
+# Web- und API-Pipelines fuer seine ops-Jobs, und die Synchronisationsjobs
+# laufen als Schedule auf main -- jede davon loeste sonst einen Build von 15
+# bis 20 Minuten und einen Deploy ins Testfeld aus.
+#
+# Das Template setzt BASE_IMAGE global auf ${CI_REGISTRY_IMAGE}, vectiscan
+# aber auf ghcr.io/dc-77/vectiscan, und die Projektvariable gewinnt. Deshalb
+# steht BASE_IMAGE unten an jedem Job: Der Swarm zieht aus der GitLab-Registry
+# mit dem Deploy-Token der Gruppe, die eigenen Images auf ghcr.io sind privat.
+# =============================================================================
+
+include:
+  - project: vectigal/ci-templates
+    ref: v4
+    file: /swarm-deploy.yml
+
+# --- gemeinsame Bausteine ----------------------------------------------------
+
+.vs:swarm:
+  variables:
+    BASE_IMAGE: ${CI_REGISTRY_IMAGE}
+    STACK_FILE: stack.yml
+    DEPLOY_BRANCH: main
+    # Jeder Name braucht in stack.yml einen Eintrag im secrets-Block; der Job
+    # swarm:lint prueft das. Ein Secret darf nicht leer sein: optionale
+    # Schluessel bekommen den Wert "-" (deploy/swarm/secrets-entrypoint.sh).
+    SECRET_VARS: >-
+      DATABASE_URL REDIS_URL REDIS_CACHE_URL MINIO_ACCESS_KEY MINIO_SECRET_KEY
+      JWT_SECRET ADMIN_PASSWORD ANTHROPIC_API_KEY RESEND_API_KEY
+      STRIPE_SECRET_KEY STRIPE_WEBHOOK_SECRET CRM_API_KEY WEBCHECK_TURNSTILE_SECRET
+      SHODAN_API_KEY ABUSEIPDB_API_KEY SECURITYTRAILS_API_KEY NVD_API_KEY
+      WPSCAN_API_TOKEN
+    CONFIG_FILES: "secrets_entrypoint=deploy/swarm/secrets-entrypoint.sh"
+    # Das scan-worker-Image ist gross, und der erste Deploy zieht es auf alle
+    # drei Knoten. 72 x 10 s = 12 Minuten; der Job selbst darf 20.
+    CONVERGE_RETRIES: "72"
+    SMOKE_TEST: "true"
+
+.vs:automatisch:
+  rules:
+    - if: $VECTISCAN_SWARM != "an"
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
+
+.vs:manuell:
+  rules:
+    - if: $VECTISCAN_SWARM != "an"
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == "main"
+      when: manual
+
+# Ein Neustart beendet laufende Scans (sys.exit bei SIGTERM, bis zu 120 min).
+# Dieselbe Sperre wie im docker02-Deploy (.deploy-base in .gitlab-ci.yml),
+# nur fragt hier ein Wegwerf-Container die Datenbank des Feldes auf dem
+# Datenknoten. DATABASE_URL geht per `-e NAME` ohne Wert hinein und steht
+# damit nicht in der Befehlszeile. DEPLOY_FORCE=true uebergeht die Sperre.
+.vs:aktive-scans:
+  script:
+    - |
+      SCAN_STATUS="'queued','scanning','passive_intel','dns_recon','scan_phase1','scan_phase2','scan_phase3','report_generating'"
+      if [ "${DEPLOY_FORCE:-false}" = "true" ]; then
+        echo "WARNUNG: DEPLOY_FORCE=true -- aktive Scans werden nicht geprueft."
+      elif [ -z "$(docker stack services -q "${STACK_NAME}" 2>/dev/null)" ]; then
+        echo "  ${STACK_NAME} laeuft noch nicht -- keine Scans zu pruefen."
+      else
+        AKTIV=$(docker run --rm --add-host "datenknoten:${DATENKNOTEN_ADDR}" -e DATABASE_URL -e PGCONNECT_TIMEOUT=5 \
+                  postgres:18-alpine psql "$DATABASE_URL" -tAc \
+                  "SELECT count(*) FROM orders WHERE status IN (${SCAN_STATUS})" 2>/dev/null | tr -d '[:space:]') || AKTIV=""
+        if [ -z "$AKTIV" ]; then
+          echo "WARNUNG: aktive Scans nicht pruefbar (Datenbank nicht erreichbar?), Deploy laeuft weiter."
+        elif [ "$AKTIV" -gt 0 ]; then
+          echo "FEHLER: $AKTIV aktive(r) Scan(s) in ${STACK_NAME} -- Deploy abgebrochen."
+          echo "  Abwarten oder DEPLOY_FORCE=true setzen (laufende Scans gehen verloren)."
+          docker run --rm --add-host "datenknoten:${DATENKNOTEN_ADDR}" -e DATABASE_URL -e PGCONNECT_TIMEOUT=5 \
+            postgres:18-alpine psql "$DATABASE_URL" -c \
+            "SELECT id, target_url, status, scan_started_at FROM orders WHERE status IN (${SCAN_STATUS}) ORDER BY scan_started_at DESC LIMIT 10" 2>/dev/null || true
+          exit 1
+        else
+          echo "  keine aktiven Scans in ${STACK_NAME}"
+        fi
+      fi
+
+# --- build und scan ----------------------------------------------------------
+
+swarm:build:
+  extends: [.swarm:build, .vs:swarm, .vs:automatisch]
+  variables:
+    BUILD_CONTEXT: $SERVICE/
+  parallel:
+    matrix:
+      - SERVICE: [api, scan-worker, report-worker]
+
+# NEXT_PUBLIC_API_URL wird beim Build in das Client-Bundle und in die CSP
+# eingebacken (frontend/Dockerfile). Ein gemeinsames Image liesse das
+# Testfeld gegen die Prod-API sprechen, deshalb je Feld eines. Das ist die eine
+# Stelle, an der Test nicht Bit fuer Bit das prueft, was nach Prod geht; der
+# Unterschied ist genau dieses Build-Argument.
+swarm:build-frontend:
+  extends: [.swarm:build, .vs:swarm, .vs:automatisch]
+  variables:
+    SERVICE: frontend
+    BUILD_CONTEXT: frontend/
+    BUILD_ARGS: --build-arg NEXT_PUBLIC_API_URL=https://scan-api.vectigal.tech --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY
+
+swarm:build-frontend-test:
+  extends: [.swarm:build, .vs:swarm, .vs:automatisch]
+  variables:
+    SERVICE: frontend-test
+    BUILD_CONTEXT: frontend/
+    BUILD_ARGS: --build-arg NEXT_PUBLIC_API_URL=https://scan-api-test.vectigal.tech --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY
+
+# Nicht blockierend, wie die trivy-Jobs von docker02 (trivy-scan-worker ist
+# dort ganz abgeschaltet). Die Werkzeuge im scan-worker bringen eigene
+# Abhaengigkeiten mit; ein harter Gate braucht vorher eine .trivyignore mit
+# Begruendung je Eintrag. Offener Punkt in docs/UMZUG-swarm.md.
+swarm:trivy:
+  extends: [.swarm:scan, .vs:swarm, .vs:automatisch]
+  allow_failure: true
+  parallel:
+    matrix:
+      - SERVICE: [api, scan-worker, report-worker, frontend, frontend-test]
+
+swarm:lint:
+  extends: [.swarm:lint, .vs:swarm, .vs:automatisch]
+
+# --- vect-test ---------------------------------------------------------------
+
+swarm:deploy:test:
+  extends: [.swarm:deploy, .vs:swarm, .vs:automatisch]
+  stage: deploy
+  variables:
+    STACK_NAME: vect-test-vectiscan
+    APP_URL: https://scan-test.vectigal.tech
+    ROUTER: vectiscan-test
+    WEB_RULE: "Host(`scan-test.vectigal.tech`)"
+    API_HOST: scan-api-test.vectigal.tech
+    FRONTEND_URL: https://scan-test.vectigal.tech
+    FRONTEND_IMAGE: frontend-test
+    MINIO_BUCKET_PREFIX: vect-test-
+    REDIS_EVENT_PREFIX: "vect-test:"
+    REPLICAS: "1"
+    EXTRA_REPLICAS: "0"
+    # Test haelt keinen Platz, den Prod nach einem Knotenausfall braucht.
+    RES_CPUS: "0"
+    RES_MEM: "0"
+    HEAVY_RES_CPUS: "0"
+    HEAVY_RES_MEM: "0"
+    # Die ungescopten Variablen beschreiben docker02, also Prod. Fehlt eine
+    # mit Scope vect-test, kaeme still der Prod-Wert -- das Testfeld schriebe
+    # in die Prod-Datenbank oder buchte mit dem Live-Schluessel von Stripe.
+    FELD_PRUEFUNG: >-
+      DATABASE_URL=:5432/ REDIS_URL=:6380/1 REDIS_CACHE_URL=:6379/1
+      MINIO_ACCESS_KEY=vect-test- STRIPE_SECRET_KEY=_test_
+  environment:
+    name: vect-test
+    deployment_tier: testing
+    url: https://scan-test.vectigal.tech
+  script:
+    - !reference [.vs:aktive-scans, script]
+    - !reference [.swarm:deploy, script]
+
+# --- vect-prod ---------------------------------------------------------------
+# Manuell und NICHT blockierend (allow_failure: true): Die ops-Jobs von
+# docker02 stehen in der Stage danach und haben kein `needs: []`. Ein
+# blockierender manueller Job hier liesse sie in jeder Pipeline auf "created"
+# stehen, bis jemand Prod ausrollt.
+
+swarm:deploy:prod:
+  extends: [.swarm:deploy, .vs:swarm]
+  stage: deploy-prod
+  rules:
+    - if: $VECTISCAN_SWARM != "an"
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
+      when: manual
+  allow_failure: true
+  variables:
+    STACK_NAME: vect-prod-vectiscan
+    APP_URL: https://scan.vectigal.tech
+    ROUTER: vectiscan-prod
+    WEB_RULE: "Host(`scan.vectigal.tech`) || Host(`vectiscan.de`) || Host(`www.vectiscan.de`)"
+    API_HOST: scan-api.vectigal.tech
+    FRONTEND_URL: https://scan.vectigal.tech
+    FRONTEND_IMAGE: frontend
+    MINIO_BUCKET_PREFIX: vect-prod-
+    REDIS_EVENT_PREFIX: "vect-prod:"
+    REPLICAS: "3"
+    EXTRA_REPLICAS: "1"
+    RES_CPUS: "0.1"
+    RES_MEM: 128M
+    HEAVY_RES_CPUS: "0.25"
+    HEAVY_RES_MEM: 512M
+    # Twenty bleibt vorerst auf docker02 und ist von hier nur ueber den
+    # oeffentlichen Namen erreichbar (Router twenty-api, Bearer CRM_API_KEY).
+    SWARM_CRM_WEBHOOK_URL: https://crm.vectigal.tech/rest/people
+    # Vorgabe wie im docker02-Deploy; eine Projektvariable gleichen Namens
+    # gewinnt, so wie dort.
+    STRIPE_PRICE_PERIMETER: price_1TewEA1j7RvmOvLYHNA2lyM2
+    FELD_PRUEFUNG: >-
+      DATABASE_URL=:5433/ REDIS_URL=:6380/0 REDIS_CACHE_URL=:6379/0
+      MINIO_ACCESS_KEY=vect-prod- STRIPE_SECRET_KEY=_live_
+  environment:
+    name: vect-prod
+    deployment_tier: production
+    url: https://scan.vectigal.tech
+  script:
+    - !reference [.vs:aktive-scans, script]
+    - !reference [.swarm:deploy, script]
+
+# --- ops, je Feld ein beschrifteter Knopf ------------------------------------
+# Die ops-Jobs von docker02 (ops-*, rollback, cleanup-prod) arbeiten mit
+# `docker compose exec` in /opt/apps/vectiscan und gelten fuer den Swarm nicht.
+# Welche davon ein Gegenstueck brauchen, steht in docs/UMZUG-swarm.md.
+
+swarm:rollback:test:
+  extends: [.swarm:rollback, .vs:manuell]
+  variables: { STACK_NAME: vect-test-vectiscan }
+  environment: { name: vect-test, url: "https://scan-test.vectigal.tech" }
+
+swarm:rollback:prod:
+  extends: [.swarm:rollback, .vs:manuell]
+  variables: { STACK_NAME: vect-prod-vectiscan }
+  environment: { name: vect-prod, url: "https://scan.vectigal.tech" }
+
+swarm:logs:test:
+  extends: [.swarm:ops-logs, .vs:manuell]
+  variables: { STACK_NAME: vect-test-vectiscan }
+
+swarm:logs:prod:
+  extends: [.swarm:ops-logs, .vs:manuell]
+  variables: { STACK_NAME: vect-prod-vectiscan }
+
+swarm:ps:test:
+  extends: [.swarm:ops-ps, .vs:manuell]
+  variables: { STACK_NAME: vect-test-vectiscan }
+
+swarm:ps:prod:
+  extends: [.swarm:ops-ps, .vs:manuell]
+  variables: { STACK_NAME: vect-prod-vectiscan }

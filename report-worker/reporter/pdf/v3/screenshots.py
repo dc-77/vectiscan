@@ -12,6 +12,7 @@ Bilder.
 from __future__ import annotations
 
 import io
+import os
 from typing import Protocol
 
 import structlog
@@ -19,7 +20,8 @@ import structlog
 log = structlog.get_logger()
 
 SCHEME = "vectiscan-screenshot"
-BUCKET = "scan-screenshots"
+# Praefix je Feld wie in reporter/worker.py (Swarm, 06.10.2026).
+BUCKET = f"{os.environ.get('MINIO_BUCKET_PREFIX', '')}scan-screenshots"
 
 # Die Rasterzelle ist bei drei Spalten auf 174 mm Satzbreite rund 55 mm breit, also
 # etwa 650 Pixel bei 300 dpi. Vierzehn ungeskalierte Vollbilder sind dekodiert leicht
