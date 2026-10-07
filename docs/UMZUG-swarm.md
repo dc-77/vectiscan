@@ -222,6 +222,14 @@ laufen `swarm:build`, `swarm:trivy`, `swarm:lint` und `swarm:deploy:test`
 mit. Der Build dauert so lange wie der für docker02 und läuft parallel auf dem
 Runner `vectigal-docker`.
 
+Vorher eine Sache klären: Mit dem Schalter bindet die Pipeline das private
+Projekt `vectigal/ci-templates` ein, und das gelingt nur, wenn der Auslöser es
+lesen darf. Die Personen im Projekt dürfen das (Stand 07.10.2026), die drei
+Projekt-Bots von vectiscan nicht. Eine Pipeline, die ein Projekt-Token
+anstößt, scheitert dann schon beim Anlegen; heute betrifft das
+`ops-rotate-crm-api-key` mit `GL_WRITE_TOKEN`. Abhilfe: dafür ein Token der
+Gruppe `vectigal` nehmen, deren Bots ci-templates lesen dürfen.
+
 ## 2. Testfeld prüfen
 
 1. `swarm:deploy:test` grün. Der Job wartet auf das Update und fragt
