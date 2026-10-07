@@ -33,9 +33,10 @@ stages:
 # eingebunden, und damit auch nicht vectigal/ci-templates. Das ist Absicht:
 # ci-templates ist privat, und ein include gelingt nur, wenn der Ausloeser der
 # Pipeline es lesen darf. Die Projekt-Bots von vectiscan duerfen das nicht --
-# eine Pipeline, die etwa ops-rotate-crm-api-key mit GL_WRITE_TOKEN anstoesst,
-# scheiterte sonst schon beim Anlegen (Pruefung 07.10.2026, docs/UMZUG-swarm.md,
-# Abschnitt 1.7). Jobs, Felder und Begruendungen in ci/swarm.yml.
+# ein Push mit dem Projekt-Token vectiscan_claude_code bekaeme sonst keinen
+# einzigen Job, also auch keinen Deploy auf docker02 (Pruefung 07.10.2026,
+# docs/UMZUG-swarm.md, Abschnitt 1.7). Jobs, Felder und Begruendungen in
+# ci/swarm.yml.
 include:
   - local: /ci/swarm.yml
     rules:

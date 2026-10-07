@@ -222,13 +222,34 @@ laufen `swarm:build`, `swarm:trivy`, `swarm:lint` und `swarm:deploy:test`
 mit. Der Build dauert so lange wie der für docker02 und läuft parallel auf dem
 Runner `vectigal-docker`.
 
-Vorher eine Sache klären: Mit dem Schalter bindet die Pipeline das private
-Projekt `vectigal/ci-templates` ein, und das gelingt nur, wenn der Auslöser es
-lesen darf. Die Personen im Projekt dürfen das (Stand 07.10.2026), die drei
-Projekt-Bots von vectiscan nicht. Eine Pipeline, die ein Projekt-Token
-anstößt, scheitert dann schon beim Anlegen; heute betrifft das
-`ops-rotate-crm-api-key` mit `GL_WRITE_TOKEN`. Abhilfe: dafür ein Token der
-Gruppe `vectigal` nehmen, deren Bots ci-templates lesen dürfen.
+Vorher eine Sache klären: Mit dem Schalter bindet jede Pipeline das private
+Projekt `vectigal/ci-templates` ein. GitLab lädt die Vorlage mit den Rechten
+dessen, der die Pipeline auslöst, bei einem Push also mit den Rechten dessen,
+der pusht. Die GitLab-Doku zu `include:project` sagt dazu: „For any private
+project in `include:project`, the user running the pipeline must have at least
+the Reporter role.“ Fehlt die Rolle, bricht GitLab die Pipeline schon beim
+Anlegen mit „not found or access denied“ ab, und kein einziger Job läuft.
+
+Wer heute Pipelines auslöst (die letzten 40 Push-Pipelines und alle per API,
+Stand 07.10.2026):
+
+| Auslöser | Anmeldung | darf ci-templates lesen |
+|---|---|---|
+| Personen im Projekt | eigenes Konto | ja |
+| `group_80_bot_…` | Gruppen-Token `gitlab-vectigal.token` der Gruppe `vectigal` | ja, Maintainer über die Gruppe |
+| `project_28_bot_…` | Projekt-Token `vectiscan_claude_code` | **nein** |
+
+13 der letzten 40 Push-Pipelines kamen vom Projekt-Token, alle auf `main`,
+zuletzt am 01.10.2026. Pusht nach dem Einschalten jemand damit auf `main`, läuft für
+diesen Push nichts: kein Test, kein Build und auch kein Deploy auf
+docker02, also nicht in die Produktion. Der Commit liegt dann still auf `main`,
+bis jemand anderes pusht. Deshalb vor dem Einschalten: Wer
+`vectiscan_claude_code` benutzt, steigt auf das Gruppen-Token oder ein eigenes
+Konto um, danach wird das Projekt-Token widerrufen.
+
+`GL_WRITE_TOKEN` in `ops-rotate-crm-api-key` und `ops-provision-turnstile` ist
+davon nicht betroffen. Die Jobs schreiben damit nur CI-Variablen über die API,
+und dabei entsteht keine Pipeline.
 
 ## 2. Testfeld prüfen
 
