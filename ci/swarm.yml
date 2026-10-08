@@ -262,3 +262,44 @@ swarm:ps:test:
 swarm:ps:prod:
   extends: [.swarm:ops-ps, .vs:manuell]
   variables: { STACK_NAME: vect-prod-vectiscan }
+
+# --- Datenumzug docker02 -> vect-prod (08.10.2026) ---------------------------
+# Ablauf in docs/UMZUG-swarm.md, Abschnitt 3. Transport ueber die
+# Paket-Registry, verschluesselt mit UMZUG_SCHLUESSEL (Masked, Protected,
+# Scope *); docker02 erreicht den Datenknoten nicht.
+# swarm:umzug:export wartet auf deploy-auto: der startet die Anwendung auf
+# docker02 mit `docker compose up -d` neu und machte das Anhalten sonst
+# wieder rueckgaengig. Danach in dieser Reihenfolge: export, import,
+# swarm:deploy:prod.
+
+swarm:umzug:export:
+  extends: [.vs:manuell]
+  stage: ops
+  tags: [vectigal]
+  needs:
+    - job: deploy-auto
+      optional: true
+  allow_failure: true
+  script:
+    - bash deploy/swarm/umzug-export.sh
+
+swarm:umzug:import:
+  extends: [.swarm:deploy-runner, .vs:manuell]
+  stage: ops
+  needs: [swarm:umzug:export]
+  allow_failure: true
+  variables: { STACK_NAME: vect-prod-vectiscan }
+  environment: { name: vect-prod, action: access }
+  script:
+    - sh deploy/swarm/umzug-import.sh
+
+swarm:umzug:rueckweg:
+  extends: [.vs:manuell]
+  stage: ops
+  tags: [vectigal]
+  needs: []
+  allow_failure: true
+  script:
+    - cd ${DEPLOY_PATH}
+    - docker compose start frontend api scan-worker-1 scan-worker-2 scan-worker-3 precheck-worker-1 precheck-worker-2 report-worker
+    - docker compose ps --format '{{.Service}} {{.State}}'

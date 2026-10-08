@@ -281,36 +281,33 @@ und dabei entsteht keine Pipeline.
 
 1. TTL des Wildcards und der beiden `vectiscan.de`-Namen mindestens eine alte
    TTL vorher auf 300 s senken. `max_connections` auf 5433 ist angehoben
-   (Abschnitt 1.1).
-2. Auf docker02 warten, bis kein Scan läuft und die Listen leer sind, dann
-   die Anwendung stoppen. Twenty läuft weiter.
-   ```bash
-   cd /opt/apps/vectiscan && sudo docker compose exec -T redis redis-cli LLEN scan-pending
-   sudo docker compose stop frontend api scan-worker-1 scan-worker-2 scan-worker-3 precheck-worker-1 precheck-worker-2 report-worker
-   ```
-3. Datenbank sichern, auf docker02:
-   ```bash
-   cd /opt/apps/vectiscan && sudo docker compose exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc --no-owner --no-privileges' > /tmp/vectiscan.dump
-   ```
-   Die Datei nach docker-share01 bringen (direkt, falls docker02 den
-   Datenknoten erreicht, sonst über die PuTTY-Tunnel) und dort in die leere
-   Datenbank einspielen. Leer heißt: `swarm:deploy:prod` ist noch nicht
-   gelaufen, sonst hat die api beim Start schon das Schema angelegt, und die
-   Datenbank gehört vorher gelöscht und neu angelegt.
-   ```bash
-   sudo -u postgres pg_restore -p 5433 -d vectiscan --no-owner --role=vectiscan /tmp/vectiscan.dump
-   sudo -u postgres psql -p 5433 -d vectiscan -c "UPDATE reports SET minio_bucket = 'vect-prod-' || minio_bucket WHERE minio_bucket NOT LIKE 'vect-prod-%'"
-   ```
-   Der zweite Befehl ist nötig, weil die api den Bucket eines Berichts aus
-   `reports.minio_bucket` liest. Danach Zeilenzahlen von `orders`, `reports`
-   und `users` gegen docker02 vergleichen.
-4. MinIO spiegeln: die Buckets `scan-rawdata`, `scan-reports`,
-   `scan-authorizations`, `scan-screenshots` und `scan-debug` nach
-   `vect-prod-<name>`. `mc` liegt im MinIO-Image; auf docker02 mit
-   `docker compose exec minio mc mirror` in ein Verzeichnis, Archiv
-   übertragen, auf docker-share01 mit dem `mc` des data-node-MinIO hinein.
-   Objektzahlen je Bucket vergleichen.
+   (Abschnitt 1.1, erledigt am 08.10.2026: 200, Grenze der Rolle 80).
+2. CI-Variable `UMZUG_SCHLUESSEL` anlegen: Masked und Protected, Scope `*`,
+   mindestens 24 Zeichen, nur Buchstaben und Ziffern (aus Bitwarden). Mit ihr
+   werden Dump und Objekte verschlüsselt, solange sie in der Paket-Registry
+   liegen. Nach dem Umzug wieder löschen.
+3. **`swarm:umzug:export`** (Shell-Runner auf docker02; wird erst anklickbar,
+   wenn `deploy-auto` derselben Pipeline durch ist, weil der die Anwendung
+   sonst wieder startete). Bricht ab, solange Aufträge laufen
+   (`UMZUG_TROTZDEM=ja` übergeht das). Hält frontend, api und alle Worker an,
+   **ab hier läuft das Fenster**; Twenty läuft weiter. Sichert die Datenbank
+   als reines SQL, zählt jede Tabelle exakt (`deploy/swarm/umzug-zaehlen.sql`),
+   holt die Objekte der fünf Buckets über S3 heraus und vergleicht ihre Zahl,
+   verschlüsselt alles und legt es als Paket `umzug/<Pipeline-ID>` ab.
+   docker02 erreicht den Datenknoten nicht (5433 und 22 zu, 08.10.2026),
+   beide erreichen GitLab.
+4. **`swarm:umzug:import`** (Deploy-Runner, Environment `vect-prod`). Bricht
+   ohne Änderung ab, wenn `DATABASE_URL` nicht auf 5433 zeigt, der MinIO-Schlüssel
+   nicht der von `vect-prod` ist oder die Datenbank schon Tabellen hat (dann
+   lief `swarm:deploy:prod` schon; die Datenbank gehört erst gelöscht und leer
+   neu angelegt). Sonst: Prüfsummen prüfen, Dump in einer Transaktion
+   einspielen, Zeilen gegen den Export vergleichen,
+   `reports.minio_bucket` auf `vect-prod-…` umstellen (die api liest den
+   Bucket eines Berichts von dort), die Objekte mit `rclone` nach
+   `vect-prod-<bucket>` hochladen und je Bucket zählen, das Paket löschen.
 5. Redis wird nicht übertragen: Die Listen sind leer, der Cache füllt sich neu.
+   Objekt-Metadaten außer dem Inhaltstyp gehen beim Weg über Dateien verloren;
+   VectiScan setzt keine eigenen.
 6. `swarm:deploy:prod` auslösen. Er prüft vorher auf aktive Scans.
 7. Mit `--resolve` gegen einen Knoten prüfen, von außen: Anmeldung, ein
    bestehender Bericht lässt sich laden, ein neuer Scan läuft durch, ein
@@ -323,8 +320,8 @@ und dabei entsteht keine Pipeline.
     `uptime-kuma`, `loki`, `promtail`, `grafana`, `keycloak`, `keycloak-db`,
     `oauth2-proxy`. Sie sehen die Anwendung nach dem Umzug ohnehin nicht mehr.
 
-**Rückweg:** A-Records zurück auf `62.217.52.165` und auf docker02
-`docker compose start`. Was in der Zwischenzeit im Swarm geschrieben wurde,
+**Rückweg:** A-Records zurück auf `62.217.52.165` und auf docker02 der Job
+`swarm:umzug:rueckweg`. Was in der Zwischenzeit im Swarm geschrieben wurde,
 fehlt dort.
 
 ## 4. Offen
