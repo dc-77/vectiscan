@@ -284,8 +284,8 @@ und dabei entsteht keine Pipeline.
    (Abschnitt 1.1, erledigt am 08.10.2026: 200, Grenze der Rolle 80).
 2. CI-Variable `UMZUG_SCHLUESSEL` anlegen: Masked und Protected, Scope `*`,
    mindestens 24 Zeichen, nur Buchstaben und Ziffern (aus Bitwarden). Mit ihr
-   werden Dump und Objekte verschlüsselt, solange sie in der Paket-Registry
-   liegen. Nach dem Umzug wieder löschen.
+   werden Dump und Objekte verschlüsselt, solange sie als Image in
+   `registry-extern` liegen. Nach dem Umzug wieder löschen.
 3. **`swarm:umzug:export`** (Shell-Runner auf docker02; wird erst anklickbar,
    wenn `deploy-auto` derselben Pipeline durch ist, weil der die Anwendung
    sonst wieder startete). Bricht ab, solange Aufträge laufen
@@ -293,9 +293,11 @@ und dabei entsteht keine Pipeline.
    **ab hier läuft das Fenster**; Twenty läuft weiter. Sichert die Datenbank
    als reines SQL, zählt jede Tabelle exakt (`deploy/swarm/umzug-zaehlen.sql`),
    holt die Objekte der fünf Buckets über S3 heraus und vergleicht ihre Zahl,
-   verschlüsselt alles und legt es als Paket `umzug/<Pipeline-ID>` ab.
-   docker02 erreicht den Datenknoten nicht (5433 und 22 zu, 08.10.2026),
-   beide erreichen GitLab.
+   verschlüsselt alles und schiebt es als Image `umzug:<Pipeline-ID>` aus
+   `FROM scratch` nach `registry-extern`. docker02 erreicht den Datenknoten
+   nicht (5433 und 22 zu, 08.10.2026), beide erreichen die Registry. Die
+   Paket-Registry ging nicht: Der Proxy vor git-extern lehnte bei
+   protokoll-assist schon 7 MB mit HTTP 413 ab.
 4. **`swarm:umzug:import`** (Deploy-Runner, Environment `vect-prod`). Bricht
    ohne Änderung ab, wenn `DATABASE_URL` nicht auf 5433 zeigt, der MinIO-Schlüssel
    nicht der von `vect-prod` ist oder die Datenbank schon Tabellen hat (dann
@@ -304,7 +306,8 @@ und dabei entsteht keine Pipeline.
    einspielen, Zeilen gegen den Export vergleichen,
    `reports.minio_bucket` auf `vect-prod-…` umstellen (die api liest den
    Bucket eines Berichts von dort), die Objekte mit `rclone` nach
-   `vect-prod-<bucket>` hochladen und je Bucket zählen, das Paket löschen.
+   `vect-prod-<bucket>` hochladen und je Bucket zählen. Das Image
+   `umzug:<Pipeline-ID>` danach von Hand löschen (Deploy, Container registry).
 5. Redis wird nicht übertragen: Die Listen sind leer, der Cache füllt sich neu.
    Objekt-Metadaten außer dem Inhaltstyp gehen beim Weg über Dateien verloren;
    VectiScan setzt keine eigenen.

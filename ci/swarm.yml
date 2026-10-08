@@ -264,9 +264,10 @@ swarm:ps:prod:
   variables: { STACK_NAME: vect-prod-vectiscan }
 
 # --- Datenumzug docker02 -> vect-prod (08.10.2026) ---------------------------
-# Ablauf in docs/UMZUG-swarm.md, Abschnitt 3. Transport ueber die
-# Paket-Registry, verschluesselt mit UMZUG_SCHLUESSEL (Masked, Protected,
-# Scope *); docker02 erreicht den Datenknoten nicht.
+# Ablauf in docs/UMZUG-swarm.md, Abschnitt 3. Transport als Image
+# umzug:<Pipeline-ID> ueber registry-extern, verschluesselt mit
+# UMZUG_SCHLUESSEL (Masked, Protected, Scope *); docker02 erreicht den
+# Datenknoten nicht, und die Paket-Registry lehnte 7 MB mit HTTP 413 ab.
 # swarm:umzug:export wartet auf deploy-auto: der startet die Anwendung auf
 # docker02 mit `docker compose up -d` neu und machte das Anhalten sonst
 # wieder rueckgaengig. Danach in dieser Reihenfolge: export, import,

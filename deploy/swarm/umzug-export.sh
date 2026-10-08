@@ -8,10 +8,12 @@
 # AB DEM ANHALTEN LAEUFT DAS UMZUGSFENSTER: frontend, api und alle Worker auf
 # docker02 bleiben aus, Twenty laeuft weiter. Zurueck mit swarm:umzug:rueckweg.
 #
-# Transport ueber die Paket-Registry statt ueber den Datenknoten: docker02
-# erreicht docker-share01 nicht (5433 und 22 zu, gemessen am 08.10.2026).
-# Alles ist mit UMZUG_SCHLUESSEL verschluesselt und traegt eine Pruefsumme des
-# Klartexts; swarm:umzug:import loescht das Paket nach Erfolg.
+# Transport als Image umzug:<Pipeline-ID> ueber registry-extern statt ueber
+# den Datenknoten: docker02 erreicht docker-share01 nicht (5433 und 22 zu,
+# gemessen am 08.10.2026). Alles ist mit UMZUG_SCHLUESSEL verschluesselt und
+# traegt eine Pruefsumme des Klartexts. Die Paket-Registry ging nicht: der
+# Proxy vor git-extern lehnte schon 7 MB mit HTTP 413 ab (protokoll-assist,
+# 08.10.2026); die Registry nimmt Schichten stueckweise an.
 #
 # MinIO: Die Objekte kommen ueber die S3-Schnittstelle heraus, nicht als
 # Rohdaten des Volumes (das Format auf der Platte ist MinIO-intern). mc laeuft
@@ -25,7 +27,7 @@ set -euo pipefail
 APP_DIR=${DEPLOY_PATH:-/opt/apps/vectiscan}
 REPO_DIR=${CI_PROJECT_DIR:?nur im CI-Job aufrufen}
 ARBEIT="$REPO_DIR/umzug-arbeit"
-PAKET="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/umzug/${CI_PIPELINE_ID}"
+BILD="${CI_REGISTRY_IMAGE}/umzug:${CI_PIPELINE_ID}"
 BUCKETS="scan-rawdata scan-reports scan-authorizations scan-screenshots scan-debug"
 APP_DIENSTE="frontend api scan-worker-1 scan-worker-2 scan-worker-3 precheck-worker-1 precheck-worker-2 report-worker"
 AKTIV="'queued','scanning','passive_intel','dns_recon','scan_phase1','scan_phase2','scan_phase3','report_generating'"
@@ -35,7 +37,7 @@ if [ "${#UMZUG_SCHLUESSEL}" -lt 24 ]; then
   echo "FEHLER: UMZUG_SCHLUESSEL ist kuerzer als 24 Zeichen." >&2
   exit 1
 fi
-for t in docker curl openssl sha256sum tar find; do
+for t in docker openssl sha256sum tar find; do
   command -v "$t" >/dev/null || { echo "FEHLER: $t fehlt auf dem Runner." >&2; exit 1; }
 done
 
@@ -114,7 +116,7 @@ for b in $BUCKETS; do
 done
 rm -rf "$ARBEIT/mc"
 
-echo "== 5. Verschluesseln und in die Paket-Registry legen"
+echo "== 5. Verschluesseln und als Image ${BILD} in die Registry"
 cd "$ARBEIT"
 tar -cf minio.tar -C minio .
 rm -rf minio
@@ -122,13 +124,22 @@ sha256sum db.sql minio.tar > pruefsummen.txt
 for f in db.sql minio.tar; do
   openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt -pass env:UMZUG_SCHLUESSEL -in "$f" -out "$f.enc"
 done
-for f in db.sql.enc minio.tar.enc zaehlung.txt objekte.txt pruefsummen.txt; do
-  curl -sS --fail-with-body -H "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "$f" "$PAKET/$f" >/dev/null
-  echo "  hochgeladen: $f ($(wc -c < "$f") Bytes)"
-done
 rm -f db.sql minio.tar
+mkdir bild
+mv db.sql.enc minio.tar.enc zaehlung.txt objekte.txt pruefsummen.txt bild/
+ls -l bild | sed 's/^/  /'
+printf 'FROM scratch\nCOPY . /umzug/\n' > bild/Dockerfile
+echo "${CI_REGISTRY_PASSWORD}" | docker login "${CI_REGISTRY}" -u "${CI_REGISTRY_USER}" --password-stdin >/dev/null
+# Ohne Attestierungen: registry-extern kennt deren Medientyp nicht. Nur die
+# Umgebungsvariable, kein --provenance: der Shell-Runner baut sonst ohne
+# buildx, und der alte Builder kennt den Schalter nicht.
+BUILDX_NO_DEFAULT_ATTESTATIONS=1 docker build -q -t "$BILD" bild
+docker push -q "$BILD"
+docker rmi "$BILD" >/dev/null
+docker logout "${CI_REGISTRY}" >/dev/null
+rm -rf bild
 
 trap - EXIT
 echo ""
 echo "Export fertig. Die Anwendung auf docker02 bleibt AUS, Twenty laeuft."
-echo "Weiter: Job swarm:umzug:import in dieser Pipeline (Pipeline ${CI_PIPELINE_ID})."
+echo "Weiter: Job swarm:umzug:import in dieser Pipeline (Image ${BILD})."

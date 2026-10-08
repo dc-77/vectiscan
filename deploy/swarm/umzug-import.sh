@@ -18,7 +18,7 @@ set -eu
 
 REPO_DIR=${CI_PROJECT_DIR:?nur im CI-Job aufrufen}
 ARBEIT="$REPO_DIR/umzug-arbeit"
-PAKET="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/umzug/${CI_PIPELINE_ID}"
+BILD="${CI_REGISTRY_IMAGE}/umzug:${CI_PIPELINE_ID}"
 PRAEFIX=vect-prod-
 
 : "${UMZUG_SCHLUESSEL:?CI-Variable UMZUG_SCHLUESSEL fehlt}"
@@ -35,7 +35,7 @@ case "$MINIO_ACCESS_KEY" in
   *) echo "FEHLER: MINIO_ACCESS_KEY ist nicht der Schluessel von vect-prod. Abbruch." >&2; exit 1 ;;
 esac
 
-apk add --no-cache openssl curl postgresql-client rclone >/dev/null
+apk add --no-cache openssl postgresql-client rclone >/dev/null
 printf '%s datenknoten docker-share01\n' "$DATENKNOTEN_ADDR" >> /etc/hosts
 q() { psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -At "$@"; }
 export RCLONE_CONFIG_ZIEL_TYPE=s3
@@ -57,13 +57,21 @@ fi
 rclone mkdir "ziel:${PRAEFIX}scan-rawdata"
 echo "  Datenbank leer, MinIO auf dem Datenknoten erreichbar"
 
-echo "== 2. Export aus Pipeline ${CI_PIPELINE_ID} laden und pruefen"
+echo "== 2. Export ${BILD} laden und pruefen"
 rm -rf "$ARBEIT"
 mkdir -p "$ARBEIT"
 cd "$ARBEIT"
+echo "${CI_REGISTRY_PASSWORD}" | docker login "${CI_REGISTRY}" -u "${CI_REGISTRY_USER}" --password-stdin >/dev/null
+docker pull -q "$BILD" >/dev/null \
+  || { echo "FEHLER: ${BILD} gibt es nicht. Lief swarm:umzug:export in dieser Pipeline durch?" >&2; exit 1; }
+# Ein Image aus scratch hat kein Programm; create braucht trotzdem einen Befehl.
+cid=$(docker create "$BILD" kein-programm)
+docker cp "$cid:/umzug/." .
+docker rm "$cid" >/dev/null
+docker rmi "$BILD" >/dev/null
+docker logout "${CI_REGISTRY}" >/dev/null
 for f in pruefsummen.txt zaehlung.txt objekte.txt db.sql.enc minio.tar.enc; do
-  curl -sS --fail -H "JOB-TOKEN: ${CI_JOB_TOKEN}" -o "$f" "$PAKET/$f" \
-    || { echo "FEHLER: $f fehlt im Paket umzug/${CI_PIPELINE_ID}. Lief swarm:umzug:export durch?" >&2; exit 1; }
+  [ -s "$f" ] || { echo "FEHLER: $f fehlt im Image." >&2; exit 1; }
 done
 for f in db.sql minio.tar; do
   openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass env:UMZUG_SCHLUESSEL -in "$f.enc" -out "$f"
@@ -108,16 +116,9 @@ while IFS='|' read -r b n; do
 done < objekte.txt
 rm -rf minio
 
-echo "== 7. Paket umzug/${CI_PIPELINE_ID} loeschen"
-id=$(curl -sS -H "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-  "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages?package_name=umzug&package_version=${CI_PIPELINE_ID}" \
-  | sed -n 's/^\[{"id":\([0-9]*\).*/\1/p' || true)
-if [ -n "$id" ] && curl -sS --fail -X DELETE -H "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-     "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/$id" >/dev/null 2>&1; then
-  echo "  geloescht"
-else
-  echo "  Konnte das Paket nicht selbst loeschen. Bitte von Hand: Deploy, Package registry, umzug ${CI_PIPELINE_ID}."
-fi
+echo "== 7. Image ${BILD}"
+echo "  Bitte von Hand loeschen: Deploy, Container registry, umzug, Tag ${CI_PIPELINE_ID}."
+echo "  Der Inhalt ist verschluesselt und ohne UMZUG_SCHLUESSEL nicht lesbar."
 
 echo ""
 echo "Import fertig. Weiter: swarm:deploy:prod in dieser Pipeline starten."
