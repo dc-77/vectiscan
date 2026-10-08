@@ -496,17 +496,23 @@ deploy-auto:
     # `deploy-manual` pinnt bereits auf SHA — analog hier. Jeder Commit = eigener
     # Tag => race-immun gegen parallele Branch-Pushes.
     TAG: ${CI_COMMIT_SHORT_SHA}
+  # AUS SEIT DEM UMZUG (08.10.2026): Die Produktion laeuft im Swarm
+  # (vect-prod-vectiscan, Daten mit swarm:umzug:* uebertragen). Ein
+  # `docker compose up -d` auf docker02 startete die alte Anwendung samt
+  # Scheduler und Mailversand gegen ihre alte Datenbank wieder an, parallel
+  # zur neuen Produktion: geplante Scans und Mails an Kunden kaemen doppelt.
+  # Zurueck nur bewusst: swarm:umzug:rueckweg (docs/UMZUG-swarm.md).
   rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+    - when: never
 
 deploy-manual:
   extends: .deploy-base
   stage: deploy
   variables:
     TAG: ${CI_COMMIT_SHORT_SHA}
+  # Aus seit dem Umzug, aus demselben Grund wie deploy-auto.
   rules:
-    - if: $CI_PIPELINE_SOURCE == "web"
-      when: manual
+    - when: never
 
 # =============================================================================
 # OPS STAGE — manuelle Operations-Jobs

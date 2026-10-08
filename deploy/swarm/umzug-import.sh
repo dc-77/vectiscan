@@ -95,7 +95,7 @@ fi
 echo "== 5. Bucket-Namen in reports auf ${PRAEFIX} umstellen"
 # Die api liest den Bucket eines Berichts aus reports.minio_bucket.
 q -c "UPDATE reports SET minio_bucket = '${PRAEFIX}' || minio_bucket WHERE minio_bucket NOT LIKE '${PRAEFIX}%'" | sed 's/^/  /'
-q -c "SELECT minio_bucket || ' ' || count(*) FROM reports GROUP BY 1 ORDER BY 1" | sed 's/^/  /'
+q -c "SELECT minio_bucket || ' ' || count(*) FROM reports GROUP BY minio_bucket ORDER BY minio_bucket" | sed 's/^/  /'
 
 echo "== 6. MinIO-Objekte nach ${PRAEFIX}* auf dem Datenknoten"
 mkdir -p minio

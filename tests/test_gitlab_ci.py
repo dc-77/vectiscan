@@ -169,11 +169,16 @@ def test_deploy_job_stage(ci, job):
     assert stage == "deploy"
 
 
-def test_deploy_manual_is_manual(ci):
-    job = ci["deploy-manual"]
-    rules = job.get("rules", [])
-    has_manual = any(r.get("when") == "manual" for r in rules)
-    assert has_manual, "deploy-manual should have when: manual"
+@pytest.mark.parametrize("job", ["deploy-auto", "deploy-manual"])
+def test_docker02_deploys_are_off(ci, job):
+    """Seit dem Umzug in den Swarm (08.10.2026) darf nichts mehr auf docker02 deployen.
+
+    Ein `docker compose up -d` dort startete die alte Anwendung samt Scheduler
+    gegen ihre alte Datenbank wieder an, parallel zur Produktion im Swarm.
+    """
+    rules = ci[job].get("rules", [])
+    assert rules and all(r.get("when") == "never" for r in rules), \
+        f"{job} muss aus sein (rules: when: never), docs/UMZUG-swarm.md"
 
 
 def test_deploy_auto_environment_url(ci):
