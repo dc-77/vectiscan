@@ -37,7 +37,8 @@
 #                            hier ohne eigene Zeile; die beiden Log-Alarme von
 #                            VectiScan stehen dort in loki/rules/fake/vectiscan.yml.
 #   keycloak, oauth2-proxy   ersetzt durch den Stack identity: Grafana meldet
-#                            sich am Realm vect-prod an, Zugang ueber die Gruppe
+#                            sich am Realm betrieb an (seit 07.10.2026, vorher
+#                            vect-prod), Zugang ueber die Gruppe
 #                            grafana-editoren. Die App selbst nutzt kein Keycloak.
 #   twenty (CRM)             eigener Umzug, laeuft vorerst auf docker02; die api
 #                            erreicht es ueber CRM_WEBHOOK_URL (Prod) oder bleibt

@@ -205,13 +205,15 @@ stehen die Einträge für `scan.vectigal.tech`, `vectiscan.de` und
 `deploy` in monitoring-services, sobald die Namen auf den Swarm zeigen; vorher
 mäße die Prüfung docker02.
 
-**Anmeldung.** Grafana meldet sich am Realm `vect-prod` des Stacks `identity`
-an. Zugang gibt die Gruppe `grafana-editoren` (Rolle `editor` am Client
+**Anmeldung.** Grafana meldet sich seit dem 07.10.2026 am Realm `betrieb`
+des Stacks `identity` an, dem Realm für die Betreuer beider Mandanten (vorher
+`vect-prod`). Zugang gibt die Gruppe `grafana-editoren` (Rolle `editor` am Client
 `grafana-api`, Schlüssel `gruppen` in `identity-services/anwendungen/grafana.yml`). Editor und nicht
 Viewer, weil Grafana die Logsuche (Explore) erst ab Editor freigibt. Die
-Personen legt man von Hand im Realm `vect-prod` an und nimmt sie in die Gruppe
-auf (README von identity-services, „Den Realm-Admin anlegen“, gleiches
-Vorgehen). Wer heute im Realm `vectiscan` des eigenen Keycloak steht, zeigt
+Konten legt man auf einem Swarm-Manager aus einem Klon von identity-services an,
+je Person einmal `sudo bash werkzeuge/betrieb-konten.sh anlegen` mit der Rolle
+`editor`; das Skript nimmt die Person dabei in die Gruppe auf (README von
+identity-services, „Grafana in den Realm betrieb umziehen“). Wer heute im Realm `vectiscan` des eigenen Keycloak steht, zeigt
 der Job `ops-keycloak-list-users` auf docker02. Die App selbst meldet weiter
 über ihr eigenes JWT an und braucht keinen Client im Stack `identity`.
 
