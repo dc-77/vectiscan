@@ -160,7 +160,8 @@ der Gruppe `vectigal`.
 ### 1.5 Platz im Cluster
 
 Drei Knoten mit je 4 CPU und 7,76 GiB, zusammen 12 CPU und 23,3 GiB
-(06.10.2026). VectiScan Prod reserviert 3,5 CPU und 6,25 GiB; die Grenzen
+(06.10.2026). VectiScan Prod reserviert 1,0 CPU (20 Tasks zu je 0,05) und
+6,25 GiB; die Grenzen
 (`limits`) aller Prod-Dienste ergeben zusammen 24,5 GiB, also mehr, als der
 Cluster insgesamt hat. Swarm plant nur nach den Reservierungen, die Grenzen
 greifen erst, wenn ein Container sie wirklich braucht. Ob das trägt, hängt am
@@ -168,6 +169,16 @@ tatsächlichen Verbrauch unter Last (auf docker02 messbar mit `docker stats`)
 und daran, wie viel die übrigen Stacks schon belegen. Vor dem Prod-Fenster
 messen; reicht es nicht, ist `REPLICAS` je Dienst die Stellschraube, und
 zap-2 bis zap-4 hängen an den Scan-Workern.
+
+**Knapp ist die CPU-Reservierung, nicht der Speicher** (08.10.2026). Mit
+ursprünglich 0,1 und 0,25 Kernen je Task reservierte VectiScan 3,5 Kerne. Der
+erste `swarm:deploy:prod` (Pipeline 3390) blieb mit sechs Tasks auf
+„insufficient resources“ hängen. Gemessen danach: 4,00, 4,00 und 3,80 von je 4
+Kernen reserviert, beim Speicher rund 4,4 von 7,8 GiB je Knoten. Der Rest des
+Clusters belegte 9,5 Kerne (Knoten 01: 3,35, 02: 3,65, 03: 2,50). Mit 0,05 je
+Task kommt der engste Knoten auf 3,95 von 4. Damit bleibt keine Reserve für
+den Ausfall eines Knotens; das betrifft den ganzen Cluster, nicht nur
+VectiScan.
 
 ### 1.6 Überwachung und Anmeldung über die Plattform
 

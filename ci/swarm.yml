@@ -211,9 +211,16 @@ swarm:deploy:prod:
     REDIS_EVENT_PREFIX: "vect-prod:"
     REPLICAS: "3"
     EXTRA_REPLICAS: "1"
-    RES_CPUS: "0.1"
+    # CPU-Reservierung 0,05 je Task (08.10.2026). Mit 0,1 und 0,25 reservierte
+    # VectiScan 3,5 Kerne; der Cluster hatte vorher 9,5 von 12 vergeben, und
+    # der erste swarm:deploy:prod blieb mit sechs Tasks auf "insufficient
+    # resources" haengen (Pipeline 3390). 20 Tasks x 0,05 = 1,0 Kern; der
+    # engste Knoten (swarm-02) kommt damit auf 3,95 von 4. Die Grenzen
+    # (limits) bleiben, rechnen duerfen die Container also weiter bis dahin.
+    # Speicher war nicht knapp (rund 4,4 von 7,8 GiB je Knoten reserviert).
+    RES_CPUS: "0.05"
     RES_MEM: 128M
-    HEAVY_RES_CPUS: "0.25"
+    HEAVY_RES_CPUS: "0.05"
     HEAVY_RES_MEM: 512M
     # Twenty bleibt vorerst auf docker02 und ist von hier nur ueber den
     # oeffentlichen Namen erreichbar (Router twenty-api, Bearer CRM_API_KEY).
