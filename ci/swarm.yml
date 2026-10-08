@@ -221,9 +221,15 @@ swarm:deploy:prod:
     # Vorgabe wie im docker02-Deploy; eine Projektvariable gleichen Namens
     # gewinnt, so wie dort.
     STRIPE_PRICE_PERIMETER: price_1TewEA1j7RvmOvLYHNA2lyM2
+    # STRIPE_SECRET_KEY bewusst nicht geprueft (08.10.2026): Die Produktion
+    # lief auf docker02 mit dem Testschluessel (sk_test_, Scope *), der Umzug
+    # aendert daran nichts. Die Pruefung auf _live_ hielt den ersten
+    # swarm:deploy:prod an (Pipeline 3386). Sobald VectiScan live abrechnet:
+    # STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET und die Preise mit Scope
+    # vect-prod anlegen und hier wieder STRIPE_SECRET_KEY=_live_ eintragen.
     FELD_PRUEFUNG: >-
       DATABASE_URL=:5433/ REDIS_URL=:6380/0 REDIS_CACHE_URL=:6379/0
-      MINIO_ACCESS_KEY=vect-prod- STRIPE_SECRET_KEY=_live_
+      MINIO_ACCESS_KEY=vect-prod-
   environment:
     name: vect-prod
     deployment_tier: production
