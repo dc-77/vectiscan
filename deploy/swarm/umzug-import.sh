@@ -6,7 +6,7 @@
 # Environment vect-prod: DATABASE_URL ist die Prod-Datenbank auf 5433,
 # MINIO_ACCESS_KEY der Schluessel vect-prod-app (Policy auf vect-prod-*).
 #
-# Die Datenbank muss LEER sein, also vor dem ersten swarm:deploy:prod: die
+# Die Datenbank muss LEER sein, also vor dem ersten deploy:prod (bis 14.10.2026 swarm:deploy:prod): die
 # api legt beim Start das Schema selbst an. Ist sie es nicht, bricht der Job
 # ab, ohne etwas zu veraendern (docs/UMZUG-swarm.md, Abschnitt 3).
 #
@@ -48,7 +48,7 @@ echo "== 1. Ziel pruefen (noch nichts veraendert)"
 q -c "SELECT current_database() || ' als ' || current_user || ' auf Port ' || current_setting('port')"
 tabellen=$(q -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind IN ('r','p') AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_toast%'")
 if [ "$tabellen" -ne 0 ]; then
-  echo "FEHLER: Die Prod-Datenbank hat schon $tabellen Tabellen. Lief swarm:deploy:prod schon?" >&2
+  echo "FEHLER: Die Prod-Datenbank hat schon $tabellen Tabellen. Lief deploy:prod schon?" >&2
   echo "        Dann gehoert sie erst geloescht und leer neu angelegt (Runbook, Abschnitt 3)." >&2
   exit 1
 fi
@@ -88,7 +88,7 @@ q -f "$REPO_DIR/deploy/swarm/umzug-zaehlen.sql" > zaehlung-ziel.txt
 if diff zaehlung.txt zaehlung-ziel.txt; then
   echo "  gleich: $(wc -l < zaehlung-ziel.txt) Tabellen"
 else
-  echo "FEHLER: Zeilenzahlen weichen ab (oben). swarm:deploy:prod NICHT starten." >&2
+  echo "FEHLER: Zeilenzahlen weichen ab (oben). deploy:prod NICHT starten." >&2
   exit 1
 fi
 
@@ -121,5 +121,5 @@ echo "  Bitte von Hand loeschen: Deploy, Container registry, umzug, Tag ${CI_PIP
 echo "  Der Inhalt ist verschluesselt und ohne UMZUG_SCHLUESSEL nicht lesbar."
 
 echo ""
-echo "Import fertig. Weiter: swarm:deploy:prod in dieser Pipeline starten."
+echo "Import fertig. Weiter: deploy:prod in dieser Pipeline starten."
 echo "docker02 bleibt aus; die Namen kommen mit der Umstellung des Wildcards."

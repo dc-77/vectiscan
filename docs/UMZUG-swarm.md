@@ -230,6 +230,13 @@ der Job `ops-keycloak-list-users` auf docker02. Die App selbst meldet weiter
 
 ### 1.7 Einschalten
 
+> **Stand 14.10.2026:** Den Schalter gibt es nicht mehr. Swarm ist fest
+> vorgesehen, `.gitlab-ci.yml` bindet ci-templates ohne Bedingung ein wie die
+> anderen Projekte, und die Projektvariable `VECTISCAN_SWARM` kann weg. Die
+> Deploy-Jobs heißen seitdem `deploy:test` und `deploy:prod` (vorher
+> `swarm:deploy:test` und `swarm:deploy:prod`); die übrigen `swarm:*`-Jobs
+> behalten ihren Namen. Der Text unten beschreibt den Umzug, wie er lief.
+
 Projektvariable `VECTISCAN_SWARM` auf `an`. Ab dem nächsten Push auf `main`
 laufen `swarm:build`, `swarm:trivy`, `swarm:lint` und `swarm:deploy:test`
 mit. Der Build dauert so lange wie der für docker02 und läuft parallel auf dem

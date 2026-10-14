@@ -21,26 +21,31 @@ stages:
   - test
   - deploy
   # Swarm, vect-prod (ci/swarm.yml). Vor ops, damit ops-Jobs beider Ziele
-  # am Ende stehen; swarm:deploy:prod blockiert nicht (allow_failure).
+  # am Ende stehen; deploy:prod blockiert nicht (allow_failure).
   - deploy-prod
   - ops
 
 # =============================================================================
-# SWARM -- Umzug von docker02 in den Swarm-Cluster (06.10.2026)
+# SWARM -- vect-test und vect-prod (seit 08.10.2026 die Produktion)
 # =============================================================================
-# Zweites Ziel neben docker02, geschaltet ueber die Projektvariable
-# VECTISCAN_SWARM=an. Solange sie fehlt, wird ci/swarm.yml gar nicht erst
-# eingebunden, und damit auch nicht vectigal/ci-templates. Das ist Absicht:
-# ci-templates ist privat, und ein include gelingt nur, wenn der Ausloeser der
-# Pipeline es lesen darf. Die Projekt-Bots von vectiscan duerfen das nicht --
-# ein Push mit dem Projekt-Token vectiscan_claude_code bekaeme sonst keinen
-# einzigen Job, also auch keinen Deploy auf docker02 (Pruefung 07.10.2026,
-# docs/UMZUG-swarm.md, Abschnitt 1.7). Jobs, Felder und Begruendungen in
-# ci/swarm.yml.
+# ci-templates wird eingebunden wie in allen anderen Projekten: ohne Bedingung,
+# Ref v4, swarm-deploy.yml. Bis zum 14.10.2026 hing beides an der
+# Projektvariablen VECTISCAN_SWARM; seit Swarm fest vorgesehen ist, gibt es den
+# Schalter nicht mehr. Damit erreichen Aenderungen am Template vectiscan wie
+# jedes andere Projekt (zuletzt v4.5.0: ergebnis:prod).
+#
+# Folge, schon seit VECTISCAN_SWARM=an galt: ci-templates ist privat, und ein
+# include gelingt nur, wenn der Ausloeser der Pipeline es lesen darf. Ein Push
+# mit einem Projekt-Token ohne Lesezugriff auf vectigal/ci-templates (etwa
+# vectiscan_claude_code, Pruefung 07.10.2026) bekommt keine Pipeline.
+#
+# Die Swarm-Jobs stehen in ci/swarm.yml, weil tests/test_compose_images.py
+# diese Datei mit yaml.safe_load liest und dort kein `!reference` stehen darf.
 include:
+  - project: vectigal/ci-templates
+    ref: v4
+    file: /swarm-deploy.yml
   - local: /ci/swarm.yml
-    rules:
-      - if: $VECTISCAN_SWARM == "an"
 
 # =============================================================================
 # WORKFLOW — welche Pipelines ueberhaupt entstehen

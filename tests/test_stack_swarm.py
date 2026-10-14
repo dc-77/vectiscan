@@ -4,7 +4,7 @@ Swarm-Umzug, 06.10.2026. Laeuft im CI-Job test-edge neben
 test_edge_admin_guard.py und test_compose_images.py (pyyaml, pytest).
 
 Geprueft wird die Stack-Datei so, wie der Deploy-Job sie je Feld ausrollt: die
-Variablen aus swarm:deploy:test und swarm:deploy:prod werden eingesetzt. Die
+Variablen aus deploy:test und deploy:prod werden eingesetzt. Die
 Router-Invarianten sind dieselben wie fuer docker-compose.yml und kommen aus
 test_edge_admin_guard.py, damit es fuer den Admin-Schutz nur eine Quelle gibt.
 """
@@ -19,7 +19,7 @@ import yaml
 import test_edge_admin_guard as edge
 
 ROOT = Path(__file__).resolve().parents[1]
-FELDER = ("swarm:deploy:test", "swarm:deploy:prod")
+FELDER = ("deploy:test", "deploy:prod")
 EINSPRUNG = ["/bin/sh", "/run/vectiscan/secrets-entrypoint.sh"]
 _VAR = re.compile(r"\$\{([A-Z0-9_]+)(?::-([^}]*))?\}")
 
@@ -88,7 +88,7 @@ def test_admin_schutz_je_feld(feld, svc, public_router, admin_router, prefix, re
 
 
 def test_prod_bedient_alle_frontend_namen():
-    regel = _labels("swarm:deploy:prod")["frontend"]["traefik.http.routers.vectiscan-prod-web.rule"]
+    regel = _labels("deploy:prod")["frontend"]["traefik.http.routers.vectiscan-prod-web.rule"]
     assert set(edge._hosts_in_rule(regel)) == {"scan.vectigal.tech", "vectiscan.de", "www.vectiscan.de"}
 
 
@@ -154,7 +154,7 @@ def test_jeder_scan_worker_hat_seinen_zap():
 
 
 def test_prod_mit_drei_repliken():
-    assert _werte("swarm:deploy:prod")["REPLICAS"] == "3"
+    assert _werte("deploy:prod")["REPLICAS"] == "3"
 
 
 def test_precheck_mit_begrenzter_parallelitaet():
@@ -175,7 +175,7 @@ def test_ueberwachung_und_anmeldung_kommen_von_der_plattform():
 # --- Trennung der Felder -------------------------------------------------------
 
 def test_testfeld_traegt_kein_prod_merkmal():
-    test = _werte("swarm:deploy:test")
+    test = _werte("deploy:test")
     assert test["MINIO_BUCKET_PREFIX"] == "vect-test-"
     assert test["REDIS_EVENT_PREFIX"] == "vect-test:"
     assert ":5432/" in test["FELD_PRUEFUNG"] and "_test_" in test["FELD_PRUEFUNG"]

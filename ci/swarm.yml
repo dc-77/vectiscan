@@ -1,10 +1,10 @@
 # =============================================================================
 # ci/swarm.yml -- VectiScan im Docker Swarm, zwei Felder (vect-test, vect-prod)
 # =============================================================================
-# Eingebunden aus .gitlab-ci.yml. Die Jobs fuer docker02 dort bleiben
-# unangetastet: bis zum Prod-Fenster ist docker02 die Produktion, und ein Push
-# auf main rollt sie weiter aus. Ablauf, Vorbedingungen und Variablen:
-# docs/UMZUG-swarm.md.
+# Eingebunden aus .gitlab-ci.yml. Seit dem 08.10.2026 laeuft die Produktion
+# hier in vect-prod; die Deploy-Jobs fuer docker02 dort (deploy-auto,
+# deploy-manual) stehen auf `when: never`. Ablauf, Vorbedingungen und
+# Variablen: docs/UMZUG-swarm.md.
 #
 # Eigene Datei statt Bloecke in .gitlab-ci.yml aus zwei Gruenden: Der Umzug
 # laesst sich spaeter in einem Schritt zurueckbauen oder zur einzigen Pipeline
@@ -13,13 +13,16 @@
 #
 #   Push auf main -> swarm:build (api, scan-worker, report-worker,
 #                    frontend, frontend-test) -> swarm:trivy -> swarm:lint
-#                 -> swarm:deploy:test (automatisch)
-#                 -> swarm:deploy:prod (manuell, Stage deploy-prod)
+#                 -> deploy:test (automatisch)
+#                 -> deploy:prod (manuell, Stage deploy-prod)
+#                 -> ergebnis:prod (aus ci-templates, macht die Pipeline rot,
+#                    wenn deploy:prod scheitert)
 #
-# SCHALTER: Nichts hier laeuft, solange die Projektvariable VECTISCAN_SWARM
-# nicht auf "an" steht. Damit kann die Datei auf main liegen, bevor Datenbank,
-# MinIO-Schluessel und Variablen fuer die Felder stehen; sonst waere jede
-# Pipeline von main rot.
+# ci-templates bindet .gitlab-ci.yml ein, wie in den anderen Projekten. Den
+# Schalter VECTISCAN_SWARM gibt es seit dem 14.10.2026 nicht mehr, und die
+# Deploy-Jobs heissen seitdem wie ueberall deploy:test und deploy:prod (vorher
+# swarm:deploy:test und swarm:deploy:prod). Nur unter dem Namen deploy:prod
+# findet ergebnis:prod den Prod-Job.
 #
 # NUR PUSH-PIPELINES bauen und deployen automatisch. vectiscan startet viele
 # Web- und API-Pipelines fuer seine ops-Jobs, und die Synchronisationsjobs
@@ -31,11 +34,6 @@
 # steht BASE_IMAGE unten an jedem Job: Der Swarm zieht aus der GitLab-Registry
 # mit dem Deploy-Token der Gruppe, die eigenen Images auf ghcr.io sind privat.
 # =============================================================================
-
-include:
-  - project: vectigal/ci-templates
-    ref: v4
-    file: /swarm-deploy.yml
 
 # --- gemeinsame Bausteine ----------------------------------------------------
 
@@ -61,14 +59,10 @@ include:
 
 .vs:automatisch:
   rules:
-    - if: $VECTISCAN_SWARM != "an"
-      when: never
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
 
 .vs:manuell:
   rules:
-    - if: $VECTISCAN_SWARM != "an"
-      when: never
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
       when: manual
     - if: $CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == "main"
@@ -150,8 +144,12 @@ swarm:lint:
 
 # --- vect-test ---------------------------------------------------------------
 
-swarm:deploy:test:
-  extends: [.swarm:deploy, .vs:swarm, .vs:automatisch]
+# Von .swarm:deploy-auto wie in den anderen Projekten, nicht von .swarm:deploy:
+# seit ci-templates v4.5.0 ist .swarm:deploy allow_failure (fuer den manuellen
+# Prod-Deploy), und ein gescheiterter Test-Deploy waere sonst nur orange und
+# gaebe deploy:prod trotzdem frei. Die Rules kommen aus .vs:automatisch.
+deploy:test:
+  extends: [.swarm:deploy-auto, .vs:swarm, .vs:automatisch]
   stage: deploy
   variables:
     STACK_NAME: vect-test-vectiscan
@@ -188,14 +186,14 @@ swarm:deploy:test:
 # Manuell und NICHT blockierend (allow_failure: true): Die ops-Jobs von
 # docker02 stehen in der Stage danach und haben kein `needs: []`. Ein
 # blockierender manueller Job hier liesse sie in jeder Pipeline auf "created"
-# stehen, bis jemand Prod ausrollt.
+# stehen, bis jemand Prod ausrollt. Ab ci-templates v4.5.0 kommt derselbe Wert
+# aus .swarm:deploy; er steht hier trotzdem, damit das nicht vom Stand von v4
+# abhaengt. Rot wird die Pipeline bei einem Fehlschlag ueber ergebnis:prod.
 
-swarm:deploy:prod:
+deploy:prod:
   extends: [.swarm:deploy, .vs:swarm]
   stage: deploy-prod
   rules:
-    - if: $VECTISCAN_SWARM != "an"
-      when: never
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
       when: manual
   allow_failure: true
@@ -284,7 +282,7 @@ swarm:ps:prod:
 # swarm:umzug:export wartet auf deploy-auto: der startet die Anwendung auf
 # docker02 mit `docker compose up -d` neu und machte das Anhalten sonst
 # wieder rueckgaengig. Danach in dieser Reihenfolge: export, import,
-# swarm:deploy:prod.
+# deploy:prod (bis 14.10.2026 swarm:deploy:prod).
 
 swarm:umzug:export:
   extends: [.vs:manuell]
