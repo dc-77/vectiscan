@@ -33,6 +33,13 @@ ALERT_PAGE_SIZE = 500
 ALERT_READ_TIMEOUT = 120
 ALERT_MAX_TOTAL = 5000
 
+# Warten auf die Passiv-Queue: der Passiv-Scanner arbeitet jeden Treffer von
+# Spider und Active Scan nach. 30 Sekunden reichten dafuer nur auf kleinen
+# Zielen; danach wurden die Alerts trotzdem geholt und die unvollstaendige
+# Menge als vollstaendig verbucht. Grosszuegiger warten und das Ergebnis des
+# Wartens auswerten, statt still eine Teilmenge auszugeben.
+PASSIVE_WAIT_TIMEOUT = 300
+
 # Thread-local pool assignment: worker.py leases a zap_id for the duration
 # of a host scan and stores it here. ZapClient() (no args) reads it as
 # fallback so every existing call site picks up the right daemon without
@@ -369,12 +376,16 @@ class ZapClient:
     # Passive Scanner
     # ------------------------------------------------------------------
 
-    def wait_for_passive_scan(self, timeout: int = 30) -> bool:
+    def wait_for_passive_scan(self, timeout: int = PASSIVE_WAIT_TIMEOUT) -> bool:
         """Wait for ZAP passive scanner queue to drain.
 
         The passive scanner runs automatically on all traffic (spider, active scan).
         After spider/active scan completes, there may still be items queued.
         Call this before collecting alerts to ensure passive findings are included.
+
+        Gibt True zurueck, wenn die Queue leer ist, und False, wenn das
+        Zeitlimit zuerst greift. Der Aufrufer muss False auswerten: die danach
+        geholten Alerts sind dann unvollstaendig.
         """
         return self.poll_until_complete(
             lambda: int(self._get("/JSON/pscan/view/recordsToScan/").get("recordsToScan", "0")),

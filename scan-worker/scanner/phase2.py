@@ -450,7 +450,8 @@ def _is_exchange_host(tech_profile: dict[str, Any] | None) -> bool:
 
 
 def _build_zap_alert_summary(all_alerts: list[dict[str, Any]], passive_count: int,
-                             active_count: int) -> dict[str, Any]:
+                             active_count: int,
+                             passive_queue_drained: bool = True) -> dict[str, Any]:
     """DB-Zeile fuer ZAP: Konfidenz und Risiko je Meldung, top_alerts nicht auf 20
     gekuerzt (S6c/Q14, spec/11 N2). Der Konfidenzfilter Q14 ist sonst nicht
     pruefbar. Die volle Rohliste steht im Tar (zap_alerts.json); ueberschreitet die
@@ -478,6 +479,9 @@ def _build_zap_alert_summary(all_alerts: list[dict[str, Any]], passive_count: in
         "confidence_distribution": conf_dist,
         "top_alerts": [_alert_row(a) for a in all_alerts],
         "truncated": False,
+        # False: das Zeitlimit griff vor der leeren Queue, die Passivbefunde
+        # sind dann unvollstaendig (ehrlicher Vermerk statt stiller Teilmenge).
+        "passive_queue_drained": passive_queue_drained,
     }
     if len(json.dumps(summary)) > 49000:
         keep = 60
@@ -1748,6 +1752,15 @@ def run_phase2(
 
         try:
             context_id = zap.create_context(context_name)
+            # Den Kontext sofort melden, nicht erst nach dem Spider. Scheiterte
+            # der Spider, blieb _zap_context leer, obwohl der Kontext in ZAP
+            # bestand: Stage 3 verbuchte dann "no_zap_context" und warf die vom
+            # Passiv-Scanner bereits erzeugten Alerts weg (Auftrag abcac6eb,
+            # mehrere Hosts). Die Listen der gespiderten VHosts bleiben bewusst
+            # bis zum Erfolg leer, damit Stage 2 den Active Scan sauber
+            # ueberspringt, statt gegen einen leeren Site-Tree zu laufen.
+            r["_zap_context"] = context_name
+            r["_zap_context_id"] = context_id
             # Include ALL primary VHosts in context scope (Multi-VHost-Probe)
             for fqdn_item in context_fqdns:
                 zap.include_in_context(context_name, f".*{_re.escape(fqdn_item)}.*")
@@ -1828,8 +1841,6 @@ def run_phase2(
             unique_urls = sorted(set(all_spider_urls))
             r["zap_spider_urls"] = unique_urls
             r["_tools"].append("zap_spider")
-            r["_zap_context"] = context_name
-            r["_zap_context_id"] = context_id
             r["_zap_spidered_fqdns"] = spidered
             r["_zap_context_fqdns"] = context_fqdns
 
@@ -2375,12 +2386,19 @@ def run_phase2(
 
     # ── Stage 3: Collect ZAP alerts (passive + active) ────────
     if zap_context:
-        from scanner.tools.zap_client import ZapError
+        from scanner.tools.zap_client import PASSIVE_WAIT_TIMEOUT, ZapError
         from scanner.tools.zap_mapper import ZapAlertMapper
         try:
             zap = _zap_client()
             log.info("zap_waiting_for_passive", ip=ip)
-            zap.wait_for_passive_scan(timeout=30)
+            # Ergebnis des Wartens auswerten: lief das Zeitlimit ab, sind die
+            # Passivbefunde unvollstaendig. Die Alerts werden trotzdem geholt
+            # (Teilmenge ist besser als nichts), der Mangel wird aber in der
+            # Zeile vermerkt, statt als vollstaendig durchzugehen.
+            passive_drained = zap.wait_for_passive_scan()
+            if not passive_drained:
+                log.warning("zap_passive_queue_not_drained", ip=ip,
+                            timeout=PASSIVE_WAIT_TIMEOUT)
 
             all_alerts_raw = zap.get_alerts()
 
@@ -2447,7 +2465,8 @@ def run_phase2(
                                 f"{len(all_alerts)} alerts ({passive_count} passive, {active_count} active)")
 
             raw_summary = json.dumps(
-                _build_zap_alert_summary(all_alerts, passive_count, active_count),
+                _build_zap_alert_summary(all_alerts, passive_count, active_count,
+                                         passive_queue_drained=passive_drained),
                 indent=2)
             record_tool_run(order_id, ip, 2, "zap", "ok",
                             exit_code=0, duration_ms=0,
