@@ -539,8 +539,19 @@ def build_groups(index: FactsIndex, scope: str, group_by: str) -> list[Group]:
             aliases = index.aliases_for(name, ip)
             # S6b-4n (spec/11 N2): im Namen einer Header-Gruppe nur Aliasnamen mit eigener Messung;
             # bergersysteme cdn hat eigenes Zertifikat und keine Header-Messung ("+cdn" in VS-007).
+            # Erweiterung: dasselbe gilt fuer TLS-Gruppen, und der Namensgeber selbst muss
+            # gemessen sein. Bei lumbeck-wolter wies der Host die Webverbindungen ab; testssl
+            # lief nur an den Mail- und FTP-Ports des Aliasnamens. Die Gruppe hiess trotzdem
+            # nach dem Webnamen, und ein Befund an Port 21 las sich als Aussage ueber die
+            # Website ("Transportverschluesselung auf www...: kein TLS 1.3").
             gezeigt = [a for a in aliases if scope != "http" or (a, ip) in index.http_by_key]
-            ensure("fqdn", _fqdn_key(name, ip), label=name if not gezeigt else f"{name} (+{', '.join(gezeigt)})",
+            titel = name
+            gemessen = {"http": index.http_by_key, "tls": index.tls_by_key}.get(scope)
+            if gemessen is not None and (name, ip) not in gemessen:
+                kandidaten = [a for a in aliases if (a, ip) in gemessen]
+                if kandidaten:
+                    titel, gezeigt = kandidaten[0], kandidaten[1:]
+            ensure("fqdn", _fqdn_key(name, ip), label=titel if not gezeigt else f"{titel} (+{', '.join(gezeigt)})",
                    host=index.host(ip), fqdn_name=name, fqdn_names=[name, *aliases])
         for it in items:
             if it.host_ip is None:

@@ -2131,7 +2131,7 @@
     "cert_hostname_mismatch"
    ],
    "evidence": "testssl.sh\njunkerwerk.de:110 · Zertifikat für: *.your-server.de · weitere Namen: *.your-server.de, your-server.de · Aussteller: Thawte TLS RSA CA G1 (DigiCert Inc from US) · gültig bis: 02.11.2026, 23:59 UTC · Name passt nicht: ja · Erneuerung laut CT-Logs: zuletzt 31 Tage vor Ablauf erneuert (05.07.2026); nächste Erneuerung nach diesem Muster um den 19.12.2026; 2 Zertifikate dieser Linie (DigiCert Inc)\n\ntestssl.sh\njunkerwerk.de:143 · Zertifikat für: *.your-server.de · weitere Namen: *.your-server.de, your-server.de · Aussteller: Thawte TLS RSA CA G1 (DigiCert Inc from US) · gültig bis: 02.11.2026, 23:59 UTC · Name passt nicht: ja · Erneuerung laut CT-Logs: zuletzt 31 Tage vor Ablauf erneuert (05.07.2026); nächste Erneuerung nach diesem Muster um den 19.12.2026; 2 Zertifikate dieser Linie (DigiCert Inc)\n\ntestssl.sh\njunkerwerk.de:21 · Zertifikat für: *.your-server.de · weitere Namen: *.your-server.de, your-server.de · Aussteller: Thawte TLS RSA CA G1 (DigiCert Inc from US) · gültig bis: 02.11.2026, 23:59 UTC · Name passt nicht: ja · Erneuerung laut CT-Logs: zuletzt 31 Tage vor Ablauf erneuert (05.07.2026); nächste Erneuerung nach diesem Muster um den 19.12.2026; 2 Zertifikate dieser Linie (DigiCert Inc)\n\ntestssl.sh\njunkerwerk.de:465 · Zertifikat für: *.your-server.de · weitere Namen: *.your-server.de, your-server.de · Aussteller: Thawte TLS RSA CA G1 (DigiCert Inc from US) · gültig bis: 02.11.2026, 23:59 UTC · Name passt nicht: ja · Erneuerung laut CT-Logs: zuletzt 31 Tage vor Ablauf erneuert (05.07.2026); nächste Erneuerung nach diesem Muster um den 19.12.2026; 2 Zertifikate dieser Linie (DigiCert Inc)\n\ntestssl.sh\njunkerwerk.de:587 · Zertifikat für: *.your-server.de · weitere Namen: *.your-server.de, your-server.de · Aussteller: Thawte TLS RSA CA G1 (DigiCert Inc from US) · gültig bis: 02.11.2026, 23:59 UTC · Name passt nicht: ja · Erneuerung laut CT-Logs: zuletzt 31 Tage vor Ablauf erneuert (05.07.2026); nächste Erneuerung nach diesem Muster um den 19.12.2026; 2 Zertifikate dieser Linie (DigiCert Inc)\n\ntestssl.sh\njunkerwerk.de:993 · Zertifikat für: *.your-server.de · weitere Namen: *.your-server.de, your-server.de · Aussteller: Thawte TLS RSA CA G1 (DigiCert Inc from US) · gültig bis: 02.11.2026, 23:59 UTC · Name passt nicht: ja · Erneuerung laut CT-Logs: zuletzt 31 Tage vor Ablauf erneuert (05.07.2026); nächste Erneuerung nach diesem Muster um den 19.12.2026; 2 Zertifikate dieser Linie (DigiCert Inc)\n\nund eine weitere Fundstelle gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
-   "found": "Für den Dienst www.junkerwerk.de (+junkerwerk.de) passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen Hostnamen: junkerwerk.de:110 (Zertifikat für *.your-server.de), junkerwerk.de:143 (Zertifikat für *.your-server.de), junkerwerk.de:21 (Zertifikat für *.your-server.de), junkerwerk.de:465 (Zertifikat für *.your-server.de), junkerwerk.de:587 (Zertifikat für *.your-server.de), junkerwerk.de:993 (Zertifikat für *.your-server.de), junkerwerk.de:995 (Zertifikat für *.your-server.de).",
+   "found": "Für den Dienst junkerwerk.de passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen Hostnamen: junkerwerk.de:110 (Zertifikat für *.your-server.de), junkerwerk.de:143 (Zertifikat für *.your-server.de), junkerwerk.de:21 (Zertifikat für *.your-server.de), junkerwerk.de:465 (Zertifikat für *.your-server.de), junkerwerk.de:587 (Zertifikat für *.your-server.de), junkerwerk.de:993 (Zertifikat für *.your-server.de), junkerwerk.de:995 (Zertifikat für *.your-server.de).",
    "id": "VS-2026-005",
    "impact": "Ein TLS-Client kann die Identität des Dienstes nicht anhand des Zertifikats bestätigen und muss die Sicherheitswarnung entweder ablehnen oder ignorieren. Werden solche Warnungen ignoriert, fällt ein echter Man-in-the-Middle-Angriff mit einem passend gefälschten Zertifikat nicht mehr auf.",
    "key": "cert_health/188.40.3.130/kunde",
@@ -2185,7 +2185,7 @@
       "www.junkerwerk.de@188.40.3.130|junkerwerk.de:995@188.40.3.130"
      ],
      "statement": "observation[0]",
-     "text": "Für den Dienst www.junkerwerk.de (+junkerwerk.de) passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen Hostnamen: junkerwerk.de:110 (Zertifikat für *.your-server.de), junkerwerk.de:143 (Zertifikat für *.your-server.de), junkerwerk.de:21 (Zertifikat für *.your-server.de), junkerwerk.de:465 (Zertifikat für *.your-server.de), junkerwerk.de:587 (Zertifikat für *.your-server.de), junkerwerk.de:993 (Zertifikat für *.your-server.de), junkerwerk.de:995 (Zertifikat für *.your-server.de)."
+     "text": "Für den Dienst junkerwerk.de passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen Hostnamen: junkerwerk.de:110 (Zertifikat für *.your-server.de), junkerwerk.de:143 (Zertifikat für *.your-server.de), junkerwerk.de:21 (Zertifikat für *.your-server.de), junkerwerk.de:465 (Zertifikat für *.your-server.de), junkerwerk.de:587 (Zertifikat für *.your-server.de), junkerwerk.de:993 (Zertifikat für *.your-server.de), junkerwerk.de:995 (Zertifikat für *.your-server.de)."
     },
     {
      "check": "cert_hostname_mismatch",
@@ -2272,7 +2272,7 @@
     "cert_hostname_mismatch|www.junkerwerk.de@188.40.3.130"
    ],
    "threat": null,
-   "title": "Zertifikate auf www.junkerwerk.de (+junkerwerk.de): Zertifikat passt nicht zum Namen",
+   "title": "Zertifikate auf junkerwerk.de: Zertifikat passt nicht zum Namen",
    "urgency": "In Kürze",
    "verify": "Verbindung zum Dienst unter dem öffentlichen Hostnamen mit einem TLS-Client aufbauen und das Zertifikat prüfen; erwartet wird ein gemeinsamer Name oder ein alternativer Antragstellername, der zu diesem Hostnamen passt."
   },
@@ -4073,7 +4073,7 @@
     "tls_no_13"
    ],
    "evidence": "testssl.sh\njunkerwerk.de:21 · Protokolle: TLS 1.2",
-   "found": "Der Dienst www.junkerwerk.de (+junkerwerk.de) bietet TLS 1.2 an, jedoch keine Unterstützung für TLS 1.3: junkerwerk.de:21.",
+   "found": "Der Dienst junkerwerk.de bietet TLS 1.2 an, jedoch keine Unterstützung für TLS 1.3: junkerwerk.de:21.",
    "id": "VS-2026-015",
    "impact": "TLS 1.3 vereinfacht den Verbindungsaufbau, entfernt veraltete Verschlüsselungsoptionen und verkleinert die Angriffsfläche gegenüber älteren Protokollversionen. Ohne TLS 1.3 bleibt der Dienst auf den größeren Funktionsumfang von TLS 1.2 angewiesen.",
    "key": "tls_hardening/188.40.3.130/kunde",
@@ -4115,7 +4115,7 @@
       "www.junkerwerk.de@188.40.3.130|junkerwerk.de:21@188.40.3.130"
      ],
      "statement": "observation[0]",
-     "text": "Der Dienst www.junkerwerk.de (+junkerwerk.de) bietet TLS 1.2 an, jedoch keine Unterstützung für TLS 1.3: junkerwerk.de:21."
+     "text": "Der Dienst junkerwerk.de bietet TLS 1.2 an, jedoch keine Unterstützung für TLS 1.3: junkerwerk.de:21."
     },
     {
      "check": "tls_no_13",
@@ -4159,7 +4159,7 @@
     "tls_no_13|www.junkerwerk.de@188.40.3.130"
    ],
    "threat": null,
-   "title": "Transportverschlüsselung auf www.junkerwerk.de (+junkerwerk.de): kein TLS 1.3",
+   "title": "Transportverschlüsselung auf junkerwerk.de: kein TLS 1.3",
    "urgency": "Strategisch",
    "verify": "Verbindungsversuch mit einem auf TLS 1.3 beschränkten Client gegen den Dienst durchführen; erwartet wird ein erfolgreicher Verbindungsaufbau."
   },
@@ -4709,7 +4709,7 @@
     "key": "D",
     "level": 2,
     "name": "Web- und Transport-Hygiene",
-    "note": "Zertifikate auf www.junkerwerk.de (+junkerwerk.de): Zertifikat passt nicht zum Namen; Transportverschlüsselung auf 217.243.248.29: veraltete Protokollversionen, kein Schutz vor Rückstufung und bekannte Schwäche der Verschlüsselung",
+    "note": "Zertifikate auf junkerwerk.de: Zertifikat passt nicht zum Namen; Transportverschlüsselung auf 217.243.248.29: veraltete Protokollversionen, kein Schutz vor Rückstufung und bekannte Schwäche der Verschlüsselung",
     "status": "gelb"
    },
    {
