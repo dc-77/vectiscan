@@ -5,7 +5,13 @@ from unittest.mock import MagicMock, patch
 import pytest
 import requests
 
-from scanner.tools.zap_client import ZapClient, ZapError
+from scanner.tools.zap_client import (
+    ALERT_PAGE_SIZE,
+    ALERT_READ_TIMEOUT,
+    READ_TIMEOUT,
+    ZapClient,
+    ZapError,
+)
 
 
 @pytest.fixture
@@ -191,6 +197,82 @@ class TestAlerts:
         with patch.object(zap, "_get", return_value={"alerts": []}):
             result = zap.get_alerts()
             assert result == []
+
+
+class TestAlertPagination:
+    """Abholung der Alerts in Seiten.
+
+    Ein einziger Aufruf mit count=5000 lief auf grossen Zielen in den
+    Lesetimeout; der Host verlor dadurch alle Befunde (Auftrag 11aa6a3c,
+    rankingcoach: 10 von 15 Hosts mit 0 Alerts trotz vollstaendigem Spider).
+    """
+
+    def test_eine_seite_ein_aufruf(self, zap):
+        """Weniger Alerts als eine Seite fasst: genau eine Anfrage."""
+        with patch.object(zap, "_get", return_value={"alerts": [{"a": 1}, {"a": 2}]}) as m:
+            result = zap.get_alerts()
+            assert len(result) == 2
+            assert m.call_count == 1
+
+    def test_mehrere_seiten_werden_zusammengefuegt(self, zap):
+        """Volle erste Seite zieht eine zweite Anfrage mit passendem Versatz nach."""
+        seite1 = [{"id": i} for i in range(ALERT_PAGE_SIZE)]
+        seite2 = [{"id": ALERT_PAGE_SIZE + i} for i in range(7)]
+        with patch.object(zap, "_get", side_effect=[{"alerts": seite1},
+                                                    {"alerts": seite2}]) as m:
+            result = zap.get_alerts()
+
+        assert len(result) == ALERT_PAGE_SIZE + 7
+        assert result[0]["id"] == 0
+        assert result[-1]["id"] == ALERT_PAGE_SIZE + 6
+        assert m.call_count == 2
+        # Versatz der zweiten Anfrage steht hinter der ersten Seite.
+        assert m.call_args_list[0].args[1]["start"] == "0"
+        assert m.call_args_list[1].args[1]["start"] == str(ALERT_PAGE_SIZE)
+
+    def test_keine_anfrage_ueber_die_seitengroesse(self, zap):
+        """Regression: nie wieder count=5000 in einer einzigen Anfrage."""
+        seiten = [{"alerts": [{"id": i} for i in range(ALERT_PAGE_SIZE)]} for _ in range(3)]
+        seiten.append({"alerts": []})
+        with patch.object(zap, "_get", side_effect=seiten) as m:
+            zap.get_alerts()
+        for aufruf in m.call_args_list:
+            assert int(aufruf.args[1]["count"]) <= ALERT_PAGE_SIZE
+
+    def test_obergrenze_wird_eingehalten(self, zap):
+        """``count`` begrenzt die Gesamtmenge ueber alle Seiten."""
+        seite = [{"id": i} for i in range(ALERT_PAGE_SIZE)]
+        with patch.object(zap, "_get", return_value={"alerts": seite}) as m:
+            result = zap.get_alerts(count=ALERT_PAGE_SIZE + 10)
+
+        assert len(result) == ALERT_PAGE_SIZE + 10
+        # Die zweite Seite fordert nur noch den Rest an.
+        assert m.call_args_list[1].args[1]["count"] == "10"
+
+    def test_eigener_lesetimeout(self, zap):
+        """Die Alertseiten laufen mit ALERT_READ_TIMEOUT, nicht mit READ_TIMEOUT."""
+        with patch.object(zap, "_get", return_value={"alerts": []}) as m:
+            zap.get_alerts()
+        assert m.call_args.kwargs["read_timeout"] == ALERT_READ_TIMEOUT
+        assert ALERT_READ_TIMEOUT > READ_TIMEOUT
+
+    def test_fehler_auf_spaeterer_seite_bleibt_ausfall(self, zap):
+        """Ein Timeout auf Seite zwei wird durchgereicht, nicht stillschweigend
+        als Teilmenge ausgegeben: der Aufrufer schreibt die Zeile als gescheitert."""
+        seite1 = [{"id": i} for i in range(ALERT_PAGE_SIZE)]
+        with patch.object(zap, "_get", side_effect=[{"alerts": seite1},
+                                                    ZapError("ZAP request timed out")]):
+            with pytest.raises(ZapError):
+                zap.get_alerts()
+
+    def test_basisadresse_bleibt_in_jeder_seite(self, zap):
+        """Der Domainfilter darf ab Seite zwei nicht verloren gehen."""
+        seite1 = [{"id": i} for i in range(ALERT_PAGE_SIZE)]
+        with patch.object(zap, "_get", side_effect=[{"alerts": seite1},
+                                                    {"alerts": []}]) as m:
+            zap.get_alerts(base_url="https://example.com")
+        for aufruf in m.call_args_list:
+            assert aufruf.args[1]["baseurl"] == "https://example.com"
 
 
 # ---------------------------------------------------------------------------
