@@ -23,6 +23,16 @@ ZAP_BASE_URL = os.environ.get("ZAP_BASE_URL", "http://zap:8090")
 CONNECT_TIMEOUT = 5
 READ_TIMEOUT = 30
 
+# Abholung der Alerts: ZAP serialisiert alle angeforderten Alerts in eine
+# einzige Antwort. Bei grossen Zielen (rankingcoach: 2252 gespiderte URLs)
+# brauchte ein Aufruf mit count=5000 laenger als READ_TIMEOUT, die Anfrage lief
+# in den Timeout und der komplette Host verlor seine Befunde ("alles oder
+# nichts", 10 von 15 Hosts in Auftrag 11aa6a3c). Deshalb seitenweise holen und
+# fuer diese Seiten einen eigenen, groesseren Lesetimeout verwenden.
+ALERT_PAGE_SIZE = 500
+ALERT_READ_TIMEOUT = 120
+ALERT_MAX_TOTAL = 5000
+
 # Thread-local pool assignment: worker.py leases a zap_id for the duration
 # of a host scan and stores it here. ZapClient() (no args) reads it as
 # fallback so every existing call site picks up the right daemon without
@@ -161,8 +171,13 @@ class ZapClient:
     # Internal helpers
     # ------------------------------------------------------------------
 
-    def _get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
-        """GET request to ZAP API. Returns parsed JSON response."""
+    def _get(self, path: str, params: dict[str, Any] | None = None,
+             read_timeout: int | None = None) -> dict[str, Any]:
+        """GET request to ZAP API. Returns parsed JSON response.
+
+        ``read_timeout`` ueberschreibt den Lesetimeout fuer diesen einen
+        Aufruf; ohne Angabe gilt READ_TIMEOUT.
+        """
         url = f"{self.base_url}{path}"
         # S0a: Kontext fuer jede ZapError -- welcher Endpunkt, welche Parameter,
         # welche Pool-Instanz. Ohne das ist "does_not_exist" nicht zuordenbar.
@@ -171,7 +186,7 @@ class ZapClient:
         try:
             resp = self.session.get(
                 url, params=params or {},
-                timeout=(CONNECT_TIMEOUT, READ_TIMEOUT),
+                timeout=(CONNECT_TIMEOUT, read_timeout or READ_TIMEOUT),
             )
             resp.raise_for_status()
             return resp.json()
@@ -670,18 +685,45 @@ class ZapClient:
         base_url: str = "",
         context_name: str = "",
         start: int = 0,
-        count: int = 5000,
+        count: int = ALERT_MAX_TOTAL,
     ) -> list[dict[str, Any]]:
         """Get all alerts, optionally filtered by base URL.
 
+        Holt die Alerts seitenweise (ALERT_PAGE_SIZE je Anfrage) statt in einem
+        Zug. Ein einzelner Aufruf ueber alle Alerts lief auf grossen Zielen in
+        den Lesetimeout und kostete den ganzen Host seine Befunde; eine Seite
+        von 500 Alerts beantwortet ZAP verlaesslich. ``start`` ist der
+        Startversatz, ``count`` die Obergrenze ueber alle Seiten.
+
         Returns list of alert dicts from ZAP.
         """
-        params: dict[str, Any] = {"start": str(start), "count": str(count)}
-        if base_url:
-            params["baseurl"] = base_url
-        data = self._get("/JSON/alert/view/alerts/", params)
-        alerts = data.get("alerts", [])
-        log.info("zap_alerts_retrieved", count=len(alerts), base_url=base_url[:60] if base_url else "all")
+        alerts: list[dict[str, Any]] = []
+        offset = start
+        while len(alerts) < count:
+            page_size = min(ALERT_PAGE_SIZE, count - len(alerts))
+            params: dict[str, Any] = {"start": str(offset), "count": str(page_size)}
+            if base_url:
+                params["baseurl"] = base_url
+            try:
+                data = self._get("/JSON/alert/view/alerts/", params,
+                                 read_timeout=ALERT_READ_TIMEOUT)
+            except ZapError:
+                # Ehrlicher Ausfall: der Aufrufer schreibt die Zeile als
+                # gescheitert. Die Zahl der bis dahin geholten Alerts steht im
+                # Log, damit erkennbar ist, ab welcher Seite es klemmt.
+                log.warning("zap_alert_page_failed", retrieved=len(alerts),
+                            offset=offset, page_size=page_size)
+                raise
+            page = data.get("alerts", [])
+            alerts.extend(page)
+            if len(alerts) >= count:
+                del alerts[count:]  # Obergrenze gilt auch, wenn ZAP mehr liefert
+                break
+            if len(page) < page_size:
+                break  # letzte Seite
+            offset += len(page)
+        log.info("zap_alerts_retrieved", count=len(alerts),
+                 base_url=base_url[:60] if base_url else "all")
         return alerts
 
     def message_status(self, message_id: str) -> Optional[int]:
