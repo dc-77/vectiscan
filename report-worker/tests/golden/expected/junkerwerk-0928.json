@@ -57,7 +57,7 @@
    "cat": "D",
    "scale": "hygiene",
    "level": "hoch",
-   "group": "www.junkerwerk.de (+junkerwerk.de)",
+   "group": "junkerwerk.de",
    "affected": [
     "junkerwerk.de:110 (Zertifikat für *.your-server.de)",
     "junkerwerk.de:143 (Zertifikat für *.your-server.de)",
@@ -594,7 +594,7 @@
    "cat": "D",
    "scale": "hygiene",
    "level": "niedrig",
-   "group": "www.junkerwerk.de (+junkerwerk.de)",
+   "group": "junkerwerk.de",
    "affected": [
     "junkerwerk.de:21"
    ],
@@ -720,7 +720,7 @@
    "check": "cert_chain_incomplete",
    "family": "cert_chain_incomplete",
    "cat": "D",
-   "group": "www.junkerwerk.de (+junkerwerk.de)",
+   "group": "junkerwerk.de",
    "title": "Zertifikatskette vollständig"
   },
   {
@@ -760,7 +760,7 @@
    "check": "cert_expired",
    "family": "cert_expired",
    "cat": "D",
-   "group": "www.junkerwerk.de (+junkerwerk.de)",
+   "group": "junkerwerk.de",
    "title": "Zertifikat gültig"
   },
   {
@@ -1056,7 +1056,7 @@
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
-   "group": "www.junkerwerk.de (+junkerwerk.de)",
+   "group": "junkerwerk.de",
    "title": "Keine schwachen TLS-Cipher"
   }
  ]
