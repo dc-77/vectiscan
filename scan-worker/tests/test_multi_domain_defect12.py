@@ -234,8 +234,12 @@ def test_phase0_sammelt_dns_fuer_jede_domain(tmp_path):
     """Der Defekt: nur die erste Domain bekam DNS-Fakten."""
     mock_dns, mock_axfr = _run_phase0_with_extras(tmp_path, ["junkerwerk.hu"])
 
+    # Beide Abrufe laufen im selben ThreadPoolExecutor (phase0.py:1916/1925),
+    # die Reihenfolge ist also nicht zugesichert. Geprueft wird, DASS jede
+    # Domain drankommt, und genau einmal; eine Ordnungszusage waere falsch und
+    # fiel auf dem belasteten Runner (Pipeline 3609) auch um.
     domains = [c.args[0] for c in mock_dns.call_args_list]
-    assert domains == ["junkerwerk.de", "junkerwerk.hu"]
+    assert sorted(domains) == ["junkerwerk.de", "junkerwerk.hu"]
 
     zusatz = [c for c in mock_dns.call_args_list if c.args[0] == "junkerwerk.hu"][0]
     assert zusatz.kwargs["filename"] == "dns_records_junkerwerk.hu.json"
@@ -247,7 +251,7 @@ def test_phase0_sammelt_dns_fuer_jede_domain(tmp_path):
     assert primaer.kwargs["label_domain"] == "junkerwerk.de"
 
     axfr_domains = [c.args[0] for c in mock_axfr.call_args_list]
-    assert axfr_domains == ["junkerwerk.de", "junkerwerk.hu"]
+    assert sorted(axfr_domains) == ["junkerwerk.de", "junkerwerk.hu"]
 
 
 def test_phase0_ohne_zusatzdomains_unveraendert(tmp_path):
