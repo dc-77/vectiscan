@@ -175,7 +175,7 @@ trivy-report-worker:
 test-api:
   stage: test
   tags: [vectigal]
-  image: node:20-alpine
+  image: node:22.23.4-alpine
   script:
     - cd api && npm ci && npm test
   rules:

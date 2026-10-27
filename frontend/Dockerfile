@@ -1,5 +1,5 @@
 # Build stage
-FROM node:22-alpine AS builder
+FROM node:22.23.4-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -15,7 +15,7 @@ ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
 RUN npm run build
 
 # Production stage
-FROM node:22-slim
+FROM node:22.23.4-slim
 # Sicherheits-Patches gegen aktuelle CVEs in der Debian-Basis (z.B.
 # libgnutls30 CVE-2026-33845/42010, vom Trivy-Scan erkannt). Wird bei
 # jedem Build neu ausgefuehrt — kostet ~30s, reduziert CRITICAL-CVEs.
