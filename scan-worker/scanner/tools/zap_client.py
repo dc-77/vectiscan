@@ -8,6 +8,7 @@ multiple scan-worker replicas can share one ZAP instance without interference.
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 import threading
@@ -39,6 +40,34 @@ ALERT_MAX_TOTAL = 5000
 # Menge als vollstaendig verbucht. Grosszuegiger warten und das Ergebnis des
 # Wartens auswerten, statt still eine Teilmenge auszugeben.
 PASSIVE_WAIT_TIMEOUT = 300
+
+# Obergrenze allein genuegt nicht: das Warten faellt je Host an, und 300
+# Sekunden mal 15 Hosts sprengen das Gesamtbudget eines Auftrags. In
+# Auftrag 419e00cc (rankingcoach, 15 Hosts) lief der Scan deshalb nach dem
+# Paginierungs-Fix in das Zeitlimit von 120 Minuten, obwohl die Befunde je
+# Host vollstaendig waren. Das Warten bekommt darum einen festen Anteil am
+# Gesamtbudget, aufgeteilt auf die Wellen, in denen die Hosts laufen.
+PASSIVE_WAIT_MIN_TIMEOUT = 30
+PASSIVE_WAIT_BUDGET_SHARE = 0.15
+
+
+def passive_wait_budget(total_timeout: int, host_count: int,
+                        parallelism: int) -> int:
+    """Zeitlimit fuer das Warten auf die Passiv-Queue je Host.
+
+    ``total_timeout`` ist das Gesamtbudget des Auftrags, ``parallelism`` die
+    Zahl gleichzeitig laufender Hosts. Die Hosts laufen in Wellen; das Warten
+    darf zusammen nur ``PASSIVE_WAIT_BUDGET_SHARE`` des Budgets kosten, also
+    je Welle ein Bruchteil davon. Das Ergebnis liegt immer zwischen
+    ``PASSIVE_WAIT_MIN_TIMEOUT`` und ``PASSIVE_WAIT_TIMEOUT``: unter dem
+    Mindestwert hat das Warten keinen Zweck, ueber der Obergrenze bringt es
+    nichts mehr. Fail-open: unbrauchbare Angaben ergeben die Obergrenze.
+    """
+    if total_timeout <= 0 or host_count <= 0 or parallelism <= 0:
+        return PASSIVE_WAIT_TIMEOUT
+    wellen = math.ceil(host_count / parallelism)
+    anteil = int(total_timeout * PASSIVE_WAIT_BUDGET_SHARE / wellen)
+    return max(PASSIVE_WAIT_MIN_TIMEOUT, min(PASSIVE_WAIT_TIMEOUT, anteil))
 
 # Thread-local pool assignment: worker.py leases a zap_id for the duration
 # of a host scan and stores it here. ZapClient() (no args) reads it as

@@ -36,6 +36,7 @@ from scanner.upload import enqueue_report_job, pack_results, prewarm_buckets, up
 from scanner.ai_strategy import plan_host_strategy, plan_phase2_config, plan_tech_analysis
 from scanner import scope as scope_module
 from scanner import zap_pool
+from scanner.tools.zap_client import passive_wait_budget
 from scanner.tools.zap_client import set_thread_zap_id as _set_thread_zap_id
 
 log = structlog.get_logger()
@@ -920,6 +921,20 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
             pool_enabled = False
             redis_client_pool = None
 
+    # Zeitlimit fuer das Warten auf die ZAP-Passiv-Queue. Es faellt je Host an
+    # und bekommt deshalb nur einen Anteil am Gesamtbudget; die Parallelitaet
+    # steht erst unten fest, hier zaehlt die Obergrenze des Pools.
+    if pool_enabled:
+        _p2_parallel_erwartet = max(1, min(zap_pool.get_max_parallel_per_order(),
+                                           len(scannable)))
+    else:
+        _p2_parallel_erwartet = max(1, min(5, len(scannable))) if not has_zap else 1
+    passive_wait_timeout = passive_wait_budget(
+        int(config["total_timeout"]), len(scannable), _p2_parallel_erwartet)
+    log.info("zap_passive_wait_budget", timeout=passive_wait_timeout,
+             hosts=len(scannable), parallel=_p2_parallel_erwartet,
+             total_timeout=config["total_timeout"])
+
     def _run_phase2_host(idx: int, host: dict[str, Any], tech_profile: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         ip = host["ip"]
         fqdns = host["fqdns"]
@@ -940,7 +955,8 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
             result = run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
                                 adaptive_config=adaptive_configs.get(ip, {}),
                                 vhost_fqdns=host_vhost_fqdns,
-                                deadline_monotonic=start + config["total_timeout"])
+                                deadline_monotonic=start + config["total_timeout"],
+                                passive_wait_timeout=passive_wait_timeout)
             return idx, result
 
         # Pool-Mode: lease a ZAP, run, release — even on error.
@@ -982,7 +998,8 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
             result = run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
                                 adaptive_config=adaptive_configs.get(ip, {}),
                                 vhost_fqdns=host_vhost_fqdns,
-                                deadline_monotonic=start + config["total_timeout"])
+                                deadline_monotonic=start + config["total_timeout"],
+                                passive_wait_timeout=passive_wait_timeout)
             return idx, result
         finally:
             hb_stop.set()

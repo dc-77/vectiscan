@@ -47,7 +47,7 @@ def _mock_zap():
     return zap
 
 
-def _phase2_mit(mock_zap, order_id, tmp_path):
+def _phase2_mit(mock_zap, order_id, tmp_path, **kwargs):
     """Phase 2 mit gemocktem ZAP fahren und die geschriebenen Zeilen liefern."""
     from scanner.phase2 import run_phase2
 
@@ -62,7 +62,8 @@ def _phase2_mit(mock_zap, order_id, tmp_path):
         config = dict(get_config("perimeter"))
         config["package"] = "perimeter"
         run_phase2("1.2.3.4", ["example.com"], _tech_profile(),
-                   str(tmp_path / "scan"), order_id, MagicMock(), config)
+                   str(tmp_path / "scan"), order_id, MagicMock(), config,
+                   **kwargs)
     return rec
 
 
@@ -135,8 +136,13 @@ class TestPassivQueue:
         assert sig.parameters["timeout"].default == PASSIVE_WAIT_TIMEOUT
         assert PASSIVE_WAIT_TIMEOUT > READ_TIMEOUT
 
-    def test_phase2_uebergibt_keine_30_sekunden(self, tmp_path):
-        """Die Aufrufstelle darf das Zeitlimit nicht wieder kleinrechnen."""
+    def test_ohne_budget_gilt_die_obergrenze(self, tmp_path):
+        """Ohne Budgetangabe darf die Aufrufstelle nicht kleinrechnen.
+
+        Seit dem Budget-Deckel gibt worker.py ein berechnetes Zeitlimit vor
+        (siehe test_zap_passive_budget.py). Fehlt es, bleibt es bei der
+        Obergrenze und nicht bei den alten 30 Sekunden.
+        """
         zap = _mock_zap()
 
         _phase2_mit(zap, "aaaaaaaa-0005", tmp_path)

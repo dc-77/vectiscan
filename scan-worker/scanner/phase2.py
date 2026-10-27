@@ -1568,6 +1568,7 @@ def run_phase2(
     adaptive_config: dict[str, Any] | None = None,
     vhost_fqdns: list[str] | None = None,
     deadline_monotonic: float | None = None,
+    passive_wait_timeout: int | None = None,
 ) -> dict[str, Any]:
     """Orchestrate Phase 2 (deep scan) for a single host.
 
@@ -1584,6 +1585,9 @@ def run_phase2(
         deadline_monotonic: Strang-A Befund 3 (optional) — monotone Scan-
             Deadline (start + total_timeout). Cappt die langen Tool-Timeouts
             (wpscan/feroxbuster) auf das Restbudget. None = kein Cap.
+        passive_wait_timeout: Zeitlimit fuer das Warten auf die ZAP-Passiv-
+            Queue, von worker.py aus dem Gesamtbudget und der Zahl der Hosts
+            berechnet (``passive_wait_budget``). None = Obergrenze.
 
     Returns:
         Results summary dict. Bei Multi-VHost: results['vhost_results'][fqdn]
@@ -2386,7 +2390,11 @@ def run_phase2(
 
     # ── Stage 3: Collect ZAP alerts (passive + active) ────────
     if zap_context:
-        from scanner.tools.zap_client import PASSIVE_WAIT_TIMEOUT, ZapError
+        from scanner.tools.zap_client import (
+            PASSIVE_WAIT_MIN_TIMEOUT,
+            PASSIVE_WAIT_TIMEOUT,
+            ZapError,
+        )
         from scanner.tools.zap_mapper import ZapAlertMapper
         try:
             zap = _zap_client()
@@ -2395,10 +2403,17 @@ def run_phase2(
             # Passivbefunde unvollstaendig. Die Alerts werden trotzdem geholt
             # (Teilmenge ist besser als nichts), der Mangel wird aber in der
             # Zeile vermerkt, statt als vollstaendig durchzugehen.
-            passive_drained = zap.wait_for_passive_scan()
+            # Das Warten faellt je Host an und muss deshalb ins Gesamtbudget
+            # passen (Auftrag 419e00cc lief sonst in das Zeitlimit). Zusaetzlich
+            # gegen das Restbudget cappen: die spaeten Hosts einer Welle sollen
+            # den Auftrag nicht ueberziehen.
+            wait_timeout = _cap_timeout_to_budget(
+                passive_wait_timeout or PASSIVE_WAIT_TIMEOUT,
+                deadline_monotonic, min_timeout=PASSIVE_WAIT_MIN_TIMEOUT)
+            passive_drained = zap.wait_for_passive_scan(timeout=wait_timeout)
             if not passive_drained:
                 log.warning("zap_passive_queue_not_drained", ip=ip,
-                            timeout=PASSIVE_WAIT_TIMEOUT)
+                            timeout=wait_timeout)
 
             all_alerts_raw = zap.get_alerts()
 
